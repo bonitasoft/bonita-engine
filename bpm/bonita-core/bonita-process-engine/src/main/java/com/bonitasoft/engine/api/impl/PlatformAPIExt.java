@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2014 BonitaSoft S.A.
+ * Copyright (C) 2009, 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -24,6 +24,7 @@ import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
+import org.bonitasoft.engine.api.impl.transaction.StartServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
@@ -97,6 +98,7 @@ import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.service.BroadcastService;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.SPModelConvertor;
+import com.bonitasoft.engine.service.TaskResult;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -272,8 +274,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     private void registerTenantJobListeners(final PlatformServiceAccessor platformServiceAccessor, final Long tenantId) throws SSchedulerException {
-        BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
-        RegisterTenantJobListeners registerTenantJobListeners = new RegisterTenantJobListeners(tenantId);
+        final BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
+        final RegisterTenantJobListeners registerTenantJobListeners = new RegisterTenantJobListeners(tenantId);
         broadcastService.execute(registerTenantJobListeners, tenantId);
     }
 
@@ -377,12 +379,16 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final WorkService workService = tenantServiceAccessor.getWorkService();
             final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
 
-            final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
+            final ActivateTenant transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
                     platformAccessor.getTechnicalLoggerService(), workService, connectorExecutor, nodeConfiguration,
                     tenantServiceAccessor.getTenantConfiguration());
             transactionContent.execute();
-            //TODO remove me when bug that does not start services on tenant creation is fixed
-            tenantServiceAccessor.getReportingService().start();
+
+            final BroadcastService broadcastService = platformAccessor.getBroadcastService();
+            final SetServiceState setServiceState = new SetServiceState(tenantId, new StartServiceStrategy());
+            final Map<String, TaskResult<Void>> result = broadcastService.execute(setServiceState, tenantId);
+            handleResult(result);
+
             sessionService.deleteSession(sessionId);
         } catch (final TenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
@@ -395,6 +401,18 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw new TenantActivationException("Tenant activation: failed.", e);
         } finally {
             cleanSessionAccessor(sessionAccessor, platformSessionId);
+        }
+    }
+
+    private void handleResult(final Map<String, TaskResult<Void>> result) throws UpdateException {
+        for (final Entry<String, TaskResult<Void>> entry : result.entrySet()) {
+            if (entry.getValue().isError()) {
+                throw new UpdateException("There is at least one exception on the node " + entry.getKey(), entry.getValue().getThrowable());
+            }
+            if (entry.getValue().isTimeout()) {
+                throw new UpdateException("There is at least one timeout after " + entry.getValue().getTimeout() + " " + entry.getValue().getTimeunit()
+                        + " on the node " + entry.getKey());
+            }
         }
     }
 
@@ -425,9 +443,14 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
-
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService);
+
+            final BroadcastService broadcastService = platformAccessor.getBroadcastService();
+            final SetServiceState setServiceState = new SetServiceState(tenantId, new StopServiceStrategy());
+            final Map<String, TaskResult<Void>> result = broadcastService.execute(setServiceState, tenantId);
+            handleResult(result);
+
+            final DeactivateTenant transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
             sessionService.deleteSessionsOfTenant(tenantId);

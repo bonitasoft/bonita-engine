@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.junit.Before;
@@ -52,12 +53,19 @@ public class BusinessDataServiceImplTest {
         @OneToOne(cascade = CascadeType.ALL)
         private Entity nullChildEntity;
 
-        private List<Entity> entities;
+        @OneToMany(cascade = CascadeType.MERGE)
+        private List<Entity> aggregationEntities;
+
+        @OneToMany(cascade = CascadeType.ALL)
+        private List<Entity> compositionEntities;
+
         private final Long persistenceId;
 
         public EntityPojo(final Long persistenceId) {
             this.persistenceId = persistenceId;
-            entities = new ArrayList<Entity>();
+            aggregationEntities = new ArrayList<Entity>();
+            compositionEntities = new ArrayList<Entity>();
+
         }
 
         @Override
@@ -102,14 +110,6 @@ public class BusinessDataServiceImplTest {
             this.numbers = numbers;
         }
 
-        public List<Entity> getEntities() {
-            return entities;
-        }
-
-        public void setEntities(final List<Entity> entities) {
-            this.entities = entities;
-        }
-
         public Entity getCompositionEntity() {
             return compositionEntity;
         }
@@ -134,6 +134,21 @@ public class BusinessDataServiceImplTest {
             this.nullChildEntity = nullChildEntity;
         }
 
+        public List<Entity> getAggregationEntities() {
+            return aggregationEntities;
+        }
+
+        public void setAggregationEntities(List<Entity> aggregationEntities) {
+            this.aggregationEntities = aggregationEntities;
+        }
+
+        public List<Entity> getCompositionEntities() {
+            return compositionEntities;
+        }
+
+        public void setCompositionEntities(List<Entity> compositionEntities) {
+            this.compositionEntities = compositionEntities;
+        }
     }
 
     private final Entity pojo = new EntityPojo(1L);
@@ -281,7 +296,7 @@ public class BusinessDataServiceImplTest {
     }
 
     @Test
-    public void callJavaOperationShouldLoadEntityIfAggregation() throws Exception {
+    public void callJavaOperationShouldLoadEntitiesIfAggregation() throws Exception {
         //given
         final Long persistenceId1 = 1562L;
         final Long persistenceId2 = 9658L;
@@ -295,15 +310,15 @@ public class BusinessDataServiceImplTest {
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setEntities", List.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities", List.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
-        assertThat(pojoObject.getEntities()).as("should have set entities").isEqualTo(entities);
+        assertThat(pojoObject.getAggregationEntities()).as("should have set entities").isEqualTo(entities);
         verify(businessDataRepository).findByIds(EntityPojo.class, keys);
     }
 
     @Test
-    public void callJavaOperationShouldSetEntities() throws Exception {
+    public void callJavaOperationShouldNotLoadEntitiesIfComposition() throws Exception {
         //given
         final Long persistenceId1 = 1562L;
         final Long persistenceId2 = 9658L;
@@ -313,14 +328,15 @@ public class BusinessDataServiceImplTest {
         final List<Long> keys = Arrays.asList(persistenceId1, persistenceId2);
 
         doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
-        doReturn(entities).when(businessDataRepository).findByIds(EntityPojo.class, keys);
+        //   doReturn(entities).when(businessDataRepository).findByIds(EntityPojo.class, keys);
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setEntities", List.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setCompositionEntities", List.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
-        assertThat(pojoObject.getEntities()).as("should have set entities").isEqualTo(entities);
+        assertThat(pojoObject.getCompositionEntities()).as("should have set entities").isEqualTo(entities);
+        verify(businessDataRepository, never()).findByIds(EntityPojo.class, keys);
     }
 
     @Test(expected = SBusinessDataNotFoundException.class)
@@ -338,10 +354,10 @@ public class BusinessDataServiceImplTest {
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setEntities", List.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities", List.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
-        assertThat(pojoObject.getEntities()).as("should have set entities").isEqualTo(entities);
+        assertThat(pojoObject.getAggregationEntities()).as("should have set entities").isEqualTo(entities);
     }
 
     @Test
@@ -355,10 +371,10 @@ public class BusinessDataServiceImplTest {
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setEntities", List.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, entities, "setAggregationEntities", List.class.getName());
 
         assertThat(pojoObject).as("should return object").isNotNull();
-        assertThat(pojoObject.getEntities()).as("should have set entities").isEmpty();
+        assertThat(pojoObject.getAggregationEntities()).as("should have set entities").isEmpty();
     }
 
     @Test
@@ -399,7 +415,7 @@ public class BusinessDataServiceImplTest {
         final EntityPojo entity1 = new EntityPojo(1562L);
         final EntityPojo entity2 = new EntityPojo(persistenceId2);
         final EntityPojo entityPojo = new EntityPojo(1L);
-        entityPojo.getEntities().add(entity1);
+        entityPojo.getAggregationEntities().add(entity1);
 
         final List<EntityPojo> newEntities = Arrays.asList(entity2);
         final List<Long> keys2 = Arrays.asList(persistenceId2);
@@ -408,10 +424,10 @@ public class BusinessDataServiceImplTest {
         doReturn(entityPojo).when(businessDataRepository).merge(entityPojo);
 
         //when
-        final EntityPojo resultPojo = (EntityPojo) businessDataService.callJavaOperation(pojo, newEntities, "setEntities", List.class.getName());
+        final EntityPojo resultPojo = (EntityPojo) businessDataService.callJavaOperation(pojo, newEntities, "setAggregationEntities", List.class.getName());
 
         assertThat(resultPojo).as("should return object").isNotNull();
-        assertThat(resultPojo.getEntities()).as("should have set entities").containsExactly(entity2);
+        assertThat(resultPojo.getAggregationEntities()).as("should have set entities").containsExactly(entity2);
 
     }
 
@@ -501,14 +517,14 @@ public class BusinessDataServiceImplTest {
         //given
         final EntityPojo parentEntity = new EntityPojo(1562L);
         final EntityPojo childEntity = new EntityPojo(156842L);
-        parentEntity.getEntities().add(childEntity);
+        parentEntity.getAggregationEntities().add(childEntity);
 
         doReturn(parentEntity).when(businessDataRepository).findById(parentEntity.getClass(), parentEntity.getPersistenceId());
         doReturn(childEntity).when(businessDataRepository).findById(childEntity.getClass(), childEntity.getPersistenceId());
         //   doReturn(childEntity).when(businessDataRepository).unwrap(childEntity);
 
         //when
-        businessDataService.getJsonChildEntity(parentEntity.getClass().getName(), parentEntity.getPersistenceId(), "entities",
+        businessDataService.getJsonChildEntity(parentEntity.getClass().getName(), parentEntity.getPersistenceId(), "aggregationEntities",
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //then

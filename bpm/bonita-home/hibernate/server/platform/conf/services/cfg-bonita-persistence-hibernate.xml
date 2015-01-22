@@ -75,6 +75,7 @@
 				<entry key="org.bonitasoft.engine.dependency.model.SDependency" value="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" />
 				<entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" />
 				<entry key="org.bonitasoft.engine.identity.model.SUser" value="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
+				<entry key="org.bonitasoft.engine.identity.model.SUserLogin" value="org.bonitasoft.engine.identity.model.impl.SUserLoginImpl" />
 				<entry key="org.bonitasoft.engine.identity.model.SRole" value="org.bonitasoft.engine.identity.model.impl.SRoleImpl" />
 				<entry key="org.bonitasoft.engine.identity.model.SGroup" value="org.bonitasoft.engine.identity.model.impl.SGroupImpl" />
 				<entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" />
@@ -342,6 +343,7 @@
 				<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SRoleImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SUserLoginImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="read-write" />
