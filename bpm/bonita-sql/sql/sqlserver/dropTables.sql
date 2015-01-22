@@ -86,6 +86,8 @@ DROP TABLE custom_usr_inf_def
 GO
 DROP TABLE user_contactinfo
 GO
+DROP TABLE user_login
+GO
 DROP TABLE user_
 GO
 DROP TABLE role

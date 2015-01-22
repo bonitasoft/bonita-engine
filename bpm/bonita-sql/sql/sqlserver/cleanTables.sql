@@ -104,6 +104,8 @@ GO
 DELETE FROM user_contactinfo
 GO
 
+DELETE FROM user_login
+GO
 DELETE FROM user_
 GO
 

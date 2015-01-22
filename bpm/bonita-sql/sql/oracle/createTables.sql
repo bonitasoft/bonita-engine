@@ -733,11 +733,17 @@ CREATE TABLE user_ (
   createdBy NUMBER(19, 0),
   creationDate NUMBER(19, 0),
   lastUpdate NUMBER(19, 0),
-  lastConnection NUMBER(19, 0),
   UNIQUE (tenantid, userName),
   PRIMARY KEY (tenantid, id)
 );
 
+
+CREATE TABLE user_login (
+  tenantid NUMBER(19, 0) NOT NULL,
+  id NUMBER(19, 0) NOT NULL,
+  lastConnection NUMBER(19, 0),
+  PRIMARY KEY (tenantid, id)
+);
 
 CREATE TABLE user_contactinfo (
   tenantid NUMBER(19, 0) NOT NULL,

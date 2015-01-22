@@ -62,11 +62,15 @@ INSERT INTO sequence VALUES(${tenantid}, 10019, 1)
 GO
 INSERT INTO sequence VALUES(${tenantid}, 10020, 1)
 GO
+INSERT INTO sequence VALUES(${tenantid}, 10021, 1)
+GO
 INSERT INTO sequence VALUES(${tenantid}, 10030, 1)
 GO
 INSERT INTO sequence VALUES(${tenantid}, 10031, 1)
 GO
 INSERT INTO sequence VALUES(${tenantid}, 10040, 1)
+GO
+INSERT INTO sequence VALUES(${tenantid}, 20051, 1)
 GO
 INSERT INTO sequence VALUES(${tenantid}, 10050, 1)
 GO

@@ -736,12 +736,18 @@ CREATE TABLE user_ (
   createdBy INT8,
   creationDate INT8,
   lastUpdate INT8,
-  lastConnection INT8,
   UNIQUE (tenantid, userName),
   PRIMARY KEY (tenantid, id)
 );
 
 CREATE INDEX idx_user_name ON user_ (tenantid, userName);
+
+CREATE TABLE user_login (
+  tenantid INT8 NOT NULL,
+  id INT8 NOT NULL,
+  lastConnection INT8,
+  PRIMARY KEY (tenantid, id)
+);
 
 CREATE TABLE user_contactinfo (
   tenantid INT8 NOT NULL,
