@@ -30,7 +30,6 @@ import javax.inject.Inject;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository;
@@ -173,19 +172,6 @@ public class FlowNodeInstanceTests {
     }
 
     @Test
-    public void getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-
-        // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
-
-        // Then
-        assertThat(numberOfHumanTaskInstances).isEqualTo(0);
-    }
-
-    @Test
     public void searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor_should_return_number_of_process_definition_if_one_instance_has_assigned_tasks_to_the_user() {
         // Given
         buildAndAddAssignedTasks();
@@ -239,19 +225,6 @@ public class FlowNodeInstanceTests {
         // Then
         assertThat(sHumanTaskInstances.size()).isEqualTo(1);
         assertThat(sHumanTaskInstances.get(0).getId()).isEqualTo(NORMAL_HUMAN_INSTANCE_ID);
-    }
-
-    @Test
-    public void searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-
-        // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
-
-        // Then
-        assertThat(sHumanTaskInstances.size()).isEqualTo(0);
     }
 
     // All
@@ -372,18 +345,6 @@ public class FlowNodeInstanceTests {
     }
 
     @Test
-    public void getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-
-        // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
-
-        // Then
-        assertThat(numberOfHumanTaskInstances).isEqualTo(0);
-    }
-
-    @Test
     public void searchSHumanTaskInstanceAssignedAndPendingByRootProcess_should_return_number_of_process_definition_supervised_if_one_instance_has_assigned_tasks() {
         // Given
         buildAndAddAssignedTasks();
@@ -433,18 +394,6 @@ public class FlowNodeInstanceTests {
         // Then
         assertThat(sHumanTaskInstances.size()).isEqualTo(2);
         assertThat(sHumanTaskInstances.get(0).getId()).isEqualTo(NORMAL_HUMAN_INSTANCE_ID);
-    }
-
-    @Test
-    public void searchSHumanTaskInstanceAssignedAndPendingByRootProcess_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-
-        // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
-
-        // Then
-        assertThat(sHumanTaskInstances.size()).isEqualTo(0);
     }
 
     private void buildAndAddAssignedTasks() {
@@ -533,19 +482,6 @@ public class FlowNodeInstanceTests {
         // Tasks OK not assigned & pending for Bob
         final SFlowNodeInstance normalTask4 = buildAndAddNormalTask("normalTask2", ROOT_PROCESS_INSTANCE_ID);
         repository.add(aPendingActivityMapping().withActorId(actorForBob.getId()).withActivityId(normalTask4.getId()).build());
-    }
-
-    private void buildAndAddAssigneeAndHiddenTask() {
-        final SUserTaskInstanceImpl activity = (SUserTaskInstanceImpl) repository.add(aUserTask().withName("normalTask1").withStateExecuting(false)
-                .withStable(true).withTerminal(false).withDeleted(false).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID)
-                .withAssigneeId(JOHN_ID).build());
-
-        final SHiddenTaskInstanceImpl sHiddenTaskInstanceImpl = new SHiddenTaskInstanceImpl();
-        sHiddenTaskInstanceImpl.setActivityId(activity.getId());
-        sHiddenTaskInstanceImpl.setUserId(JOHN_ID);
-        sHiddenTaskInstanceImpl.setTenantId(1L);
-        sHiddenTaskInstanceImpl.setId(48L);
-        repository.add(sHiddenTaskInstanceImpl);
     }
 
     private SFlowNodeInstance buildAndAddNormalTask(final String taskName, final long rootProcessInstanceId) {

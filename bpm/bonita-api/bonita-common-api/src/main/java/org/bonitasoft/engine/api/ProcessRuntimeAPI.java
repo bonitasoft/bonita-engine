@@ -93,22 +93,6 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 public interface ProcessRuntimeAPI {
 
     /**
-     * Search for pending hidden tasks that are available to the specified user.
-     * Only searches for pending tasks for the current user: if a hidden task has been assigned
-     * or executed, it will not be retrieved.
-     *
-     * @param userId
-     *        The identifier of the user for whom to list the hidden tasks.
-     * @param searchOptions
-     *        The search criterion. See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
-     * @return The list of hidden tasks for the specified user.
-     * @throws SearchException
-     *         If an exception occurs when getting the list of tasks.
-     * @since 6.0
-     */
-    SearchResult<HumanTaskInstance> searchPendingHiddenTasks(long userId, SearchOptions searchOptions) throws SearchException;
-
-    /**
      * List all open root process instances.
      *
      * @param searchOptions
@@ -635,7 +619,6 @@ public interface ProcessRuntimeAPI {
      * Get the list of pending human task instances available to the specified user.
      * A human task is pending for a given user if it is not yet assigned and if the
      * user is a candidate either through an {@link org.bonitasoft.engine.bpm.actor.ActorMember} or through a {@link org.bonitasoft.engine.filter.UserFilter}.
-     * Hidden tasks for this user are not retrieved (see {@link #hideTasks(long, Long...)}).
      *
      * @param userId
      *        The identifier of the user.
@@ -1376,40 +1359,6 @@ public interface ProcessRuntimeAPI {
     void retryTask(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
     /**
-     * Hides a list of tasks from a specified user. A task that is "hidden" for a user is not pending for that user,
-     * so is not retrieved by #searchPendingTasksForUser.
-     * As soon as a task is claimed by or assigned to a user, it is no longer hidden from any users.
-     *
-     * @param userId
-     *        The identifier of the user.
-     * @param activityInstanceId
-     *        The list of identifiers of the tasks to be hidden.
-     * @throws InvalidSessionException
-     *         If there is no current valid session.
-     * @throws UpdateException
-     *         If a problem occurs when hiding one of the tasks.
-     * @see #unhideTasks(long, Long...)
-     * @since 6.0
-     */
-    void hideTasks(long userId, Long... activityInstanceId) throws UpdateException;
-
-    /**
-     * Un-hides a list of tasks for a specified user. Un-hiding a task makes it available for a user if the task is pending for that user.
-     *
-     * @param userId
-     *        The identifier of the user.
-     * @param activityInstanceId
-     *        The list of identifiers of the tasks to be hidden.
-     * @throws InvalidSessionException
-     *         If there is no current valid session.
-     * @throws UpdateException
-     *         If a problem occurs when un-hiding one of the tasks.
-     * @see #hideTasks(long, Long...)
-     * @since 6.0
-     */
-    void unhideTasks(long userId, Long... activityInstanceId) throws UpdateException;
-
-    /**
      * Evaluate an expression in the context of the specified process.
      * Some context values can also be provided
      *
@@ -1428,22 +1377,6 @@ public interface ProcessRuntimeAPI {
      */
     Serializable evaluateExpressionOnProcessDefinition(Expression expression, Map<String, Serializable> context, long processDefinitionId)
             throws ExpressionEvaluationException;
-
-    /**
-     * Checks whether a specified task is hidden from a given user.
-     *
-     * @param userTaskId
-     *        The identifier of the task to check.
-     * @param userId
-     *        The identifier of the user.
-     * @return True if the task is hidden from the user.
-     * @throws InvalidSessionException
-     *         If there is no current valid session
-     * @throws RetrieveException
-     *         If an error occurs while retreiving the task.
-     * @since 6.0
-     */
-    boolean isTaskHidden(long userTaskId, long userId);
 
     /**
      * Get the number of comments matching the search conditions.
@@ -1701,7 +1634,6 @@ public interface ProcessRuntimeAPI {
     /**
      * Search for all tasks available to a specified user.
      * A task is available to a user if is assigned to the user or it is pending for that user.
-     * Hidden tasks are not retrieved.
      *
      * @param userId
      *        The identifier of the user for whom the tasks are available.

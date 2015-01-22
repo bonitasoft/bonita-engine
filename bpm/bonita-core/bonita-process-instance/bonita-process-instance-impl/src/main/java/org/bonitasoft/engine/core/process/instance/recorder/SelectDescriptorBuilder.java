@@ -22,7 +22,6 @@ import java.util.Set;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
-import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
@@ -55,19 +54,6 @@ public class SelectDescriptorBuilder {
     // FIXME put in a common model
     public static <T extends PersistentObject> SelectByIdDescriptor<T> getElementById(final Class<T> clazz, final String elementName, final long id) {
         return new SelectByIdDescriptor<T>("get" + elementName + "ById", clazz, id);
-    }
-
-    public static SelectOneDescriptor<SHiddenTaskInstance> getSHiddenTask(final long userId, final long activityInstanceId) {
-        final Map<String, Object> parameters = new HashMap<String, Object>(2);
-        parameters.put("userId", userId);
-        parameters.put("activityInstanceId", activityInstanceId);
-        return new SelectOneDescriptor<SHiddenTaskInstance>("getSHiddenTaskByUserAndActivity", parameters, SHiddenTaskInstance.class);
-    }
-
-    public static SelectListDescriptor<SHiddenTaskInstance> getSHiddenTasksForActivity(final long activityInstanceId, final int fromIndex, final int maxResults) {
-        final Map<String, Object> parameters = Collections.singletonMap("activityInstanceId", (Object) activityInstanceId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
-        return new SelectListDescriptor<SHiddenTaskInstance>("getSHiddenTasksForActivity", parameters, SHiddenTaskInstance.class, queryOptions);
     }
 
     public static SelectListDescriptor<SFlowNodeInstance> getFlowNodesFromProcessInstance(final long rootContainerId, final int fromIndex, final int maxResults) {

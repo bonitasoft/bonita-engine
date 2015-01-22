@@ -523,7 +523,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         deleteDataInstancesIfNecessary(sActivityInstance, processDefinition);
         deleteConnectorInstancesIfNecessary(sActivityInstance, processDefinition);
         if (SFlowNodeType.USER_TASK.equals(sActivityInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(sActivityInstance.getType())) {
-            activityService.deleteHiddenTasksForActivity(sActivityInstance.getId());
             activityService.deletePendingMappings(sActivityInstance.getId());
         } else if (SFlowNodeType.CALL_ACTIVITY.equals(sActivityInstance.getType()) || SFlowNodeType.SUB_PROCESS.equals(sActivityInstance.getType())) {
             // in the case of a call activity or subprocess activity delete the child process instance
