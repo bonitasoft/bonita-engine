@@ -106,7 +106,6 @@ public class UserImporter {
         final long now = System.currentTimeMillis();
         userBuilder.setCreationDate(now);
         userBuilder.setLastUpdate(now);
-        userBuilder.setLastConnection(null);
 
         userBuilder.setUserName(exportedUser.getUserName());
         userBuilder.setPassword(exportedUser.getPassword());

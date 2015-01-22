@@ -8,6 +8,8 @@ DROP TABLE user_contactinfo
 GO
 DROP TABLE user_
 GO
+DROP TABLE user_login
+GO
 DROP TABLE role
 GO
 DROP TABLE group_

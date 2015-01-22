@@ -1,0 +1,55 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="cacheConfigurations" class="org.bonitasoft.engine.cache.CacheConfigurations" autowire="byType" />
+
+	<bean id="connectorCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="CONNECTOR" />
+		<property name="readIntensive" value="true" />
+	</bean>
+
+	<bean id="processDefCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="_PROCESSDEF" />
+	</bean>
+
+	<bean id="userFilterCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="USER_FILTER" />
+	</bean>
+
+	<bean id="migrationPlanCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="MIGRATION_PLAN_CACHE_NAME" />
+	</bean>
+
+	<bean id="breakpointCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="BREAKPOINTS_BY_INSTANCE" />
+	</bean>
+
+	<bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="GROOVY_SCRIPT_CACHE_NAME" />
+		<property name="maxElementsInMemory" value="10000" />
+		<property name="inMemoryOnly" value="true" />
+		<property name="eternal" value="true" />
+	</bean>
+
+	<bean id="synchroServiceCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="SYNCHRO_SERVICE_CACHE" />
+		<property name="timeToLiveSeconds" value="120" />
+		<property name="maxElementsInMemory" value="10000" />
+		<property name="inMemoryOnly" value="true" />
+	</bean>
+
+	<bean id="transientDataCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="transient_data" />
+		<property name="maxElementsInMemory" value="10000" />
+		<property name="inMemoryOnly" value="true" />
+		<property name="eternal" value="true" />
+	</bean>
+	
+	<bean id="platformCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="PLATFORM" />
+		<property name="maxElementsInMemory" value="100" />
+		<property name="inMemoryOnly" value="true" />
+		<property name="eternal" value="true" />
+	</bean>
+
+</beans>
