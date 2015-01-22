@@ -560,7 +560,6 @@ public class CommonBPMServicesTest {
         userBuilder.setIconName("iconName");
         userBuilder.setIconPath("iconPath");
         userBuilder.setJobTitle("jobTitle");
-        userBuilder.setLastConnection(3L);
         userBuilder.setLastName(lastName);
         userBuilder.setLastUpdate(4L);
         userBuilder.setManagerUserId(managerUserId);
