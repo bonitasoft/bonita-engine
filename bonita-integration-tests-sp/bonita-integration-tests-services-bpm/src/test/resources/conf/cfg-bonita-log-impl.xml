@@ -42,8 +42,6 @@
         		<entry key="FLOW_INSTANCE_UPDATED:INTERNAL" value="true" />
         		<entry key="GATEWAY_INSTANCE_CREATED:INTERNAL" value="true" />
         		<entry key="GATEWAY_INSTANCE_UPDATED:INTERNAL" value="true" />
-        		<entry key="HIDDEN_TASK_CREATED:INTERNAL" value="true" />
-        		<entry key="HIDDEN_TASK_DELETED:INTERNAL" value="true" />
         		<entry key="IDENTITY_GROUP_CREATED:INTERNAL" value="false" />
         		<entry key="IDENTITY_GROUP_DELETED:INTERNAL" value="false" />
         		<entry key="IDENTITY_GROUP_UPDATED:INTERNAL" value="false" />

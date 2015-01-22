@@ -51,7 +51,6 @@
 				<entry key="10000" value="100" /><!-- actor -->
 				<entry key="10001" value="100" /><!-- actorMapping -->
 				<entry key="10019" value="100" /><!-- Breakpoint -->
-				<entry key="10095" value="100" /><!-- HiddenTask -->
 				<entry key="10096" value="100" /><!-- Ref Business Data Instance -->
 				<entry key="10030" value="100" /><!-- category -->
 				<entry key="10040" value="100" /><!-- SDocumentMapping -->
@@ -154,7 +153,6 @@
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="10070" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="10080" />
 				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="10090" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="10095" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" value="10110" />
 				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" value="500" />
 
