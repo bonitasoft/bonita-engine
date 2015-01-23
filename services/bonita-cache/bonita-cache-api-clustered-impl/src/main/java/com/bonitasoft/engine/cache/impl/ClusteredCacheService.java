@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013, 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -23,6 +23,9 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
+/**
+ * @author Matthieu Chaffotte
+ */
 public class ClusteredCacheService extends CommonClusteredCacheService implements CacheService {
 
     private final ReadSessionAccessor sessionAccessor;
@@ -38,11 +41,6 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
         this.sessionAccessor = sessionAccessor;
     }
 
-    /**
-     * @param cacheName
-     * @return
-     * @throws SCacheException
-     */
     @Override
     protected String getKeyFromCacheName(final String cacheName) throws SCacheException {
         try {
@@ -72,12 +70,28 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
         return cacheNamesList;
     }
 
-    /**
-     * @param cacheName
-     * @return
-     */
     private String getCacheNameFromKey(final String cacheNameKey) {
         return cacheNameKey.substring(cacheNameKey.indexOf('_') + 1);
+    }
+
+    @Override
+    public void start() {
+        // do nothing, we start/stop hazelcast, not this service
+    }
+
+    @Override
+    public void stop() {
+        // do nothing, we start/stop hazelcast, not this service
+    }
+
+    @Override
+    public void pause() {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() {
+        // nothing to do
     }
 
 }
