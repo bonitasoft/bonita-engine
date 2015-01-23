@@ -42,10 +42,6 @@
 		</loadfile>
 		<echo file="${target.dir}/home/server/platform/conf/VERSION" append="false">${project.version}</echo>
 		
-    	<copy todir="${target.dir}/home/server/sql">
-    		<fileset dir="${basedir}/../../../bonita-engine/bpm/bonita-sql/sql" />
-    	</copy>
-
 	</target>
 
 

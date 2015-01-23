@@ -131,13 +131,6 @@
                                     <type>zip</type>
                                     <classifier>${bonita.home.classifier}</classifier>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.bonitasoft.engine</groupId>
-                                    <artifactId>bonita-sql</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                    <outputDirectory>${project.build.directory}/home/server</outputDirectory>
-                                </artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
