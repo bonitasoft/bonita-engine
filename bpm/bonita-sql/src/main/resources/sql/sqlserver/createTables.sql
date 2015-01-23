@@ -119,7 +119,7 @@ CREATE TABLE arch_document_mapping (
   version NVARCHAR(10) NOT NULL,
   index_ INT NOT NULL,
   archiveDate NUMERIC(19, 0) NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (tenantid, ID)
 )
 GO
 CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid, tenantid)
@@ -133,7 +133,7 @@ CREATE TABLE document (
   filename NVARCHAR(255),
   mimetype NVARCHAR(255),
   url NVARCHAR(1024),
-  content VARBINARY(MAX) NULL,
+  content VARBINARY(MAX),
   PRIMARY KEY (tenantid, id)
 )
 GO
@@ -146,7 +146,7 @@ CREATE TABLE document_mapping (
   description NVARCHAR(MAX),
   version NVARCHAR(10) NOT NULL,
   index_ INT NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (tenantid, ID)
 )
 GO
 CREATE TABLE arch_process_instance (
@@ -156,7 +156,7 @@ CREATE TABLE arch_process_instance (
   processDefinitionId NUMERIC(19, 0) NOT NULL,
   description NVARCHAR(255),
   startDate NUMERIC(19, 0) NOT NULL,
-  startedBy NUMERIC(19, 0) NOT NULL,
+  startedBy NUMERIC(19, 0) NULL,
   startedBySubstitute NUMERIC(19, 0) NOT NULL,
   endDate NUMERIC(19, 0) NOT NULL,
   archiveDate NUMERIC(19, 0) NOT NULL,
@@ -525,9 +525,9 @@ CREATE INDEX idx_biz_data_inst2 ON ref_biz_data_inst (tenantid, fn_inst_id)
 GO
 
 
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data_inst PRIMARY KEY (tenantid, id)
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data PRIMARY KEY (tenantid, id)
 GO
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT uk_ref_biz_data_inst UNIQUE (name, proc_inst_id, fn_inst_id, tenantid)
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT uk_ref_biz_data UNIQUE (name, proc_inst_id, fn_inst_id, tenantid)
 GO
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (tenantid, proc_inst_id) REFERENCES process_instance(tenantid, id) ON DELETE CASCADE
 GO
@@ -721,7 +721,7 @@ CREATE TABLE dependency (
   PRIMARY KEY (tenantid, id)
 )
 GO
-CREATE INDEX idx_dependency_name ON dependency (name)
+CREATE INDEX idx_dependency_name ON dependency (name, id)
 GO
 
 CREATE TABLE dependencymapping (
@@ -734,7 +734,7 @@ CREATE TABLE dependencymapping (
   PRIMARY KEY (tenantid, id)
 )
 GO
-CREATE INDEX idx_dependencymapping_depid ON dependencymapping (dependencyid)
+CREATE INDEX idx_dependencymapping_depid ON dependencymapping (dependencyid, id)
 GO
 ALTER TABLE dependencymapping ADD CONSTRAINT fk_depmapping_depid FOREIGN KEY (tenantid, dependencyid) REFERENCES dependency(tenantid, id) ON DELETE CASCADE
 GO
@@ -747,7 +747,7 @@ CREATE TABLE pdependency (
   PRIMARY KEY (id)
 )
 GO
-CREATE INDEX idx_pdependency_name ON pdependency (name)
+CREATE INDEX idx_pdependency_name ON pdependency (name, id)
 GO
 
 CREATE TABLE pdependencymapping (
@@ -759,7 +759,7 @@ CREATE TABLE pdependencymapping (
   PRIMARY KEY (id)
 )
 GO
-CREATE INDEX idx_pdependencymapping_depid ON pdependencymapping (dependencyid)
+CREATE INDEX idx_pdependencymapping_depid ON pdependencymapping (dependencyid, id)
 GO
 ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdepmapping_depid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE
 GO
@@ -951,7 +951,7 @@ CREATE TABLE queriablelog_p (
 )
 GO
 
-CREATE INDEX idx_queriablelog ON queriablelog_p (queriableLogId)
+CREATE INDEX idx_queriablelog ON queriablelog_p (queriableLogId, id)
 GO
 ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenantid, queriableLogId) REFERENCES queriable_log(tenantid, id)
 GO
