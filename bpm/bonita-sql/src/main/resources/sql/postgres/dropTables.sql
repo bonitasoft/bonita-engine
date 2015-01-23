@@ -6,7 +6,7 @@ DROP TABLE migration_plan;
 DROP TABLE arch_process_comment;
 DROP TABLE process_comment;
 DROP TABLE process_definition;
-DROP TABLE arch_document_mapping;
+DROP TABLE arch_document_mapping CASCADE;
 DROP TABLE document_mapping;
 DROP TABLE document;
 DROP TABLE arch_flownode_instance;

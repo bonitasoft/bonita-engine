@@ -6,7 +6,7 @@ CREATE TABLE actor (
   displayName VARCHAR2(75 CHAR),
   description VARCHAR2(1024 CHAR),
   initiator NUMBER(1),
-  UNIQUE (tenantid, id, scopeId, name),
+  CONSTRAINT UK_Actor UNIQUE (tenantid, id, scopeId, name),
   PRIMARY KEY (tenantid, id)
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE category (
   description VARCHAR2(1024 CHAR),
   creationDate NUMBER(19, 0) NOT NULL,
   lastUpdateDate NUMBER(19, 0) NOT NULL,
-  UNIQUE (tenantid, name),
+  CONSTRAINT UK_Category UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 );
 
@@ -78,7 +78,7 @@ CREATE TABLE process_comment (
   PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE process_definition (
-  tenantid NUMBER(19, 0) NOT NULL,
+  tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   processId NUMBER(19, 0) NOT NULL,
   name VARCHAR2(150 CHAR) NOT NULL,
@@ -94,8 +94,8 @@ CREATE TABLE process_definition (
   lastUpdateDate NUMBER(19, 0),
   categoryId NUMBER(19, 0),
   iconPath VARCHAR2(255 CHAR),
-  PRIMARY KEY (tenantid, id),
-  UNIQUE (tenantid, name, version)
+  PRIMARY KEY (tenantId, id),
+  CONSTRAINT UK_Process_Definition UNIQUE (tenantId, name, version)
 );
 CREATE TABLE arch_document_mapping (
   tenantid NUMBER(19, 0) NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE document (
   filename VARCHAR2(255 CHAR),
   mimetype VARCHAR2(255 CHAR),
   url VARCHAR2(1024 CHAR),
-  content BLOB NULL,
+  content BLOB,
   PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE document_mapping (
@@ -478,7 +478,7 @@ CREATE INDEX idx_biz_data_inst2 ON ref_biz_data_inst (tenantid, fn_inst_id);
 
 
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data_inst PRIMARY KEY (tenantid, id);
-ALTER TABLE ref_biz_data_inst ADD CONSTRAINT uk_ref_biz_data_inst UNIQUE (name, proc_inst_id, fn_inst_id, tenantid);
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT UK_Ref_Biz_Data_Inst UNIQUE (name, proc_inst_id, fn_inst_id, tenantId);
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (tenantid, proc_inst_id) REFERENCES process_instance(tenantid, id) ON DELETE CASCADE;
 ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_fn FOREIGN KEY (tenantid, fn_inst_id) REFERENCES flownode_instance(tenantid, id) ON DELETE CASCADE;
 
@@ -502,7 +502,7 @@ CREATE TABLE report (
   lastModificationDate NUMBER(19, 0) NOT NULL,
   screenshot BLOB,
   content BLOB,
-  UNIQUE (tenantId, name),
+  CONSTRAINT UK_Report UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)
 );
 CREATE TABLE processsupervisor (
@@ -534,7 +534,7 @@ CREATE TABLE business_app (
 );
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app ADD CONSTRAINT uk_app_token_version UNIQUE (tenantId, token, version);
+ALTER TABLE business_app ADD CONSTRAINT UK_Business_app UNIQUE (tenantId, token, version);
 
 CREATE INDEX idx_app_token ON business_app (token, tenantid);
 CREATE INDEX idx_app_profile ON business_app (profileId, tenantid);
@@ -549,7 +549,7 @@ CREATE TABLE business_app_page (
 );
 
 ALTER TABLE business_app_page ADD CONSTRAINT pk_business_app_page PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_token UNIQUE (tenantId, applicationId, token);
+ALTER TABLE business_app_page ADD CONSTRAINT UK_Business_app_page UNIQUE (tenantId, applicationId, token);
 
 CREATE INDEX idx_app_page_token ON business_app_page (applicationId, token, tenantid);
 CREATE INDEX idx_app_page_pageId ON business_app_page (pageId, tenantid);
@@ -577,7 +577,7 @@ CREATE TABLE command (
   description VARCHAR2(1024 CHAR),
   IMPLEMENTATION VARCHAR2(100 CHAR) NOT NULL,
   system NUMBER(1),
-  UNIQUE (tenantid, name),
+  CONSTRAINT UK_Command UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE arch_data_instance (
@@ -639,7 +639,7 @@ CREATE TABLE dependency (
   description VARCHAR2(1024 CHAR),
   filename VARCHAR2(255 CHAR) NOT NULL,
   value_ BLOB NOT NULL,
-  UNIQUE (tenantId, name),
+  CONSTRAINT UK_Dependency UNIQUE (tenantId, name),
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_dependency_name ON dependency (name);
@@ -650,7 +650,7 @@ CREATE TABLE dependencymapping (
   artifactid NUMBER(19, 0) NOT NULL,
   artifacttype VARCHAR2(50 CHAR) NOT NULL,
   dependencyid NUMBER(19, 0) NOT NULL,
-  UNIQUE (tenantid, dependencyid, artifactid, artifacttype),
+  CONSTRAINT UK_Dependency_Mapping UNIQUE (tenantid, dependencyid, artifactid, artifacttype),
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_dependencymapping_depid ON dependencymapping (dependencyid);
@@ -669,7 +669,7 @@ CREATE TABLE pdependencymapping (
   artifactid NUMBER(19, 0) NOT NULL,
   artifacttype VARCHAR2(50 CHAR) NOT NULL,
   dependencyid NUMBER(19, 0) NOT NULL,
-  UNIQUE (dependencyid, artifactid, artifacttype),
+  CONSTRAINT UK_PDependency_Mapping UNIQUE (dependencyid, artifactid, artifacttype),
   PRIMARY KEY (id)
 );
 ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdepmapping_depid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE;
@@ -681,7 +681,7 @@ CREATE TABLE external_identity_mapping (
   userId NUMBER(19, 0) NOT NULL,
   groupId NUMBER(19, 0) NOT NULL,
   roleId NUMBER(19, 0) NOT NULL,
-  UNIQUE (tenantid, kind, externalId, userId, groupId, roleId),
+  CONSTRAINT UK_External_Identity_Mapping UNIQUE (tenantid, kind, externalId, userId, groupId, roleId),
   PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE group_ (
@@ -696,7 +696,7 @@ CREATE TABLE group_ (
   createdBy NUMBER(19, 0),
   creationDate NUMBER(19, 0),
   lastUpdate NUMBER(19, 0),
-  UNIQUE (tenantid, parentPath, name),
+  CONSTRAINT UK_Group UNIQUE (tenantid, parentPath, name),
   PRIMARY KEY (tenantid, id)
 );
 
@@ -711,7 +711,7 @@ CREATE TABLE role (
   createdBy NUMBER(19, 0),
   creationDate NUMBER(19, 0),
   lastUpdate NUMBER(19, 0),
-  UNIQUE (tenantid, name),
+  CONSTRAINT UK_Role UNIQUE (tenantId, name),
   PRIMARY KEY (tenantid, id)
 );
 
@@ -733,7 +733,7 @@ CREATE TABLE user_ (
   createdBy NUMBER(19, 0),
   creationDate NUMBER(19, 0),
   lastUpdate NUMBER(19, 0),
-  UNIQUE (tenantid, userName),
+  CONSTRAINT UK_User UNIQUE (tenantid, userName),
   PRIMARY KEY (tenantid, id)
 );
 
@@ -773,7 +773,7 @@ CREATE TABLE custom_usr_inf_def (
   id NUMBER(19, 0) NOT NULL,
   name VARCHAR2(75 CHAR) NOT NULL,
   description VARCHAR2(1024 CHAR),
-  UNIQUE (tenantid, name),
+  CONSTRAINT UK_Custom_Usr_Inf_Def UNIQUE (tenantId, name),
   PRIMARY KEY (tenantid, id)
 );
 
@@ -854,7 +854,7 @@ CREATE TABLE page (
   lastUpdatedBy NUMBER(19, 0) NOT NULL,
   contentName VARCHAR2(50 CHAR) NOT NULL,
   content BLOB,
-  UNIQUE (tenantId, name),
+  CONSTRAINT UK_Page UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)
 );
 CREATE TABLE sequence (
@@ -873,7 +873,7 @@ CREATE TABLE blob_ (
 CREATE TABLE platform (
   id NUMBER(19, 0) NOT NULL,
   version VARCHAR2(50 CHAR) NOT NULL,
-  previousVersion VARCHAR2(50 CHAR) NOT NULL,
+  previousVersion VARCHAR2(50 CHAR),
   initialVersion VARCHAR2(50 CHAR) NOT NULL,
   created NUMBER(19, 0) NOT NULL,
   createdBy VARCHAR2(50 CHAR) NOT NULL,
@@ -908,7 +908,7 @@ CREATE TABLE profile (
   createdBy NUMBER(19, 0) NOT NULL,
   lastUpdateDate NUMBER(19, 0) NOT NULL,
   lastUpdatedBy NUMBER(19, 0) NOT NULL,
-  UNIQUE (tenantId, name),
+  CONSTRAINT UK_Profile UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)
 );
 
@@ -939,32 +939,32 @@ CREATE TABLE profilemember (
   PRIMARY KEY (tenantId, id)
 );
 CREATE TABLE job_desc (
-  tenantid NUMBER(19, 0) NOT NULL,
+  tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   jobclassname VARCHAR2(100 CHAR) NOT NULL,
   jobname VARCHAR2(100 CHAR) NOT NULL,
   description VARCHAR2(50 CHAR),
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (tenantId, id)
 );
 
 CREATE TABLE job_param (
-  tenantid NUMBER(19, 0) NOT NULL,
+  tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   jobDescriptorId NUMBER(19, 0) NOT NULL,
   key_ VARCHAR2(50 CHAR) NOT NULL,
   value_ BLOB NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (tenantId, id)
 );
 
 CREATE TABLE job_log (
-  tenantid NUMBER(19, 0) NOT NULL,
+  tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   jobDescriptorId NUMBER(19, 0) NOT NULL,
   retryNumber NUMBER(19, 0),
   lastUpdateDate NUMBER(19, 0),
-  lastMessage VARCHAR2(1024 CHAR),
+  lastMessage CLOB,
   UNIQUE (tenantId, jobDescriptorId),
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (tenantId, id)
 );
 
 ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;

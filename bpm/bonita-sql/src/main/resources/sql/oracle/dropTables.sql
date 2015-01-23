@@ -1,3 +1,9 @@
+-- ALTER TABLE dependencymapping DROP CONSTRAINT fk_depmapping_depid;
+-- ALTER TABLE job_log DROP CONSTRAINT fk_job_log_jobid;
+-- ALTER TABLE job_param DROP CONSTRAINT fk_job_param_jobid;
+-- ALTER TABLE pdependencymapping DROP CONSTRAINT fk_pdepmapping_depid;
+-- ALTER TABLE processcategorymapping DROP CONSTRAINT fk_catmapping_catid;
+-- ALTER TABLE queriablelog_p DROP CONSTRAINT fk_queriableLogId;
 DROP TABLE actormember cascade constraints purge;
 DROP TABLE actor cascade constraints purge;
 DROP TABLE processcategorymapping cascade constraints purge;

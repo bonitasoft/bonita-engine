@@ -108,7 +108,7 @@ CREATE TABLE arch_document_mapping (
   version VARCHAR(10) NOT NULL,
   index_ INT NOT NULL,
   archiveDate INT8 NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (tenantid, ID)
 );
 CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid, tenantid);
 CREATE TABLE document (
@@ -120,7 +120,7 @@ CREATE TABLE document (
   filename VARCHAR(255),
   mimetype VARCHAR(255),
   url VARCHAR(1024),
-  content BYTEA NULL,
+  content BYTEA,
   PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE document_mapping (
@@ -132,7 +132,7 @@ CREATE TABLE document_mapping (
   description TEXT,
   version VARCHAR(10) NOT NULL,
   index_ INT NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (tenantid, ID)
 );
 CREATE TABLE arch_process_instance (
   tenantid INT8 NOT NULL,
@@ -969,8 +969,7 @@ CREATE TABLE job_log (
   retryNumber INT8,
   lastUpdateDate INT8,
   lastMessage TEXT,
-  UNIQUE (tenantId, jobDescriptorId),
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (tenantid, id, jobDescriptorId)
 );
 
 ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;

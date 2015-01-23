@@ -53,6 +53,7 @@ CREATE TABLE migration_plan (
   content MEDIUMBLOB NOT NULL,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+
 CREATE TABLE arch_process_comment(
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -64,9 +65,9 @@ CREATE TABLE arch_process_comment(
   sourceObjectId BIGINT NOT NULL,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
-
 CREATE INDEX idx1_arch_process_comment on arch_process_comment (tenantid, sourceobjectid);
 CREATE INDEX idx2_arch_process_comment on arch_process_comment (processInstanceId, archivedate, tenantid);
+
 CREATE TABLE process_comment (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -77,6 +78,7 @@ CREATE TABLE process_comment (
   content VARCHAR(255) NOT NULL,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+
 CREATE TABLE process_definition (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -97,6 +99,7 @@ CREATE TABLE process_definition (
   PRIMARY KEY (tenantid, id),
   UNIQUE (tenantid, name, version)
 ) ENGINE = INNODB;
+
 CREATE TABLE arch_document_mapping (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -108,9 +111,10 @@ CREATE TABLE arch_document_mapping (
   version VARCHAR(10) NOT NULL,
   index_ INT NOT NULL,
   archiveDate BIGINT NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (tenantid, ID)
 ) ENGINE = INNODB;
 CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid, tenantid);
+
 CREATE TABLE document (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -120,9 +124,10 @@ CREATE TABLE document (
   filename VARCHAR(255),
   mimetype VARCHAR(255),
   url VARCHAR(1024),
-  content LONGBLOB NULL,
+  content LONGBLOB,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+
 CREATE TABLE document_mapping (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -132,8 +137,9 @@ CREATE TABLE document_mapping (
   description TEXT,
   version VARCHAR(10) NOT NULL,
   index_ INT NOT NULL,
-  PRIMARY KEY (tenantid, id)
+  PRIMARY KEY (tenantid, ID)
 ) ENGINE = INNODB;
+
 CREATE TABLE arch_process_instance (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -361,7 +367,7 @@ CREATE TABLE connector_instance (
   state VARCHAR(50),
   executionOrder INT,
   exceptionMessage VARCHAR(255),
-  stackTrace MEDIUMTEXT,
+  stackTrace TEXT,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 CREATE INDEX idx_ci_container_activation ON connector_instance (tenantid, containerId, containerType, activationEvent);
@@ -944,6 +950,7 @@ CREATE TABLE profilemember (
   UNIQUE (tenantId, profileId, userId, groupId, roleId),
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;
+
 CREATE TABLE job_desc (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -952,6 +959,7 @@ CREATE TABLE job_desc (
   description VARCHAR(50),
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+CREATE INDEX fk_job_desc_Id_idx ON job_desc(id ASC, tenantid ASC);
 
 CREATE TABLE job_param (
   tenantid BIGINT NOT NULL,
@@ -961,6 +969,8 @@ CREATE TABLE job_param (
   value_ MEDIUMBLOB NOT NULL,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+CREATE INDEX fk_job_param_jobId_idx ON job_param(jobDescriptorId ASC, tenantid ASC);
+ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
 
 CREATE TABLE job_log (
   tenantid BIGINT NOT NULL,
@@ -972,8 +982,8 @@ CREATE TABLE job_log (
   UNIQUE (tenantId, jobDescriptorId),
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+CREATE INDEX fk_job_log_jobId_idx ON job_log(jobDescriptorId ASC, tenantid ASC);
 
-ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
 ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
 CREATE TABLE theme (
   tenantId BIGINT NOT NULL,
