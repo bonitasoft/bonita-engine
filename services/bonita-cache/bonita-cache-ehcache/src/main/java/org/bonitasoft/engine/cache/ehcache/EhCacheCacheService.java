@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,9 +18,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.ehcache.CacheManager;
+
 import org.bonitasoft.engine.cache.CacheConfigurations;
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
@@ -32,20 +35,18 @@ import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
  */
 public class EhCacheCacheService extends CommonEhCacheCacheService implements CacheService {
 
+    private final URL configFile;
+
     public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final CacheConfigurations cacheConfigurations,
             final URL configFile) {
-        super(logger, sessionAccessor, cacheConfigurations, configFile);
+        super(logger, sessionAccessor, cacheConfigurations);
+        this.configFile = configFile;
     }
 
     public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final CacheConfigurations cacheConfigurations) {
-        super(logger, sessionAccessor, cacheConfigurations);
+        this(logger, sessionAccessor, cacheConfigurations, null);
     }
 
-    /**
-     * @param cacheName
-     * @return
-     * @throws SCacheException
-     */
     @Override
     protected String getKeyFromCacheName(final String cacheName) throws SCacheException {
         try {
@@ -61,7 +62,7 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
             return Collections.emptyList();
         }
         final String[] cacheNames = cacheManager.getCacheNames();
-        final ArrayList<String> cacheNamesList = new ArrayList<String>(cacheNames.length);
+        final List<String> cacheNamesList = new ArrayList<String>(cacheNames.length);
         String prefix;
         try {
             prefix = String.valueOf(sessionAccessor.getTenantId()) + '_';
@@ -76,12 +77,37 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
         return cacheNamesList;
     }
 
-    /**
-     * @param cacheName
-     * @return
-     */
     private String getCacheNameFromKey(final String cacheNameKey) {
         return cacheNameKey.substring(cacheNameKey.indexOf('_') + 1);
+    }
+
+    @Override
+    public synchronized void start() {
+        cacheManager = configFile != null ? new CacheManager(configFile) : new CacheManager();
+    }
+
+    @Override
+    public synchronized void stop() {
+        if (cacheManager != null) {
+            cacheManager.shutdown();
+            cacheManager = null;
+        }
+    }
+
+    @Override
+    public void pause() {
+        try {
+            clearAll();
+        } catch (final SCacheException sce) {
+            throw new SBonitaRuntimeException(sce);
+        }
+    }
+
+    @Override
+    public void resume() {
+        if (cacheManager == null) {
+            start();
+        }
     }
 
 }
