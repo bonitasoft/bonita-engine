@@ -25,7 +25,7 @@ CREATE TABLE process_instance (
   PRIMARY KEY (tenantid, id)
 );
 
-CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (processdefinitionid, stateid);
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, processdefinitionid, stateid);
 
 CREATE TABLE token (
   tenantid NUMBER(19, 0) NOT NULL,
