@@ -465,12 +465,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
-					<properties>
-						<property>
-							<name>listener</name>
-							<value>org.bonitasoft.engine.test.annotation.CustomListener</value>
-						</property>
-					</properties>
 					<systemPropertyVariables>
 						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
                         <sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>

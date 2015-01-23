@@ -780,12 +780,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
-					<properties>
-						<property>
-							<name>listener</name>
-							<value>org.bonitasoft.engine.test.annotation.CustomListener</value>
-						</property>
-					</properties>
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
                         <!-- Set 'bonita.services.folder' sytem property to a different value to test with a different configuration -->
