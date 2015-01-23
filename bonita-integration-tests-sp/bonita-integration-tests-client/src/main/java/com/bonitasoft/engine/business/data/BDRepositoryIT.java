@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -90,8 +91,13 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "findByLastName";
     private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
+    private static final String FIND_BY_FIRST_NAME_FETCH_ADDRESSES = "findByFirstNameFetchAddresses";
+    private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
+    private static final String COUNT_EMPLOYEE = "countEmployee";
 
     private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
+    public static final String BUSINESS_DATA_CLASS_NAME_ID_FIELD = "/businessdata/{className}/{id}/{field}";
+    public static final String ENTITY_CLASS_NAME = "entityClassName";
 
     private User matti;
     private File clientFolder;
@@ -170,19 +176,19 @@ public class BDRepositoryIT extends CommonAPISPIT {
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
         final Query getEmployeeByPhoneNumber = employee.addQuery(GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME,
-                "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)", List.class.getName());
+                "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)", EMPLOYEE_QUALIF_CLASSNAME);
         getEmployeeByPhoneNumber.addQueryParameter("phoneNumber", String.class.getName());
 
-        final Query findByFirstNAmeAndLastNameNewOrder = employee.addQuery("findByFirstNameAndLastNameNewOrder",
-                "SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName = :lastName ORDER BY e.lastName", List.class.getName());
+        final Query findByFirstNAmeAndLastNameNewOrder = employee.addQuery(FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER,
+                "SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName = :lastName ORDER BY e.lastName", EMPLOYEE_QUALIF_CLASSNAME);
         findByFirstNAmeAndLastNameNewOrder.addQueryParameter("firstName", String.class.getName());
         findByFirstNAmeAndLastNameNewOrder.addQueryParameter("lastName", String.class.getName());
 
-        final Query findByFirstNameFetchAddresses = employee.addQuery("findByFirstNameFetchAddresses",
-                "SELECT e FROM Employee e INNER JOIN FETCH e.addresses WHERE e.firstName =:firstName ORDER BY e.lastName", List.class.getName());
+        final Query findByFirstNameFetchAddresses = employee.addQuery(FIND_BY_FIRST_NAME_FETCH_ADDRESSES,
+                "SELECT e FROM Employee e INNER JOIN FETCH e.addresses WHERE e.firstName =:firstName ORDER BY e.lastName", EMPLOYEE_QUALIF_CLASSNAME);
         findByFirstNameFetchAddresses.addQueryParameter("firstName", String.class.getName());
 
-        employee.addQuery("countEmployee", "SELECT COUNT(e) FROM Employee e", Long.class.getName());
+        employee.addQuery(COUNT_EMPLOYEE, "SELECT COUNT(e) FROM Employee e", Long.class.getName());
 
         employee.addIndex("IDX_LSTNM", "lastName");
 
@@ -328,7 +334,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
-        waitForUserTask(processInstance,"step2");
+        waitForUserTask(processInstance, "step2");
 
         // Let's check the updated firstName + lastName values by calling an expression:
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
@@ -948,7 +954,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
 
-        waitForUserTask(instance,"step2");
+        waitForUserTask(instance, "step2");
         final String employeeToString = getEmployeesToString("myEmployees", instance.getId());
         assertThat(firstNames(employeeToString)).containsOnlyOnce("Jane", "John");
         assertThat(lastNames(employeeToString)).containsExactly("Smith", "Smith");
@@ -1143,10 +1149,13 @@ public class BDRepositoryIT extends CommonAPISPIT {
     }
 
     @Test
-    public void commandGetBusinessData_should_return_a_simple_lazy_child() throws Exception {
+    public void getBusinessDataCommand_should_return_json_entities() throws Exception {
+        final ProcessDefinition processDefinition;
+        final ProcessDefinitionBuilderExt processDefinitionBuilder;
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; import org.bonita.pojo.Address; Employee e = new Employee(); e.firstName = 'Alphonse';"
-                + " e.lastName = 'Dupond'; e.setAddress(myAddress);e.addToAddresses(myAddress); return e;", EMPLOYEE_QUALIF_CLASSNAME,
+                + " e.lastName = 'Dupond'; e.addToPhoneNumbers('123456789'); e.setAddress(myAddress);e.addToAddresses(myAddress); return e;",
+                EMPLOYEE_QUALIF_CLASSNAME,
                 new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME));
         final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
                 "import org.bonita.pojo.Address; import org.bonita.pojo.Country; "
@@ -1158,7 +1167,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
                         + " c;",
                 COUNTRY_QUALIF_NAME);
 
-        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+        processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
                 "rest", "1.0");
         final String bizDataName = "myEmployee";
         processDefinitionBuilder.addBusinessData("myCountry", COUNTRY_QUALIF_NAME, null);
@@ -1172,32 +1181,135 @@ public class BDRepositoryIT extends CommonAPISPIT {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, "step2");
 
         final SimpleBusinessDataReference businessDataReference = (SimpleBusinessDataReference) getProcessAPI().getProcessBusinessDataReference(bizDataName,
                 processInstance.getId());
 
+        verifyCommandGetBusinessDataById(businessDataReference);
+        verifyCommandGetQuery_findByFirstNameAndLastNameNewOrder();
+        verifyCommandGetQuery_getEmployeeByPhoneNumber();
+        verifyCommandGetQuery_findByFirstNameFetchAddresses();
+        verifyCommandGetQuery_countEmployee();
+
+
+        disableAndDeleteProcess(processDefinition.getId());
+    }
+
+    private void verifyCommandGetBusinessDataById(SimpleBusinessDataReference businessDataReference) throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("businessDataId", businessDataReference.getStorageId());
         parameters.put("entityClassName", EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put("businessDataChildName", "address");
         parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
+
+        //when
         final String lazyAddressResultWithChildName = (String) getCommandAPI().execute("getBusinessDataById", parameters);
 
-        assertThat(lazyAddressResultWithChildName).as("Address should have the right street and city").contains("\"street\":\"32, rue Gustave Eiffel\"")
-                .contains("\"city\":\"Grenoble\"");
-        assertThat(lazyAddressResultWithChildName).as("Address should have a link to country ")
-                .contains("\"rel\":\"country\"");
+        //then
+        assertThatJson(lazyAddressResultWithChildName).as("should get address with lazy link to country")
+                .isEqualTo(getJsonContent("getBusinessDataByIdAddress.json"));
 
+        //when
         parameters.remove("businessDataChildName");
-
         final String employeeResultWithAddress = (String) getCommandAPI().execute("getBusinessDataById", parameters);
 
-        assertThat(employeeResultWithAddress).as("should have a link to lazy address object").contains("\"rel\":\"address\"");
+        //then
+        assertThatJson(employeeResultWithAddress).as("should get employee with lazy link to country in addresses")
+                .isEqualTo(getJsonContent("getBusinessDataByIdEmployee.json"));
 
-        disableAndDeleteProcess(definition.getId());
+    }
+
+    private void verifyCommandGetQuery_findByFirstNameAndLastNameNewOrder() throws Exception {
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+
+        queryParameters.put("firstName", "Alphonse");
+        queryParameters.put("lastName", "Dupond");
+
+        parameters.put("queryName", FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER);
+        parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put("startIndex", 0);
+        parameters.put("maxResults", 10);
+        parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
+        parameters.put("queryParameters", (Serializable) queryParameters);
+
+        //when
+        final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+
+        //then
+        assertThatJson(jsonResult).as("should get employee").isEqualTo(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
+
+    }
+
+    private void verifyCommandGetQuery_getEmployeeByPhoneNumber() throws Exception {
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+
+        queryParameters.put("phoneNumber", "123456789");
+
+        parameters.put("queryName", GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME);
+        parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put("startIndex", 0);
+        parameters.put("maxResults", 10);
+        parameters.put("businessDataURIPattern", BUSINESS_DATA_CLASS_NAME_ID_FIELD);
+        parameters.put("queryParameters", (Serializable) queryParameters);
+
+        //when
+        final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+
+        //then
+        assertThatJson(jsonResult).as("should get employee").isEqualTo(getJsonContent("getEmployeeByPhoneNumber.json"));
+
+    }
+
+    private void verifyCommandGetQuery_findByFirstNameFetchAddresses() throws Exception {
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+
+        queryParameters.put("firstName", "Alphonse");
+
+        parameters.put("queryName", FIND_BY_FIRST_NAME_FETCH_ADDRESSES);
+        parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put("startIndex", 0);
+        parameters.put("maxResults", 10);
+        parameters.put("businessDataURIPattern", BUSINESS_DATA_CLASS_NAME_ID_FIELD);
+        parameters.put("queryParameters", (Serializable) queryParameters);
+
+        //when
+        final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+
+        //then
+        assertThatJson(jsonResult).as("should get employee").isEqualTo(getJsonContent("findByFirstNameFetchAddresses.json"));
+
+    }
+
+    private void verifyCommandGetQuery_countEmployee() throws Exception {
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        //Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+
+        parameters.put("queryName", COUNT_EMPLOYEE);
+        parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put("startIndex", 0);
+        parameters.put("maxResults", 10);
+        parameters.put("businessDataURIPattern", BUSINESS_DATA_CLASS_NAME_ID_FIELD);
+        //parameters.put("queryParameters", null);
+
+        //when
+        final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+
+        //then
+        assertThatJson(jsonResult).as("should get employee count ").isEqualTo(getJsonContent("countEmployee.json"));
+
+    }
+
+
+    private String getJsonContent(String jsonFileName) throws IOException {
+        final String json;
+        json = new String(IOUtils.toByteArray(this.getClass().getResourceAsStream(jsonFileName)));
+        return json;
     }
 
     @Test
@@ -1231,23 +1343,23 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    //    @Test
+    @Test
     public void should_get_the_lazy_list_in_a_multiple_business_data() throws Exception {
         final Expression initProducts = new ExpressionBuilder().createGroovyScriptExpression("initProducts", "import org.bonita.pojo.Product;"
                 + " Product p1 = new Product(); p1.name = 'Rock'; "
                 + " Product p2 = new Product(); p2.name = 'Paper'; "
                 + " return [p1, p2];", List.class.getName());
 
-        final Expression productdependency = new ExpressionBuilder().createBusinessDataExpression("products", List.class.getName());
+        final Expression productDependency = new ExpressionBuilder().createBusinessDataExpression("products", List.class.getName());
 
         final Expression initCatalogs = new ExpressionBuilder().createGroovyScriptExpression("initCatalogs", "import org.bonita.pojo.ProductCatalog;"
                 + " ProductCatalog pc = new ProductCatalog(); pc.name = 'MyFirstCatalog'; pc.setProducts(products);"
-                + " return [pc];", List.class.getName(), productdependency);
+                + " return [pc];", List.class.getName(), productDependency);
 
-        final Expression catalogdependency = new ExpressionBuilder().createBusinessDataExpression("productCatalogs", List.class.getName());
+        final Expression catalogDependency = new ExpressionBuilder().createBusinessDataExpression("productCatalogs", List.class.getName());
 
         final Expression nbOfProducts = new ExpressionBuilder().createGroovyScriptExpression("nbOfProducts", "import org.bonita.pojo.ProductCatalog;"
-                + " productCatalogs.get(0).getProducts().size()", Integer.class.getName(), catalogdependency);
+                + " productCatalogs.get(0).getProducts().size()", Integer.class.getName(), catalogDependency);
 
         final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("def", "6.3-beta");
         builder.addActor(ACTOR_NAME);

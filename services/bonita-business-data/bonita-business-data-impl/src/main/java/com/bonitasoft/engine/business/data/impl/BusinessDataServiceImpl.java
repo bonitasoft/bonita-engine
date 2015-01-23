@@ -7,8 +7,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -22,21 +24,32 @@ import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
 
 import com.bonitasoft.engine.bdm.Entity;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.QueryParameter;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.BusinessDataService;
 import com.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import com.toddfast.util.convert.TypeConverter;
 
 public class BusinessDataServiceImpl implements BusinessDataService {
 
+    private static final String BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
+
     private final BusinessDataRepository businessDataRepository;
     private final JsonBusinessDataSerializer jsonBusinessDataSerializer;
+    private final BusinessDataModelRepository businessDataModelRepository;
 
-    public BusinessDataServiceImpl(final BusinessDataRepository businessDataRepository, final JsonBusinessDataSerializer jsonBusinessDataSerializer) {
+    public BusinessDataServiceImpl(final BusinessDataRepository businessDataRepository, final JsonBusinessDataSerializer jsonBusinessDataSerializer,
+            BusinessDataModelRepository businessDataModelRepository) {
         this.businessDataRepository = businessDataRepository;
         this.jsonBusinessDataSerializer = jsonBusinessDataSerializer;
+        this.businessDataModelRepository = businessDataModelRepository;
     }
 
     @Override
@@ -273,6 +286,75 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
         return null;
 
+    }
+
+    @Override
+    public Serializable getJsonQueryEntities(final String entityClassName, final String queryName, final Map<String, Serializable> parameters,
+            final Integer startIndex,
+            final Integer maxResults, final String businessDataURIPattern) throws SBusinessDataRepositoryException {
+        final Class<? extends Entity> businessDataClass = loadClass(entityClassName);
+        final Query queryDefinition = getQueryDefinition(entityClassName, queryName);
+
+        final List<? extends Serializable> list = businessDataRepository.findListByNamedQuery(getQualifiedQueryName(businessDataClass, queryName),
+                getQueryReturnType(queryDefinition),
+                getQueryParameters(queryDefinition, parameters), startIndex,
+                maxResults);
+        try {
+            return jsonBusinessDataSerializer.serializeEntity((List<Entity>) list, businessDataURIPattern);
+        } catch (final Exception e) {
+            throw new SBusinessDataRepositoryException(e);
+        }
+    }
+
+    private Class<? extends Serializable> getQueryReturnType(Query queryDefinition) throws SBusinessDataRepositoryException {
+        try {
+            return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(queryDefinition.getReturnType());
+        } catch (ClassNotFoundException e) {
+            throw new SBusinessDataRepositoryException("unable to load class " + queryDefinition.getReturnType());
+        }
+    }
+
+    private Class<? extends Serializable> getQueryReturnTypez(Query queryDefinition) throws SBusinessDataRepositoryException {
+        try {
+            return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(queryDefinition.getReturnType());
+        } catch (ClassNotFoundException e) {
+            throw new SBusinessDataRepositoryException("unable to load class " + queryDefinition.getReturnType());
+        }
+    }
+
+    private String getQualifiedQueryName(Class<? extends Entity> businessDataClass, String queryName) {
+        return String.format("%s.%s", businessDataClass.getSimpleName(), queryName);
+    }
+
+    private Map<String, Serializable> getQueryParameters(Query queryDefinition, final Map<String, Serializable> parameters)
+            throws SBusinessDataRepositoryException {
+        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        for (QueryParameter queryParameter : queryDefinition.getQueryParameters()) {
+            if (parameters.containsKey(queryParameter.getName())) {
+                try {
+                    queryParameters.put(queryParameter.getName(),
+                            (Serializable) TypeConverter.convert(Thread.currentThread().getContextClassLoader().loadClass(queryParameter.getClassName()),
+                                    parameters.get(queryParameter.getName())));
+                } catch (ClassNotFoundException e) {
+                    throw new SBusinessDataRepositoryException("unable to load class " + queryParameter.getClassName());
+                }
+            }
+        }
+        return queryParameters;
+    }
+
+    private Query getQueryDefinition(String className, String queryName) throws SBusinessDataRepositoryException {
+        final BusinessObjectModel businessObjectModel = businessDataModelRepository.getBusinessObjectModel();
+        for (BusinessObject businessObject : businessObjectModel.getBusinessObjects()) {
+            if (businessObject.getQualifiedName().equals(className)) {
+                for (Query query : businessObject.getQueries()) {
+                    if (query.getName().equals(queryName)) {
+                        return query;
+                    }
+                }
+            }
+        }
+        throw new SBusinessDataRepositoryException("unable to get query " + queryName + " for business object " + className);
     }
 
     @SuppressWarnings("unchecked")

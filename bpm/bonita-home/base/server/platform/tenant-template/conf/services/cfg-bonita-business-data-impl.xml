@@ -52,6 +52,7 @@
     <bean id="businessDataService" class="com.bonitasoft.engine.business.data.impl.BusinessDataServiceImpl">
         <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
         <constructor-arg name="jsonBusinessDataSerializer" ref="jsonBusinessDataSerializer" />
+		<constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
     </bean>
         
 </beans>

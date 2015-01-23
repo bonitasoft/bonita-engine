@@ -6,6 +6,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import javassist.util.proxy.MethodHandler;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.bonitasoft.engine.bdm.Entity;
@@ -32,10 +34,14 @@ public class EntitySerializer extends JsonSerializer<Entity> {
 
     @Override
     public void serialize(final Entity value, final JsonGenerator jgen, final SerializerProvider provider) throws IOException, JsonProcessingException {
+        final Class<? extends Entity> valueClass = value.getClass();
         jgen.writeStartObject();
 
         final List<Link> links = new ArrayList<Link>();
-        for (final Field field : value.getClass().getDeclaredFields()) {
+        for (final Field field : valueClass.getDeclaredFields()) {
+            if (field.getType().equals(MethodHandler.class)){
+                continue;
+            }
             if (field.isAnnotationPresent(JsonIgnore.class)) {
                 final String uri = buildURI(value, patternURI, field);
                 final Link link = new Link(field.getName(), uri);
@@ -44,7 +50,7 @@ public class EntitySerializer extends JsonSerializer<Entity> {
             else {
                 try {
                     Method declaredMethod;
-                    declaredMethod = value.getClass().getDeclaredMethod("get" + StringUtils.capitalize(field.getName()));
+                    declaredMethod = valueClass.getDeclaredMethod("get" + StringUtils.capitalize(field.getName()));
                     final Object invoke = declaredMethod.invoke(value);
                     jgen.writeObjectField(field.getName(), invoke);
                 } catch (final NoSuchMethodException e) {

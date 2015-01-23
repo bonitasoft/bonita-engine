@@ -1,6 +1,10 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -11,12 +15,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Parameter;
 
+import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -163,9 +173,12 @@ public class BusinessDataServiceImplTest {
     @Mock
     JsonBusinessDataSerializer jsonEntitySerializer;
 
+    @Mock
+    BusinessDataModelRepository businessDataModelRepository;
+
     @Before
     public void before() throws Exception {
-        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer));
+        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository));
     }
 
     @Test
@@ -534,4 +547,47 @@ public class BusinessDataServiceImplTest {
 
     }
 
+    @Test
+    public void getJsonQueryEntities_should_return_json() throws Exception {
+        //given
+        final EntityPojo entity = new EntityPojo(1562L);
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+
+        parameters.put("string", "a");
+        parameters.put("integer", "12");
+        parameters.put("long", "34");
+
+        final Set<Parameter<?>> queryParameters = new HashSet<Parameter<?>>();
+        final Parameter<?> e = new Parameter<Integer>() {
+
+            @Override
+            public String getName() {
+                return "integer";
+            }
+
+            @Override
+            public Integer getPosition() {
+                return 1;
+            }
+
+            @Override
+            public Class<Integer> getParameterType() {
+                return Integer.class;
+            }
+        };
+        queryParameters.add(e);
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        final List<Entity> asList = new ArrayList<Entity>();
+        asList.add(entity);
+        doReturn(asList).when(businessDataRepository).findListByNamedQuery(anyString(), any(Class.class), anyMap(), anyInt(), anyInt());
+
+        //when
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "query", parameters, 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        //then
+        verify(jsonEntitySerializer).serializeEntity(asList, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        // JsonAssert.assertThatJson(jsonQueryEntities).as("should return json").isEqualTo(JsonBusinessDataSerializer.EMPTY_OBJECT);
+    }
 }

@@ -43,6 +43,7 @@
                 <ref bean="advancedStartProcessCommand" />
                 <ref bean="executeBDMQuery" />
                 <ref bean="getBusinessDataByIdCommand" />
+				<ref bean="getBusinessDataByQueryCommand" />
 			</list>
 		</property>
 	</bean>
@@ -426,5 +427,17 @@
             <value>com.bonitasoft.engine.command.GetBusinessDataByIdCommand</value>
         </constructor-arg>
     </bean>
+
+	<bean id="getBusinessDataByQueryCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+		<constructor-arg name="name">
+			<value>getBusinessDataByQueryCommand</value>
+		</constructor-arg>
+		<constructor-arg name="description">
+			<value>Execute a named query in the BDM, and returns its Json representation. Use parameter keys : "queryName" the name of the query in the bdm, "returnType" the query expected return type, "returnsList" if result is a List or a single value, "queryParameters" a Map to value query parameters</value>
+		</constructor-arg>
+		<constructor-arg name="implementation">
+			<value>com.bonitasoft.engine.command.GetBusinessDataByQueryCommand</value>
+		</constructor-arg>
+	</bean>
 
 </beans>
