@@ -5,28 +5,20 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Parameter;
 
-import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +26,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.bdm.Entity;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.QueryParameter;
+import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
@@ -552,42 +549,61 @@ public class BusinessDataServiceImplTest {
         //given
         final EntityPojo entity = new EntityPojo(1562L);
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-
         parameters.put("string", "a");
         parameters.put("integer", "12");
         parameters.put("long", "34");
 
-        final Set<Parameter<?>> queryParameters = new HashSet<Parameter<?>>();
-        final Parameter<?> e = new Parameter<Integer>() {
-
-            @Override
-            public String getName() {
-                return "integer";
-            }
-
-            @Override
-            public Integer getPosition() {
-                return 1;
-            }
-
-            @Override
-            public Class<Integer> getParameterType() {
-                return Integer.class;
-            }
-        };
-        queryParameters.add(e);
         doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
 
-        final List<Entity> asList = new ArrayList<Entity>();
-        asList.add(entity);
-        doReturn(asList).when(businessDataRepository).findListByNamedQuery(anyString(), any(Class.class), anyMap(), anyInt(), anyInt());
+        final List<Entity> entities = new ArrayList<Entity>();
+        entities.add(entity);
+        doReturn(entities).when(businessDataRepository).findListByNamedQuery(anyString(), any(Class.class), anyMap(), anyInt(), anyInt());
+
+        //given
+        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
 
         //when
         businessDataService.getJsonQueryEntities(entity.getClass().getName(), "query", parameters, 0, 10,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
         //then
-        verify(jsonEntitySerializer).serializeEntity(asList, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
-        // JsonAssert.assertThatJson(jsonQueryEntities).as("should return json").isEqualTo(JsonBusinessDataSerializer.EMPTY_OBJECT);
+        verify(jsonEntitySerializer).serializeEntity(entities, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    @Test(expected = SBusinessDataRepositoryException.class)
+    public void getJsonQueryEntities_should_throw_exception_when_query_not_found() throws Exception {
+        //given
+        final EntityPojo entity = new EntityPojo(1562L);
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("string", "a");
+        parameters.put("integer", "12");
+        parameters.put("long", "34");
+
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
+
+        //when then exception
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "not a query", parameters, 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    private BusinessObjectModel getBusinessObjectModel(EntityPojo entity) {
+        BusinessObjectModel businessObjectModel;
+        businessObjectModel = new BusinessObjectModel();
+
+        Query query = new Query("query", "content", String.class.getName());
+        query.getQueryParameters().add(new QueryParameter("string", String.class.getName()));
+        query.getQueryParameters().add(new QueryParameter("integer", Integer.class.getName()));
+        query.getQueryParameters().add(new QueryParameter("long", Long.class.getName()));
+
+        BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName(entity.getClass().getName());
+        businessObject.setQueries(Arrays.asList(query));
+        businessObjectModel.getBusinessObjects().add(businessObject);
+
+        return businessObjectModel;
     }
 }

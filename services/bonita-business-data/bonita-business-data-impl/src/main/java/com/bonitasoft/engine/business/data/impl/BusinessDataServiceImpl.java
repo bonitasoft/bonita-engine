@@ -345,11 +345,13 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private Query getQueryDefinition(String className, String queryName) throws SBusinessDataRepositoryException {
         final BusinessObjectModel businessObjectModel = businessDataModelRepository.getBusinessObjectModel();
-        for (BusinessObject businessObject : businessObjectModel.getBusinessObjects()) {
-            if (businessObject.getQualifiedName().equals(className)) {
-                for (Query query : businessObject.getQueries()) {
-                    if (query.getName().equals(queryName)) {
-                        return query;
+        if (businessObjectModel != null) {
+            for (BusinessObject businessObject : businessObjectModel.getBusinessObjects()) {
+                if (businessObject.getQualifiedName().equals(className)) {
+                    for (Query query : businessObject.getQueries()) {
+                        if (query.getName().equals(queryName)) {
+                            return query;
+                        }
                     }
                 }
             }
