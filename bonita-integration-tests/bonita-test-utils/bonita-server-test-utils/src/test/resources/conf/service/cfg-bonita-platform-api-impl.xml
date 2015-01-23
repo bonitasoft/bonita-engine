@@ -15,7 +15,7 @@
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
 		<constructor-arg name="sqlFolders">
 			<list>
-                <value>target/server/sql/${db.vendor}</value>
+                <value>/sql/${db.vendor}</value>
                 <value>target/test-classes/sql-test/sql/${db.vendor}</value>
 			</list>
         </constructor-arg>

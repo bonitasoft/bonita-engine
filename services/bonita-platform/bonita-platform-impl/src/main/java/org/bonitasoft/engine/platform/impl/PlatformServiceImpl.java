@@ -18,6 +18,7 @@ import static java.util.Collections.singletonMap;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -199,19 +200,55 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     /**
+     * @param sqlFolder the folder to look in.
+     * @param sqlFile the name of the file to load.
+     * @return null if not found, the SQL text content in normal cases.
+     */
+    private String getSQLFileContent(final File sqlFolder, final String sqlFile) {
+        final String resourcePath = sqlFolder + File.separator + sqlFile;
+        InputStream sqlStream = null;
+        try {
+            sqlStream = this.getClass().getResourceAsStream(resourcePath);
+            if (sqlStream != null) {
+                final byte[] content = IOUtil.getAllContentFrom(sqlStream);
+                if (content != null) {
+                    return new String(content);
+                }
+            }
+            else {
+                // try to read from File():
+                final File sqlResource = new File(sqlFolder, sqlFile);
+                if (sqlResource.exists()) {
+                    return new String(IOUtil.getAllContentFrom(sqlResource));
+                }
+            }
+        } catch (final IOException e) {
+            // ignore, will return null
+        } finally {
+            if (sqlStream != null) {
+                try {
+                    sqlStream.close();
+                } catch (final IOException e) {
+                    // ignore stream closing problem
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * @param sqlFile
      * @throws IOException
      * @throws SPersistenceException
      */
     protected void executeSQLResource(final String sqlFile, final Map<String, String> replacements) throws IOException, SQLException {
         for (final File sqlFolder : sqlFolders) {
-            final File sqlResource = new File(sqlFolder, sqlFile);
+            final String fileContent = getSQLFileContent(sqlFolder, sqlFile);
 
-            if (sqlResource.exists()) {
-                final String fileContent = new String(IOUtil.getAllContentFrom(sqlResource));
-
+            final String path = sqlFolder + File.separator + sqlFile;
+            if (fileContent != null) {
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Processing SQL resource : " + sqlResource);
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Processing SQL resource : " + path);
                 }
                 final String regex = statementDelimiter.concat("\r?\n");
                 final List<String> commands = new ArrayList<String>(asList(fileContent.split(regex)));
@@ -227,6 +264,9 @@ public class PlatformServiceImpl implements PlatformService {
                 }
 
                 doExecuteSQLThroughJDBC(commands, replacements);
+            }
+            else {
+                logger.log(getClass(), TechnicalLogSeverity.WARNING, "SQL resource file not found: " + path);
             }
         }
     }

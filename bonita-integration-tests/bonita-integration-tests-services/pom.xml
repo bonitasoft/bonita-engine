@@ -371,12 +371,11 @@
             <scope>test</scope>
         </dependency>
 
-       <dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine</groupId>
             <artifactId>bonita-sql</artifactId>
             <version>${project.version}</version>
-            <type>zip</type>
-			<scope>test</scope>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -397,12 +396,6 @@
                                 <artifactItem>
                                     <groupId>org.bonitasoft.engine.test</groupId>
                                     <artifactId>bonita-server-test-utils</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.bonitasoft.engine</groupId>
-                                    <artifactId>bonita-sql</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
                                 </artifactItem>

@@ -14,10 +14,6 @@
 
 		<!-- sql files -->
 		<delete dir="${target.dir}/server" />
-    	<delete dir="${target.dir}/server/sql" />
-    	<copy todir="${target.dir}/server/sql">
-    		<fileset dir="${basedir}/../../bpm/bonita-sql/sql" />
-    	</copy>
 
 		<copy todir="${target.dir}/test-classes/home">
 			<fileset dir="${basedir}/home" />
