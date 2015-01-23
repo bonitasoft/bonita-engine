@@ -371,12 +371,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.bonitasoft.engine</groupId>
-            <artifactId>bonita-sql</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -446,12 +440,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <properties>
-                        <property>
-                            <name>listener</name>
-                            <value>org.bonitasoft.engine.test.annotation.CustomListener</value>
-                        </property>
-                    </properties>
                     <systemPropertyVariables>
                         <bonita.home>${project.build.directory}</bonita.home>
                         <bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>

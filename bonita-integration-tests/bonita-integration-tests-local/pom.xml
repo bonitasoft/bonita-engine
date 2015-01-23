@@ -136,12 +136,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <properties>
-                        <property>
-                            <name>listener</name>
-                            <value>org.bonitasoft.engine.test.annotation.CustomListener</value>
-                        </property>
-                    </properties>
                     <systemPropertyVariables>
                         <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
                         <bonita.home>${bonita.home}</bonita.home>
@@ -172,12 +166,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
-                            <properties>
-                                <property>
-                                    <name>listener</name>
-                                    <value>org.bonitasoft.engine.test.annotation.CustomListener</value>
-                                </property>
-                            </properties>
                             <systemPropertyVariables>
                                 <!-- for the TestShades -->
                                 <bonita.version>${project.version}</bonita.version>
