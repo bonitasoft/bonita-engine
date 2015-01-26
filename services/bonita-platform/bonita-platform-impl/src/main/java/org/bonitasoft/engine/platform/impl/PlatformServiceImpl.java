@@ -18,7 +18,7 @@ import static java.util.Collections.singletonMap;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -140,11 +140,12 @@ public class PlatformServiceImpl implements PlatformService {
 
     private final String statementDelimiter;
 
-    private final List<File> sqlFolders;
+    private final List<String> sqlFolders;
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final Recorder recorder,
             final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
-            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource, final File sqlFolder,
+            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource,
+            final String sqlFolder,
             final String statementDelimiter) {
         this(platformPersistenceService, recorder, tenantPersistenceServices, logger, platformCacheService, sPlatformProperties, datasource, asList(sqlFolder),
                 statementDelimiter);
@@ -153,7 +154,7 @@ public class PlatformServiceImpl implements PlatformService {
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final Recorder recorder,
             final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
             final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource,
-            final List<File> sqlFolders, final String statementDelimiter) {
+            final List<String> sqlFolders, final String statementDelimiter) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
         this.logger = logger;
@@ -204,13 +205,12 @@ public class PlatformServiceImpl implements PlatformService {
      * @param sqlFile the name of the file to load.
      * @return null if not found, the SQL text content in normal cases.
      */
-    private String getSQLFileContent(final File sqlFolder, final String sqlFile) {
-        final String resourcePath = sqlFolder + File.separator + sqlFile;
-        InputStream sqlStream = null;
+    private String getSQLFileContent(final String sqlFolder, final String sqlFile) {
+        final String resourcePath = sqlFolder + "/" + sqlFile; // Must always be forward slash, even on Windows.
         try {
-            sqlStream = this.getClass().getResourceAsStream(resourcePath);
-            if (sqlStream != null) {
-                final byte[] content = IOUtil.getAllContentFrom(sqlStream);
+            final URL url = this.getClass().getResource(resourcePath);
+            if (url != null) {
+                final byte[] content = IOUtil.getAllContentFrom(url);
                 if (content != null) {
                     return new String(content);
                 }
@@ -224,14 +224,6 @@ public class PlatformServiceImpl implements PlatformService {
             }
         } catch (final IOException e) {
             // ignore, will return null
-        } finally {
-            if (sqlStream != null) {
-                try {
-                    sqlStream.close();
-                } catch (final IOException e) {
-                    // ignore stream closing problem
-                }
-            }
         }
         return null;
     }
@@ -242,7 +234,7 @@ public class PlatformServiceImpl implements PlatformService {
      * @throws SPersistenceException
      */
     protected void executeSQLResource(final String sqlFile, final Map<String, String> replacements) throws IOException, SQLException {
-        for (final File sqlFolder : sqlFolders) {
+        for (final String sqlFolder : sqlFolders) {
             final String fileContent = getSQLFileContent(sqlFolder, sqlFile);
 
             final String path = sqlFolder + File.separator + sqlFile;
