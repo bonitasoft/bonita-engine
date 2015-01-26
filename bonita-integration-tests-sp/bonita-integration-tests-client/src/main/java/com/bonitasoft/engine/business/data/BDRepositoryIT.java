@@ -1210,7 +1210,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         //then
         assertThatJson(lazyAddressResultWithChildName).as("should get address with lazy link to country")
-                .isEqualTo(getJsonContent("getBusinessDataByIdAddress.json"));
+                .hasSameStructureAs(getJsonContent("getBusinessDataByIdAddress.json"));
 
         //when
         parameters.remove("businessDataChildName");
@@ -1218,7 +1218,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         //then
         assertThatJson(employeeResultWithAddress).as("should get employee with lazy link to country in addresses")
-                .isEqualTo(getJsonContent("getBusinessDataByIdEmployee.json"));
+                .hasSameStructureAs(getJsonContent("getBusinessDataByIdEmployee.json"));
 
     }
 
@@ -1261,7 +1261,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
         //then
-        assertThatJson(jsonResult).as("should get employee").isEqualTo(getJsonContent("getEmployeeByPhoneNumber.json"));
+        assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("getEmployeeByPhoneNumber.json"));
 
     }
 
@@ -1282,7 +1282,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
         //then
-        assertThatJson(jsonResult).as("should get employee").isEqualTo(getJsonContent("findByFirstNameFetchAddresses.json"));
+        assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameFetchAddresses.json"));
 
     }
 
