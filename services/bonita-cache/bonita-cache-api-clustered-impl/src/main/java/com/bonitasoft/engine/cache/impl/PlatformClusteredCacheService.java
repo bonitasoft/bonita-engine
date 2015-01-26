@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013, 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -19,9 +19,12 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
+/**
+ * @author Matthieu Chaffotte
+ */
 public class PlatformClusteredCacheService extends CommonClusteredCacheService implements PlatformCacheService {
 
-    public PlatformClusteredCacheService(TechnicalLoggerService logger, HazelcastInstance hazelcastInstance) {
+    public PlatformClusteredCacheService(final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance) {
         super(logger, hazelcastInstance);
     }
 
@@ -33,7 +36,7 @@ public class PlatformClusteredCacheService extends CommonClusteredCacheService i
     @Override
     public List<String> getCachesNames() {
         final Collection<DistributedObject> distributedObjects = hazelcastInstance.getDistributedObjects();
-        final ArrayList<String> cacheNamesList = new ArrayList<String>(distributedObjects.size());
+        final List<String> cacheNamesList = new ArrayList<String>(distributedObjects.size());
 
         final String prefix = "P_";
         for (final DistributedObject instance : distributedObjects) {
@@ -45,12 +48,28 @@ public class PlatformClusteredCacheService extends CommonClusteredCacheService i
         return cacheNamesList;
     }
 
-    /**
-     * @param cacheName
-     * @return
-     */
     private String getCacheNameFromKey(final String cacheNameKey) {
         return cacheNameKey.substring(cacheNameKey.indexOf('_') + 1);
+    }
+
+    @Override
+    public void start() {
+        // do nothing, we start/stop hazelcast, not this service
+    }
+
+    @Override
+    public void stop() {
+        // do nothing, we start/stop hazelcast, not this service
+    }
+
+    @Override
+    public void pause() {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() {
+        // nothing to do
     }
 
 }

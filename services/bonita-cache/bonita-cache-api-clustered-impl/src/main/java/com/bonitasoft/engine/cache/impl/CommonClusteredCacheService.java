@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * Copyright (C) 2013, 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -25,9 +25,10 @@ import com.hazelcast.core.HazelcastInstance;
 
 /**
  * Cache service that uses hazelcast
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public abstract class CommonClusteredCacheService implements CommonCacheService {
 
@@ -212,25 +213,5 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
     }
 
     protected abstract String getKeyFromCacheName(final String cacheName) throws SCacheException;
-
-    @Override
-    public void start() {
-        // do nothing, we start/stop hazelcast, not this service
-    }
-
-    @Override
-    public void stop() {
-        // do nothing, we start/stop hazelcast, not this service
-    }
-
-    @Override
-    public void pause() {
-        // nothing to do
-    }
-
-    @Override
-    public void resume() {
-        // nothing to do
-    }
 
 }

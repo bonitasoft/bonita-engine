@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -55,11 +56,11 @@ public class ServerAPIExtTest {
         final long tenantId = 54L;
         final APISessionImpl session = buildSession(tenantId);
         final ServerAPIExt serverAPIExtSpy = spy(serverAPIExt);
-        doReturn(false).when(serverAPIExtSpy).isTenantAvailable(tenantId, session);
+        doReturn(false).when(serverAPIExtSpy).isTenantAvailable(tenantId, session, false);
 
         // When:
         serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("canAlsoBeCalledOnPausedTenant", new Class[0]), session);
+                FakeTenantLevelAPI.class.getMethod("canAlsoBeCalledOnPausedTenant", new Class[0]), session, false);
 
         // no TenantModeException must be thrown. If so, test would fail.
     }
@@ -70,11 +71,11 @@ public class ServerAPIExtTest {
         final long tenantId = 54L;
         final APISessionImpl session = buildSession(tenantId);
         final ServerAPIExt serverAPIExtSpy = spy(serverAPIExt);
-        doReturn(false).when(serverAPIExtSpy).isTenantAvailable(tenantId, session);
+        doReturn(false).when(serverAPIExtSpy).isTenantAvailable(tenantId, session, false);
 
         // When:
         serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelFullyAccessibleAPI(), FakeTenantLevelFullyAccessibleAPI.class.getName(),
-                FakeTenantLevelFullyAccessibleAPI.class.getMethod("aMethod", new Class[0]), session);
+                FakeTenantLevelFullyAccessibleAPI.class.getMethod("aMethod", new Class[0]), session, false);
 
         // no TenantModeException must be thrown. If so, test would fail.
     }
@@ -85,11 +86,11 @@ public class ServerAPIExtTest {
         final long tenantId = 54L;
         final APISessionImpl session = buildSession(tenantId);
         final ServerAPIExt serverAPIExtSpy = spy(serverAPIExt);
-        doReturn(true).when(serverAPIExtSpy).isTenantAvailable(tenantId, session);
+        doReturn(true).when(serverAPIExtSpy).isTenantAvailable(tenantId, session, false);
 
         // When:
         serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session);
+                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session, false);
 
         // no TenantModeException must be thrown. If so, test would fail.
     }
@@ -100,12 +101,12 @@ public class ServerAPIExtTest {
         final long tenantId = 98744L;
         final APISessionImpl session = buildSession(tenantId);
         final ServerAPIExt serverAPIExtSpy = spy(serverAPIExt);
-        doReturn(false).when(serverAPIExtSpy).isTenantAvailable(tenantId, session);
+        doReturn(false).when(serverAPIExtSpy).isTenantAvailable(tenantId, session, false);
 
         try {
             // when:
             serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                    FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session);
+                    FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session, false);
             fail("Should have thrown TenantStatusException");
         } catch (final TenantStatusException e) {
             assertThat(e.getMessage()).isEqualTo("Tenant with ID " + tenantId + " is in pause, no API call on this tenant can be made for now.");
@@ -118,13 +119,13 @@ public class ServerAPIExtTest {
         final long tenantId = 98744L;
         final APISessionImpl session = buildSession(tenantId);
         final ServerAPIExt serverAPIExtSpy = spy(serverAPIExt);
-        doReturn(true).when(serverAPIExtSpy).isTenantAvailable(tenantId, session);
+        doReturn(true).when(serverAPIExtSpy).isTenantAvailable(tenantId, session, false);
         doReturn(false).when(serverAPIExtSpy).isMethodAvailableOnRunningTenant(anyBoolean(), any(AvailableWhenTenantIsPaused.class));
 
         try {
             // when:
             serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                    FakeTenantLevelAPI.class.getMethod("canOnlyBeCalledOnPausedTenant", new Class[0]), session);
+                    FakeTenantLevelAPI.class.getMethod("canOnlyBeCalledOnPausedTenant", new Class[0]), session, false);
             fail("Should have thrown TenantStatusException");
         } catch (final TenantStatusException e) {
             // then:
@@ -140,11 +141,11 @@ public class ServerAPIExtTest {
         final long tenantId = 54L;
         final APISessionImpl session = buildSession(tenantId);
         final ServerAPIExt serverAPIExtSpy = spy(serverAPIExt);
-        doReturn(false).when(serverAPIExtSpy).isTenantAvailable(tenantId, session);
+        doReturn(false).when(serverAPIExtSpy).isTenantAvailable(tenantId, session, false);
 
         // When:
         serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session);
+                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session, false);
 
     }
 
@@ -156,10 +157,10 @@ public class ServerAPIExtTest {
 
         // When:
         serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("platformAPIMethod", new Class[0]), session);
+                FakeTenantLevelAPI.class.getMethod("platformAPIMethod", new Class[0]), session, false);
 
         // Then:
-        verify(serverAPIExtSpy, never()).isTenantAvailable(anyLong(), any(Session.class));
+        verify(serverAPIExtSpy, never()).isTenantAvailable(anyLong(), any(Session.class), eq(false));
     }
 
     @Test

@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.TestsInitializerSP;
 import com.bonitasoft.engine.page.Page;
 
@@ -30,7 +30,7 @@ import com.bonitasoft.engine.page.Page;
  */
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
-public class TenantLocalIT extends CommonAPISPTest {
+public class TenantLocalIT extends CommonAPISPIT {
 
     private static final int EXPECTED_PAGE_SEARCH_RESULT_COUNT = 1;
 

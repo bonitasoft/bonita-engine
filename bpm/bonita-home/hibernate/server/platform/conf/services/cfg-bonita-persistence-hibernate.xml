@@ -75,6 +75,7 @@
 				<entry key="org.bonitasoft.engine.dependency.model.SDependency" value="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" />
 				<entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" />
 				<entry key="org.bonitasoft.engine.identity.model.SUser" value="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
+				<entry key="org.bonitasoft.engine.identity.model.SUserLogin" value="org.bonitasoft.engine.identity.model.impl.SUserLoginImpl" />
 				<entry key="org.bonitasoft.engine.identity.model.SRole" value="org.bonitasoft.engine.identity.model.impl.SRoleImpl" />
 				<entry key="org.bonitasoft.engine.identity.model.SGroup" value="org.bonitasoft.engine.identity.model.impl.SGroupImpl" />
 				<entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" />
@@ -99,7 +100,6 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.SXMLDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SBlobDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl" />
-				<entry key="org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" />
 				<entry key="org.bonitasoft.engine.profile.model.SProfile" value="org.bonitasoft.engine.profile.model.impl.SProfileImpl" />
 				<entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
 				<entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
@@ -117,7 +117,6 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" />
 				<entry key="com.bonitasoft.engine.business.application.model.SApplication" value="com.bonitasoft.engine.business.application.model.impl.SApplicationImpl" />
                 <entry key="com.bonitasoft.engine.business.application.model.SApplicationPage" value="com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" />
                 <entry key="com.bonitasoft.engine.business.application.model.SApplicationMenu" value="com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" />
@@ -283,6 +282,8 @@
 				<entry key="getPlatform" value="true" />
 				<entry key="getDeployInfoByProcessDefId" value="true" />
 				<entry key="getCommandByName" value="true" />
+				<entry key="getUserByUserName" value="true" />
+				<entry key="getRoleByName" value="true" />
 			</map>
 		</constructor-arg>
 	</bean>
@@ -332,7 +333,6 @@
                 <entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="read-write" />
                 <entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" value="read-write" />
@@ -343,6 +343,7 @@
 				<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SRoleImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SUserLoginImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="read-write" />

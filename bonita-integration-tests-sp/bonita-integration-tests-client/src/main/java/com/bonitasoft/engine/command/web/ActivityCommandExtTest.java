@@ -68,7 +68,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.ProcessAPI;
 
 /**
@@ -76,7 +76,7 @@ import com.bonitasoft.engine.api.ProcessAPI;
  * @author Celine Souchet
  * @author Elias Ricken de Medeiros
  */
-public class ActivityCommandExtTest extends CommonAPISPTest {
+public class ActivityCommandExtTest extends CommonAPISPIT {
 
     private static final String dataName = "var1";
 
@@ -183,7 +183,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         assertTrue("processInstanceId should be > 0", processInstanceId > 0);
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(myDdataName, processInstanceId);
         assertEquals(Integer.parseInt(enteredValue), ((Integer) dataInstance.getValue()).intValue());
-        waitForUserTask(userTaskName, getProcessAPI().getProcessInstance(processInstanceId));
+        waitForUserTask(getProcessAPI().getProcessInstance(processInstanceId), userTaskName);
     }
 
     private ProcessDefinitionBuilder deployProcessWithIntegerData(final String myDdataName, final String actorName, final String userTaskName) {
@@ -265,17 +265,9 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
             // Check data
             assertEquals("welcome Lily and Lucy and Mett", getProcessAPI().getProcessDataInstance("text", processInstanceId).getValue());
             assertEquals(2, getProcessAPI().getProcessDataInstance(dataName, processInstanceId).getValue());
-            assertNotNull("User task step1 don't exist.", waitForUserTask("step1", processInstance));
-            HumanTaskInstance userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1,
-                    ActivityInstanceCriterion.NAME_ASC)
-                    .get(0);
-            assignAndExecuteStep(userTaskInstance, getSession().getUserId());
-            assertNotNull("User task step2 don't exist.", waitForUserTask("step2", processInstance));
+            waitForUserTaskAndExecuteIt(processInstance, "step1", businessUser);
+            waitForUserTask(processInstance, "step2");
 
-            userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1, ActivityInstanceCriterion.NAME_ASC).get(0);
-            final String activityName = userTaskInstance.getName();
-            assertNotNull(activityName);
-            assertEquals("step2", activityName);
             assertEquals(businessUser.getId(), processInstance.getStartedBySubstitute());
             assertEquals(firstUser.getId(), processInstance.getStartedBy());
         } finally {
@@ -295,7 +287,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         createAndDeployProcess2();
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long processInstanceId = processInstance.getId();
-        final ActivityInstance step1 = waitForUserTaskAndAssigneIt("step1", processInstance, businessUser);
+        final ActivityInstance step1 = waitForUserTaskAndAssigneIt(processInstance, "step1", businessUser);
 
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put("field_fieldId1", "Ryan");
@@ -313,7 +305,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         parameters.put(OPERATIONS_INPUT_KEY, (Serializable) fieldValues);
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
 
-        waitForUserTask("step2", processInstance);
+        waitForUserTask(processInstance, "step2");
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstanceId);
         assertEquals("Ryan", dataInstance.getValue().toString());
         final DataInstance dataInstance2 = getProcessAPI().getProcessDataInstance(dataName2, processInstanceId);
@@ -368,14 +360,14 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         createAndDeployProcess2();
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTaskAndAssigneIt("step1", processInstance, businessUser);
+        final ActivityInstance userTask = waitForUserTaskAndAssigneIt(processInstance, "step1", businessUser);
 
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(ACTIVITY_INSTANCE_ID_KEY, userTask.getId());
         parameters.put("USER_ID_KEY", user.getId());
         try {
             getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
-            waitForUserTask("step2", processInstance);
+            waitForUserTask(processInstance, "step2");
 
             final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(userTask.getId());
             assertEquals(user.getId(), archivedActivityInstance.getExecutedBy());
@@ -427,14 +419,12 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final String mainInputName1 = "param1";
 
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcessDefinition.getId());
-        final ActivityInstance step2 = waitForUserTask("step2");
-        getProcessAPI().assignUserTask(step2.getId(), businessUser.getId());
+        final ActivityInstance step2 = waitForUserTaskAndAssigneIt("step2", businessUser);
 
         // Expressions
         final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, "'Welcome '+valueOfInput1",
-                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression));
+                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), "GROOVY", Arrays.asList(input1Expression));
 
         final HashMap<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put(inputName1, "Lily");
@@ -462,7 +452,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         parameters.put(OPERATIONS_INPUT_KEY, fieldValues);
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
 
-        waitForUserTask("step1", parentProcessInstance);
+        waitForUserTask(parentProcessInstance, "step1");
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("parentProcessData", parentProcessInstance.getId());
         assertEquals("Welcome Lily", dataInstance.getValue().toString());
 
@@ -477,8 +467,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for the user task and assign it
-        final ActivityInstance userTask = waitForUserTask("step1", processInstance);
-        getProcessAPI().assignUserTask(userTask.getId(), getSession().getUserId());
+        final ActivityInstance userTask = waitForUserTaskAndAssigneIt(processInstance, "step1", businessUser);
 
         // create operation to increment the variable
         final Expression dataExpression = new ExpressionBuilder().createDataExpression(intDataName, Integer.class.getName());
@@ -508,8 +497,8 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         createAndDeployProcess2();
         final String mainInputName1 = "param1";
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long processInstanceId = processInstance.getId();
-        waitForUserTask("step1", processInstance);
+
+        waitForUserTask(processInstance, "step1");
 
         // Main Expression
         final HashMap<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -549,7 +538,9 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         parameters.put(OPERATIONS_INPUT_KEY, fieldValues);
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
 
-        waitForUserTask("step2", processInstanceId);
+        waitForUserTask(processInstance, "step2");
+
+        final long processInstanceId = processInstance.getId();
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstanceId);
         assertEquals("field_fieldId1_Ryan", dataInstance.getValue().toString());
         final DataInstance dataInstance2 = getProcessAPI().getProcessDataInstance(dataName2, processInstanceId);
@@ -642,9 +633,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         processDefinition = deployAndEnableProcessWithActor(builder.done(), "myActor", businessUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
-        final ActivityInstance userTaskInstance = waitForUserTask("Request", processInstance);
-        final long taskId = userTaskInstance.getId();
-        getProcessAPI().assignUserTask(taskId, getSession().getUserId());
+        final ActivityInstance userTaskInstance = waitForUserTaskAndAssigneIt(processInstance, "Request", businessUser);
 
         // execute it with operation using the command
         final HashMap<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -655,12 +644,12 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final ArrayList<Operation> operations = new ArrayList<Operation>(1);
         operations.add(operation);
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(ACTIVITY_INSTANCE_ID_KEY, taskId);
+        parameters.put(ACTIVITY_INSTANCE_ID_KEY, userTaskInstance.getId());
         parameters.put(OPERATIONS_LIST_KEY, operations);
         parameters.put(OPERATIONS_INPUT_KEY, fieldValues);
 
         // just check the operation is executed normally
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
-        waitForUserTask("Approval", processInstance);
+        waitForUserTask(processInstance, "Approval");
     }
 }

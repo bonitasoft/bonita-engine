@@ -25,6 +25,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
@@ -155,10 +157,10 @@ public class CodeGeneratorTest {
     public void shouldAddGetter_AddAJMethodInDefinedClass_AndReturnIt_ForBoolean() throws Exception {
         final JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
         final JFieldVar privateField = codeGenerator.addField(definedClass, "married", Boolean.class);
-        final JMethod setter = codeGenerator.addGetter(definedClass, privateField);
-        assertThat(setter).isNotNull().isInstanceOf(JMethod.class);
-        assertThat(setter.name()).isEqualTo("isMarried");
-        assertThat(codeGenerator.getModel()._getClass("org.bonitasoft.Entity").methods()).contains(setter);
+        final JMethod getter = codeGenerator.addGetter(definedClass, privateField);
+        assertThat(getter).isNotNull().isInstanceOf(JMethod.class);
+        assertThat(getter.name()).isEqualTo("isMarried");
+        assertThat(codeGenerator.getModel()._getClass("org.bonitasoft.Entity").methods()).contains(getter);
     }
 
     @Test
@@ -200,6 +202,12 @@ public class CodeGeneratorTest {
         final JFieldVar nameField = codeGenerator.addField(definedClass, "name", String.class);
 
         final JClass stringList = codeGenerator.getModel().ref(List.class).narrow(String.class);
+        final JClass booleanList = codeGenerator.getModel().ref(List.class).narrow(Boolean.class);
+        final JClass booleanField = codeGenerator.getModel().ref(Boolean.class);
+
+        final JFieldVar booleanMultipleField = codeGenerator.addField(definedClass, "bools", booleanList);
+        final JFieldVar booleanSingleField = codeGenerator.addField(definedClass, "bool", booleanField);
+
         final JFieldVar skillField = codeGenerator.addField(definedClass, "skills", stringList);
         final JFieldVar dateField = codeGenerator.addField(definedClass, "returnDate", codeGenerator.getModel().ref(Date.class));
         final JAnnotationUse tAnnotation = codeGenerator.addAnnotation(dateField, Temporal.class);
@@ -211,6 +219,12 @@ public class CodeGeneratorTest {
 
         codeGenerator.addGetter(definedClass, skillField);
         codeGenerator.addSetter(definedClass, skillField);
+
+        codeGenerator.addGetter(definedClass, booleanMultipleField);
+        codeGenerator.addSetter(definedClass, booleanMultipleField);
+
+        codeGenerator.addGetter(definedClass, booleanSingleField);
+        codeGenerator.addSetter(definedClass, booleanSingleField);
 
         final File destDir = createTempDirectory("generatedPojo");
         try {
@@ -233,6 +247,37 @@ public class CodeGeneratorTest {
     public void shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() {
         System.err
                 .println("***************** PLEASE Implement test com.bonitasoft.engine.bdm.CodeGeneratorTest.shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() *************");
+    }
+
+    @Test
+    public void should_add_and_remove_generate_on_boolean_list() throws Exception {
+        //given
+        final JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Demo");
+        SimpleField booleanField = new SimpleField();
+        booleanField.setName("booleanField");
+        booleanField.setType(FieldType.BOOLEAN);
+        booleanField.setCollection(true);
+        SimpleField stringField = new SimpleField();
+        stringField.setName("stringField");
+        stringField.setType(FieldType.STRING);
+        stringField.setCollection(true);
+
+        //when
+        codeGenerator.addAddMethod(definedClass, booleanField);
+        codeGenerator.addRemoveMethod(definedClass, booleanField);
+        codeGenerator.addAddMethod(definedClass, stringField);
+        codeGenerator.addRemoveMethod(definedClass, stringField);
+
+        //then
+        final File tempDirectory = createTempDirectory("generatedPojo");
+        try {
+            codeGenerator.generate(tempDirectory);
+            final File rootFolder = new File(tempDirectory, "org" + File.separatorChar + "bonitasoft");
+            assertThat(rootFolder.listFiles()).isNotEmpty().contains(new File(rootFolder, "Demo.java"));
+        } finally {
+            FileUtils.deleteQuietly(tempDirectory);
+        }
+
     }
 
 }

@@ -27,6 +27,9 @@
     <cache name="org.bonitasoft.engine.identity.model.impl.SUserImpl"
            maxElementsInMemory="10000" timeToLiveSeconds="120"
            memoryStoreEvictionPolicy="LRU" overflowToDisk="false"/>
+    <cache name="org.bonitasoft.engine.identity.model.impl.SUserLoginImpl"
+           maxElementsInMemory="10000" timeToLiveSeconds="120"
+           memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
     <cache
             name="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl"
             maxElementsInMemory="10000" timeToLiveSeconds="120"
@@ -70,10 +73,7 @@
             name="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl"
             maxElementsInMemory="10000" timeToLiveSeconds="120"
             memoryStoreEvictionPolicy="LRU" overflowToDisk="false"/>
-    <cache
-            name="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl"
-            maxElementsInMemory="10000" timeToLiveSeconds="120"
-            memoryStoreEvictionPolicy="LRU" overflowToDisk="false"/>
+    
     <cache
             name="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl"
             maxElementsInMemory="10000" timeToLiveSeconds="120"

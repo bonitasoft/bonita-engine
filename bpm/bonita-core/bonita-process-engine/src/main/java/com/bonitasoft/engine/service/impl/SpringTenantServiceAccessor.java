@@ -11,6 +11,7 @@ package com.bonitasoft.engine.service.impl;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
+import com.bonitasoft.engine.business.data.BusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
@@ -41,6 +42,8 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     private BusinessDataModelRepository businessDataModelRespository;
 
     private ApplicationService applicationService;
+
+    private BusinessDataService businessDataService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         super(tenantId);
@@ -131,6 +134,14 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
             applicationService = lookupService(ApplicationService.class);
         }
         return applicationService;
+    }
+
+    @Override
+    public BusinessDataService getBusinessDataService() {
+        if (businessDataService == null) {
+            businessDataService = lookupService(BusinessDataService.class);
+        }
+        return businessDataService;
     }
 
 }

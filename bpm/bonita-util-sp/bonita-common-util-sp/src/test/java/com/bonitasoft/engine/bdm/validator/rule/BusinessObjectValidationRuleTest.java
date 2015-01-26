@@ -59,21 +59,37 @@ public class BusinessObjectValidationRuleTest {
 
         assertThat(validationStatus).isNotOk();
     }
-    
+
     @Test
     public void should_validate_that_qualified_name_is_not_starting_by_org_bonitasoft() throws Exception {
-        final BusinessObject bo = aValidBusinesObject();
-        bo.setQualifiedName("com.bonitasoft.Forbidden");
+        checkQualifiedNameValidationStatus("com.bonitasoft.Forbidden", false);
 
+
+        checkQualifiedNameValidationStatus("com.bonitasoftextended", true);
+        checkQualifiedNameValidationStatus("org.com.bonitasoft.modem", true);
+        checkQualifiedNameValidationStatus("org.bonitasoft", true);
+    }
+
+    private void checkQualifiedNameValidationStatus(final String qualifiedName, final boolean expectedValidation) {
+        //given
+        final BusinessObject bo = aValidBusinesObject();
+        bo.setQualifiedName(qualifiedName);
+
+        //when
         final ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
 
-        assertThat(validationStatus).isNotOk();
+        //then
+        if (expectedValidation) {
+            assertThat(validationStatus).isOk();
+        } else {
+            assertThat(validationStatus).isNotOk();
+        }
     }
 
     @Test
     public void shoudCheckRule_returns_valid_status() {
         final BusinessObject bo = aValidBusinesObject();
-        
+
         ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus).isOk();
 
@@ -83,12 +99,12 @@ public class BusinessObjectValidationRuleTest {
     }
 
     private BusinessObject aValidBusinesObject() {
-        BusinessObject bo = new BusinessObject();
+        final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo");
-        
-        SimpleField field = new SimpleField();
+
+        final SimpleField field = new SimpleField();
         field.setName("firstName");
-        
+
         bo.addField(field);
         return bo;
     }
