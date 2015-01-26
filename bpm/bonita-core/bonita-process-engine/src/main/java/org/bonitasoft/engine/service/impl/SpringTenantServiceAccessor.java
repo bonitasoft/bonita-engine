@@ -70,6 +70,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.xml.ChildrenEntriesBinding;
 import org.bonitasoft.engine.profile.xml.MembershipBinding;
@@ -232,6 +233,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private PermissionService permissionService;
 
     private ParentContainerResolver parentContainerResolver;
+
+    private ParameterService parameterService;
 
     public ParentContainerResolver getParentContainerResolver() {
         if (parentContainerResolver == null) {
@@ -807,5 +810,13 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             permissionService = beanAccessor.getService(PermissionService.class);
         }
         return permissionService;
+    }
+
+    @Override
+    public ParameterService getParameterService() {
+        if (parameterService == null) {
+            parameterService = beanAccessor.getService(ParameterService.class);
+        }
+        return parameterService;
     }
 }
