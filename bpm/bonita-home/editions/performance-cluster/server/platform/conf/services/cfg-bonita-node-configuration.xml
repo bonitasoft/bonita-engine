@@ -17,9 +17,6 @@
                 <ref bean="classLoaderService" />
                 <ref bean="normalClassLoader" />
                 <ref bean="platformCacheService" />
-                <ref bean="cacheService" />
-                <ref bean="distributedCacheService" />
-                <ref bean="localCacheService" />
             </list>
         </property>
 		<property name="jobListeners">
