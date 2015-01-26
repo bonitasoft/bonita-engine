@@ -286,7 +286,7 @@ public interface CommandAPI {
      * @param name
      *        The name of the command
      * @param updateDescriptor
-     *        The update descriptor (containing the fields to update & their new value).
+     *        The update descriptor (containing the fields to update &amp; their new value).
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
