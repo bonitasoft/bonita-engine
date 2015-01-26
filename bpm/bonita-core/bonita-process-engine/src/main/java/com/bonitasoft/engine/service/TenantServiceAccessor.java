@@ -17,7 +17,7 @@ import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.page.PageService;
-import com.bonitasoft.engine.parameter.ParameterService;
+import org.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 
 /**
@@ -25,8 +25,6 @@ import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
  * @author Celine Souchet
  */
 public interface TenantServiceAccessor extends org.bonitasoft.engine.service.TenantServiceAccessor {
-
-    ParameterService getParameterService();
 
     BreakpointService getBreakpointService();
 

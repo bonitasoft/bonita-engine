@@ -11,8 +11,8 @@ package com.bonitasoft.engine.api.impl.transaction.process;
 import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
-import com.bonitasoft.engine.parameter.ParameterService;
-import com.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
+import org.bonitasoft.engine.parameter.ParameterService;
+import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
