@@ -37,6 +37,7 @@ public class BusinessArchiveFactory {
     static {
         contributions = new ArrayList<BusinessArchiveContribution>();
         contributions.add(new ProcessDefinitionBARContribution());
+        contributions.add(new ParameterContribution());
         contributions.add(new ConnectorContribution());
         contributions.add(new ExternalResourceContribution());
         contributions.add(new ActorMappingContribution());

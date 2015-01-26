@@ -79,7 +79,7 @@ public class ProcessBuilder extends FlowElementContainerBuilder {
      *        The type of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition} (complete class name)
      * @return The {@link ParameterDefinitionBuilder} containing the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
      */
-    public ParameterDefinitionBuilder addAParameter(final String parameterName, final String type) {
+    public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
         return new ParameterDefinitionBuilder(getProcessBuilder(), process, parameterName, type);
     }
 

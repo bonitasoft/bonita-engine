@@ -15,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
         ProcessResolutionIT.class,
+        ProcessParameterIT.class,
         ProcessExecutionIT.class,
         ProcessManagementIT.class,
         ProcessDeploymentIT.class,

@@ -679,7 +679,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      *        The type of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition} (complete class name)
      * @return The {@link ParameterDefinitionBuilder} containing the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
      */
-    public ParameterDefinitionBuilder addAParameter(final String parameterName, final String type) {
+    public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
         return new ParameterDefinitionBuilder(this, process, parameterName, type);
     }
 
