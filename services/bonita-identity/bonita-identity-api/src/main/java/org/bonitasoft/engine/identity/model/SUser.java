@@ -53,7 +53,7 @@ public interface SUser extends PersistentObject {
 
     long getLastUpdate();
 
-    Long getLastConnection();
+    SUserLogin getSUserLogin();
 
     boolean isEnabled();
 

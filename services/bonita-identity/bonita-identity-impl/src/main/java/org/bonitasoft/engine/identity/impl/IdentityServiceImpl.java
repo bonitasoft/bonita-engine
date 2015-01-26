@@ -54,6 +54,7 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.SUserLogin;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoLogBuilder;
@@ -69,6 +70,8 @@ import org.bonitasoft.engine.identity.model.builder.SUserLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilderFactory;
+import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.impl.SUserLoginImpl;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -259,9 +262,16 @@ public class IdentityServiceImpl implements IdentityService {
                 + user.getLastName();
         final SUserLogBuilder logBuilder = getUserLog(ActionType.CREATED, message);
         try {
+            //no insert event for user login objects
             final InsertRecord insertRecord = new InsertRecord(hashedUser);
             final SInsertEvent insertEvent = getInsertEvent(hashedUser, USER);
+            SUserLoginImpl sUserLogin = new SUserLoginImpl();
             recorder.recordInsert(insertRecord, insertEvent);
+            ((SUserImpl)hashedUser).setsUserLogin(sUserLogin);
+            sUserLogin.setsUser(hashedUser);
+            sUserLogin.setId(hashedUser.getId());
+            sUserLogin.setTenantId(((SUserImpl)hashedUser).getTenantId());
+            recorder.recordInsert(new InsertRecord(sUserLogin), null);
             initiateLogBuilder(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
             return hashedUser;
@@ -538,6 +548,8 @@ public class IdentityServiceImpl implements IdentityService {
         try {
             final DeleteAllRecord record = new DeleteAllRecord(SUser.class, null);
             recorder.recordDeleteAll(record);
+            final DeleteAllRecord record2 = new DeleteAllRecord(SUserLogin.class, null);
+            recorder.recordDeleteAll(record2);
         } catch (final SRecorderException e) {
             throw new SUserDeletionException("Can't delete all users.", e);
         }
@@ -1806,5 +1818,4 @@ public class IdentityServiceImpl implements IdentityService {
         logAfterMethod(methodName);
         return result;
     }
-
 }

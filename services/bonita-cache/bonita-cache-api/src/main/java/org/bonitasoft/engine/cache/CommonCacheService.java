@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013, 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,16 +16,14 @@ package org.bonitasoft.engine.cache;
 import java.io.Serializable;
 import java.util.List;
 
-import org.bonitasoft.engine.commons.PlatformLifecycleService;
-
 /**
  * @author Baptiste Mesta
  */
-public interface CommonCacheService extends PlatformLifecycleService {
+public interface CommonCacheService {
 
     /**
      * Store an object in the cache. If the cache don't exists it will be created.
-     * 
+     *
      * @param cacheName
      *            The name of the cache in which the object must be stored
      * @param key
@@ -39,7 +37,7 @@ public interface CommonCacheService extends PlatformLifecycleService {
 
     /**
      * Remove the element according to the cache name and the key
-     * 
+     *
      * @param cacheName
      * @param key
      *            The name of the cache where the object must be stored
@@ -53,7 +51,7 @@ public interface CommonCacheService extends PlatformLifecycleService {
 
     /**
      * Get a cached object.
-     * 
+     *
      * @param cacheName
      *            The name of the cache on which to get the object
      * @param key
@@ -66,7 +64,7 @@ public interface CommonCacheService extends PlatformLifecycleService {
 
     /**
      * Get list of keys on a cache.
-     * 
+     *
      * @param cacheName
      *            The name of the cache on which to get the key list
      * @return the list of keys on the cache, or null if no keys exist
@@ -76,7 +74,7 @@ public interface CommonCacheService extends PlatformLifecycleService {
 
     /**
      * Clear the cache named by cacheName
-     * 
+     *
      * @param cacheName
      *            The name of the cache to clear
      * @return
@@ -87,7 +85,7 @@ public interface CommonCacheService extends PlatformLifecycleService {
 
     /**
      * Clear all cache of the service
-     * 
+     *
      * @throws SCacheException
      *             Error thrown if has exceptions during the cache clear.
      */
@@ -95,7 +93,7 @@ public interface CommonCacheService extends PlatformLifecycleService {
 
     /**
      * Return the size of the cache with cacheName.
-     * 
+     *
      * @param cacheName
      *            The name of cache
      * @return the size of the named cache
@@ -106,7 +104,7 @@ public interface CommonCacheService extends PlatformLifecycleService {
 
     /**
      * Get the names of all the caches
-     * 
+     *
      * @return a list of caches names
      */
     List<String> getCachesNames();
