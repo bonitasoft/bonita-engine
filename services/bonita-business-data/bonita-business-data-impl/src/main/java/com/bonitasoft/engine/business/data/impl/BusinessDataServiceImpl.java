@@ -2,7 +2,6 @@ package com.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -38,8 +37,6 @@ import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import com.toddfast.util.convert.TypeConverter;
 
 public class BusinessDataServiceImpl implements BusinessDataService {
-
-    private static final String BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
 
     private final BusinessDataRepository businessDataRepository;
     private final JsonBusinessDataSerializer jsonBusinessDataSerializer;
@@ -296,7 +293,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         final Query queryDefinition = getQueryDefinition(entityClassName, queryName);
 
         final List<? extends Serializable> list = businessDataRepository.findListByNamedQuery(getQualifiedQueryName(businessDataClass, queryName),
-                getQueryReturnType(queryDefinition),
+                getQueryReturnType(queryDefinition, entityClassName),
                 getQueryParameters(queryDefinition, parameters), startIndex,
                 maxResults);
         try {
@@ -306,7 +303,11 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
     }
 
-    private Class<? extends Serializable> getQueryReturnType(Query queryDefinition) throws SBusinessDataRepositoryException {
+    private Class<? extends Serializable> getQueryReturnType(Query queryDefinition, String entityClassName) throws SBusinessDataRepositoryException {
+        String returnType = queryDefinition.getReturnType();
+        if (queryReturnsMultipleResults(returnType)) {
+            return loadClass(entityClassName);
+        }
         try {
             return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(queryDefinition.getReturnType());
         } catch (ClassNotFoundException e) {
@@ -314,12 +315,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
     }
 
-    private Class<? extends Serializable> getQueryReturnTypez(Query queryDefinition) throws SBusinessDataRepositoryException {
-        try {
-            return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(queryDefinition.getReturnType());
-        } catch (ClassNotFoundException e) {
-            throw new SBusinessDataRepositoryException("unable to load class " + queryDefinition.getReturnType());
-        }
+    private boolean queryReturnsMultipleResults(String returnType) {
+        return returnType.equals(List.class.getName());
     }
 
     private String getQualifiedQueryName(Class<? extends Entity> businessDataClass, String queryName) {
