@@ -72,6 +72,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
@@ -567,6 +568,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public <T> T lookup(final String serviceName) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PageService getOrgPageService() {
+        return getInstanceOf(PageService.class);
     }
 
 }

@@ -259,11 +259,16 @@
 			<artifactId>bonita-operation-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Page -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.page</groupId>
 			<artifactId>bonita-page</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.page</groupId>
+			<artifactId>bonita-page-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
@@ -635,7 +640,8 @@
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-api</include>
 									<include>org.bonitasoft.engine.core.operation:bonita-operation-api-impl</include>
 									<!-- Page -->
-									<include>org.bonitasoft.engine.page:bonita-page</include>
+									<include>org.bonitasoft.engine.page:bonita-page-api</include>
+									<include>org.bonitasoft.engine.page:bonita-page-impl</include>
 									<!-- Persistence -->
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-api</include>
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-db</include>

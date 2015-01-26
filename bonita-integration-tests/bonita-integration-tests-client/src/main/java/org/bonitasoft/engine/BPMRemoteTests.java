@@ -9,6 +9,7 @@ import org.bonitasoft.engine.identity.IdentityTests;
 import org.bonitasoft.engine.login.LoginAPIIT;
 import org.bonitasoft.engine.login.PlatformLoginAPIIT;
 import org.bonitasoft.engine.operation.OperationIT;
+import org.bonitasoft.engine.page.PageAPIIT;
 import org.bonitasoft.engine.platform.command.PlatformCommandIT;
 import org.bonitasoft.engine.process.ProcessTests;
 import org.bonitasoft.engine.profile.ProfileAllTest;
@@ -35,7 +36,8 @@ import org.junit.runners.Suite.SuiteClasses;
         OperationIT.class,
         TaskTests.class,
         TenantAccessorTest.class,
-        MultiThreadCallsIT.class
+        MultiThreadCallsIT.class,
+        PageAPIIT.class
 })
 @Initializer(TestsInitializer.class)
 public class BPMRemoteTests {

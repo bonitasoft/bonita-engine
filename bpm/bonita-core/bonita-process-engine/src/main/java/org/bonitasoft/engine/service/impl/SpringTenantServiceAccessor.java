@@ -70,6 +70,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.xml.ChildrenEntriesBinding;
 import org.bonitasoft.engine.profile.xml.MembershipBinding;
@@ -232,6 +233,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private PermissionService permissionService;
 
     private ParentContainerResolver parentContainerResolver;
+
+    private PageService pageService;
 
     public ParentContainerResolver getParentContainerResolver() {
         if (parentContainerResolver == null) {
@@ -808,4 +811,16 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         }
         return permissionService;
     }
+
+    /**
+     * might not be an available service
+     */
+    @Override
+    public PageService getOrgPageService() {
+        if (pageService == null) {
+            pageService = beanAccessor.getService(PageService.class);
+        }
+        return pageService;
+    }
+
 }

@@ -10,6 +10,7 @@ import org.bonitasoft.engine.identity.UserIT;
 import org.bonitasoft.engine.login.LoginAPIIT;
 import org.bonitasoft.engine.login.PlatformLoginAPIIT;
 import org.bonitasoft.engine.operation.OperationIT;
+import org.bonitasoft.engine.page.PageAPIIT;
 import org.bonitasoft.engine.platform.command.PlatformCommandIT;
 import org.bonitasoft.engine.process.ProcessManagementIT;
 import org.bonitasoft.engine.profile.ProfileIT;
@@ -39,7 +40,10 @@ import org.junit.runners.Suite.SuiteClasses;
         OperationIT.class,
         TenantAccessorTest.class,
         MultiThreadCallsIT.class,
-        AdvancedStartProcessCommandIT.class })
+        AdvancedStartProcessCommandIT.class,
+        PageAPIIT.class
+
+})
 @Initializer(BPMRemoteTestsForServers.class)
 public class BPMRemoteTestsForServers {
 

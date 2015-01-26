@@ -33,6 +33,7 @@ import java.util.concurrent.TimeoutException;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
@@ -171,6 +172,8 @@ public class APITestUtil extends PlatformTestUtil {
 
     private PermissionAPI permissionAPI;
 
+    private PageAPI pageAPI;
+
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
         if (strTimeout != null) {
@@ -210,6 +213,7 @@ public class APITestUtil extends PlatformTestUtil {
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
+        setPageAPI(TenantAPIAccessor.getPageAPI(getSession()));
     }
 
     public void logoutOnTenant() throws BonitaException {
@@ -1441,6 +1445,14 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void setSession(final APISession session) {
         this.session = session;
+    }
+
+    protected void setPageAPI(final PageAPI pageAPI) {
+        this.pageAPI = pageAPI;
+    }
+
+    public PageAPI getOrgPageAPI() {
+        return pageAPI;
     }
 
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
