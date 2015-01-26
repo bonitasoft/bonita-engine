@@ -48,12 +48,19 @@ CREATE TABLE user_ (
   createdBy BIGINT,
   creationDate BIGINT,
   lastUpdate BIGINT,
-  lastConnection BIGINT,
   UNIQUE (tenantid, userName),
   PRIMARY KEY (tenantid, id)
 );
 
 CREATE INDEX idx_user_name ON user_ (tenantid, userName);
+
+
+CREATE TABLE user_login (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  lastConnection BIGINT,
+  PRIMARY KEY (tenantid, id)
+);
 
 CREATE TABLE user_contactinfo (
   tenantid BIGINT NOT NULL,

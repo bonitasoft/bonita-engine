@@ -1,7 +1,19 @@
+/**
+ * Copyright (C) 2013, 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.cache.ehcache;
 
 import java.io.Serializable;
-import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +32,9 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
+/**
+ * @author Matthieu Chaffotte
+ */
 public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     protected CacheManager cacheManager;
@@ -30,18 +45,10 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     protected final Map<String, CacheConfiguration> cacheConfigurations;
 
-    private final URL configFile;
-
     public CommonEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
             final CacheConfigurations cacheConfigurations) {
-        this(logger, sessionAccessor, cacheConfigurations, null);
-    }
-
-    public CommonEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-            final CacheConfigurations cacheConfigurations, final URL configFile) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
-        this.configFile = configFile;
         final List<org.bonitasoft.engine.cache.CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
         this.cacheConfigurations = new HashMap<String, CacheConfiguration>(configurations.size());
         for (final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig : configurations) {
@@ -289,33 +296,6 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             }
             throw new SCacheException(e);
         }
-    }
-
-    public void destroy() {
-        stop();
-    }
-
-    @Override
-    public synchronized void start() {
-        cacheManager = configFile != null ? CacheManager.create(configFile) : CacheManager.create();
-    }
-
-    @Override
-    public synchronized void stop() {
-        if (cacheManager != null) {
-            cacheManager.shutdown();
-            cacheManager = null;
-        }
-    }
-
-    @Override
-    public void pause() {
-        // nothing to do
-    }
-
-    @Override
-    public void resume() {
-        // nothing to do
     }
 
 }

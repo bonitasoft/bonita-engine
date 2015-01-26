@@ -3,8 +3,6 @@ package org.bonitasoft.engine.execution;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +66,7 @@ public class NormalStateTransitionsManagerTest {
     }
 
     @Test
-    public void getNextState_should_throw_terminal_SIllegalStateTransition_exception_if_ther_is_no_entry_in_the_map_and_state_is_terminal() {
+    public void getNextState_should_throw_SIllegalStateTransition_exception_if_there_is_no_entry_in_the_map() {
         // given
         NormalStateTransitionsManager transitionsManager = new NormalStateTransitionsManager(stateTransitions, flowNodeInstance);
 
@@ -82,26 +80,6 @@ public class NormalStateTransitionsManagerTest {
             assertThat(message).startsWith("no state found after");
             assertThat(message).contains("for flow node of type");
             assertThat(message).endsWith("in state category " + SStateCategory.NORMAL + ". Flow node instance id = " + FLOW_NODE_INSTANCE_ID);
-            assertThat(e.isTransitionFromTerminalState()).isTrue();
-        }
-
-    }
-
-    @Test
-    public void getNextState_should_throw_non_terminal_SIllegalStateTransition_exception_if_ther_is_no_entry_in_the_map_and_state_is_non_terminal() {
-        // given
-        FlowNodeState terminalUnMappedState = mock(FlowNodeState.class);
-        when(terminalUnMappedState.getStateCategory()).thenReturn(SStateCategory.NORMAL);
-        when(terminalUnMappedState.getId()).thenReturn(1000);
-        NormalStateTransitionsManager transitionsManager = new NormalStateTransitionsManager(stateTransitions, flowNodeInstance);
-
-        try {
-            // when
-            transitionsManager.getNextState(terminalUnMappedState);
-            fail("SIllegalStateTransition must be thrown");
-        } catch (SIllegalStateTransition e) {
-            // then
-            assertThat(e.isTransitionFromTerminalState()).isFalse();
         }
 
     }

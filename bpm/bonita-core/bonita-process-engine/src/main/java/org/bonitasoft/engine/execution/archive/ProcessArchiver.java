@@ -85,11 +85,7 @@ public class ProcessArchiver {
             final ConnectorInstanceService connectorInstanceService) throws SArchivingException {
         final SAProcessInstance saProcessInstance = BuilderFactory.get(SAProcessInstanceBuilderFactory.class).createNewInstance(processInstance).done();
         final long archiveDate = saProcessInstance.getEndDate();
-        try {
-            dataInstanceService.removeContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.toString());
-        } catch (final SDataInstanceException e) {
-            throw new SArchivingException("Unable to delete data mapping.", e);
-        }
+
         SProcessDefinition processDefinition = null;
         try {
             processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
@@ -212,7 +208,19 @@ public class ProcessArchiver {
     private static void archiveDataInstances(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
             final DataInstanceService dataInstanceService, final long archiveDate) throws SArchivingException {
         try {
-            dataInstanceService.archiveLocalDataInstancesFromProcessInstance(processInstance.getId(), archiveDate);
+            long processInstanceId = processInstance.getId();
+            final int archiveBatchSize = 50;
+            int currentIndex = 0;
+            List<SDataInstance> sDataInstances = dataInstanceService.getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,
+                    archiveBatchSize);
+
+            while (sDataInstances != null && sDataInstances.size() > 0) {
+                for (final SDataInstance sDataInstance : sDataInstances) {
+                    dataInstanceService.archiveDataInstance(sDataInstance, archiveDate);
+                }
+                currentIndex += archiveBatchSize;
+                sDataInstances = dataInstanceService.getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex, archiveBatchSize);
+            }
         } catch (final SDataInstanceException e) {
             setExceptionContext(processDefinition, processInstance, e);
             throw new SArchivingException("Unable to archive the process instance.", e);
@@ -278,8 +286,14 @@ public class ProcessArchiver {
                         .createNewArchivedSubProcessActivityInstance((SSubProcessActivityInstance) flowNodeInstance).done();
                 break;
             case END_EVENT:
+                // To uncomment if need to fix BS-11970
+                //                saFlowNodeInstance = BuilderFactory.get(SAEndEventInstanceBuilderFactory.class)
+                //                        .createNewArchivedEndEventInstance((SEndEventInstance) flowNodeInstance).done();
                 break;
             case START_EVENT:
+                // To uncomment if need to fix BS-11970
+                //                saFlowNodeInstance = BuilderFactory.get(SAStartEventInstanceBuilderFactory.class)
+                //                        .createNewArchivedStartEventInstance((SStartEventInstance) flowNodeInstance).done();
                 break;
             case BOUNDARY_EVENT:
                 break;
@@ -329,7 +343,6 @@ public class ProcessArchiver {
                         archiveConnectors(connectorInstanceService, archiveDate, intTxflowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
                     }
                 }
-                dataInstanceService.removeContainer(intTxflowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
 
                 // then archive the flow node instance:
                 archiveFlowNodeInstance(intTxflowNodeInstance, archiveService, archiveDate);

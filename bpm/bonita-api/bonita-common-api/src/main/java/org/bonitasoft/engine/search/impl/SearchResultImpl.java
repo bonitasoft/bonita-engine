@@ -45,4 +45,38 @@ public class SearchResultImpl<T extends Serializable> implements SearchResult<T>
         return list;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (count ^ count >>> 32);
+        result = prime * result + (list == null ? 0 : list.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SearchResultImpl<?> other = (SearchResultImpl<?>) obj;
+        if (count != other.count) {
+            return false;
+        }
+        if (list == null) {
+            if (other.list != null) {
+                return false;
+            }
+        } else if (!list.equals(other.list)) {
+            return false;
+        }
+        return true;
+    }
+
 }

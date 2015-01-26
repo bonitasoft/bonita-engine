@@ -53,7 +53,6 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -107,7 +106,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(instance));
+        waitForProcessToFinish(instance);
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(instance.getId(), 0, 100,
                 ActivityInstanceCriterion.NAME_ASC);
         assertEquals(4, archivedActivityInstances.size());
@@ -126,16 +125,9 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(2));
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
-        getProcessAPI().startProcess(processDefinition.getId());
-
-        checkNbPendingTaskOf(1, john);
-        List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        HumanTaskInstance pendingTask = pendingTasks.get(0);
-        assignAndExecuteStep(pendingTask, john.getId());
-
-        checkNbPendingTaskOf(1, john);
-        pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        pendingTask = pendingTasks.get(0);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt(processInstance, "step1", john);
+        waitForUserTask(processInstance, "step1");
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -149,7 +141,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance userTask = waitForUserTask("step1", processInstance.getId());
+        final long step1Id = waitForUserTask(processInstance, "step1");
         final SearchResult<ActivityInstance> searchActivities = getProcessAPI().searchActivities(
                 new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
                         .filter(ActivityInstanceSearchDescriptor.STATE_NAME, "executing").done());
@@ -162,7 +154,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final MultiInstanceActivityInstance flowNode = (MultiInstanceActivityInstance) searchFlowNode.getResult().get(0);
         assertEquals(1, flowNode.getNumberOfActiveInstances());
 
-        assignAndExecuteStep(userTask, john.getId());
+        assignAndExecuteStep(step1Id, john);
         waitForProcessToFinish(processInstance);
 
         final SearchResult<ArchivedActivityInstance> searchArchivedActivities = getProcessAPI().searchArchivedActivities(
@@ -252,7 +244,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance(loopDataOutputName, process.getId());
         assertNotNull("unable to find the loop data output on the process", processDataInstance);
         final List<?> list = (List<?>) processDataInstance.getValue();
-        waitForUserTask("lastTask", process);
+        waitForUserTask(process, "lastTask");
         disableAndDeleteProcess(processDefinition);
         return list;
     }
@@ -420,10 +412,10 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("Step1");
-        waitForUserTaskAndExecuteIt("Step2", processInstance, john);
+        final long step1Id = waitForUserTask(processInstance, "Step1");
+        waitForUserTaskAndExecuteIt(processInstance, "Step2", john);
         waitForProcessToFinish(processInstance);
-        final ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1.getId());
+        final ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1Id);
         assertEquals(ActivityStates.ABORTED_STATE, archivedStep1.getState());
 
         disableAndDeleteProcess(processDefinition);
@@ -473,11 +465,10 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-        assertTrue(new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 4, john).waitUntil());
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        final HumanTaskInstance pendingTask1 = pendingTasks.get(0);
-        assignAndExecuteStep(pendingTask1, john.getId());
+        waitForUserTask(processInstance, "step1");
+        waitForUserTask(processInstance, "step1");
+        waitForUserTask(processInstance, "step1");
+        waitForUserTaskAndExecuteIt(processInstance, "step1", john);
 
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
@@ -615,7 +606,6 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
      */
     @Test
     public void executeTaskAfterMultiInstanceSequential() throws Exception {
-        final String ACTOR_NAME = "ACTOR_NAME men";
         final int loopMax = 3;
         final int numberOfExecutedActivities = loopMax + 1;
 
@@ -627,7 +617,6 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         checkPendingTaskSequentially(numberOfExecutedActivities, processInstance, true);
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -639,22 +628,17 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
      */
     @Test
     public void executeTaskAfterMultiInstanceSequentialAuto() throws Exception {
-        final int loopMax = 3;
-
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeTaskAfterMultiInstanceSequentialAuto",
                 PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
-        builder.addAutomaticTask("step1").addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
+        builder.addAutomaticTask("step1").addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(3));
         builder.addAutomaticTask("step2").addUserTask("step3", ACTOR_NAME).addTransition("step1", "step2").addTransition("step2", "step3");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkNbPendingTaskOf(1, john);
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        final HumanTaskInstance pendingTask = pendingTasks.get(0);
+        waitForUserTaskAndExecuteIt(processInstance, "step3", john);
 
-        assignAndExecuteStep(pendingTask, john.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -667,7 +651,6 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
     @Test
     public void executeTaskAfterMultiInstanceParallel() throws Exception {
         final int loopMax = 3;
-        final int numberOfTask = loopMax;
         final int numberOfTaskToComplete = 3;
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeTaskAfterMultiInstanceSequential", PROCESS_VERSION);
@@ -677,8 +660,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkPendingTaskInParallel(numberOfTask, numberOfTaskToComplete, processInstance);
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        checkPendingTaskInParallel(loopMax, numberOfTaskToComplete, processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -690,22 +672,17 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
      */
     @Test
     public void executeTaskAfterMultiInstanceParallelAuto() throws Exception {
-        final int loopMax = 3;
-
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeTaskAfterMultiInstanceSequentialAuto",
                 PROCESS_VERSION);
         builder.addActor(ACTOR_NAME);
-        builder.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
+        builder.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(3));
         builder.addAutomaticTask("step2").addUserTask("step3", ACTOR_NAME).addTransition("step1", "step2").addTransition("step2", "step3");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkNbPendingTaskOf(1, john);
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-        final HumanTaskInstance pendingTask = pendingTasks.get(0);
+        waitForUserTaskAndExecuteIt(processInstance, "step3", john);
 
-        assignAndExecuteStep(pendingTask, john.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -717,11 +694,9 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
      */
     @Test
     public void multiInstanceParallelWithSeveralUsers() throws Exception {
-        final int loopMax = 3;
-
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeMultiInstanceWithActors", PROCESS_VERSION);
         builder.addActor(ACTOR_NAME).addDescription("Survey");
-        builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
+        builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(3));
         builder.addAutomaticTask("step2").addTransition("step1", "step2");
 
         final List<User> listUsers = new ArrayList<User>();
@@ -754,7 +729,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final HumanTaskInstance pendingTask3 = pendingTasks3.get(0);
         assignAndExecuteStep(pendingTask3, jenny.getId());
 
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -803,7 +778,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final HumanTaskInstance pendingTask3 = pendingTasks3.get(0);
         assignAndExecuteStep(pendingTask3, jenny.getId());
 
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -836,7 +811,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final ProcessDefinition mainProcess = deployAndEnableProcessWithActor(builderProc.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(mainProcess.getId());
 
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(mainProcess);
         disableAndDeleteProcess(subProcess);
     }
@@ -930,9 +905,9 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
 
         // Start process, and wait all multiinstancied user tasks
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1", processInstance);
-        waitForUserTask("step1", processInstance);
-        waitForUserTask("step1", processInstance);
+        waitForUserTask(processInstance, "step1");
+        waitForUserTask(processInstance, "step1");
+        waitForUserTask(processInstance, "step1");
 
         // Get comments and check it
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
@@ -991,7 +966,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1", processInstance);
+        waitForUserTask(processInstance, "step1");
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -1006,9 +981,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         taskDefinitionBuilder.addMultiInstance(true, "list").addDataInputItemRef("listValue");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
-
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
         waitForFlowNodeInFailedState(processInstance);
 
         disableAndDeleteProcess(processDefinition);

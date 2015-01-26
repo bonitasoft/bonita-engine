@@ -88,21 +88,21 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", p1);
-        final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("activityData", step1.getId());
+        final long step1Id = waitForUserTask(p1, "step1");
+        final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("activityData", step1Id);
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("procData", p1.getId());
         assertNotNull(activityDataInstance);
-        assignAndExecuteStep(step1, john.getId());
-        waitForUserTaskAndExecuteIt("step1", p2, john);
-        waitForUserTaskAndExecuteIt("step1", p3, john);
+        assignAndExecuteStep(step1Id, john.getId());
+        waitForUserTaskAndExecuteIt(p2, "step1", john);
+        waitForUserTaskAndExecuteIt(p3, "step1", john);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         userTransactionService.executeInTransaction(new Callable<Void>() {
 
             @Override
             public Void call() throws Exception {
-                final SADataInstance saActDataInstances = dataInstanceService.getLastSADataInstance(activityDataInstance.getId());
+                final SADataInstance saActDataInstances = dataInstanceService.getSADataInstance(activityDataInstance.getId(), System.currentTimeMillis());
                 assertNotNull(saActDataInstances);
-                final SADataInstance saProcDataInstances = dataInstanceService.getLastSADataInstance(processDataInstance.getId());
+                final SADataInstance saProcDataInstances = dataInstanceService.getSADataInstance(processDataInstance.getId(), System.currentTimeMillis());
                 assertNotNull(saProcDataInstances);
 
                 return null;
@@ -120,8 +120,8 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
 
             @Override
             public Void call() throws Exception {
-                final SADataInstance saActDataInstances = dataInstanceService.getLastSADataInstance(activityDataInstance.getId());
-                final SADataInstance saProcDataInstances = dataInstanceService.getLastSADataInstance(processDataInstance.getId());
+                final SADataInstance saActDataInstances = dataInstanceService.getSADataInstance(activityDataInstance.getId(), System.currentTimeMillis());
+                final SADataInstance saProcDataInstances = dataInstanceService.getSADataInstance(processDataInstance.getId(), System.currentTimeMillis());
                 assertNull(saActDataInstances);
                 assertNull(saProcDataInstances);
                 return null;
@@ -186,7 +186,7 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", p1);
+        final long step1Id = waitForUserTask(p1, "step1");
         getProcessAPI().addProcessComment(p1.getId(), "A cool comment on p1");
         getProcessAPI().addProcessComment(p2.getId(), "A cool comment on p2");
         getProcessAPI().addProcessComment(p3.getId(), "A cool comment on p3");
@@ -204,9 +204,9 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
                 return null;
             }
         });
-        assignAndExecuteStep(step1, john.getId());
-        waitForUserTaskAndExecuteIt("step1", p2, john);
-        waitForUserTaskAndExecuteIt("step1", p3, john);
+        assignAndExecuteStep(step1Id, john.getId());
+        waitForUserTaskAndExecuteIt(p2, "step1", john);
+        waitForUserTaskAndExecuteIt(p3, "step1", john);
         waitForProcessToFinish(p1);
         waitForProcessToFinish(p2);
         waitForProcessToFinish(p3);
@@ -258,8 +258,7 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         final ProcessDefinition callingProcessDef = deployAndEnableProcess(callingProcess.getProcess());
 
         final ProcessInstance p1 = getProcessAPI().startProcess(callingProcessDef.getId());
-        final ActivityInstance userTask = waitForUserTask("step1", p1);
-        assignAndExecuteStep(userTask, john.getId());
+        final ActivityInstance userTask = waitForUserTaskAndExecuteAndGetIt(p1, "step1", john);
         waitForProcessToFinish(p1);
         waitForArchivedActivity(userTask.getId(), TestStates.NORMAL_FINAL);
         final ArchivedActivityInstance archivedUserTask = getProcessAPI().getArchivedActivityInstance(userTask.getId());
@@ -287,10 +286,9 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTask("step1", p1);
-        assignAndExecuteStep(userTask, john.getId());
+        final long userTaskId = waitForUserTaskAndExecuteIt(p1, "step1", john);
         waitForProcessToFinish(p1);
-        final ArchivedActivityInstance archivedUserTask = getProcessAPI().getArchivedActivityInstance(userTask.getId());
+        final ArchivedActivityInstance archivedUserTask = getProcessAPI().getArchivedActivityInstance(userTaskId);
         assertEquals(archivedUserTask, getProcessAPI().getArchivedFlowNodeInstance(archivedUserTask.getId()));
         disableAndDeleteProcess(processDefinition);
     }

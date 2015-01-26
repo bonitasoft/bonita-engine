@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.activity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessManagementAPI;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedLoopActivityInstance;
@@ -21,6 +22,7 @@ import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
@@ -33,6 +35,7 @@ import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -55,7 +58,7 @@ public class LoopIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(instance));
+        waitForProcessToFinish(instance);
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(instance.getId(), 0, 100,
                 ActivityInstanceCriterion.NAME_ASC);
         assertEquals(2, archivedActivityInstances.size());
@@ -76,7 +79,7 @@ public class LoopIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         waitForUserTask("step1");
 
         disableAndDeleteProcess(processDefinition);
@@ -95,10 +98,10 @@ public class LoopIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-            final ActivityInstance userTask = waitForUserTask(activityName, processInstance);
+            final long userTaskId = waitForUserTask(processInstance, activityName);
             final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
             expressions.put(new ExpressionBuilder().createConstantBooleanExpression(true), new HashMap<String, Serializable>(0));
-            getProcessAPI().evaluateExpressionsOnActivityInstance(userTask.getId(), expressions);
+            getProcessAPI().evaluateExpressionsOnActivityInstance(userTaskId, expressions);
         } finally {
             disableAndDeleteProcess(processDefinition);
         }
@@ -119,8 +122,8 @@ public class LoopIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         for (int i = 0; i < loopMax; i++) {
-            final HumanTaskInstance pendingTask = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
-            assignAndExecuteStep(pendingTask, user.getId());
+            final long step1Id = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
+            assignAndExecuteStep(step1Id, user);
         }
         waitForUserTaskAndcheckPendingHumanTaskInstances("step2", processInstance);
 
@@ -141,20 +144,52 @@ public class LoopIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         for (int i = 0; i < 3; i++) {
-            final HumanTaskInstance pendingTask = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
-            assignAndExecuteStep(pendingTask, user.getId());
+            final long step1Id = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
+            assignAndExecuteStep(step1Id, user);
         }
         waitForUserTaskAndcheckPendingHumanTaskInstances("step2", processInstance);
 
         disableAndDeleteProcess(processDefinition);
     }
 
-    private HumanTaskInstance waitForUserTaskAndcheckPendingHumanTaskInstances(final String userTaskName, final ProcessInstance processInstance)
+    @Test
+    @Ignore("BS-11655")
+    public void executeAStandardLoopWithDataUsingLoopCounter() throws Exception {
+        final Expression condition = new ExpressionBuilder().createGroovyScriptExpression("executeAStandardLoopWithDataUsingLoopCounter",
+                "loopCounter < 3", Boolean.class.getName(), Arrays.asList(new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
+
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAStandardLoopUserTask", "1.0");
+        builder.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
+
+        final Expression defaultValueExpression = new ExpressionBuilder().createGroovyScriptExpression("useLoopCounter",
+                "loopCounter", Integer.class.getName(), Arrays.asList(new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
+
+        final UserTaskDefinitionBuilder userTask = builder.addUserTask("step1", ACTOR_NAME);
+        userTask.addData("loopCounterData", Integer.class.getName(), defaultValueExpression);
+        userTask.addLoop(false, condition);
+
+        builder.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        for (int i = 1; i <= 3; i++) {
+            final long stepId;
+            stepId = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
+            assignAndExecuteStep(stepId, user);
+            final DataInstance loopCounterData = getProcessAPI().getActivityDataInstance("loopCounterData", stepId);
+            assertEquals(loopCounterData.getValue(), i);
+        }
+        waitForUserTaskAndcheckPendingHumanTaskInstances("step2", processInstance);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    private long waitForUserTaskAndcheckPendingHumanTaskInstances(final String userTaskName, final ProcessInstance processInstance)
             throws Exception {
-        final HumanTaskInstance pendingTask = waitForUserTask(userTaskName, processInstance);
+        final long pendingTaskId = waitForUserTask(processInstance, userTaskName);
         final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, pendingTasks.size());
-        return pendingTask;
+        return pendingTaskId;
     }
 
     @Test
@@ -180,8 +215,8 @@ public class LoopIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         for (int i = 0; i < 3; i++) {
-            final HumanTaskInstance pendingTask = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
-            assignAndExecuteStep(pendingTask, user.getId());
+            final long step1Id = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
+            assignAndExecuteStep(step1Id, user);
         }
         waitForUserTaskAndcheckPendingHumanTaskInstances("step2", processInstance);
 
@@ -196,9 +231,9 @@ public class LoopIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithLoopAndUserTaskInPararallelAndTerminateEvent(loopName, userTaskName);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        waitForUserTask(loopName, processInstance.getId());
+        waitForUserTask(processInstance.getId(), loopName);
         // when
-        waitForUserTaskAndExecuteIt(userTaskName, processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, userTaskName, user);
 
         // then
         // executing the user task will terminate the process: the loop activity must be aborted

@@ -8,7 +8,6 @@ ALTER TABLE category DROP CONSTRAINT fk_category_tenantId;
 ALTER TABLE command DROP CONSTRAINT fk_command_tenantId;
 ALTER TABLE connector_instance DROP CONSTRAINT fk_connector_instance_tenantId;
 ALTER TABLE data_instance DROP CONSTRAINT fk_data_instance_tenantId;
-ALTER TABLE data_mapping DROP CONSTRAINT fk_data_mapping_tenantId;
 ALTER TABLE dependency DROP CONSTRAINT fk_dependency_tenantId;
 ALTER TABLE dependencymapping DROP CONSTRAINT fk_dependencymapping_tenantId;
 ALTER TABLE document DROP CONSTRAINT fk_document_tenantId;
@@ -67,4 +66,3 @@ ALTER TABLE arch_process_comment DROP CONSTRAINT fk_arch_process_comment_tenantI
 ALTER TABLE arch_process_instance DROP CONSTRAINT fk_arch_process_instance_tenantId;
 ALTER TABLE arch_transition_instance DROP CONSTRAINT fk_arch_transition_instance_tenantId;
 ALTER TABLE arch_data_instance DROP CONSTRAINT fk_arch_data_instance_tenantId;
-ALTER TABLE arch_data_mapping DROP CONSTRAINT fk_arch_data_mapping_tenantId;

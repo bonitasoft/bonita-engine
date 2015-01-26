@@ -32,6 +32,10 @@ import org.bonitasoft.engine.commons.exceptions.SReflectException;
  */
 public class ClassReflector {
 
+    private static final String EMPTY = "";
+    private static final String SET = "set";
+    private static final String IS = "is";
+    private static final String GET = "get";
     private static final Map<String, Method> methods;
 
     static {
@@ -43,7 +47,7 @@ public class ClassReflector {
     public static Collection<Method> getAccessibleGetters(final Class<?> clazz) {
         final Collection<Method> methods = new HashSet<Method>();
         for (final Method method : clazz.getMethods()) {
-            if (!Void.class.equals(method.getReturnType()) && method.getParameterTypes().length == 0 && method.getName().startsWith("get")) {
+            if (isAGetterMethod(method)) {
                 methods.add(method);
             }
         }
@@ -218,6 +222,9 @@ public class ClassReflector {
                     if (methodName.equals(method.getName())) {
                         final Class<?>[] types = method.getParameterTypes();
                         boolean check = true;
+                        if (!(types.length == paramTypes.length)) {
+                            throw new SReflectException("wrong parameters");
+                        }
                         for (int i = 0; i < types.length; i++) {
                             if (!(types[i].isAssignableFrom(paramTypes[i]) || paramTypes[i].isAssignableFrom(types[i]) || isWrapped(types[i], paramTypes[i]))) {
                                 check = false;
@@ -237,7 +244,7 @@ public class ClassReflector {
     public static Type getGetterReturnType(final Class<?> classConnector, final String getterName) throws SReflectException {
         Method m;
         try {
-            m = getMethod(classConnector, getterName, (Class<?>) null);
+            m = getMethod(classConnector, getterName);
         } catch (final Exception e) {
             throw new SReflectException(e);
         }
@@ -270,17 +277,18 @@ public class ClassReflector {
 
     public static boolean isAGetterMethod(final Method method) {
         final String methodName = method.getName();
-        return (methodName.startsWith("get") || methodName.startsWith("is")) && method.getParameterTypes().length == 0
+        return (methodName.startsWith(GET) || methodName.startsWith(IS)) && method.getParameterTypes().length == 0
                 && !Void.class.equals(method.getReturnType());
     }
 
     public static boolean isASetterMethod(final Method method) {
         final String methodName = method.getName();
-        return methodName.startsWith("set") && "void".equals(method.getReturnType().toString()) && method.getParameterTypes().length == 1;
+        return methodName.startsWith(SET) && "void".equals(method.getReturnType().toString()) && method.getParameterTypes().length == 1;
     }
 
     public static String getGetterName(final String fieldName) {
-        final StringBuilder builder = new StringBuilder("get");
+        //NOTE: can't work with boolean since field name type is unknown
+        final StringBuilder builder = new StringBuilder(GET);
         builder.append(String.valueOf(fieldName.charAt(0)).toUpperCase());
         builder.append(fieldName.substring(1));
         return builder.toString();
@@ -288,11 +296,11 @@ public class ClassReflector {
 
     public static String getFieldName(final String methodName) {
         int cut = 4;
-        if (methodName.startsWith("is")) {
+        if (methodName.startsWith(IS)) {
             cut = 3;
         }
         if (methodName.length() < cut) {
-            return "";
+            return EMPTY;
         }
         final String end = methodName.substring(cut);
         final char c = methodName.charAt(cut - 1);

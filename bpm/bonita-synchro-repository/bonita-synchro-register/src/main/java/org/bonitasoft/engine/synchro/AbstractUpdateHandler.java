@@ -50,17 +50,23 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
     public void execute(final SEvent sEvent) throws SHandlerExecutionException {
         try {
             final Map<String, Serializable> event = getEvent(sEvent);
+            event.put("tenantId", tenantId);
             final Long id = getObjectId(sEvent);
 
             final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
-            final BonitaTransactionSynchronization synchronization = new WaitForEventSynchronization(event, id, tenantServiceAccessor.getSynchroService());
+            final BonitaTransactionSynchronization synchronization = getSynchronization(event, id, tenantServiceAccessor);
 
-            UserTransactionService userTransactionService = tenantServiceAccessor.getUserTransactionService();
+            final UserTransactionService userTransactionService = tenantServiceAccessor.getUserTransactionService();
             userTransactionService.registerBonitaSynchronization(synchronization);
         } catch (final STransactionNotFoundException e) {
             e.printStackTrace();
             throw new SHandlerExecutionException(e);
         }
+    }
+
+    protected BonitaTransactionSynchronization getSynchronization(final Map<String, Serializable> event, final Long id,
+            final TenantServiceAccessor tenantServiceAccessor) {
+        return new WaitForEventSynchronization(event, id, tenantServiceAccessor.getSynchroService());
     }
 
     /**

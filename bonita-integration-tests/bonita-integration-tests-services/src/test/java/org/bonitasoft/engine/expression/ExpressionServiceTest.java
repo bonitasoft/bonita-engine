@@ -355,7 +355,6 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
         getTransactionService().begin();
         // create data instance
         dataInstanceService.createDataInstance(dataInstance);
-        dataInstanceService.createDataContainer(dataInstance.getContainerId(), dataInstance.getContainerType(), true);
         getTransactionService().complete();
     }
 

@@ -172,8 +172,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             throw e;
         } catch (final SFlowNodeExecutionException e) {
             throw e;
-        } catch (final SWorkRegisterException e) {
-            throw new SFlowNodeExecutionException(e);
         } catch (final SBonitaException e) {
             throw new SFlowNodeExecutionException(e);
         } finally {
@@ -226,9 +224,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     private void executeOperations(final SExpressionContext expressionContext, final List<SOperation> operations, final SFlowNodeInstance sFlowNodeInstance)
             throws SOperationExecutionException {
         if (operations != null) {
-            for (final SOperation operation : operations) {
-                operationService.execute(operation, sFlowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), expressionContext);
-            }
+            operationService.execute(operations, sFlowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), expressionContext);
         }
     }
 

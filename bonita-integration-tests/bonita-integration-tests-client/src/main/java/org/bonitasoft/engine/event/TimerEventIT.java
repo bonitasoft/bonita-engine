@@ -2,7 +2,6 @@ package org.bonitasoft.engine.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -11,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventCriterion;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventInstance;
@@ -45,8 +43,7 @@ public class TimerEventIT extends TestWithUser {
                 step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final ActivityInstance userTask = waitForUserTask(step1Name, processInstance);
-        assignAndExecuteStep(userTask, getIdentityAPI().getUserByUserName(USERNAME).getId());
+        waitForUserTaskAndExecuteIt(processInstance, step1Name, user);
 
         waitForEventInWaitingState(processInstance, "intermediateCatchEvent");
         final long processInstanceId = processInstance.getId();
@@ -63,7 +60,7 @@ public class TimerEventIT extends TestWithUser {
         }
         assertNull(eventInstance);// finished
 
-        waitForUserTask(step2Name, processInstance);
+        waitForUserTask(processInstance, step2Name);
 
         disableAndDeleteProcess(definition);
     }
@@ -81,16 +78,13 @@ public class TimerEventIT extends TestWithUser {
                 step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final ActivityInstance userTask = waitForUserTask(step1Name, processInstance);
-        assertNotNull(userTask);
-
-        assignAndExecuteStep(userTask, getIdentityAPI().getUserByUserName(USERNAME).getId());
+        waitForUserTaskAndExecuteIt(processInstance, step1Name, user);
 
         waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.WAITING, true);
         final EventInstance eventInstance = getEventInstance(processInstance.getId(), "intermediateCatchEvent");
         checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.WAITING);
         // wait trigger activation
-        waitForUserTask(step2Name, processInstance);
+        waitForUserTask(processInstance, step2Name);
         final long now = System.currentTimeMillis();
         assertTrue("Event has triggered too early !" + (now - expectedDate), expectedDate <= now);
 
@@ -144,7 +138,7 @@ public class TimerEventIT extends TestWithUser {
         assertThat(secondProcessInstances.size()).as("should have started another instance").isGreaterThan(firstProcessInstances.size());
 
         //cleanup
-        waitForUserTask(stepName, secondProcessInstances.get(secondProcessInstances.size() - 1));
+        waitForUserTask(secondProcessInstances.get(secondProcessInstances.size() - 1), stepName);
         disableAndDeleteProcess(definition);
     }
 

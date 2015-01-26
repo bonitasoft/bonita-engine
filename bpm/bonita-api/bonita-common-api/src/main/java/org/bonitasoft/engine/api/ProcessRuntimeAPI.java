@@ -1840,8 +1840,10 @@ public interface ProcessRuntimeAPI {
      * Check whether a specified user is involved in a process instance.<br>
      * User A is involved with a process instance if any of the following is true:
      * <ul>
+     * <li>user A has started the process instance</li>
      * <li>a task in the process instance is assigned to user A</li>
      * <li>a task in the process instance is pending for user A</li>
+     * <li>the process instance has been started by a user managed by user A</li>
      * <li>a task in the process instance is assigned to a user managed by user A</li>
      * <li>a task in the process instance is pending for a user managed by user A</li>
      * </ul>

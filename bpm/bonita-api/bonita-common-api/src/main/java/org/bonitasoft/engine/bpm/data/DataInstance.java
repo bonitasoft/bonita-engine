@@ -88,9 +88,6 @@ public interface DataInstance extends NamedElement, BaseElement {
      * <li>
      * <code>MESSAGE_INSTANCE</code>
      * </li>
-     * <li>
-     * <code>WAITING_MESSAGE</code>
-     * </li>
      * </ul>
      *
      * @return The type of the container of the data.

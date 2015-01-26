@@ -13,8 +13,6 @@ CREATE INDEX fk_breakpoint_tenantId_idx ON breakpoint(tenantid ASC);
 CREATE INDEX fk_breakpoint_process_definitionId_idx ON breakpoint(def_id ASC, tenantid ASC);
 CREATE INDEX fk_breakpoint_process_instanceId_idx ON breakpoint(inst_id ASC, tenantid ASC);
 CREATE INDEX fk_data_instance_tenantId_idx ON data_instance(tenantid ASC);
-CREATE INDEX fk_data_mapping_data_instanceId_idx ON data_mapping(dataInstanceId ASC, tenantid ASC);
-CREATE INDEX fk_data_mapping_tenantId_idx ON data_mapping(tenantid ASC);
 CREATE INDEX fk_dependency_tenantId_idx ON dependency(tenantid ASC);
 CREATE INDEX fk_dependencymapping_tenantId_idx ON dependencymapping(tenantid ASC);
 CREATE INDEX fk_document_tenantId_idx ON document(tenantid ASC);
@@ -87,7 +85,6 @@ CREATE INDEX fk_arch_process_comment_user_Id_idx ON arch_process_comment(userId 
 CREATE INDEX fk_arch_process_comment_arch_process_instanceId_idx ON arch_process_comment(processInstanceId ASC, tenantid ASC);
 CREATE INDEX fk_arch_process_comment_tenantId_idx ON arch_process_comment(tenantid ASC);
 CREATE INDEX fk_arch_data_instance_tenantId_idx ON arch_data_instance(tenantid ASC);
-CREATE INDEX fk_arch_data_mapping_tenantId_idx ON arch_data_mapping(tenantid ASC);
 CREATE INDEX fk_arch_transition_instance_tenantId_idx ON arch_transition_instance(tenantid ASC);
 
 
@@ -101,7 +98,6 @@ ALTER TABLE category ADD CONSTRAINT fk_category_tenantId FOREIGN KEY (tenantid) 
 ALTER TABLE command ADD CONSTRAINT fk_command_tenantId FOREIGN KEY (tenantid) REFERENCES tenant (id);
 ALTER TABLE connector_instance ADD CONSTRAINT fk_connector_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE data_instance ADD CONSTRAINT fk_data_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
-ALTER TABLE data_mapping ADD CONSTRAINT fk_data_mapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE dependency ADD CONSTRAINT fk_dependency_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE dependencymapping ADD CONSTRAINT fk_dependencymapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE document ADD CONSTRAINT fk_document_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
@@ -164,6 +160,5 @@ ALTER TABLE arch_process_comment ADD CONSTRAINT fk_arch_process_comment_tenantId
 ALTER TABLE arch_process_instance ADD CONSTRAINT fk_arch_process_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE arch_transition_instance ADD CONSTRAINT fk_arch_transition_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE arch_data_instance ADD CONSTRAINT fk_arch_data_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
-ALTER TABLE arch_data_mapping ADD CONSTRAINT fk_arch_data_mapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE arch_process_comment ADD CONSTRAINT fk_arch_process_comment_arch_process_instanceId FOREIGN KEY (processInstanceId, tenantid) REFERENCES arch_process_instance (sourceObjectId, tenantid);
 -- ALTER TABLE arch_document_mapping ADD CONSTRAINT fk_arch_document_mapping_arch_process_instanceId FOREIGN KEY (processinstanceid, tenantid) REFERENCES arch_process_instance (sourceObjectId, tenantid);

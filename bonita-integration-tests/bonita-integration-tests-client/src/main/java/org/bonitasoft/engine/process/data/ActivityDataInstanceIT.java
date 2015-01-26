@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.bonitasoft.engine.bpm.process.impl.DataDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.ExceptionContext;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
@@ -72,10 +74,10 @@ public class ActivityDataInstanceIT extends TestWithUser {
 
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+        final Long step1Id = waitForUserTask(processInstance, "step1");
 
         // verify there are data
-        final List<DataInstance> processDataInstances = getProcessAPI().getActivityDataInstances(step1.getId(), 0, 10);
+        final List<DataInstance> processDataInstances = getProcessAPI().getActivityDataInstances(step1Id, 0, 10);
         assertTrue(!processDataInstances.isEmpty());
         assertEquals(1, processDataInstances.size());
         assertEquals("var1", processDataInstances.get(0).getName());
@@ -106,7 +108,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         }
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(addUserTask.getProcess(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long activityInstanceId = waitForUserTask("step1", processInstance).getId();
+        final long activityInstanceId = waitForUserTask(processInstance, "step1");
 
         final DataInstance dataInstance = getActivityDataInstance(activityInstanceId);
         assertEquals("var1", dataInstance.getName());
@@ -126,7 +128,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        final long activityInstanceId = waitForUserTask("step1", processInstance).getId();
+        final long activityInstanceId = waitForUserTask(processInstance, "step1");
 
         // Update data instance
         final String updatedValue = "afterUpdate";
@@ -144,7 +146,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        final long activityInstanceId = waitForUserTask("step1", processInstance).getId();
+        final long activityInstanceId = waitForUserTask(processInstance, "step1");
 
         final String updatedValue = "afterUpdate";
         final Map<String, Serializable> variables = new HashMap<String, Serializable>(2);
@@ -163,7 +165,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        final long activityInstanceId = waitForUserTask("step1", processInstance).getId();
+        final long activityInstanceId = waitForUserTask(processInstance, "step1");
 
         final Map<String, Serializable> variables = new HashMap<String, Serializable>(2);
         variables.put("dataName1", "afterUpdate");
@@ -191,10 +193,10 @@ public class ActivityDataInstanceIT extends TestWithUser {
 
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+        final Long step1Id = waitForUserTask(processInstance, "step1");
 
         // verify the retrieved data
-        List<DataInstance> processDataInstances = getProcessAPI().getActivityDataInstances(step1.getId(), 0, 10);
+        List<DataInstance> processDataInstances = getProcessAPI().getActivityDataInstances(step1Id, 0, 10);
         assertTrue(!processDataInstances.isEmpty());
         assertEquals(1, processDataInstances.size());
         assertEquals("var1", processDataInstances.get(0).getName());
@@ -204,7 +206,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance activityInstance = activities.iterator().next();
         assignAndExecuteStep(activityInstance, user.getId());
-        assertTrue("process was not completed", waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
 
         // retrieve data after process has finished
         try {
@@ -228,29 +230,29 @@ public class ActivityDataInstanceIT extends TestWithUser {
 
         // Start first process, and wait the first step
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1_1 = waitForUserTask("step1", processInstance1);
+        final Long step1_1Id = waitForUserTask(processInstance1, "step1");
         // Set data to true, for the first instance
-        getProcessAPI().updateActivityDataInstance("booleanData", step1_1.getId(), true);
+        getProcessAPI().updateActivityDataInstance("booleanData", step1_1Id, true);
 
         // Start second process, and wait the first step
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1_2 = waitForUserTask("step1", processInstance2);
+        final Long step1_2Id = waitForUserTask(processInstance2, "step1");
         // Set data to false, for the second instance
-        getProcessAPI().updateActivityDataInstance("booleanData", step1_2.getId(), false);
+        getProcessAPI().updateActivityDataInstance("booleanData", step1_2Id, false);
 
         // Start third process, and wait the first step
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1_3 = waitForUserTask("step1", processInstance3);
+        final Long step1_3Id = waitForUserTask(processInstance3, "step1");
         // Set data to true, for the third instance
-        getProcessAPI().updateActivityDataInstance("booleanData", step1_3.getId(), true);
+        getProcessAPI().updateActivityDataInstance("booleanData", step1_3Id, true);
 
         // Execute all step1
-        assignAndExecuteStep(step1_1, user.getId());
-        waitForUserTask("step2", processInstance1);
-        assignAndExecuteStep(step1_2, user.getId());
-        waitForUserTask("step3", processInstance2);
-        assignAndExecuteStep(step1_3, user.getId());
-        waitForUserTask("step2", processInstance3);
+        assignAndExecuteStep(step1_1Id, user);
+        waitForUserTask(processInstance1, "step2");
+        assignAndExecuteStep(step1_2Id, user);
+        waitForUserTask(processInstance2, "step3");
+        assignAndExecuteStep(step1_3Id, user);
+        waitForUserTask(processInstance3, "step2");
 
         // Check that only these 3 steps are pending
         assertEquals(3, getProcessAPI().getNumberOfPendingHumanTaskInstances(user.getId()));
@@ -285,10 +287,10 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+        final HumanTaskInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
         assertEquals(step1.getName(), getProcessAPI().getActivityDataInstance("a", step1.getId()).getValue());
 
-        final HumanTaskInstance step2 = waitForUserTask("step2", processInstance);
+        final HumanTaskInstance step2 = waitForUserTaskAndGetIt(processInstance, "step2");
         assertEquals(step2.getName(), getProcessAPI().getActivityDataInstance("a", step2.getId()).getValue());
 
         assertEquals("process", getProcessAPI().getProcessDataInstance("a", processInstance.getId()).getValue());
@@ -316,7 +318,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final String userTaskName = "task1";
         final ProcessDefinition processDefinition = deployAndEnableProcWithPersistedAndTransientVariable(userTaskName);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTask(userTaskName, processInstance);
+        final Long userTaskId = waitForUserTask(processInstance, userTaskName);
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
         final Expression persistedVariableExpression = new ExpressionBuilder().createDataExpression("persistedVariable", String.class.getName());
@@ -324,7 +326,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         expressions.put(persistedVariableExpression, (Map<String, Serializable>) null);
         expressions.put(transientVariableExpression, (Map<String, Serializable>) null);
 
-        final Map<String, Serializable> expressionResult = getProcessAPI().evaluateExpressionsOnActivityInstance(userTask.getId(), expressions);
+        final Map<String, Serializable> expressionResult = getProcessAPI().evaluateExpressionsOnActivityInstance(userTaskId, expressions);
         assertEquals("default", expressionResult.get(persistedVariableExpression.getName()));
         assertEquals("default", expressionResult.get(transientVariableExpression.getName()));
 
@@ -342,10 +344,10 @@ public class ActivityDataInstanceIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
-        getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
+        final Long userTaskId = waitForUserTask(processInstance, "step");
+        getProcessAPI().updateActivityDataInstance(dataName, userTaskId, "2");
 
-        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedActivityDataInstance(dataName, userTask.getId());
+        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedActivityDataInstance(dataName, userTaskId);
         assertEquals("2", archivedData.getValue());
         disableAndDeleteProcess(processDefinition);
     }
@@ -361,12 +363,12 @@ public class ActivityDataInstanceIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
-        getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
-        assignAndExecuteStep(userTask, user.getId());
+        final Long userTaskId = waitForUserTask(processInstance, "step");
+        getProcessAPI().updateActivityDataInstance(dataName, userTaskId, "2");
+        assignAndExecuteStep(userTaskId, user.getId());
         waitForProcessToFinish(processInstance.getId());
 
-        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedActivityDataInstance(dataName, userTask.getId());
+        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedActivityDataInstance(dataName, userTaskId);
         assertEquals("2", archivedData.getValue());
         disableAndDeleteProcess(processDefinition);
     }
@@ -386,12 +388,12 @@ public class ActivityDataInstanceIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
-        getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
-        assignAndExecuteStep(userTask, user.getId());
+        final Long userTaskId = waitForUserTask(processInstance, "step");
+        getProcessAPI().updateActivityDataInstance(dataName, userTaskId, "2");
+        assignAndExecuteStep(userTaskId, user);
         waitForProcessToFinish(processInstance.getId());
 
-        List<ArchivedDataInstance> archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTask.getId(), 0, 10);
+        List<ArchivedDataInstance> archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTaskId, 0, 10);
         assertEquals(3, archivedDataInstances.size());
         ArchivedDataInstance archivedDataInstance = getArchivedDataInstance(archivedDataInstances, dataName);
         assertEquals("2", archivedDataInstance.getValue());
@@ -400,12 +402,12 @@ public class ActivityDataInstanceIT extends TestWithUser {
         archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "desc");
         assertEquals("desc", archivedDataInstance.getValue());
 
-        archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTask.getId(), 0, 1);
+        archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTaskId, 0, 1);
         assertEquals(1, archivedDataInstances.size());
         archivedDataInstance = getArchivedDataInstance(archivedDataInstances, dataName);
         assertEquals("2", archivedDataInstance.getValue());
 
-        archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTask.getId(), 1, 10);
+        archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTaskId, 1, 10);
         assertEquals(2, archivedDataInstances.size());
         archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "job");
         assertEquals("job", archivedDataInstance.getValue());
@@ -425,10 +427,10 @@ public class ActivityDataInstanceIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+        final Long userTaskId = waitForUserTask(processInstance, "step");
 
         try {
-            getProcessAPI().getArchivedProcessDataInstance("o", userTask.getId());
+            getProcessAPI().getArchivedProcessDataInstance("o", userTaskId);
             fail("The data named 'o' does not exists");
         } catch (final ArchivedDataNotFoundException dnfe) {
             // Do nothing
@@ -453,6 +455,45 @@ public class ActivityDataInstanceIT extends TestWithUser {
         builder.addTransition(userTaskName, endName);
 
         return deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
+    }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.DATA, jira = "BS-1984", keywords = { "update", "activity data", "wrong type" })
+    @Test
+    public void cantUpdateActivityDataInstanceWithWrongValue() throws Exception {
+        final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addActor(ACTOR_NAME)
+                .addDescription("Delivery all day and night long")
+                .addUserTask("step1", ACTOR_NAME).addData("data", List.class.getName(), null).getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, ACTOR_NAME, user);
+
+        // test execution
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final long step1Id = waitForUserTask(processInstance, "step1");
+
+        // verify the retrieved data
+        try {
+            getProcessAPI().updateActivityDataInstance("data", step1Id, "wrong value");
+            fail();
+        } catch (final UpdateException e) {
+            assertEquals("USERNAME=" + USERNAME + " | DATA_NAME=data | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
+                    + "] is not compatible with the type of the data.", e.getMessage());
+            final Map<ExceptionContext, Serializable> exceptionContext = e.getContext();
+            assertEquals(List.class.getName(), exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
+            assertEquals("data", exceptionContext.get(ExceptionContext.DATA_NAME));
+        }
+
+        // retrieve data after the update
+        final List<DataInstance> activityDataInstances = getProcessAPI().getActivityDataInstances(step1Id, 0, 10);
+        assertEquals(1, activityDataInstances.size());
+        assertEquals(null, activityDataInstances.get(0).getValue());
+
+        // Evaluate the data
+        final List<Expression> dependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("data", List.class.getName()));
+        final Expression longExpression = new ExpressionBuilder().createGroovyScriptExpression("Script",
+                "data = new ArrayList<String>(); data.add(\"plop\"); return data;", List.class.getName(), dependencies);
+        final Map<Expression, Map<String, Serializable>> expressions = Collections.singletonMap(longExpression, Collections.<String, Serializable> emptyMap());
+        getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id, expressions);
+
+        disableAndDeleteProcess(processDefinition);
     }
 
 }
