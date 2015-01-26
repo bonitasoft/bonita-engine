@@ -18,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
@@ -141,8 +142,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         if (isEntity(valueToSetObjectWith)) {
             final Type relationType = getRelationType(businessObject, methodName);
             valueToSet = getPersistedValue((Entity) valueToSetObjectWith, relationType);
-        }
-        else if (isListOfEntities(valueToSetObjectWith)) {
+        } else if (isListOfEntities(valueToSetObjectWith)) {
             final Type relationType = getRelationType(businessObject, methodName);
             valueToSet = getPersistedValues((List<Entity>) valueToSetObjectWith, relationType);
         } else {
@@ -169,8 +169,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
         if (Type.AGGREGATION.equals(type)) {
             return businessDataRepository.findByIds(entities.get(0).getClass(), getPrimaryKeys(entities));
-        }
-        else {
+        } else {
             return copyForServer(entities);
         }
     }
@@ -178,8 +177,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     private Entity getPersistedValue(final Entity entity, final Type type) throws SBusinessDataNotFoundException {
         if (Type.AGGREGATION.equals(type)) {
             return businessDataRepository.findById(entity.getClass(), entity.getPersistenceId());
-        }
-        else {
+        } else {
             return copyForServer(entity);
         }
     }
@@ -325,17 +323,22 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private Map<String, Serializable> getQueryParameters(Query queryDefinition, final Map<String, Serializable> parameters)
             throws SBusinessDataRepositoryException {
+        Set<String> errors = new HashSet<String>();
         final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
         for (QueryParameter queryParameter : queryDefinition.getQueryParameters()) {
-            if (parameters.containsKey(queryParameter.getName())) {
-                try {
-                    queryParameters.put(queryParameter.getName(),
-                            (Serializable) TypeConverter.convert(Thread.currentThread().getContextClassLoader().loadClass(queryParameter.getClassName()),
-                                    parameters.get(queryParameter.getName())));
-                } catch (ClassNotFoundException e) {
-                    throw new SBusinessDataRepositoryException("unable to load class " + queryParameter.getClassName());
-                }
+            if (parameters != null && parameters.containsKey(queryParameter.getName())) {
+                queryParameters.put(queryParameter.getName(),
+                        TypeConverter.convert(loadSerializableClass(queryParameter.getClassName()),
+                                parameters.get(queryParameter.getName())));
+            } else {
+                errors.add(queryParameter.getName());
             }
+        }
+        if (!errors.isEmpty()) {
+            final StringBuilder errorMessage = new StringBuilder().append("parameter(s) are missing for query named ").append(queryDefinition.getName())
+                    .append(" : ");
+            errorMessage.append(StringUtils.join(errors, ","));
+            throw new SBusinessDataRepositoryException(errorMessage.toString());
         }
         return queryParameters;
     }
@@ -362,6 +365,14 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             return (Class<? extends Entity>) Thread.currentThread().getContextClassLoader().loadClass(returnType);
         } catch (final ClassNotFoundException e) {
             throw new SBusinessDataRepositoryException(e);
+        }
+    }
+
+    protected Class<? extends Serializable> loadSerializableClass(final String className) throws SBusinessDataRepositoryException {
+        try {
+            return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(className);
+        } catch (final ClassNotFoundException e) {
+            throw new SBusinessDataRepositoryException("unable to load class " + className);
         }
     }
 

@@ -20,7 +20,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -42,6 +44,10 @@ public class BusinessDataServiceImplTest {
 
     private static final String PARAMETER_BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
     private static final String NEW_NAME = "new name";
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
 
     public class EntityPojo implements Entity {
 
@@ -571,8 +577,11 @@ public class BusinessDataServiceImplTest {
         verify(jsonEntitySerializer).serializeEntity(entities, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
-    @Test(expected = SBusinessDataRepositoryException.class)
+    @Test
     public void getJsonQueryEntities_should_throw_exception_when_query_not_found() throws Exception {
+        expectedException.expect(SBusinessDataRepositoryException.class);
+        expectedException.expectMessage("unable to get query wrongQuery for business object " + EntityPojo.class.getName());
+
         //given
         final EntityPojo entity = new EntityPojo(1562L);
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
@@ -586,7 +595,24 @@ public class BusinessDataServiceImplTest {
         doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
 
         //when then exception
-        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "not a query", parameters, 0, 10,
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "wrongQuery", parameters, 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_check_parameters() throws Exception {
+        expectedException.expect(SBusinessDataRepositoryException.class);
+        expectedException.expectMessage("parameter(s) are missing for query named query : integer,string,long");
+
+        //given
+        final EntityPojo entity = new EntityPojo(1562L);
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
+
+        //when then exception
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "query", null, 0, 10,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
