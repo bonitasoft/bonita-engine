@@ -14,8 +14,10 @@
 package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.APIAccessor;
+import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
@@ -58,5 +60,14 @@ public class APIAccessorImpl implements APIAccessor {
     @Override
     public PermissionAPI getPermissionAPI() {
         return new PermissionAPIImpl();
+    }
+
+    public PageAPI getOrgPageAPI() {
+        return new PageAPIImpl();
+    }
+
+    @Override
+    public ApplicationAPI getOrgApplicationAPI() {
+        return new ApplicationAPIImpl();
     }
 }

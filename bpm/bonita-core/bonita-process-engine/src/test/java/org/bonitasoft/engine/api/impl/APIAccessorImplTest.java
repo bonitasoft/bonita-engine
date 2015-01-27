@@ -15,11 +15,13 @@ package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -71,6 +73,22 @@ public class APIAccessorImplTest {
         final ThemeAPI themeAPI = apiAccessor.getThemeAPI();
 
         assertThat(themeAPI).isNotNull().isExactlyInstanceOf(ThemeAPIImpl.class);
+    }
+
+    @Test
+    public void getPageAPI_should_return_the_default_implementation() throws SBonitaException {
+        initAPIAccessor();
+        final org.bonitasoft.engine.api.PageAPI pageAPI = apiAccessor.getOrgPageAPI();
+
+        assertThat(pageAPI).isNotNull().isExactlyInstanceOf(PageAPIImpl.class);
+    }
+
+    @Test
+    public void getApplicationAPI_should_return_the_default_implementation() throws SBonitaException {
+        initAPIAccessor();
+        final ApplicationAPI applicationAPI = apiAccessor.getOrgApplicationAPI();
+
+        assertThat(applicationAPI).isNotNull().isExactlyInstanceOf(ApplicationAPIImpl.class);
     }
 
 }
