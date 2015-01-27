@@ -1004,108 +1004,24 @@
  	<query name="getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasks">
         SELECT COUNT(DISTINCT process_definition)
         FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-        	 org.bonitasoft.engine.identity.model.impl.SUserImpl as user
-        WHERE process_definition.processId = p.processDefinitionId
-        AND p.id = a.logicalGroup2
-        AND a.stable = TRUE
+        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+		WHERE process_definition.processId = a.logicalGroup1
+		AND a.stable = TRUE
 		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
-		AND ( 
-			a.assigneeId = user.id
-			OR ( 
-				a.assigneeId = 0
-				AND EXISTS (
-					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
-					WHERE mapping.activityId = a.id
-					AND ( 
-						mapping.userId = user.id
-						OR EXISTS (
-							SELECT actor.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
-							WHERE mapping.actorId = actor.id
-							AND  actor.id = actormember.actorId
-							AND ( 
-								actormember.userId = user.id
-			 	  				OR EXISTS (
-									SELECT um.id
-									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-									WHERE um.userId = user.id
-									AND (
-										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
-										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
-									)
-								)
-			     			)
-						)
-					)
-				)
-			)
-		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = user.id
-		)
+		AND a.stateId = 4
     </query>
 	
 	<query name="searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasks">
         SELECT DISTINCT(process_definition)
         FROM org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl AS process_definition,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-        	 org.bonitasoft.engine.identity.model.impl.SUserImpl as user
-        WHERE process_definition.processId = p.processDefinitionId
-        AND p.id = a.logicalGroup2
+        	 org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
+        WHERE process_definition.processId = a.logicalGroup1
         AND a.stable = TRUE
 		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
-		AND ( 
-			a.assigneeId = user.id
-			OR ( 
-				a.assigneeId = 0
-				AND EXISTS (
-					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
-					WHERE mapping.activityId = a.id
-					AND ( 
-						mapping.userId = user.id
-						OR EXISTS (
-							SELECT actor.id
-							FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-								 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
-							WHERE mapping.actorId = actor.id
-							AND  actor.id = actormember.actorId
-							AND ( 
-								actormember.userId = user.id
-			 	  				OR EXISTS (
-									SELECT um.id
-									FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-									WHERE um.userId = user.id
-									AND (
-										(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-										OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
-										OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
-									)
-								)
-			     			)
-						)
-					)
-				)
-			)
-		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = user.id
-		)
+		AND a.stateId = 4
     </query>   
 </hibernate-mapping>

@@ -169,8 +169,6 @@ public abstract class AbstractEventIT extends TestWithUser {
      *        the name of human task reached by exception flow
      * @param normalFlowTaskName
      *        name of human task following the task containing the boundary (normal flow)
-     * @param timerValue
-     *        the timer value
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -193,8 +191,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithBoundaryTimerEventOnHumanTask(final long timerValue, final boolean withData) throws BonitaException,
-            InvalidProcessDefinitionException {
+    public ProcessDefinition deployAndEnableProcessWithBoundaryTimerEventOnHumanTask(final long timerValue, final boolean withData) throws BonitaException {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("pTimerBoundary", "2.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addStartEvent("start");
@@ -228,10 +225,6 @@ public abstract class AbstractEventIT extends TestWithUser {
      *        define whether the boundary is interrupting or not
      * @param targetProcessName
      *        the name of called process
-     * @param userTaskName
-     *        the name of user task following the call activity in the normal flow
-     * @param exceptionFlowTaskName
-     *        the name of the user task reached by the exception flow
      * @return
      * @throws InvalidExpressionException
      * @throws BonitaException
@@ -631,8 +624,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithBoundaryMessageEventOnLoopActivity(final int loopMax) throws BonitaException,
-            InvalidProcessDefinitionException {
+    public ProcessDefinition deployAndEnableProcessWithBoundaryMessageEventOnLoopActivity(final int loopMax) throws BonitaException {
         final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithLoopActivityAndBoundaryEvent", "1.0");
@@ -930,6 +922,10 @@ public abstract class AbstractEventIT extends TestWithUser {
         return receiveMessageProcess;
     }
 
+    public ProcessDefinition deployAndEnableProcessWithStartMessageEvent(final String processName, final String messageName) throws BonitaException {
+        return deployAndEnableProcessWithStartMessageEvent(processName, messageName, Collections.<String, String>emptyMap(), Collections.<Operation>emptyList());
+    }
+
     public void addOperations(final CatchMessageEventTriggerDefinitionBuilder messageEventTrigger, final List<Operation> catchMessageOperations) {
         if (catchMessageOperations != null) {
             for (final Operation operation : catchMessageOperations) {
@@ -1147,4 +1143,22 @@ public abstract class AbstractEventIT extends TestWithUser {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         return definition;
     }
+
+    public ProcessDefinition deployAndEnableProcessSendingMessageUsingVariableAsTarget(final String targetProcessName, final String targetFlowNode, final String messageName) throws BonitaException {
+        Expression targetProcessExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
+        Expression targetFlowNodeExpr = new ExpressionBuilder().createConstantStringExpression(targetFlowNode);
+        Expression targetProcessVarExpr = new ExpressionBuilder().createDataExpression("targetProcess", String.class.getName());
+        Expression targetFlowNodeVarExpr = new ExpressionBuilder().createDataExpression("targetFlowNode", String.class.getName());
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("sendMsgProcess", "5.1");
+        builder.addShortTextData("targetProcess", targetProcessExpr);
+        builder.addShortTextData("targetFlowNode", targetFlowNodeExpr);
+        builder.addStartEvent("start");
+        builder.addIntermediateThrowEvent("sendMsg").addMessageEventTrigger(messageName, targetProcessVarExpr, targetFlowNodeVarExpr);
+        builder.addEndEvent("end");
+        builder.addTransition("start", "sendMsg");
+        builder.addTransition("sendMsg", "end");
+
+        return deployAndEnableProcess(builder.done());
+    }
+
 }

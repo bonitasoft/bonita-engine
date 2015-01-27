@@ -61,10 +61,6 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 		AND aa.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
@@ -87,10 +83,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
+
 		AND aa.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
@@ -166,10 +159,6 @@
 		AND assigneeId IN ( SELECT u.id
 							FROM org.bonitasoft.engine.identity.model.impl.SUserImpl u
 							WHERE u.managerUserId = :managerUserId )
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2 
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query>
 	
 	<query name="getNumberOfSAHumanTaskInstanceSupervisedBy">
@@ -177,10 +166,6 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa, 
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2 
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 		AND aa.logicalGroup1 = supervisor.processDefId
 		AND(supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
@@ -202,10 +187,6 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2 
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-			)
 		AND aa.logicalGroup1 = supervisor.processDefId
 		AND(supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
@@ -226,20 +207,12 @@
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
   	</query>
   	
 	<query name="getNumberOfSAHumanTaskInstance">
   		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query>  	
   	
 	<query name="getNumberOfSAProcessInstancewithSUserTaskInstance">
@@ -278,200 +251,120 @@
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
   	</query>
   	
 	<query name="getNumberOfSAHumanTaskInstancewithSAActivityInstance">
   		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query>  	
 	
 	<query name="searchSAManualTaskInstance">
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
   	</query>
   	
 	<query name="getNumberOfSAManualTaskInstance">
   		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query>
 	
 	<query name="searchSAManualTaskInstancewithSAActivityInstance">
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
   	</query>
   	
 	<query name="getNumberOfSAManualTaskInstancewithSAActivityInstance">
   		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query> 
 	
 	<query name="searchSAUserTaskInstance">
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
   	</query>
   	
 	<query name="getNumberOfSAUserTaskInstance">
   		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query>  
 	
 	<query name="searchSAUserTaskInstancewithSAActivityInstance">
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
   	</query>
   	
 	<query name="getNumberOfSAUserTaskInstancewithSAActivityInstance">
   		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query> 
 	
 	<query name="searchSAAutomaticTaskInstance">
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
   	</query>
   	
 	<query name="getNumberOfSAAutomaticTaskInstance">
   		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query>  
 	
 	<query name="searchSAReceiveTaskInstance">
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
   	</query>
   	
 	<query name="getNumberOfSAReceiveTaskInstance">
   		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query>
 	
 	<query name="searchSAAutomaticTaskInstancewithSAActivityInstance">
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
   	</query>
   	
 	<query name="getNumberOfSAAutomaticTaskInstancewithSAActivityInstance">
   		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query> 
 	
 	<query name="searchSAReceiveTaskInstancewithSAActivityInstance">
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
   	</query>
   	
 	<query name="getNumberOfSAReceiveTaskInstancewithSAActivityInstance">
   		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query>   
 	
 	<query name="searchSAActivityInstance">
 		SELECT aa
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
   	</query>
   	
 	<query name="getNumberOfSAActivityInstance">
   		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa
 		WHERE terminal = TRUE
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa2
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
 	</query>  
  	 
 	<query name="getArchivedFlowNodesFromProcessInstance">

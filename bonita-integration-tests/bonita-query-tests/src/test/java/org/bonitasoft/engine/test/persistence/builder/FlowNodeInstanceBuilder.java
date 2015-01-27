@@ -183,4 +183,8 @@ public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B
         this.logicalGroup4 = logicalGroup;
         return thisBuilder;
     }
+
+    public B withProcessDefinition(long processDefinitionId) {
+        return withLogicalGroup1(processDefinitionId);
+    }
 }
