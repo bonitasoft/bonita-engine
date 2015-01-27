@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -25,13 +25,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.cache.SCacheException;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
+import org.bonitasoft.engine.core.contract.data.SContractDataNotFoundException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -42,7 +43,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ContractInputExpressionExecutorStrategyTest {
 
     @Mock
-    private CacheService cacheService;
+    private ContractDataService contractDataService;
 
     @InjectMocks
     private ContractInputExpressionExecutorStrategy strategy;
@@ -64,7 +65,7 @@ public class ContractInputExpressionExecutorStrategyTest {
         inputs.put("comment", "No way!");
         final SExpression expression = buildInputContractExpression("comment", String.class);
         final Map<String, Object> context = buildInitialContext(465465L);
-        when(cacheService.get("USER_TASK_CONTRACT", 465465L)).thenReturn(inputs);
+        when(contractDataService.getUserTaskData(465465L, "comment")).thenReturn("No way!");
 
         final String result = (String) strategy.evaluate(expression, context, null, null);
         assertThat(result).isEqualTo("No way!");
@@ -74,17 +75,7 @@ public class ContractInputExpressionExecutorStrategyTest {
     public void evaluateShouldThrowAnExceptionInputNotFound() throws Exception {
         final SExpression expression = buildInputContractExpression("comment", String.class);
         final Map<String, Object> context = buildInitialContext(465465L);
-        when(cacheService.get("USER_TASK_CONTRACT", 465465L)).thenReturn(null);
-
-        strategy.evaluate(expression, context, null, null);
-    }
-
-    @Test(expected = SExpressionEvaluationException.class)
-    public void evaluateShouldThrowAnExceptionInputNotDefined() throws Exception {
-        final Map<String, Object> inputs = new HashMap<String, Object>();
-        final SExpression expression = buildInputContractExpression("comment", String.class);
-        final Map<String, Object> context = buildInitialContext(465465L);
-        when(cacheService.get("USER_TASK_CONTRACT", 465465L)).thenReturn(inputs);
+        when(contractDataService.getUserTaskData(465465L, "comment")).thenThrow(new SContractDataNotFoundException("exception"));
 
         strategy.evaluate(expression, context, null, null);
     }
@@ -93,7 +84,7 @@ public class ContractInputExpressionExecutorStrategyTest {
     public void evaluateShouldThrowAnExceptionDuetoServiceFailure() throws Exception {
         final SExpression expression = buildInputContractExpression("comment", String.class);
         final Map<String, Object> context = buildInitialContext(465465L);
-        when(cacheService.get("USER_TASK_CONTRACT", 465465L)).thenThrow(new SCacheException("exception"));
+        when(contractDataService.getUserTaskData(465465L, "comment")).thenThrow(new SBonitaReadException("exception"));
 
         strategy.evaluate(expression, context, null, null);
     }
@@ -108,7 +99,7 @@ public class ContractInputExpressionExecutorStrategyTest {
         final SExpression expression = buildInputContractExpression("comment", String.class);
         strategy.validate(expression);
 
-        verify(cacheService, never()).get(anyString(), anyObject());
+        verify(contractDataService, never()).getUserTaskData(anyLong(), anyString());
     }
 
     @Test
@@ -125,7 +116,8 @@ public class ContractInputExpressionExecutorStrategyTest {
         final SExpression expression2 = buildInputContractExpression("isValid", Boolean.class);
         final List<SExpression> expressions = Arrays.asList(expression1, expression2);
         final Map<String, Object> context = buildInitialContext(465465L);
-        when(cacheService.get("USER_TASK_CONTRACT", 465465L)).thenReturn(inputs);
+        when(contractDataService.getUserTaskData(465465L, "comment")).thenReturn("No way!");
+        when(contractDataService.getUserTaskData(465465L, "isValid")).thenReturn(false);
 
         final List<Object> results = strategy.evaluate(expressions, context, null, null);
         assertThat(results).hasSize(2);

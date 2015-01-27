@@ -80,6 +80,7 @@ import org.bonitasoft.engine.api.impl.transaction.event.GetEventInstances;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevel;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchived;
+import org.bonitasoft.engine.api.impl.transaction.flownode.ExecuteFlowNode;
 import org.bonitasoft.engine.api.impl.transaction.flownode.GetFlowNodeInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.HideTasks;
 import org.bonitasoft.engine.api.impl.transaction.flownode.IsTaskHidden;
@@ -349,7 +350,6 @@ import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
-import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
@@ -916,29 +916,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new FlowNodeExecutionException(e);
         }
 
-    }
-
-    protected void addSystemCommentOnProcessInstanceWhenExecutingTaskFor(final SFlowNodeInstance flowNodeInstance, final long executerUserId,
-            final long executerSubstituteUserId) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        final SCommentService commentService = tenantAccessor.getCommentService();
-
-        final SessionInfos session = SessionInfos.getSessionInfos();
-
-        if (executerUserId != executerSubstituteUserId) {
-            final IdentityService identityService = tenantAccessor.getIdentityService();
-            try {
-                final SUser executerUser = identityService.getUser(executerUserId);
-                final StringBuilder stb = new StringBuilder();
-                stb.append("The user " + session.getUsername() + " ");
-                stb.append("acting as delegate of the user " + executerUser.getUserName() + " ");
-                stb.append("has done the task \"" + flowNodeInstance.getDisplayName() + "\".");
-                commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb.toString());
-            } catch (final SBonitaException e) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error when adding a comment on the process instance.", e);
-            }
-        }
     }
 
     private void executeTransactionContent(final TenantServiceAccessor tenantAccessor, final TransactionContent transactionContent,
@@ -6048,9 +6025,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final BonitaLock lock = lockService.lock(flowNodeInstance.getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name(),
                 tenantAccessor.getTenantId());
         try {
-            final org.bonitasoft.engine.api.impl.transaction.flownode.ExecuteFlowNode executeFlowNode = new org.bonitasoft.engine.api.impl.transaction.flownode.ExecuteFlowNode(
-                    tenantAccessor, userId,
-                    flowNodeInstance, inputs);
+            final ExecuteFlowNode executeFlowNode = new ExecuteFlowNode(tenantAccessor, userId, flowNodeInstance, inputs);
             executeTransactionContent(tenantAccessor, executeFlowNode, wrapInTransaction);
         } finally {
             lockService.unlock(lock, tenantAccessor.getTenantId());
@@ -6111,52 +6086,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             DocumentAttachmentException,
             AlreadyExistsException {
         return documentAPI.updateDocument(documentId, documentValue);
-    }
-
-    private class ExecuteFlowNode implements TransactionContent {
-
-        private final long userId;
-        private final ActivityInstanceService activityInstanceService;
-        private final long flownodeInstanceId;
-        private final ProcessExecutor processExecutor;
-        private final TechnicalLoggerService logger;
-
-        public ExecuteFlowNode(final long userId, final ActivityInstanceService activityInstanceService, final long flownodeInstanceId,
-                final ProcessExecutor processExecutor, final TechnicalLoggerService logger) {
-            this.userId = userId;
-            this.activityInstanceService = activityInstanceService;
-            this.flownodeInstanceId = flownodeInstanceId;
-            this.processExecutor = processExecutor;
-            this.logger = logger;
-        }
-
-        @Override
-        public void execute() throws SBonitaException {
-            final SessionInfos session = SessionInfos.getSessionInfos();
-            if (session != null) {
-                final long executerSubstituteUserId = session.getUserId();
-                final long executerUserId;
-                if (userId == 0) {
-                    executerUserId = executerSubstituteUserId;
-                } else {
-                    executerUserId = userId;
-                }
-
-                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
-                final boolean isFirstState = flowNodeInstance.getStateId() == 0;
-                // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
-                processExecutor
-                        .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerUserId,
-                                executerSubstituteUserId);
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                    final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUsername(), executerUserId,
-                            executerSubstituteUserId);
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, message);
-                }
-
-                addSystemCommentOnProcessInstanceWhenExecutingTaskFor(flowNodeInstance, executerUserId, executerSubstituteUserId);
-            }
-        }
     }
 
     @Override

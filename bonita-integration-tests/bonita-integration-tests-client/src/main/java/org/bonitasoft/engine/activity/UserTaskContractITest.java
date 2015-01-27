@@ -224,8 +224,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         userTaskDefinitionBuilder.addContract()
                 .addComplexInput("expenseReport", "expense report with several expense lines", true,
-                        Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof),
-                        null)
+                        Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof), null)
                 .addMandatoryConstraint("expenseAmount")
                 .addMandatoryConstraint("expenseReport")
                 .addMandatoryConstraint("expenseDate");
@@ -475,7 +474,6 @@ public class UserTaskContractITest extends CommonAPIIT {
             disableAndDeleteProcess(processDefinition);
 
         }
-
     }
 
 }

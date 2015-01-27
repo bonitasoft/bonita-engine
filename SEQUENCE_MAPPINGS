@@ -110,6 +110,8 @@ SBusinessApplication -> 10200
 SBusinessApplicationPage -> 10201
 SBusinessApplicationMenu -> 10202
 
+SContractData -> 10210
+
 =Archived objects==
 
 ProcessInstance -> 20010

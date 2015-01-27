@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+    <query name="getContractDataByUserTaskId">
+        SELECT cd
+        FROM org.bonitasoft.engine.core.contract.data.SContractData AS cd
+        WHERE cd.scopeId = :scopeId
+        AND cd.name = :name
+    </query>
+
+    <query name="getContractDataByUserTaskIdAndDataName">
+        SELECT cd
+        FROM org.bonitasoft.engine.core.contract.data.SContractData AS cd
+        WHERE cd.scopeId = :scopeId
+        AND cd.name = :name
+    </query>
+
+</hibernate-mapping>

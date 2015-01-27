@@ -17,24 +17,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.cache.SCacheException;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
+import org.bonitasoft.engine.core.contract.data.SContractDataNotFoundException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class ContractInputExpressionExecutorStrategy implements ExpressionExecutorStrategy {
 
-    private final CacheService cacheService;
+    private final ContractDataService contractDataService;
 
-    public ContractInputExpressionExecutorStrategy(final CacheService cacheService) {
+    public ContractInputExpressionExecutorStrategy(final ContractDataService contractDataService) {
         super();
-        this.cacheService = cacheService;
+        this.contractDataService = contractDataService;
     }
 
     @Override
@@ -42,17 +43,11 @@ public class ContractInputExpressionExecutorStrategy implements ExpressionExecut
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final Long containerId = (Long) context.get(CONTAINER_ID_KEY);
         try {
-            final Map<String, Object> inputs = (Map<String, Object>) cacheService.get("USER_TASK_CONTRACT", containerId);
-            if (inputs == null) {
-                throw new SExpressionEvaluationException("No Contract inputs are defined for the user task '" + containerId + "'", expression.getName());
-            }
-            if (!inputs.containsKey(expression.getContent())) {
-                throw new SExpressionEvaluationException(expression.getContent() + " is not defined in the contract of the user task '" + containerId + "'",
-                        expression.getName());
-            }
-            return inputs.get(expression.getContent());
-        } catch (final SCacheException sce) {
-            throw new SExpressionEvaluationException(sce, expression.getName());
+            return contractDataService.getUserTaskData(containerId, expression.getContent());
+        } catch (final SContractDataNotFoundException scdnfe) {
+            throw new SExpressionEvaluationException(scdnfe, expression.getName());
+        } catch (final SBonitaReadException sre) {
+            throw new SExpressionEvaluationException(sre, expression.getName());
         }
     }
 

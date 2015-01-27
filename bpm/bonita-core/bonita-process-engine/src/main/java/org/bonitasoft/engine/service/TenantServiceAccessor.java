@@ -27,6 +27,7 @@ import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -80,7 +81,7 @@ import org.bonitasoft.engine.xml.XMLWriter;
  * <p>
  * All server side services of a tenant can be accessed using this class. Using server side services instead of an API might cause unexpected behaviors and
  * damage your data.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Hongwen Zang
@@ -219,5 +220,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     TimeTracker getTimeTracker();
 
     PermissionService getPermissionService();
+
+    ContractDataService getContractDataService();
 
 }

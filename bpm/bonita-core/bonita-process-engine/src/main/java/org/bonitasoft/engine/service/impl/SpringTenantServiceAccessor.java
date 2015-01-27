@@ -39,6 +39,7 @@ import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -233,11 +234,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private ParentContainerResolver parentContainerResolver;
 
+    private ContractDataService contractDataService;
+
+    @Override
     public ParentContainerResolver getParentContainerResolver() {
         if (parentContainerResolver == null) {
             parentContainerResolver = beanAccessor.getService(ParentContainerResolver.class);
         }
-        return this.parentContainerResolver;
+        return parentContainerResolver;
     }
 
     public SpringTenantServiceAccessor(final Long tenantId) {
@@ -258,7 +262,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         if (timeTracker == null) {
             timeTracker = beanAccessor.getService(TimeTracker.class);
         }
-        return this.timeTracker;
+        return timeTracker;
     }
 
     @Override
@@ -808,4 +812,13 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         }
         return permissionService;
     }
+
+    @Override
+    public ContractDataService getContractDataService() {
+        if (contractDataService == null) {
+            contractDataService = beanAccessor.getService(ContractDataService.class);
+        }
+        return contractDataService;
+    }
+
 }
