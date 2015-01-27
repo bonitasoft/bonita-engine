@@ -66,7 +66,6 @@ s/fk_message_instance_tenantId_idx/fk_msgInst_tenId_idx/g
 s/fk_message_instance_process_definitionId_idx/fk_msg_procDef_idx/g
 s/fk_pending_mapping_tenantId_idx/fk_pMap_tenId_idx/g
 s/fk_pending_mapping_flownode_instanceId/fk_pMap_flnId/g
-s/fk_hidden_activity_tenantId_idx/fk_hideAct_tenId_idx/g
 s/fk_breakpoint_process_definitionId_idx/fk_bk_ProcDefId_idx/g
 s/fk_breakpoint_process_instanceId_idx/fk_bk_procInstId_idx/g
 s/fk_arch_process_instance_process_definitionId_idx/fk_Aproc_procDef_idx/g
@@ -119,7 +118,6 @@ s/fk_arch_transition_instance_tenantId/fk_ATrans_tenId/g
 /fk_connector_instance_tenantId/d
 /fk_flownode_instance_tenantId/d
 /fk_group__tenantId/d
-/fk_hidden_activity_tenantId/d
 /fk_message_instance_tenantId/d
 /fk_p_metadata_def_tenantId/d
 /fk_p_metadata_val_tenantId/d

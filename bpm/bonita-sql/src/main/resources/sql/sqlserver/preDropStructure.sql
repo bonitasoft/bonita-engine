@@ -37,8 +37,6 @@ ALTER TABLE flownode_instance DROP CONSTRAINT fk_flownode_instance_tenantId
 GO
 ALTER TABLE group_ DROP CONSTRAINT fk_group__tenantId
 GO
-ALTER TABLE hidden_activity DROP CONSTRAINT fk_hidden_activity_tenantId
-GO
 ALTER TABLE job_desc DROP CONSTRAINT fk_job_desc_tenantId
 GO
 ALTER TABLE job_param DROP CONSTRAINT fk_job_param_tenantId
