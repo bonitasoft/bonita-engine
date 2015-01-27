@@ -16,6 +16,7 @@ package org.bonitasoft.engine;
 
 import java.util.Properties;
 
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 

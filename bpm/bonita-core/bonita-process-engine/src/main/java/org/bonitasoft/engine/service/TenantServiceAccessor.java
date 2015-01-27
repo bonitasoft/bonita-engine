@@ -18,6 +18,7 @@ import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -81,7 +82,7 @@ import org.bonitasoft.engine.xml.XMLWriter;
  * <p>
  * All server side services of a tenant can be accessed using this class. Using server side services instead of an API might cause unexpected behaviors and
  * damage your data.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Hongwen Zang
@@ -222,5 +223,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     PermissionService getPermissionService();
 
     PageService getOrgPageService();
+
+    ApplicationService getOrgApplicationService();
 
 }

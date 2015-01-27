@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
+import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 

@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.filefilter.AbstractFileFilter;
+import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.bonitasoft.engine.commons.StringUtils;
 
 /**

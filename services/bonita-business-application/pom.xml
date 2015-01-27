@@ -4,11 +4,17 @@
 
     <parent>
         <artifactId>services</artifactId>
-		<groupId>org.bonitasoft.engine</groupId>
+        <groupId>org.bonitasoft.engine</groupId>
         <version>6.5.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bonita-business-application</artifactId>
     <groupId>org.bonitasoft.engine.application</groupId>
+    <artifactId>bonita-business-application</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>bonita-business-application-api</module>
+        <module>bonita-business-application-impl</module>
+    </modules>
 
 </project>

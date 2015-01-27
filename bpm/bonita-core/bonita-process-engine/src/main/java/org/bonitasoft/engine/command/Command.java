@@ -16,6 +16,7 @@ package org.bonitasoft.engine.command;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**

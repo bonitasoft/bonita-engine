@@ -30,6 +30,7 @@ import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -230,17 +231,21 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private TransientDataService transientDataService;
 
     private TimeTracker timeTracker;
+
     private PermissionService permissionService;
 
     private ParentContainerResolver parentContainerResolver;
 
     private PageService pageService;
 
+    private ApplicationService applicationService;
+
+    @Override
     public ParentContainerResolver getParentContainerResolver() {
         if (parentContainerResolver == null) {
             parentContainerResolver = beanAccessor.getService(ParentContainerResolver.class);
         }
-        return this.parentContainerResolver;
+        return parentContainerResolver;
     }
 
     public SpringTenantServiceAccessor(final Long tenantId) {
@@ -261,7 +266,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         if (timeTracker == null) {
             timeTracker = beanAccessor.getService(TimeTracker.class);
         }
-        return this.timeTracker;
+        return timeTracker;
     }
 
     @Override
@@ -821,6 +826,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             pageService = beanAccessor.getService(PageService.class);
         }
         return pageService;
+    }
+
+    @Override
+    public ApplicationService getOrgApplicationService() {
+        if (applicationService == null) {
+            applicationService = beanAccessor.getService(ApplicationService.class);
+        }
+        return applicationService;
     }
 
 }

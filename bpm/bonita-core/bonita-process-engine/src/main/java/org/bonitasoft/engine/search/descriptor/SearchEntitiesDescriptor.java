@@ -81,6 +81,12 @@ public class SearchEntitiesDescriptor {
 
     private final SearchPageDescriptor searchPageDescriptor;
 
+    private final SearchApplicationDescriptor searchApplicationDescriptor;
+
+    private final SearchApplicationMenuDescriptor searchApplicationMenuDescriptor;
+
+    private final SearchApplicationPageDescriptor searchApplicationPageDescriptor;
+
     public SearchEntitiesDescriptor() {
         searchUserDescriptor = new SearchUserDescriptor();
         searchRoleDescriptor = new SearchRoleDescriptor();
@@ -112,6 +118,9 @@ public class SearchEntitiesDescriptor {
         searchThemeDescriptor = new SearchThemeDescriptor();
         searchEventTriggerInstanceDescriptor = new SearchEventTriggerInstanceDescriptor();
         searchPageDescriptor = new SearchPageDescriptor();
+        searchApplicationDescriptor = new SearchApplicationDescriptor();
+        searchApplicationMenuDescriptor = new SearchApplicationMenuDescriptor();
+        searchApplicationPageDescriptor = new SearchApplicationPageDescriptor();
     }
 
     public SearchUserDescriptor getSearchUserDescriptor() {
@@ -234,5 +243,16 @@ public class SearchEntitiesDescriptor {
         return searchPageDescriptor;
     }
 
+    public SearchApplicationDescriptor getOrgSearchApplicationDescriptor() {
+        return searchApplicationDescriptor;
+    }
+
+    public SearchApplicationMenuDescriptor getOrgSearchApplicationMenuDescriptor() {
+        return searchApplicationMenuDescriptor;
+    }
+
+    public SearchApplicationPageDescriptor getOrgSearchApplicationPageDescriptor() {
+        return searchApplicationPageDescriptor;
+    }
 
 }
