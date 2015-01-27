@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
+import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
@@ -127,9 +129,12 @@ import org.bonitasoft.engine.test.wait.WaitForDataValue;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
 import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 /**
  * @author Emmanuel Duchastenier
@@ -174,6 +179,8 @@ public class APITestUtil extends PlatformTestUtil {
 
     private PageAPI pageAPI;
 
+    private ApplicationAPI applicationAPI;
+
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
         if (strTimeout != null) {
@@ -214,6 +221,7 @@ public class APITestUtil extends PlatformTestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
         setPageAPI(TenantAPIAccessor.getPageAPI(getSession()));
+        applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
     }
 
     public void logoutOnTenant() throws BonitaException {
@@ -1455,6 +1463,10 @@ public class APITestUtil extends PlatformTestUtil {
         return pageAPI;
     }
 
+    public ApplicationAPI getOrgApplicationAPI() {
+        return applicationAPI;
+    }
+
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
         if (processSupervisors != null) {
             for (final ProcessSupervisor processSupervisor : processSupervisors) {
@@ -1526,6 +1538,14 @@ public class APITestUtil extends PlatformTestUtil {
             processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
         }
         return processDefinitions;
+    }
+
+    protected void assertThatXmlHaveNoDifferences(final String xmlPrettyFormatExpected, final String xmlPrettyFormatExported) throws SAXException, IOException {
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+        final DetailedDiff diff = new DetailedDiff(XMLUnit.compareXML(xmlPrettyFormatExported, xmlPrettyFormatExpected));
+        final List<?> allDifferences = diff.getAllDifferences();
+        assertThat(allDifferences).as("should have no differences between:\n%s\n and:\n%s\n", xmlPrettyFormatExpected, xmlPrettyFormatExported).isEmpty();
     }
 
 }

@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
@@ -29,6 +30,7 @@ import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
+import org.bonitasoft.engine.api.impl.ApplicationAPIImpl;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
@@ -65,6 +67,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(ThemeAPI.class.getName(), new ThemeAPIImpl());
         apis.put(PermissionAPI.class.getName(), new PermissionAPIImpl());
         apis.put(PageAPI.class.getName(), new PageAPIImpl());
+        apis.put(ApplicationAPI.class.getName(), new ApplicationAPIImpl());
     }
 
     @Override

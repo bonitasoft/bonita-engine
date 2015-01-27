@@ -2,6 +2,7 @@ package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.accessors.TenantAccessorTest;
 import org.bonitasoft.engine.activity.TaskTests;
+import org.bonitasoft.engine.business.application.ApplicationAPIITs;
 import org.bonitasoft.engine.command.CommandsTests;
 import org.bonitasoft.engine.connectors.RemoteConnectorExecutionIT;
 import org.bonitasoft.engine.event.EventTests;
@@ -37,7 +38,8 @@ import org.junit.runners.Suite.SuiteClasses;
         TaskTests.class,
         TenantAccessorTest.class,
         MultiThreadCallsIT.class,
-        PageAPIIT.class
+        PageAPIIT.class,
+        ApplicationAPIITs.class
 })
 @Initializer(TestsInitializer.class)
 public class BPMRemoteTests {
