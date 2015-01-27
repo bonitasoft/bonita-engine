@@ -519,6 +519,12 @@
 			<version>${project.version}</version>
 		</dependency>
 
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-sql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
 		<!-- Not in shade -->
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
@@ -724,6 +730,8 @@
 									<include>org.bonitasoft.engine.theme:bonita-theme-impl</include>
 									<!-- Engine -->
 									<include>org.bonitasoft.engine.core:bonita-process-engine</include>
+                                    <!-- SQL files -->
+									<include>org.bonitasoft.engine:bonita-sql</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${project.build.directory}</outputDirectory>

@@ -110,10 +110,7 @@ public class PlatformUtil {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        // transactionService.begin();
-        platformService.createPlatformTables();
-        platformService.createTenantTables();
-        // transactionService.complete();
+        platformService.createTables();
 
         try {
             transactionService.begin();
@@ -140,13 +137,7 @@ public class PlatformUtil {
         } finally {
             transactionService.complete();
         }
-        transactionService.begin();
-        try {
-            platformService.deleteTenantTables();
-            platformService.deletePlatformTables();
-        } finally {
-            transactionService.complete();
-        }
+        platformService.deleteTables();
     }
 
     private static void deactiveAndDeleteAllTenants(final PlatformService platformService) throws STenantException, STenantNotFoundException,

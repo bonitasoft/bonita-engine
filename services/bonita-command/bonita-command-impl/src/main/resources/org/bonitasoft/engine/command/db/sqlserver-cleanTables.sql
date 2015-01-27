@@ -1,2 +1,0 @@
-DELETE FROM command
-GO

@@ -119,7 +119,6 @@ public class ConnectorServiceImplTest {
     private void fixBonitaHomeIfNotSet() {
         //when test are run outside of maven
         System.setProperty("bonita.home", System.getProperty("bonita.home", IOUtil.createTempDirectoryInDefaultTempDirectory("bonita_home").getAbsolutePath()));
-        System.err.println("using bonita_home:" + System.getProperty("bonita.home"));
     }
 
     @Test(expected = SInvalidConnectorImplementationException.class)
