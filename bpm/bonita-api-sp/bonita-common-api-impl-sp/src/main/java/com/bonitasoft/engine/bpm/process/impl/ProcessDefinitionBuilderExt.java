@@ -52,6 +52,7 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
      * @param type
      *        The type of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition} (complete class name)
      * @return The {@link ParameterDefinitionBuilder} containing the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
+     * @deprecated use {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder#addParameter(String, String)}
      */
     public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
         return new ParameterDefinitionBuilder(this, process, parameterName, type);

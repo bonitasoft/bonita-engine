@@ -10,6 +10,7 @@ package com.bonitasoft.engine.bpm.parameter;
 
 /**
  * @author Matthieu Chaffotte
+ * @deprecated use {@link org.bonitasoft.engine.bpm.parameter.ParameterInstance}
  */
 public interface ParameterInstance extends org.bonitasoft.engine.bpm.parameter.ParameterInstance {
 

@@ -48,7 +48,9 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
+     * @deprecated use {@link org.bonitasoft.engine.api.ProcessManagementAPI#getParameterInstance(long, String)}
      */
+    @Deprecated
     ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws ParameterNotFoundException;
 
     /**
@@ -66,7 +68,9 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
+     * @deprecated use {@link org.bonitasoft.engine.api.ProcessManagementAPI#getParameterInstances(long, int, int, org.bonitasoft.engine.bpm.parameter.ParameterCriterion)}
      */
+    @Deprecated
     List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort);
 
     /**
