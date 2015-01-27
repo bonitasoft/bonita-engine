@@ -1,5 +1,0 @@
-This script updates sql files to create/delete tables used by the engine and its services.
-
-WARNINGS:
-When executing the script, revert modifications of module bonita-scheduler-quartz!
-When updating a sed file, order string replacements from the longest string to the shortest! 

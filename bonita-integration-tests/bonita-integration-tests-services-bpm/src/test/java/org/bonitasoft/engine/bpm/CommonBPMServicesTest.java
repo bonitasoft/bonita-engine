@@ -101,11 +101,11 @@ public class CommonBPMServicesTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonBPMServicesTest.class);
 
-    private static final String BONITA_SERVICES_FOLDER_DEFAULT_PATH = "target/conf";
+    private static final String BONITA_SERVICES_FOLDER_DEFAULT_PATH = "target/test-classes/conf";
 
     private static final String BONITA_SERVICES_FOLDER_PROPERTY = "bonita.services.folder";
 
-    private static final String BONITA_HOME_DEFAULT_PATH = "target/home";
+    private static final String BONITA_HOME_DEFAULT_PATH = "target/test-classes/home";
 
     private static final String BONITA_HOME_PROPERTY = "bonita.home";
 
