@@ -1774,7 +1774,7 @@ public interface ProcessManagementAPI {
      * @return The number of parameters of a process definition
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since 6.0
+     * @since 7.0
      */
     int getNumberOfParameterInstances(long processDefinitionId);
 
@@ -1790,7 +1790,7 @@ public interface ProcessManagementAPI {
      *             Error thrown if the given parameter is not found.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since 6.0
+     * @since 7.0
      */
     ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws NotFoundException;
 
@@ -1808,7 +1808,7 @@ public interface ProcessManagementAPI {
      * @return The ordered list of parameter instances
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since 6.0
+     * @since 7.0
      */
     List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort);
 
