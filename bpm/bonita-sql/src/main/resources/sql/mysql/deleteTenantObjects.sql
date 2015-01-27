@@ -1,3 +1,4 @@
+DELETE FROM contract_data WHERE tenantid = ${tenantid};
 DELETE FROM actormember WHERE tenantid = ${tenantid};
 DELETE FROM actor WHERE tenantid = ${tenantid};
 DELETE FROM processcategorymapping WHERE tenantid = ${tenantid};

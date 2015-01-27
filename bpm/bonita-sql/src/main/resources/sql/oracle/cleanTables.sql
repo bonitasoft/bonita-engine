@@ -1,3 +1,5 @@
+DELETE FROM contract_data;
+
 DELETE FROM actormember;
 
 DELETE FROM actor;

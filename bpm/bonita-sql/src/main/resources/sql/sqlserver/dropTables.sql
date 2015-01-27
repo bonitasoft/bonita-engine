@@ -1,3 +1,5 @@
+DROP TABLE contract_data
+GO
 DROP TABLE actormember
 GO
 DROP TABLE actor

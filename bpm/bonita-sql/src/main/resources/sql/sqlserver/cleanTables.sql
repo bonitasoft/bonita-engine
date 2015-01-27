@@ -1,3 +1,6 @@
+DELETE FROM contract_data
+GO
+
 DELETE FROM actormember
 GO
 

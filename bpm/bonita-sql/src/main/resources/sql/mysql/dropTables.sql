@@ -1,3 +1,4 @@
+DROP TABLE contract_data;
 DROP TABLE actormember;
 DROP TABLE actor;
 DROP TABLE processcategorymapping;
