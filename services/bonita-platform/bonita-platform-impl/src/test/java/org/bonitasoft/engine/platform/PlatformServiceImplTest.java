@@ -23,11 +23,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import javax.sql.DataSource;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.PlatformCacheService;
@@ -84,6 +87,12 @@ public class PlatformServiceImplTest {
     @Mock
     private Recorder recorder;
 
+    @Mock
+    private DataSource datasource;
+
+    @Mock
+    private File sqlFolder;
+
     @InjectMocks
     private PlatformServiceImpl platformServiceImpl;
 
@@ -114,7 +123,7 @@ public class PlatformServiceImplTest {
         final long numberOfTenants = 155L;
         final Map<String, Object> emptyMap = Collections.emptyMap();
         when(persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenants", emptyMap, STenant.class, Long.class)))
-                .thenReturn(numberOfTenants);
+        .thenReturn(numberOfTenants);
 
         assertEquals(numberOfTenants, platformServiceImpl.getNumberOfTenants());
     }

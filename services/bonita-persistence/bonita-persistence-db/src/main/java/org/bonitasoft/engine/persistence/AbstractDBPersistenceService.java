@@ -148,32 +148,32 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     protected void initTablesFiles(final DBConfigurationsProvider dbConfigurationsProvider, final String persistenceDBConfigFilter) {
         if (dbConfigurationsProvider != null) {
-            for (final DBConfiguration dbConfiguration : dbConfigurationsProvider.getMatchingTenantConfigurations(persistenceDBConfigFilter)) {
-                if (dbConfiguration.hasCreateTablesFile()) {
-                    createTablesFiles.add(dbConfiguration.getCreateTablesFile());
-                }
-                if (dbConfiguration.hasInitTablesFile()) {
-                    initTablesFiles.add(dbConfiguration.getInitTablesFile());
-                }
-                if (dbConfiguration.hasCleanTablesFile()) {
-                    cleanTablesFiles.add(dbConfiguration.getCleanTablesFile());
-                }
-                if (dbConfiguration.hasDropTablesFile()) {
-                    dropTablesFiles.add(dbConfiguration.getDropTablesFile());
-                }
-                if (dbConfiguration.hasDeleteTenantObjectsFile()) {
-                    deleteObjectsFiles.add(dbConfiguration.getDeleteTenantObjectsFile());
-                }
-                if (dbConfiguration.hasPostCreateStructureFile()) {
-                    postCreateStructureFiles.add(dbConfiguration.getPostCreateStructureFile());
-                }
-                if (dbConfiguration.hasPreDropStructureFile()) {
-                    preDropStructureFiles.add(dbConfiguration.getPreDropStructureFile());
-                }
-                if (dbConfiguration.hasSqlTransformers()) {
-                    sqlTransformers.putAll(dbConfiguration.getSqlTransformers());
-                }
-            }
+//            for (final DBConfiguration dbConfiguration : dbConfigurationsProvider.getMatchingTenantConfigurations(persistenceDBConfigFilter)) {
+//                if (dbConfiguration.hasCreateTablesFile()) {
+//                    createTablesFiles.add(dbConfiguration.getCreateTablesFile());
+//                }
+//                if (dbConfiguration.hasInitTablesFile()) {
+//                    initTablesFiles.add(dbConfiguration.getInitTablesFile());
+//                }
+//                if (dbConfiguration.hasCleanTablesFile()) {
+//                    cleanTablesFiles.add(dbConfiguration.getCleanTablesFile());
+//                }
+//                if (dbConfiguration.hasDropTablesFile()) {
+//                    dropTablesFiles.add(dbConfiguration.getDropTablesFile());
+//                }
+//                if (dbConfiguration.hasDeleteTenantObjectsFile()) {
+//                    deleteObjectsFiles.add(dbConfiguration.getDeleteTenantObjectsFile());
+//                }
+//                if (dbConfiguration.hasPostCreateStructureFile()) {
+//                    postCreateStructureFiles.add(dbConfiguration.getPostCreateStructureFile());
+//                }
+//                if (dbConfiguration.hasPreDropStructureFile()) {
+//                    preDropStructureFiles.add(dbConfiguration.getPreDropStructureFile());
+//                }
+//                if (dbConfiguration.hasSqlTransformers()) {
+//                    sqlTransformers.putAll(dbConfiguration.getSqlTransformers());
+//                }
+//            }
         }
     }
 

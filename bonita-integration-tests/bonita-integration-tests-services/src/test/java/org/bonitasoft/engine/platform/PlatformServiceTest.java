@@ -58,7 +58,7 @@ public class PlatformServiceTest extends CommonServiceTest {
 
         final SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class)
                 .createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
-        getPlatformService().createPlatformTables();
+        getPlatformService().createTables();
 
         getTransactionService().complete();
         getTransactionService().begin();
@@ -69,22 +69,17 @@ public class PlatformServiceTest extends CommonServiceTest {
         assertEquals(platform.getCreated(), readPlatform.getCreated());
 
         try {
-            getPlatformService().createPlatformTables();
-            fail("Platform alreadyExist...");
+            getPlatformService().createTables();
+            fail("Platform already exists...");
         } catch (final SPlatformAlreadyExistException e) {
             // OK
         }
         getPlatformService().deletePlatform();
         getTransactionService().complete();
-        getTransactionService().begin();
-        getPlatformService().deletePlatformTables();
-        getTransactionService().complete();
+        getPlatformService().deleteTables();
 
-        getTransactionService().begin();
         // check the platform was well deleted and try to recreate it
-        getPlatformService().createPlatformTables();
-        getPlatformService().deletePlatformTables();
-        getTransactionService().complete();
+        getPlatformService().createTables();
     }
 
     @Test
@@ -108,10 +103,8 @@ public class PlatformServiceTest extends CommonServiceTest {
 
         final SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class)
                 .createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
-        getTransactionService().begin();
-        getPlatformService().createPlatformTables();
+        getPlatformService().createTables();
         getTransactionService().complete();
-        getTransactionService().begin();
         getPlatformService().createPlatform(platform);
         SPlatform readPlatform = getPlatformService().getPlatform();
         assertNotNull(readPlatform);
@@ -122,9 +115,8 @@ public class PlatformServiceTest extends CommonServiceTest {
         getPlatformService().deletePlatform();
 
         getTransactionService().complete();
-        getTransactionService().begin();
-        getPlatformService().deletePlatformTables();
-        getTransactionService().complete();
+
+        getPlatformService().deleteTables();
     }
 
     @Test(expected = SPlatformUpdateException.class)
@@ -184,9 +176,8 @@ public class PlatformServiceTest extends CommonServiceTest {
 
         getPlatformService().deletePlatform();
         getTransactionService().complete();
-        getTransactionService().begin();
-        getPlatformService().deletePlatformTables();
-        getTransactionService().complete();
+
+        getPlatformService().deleteTables();
     }
 
 }

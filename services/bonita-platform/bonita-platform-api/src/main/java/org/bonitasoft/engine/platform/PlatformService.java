@@ -57,7 +57,7 @@ public interface PlatformService {
     /**
      * Retrieve the platform from the cache
      * No need to be in a transaction
-     * 
+     *
      * @return sPlatform
      * @throws SPlatformNotFoundException
      *             occurs when the identifier does not refer to an existing sPlatform
@@ -67,11 +67,11 @@ public interface PlatformService {
 
     // create platform tables (platform only, not tenant related tables)
     // insert the SPlatform row
-    void createPlatformTables() throws SPlatformCreationException, SPlatformAlreadyExistException;
+    void createTables() throws SPlatformCreationException, SPlatformAlreadyExistException;
 
     /**
      * Create a sPlatform
-     * 
+     *
      * @param platform
      *            sPlatform
      * @throws SPlatformCreationException
@@ -82,7 +82,7 @@ public interface PlatformService {
 
     /**
      * Delete the current sPlatform
-     * 
+     *
      * @throws SPlatformDeletionException
      *             occurs when an exception is thrown during sPlatform deletion
      * @throws SPlatformNotFoundException
@@ -91,11 +91,11 @@ public interface PlatformService {
      */
     void deletePlatform() throws SPlatformDeletionException, SPlatformNotFoundException;
 
-    void deletePlatformTables() throws SPlatformDeletionException;
+    void deleteTables() throws SPlatformDeletionException;
 
     /**
      * Update a sPlatform from given sPlatform and new content.
-     * 
+     *
      * @param platform
      *            sPlatform
      * @param descriptor
@@ -111,7 +111,7 @@ public interface PlatformService {
      * case 1 - create tenants tables if not already exists + insert rows where necessary (sequences for example) + insert default users (defined in
      * configuration)
      * case 2 - create tenants tables + insert rows where necessary (sequences for example) + insert default users (defined in configuration)
-     * 
+     *
      * @param tenant
      *            sTenant
      * @return id of new created tenant
@@ -126,7 +126,7 @@ public interface PlatformService {
     /**
      * case 1 - Remove tenant specific tenant tables if no mor etenant in the db
      * case 2 - Remove tenant specific tables
-     * 
+     *
      * @param tenantId
      * @throws STenantDeletionException
      *             occurs when an exception is thrown during sTenant deletion
@@ -140,7 +140,7 @@ public interface PlatformService {
 
     /**
      * Remove all rows from all tables where the tenantId matches
-     * 
+     *
      * @param tenantId
      * @throws STenantDeletionException
      * @throws STenantNotFoundException
@@ -150,7 +150,7 @@ public interface PlatformService {
 
     /**
      * Update a sTenant from given sTenant and new content.
-     * 
+     *
      * @param tenant
      *            sTenant
      * @param descriptor
@@ -163,7 +163,7 @@ public interface PlatformService {
 
     /**
      * Get tenant by its id
-     * 
+     *
      * @param id
      *            tenant id
      * @return sTenant
@@ -175,7 +175,7 @@ public interface PlatformService {
 
     /**
      * Get tenant by its name
-     * 
+     *
      * @param name
      *            tenant's name
      * @return sTenant
@@ -187,7 +187,7 @@ public interface PlatformService {
 
     /**
      * Get default tenant
-     * 
+     *
      * @return sTenant
      * @throws STenantNotFoundException
      *             occurs when the identifier does not refer to an existing sTenant
@@ -197,7 +197,7 @@ public interface PlatformService {
 
     /**
      * Get tenants which ids belong to given collection
-     * 
+     *
      * @param ids
      *            a collection of ids
      * @param queryOptions
@@ -212,7 +212,7 @@ public interface PlatformService {
 
     /**
      * Set status of the tenant into activated
-     * 
+     *
      * @param tenantId
      * @return TODO
      * @throws STenantNotFoundException
@@ -225,7 +225,7 @@ public interface PlatformService {
 
     /**
      * Set status of the tenant into deactivated
-     * 
+     *
      * @param tenantId
      * @throws STenantNotFoundException
      *             occurs when the identifier does not refer to an existing sTenant
@@ -237,7 +237,7 @@ public interface PlatformService {
 
     /**
      * Get the total number of sTenants
-     * 
+     *
      * @return the total number of sTenants
      * @throws STenantException
      * @since 6.0
@@ -246,7 +246,7 @@ public interface PlatformService {
 
     /**
      * Return true if the platform is created, else return false.
-     * 
+     *
      * @return true or false
      * @since 6.0
      */
@@ -254,7 +254,7 @@ public interface PlatformService {
 
     /**
      * Return a list of tenants by the given conditions, as one part of SearchResult that is search method's return value in platformApi
-     * 
+     *
      * @param options
      * @return a list of tenants by the given conditions
      * @throws SBonitaReadException
@@ -263,7 +263,7 @@ public interface PlatformService {
 
     /**
      * Get all tenants
-     * 
+     *
      * @param queryOptions
      *            The criterion used to search tenants
      * @return a list of sTenant
@@ -274,16 +274,12 @@ public interface PlatformService {
 
     /**
      * Return a number of tenants by the given conditions, as one part of SearchResult that is search method's return value in platformApi
-     * 
+     *
      * @param options
      * @return a number of tenants by the given conditions
      * @throws SBonitaReadException
      */
     long getNumberOfTenants(QueryOptions options) throws SBonitaReadException;
-
-    void deleteTenantTables() throws STenantDeletionException;
-
-    void createTenantTables() throws STenantCreationException;
 
     void cleanTenantTables() throws STenantUpdateException;
 
@@ -294,7 +290,7 @@ public interface PlatformService {
 
     /**
      * Return the platform properties
-     * 
+     *
      * @return The platform properties
      * @since 6.1
      */
