@@ -48,7 +48,6 @@ public class BusinessDataServiceImplTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-
     public class EntityPojo implements Entity {
 
         private static final long serialVersionUID = 1L;
@@ -596,6 +595,25 @@ public class BusinessDataServiceImplTest {
 
         //when then exception
         businessDataService.getJsonQueryEntities(entity.getClass().getName(), "wrongQuery", parameters, 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_find_provided_query() throws Exception {
+
+        //given
+        final EntityPojo entity = new EntityPojo(1562L);
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("string", "a");
+        parameters.put("integer", "12");
+        parameters.put("long", "34");
+
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
+
+        //when then no exception
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "find", parameters, 0, 10,
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 

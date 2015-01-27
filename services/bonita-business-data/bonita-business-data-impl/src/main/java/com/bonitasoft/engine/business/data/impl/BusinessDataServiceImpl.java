@@ -18,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
@@ -348,7 +349,10 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         if (businessObjectModel != null) {
             for (BusinessObject businessObject : businessObjectModel.getBusinessObjects()) {
                 if (businessObject.getQualifiedName().equals(className)) {
-                    for (Query query : businessObject.getQueries()) {
+                    List<Query> allQueries = new ArrayList<Query>();
+                    allQueries.addAll(businessObject.getQueries());
+                    allQueries.addAll(BDMQueryUtil.createProvidedQueriesForBusinessObject(businessObject));
+                    for (Query query : allQueries) {
                         if (query.getName().equals(queryName)) {
                             return query;
                         }
