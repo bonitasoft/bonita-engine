@@ -343,14 +343,4 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" table="hidden_activity">
-		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-			<key-property name="tenantId" column="tenantid" type="long" />
-			<key-property name="id" column="id" type="long" />
-		</composite-id>
-		<property name="activityId" column="activityId" />
-		<property name="userId" column="userId" />
-		<filter name="tenantFilter" />
-	</class>
-
 </hibernate-mapping>
