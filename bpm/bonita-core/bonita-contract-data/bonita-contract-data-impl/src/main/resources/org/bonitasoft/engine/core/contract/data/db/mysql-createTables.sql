@@ -4,7 +4,6 @@ CREATE TABLE contract_data (
   scopeId BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
   value LONGBLOB,
-  PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
 ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id);
