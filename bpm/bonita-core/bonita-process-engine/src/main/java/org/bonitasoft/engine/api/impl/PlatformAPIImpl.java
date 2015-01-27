@@ -36,8 +36,6 @@ import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.api.impl.transaction.platform.CleanPlatformTableContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteAllTenants;
-import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformContent;
-import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformTableContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
@@ -71,6 +69,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -153,8 +152,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         final TransactionService transactionService = platformAccessor.getTransactionService();
         try {
             final SPlatform platform = constructPlatform(platformAccessor);
-            platformService.createPlatformTables();
-            platformService.createTenantTables();
+            platformService.createTables();
 
             transactionService.begin();
             try {
@@ -570,7 +568,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void deletePlatform() throws DeletionException {
-        // TODO : Reduce number of transactions
         PlatformServiceAccessor platformAccessor;
         try {
             platformAccessor = getPlatformAccessor();
@@ -578,20 +575,31 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new DeletionException(e);
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-        final TransactionContent deletePlatformContent = new DeletePlatformContent(platformService);
         try {
-            final TransactionContent deleteTenantTables = new TransactionContent() {
+            if (isPlatformCreated()) {
+                // to ensure Hibernate cache is up-to-date before we drop tables with its content:
+                platformAccessor.getTransactionService().executeInTransaction(new Callable<Void>() {
 
-                @Override
-                public void execute() throws SBonitaException {
-                    platformService.deleteTenantTables();
-                }
-            };
-            transactionExecutor.execute(deletePlatformContent);
-            transactionExecutor.execute(deleteTenantTables);
-            final TransactionContent deletePlatformTableContent = new DeletePlatformTableContent(platformService);
-            transactionExecutor.execute(deletePlatformTableContent);
+                    @Override
+                    public Void call() throws Exception {
+                        final List<STenant> tenants = platformService.getTenants(new QueryOptions(0, Integer.MAX_VALUE));
+                        for (final STenant sTenant : tenants) {
+                            if (sTenant.isActivated()) {
+                                throw new DeletionException("Cannot delete platform with some active tenants.");
+                            }
+                        }
+                        platformService.deletePlatform();
+                        return null;
+                    }
+                });
+            }
+        } catch (final DeletionException e) {
+            throw e;
+        } catch (final Exception e) {
+            // ignore not existing platform
+        }
+        try {
+            platformService.deleteTables();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
@@ -600,7 +608,15 @@ public class PlatformAPIImpl implements PlatformAPI {
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
+    @Deprecated
     public void cleanAndDeletePlaftorm() throws DeletionException {
+        cleanAndDeletePlatform();
+    }
+
+    @Override
+    @CustomTransactions
+    @AvailableOnStoppedNode
+    public void cleanAndDeletePlatform() throws DeletionException {
         cleanPlatform();
         deletePlatform();
     }

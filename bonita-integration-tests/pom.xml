@@ -17,6 +17,7 @@
 	<modules>
 		<module>bonita-test-utils</module>
 		<module>bonita-query-tests</module>
+		<module>bonita-integration-tests-services-sql</module>
 	</modules>
 
 	<dependencyManagement>

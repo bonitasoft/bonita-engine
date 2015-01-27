@@ -21,6 +21,7 @@ import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * <b>Manage the platform.</b>
@@ -29,7 +30,7 @@ import org.bonitasoft.engine.platform.StopNodeException;
  * It mainly handles the creation of tables in database and also allow to start/stop a Node which is the current Virtual machine on which runs the engine. There
  * is only one platform for a running Bonita Engine.
  * </p>
- * 
+ *
  * @author Elias Ricken de Medeiros
  * @author Lu Kai
  * @author Zhang Bole
@@ -47,11 +48,11 @@ public interface PlatformAPI {
      * <li>Initialization of persistence structure: index are added, default values and so on</li>
      * <li>The platform state is persisted</li>
      * </ul>
-     * 
+     *
      * @throws InvalidSessionException
-     *             occurs if the API session is invalid, e.g session has expired.
+     *         occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
-     *             occurs when an exception is thrown during platform creation
+     *         occurs when an exception is thrown during platform creation
      */
     void createPlatform() throws CreationException;
 
@@ -61,23 +62,23 @@ public interface PlatformAPI {
      * Business elements linked to the execution are initialized, after this step the technical user will be able to connect to the engine and to import the
      * organization. No user are created by default and the default username/password to connect to the Bonita Engine are stored in the file bonita-server.xml
      * that is in the Bonita home.
-     * 
+     *
      * @throws InvalidSessionException
-     *             occurs if the API session is invalid, e.g session has expired.
+     *         occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
-     *             occurs when an exception is thrown during platform creation
+     *         occurs when an exception is thrown during platform creation
      */
     void initializePlatform() throws CreationException;
 
     /**
      * Utilitary method that call {@link #createPlatform()} and {@link #initializePlatform()}
-     * 
+     *
      * @see #createPlatform()
      * @see #initializePlatform()
      * @throws InvalidSessionException
-     *             occurs if the API session is invalid, e.g session has expired.
+     *         occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
-     *             occurs when an exception is thrown during platform creation
+     *         occurs when an exception is thrown during platform creation
      */
     void createAndInitializePlatform() throws CreationException;
 
@@ -87,11 +88,11 @@ public interface PlatformAPI {
      * The node is the currently Java Virtual Machine on which Bonita Engine is running
      * <p>
      * Starting the node make the Scheduler service to start and restart elements that were not finished by the Work service on the previous shutdown.
-     * 
+     *
      * @throws InvalidSessionException
-     *             occurs if API Session is invalid, e.g session has expired.
+     *         occurs if API Session is invalid, e.g session has expired.
      * @throws StartNodeException
-     *             occurs when an exception is thrown during the activation of the node
+     *         occurs when an exception is thrown during the activation of the node
      */
     void startNode() throws StartNodeException;
 
@@ -101,11 +102,11 @@ public interface PlatformAPI {
      * The node is the currently Java Virtual Machine on which Bonita Engine is running
      * <p>
      * Stopping the node make the Scheduler service to stop.
-     * 
+     *
      * @throws InvalidSessionException
-     *             occurs if API Session is invalid, e.g session has expired.
+     *         occurs if API Session is invalid, e.g session has expired.
      * @throws StopNodeException
-     *             occurs when an exception is thrown during the stop of the node
+     *         occurs when an exception is thrown during the stop of the node
      */
     void stopNode() throws StopNodeException;
 
@@ -117,12 +118,12 @@ public interface PlatformAPI {
      * /!\Please remember that <b>all data will be DELETED</b>/!\
      * <p>
      * This method does the opposite of {@link #initializePlatform()}
-     * 
+     *
      * @see #initializePlatform()
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DeletionException
-     *             occurs when an exception is thrown during platform deletion
+     *         occurs when an exception is thrown during platform deletion
      */
     void cleanPlatform() throws DeletionException;
 
@@ -130,63 +131,77 @@ public interface PlatformAPI {
      * <b>Delete the platform</b>
      * <p>
      * This method delete the platform, i.e. all the database tables.
-     * 
+     *
      * @see #createPlatform()
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DeletionException
-     *             occurs when an exception is thrown during platform deletion
+     *         occurs when an exception is thrown during platform deletion
      */
     void deletePlatform() throws DeletionException;
 
     /**
      * Clean and delete a platform.
-     * 
+     *
      * @see #cleanPlatform()
      * @see #deletePlatform()
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DeletionException
-     *             occurs when an exception is thrown during platform deletion
+     *         occurs when an exception is thrown during platform deletion
+     * @deprecated since 6.5.0 (typo in method name). Use {@link #cleanAndDeletePlatform()} instead.
      */
+    @Deprecated
     void cleanAndDeletePlaftorm() throws DeletionException;
 
     /**
+     * Clean and delete a platform.
+     *
+     * @see #cleanPlatform()
+     * @see #deletePlatform()
+     * @throws InvalidSessionException
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws DeletionException
+     *         occurs when an exception is thrown during platform deletion
+     */
+    void cleanAndDeletePlatform() throws DeletionException;
+
+    /**
      * Get the platform.
-     * 
+     *
      * @return the Platform object
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws PlatformNotFoundException
-     *             occurs when the identifier does not refer to an existing platform
+     *         occurs when the identifier does not refer to an existing platform
      */
     Platform getPlatform() throws PlatformNotFoundException;
 
     /**
      * Check if the platform created or not.
-     * 
+     *
      * @return true if the platform existed
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws PlatformNotFoundException
-     *             occurs when the identifier does not refer to an existing platform
+     *         occurs when the identifier does not refer to an existing platform
      */
     boolean isPlatformCreated() throws PlatformNotFoundException;
 
     /**
      * Get the state of the platform of the current node
-     * 
+     *
      * @return {@link PlatformState#STARTED} or {@link PlatformState#STOPPED} depending on the scheduler state
      * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws PlatformNotFoundException
-     *             occurs when the identifier does not refer to an existing platform
+     *         occurs when the identifier does not refer to an existing platform
      */
     PlatformState getPlatformState() throws PlatformNotFoundException;
 
     /**
      * Is the current node started?
-     * 
+     *
      * @return true if the node is started, false if not started or if its state cannot be determined.
      * @since 6.1
      */
@@ -194,9 +209,9 @@ public interface PlatformAPI {
 
     /**
      * Reschedules triggers which are in error state.
-     * 
+     *
      * @throws UpdateException
-     *             If an exception occurs during the scheduling
+     *         If an exception occurs during the scheduling
      * @since 6.2
      */
     void rescheduleErroneousTriggers() throws UpdateException;
