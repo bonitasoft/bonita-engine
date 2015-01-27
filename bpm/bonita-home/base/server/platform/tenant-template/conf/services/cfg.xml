@@ -97,6 +97,43 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService"/>
     </bean>
 
+    <bean id="transitionConditionEvaluator" class="org.bonitasoft.engine.execution.transition.TransitionConditionEvaluator">
+        <constructor-arg name="resolverService" ref="expressionResolverService" />
+    </bean>
+
+    <bean id="defaultTransitionGetter" class="org.bonitasoft.engine.execution.transition.DefaultTransitionGetter"/>
+
+    <bean id="implicitGatewayTransitionEvaluator" class="org.bonitasoft.engine.execution.transition.ImplicitGatewayTransitionEvaluator">
+        <constructor-arg name="conditionEvaluator" ref="transitionConditionEvaluator"/>
+        <constructor-arg name="defaultTransitionGetter" ref="defaultTransitionGetter"/>
+    </bean>
+
+
+    <bean id="inclusiveGatewayTransitionEvaluationStrategy" class="org.bonitasoft.engine.execution.transition.InclusiveGatewayTransitionEvaluationStrategy"/>
+    <bean id="exclusiveGatewayTransitionEvaluationStrategy" class="org.bonitasoft.engine.execution.transition.ExclusiveGatewayTransitionEvaluationStrategy"/>
+
+    <bean id="inclusiveTransitionEvaluator" class="org.bonitasoft.engine.execution.transition.InclusiveExclusiveTransitionEvaluator">
+        <constructor-arg name="strategy" ref="inclusiveGatewayTransitionEvaluationStrategy"/>
+        <constructor-arg name="evaluator" ref="transitionConditionEvaluator"/>
+        <constructor-arg name="defaultTransitionGetter" ref="defaultTransitionGetter"/>
+
+    </bean>
+
+    <bean id="exclusiveTransitionEvaluator" class="org.bonitasoft.engine.execution.transition.InclusiveExclusiveTransitionEvaluator">
+        <constructor-arg name="strategy" ref="exclusiveGatewayTransitionEvaluationStrategy"/>
+        <constructor-arg name="evaluator" ref="transitionConditionEvaluator"/>
+        <constructor-arg name="defaultTransitionGetter" ref="defaultTransitionGetter"/>
+    </bean>
+
+    <bean id="parallelGatewayTransitionEvaluator" class="org.bonitasoft.engine.execution.transition.ParallelGatewayTransitionEvaluator"/>
+
+    <bean id="transitionEvaluator" class="org.bonitasoft.engine.execution.TransitionEvaluator">
+        <constructor-arg name="implicitGatewayTransitionEvaluator" ref="implicitGatewayTransitionEvaluator"/>
+        <constructor-arg name="parallelGatewayTransitionEvaluator" ref="parallelGatewayTransitionEvaluator"/>
+        <constructor-arg name="inclusiveTransitionEvaluator" ref="inclusiveTransitionEvaluator"/>
+        <constructor-arg name="exclusiveTransitionEvaluator" ref="exclusiveTransitionEvaluator"/>
+    </bean>
+
     <bean id="processExecutor" class="com.bonitasoft.engine.execution.ProcessExecutorExt">
         <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
         <constructor-arg name="processInstanceService" ref="processInstanceService"/>
@@ -133,6 +170,7 @@
         <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager"/>
         <constructor-arg name="businessDataRepository" ref="businessDataRepository"/>
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
+        <constructor-arg name="transitionEvaluator" ref="transitionEvaluator" />
     </bean>
 
     <bean id="transactionalProcessInstanceInterruptor"
