@@ -137,6 +137,13 @@
       <version>${project.version}</version>
     </dependency>
 
+        <!-- Contract Data -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.contract.data</groupId>
+            <artifactId>bonita-contract-data-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     <!-- Connector Executor -->
     <dependency>
       <groupId>org.bonitasoft.engine.connector</groupId>
@@ -768,6 +775,9 @@
                   <!-- Command -->
                   <include>org.bonitasoft.engine.command:bonita-command-api</include>
                   <include>org.bonitasoft.engine.command:bonita-command-impl</include>
+                  <!-- Contract Data -->
+                                    <include>org.bonitasoft.engine.core.contract.data:bonita-contract-data-api</include>
+                                    <include>org.bonitasoft.engine.core.contract.data:bonita-contract-data-impl</include>
                   <!-- Connector Executor -->
                   <include>org.bonitasoft.engine.connector:bonita-connector-executor-api</include>
                   <include>org.bonitasoft.engine.connector:bonita-connector-executor-api-impl</include>

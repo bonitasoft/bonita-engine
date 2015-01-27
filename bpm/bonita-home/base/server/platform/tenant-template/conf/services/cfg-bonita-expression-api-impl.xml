@@ -79,7 +79,7 @@
 	</bean>
 
     <bean id="contractInputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ContractInputExpressionExecutorStrategy" >
-        <constructor-arg name="cacheService" ref="cacheService" />
+        <constructor-arg name="contractDataService" ref="contractDataService" />
     </bean>
 
 </beans>
