@@ -73,6 +73,13 @@ public class BPMTestSPUtil {
         logoutOnTenant(loginDefaultTenant);
     }
 
+    public static void refreshDefaultTenantId() throws BonitaException {
+        final PlatformSession session = loginOnPlatform();
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        setDefaultTenantId(platformAPI.getDefaultTenant().getId());
+        logoutOnPlatform(session);
+    }
+
     public static void setDefaultTenantId(final long defaultTenantId) {
         BPMTestSPUtil.defaultTenantId = defaultTenantId;
     }
@@ -166,7 +173,7 @@ public class BPMTestSPUtil {
 
     public static DesignProcessDefinition createProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
             final List<String> stepNames, final List<Boolean> isHuman, final String actorName, final boolean addActorInitiator, final boolean parallelActivities)
-                    throws InvalidProcessDefinitionException {
+            throws InvalidProcessDefinitionException {
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(processName, processVersion);
         if (!isHuman.isEmpty() && isHuman.contains(true)) {
             processBuilder.addActor(actorName);
@@ -212,7 +219,7 @@ public class BPMTestSPUtil {
 
     public static DesignProcessDefinition createProcessDefinitionWithHumanAndAutomaticSteps(final String processName, final String processVersion,
             final List<String> stepNames, final List<Boolean> isHuman, final String actorName, final boolean addActorInitiator)
-                    throws InvalidProcessDefinitionException {
+            throws InvalidProcessDefinitionException {
         return createProcessDefinitionWithHumanAndAutomaticSteps(processName, processVersion, stepNames, isHuman, actorName, addActorInitiator, false);
     }
 
@@ -227,7 +234,7 @@ public class BPMTestSPUtil {
     }
 
     public static APISession loginOnTenant(final String userName, final String password, final long tenantId) throws LoginException, BonitaHomeNotSetException,
-    ServerAPIException, UnknownAPITypeException {
+            ServerAPIException, UnknownAPITypeException {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         return loginAPI.login(tenantId, userName, password);
     }
