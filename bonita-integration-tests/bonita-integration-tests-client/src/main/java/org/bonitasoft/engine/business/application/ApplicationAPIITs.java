@@ -24,10 +24,10 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        ApplicationAPIApplicationIT.class,
-        ApplicationAPIApplicationPageIT.class,
-        ApplicationAPIApplicationMenuIT.class,
-        ApplicationAPIImportExportIT.class
+        ApplicationIT.class,
+        ApplicationPageIT.class,
+        ApplicationMenuIT.class,
+        ImportExportIT.class
 })
 @Initializer(TestsInitializer.class)
 public class ApplicationAPIITs {

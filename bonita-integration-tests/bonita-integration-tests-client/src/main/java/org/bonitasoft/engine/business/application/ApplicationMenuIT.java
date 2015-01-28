@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
+public class ApplicationMenuIT extends TestWithCustomPage {
 
     private Application application;
 

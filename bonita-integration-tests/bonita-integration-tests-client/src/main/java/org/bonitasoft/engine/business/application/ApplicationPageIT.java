@@ -35,7 +35,7 @@ import org.junit.Test;
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
  */
-public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
+public class ApplicationPageIT extends TestWithCustomPage {
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page", "create" })
     @Test

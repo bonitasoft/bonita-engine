@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationAPIApplicationIT extends TestWithApplication {
+public class ApplicationIT extends TestWithApplication {
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create" })
     @Test

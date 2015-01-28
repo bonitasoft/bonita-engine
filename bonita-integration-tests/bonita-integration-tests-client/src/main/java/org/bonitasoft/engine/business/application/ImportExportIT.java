@@ -35,7 +35,7 @@ import org.junit.Test;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationAPIImportExportIT extends TestWithApplication {
+public class ImportExportIT extends TestWithApplication {
 
     private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
@@ -54,7 +54,7 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
         //given
         Profile userProfile = getProfileUser();
 
-        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
+        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class
                 .getResourceAsStream("applications.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
 
@@ -69,7 +69,7 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
 
         // Associate a new page to application hr (real page name is defined in zip/page.properties):
         final Page myPage = getOrgPageAPI().createPage("not_used",
-                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+                IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
         final ApplicationPage appPage = getOrgApplicationAPI().createApplicationPage(hr.getId(), myPage.getId(), "my-new-custom-page");
 
         // Add menus:
@@ -105,9 +105,9 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
 
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getOrgPageAPI().createPage("not_used",
-                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+                IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
 
-        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
+        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class
                 .getResourceAsStream("applications.xml"));
 
         //when
@@ -209,12 +209,12 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
     @Test
     public void importApplications_should_create_applications_contained_by_xml_file_and_return_error_in_there_is_unavailable_info() throws Exception {
         //given
-        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
+        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class
                 .getResourceAsStream("applicationWithUnavailableInfo.xml"));
 
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getOrgPageAPI().createPage("not_used",
-                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+                IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
 
         //when
         final List<ImportStatus> importStatus = getOrgApplicationAPI().importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
@@ -272,9 +272,9 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
         //given
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getOrgPageAPI().createPage("not_used",
-                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+                IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
 
-        final byte[] importedByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
+        final byte[] importedByteArray = IOUtils.toByteArray(ApplicationIT.class
                 .getResourceAsStream("applications.xml"));
 
         getOrgApplicationAPI().importApplications(importedByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
