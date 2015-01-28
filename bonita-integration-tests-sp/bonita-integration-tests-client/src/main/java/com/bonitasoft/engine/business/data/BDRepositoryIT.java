@@ -1240,7 +1240,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
         //then
-        assertThatJson(jsonResult).as("should get employee").isEqualTo(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
+        assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
 
     }
 
