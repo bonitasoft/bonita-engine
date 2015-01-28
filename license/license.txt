@@ -11,24 +11,3 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.application;
-
-import org.bonitasoft.engine.TestsInitializer;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite.SuiteClasses;
-
-/**
- * @author Elias Ricken de Medeiros
- */
-@RunWith(BonitaSuiteRunner.class)
-@SuiteClasses({
-        ApplicationIT.class,
-        ApplicationPageIT.class,
-        ApplicationMenuIT.class,
-        ImportExportIT.class
-})
-@Initializer(TestsInitializer.class)
-public class ApplicationAPIITs {
-}
