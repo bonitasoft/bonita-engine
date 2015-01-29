@@ -211,7 +211,8 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.document.model.archive.SADocumentMapping" value="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" />
                 <entry key="org.bonitasoft.engine.core.document.model.archive.SAMappedDocument" value="org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl" />
-			</map>
+                <entry key="org.bonitasoft.engine.core.contract.data.SAContractData" value="org.bonitasoft.engine.core.contract.data.SAContractData" />
+            </map>
 		</constructor-arg>
 		<constructor-arg name="mappingExclusions">
 			<list>
