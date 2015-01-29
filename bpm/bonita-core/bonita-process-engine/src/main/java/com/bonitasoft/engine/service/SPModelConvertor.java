@@ -54,12 +54,10 @@ import com.bonitasoft.engine.monitoring.SGcInfo;
 import com.bonitasoft.engine.monitoring.SMemoryUsage;
 import com.bonitasoft.engine.monitoring.impl.GcInfoImpl;
 import com.bonitasoft.engine.monitoring.impl.MemoryUsageImpl;
-import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageCreator.PageField;
 import com.bonitasoft.engine.page.PageUpdater;
 import com.bonitasoft.engine.page.PageUpdater.PageUpdateField;
-import com.bonitasoft.engine.page.impl.PageImpl;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantCreator.TenantField;
@@ -241,21 +239,6 @@ public final class SPModelConvertor extends ModelConvertor {
         report.setLastModificationDate(new Date(sReport.getLastModificationDate()));
         report.setScreenshot(sReport.getScreenshot());
         return report;
-    }
-
-    public static Page toPage(final SPage sPage) {
-        final PageImpl page = new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(), sPage.getDescription(),
-                sPage.getInstallationDate(),
-                sPage.getInstalledBy(), sPage.getLastModificationDate(), sPage.getLastUpdatedBy(), sPage.getContentName());
-        return page;
-    }
-
-    public static List<Page> toPages(final List<SPage> sPages) {
-        final List<Page> pages = new ArrayList<Page>(sPages.size());
-        for (final SPage sPage : sPages) {
-            pages.add(toPage(sPage));
-        }
-        return pages;
     }
 
     public static List<Report> toReports(final List<SReport> sReports) {
