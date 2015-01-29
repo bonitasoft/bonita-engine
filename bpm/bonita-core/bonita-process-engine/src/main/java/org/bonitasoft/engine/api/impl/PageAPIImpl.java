@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.bonitasoft.engine.api.PageAPI;
-import org.bonitasoft.engine.api.impl.converter.PageConverter;
+import org.bonitasoft.engine.api.impl.converter.PageModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.page.SearchPages;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -74,7 +74,7 @@ public class PageAPIImpl implements PageAPI {
 
     @Override
     public Page getPage(final long pageId) throws PageNotFoundException {
-        final PageService pageService = getTenantAccessor().getOrgPageService();
+        final PageService pageService = getTenantAccessor().getPageService();
 
         try {
             return convertToPage(pageService.getPage(pageId));
@@ -88,7 +88,7 @@ public class PageAPIImpl implements PageAPI {
 
     @Override
     public byte[] getPageContent(final long pageId) throws PageNotFoundException {
-        final PageService pageService = getTenantAccessor().getOrgPageService();
+        final PageService pageService = getTenantAccessor().getPageService();
 
         try {
             return pageService.getPageContent(pageId);
@@ -104,7 +104,7 @@ public class PageAPIImpl implements PageAPI {
     public SearchResult<Page> searchPages(final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final PageService pageService = tenantAccessor.getOrgPageService();
+        final PageService pageService = tenantAccessor.getPageService();
         final SearchPages searchPages = getSearchPages(searchOptions, searchEntitiesDescriptor, pageService);
         try {
             searchPages.execute();
@@ -123,7 +123,7 @@ public class PageAPIImpl implements PageAPI {
     @Override
     public Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException {
-        final PageService pageService = getTenantAccessor().getOrgPageService();
+        final PageService pageService = getTenantAccessor().getPageService();
         final long userId = getUserIdFromSessionInfos();
         final SPage sPage = constructPage(pageCreator, userId);
 
@@ -160,7 +160,7 @@ public class PageAPIImpl implements PageAPI {
     @Override
     public Page createPage(final String contentName, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException {
-        final PageService pageService = getTenantAccessor().getOrgPageService();
+        final PageService pageService = getTenantAccessor().getPageService();
         final long userId = getUserIdFromSessionInfos();
 
         try {
@@ -178,21 +178,20 @@ public class PageAPIImpl implements PageAPI {
     }
 
     protected Page convertToPage(final SPage addPage) {
-        return PageConverter.toPage(addPage);
+        return PageModelConverter.toPage(addPage);
     }
 
     protected SPage constructPage(final PageCreator pageCreator, final long userId) {
-        return PageConverter.constructSPage(pageCreator, userId);
+        return PageModelConverter.constructSPage(pageCreator, userId);
     }
 
     protected long getUserIdFromSessionInfos() {
-        final long userId = SessionInfos.getUserIdFromSession();
-        return userId;
+        return SessionInfos.getUserIdFromSession();
     }
 
     @Override
     public void deletePage(final long pageId) throws DeletionException {
-        final PageService pageService = getTenantAccessor().getOrgPageService();
+        final PageService pageService = getTenantAccessor().getPageService();
         try {
             pageService.deletePage(pageId);
         } catch (final SBonitaException sBonitaException) {
@@ -202,7 +201,7 @@ public class PageAPIImpl implements PageAPI {
 
     @Override
     public void deletePages(final List<Long> pageIds) throws DeletionException {
-        final PageService pageService = getTenantAccessor().getOrgPageService();
+        final PageService pageService = getTenantAccessor().getPageService();
         try {
             for (final Long pageId : pageIds) {
                 pageService.deletePage(pageId);
@@ -225,7 +224,7 @@ public class PageAPIImpl implements PageAPI {
 
     @Override
     public Page getPageByName(final String name) throws PageNotFoundException {
-        final PageService pageService = getTenantAccessor().getOrgPageService();
+        final PageService pageService = getTenantAccessor().getPageService();
 
         try {
             final SPage sPage = pageService.getPageByName(name);
@@ -245,7 +244,7 @@ public class PageAPIImpl implements PageAPI {
         if (pageUpdater == null || pageUpdater.getFields().isEmpty()) {
             throw new UpdateException("The pageUpdater descriptor does not contain field updates");
         }
-        final PageService pageService = getTenantAccessor().getOrgPageService();
+        final PageService pageService = getTenantAccessor().getPageService();
 
         final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
         final Map<PageUpdater.PageUpdateField, Serializable> fields = pageUpdater.getFields();
@@ -292,7 +291,7 @@ public class PageAPIImpl implements PageAPI {
     @Override
     public void updatePageContent(final long pageId, final byte[] content) throws UpdateException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException {
-        final PageService pageService = getTenantAccessor().getOrgPageService();
+        final PageService pageService = getTenantAccessor().getPageService();
         final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
         pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
         pageUpdateBuilder.updateLastUpdatedBy(getUserIdFromSessionInfos());
@@ -315,14 +314,14 @@ public class PageAPIImpl implements PageAPI {
     }
 
     protected SPage constructPage(final PageUpdater pageUpdater, final long userId) {
-        return PageConverter.constructSPage(pageUpdater, userId);
+        return PageModelConverter.constructSPage(pageUpdater, userId);
     }
 
     @Override
     public Properties getPageProperties(byte[] content, boolean checkIfItAlreadyExists) throws InvalidPageTokenException,
             AlreadyExistsException, InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException,
             InvalidPageZipMissingAPropertyException {
-        final PageService pageService = getTenantAccessor().getOrgPageService();
+        final PageService pageService = getTenantAccessor().getPageService();
         try {
             return getProperties(content, checkIfItAlreadyExists, pageService);
         } catch (SInvalidPageTokenException e) {

@@ -83,7 +83,7 @@ public class ApplicationPageAPIDelegateTest {
 
     @Before
     public void setUp() throws Exception {
-        given(accessor.getOrgApplicationService()).willReturn(applicationService);
+        given(accessor.getApplicationService()).willReturn(applicationService);
         delegate = new ApplicationPageAPIDelegate(accessor, convertor, searchApplicationPages, 9999L);
     }
 

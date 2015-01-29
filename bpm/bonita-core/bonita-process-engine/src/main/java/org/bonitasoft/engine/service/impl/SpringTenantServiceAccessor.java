@@ -821,7 +821,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
      * might not be an available service
      */
     @Override
-    public PageService getOrgPageService() {
+    public PageService getPageService() {
         if (pageService == null) {
             pageService = beanAccessor.getService(PageService.class);
         }
@@ -829,7 +829,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public ApplicationService getOrgApplicationService() {
+    public ApplicationService getApplicationService() {
         if (applicationService == null) {
             applicationService = beanAccessor.getService(ApplicationService.class);
         }

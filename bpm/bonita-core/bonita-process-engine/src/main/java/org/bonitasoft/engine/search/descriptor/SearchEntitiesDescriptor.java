@@ -243,7 +243,7 @@ public class SearchEntitiesDescriptor {
         return searchPageDescriptor;
     }
 
-    public SearchApplicationDescriptor getOrgSearchApplicationDescriptor() {
+    public SearchApplicationDescriptor getSearchApplicationDescriptor() {
         return searchApplicationDescriptor;
     }
 

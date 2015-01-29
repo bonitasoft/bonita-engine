@@ -15,7 +15,7 @@ package org.bonitasoft.engine.api.impl.transaction.page;
 
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.converter.PageConverter;
+import org.bonitasoft.engine.api.impl.converter.PageModelConverter;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
@@ -53,7 +53,7 @@ public class SearchPages extends AbstractSearchEntity<Page, SPage> {
 
     @Override
     public List<Page> convertToClientObjects(final List<SPage> pages) {
-        return PageConverter.toPages(pages);
+        return PageModelConverter.toPages(pages);
     }
 
 }

@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl.application;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationModelConvertor;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import org.bonitasoft.engine.api.impl.validator.TokenValidator;
 import org.bonitasoft.engine.business.application.Application;
@@ -41,14 +41,14 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class ApplicationAPIDelegate {
 
-    private final ApplicationConvertor convertor;
+    private final ApplicationModelConvertor convertor;
     private final long loggedUserId;
     private final SearchApplications searchApplications;
     private final ApplicationService applicationService;
 
-    public ApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationConvertor convertor, final long loggedUserId,
+    public ApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationModelConvertor convertor, final long loggedUserId,
             final SearchApplications searchApplications) {
-        applicationService = accessor.getOrgApplicationService();
+        applicationService = accessor.getApplicationService();
         this.convertor = convertor;
         this.loggedUserId = loggedUserId;
         this.searchApplications = searchApplications;

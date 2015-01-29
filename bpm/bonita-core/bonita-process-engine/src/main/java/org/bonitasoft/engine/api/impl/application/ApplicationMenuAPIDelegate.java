@@ -52,7 +52,7 @@ public class ApplicationMenuAPIDelegate {
         this.searchApplicationMenus = searchApplicationMenus;
         this.creatorValidator = creatorValidator;
         this.loggedUserId = loggedUserId;
-        applicationService = accessor.getOrgApplicationService();
+        applicationService = accessor.getApplicationService();
         this.convertor = convertor;
     }
 

@@ -55,7 +55,7 @@ public class ApplicationPageAPIDelegate {
     public ApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationPageConvertor convertor,
             final SearchApplicationPages searchApplicationPages, final long loggedUserId) {
         this.searchApplicationPages = searchApplicationPages;
-        applicationService = accessor.getOrgApplicationService();
+        applicationService = accessor.getApplicationService();
         this.convertor = convertor;
         this.loggedUserId = loggedUserId;
     }

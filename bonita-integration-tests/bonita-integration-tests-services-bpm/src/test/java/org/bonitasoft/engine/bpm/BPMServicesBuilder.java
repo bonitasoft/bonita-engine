@@ -571,12 +571,12 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public PageService getOrgPageService() {
+    public PageService getPageService() {
         return getInstanceOf(PageService.class);
     }
 
     @Override
-    public ApplicationService getOrgApplicationService() {
+    public ApplicationService getApplicationService() {
         return getInstanceOf(ApplicationService.class);
     }
 

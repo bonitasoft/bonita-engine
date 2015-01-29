@@ -31,7 +31,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationConvertor {
+public class ApplicationModelConvertor {
 
     public SApplication buildSApplication(final ApplicationCreator creator, final long creatorUserId) {
         final Map<ApplicationField, Serializable> fields = creator.getFields();

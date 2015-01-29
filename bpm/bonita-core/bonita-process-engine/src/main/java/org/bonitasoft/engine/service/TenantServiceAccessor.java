@@ -222,8 +222,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     PermissionService getPermissionService();
 
-    PageService getOrgPageService();
+    PageService getPageService();
 
-    ApplicationService getOrgApplicationService();
+    ApplicationService getApplicationService();
 
 }

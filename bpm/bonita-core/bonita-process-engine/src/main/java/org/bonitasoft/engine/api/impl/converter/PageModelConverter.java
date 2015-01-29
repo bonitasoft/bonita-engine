@@ -11,7 +11,6 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  ******************************************************************************/
-
 package org.bonitasoft.engine.api.impl.converter;
 
 import java.io.Serializable;
@@ -31,7 +30,7 @@ import org.bonitasoft.engine.page.SPageBuilderFactory;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class PageConverter {
+public class PageModelConverter {
 
     public static SPage constructSPage(final PageCreator pageCreator, final long creatorUserId) {
         final Map<PageCreator.PageField, Serializable> fields = pageCreator.getFields();

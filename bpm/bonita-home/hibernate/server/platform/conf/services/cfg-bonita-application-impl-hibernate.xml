@@ -4,8 +4,8 @@
     <bean id="hbm-bos-application-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
         <property name="resources">
             <set>
-                <value>com/bonitasoft/engine/business/application/impl/hibernate/application.hbm.xml</value>
-                <value>com/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
+                <value>org/bonitasoft/engine/business/application/impl/hibernate/application.hbm.xml</value>
+                <value>org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
             </set>
         </property>
         <property name="classAliasMappings">

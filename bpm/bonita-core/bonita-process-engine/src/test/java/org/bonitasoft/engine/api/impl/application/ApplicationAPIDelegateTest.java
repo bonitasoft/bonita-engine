@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationModelConvertor;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
@@ -59,7 +59,7 @@ public class ApplicationAPIDelegateTest {
     private TenantServiceAccessor accessor;
 
     @Mock
-    private ApplicationConvertor convertor;
+    private ApplicationModelConvertor convertor;
 
     @Mock
     private SearchApplications searchApplications;
@@ -86,7 +86,7 @@ public class ApplicationAPIDelegateTest {
 
     @Before
     public void setUp() throws Exception {
-        given(accessor.getOrgApplicationService()).willReturn(applicationService);
+        given(accessor.getApplicationService()).willReturn(applicationService);
         delegate = new ApplicationAPIDelegate(accessor, convertor, LOGGED_USER_ID, searchApplications);
     }
 

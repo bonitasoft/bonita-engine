@@ -80,7 +80,7 @@ public class ApplicationMenuAPIDelegateTest {
 
     @Before
     public void setUp() throws Exception {
-        given(accessor.getOrgApplicationService()).willReturn(applicationService);
+        given(accessor.getApplicationService()).willReturn(applicationService);
         delegate = new ApplicationMenuAPIDelegate(accessor, convertor, searchApplicatonMenus, creatorValidator, 911L);
         given(creatorValidator.isValid(any(ApplicationMenuCreator.class))).willReturn(true);
     }
