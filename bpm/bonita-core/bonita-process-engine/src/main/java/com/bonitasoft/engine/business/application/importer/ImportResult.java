@@ -10,8 +10,7 @@
 package com.bonitasoft.engine.business.application.importer;
 
 import org.bonitasoft.engine.api.ImportStatus;
-
-import com.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplication;
 
 /**
  * @author Elias Ricken de Medeiros

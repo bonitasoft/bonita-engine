@@ -18,6 +18,7 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
@@ -33,13 +34,11 @@ import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 
-import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.manager.Features;
 
 /**
  * @author Baptiste Mesta
- * 
  */
 public class ProfilesImporterExt extends ProfilesImporter {
 
@@ -149,7 +148,6 @@ public class ProfilesImporterExt extends ProfilesImporter {
     }
 
     /**
-     * 
      * @param exportedProfile
      * @return
      *         true when needed features are present

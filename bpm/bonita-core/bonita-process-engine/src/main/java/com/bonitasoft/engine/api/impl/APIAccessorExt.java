@@ -11,8 +11,6 @@ package com.bonitasoft.engine.api.impl;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.ApplicationAPI;

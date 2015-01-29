@@ -18,8 +18,6 @@ import static org.mockito.Mockito.verify;
 import java.util.Arrays;
 import java.util.List;
 
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.scheduler.TenantJobListenerManager;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
@@ -28,6 +26,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.bonitasoft.engine.service.PlatformServiceAccessor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RegisterTenantJobListenersTest {

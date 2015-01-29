@@ -85,6 +85,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(com.bonitasoft.engine.api.TenantManagementAPI.class.getName(), new TenantManagementAPIExt());
         apis.put(com.bonitasoft.engine.api.PageAPI.class.getName(), new PageAPIExt());
         apis.put(com.bonitasoft.engine.api.ApplicationAPI.class.getName(), new ApplicationAPIImpl());
+        //        apis.put(ApplicationAPI.class.getName(), new org.bonitasoft.engine.api.impl.ApplicationAPIImpl());
         apis.put(PermissionAPI.class.getName(), new PermissionAPIImpl());
     }
 

@@ -10,8 +10,7 @@
 package com.bonitasoft.engine.business.application.importer;
 
 import org.bonitasoft.engine.api.ImportError;
-
-import com.bonitasoft.engine.business.application.model.SApplicationMenu;
+import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 
 /**
  * @author Elias Ricken de Medeiros

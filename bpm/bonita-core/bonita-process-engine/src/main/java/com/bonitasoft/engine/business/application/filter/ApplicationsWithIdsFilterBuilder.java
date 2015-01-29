@@ -14,13 +14,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-
-import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
 
 /**
  * @author Elias Ricken de Medeiros

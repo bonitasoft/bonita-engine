@@ -9,9 +9,8 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
+import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
-
-import com.bonitasoft.engine.business.application.model.SApplication;
 
 /**
  * @author Elias Ricken de Medeiros

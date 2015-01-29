@@ -106,14 +106,4 @@ public class LicenseTest {
         valideFeature(Features.TRACEABILITY);
     }
 
-    @Test
-    public void customPages() {
-        valideFeature(Features.CUSTOM_PAGE);
-    }
-
-    @Test
-    public void applications() throws Exception {
-        valideFeature(Features.BUSINESS_APPLICATIONS);
-    }
-
 }

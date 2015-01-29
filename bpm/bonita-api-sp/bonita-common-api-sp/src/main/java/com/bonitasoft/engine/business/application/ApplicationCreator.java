@@ -11,6 +11,7 @@ package com.bonitasoft.engine.business.application;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bonitasoft.engine.profile.Profile;
 
@@ -20,12 +21,15 @@ import org.bonitasoft.engine.profile.Profile;
  * @author Elias Ricken de Medeiros
  * @since 6.4
  * @see Application
+ * @see org.bonitasoft.engine.business.application.ApplicationCreator
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationCreator} instead.
  */
+@Deprecated
 public class ApplicationCreator implements Serializable {
 
     private static final long serialVersionUID = -916041825489100271L;
 
-    private final Map<ApplicationField, Serializable> fields;
+    private final org.bonitasoft.engine.business.application.ApplicationCreator delegate;
 
     /**
      * Creates an instance of <code>ApplicationCreator</code> containing mandatory information
@@ -36,11 +40,9 @@ public class ApplicationCreator implements Serializable {
      * @param version the <code>Application</code> version
      * @see Application
      */
+    @Deprecated
     public ApplicationCreator(final String token, final String displayName, final String version) {
-        fields = new HashMap<ApplicationField, Serializable>(2);
-        fields.put(ApplicationField.TOKEN, token);
-        fields.put(ApplicationField.VERSION, version);
-        fields.put(ApplicationField.DISPLAY_NAME, displayName);
+        delegate = new org.bonitasoft.engine.business.application.ApplicationCreator(token, version, displayName);
     }
 
     /**
@@ -50,7 +52,7 @@ public class ApplicationCreator implements Serializable {
      * @see Application
      */
     public String getToken() {
-        return (String) fields.get(ApplicationField.TOKEN);
+        return delegate.getToken();
     }
 
     /**
@@ -61,7 +63,7 @@ public class ApplicationCreator implements Serializable {
      * @see Application
      */
     public ApplicationCreator setDescription(final String description) {
-        fields.put(ApplicationField.DESCRIPTION, description);
+        delegate.setDescription(description);
         return this;
     }
 
@@ -73,7 +75,7 @@ public class ApplicationCreator implements Serializable {
      * @see Application
      */
     public ApplicationCreator setIconPath(final String iconPath) {
-        fields.put(ApplicationField.ICON_PATH, iconPath);
+        delegate.setIconPath(iconPath);
         return this;
     }
 
@@ -86,7 +88,7 @@ public class ApplicationCreator implements Serializable {
      * @see Profile
      */
     public ApplicationCreator setProfileId(final Long profileId) {
-        fields.put(ApplicationField.PROFILE_ID, profileId);
+        delegate.setProfileId(profileId);
         return this;
     }
 
@@ -97,37 +99,31 @@ public class ApplicationCreator implements Serializable {
      * @see ApplicationField
      */
     public Map<ApplicationField, Serializable> getFields() {
+        final Map<org.bonitasoft.engine.business.application.ApplicationField, Serializable> superFields = delegate.getFields();
+        final Map<ApplicationField, Serializable> fields = new HashMap<ApplicationField, Serializable>(superFields.size());
+        for (final Entry<org.bonitasoft.engine.business.application.ApplicationField, Serializable> entry : superFields.entrySet()) {
+            fields.put(ApplicationField.valueOf(entry.getKey().name()), entry.getValue());
+        }
         return fields;
+    }
+
+    /**
+     * Retrieves the community version of this class.
+     *
+     * @return the community version of this class.
+     */
+    public org.bonitasoft.engine.business.application.ApplicationCreator getDelegate() {
+        return delegate;
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (fields == null ? 0 : fields.hashCode());
-        return result;
+        return delegate.hashCode();
     }
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ApplicationCreator other = (ApplicationCreator) obj;
-        if (fields == null) {
-            if (other.fields != null) {
-                return false;
-            }
-        } else if (!fields.equals(other.fields)) {
-            return false;
-        }
-        return true;
+        return delegate.equals(obj);
     }
 
 }

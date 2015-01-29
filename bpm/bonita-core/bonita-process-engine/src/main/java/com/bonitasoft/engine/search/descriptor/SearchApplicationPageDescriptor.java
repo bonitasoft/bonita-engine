@@ -14,13 +14,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 import com.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
-import com.bonitasoft.engine.business.application.model.SApplicationPage;
-import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 
 /**
  * @author Elias Ricken de Medeiros

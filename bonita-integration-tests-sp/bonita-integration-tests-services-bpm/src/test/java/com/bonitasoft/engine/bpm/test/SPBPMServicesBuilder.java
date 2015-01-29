@@ -10,7 +10,6 @@ package com.bonitasoft.engine.bpm.test;
 
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 
-import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.BusinessDataService;
@@ -22,7 +21,6 @@ import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
 import com.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
 import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
-import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
@@ -111,11 +109,6 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     }
 
     @Override
-    public PageService getPageService() {
-        return getInstanceOf(PageService.class);
-    }
-
-    @Override
     public RefBusinessDataService getRefBusinessDataService() {
         return getInstanceOf(RefBusinessDataService.class);
     }
@@ -123,11 +116,6 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     @Override
     public BusinessDataModelRepository getBusinessDataModelRepository() {
         return getInstanceOf(BusinessDataModelRepository.class);
-    }
-
-    @Override
-    public ApplicationService getApplicationService() {
-        return getInstanceOf(ApplicationService.class);
     }
 
     @Override

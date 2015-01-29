@@ -18,6 +18,8 @@ import java.util.List;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
@@ -28,9 +30,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import com.bonitasoft.engine.page.PageService;
-import com.bonitasoft.engine.page.SPage;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProfilesImporterExtTest {

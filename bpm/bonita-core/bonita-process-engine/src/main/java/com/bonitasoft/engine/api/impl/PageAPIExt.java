@@ -6,11 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import com.bonitasoft.engine.page.SInvalidPageZipMissingAPropertyException;
-import com.bonitasoft.engine.page.SInvalidPageZipException;
-import com.bonitasoft.engine.page.SInvalidPageZipInconsistentException;
-import com.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
-import com.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -22,9 +17,9 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
-import org.bonitasoft.engine.exception.InvalidPageZipMissingAPropertyException;
 import org.bonitasoft.engine.exception.InvalidPageZipContentException;
 import org.bonitasoft.engine.exception.InvalidPageZipInconsistentException;
+import org.bonitasoft.engine.exception.InvalidPageZipMissingAPropertyException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -32,6 +27,18 @@ import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
+import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SInvalidPageTokenException;
+import org.bonitasoft.engine.page.SInvalidPageZipException;
+import org.bonitasoft.engine.page.SInvalidPageZipInconsistentException;
+import org.bonitasoft.engine.page.SInvalidPageZipMissingAPropertyException;
+import org.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
+import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
+import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.page.SPageUpdateBuilder;
+import org.bonitasoft.engine.page.SPageUpdateBuilderFactory;
+import org.bonitasoft.engine.page.SPageUpdateContentBuilder;
+import org.bonitasoft.engine.page.SPageUpdateContentBuilderFactory;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -43,15 +50,8 @@ import com.bonitasoft.engine.api.impl.transaction.page.SearchPages;
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageNotFoundException;
-import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.page.PageUpdater;
 import com.bonitasoft.engine.page.PageUpdater.PageUpdateField;
-import com.bonitasoft.engine.page.SInvalidPageTokenException;
-import com.bonitasoft.engine.page.SPage;
-import com.bonitasoft.engine.page.SPageUpdateBuilder;
-import com.bonitasoft.engine.page.SPageUpdateBuilderFactory;
-import com.bonitasoft.engine.page.SPageUpdateContentBuilder;
-import com.bonitasoft.engine.page.SPageUpdateContentBuilderFactory;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -130,17 +130,17 @@ public class PageAPIExt implements PageAPI {
         }
     }
 
-    private InvalidPageZipContentException convertException(SInvalidPageZipException e)  {
-        if(e instanceof SInvalidPageZipMissingPropertiesException){
+    private InvalidPageZipContentException convertException(final SInvalidPageZipException e) {
+        if (e instanceof SInvalidPageZipMissingPropertiesException) {
             return new InvalidPageZipMissingPropertiesException();
         }
-        if(e instanceof SInvalidPageZipMissingAPropertyException){
+        if (e instanceof SInvalidPageZipMissingAPropertyException) {
             return new InvalidPageZipMissingAPropertyException(((SInvalidPageZipMissingAPropertyException) e).getFields());
         }
-        if(e instanceof SInvalidPageZipInconsistentException){
+        if (e instanceof SInvalidPageZipInconsistentException) {
             return new InvalidPageZipInconsistentException(e.getMessage(), e);
         }
-        if(e instanceof SInvalidPageZipMissingIndexException){
+        if (e instanceof SInvalidPageZipMissingIndexException) {
             return new InvalidPageZipMissingIndexException();
         }
         return new InvalidPageZipContentException(e.getMessage(), e);
@@ -308,33 +308,36 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public Properties getPageProperties(byte[] content, boolean checkIfItAlreadyExists) throws InvalidPageTokenException,
-            AlreadyExistsException, InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException, InvalidPageZipMissingAPropertyException {
+    public Properties getPageProperties(final byte[] content, final boolean checkIfItAlreadyExists) throws InvalidPageTokenException,
+            AlreadyExistsException, InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException,
+            InvalidPageZipMissingAPropertyException {
         final PageService pageService = getTenantAccessor().getPageService();
         try {
             return getProperties(content, checkIfItAlreadyExists, pageService);
-        } catch (SInvalidPageTokenException e) {
+        } catch (final SInvalidPageTokenException e) {
             throw new InvalidPageTokenException(e.getMessage());
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
-        } catch (SInvalidPageZipMissingAPropertyException e) {
+        } catch (final SInvalidPageZipMissingAPropertyException e) {
             throw new InvalidPageZipMissingAPropertyException(e.getFields());
-        } catch (SInvalidPageZipInconsistentException e) {
+        } catch (final SInvalidPageZipInconsistentException e) {
             throw new InvalidPageZipInconsistentException(e.getMessage(), e);
-        } catch (SInvalidPageZipMissingIndexException e) {
+        } catch (final SInvalidPageZipMissingIndexException e) {
             throw new InvalidPageZipMissingIndexException();
-        } catch (SInvalidPageZipMissingPropertiesException e) {
+        } catch (final SInvalidPageZipMissingPropertiesException e) {
             throw new InvalidPageZipMissingPropertiesException();
         }
     }
 
-    private Properties getProperties(byte[] content, boolean checkIfItAlreadyExists, PageService pageService) throws SInvalidPageZipMissingIndexException, SInvalidPageZipMissingAPropertyException, SInvalidPageZipInconsistentException, SInvalidPageZipMissingPropertiesException, SInvalidPageTokenException, SBonitaReadException, AlreadyExistsException {
-        Properties properties = pageService.readPageZip(content);
-        if(checkIfItAlreadyExists){
-            String name = properties.getProperty(PageService.PROPERTIES_NAME);
-            SPage pageByName = pageService.getPageByName(name);
-            if(pageByName != null){
-                throw new AlreadyExistsException("A page with name "+name+" already exists");
+    private Properties getProperties(final byte[] content, final boolean checkIfItAlreadyExists, final PageService pageService)
+            throws SInvalidPageZipMissingIndexException, SInvalidPageZipMissingAPropertyException, SInvalidPageZipInconsistentException,
+            SInvalidPageZipMissingPropertiesException, SInvalidPageTokenException, SBonitaReadException, AlreadyExistsException {
+        final Properties properties = pageService.readPageZip(content);
+        if (checkIfItAlreadyExists) {
+            final String name = properties.getProperty(PageService.PROPERTIES_NAME);
+            final SPage pageByName = pageService.getPageByName(name);
+            if (pageByName != null) {
+                throw new AlreadyExistsException("A page with name " + name + " already exists");
             }
         }
         return properties;

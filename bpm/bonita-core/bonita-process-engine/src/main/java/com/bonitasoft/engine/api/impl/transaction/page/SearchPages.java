@@ -10,16 +10,15 @@ package com.bonitasoft.engine.api.impl.transaction.page;
 
 import java.util.List;
 
+import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 import com.bonitasoft.engine.page.Page;
-import com.bonitasoft.engine.page.PageService;
-import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.service.SPModelConvertor;
 
 /**

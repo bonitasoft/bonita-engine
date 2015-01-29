@@ -9,8 +9,6 @@
 package com.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -19,15 +17,8 @@ import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.session.SSessionException;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.api.ApplicationAPI;
@@ -40,8 +31,6 @@ import com.bonitasoft.engine.api.ReportingAPI;
 
 @RunWith(MockitoJUnitRunner.class)
 public class APIAccessorExtTest {
-
-
 
     private APIAccessorExt apiAccessor;
 

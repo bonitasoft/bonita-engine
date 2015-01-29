@@ -18,10 +18,10 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.Session;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
 import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.TenantStatusException;
-import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Emmanuel Duchastenier

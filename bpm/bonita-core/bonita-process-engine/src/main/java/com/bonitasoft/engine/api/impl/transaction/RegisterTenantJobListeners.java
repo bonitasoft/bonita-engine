@@ -13,13 +13,14 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.api.impl.scheduler.TenantJobListenerManager;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+
+import com.bonitasoft.engine.service.PlatformServiceAccessor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
  * Register TenantJobListeners. This class must extend {@link java.util.concurrent.Callable} because it will be executed by

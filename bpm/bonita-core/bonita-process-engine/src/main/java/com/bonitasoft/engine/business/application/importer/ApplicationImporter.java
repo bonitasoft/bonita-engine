@@ -14,17 +14,17 @@ import java.util.List;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
+import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ImportException;
 
-import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
-import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.SApplicationPage;
-import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
-import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import com.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationPageNode;
@@ -36,12 +36,13 @@ public class ApplicationImporter {
 
     private final ApplicationService applicationService;
     private final ApplicationImportStrategy strategy;
-    private ApplicationNodeConverter applicationNodeConverter;
-    private ApplicationPageImporter applicationPageImporter;
-    private ApplicationMenuImporter applicationMenuImporter;
+    private final ApplicationNodeConverter applicationNodeConverter;
+    private final ApplicationPageImporter applicationPageImporter;
+    private final ApplicationMenuImporter applicationMenuImporter;
 
-    public ApplicationImporter(ApplicationService applicationService, ApplicationImportStrategy strategy, ApplicationNodeConverter applicationNodeConverter,
-            ApplicationPageImporter applicationPageImporter, ApplicationMenuImporter applicationMenuImporter) {
+    public ApplicationImporter(final ApplicationService applicationService, final ApplicationImportStrategy strategy,
+            final ApplicationNodeConverter applicationNodeConverter,
+            final ApplicationPageImporter applicationPageImporter, final ApplicationMenuImporter applicationMenuImporter) {
         this.applicationService = applicationService;
         this.strategy = strategy;
         this.applicationNodeConverter = applicationNodeConverter;
@@ -49,15 +50,15 @@ public class ApplicationImporter {
         this.applicationMenuImporter = applicationMenuImporter;
     }
 
-    public ImportStatus importApplication(ApplicationNode applicationNode, long createdBy) throws ImportException, AlreadyExistsException {
-        ImportResult importResult = applicationNodeConverter.toSApplication(applicationNode, createdBy);
+    public ImportStatus importApplication(final ApplicationNode applicationNode, final long createdBy) throws ImportException, AlreadyExistsException {
+        final ImportResult importResult = applicationNodeConverter.toSApplication(applicationNode, createdBy);
         try {
-            SApplication application = importApplication(importResult.getApplication());
+            final SApplication application = importApplication(importResult.getApplication());
             importApplicationPages(applicationNode, importResult, application);
             importApplicationMenus(applicationNode, importResult, application);
             updateHomePage(application, applicationNode, createdBy, importResult);
             return importResult.getImportStatus();
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new ImportException(e);
         }
     }
@@ -66,11 +67,11 @@ public class ApplicationImporter {
             throws SBonitaException {
         if (applicationNode.getHomePage() != null) {
             try {
-                SApplicationPage homePage = applicationService.getApplicationPage(applicationNode.getToken(), applicationNode.getHomePage());
-                SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(createdBy);
+                final SApplicationPage homePage = applicationService.getApplicationPage(applicationNode.getToken(), applicationNode.getHomePage());
+                final SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(createdBy);
                 updateBuilder.updateHomePageId(homePage.getId());
                 applicationService.updateApplication(application, updateBuilder.done());
-            } catch (SObjectNotFoundException e) {
+            } catch (final SObjectNotFoundException e) {
                 addError(importResult.getImportStatus(), new ImportError(applicationNode.getHomePage(), ImportError.Type.APPLICATION_PAGE));
             }
         }
@@ -78,9 +79,9 @@ public class ApplicationImporter {
 
     private void importApplicationMenus(final ApplicationNode applicationNode, final ImportResult importResult, final SApplication application)
             throws ImportException {
-        for (ApplicationMenuNode applicationMenuNode : applicationNode.getApplicationMenus()) {
-            List<ImportError> importErrors = applicationMenuImporter.importApplicationMenu(applicationMenuNode, application, null);
-            for (ImportError importError : importErrors) {
+        for (final ApplicationMenuNode applicationMenuNode : applicationNode.getApplicationMenus()) {
+            final List<ImportError> importErrors = applicationMenuImporter.importApplicationMenu(applicationMenuNode, application, null);
+            for (final ImportError importError : importErrors) {
                 addError(importResult.getImportStatus(), importError);
             }
         }
@@ -88,8 +89,8 @@ public class ApplicationImporter {
 
     private void importApplicationPages(final ApplicationNode applicationNode, final ImportResult importResult, final SApplication application)
             throws ImportException {
-        for (ApplicationPageNode applicationPageNode : applicationNode.getApplicationPages()) {
-            ImportError importError = applicationPageImporter.importApplicationPage(applicationPageNode, application);
+        for (final ApplicationPageNode applicationPageNode : applicationNode.getApplicationPages()) {
+            final ImportError importError = applicationPageImporter.importApplicationPage(applicationPageNode, application);
             addError(importResult.getImportStatus(), importError);
         }
     }
@@ -100,8 +101,8 @@ public class ApplicationImporter {
         }
     }
 
-    private SApplication importApplication(SApplication applicationToBeImported) throws SBonitaException, AlreadyExistsException {
-        SApplication conflictingApplication = applicationService.getApplicationByToken(applicationToBeImported.getToken());
+    private SApplication importApplication(final SApplication applicationToBeImported) throws SBonitaException, AlreadyExistsException {
+        final SApplication conflictingApplication = applicationService.getApplicationByToken(applicationToBeImported.getToken());
         if (conflictingApplication != null) {
             strategy.whenApplicationExists(conflictingApplication, applicationToBeImported);
         }

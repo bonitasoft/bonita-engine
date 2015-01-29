@@ -17,24 +17,15 @@ import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.xml.XmlStringPrettyFormatter;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.ApplicationAPI;
-import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.page.Page;
 
 /**
@@ -60,8 +51,7 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
         //given
         final Profile profile = getProfileAPI().createProfile("ApplicationProfile", "Profile for applications");
 
-        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
-                .getResourceAsStream("applications.xml"));
+        final byte[] applicationsByteArray = IOUtils.toByteArray(this.getClass().getResourceAsStream("applications.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
 
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0");
@@ -75,7 +65,7 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
 
         // Associate a new page to application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used",
-                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+                IOUtils.toByteArray(this.getClass().getResourceAsStream("dummy-bizapp-page.zip")));
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(hr.getId(), myPage.getId(), "my-new-custom-page");
 
         // Add menus:
@@ -112,9 +102,9 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
 
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used",
-                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+                IOUtils.toByteArray(this.getClass().getResourceAsStream("dummy-bizapp-page.zip")));
 
-        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
+        final byte[] applicationsByteArray = IOUtils.toByteArray(this.getClass()
                 .getResourceAsStream("applications.xml"));
 
         //when
@@ -128,16 +118,16 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
         // check applications ware created
         final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
-        Application hrApp = searchResult.getResult().get(0);
+        final Application hrApp = searchResult.getResult().get(0);
         assertIsHRApplication(profile, hrApp);
         assertIsMarketingApplication(searchResult.getResult().get(1));
 
         //check pages were created
         SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, hrApp.getId());
-        SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
+        final SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
-        ApplicationPage myNewCustomPage = pageSearchResult.getResult().get(0);
+        final ApplicationPage myNewCustomPage = pageSearchResult.getResult().get(0);
         assertIsMyNewCustomPage(myPage, hrApp, myNewCustomPage);
 
         //check home page
@@ -146,13 +136,12 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
         //check menu is created
         builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, hrApp.getId());
-        SearchResult<ApplicationMenu> menuSearchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+        final SearchResult<ApplicationMenu> menuSearchResult = getApplicationAPI().searchApplicationMenus(builder.done());
         assertThat(menuSearchResult.getCount()).isEqualTo(3);
-        ApplicationMenu hrFollowUpMenu = menuSearchResult.getResult().get(0);
+        final ApplicationMenu hrFollowUpMenu = menuSearchResult.getResult().get(0);
         assertIsHrFollowUpMenu(hrFollowUpMenu);
         assertIsDailyHrFollowUpMenu(menuSearchResult.getResult().get(1), hrFollowUpMenu, myNewCustomPage);
         assertIsEmptyMenu(menuSearchResult.getResult().get(2));
-
 
         getApplicationAPI().deleteApplication(hrApp.getId());
         getProfileAPI().deleteProfile(profile.getId());
@@ -167,7 +156,7 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
         assertThat(applicationMenu.getApplicationPageId()).isNull();
     }
 
-    private void assertIsDailyHrFollowUpMenu(final ApplicationMenu applicationMenu, ApplicationMenu hrFollowUpMenu, ApplicationPage myNewCustomPage) {
+    private void assertIsDailyHrFollowUpMenu(final ApplicationMenu applicationMenu, final ApplicationMenu hrFollowUpMenu, final ApplicationPage myNewCustomPage) {
         assertThat(applicationMenu.getIndex()).isEqualTo(1);
         assertThat(applicationMenu.getParentId()).isEqualTo(hrFollowUpMenu.getId());
         assertThat(applicationMenu.getDisplayName()).isEqualTo("Daily HR follow-up");
@@ -207,7 +196,7 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
         assertThat(app.getProfileId()).isEqualTo(profile.getId());
     }
 
-    private void assertIsAddOkStatus(final ImportStatus importStatus, String expectedToken) {
+    private void assertIsAddOkStatus(final ImportStatus importStatus, final String expectedToken) {
         assertThat(importStatus.getName()).isEqualTo(expectedToken);
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         assertThat(importStatus.getErrors()).isEmpty();
@@ -218,12 +207,12 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
     @Test
     public void importApplications_should_create_applications_contained_by_xml_file_and_return_error_in_there_is_unavailable_info() throws Exception {
         //given
-        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
+        final byte[] applicationsByteArray = IOUtils.toByteArray(this.getClass()
                 .getResourceAsStream("applicationWithUnavailableInfo.xml"));
 
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used",
-                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+                IOUtils.toByteArray(this.getClass().getResourceAsStream("dummy-bizapp-page.zip")));
 
         //when
         final List<ImportStatus> importStatus = getApplicationAPI().importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
@@ -232,10 +221,10 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
         assertThat(importStatus).hasSize(1);
         assertThat(importStatus.get(0).getName()).isEqualTo("HR-dashboard");
         assertThat(importStatus.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        ImportError profileError = new ImportError("ThisProfileNotExists", ImportError.Type.PROFILE);
-        ImportError customPageError = new ImportError("custompage_notexists", ImportError.Type.PAGE);
-        ImportError appPageError1 = new ImportError("will-not-be-imported", ImportError.Type.APPLICATION_PAGE);
-        ImportError appPageError2 = new ImportError("never-existed", ImportError.Type.APPLICATION_PAGE);
+        final ImportError profileError = new ImportError("ThisProfileNotExists", ImportError.Type.PROFILE);
+        final ImportError customPageError = new ImportError("custompage_notexists", ImportError.Type.PAGE);
+        final ImportError appPageError1 = new ImportError("will-not-be-imported", ImportError.Type.APPLICATION_PAGE);
+        final ImportError appPageError2 = new ImportError("never-existed", ImportError.Type.APPLICATION_PAGE);
         assertThat(importStatus.get(0).getErrors()).containsExactly(profileError, customPageError, appPageError1, appPageError2);
 
         // check applications ware created
@@ -253,7 +242,7 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
         //check only one application page was created
         SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, app1.getId());
-        SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
+        final SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
         assertThat(pageSearchResult.getResult().get(0).getToken()).isEqualTo("my-new-custom-page");
 
@@ -261,7 +250,7 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, app1.getId());
 
         //check three menus were created
-        SearchResult<ApplicationMenu> menuSearchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+        final SearchResult<ApplicationMenu> menuSearchResult = getApplicationAPI().searchApplicationMenus(builder.done());
         assertThat(menuSearchResult.getCount()).isEqualTo(3);
         assertThat(menuSearchResult.getResult().get(0).getDisplayName()).isEqualTo("HR follow-up");
         assertThat(menuSearchResult.getResult().get(0).getIndex()).isEqualTo(1);
@@ -283,18 +272,17 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
 
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used",
-                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+                IOUtils.toByteArray(this.getClass().getResourceAsStream("dummy-bizapp-page.zip")));
 
-        final byte[] importedByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
-                .getResourceAsStream("applications.xml"));
+        final byte[] importedByteArray = IOUtils.toByteArray(this.getClass().getResourceAsStream("applications.xml"));
 
         getApplicationAPI().importApplications(importedByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
         final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
 
         //when
-        Application hrApplication = searchResult.getResult().get(0);
-        byte[] exportedByteArray = getApplicationAPI().exportApplications(hrApplication.getId(), searchResult.getResult().get(1).getId());
+        final Application hrApplication = searchResult.getResult().get(0);
+        final byte[] exportedByteArray = getApplicationAPI().exportApplications(hrApplication.getId(), searchResult.getResult().get(1).getId());
 
         //then
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(importedByteArray));
@@ -306,6 +294,5 @@ public class ApplicationAPIImportExportIT extends TestWithApplication {
         getPageAPI().deletePage(myPage.getId());
 
     }
-
 
 }

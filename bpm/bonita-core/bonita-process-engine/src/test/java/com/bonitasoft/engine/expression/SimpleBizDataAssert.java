@@ -3,7 +3,6 @@ package com.bonitasoft.engine.expression;
 import static java.lang.String.format;
 
 import org.assertj.core.api.AbstractAssert;
-import org.assertj.core.api.Assertions;
 
 
 /**

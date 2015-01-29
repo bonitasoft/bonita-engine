@@ -8,19 +8,15 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
-import org.bonitasoft.engine.exception.NotFoundException;
-
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
-public class ApplicationNotFoundException extends NotFoundException {
+public class ApplicationNotFoundException extends org.bonitasoft.engine.business.application.ApplicationNotFoundException {
 
     private static final long serialVersionUID = -4073233652785845623L;
 
     public ApplicationNotFoundException(final long applicationId) {
-        super("Unable to find the application with id '" + applicationId + "'");
+        super(applicationId);
     }
 
 }
