@@ -41,7 +41,7 @@ public class SearchPages extends AbstractSearchEntity<Page, SPage> {
     public long executeCount(final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             return pageService.getNumberOfPages(queryOptions);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new SBonitaReadException(e);
         }
     }
@@ -53,7 +53,7 @@ public class SearchPages extends AbstractSearchEntity<Page, SPage> {
 
     @Override
     public List<Page> convertToClientObjects(final List<SPage> pages) {
-        return PageModelConverter.toPages(pages);
+        return new PageModelConverter().toPages(pages);
     }
 
 }

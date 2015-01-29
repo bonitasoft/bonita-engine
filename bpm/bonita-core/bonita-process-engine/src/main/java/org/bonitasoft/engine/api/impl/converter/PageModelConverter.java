@@ -32,7 +32,7 @@ import org.bonitasoft.engine.page.SPageBuilderFactory;
  */
 public class PageModelConverter {
 
-    public static SPage constructSPage(final PageCreator pageCreator, final long creatorUserId) {
+    public SPage constructSPage(final PageCreator pageCreator, final long creatorUserId) {
         final Map<PageCreator.PageField, Serializable> fields = pageCreator.getFields();
         final String name = (String) fields.get(PageCreator.PageField.NAME);
         final String description = (String) fields.get(PageCreator.PageField.DESCRIPTION);
@@ -43,7 +43,7 @@ public class PageModelConverter {
         return newSPageBuilder.done();
     }
 
-    public static SPage constructSPage(final PageUpdater pageUpdater, final long creatorUserId) {
+    public SPage constructSPage(final PageUpdater pageUpdater, final long creatorUserId) {
         final Map<PageUpdater.PageUpdateField, Serializable> fields = pageUpdater.getFields();
         final String name = (String) fields.get(PageCreator.PageField.NAME);
         final String description = (String) fields.get(PageCreator.PageField.DESCRIPTION);
@@ -54,14 +54,14 @@ public class PageModelConverter {
         return newSPageBuilder.done();
     }
 
-    public static Page toPage(final SPage sPage) {
+    public Page toPage(final SPage sPage) {
         final PageImpl page = new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(), sPage.getDescription(),
                 sPage.getInstallationDate(),
                 sPage.getInstalledBy(), sPage.getLastModificationDate(), sPage.getLastUpdatedBy(), sPage.getContentName());
         return page;
     }
 
-    public static List<Page> toPages(final List<SPage> sPages) {
+    public List<Page> toPages(final List<SPage> sPages) {
         final List<Page> pages = new ArrayList<Page>(sPages.size());
         for (final SPage sPage : sPages) {
             pages.add(toPage(sPage));

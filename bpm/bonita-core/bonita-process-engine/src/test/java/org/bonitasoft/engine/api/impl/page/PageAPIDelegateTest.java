@@ -1,12 +1,4 @@
-/*******************************************************************************
- * Copyright (C) 2014 Bonitasoft S.A.
- * Bonitasoft is a trademark of Bonitasoft SA.
- * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
- * For commercial licensing information, contact:
- * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
- * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
- *******************************************************************************/
-package org.bonitasoft.engine.api.impl;
+package org.bonitasoft.engine.api.impl.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.commons.Pair.pair;
@@ -54,14 +46,12 @@ import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageUpdateBuilder;
 import org.bonitasoft.engine.page.SPageUpdateContentBuilder;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,38 +61,24 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PageAPIImplTest {
+public class PageAPIDelegateTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    PageService pageService;
+    SearchPages searchPages;
 
     @Mock
-    TenantServiceAccessor tenantServiceAccessor;
+    TenantServiceAccessor serviceAccessor;
 
     @Mock
     SPage sPage;
-
     @Mock
     Page page;
 
     @Mock
-    SessionAccessor sessionAccessor;
-
-    @Mock
-    QueryOptions queryOptions;
-
-    @Mock
-    SearchPages searchPages;
-
-    @Mock
     private PageUpdater pageUpdater;
-
-    private final long userId = 1;
-
-    private PageAPIImpl pageAPIImpl;
 
     @Mock
     private SPageUpdateBuilder sPageUpdateBuilder;
@@ -110,168 +86,67 @@ public class PageAPIImplTest {
     @Mock
     private SPageUpdateContentBuilder sPageUpdateContentBuilder;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
+    private PageAPIDelegate pageAPIDelegate;
+
+    @Mock
+    private PageService pageService;
+
+    private final long userId = 123L;
 
     @Before
     public void before() {
-        pageAPIImpl = spy(new PageAPIImpl());
-
-        doReturn(tenantServiceAccessor).when(pageAPIImpl).getTenantAccessor();
-        doReturn(pageService).when(tenantServiceAccessor).getPageService();
-        doReturn(123l).when(pageAPIImpl).getUserIdFromSessionInfos();
-
-        doReturn(1l).when(sPage).getId();
-        doReturn("name").when(sPage).getName();
-        doReturn("display name").when(sPage).getDisplayName();
-        doReturn("description").when(sPage).getDescription();
-        doReturn(2l).when(sPage).getInstalledBy();
-        doReturn(3l).when(sPage).getInstallationDate();
-        doReturn(4l).when(sPage).getLastModificationDate();
-        doReturn(userId).when(pageAPIImpl).getUserIdFromSessionInfos();
-    }
-
-    @Test
-    public void testGetPage() throws Exception {
-        // given
-        final long pageId = 123;
-        doReturn(sPage).when(pageService).getPage(pageId);
-
-        // when
-        pageAPIImpl.getPage(pageId);
-
-        // then
-        verify(pageService, times(1)).getPage(pageId);
-    }
-
-    @Test
-    public void testGetPageByName() throws Exception {
-        // given
-        final String pageName = "name";
-        doReturn(sPage).when(pageService).getPageByName(pageName);
-
-        // when
-        pageAPIImpl.getPageByName(pageName);
-
-        // then
-        verify(pageService, times(1)).getPageByName(pageName);
-    }
-
-    @Test(expected = PageNotFoundException.class)
-    public void testGetPageByNameNotFound() throws Exception {
-        // given
-        // when
-        pageAPIImpl.getPageByName("unknown");
-
-        // then: exception
-    }
-
-    @Test
-    public void testGetPageContent() throws Exception {
-        // given
-        final long pageId = 123;
-
-        // when
-        pageAPIImpl.getPageContent(pageId);
-
-        // then
-        verify(pageService, times(1)).getPageContent(pageId);
+        doReturn(pageService).when(serviceAccessor).getPageService();
+        doReturn(mock(SearchEntitiesDescriptor.class)).when(serviceAccessor).getSearchEntitiesDescriptor();
+        pageAPIDelegate = spy(new PageAPIDelegate(serviceAccessor, userId));
     }
 
     @Test
     public void testSearchPages() throws Exception {
-        doReturn(searchPages).when(pageAPIImpl).getSearchPages(any(SearchOptions.class), any(SearchEntitiesDescriptor.class), any(PageService.class));
+        doReturn(searchPages).when(pageAPIDelegate).getSearchPages(any(SearchOptions.class));
 
         // when
         final SearchOptions searchOptions = new SearchOptionsBuilder(0, 5).searchTerm("search").done();
-        pageAPIImpl.searchPages(searchOptions);
+        pageAPIDelegate.searchPages(searchOptions);
 
         // then
         verify(searchPages, times(1)).execute();
     }
 
     @Test
-    public void testCreatePage() throws Exception {
+    public void createPageShouldCallAddPageOnPageService() throws Exception {
         // given
         final PageCreator pageCreator = new PageCreator("name", "content.zip");
         final byte[] content = "content".getBytes();
 
-        doReturn(sPage).when(pageAPIImpl).constructPage(pageCreator, userId);
-        doReturn(page).when(pageAPIImpl).convertToPage(any(SPage.class));
+        doReturn(sPage).when(pageAPIDelegate).constructPage(pageCreator, userId);
+        doReturn(page).when(pageAPIDelegate).convertToPage(any(SPage.class));
 
         // when
-        pageAPIImpl.createPage(pageCreator, content);
+        pageAPIDelegate.createPage(pageCreator, content);
 
         // then
         verify(pageService, times(1)).addPage(sPage, content);
     }
 
     @Test
-    public void testUpdatePage() throws Exception {
-        final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
-        doReturn(sPage).when(pageAPIImpl).constructPage(any(PageUpdater.class), anyLong());
-        doReturn(page).when(pageAPIImpl).convertToPage(any(SPage.class));
-        doReturn(sPageUpdateBuilder).when(pageAPIImpl).getPageUpdateBuilder();
-        doReturn(map).when(pageUpdater).getFields();
-
+    public void createPageWithContentShouldCallAddPageOnPageService() throws Exception {
         // given
-        map.put(PageUpdateField.DISPLAY_NAME, "displayname");
-        map.put(PageUpdateField.NAME, "name");
-        map.put(PageUpdateField.DESCRIPTION, "description");
-        map.put(PageUpdateField.CONTENT_NAME, "content.zip");
+        final byte[] content = "content".getBytes();
+        final String contentName = "contentName";
+
+        doReturn(page).when(pageAPIDelegate).convertToPage(any(SPage.class));
 
         // when
-        pageAPIImpl.updatePage(1, pageUpdater);
+        pageAPIDelegate.createPage(contentName, content);
 
         // then
-        verify(pageService, times(1)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
-    }
-
-    @Test(expected = UpdateException.class)
-    public void testUpdatePageWithEmplyUpdateFileShouldThrowExceptions() throws Exception {
-        doReturn(sPage).when(pageAPIImpl).constructPage(any(PageUpdater.class), anyLong());
-        doReturn(page).when(pageAPIImpl).convertToPage(any(SPage.class));
-
-        // given
-        final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
-        doReturn(map).when(pageUpdater).getFields();
-
-        // when
-        pageAPIImpl.updatePage(1, pageUpdater);
-
-        // then
-        verify(pageService, times(1)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
-    }
-
-    @Test
-    public void testUpdatePageContent() throws Exception {
-
-        doReturn(sPageUpdateBuilder).when(pageAPIImpl).getPageUpdateBuilder();
-        doReturn(sPageUpdateContentBuilder).when(pageAPIImpl).getPageUpdateContentBuilder();
-        doReturn(mock(SPage.class)).when(pageService).getPage(1);
-
-        // given
-        @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
-                pair("page.properties", "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
-        final long pageId = 1;
-
-        // when
-        pageAPIImpl.updatePageContent(pageId, content);
-
-        // then
-        verify(pageService, times(1)).updatePageContent(anyLong(), eq(content), anyString());
+        verify(pageService, times(1)).addPage(content, contentName, userId);
     }
 
     @Test
     public void testDeletePage() throws Exception {
-        // given
         final long pageId = 123;
-
-        // when
-        pageAPIImpl.deletePage(pageId);
-
-        // then
+        pageAPIDelegate.deletePage(pageId);
         verify(pageService, times(1)).deletePage(pageId);
     }
 
@@ -284,23 +159,124 @@ public class PageAPIImplTest {
         }
 
         // when
-        pageAPIImpl.deletePages(pageIds);
+        pageAPIDelegate.deletePages(pageIds);
 
         // then
         verify(pageService, times(pageIds.size())).deletePage(anyLong());
+    }
+
+    @Test
+    public void testGetPage() throws Exception {
+        // given
+        final long pageId = 123;
+        doReturn(sPage).when(pageService).getPage(pageId);
+
+        // when
+        pageAPIDelegate.getPage(pageId);
+
+        // then
+        verify(pageService, times(1)).getPage(pageId);
+    }
+
+    @Test
+    public void testGetPageByName() throws Exception {
+        // given
+        final String pageName = "name";
+        doReturn(sPage).when(pageService).getPageByName(pageName);
+
+        // when
+        pageAPIDelegate.getPageByName(pageName);
+
+        // then
+        verify(pageService, times(1)).getPageByName(pageName);
+    }
+
+    @Test(expected = PageNotFoundException.class)
+    public void testGetPageByNameNotFound() throws Exception {
+        // when
+        pageAPIDelegate.getPageByName("unknown");
+        // then: exception
+    }
+
+    @Test(expected = UpdateException.class)
+    public void testUpdatePageWithEmplyUpdateFileShouldThrowExceptions() throws Exception {
+        doReturn(sPage).when(pageAPIDelegate).constructPage(any(PageUpdater.class), anyLong());
+        doReturn(page).when(pageAPIDelegate).convertToPage(any(SPage.class));
+
+        // given
+        final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
+        doReturn(map).when(pageUpdater).getFields();
+
+        // when
+        pageAPIDelegate.updatePage(1, pageUpdater);
+
+        // then
+        verify(pageService, times(1)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
+    }
+
+    @Test
+    public void testUpdatePageContent() throws Exception {
+        doReturn(sPageUpdateBuilder).when(pageAPIDelegate).getPageUpdateBuilder();
+        doReturn(sPageUpdateContentBuilder).when(pageAPIDelegate).getPageUpdateContentBuilder();
+        doReturn(mock(SPage.class)).when(pageService).getPage(1);
+
+        // given
+        @SuppressWarnings("unchecked")
+        final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
+                pair("page.properties", "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+        final long pageId = 1;
+
+        // when
+        pageAPIDelegate.updatePageContent(pageId, content);
+
+        // then
+        verify(pageService, times(1)).updatePageContent(anyLong(), eq(content), anyString());
+    }
+
+    @Test
+    public void testUpdatePage() throws Exception {
+        final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
+        doReturn(sPage).when(pageAPIDelegate).constructPage(any(PageUpdater.class), anyLong());
+        doReturn(page).when(pageAPIDelegate).convertToPage(any(SPage.class));
+        doReturn(sPageUpdateBuilder).when(pageAPIDelegate).getPageUpdateBuilder();
+        doReturn(map).when(pageUpdater).getFields();
+
+        // given
+        map.put(PageUpdateField.DISPLAY_NAME, "displayname");
+        map.put(PageUpdateField.NAME, "name");
+        map.put(PageUpdateField.DESCRIPTION, "description");
+        map.put(PageUpdateField.CONTENT_NAME, "content.zip");
+
+        // when
+        pageAPIDelegate.updatePage(1, pageUpdater);
+
+        // then
+        verify(pageService, times(1)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
+    }
+
+    @Test
+    public void testGetPageContent() throws Exception {
+        // given
+        final long pageId = 123;
+
+        // when
+        pageAPIDelegate.getPageContent(pageId);
+
+        // then
+        verify(pageService, times(1)).getPageContent(pageId);
     }
 
     @Test(expected = AlreadyExistsException.class)
     public void testCheckPageAlreadyExists() throws Exception {
         // given
         final PageCreator pageCreator = new PageCreator("name", "content.zip");
-        doReturn(sPage).when(pageAPIImpl).constructPage(pageCreator, userId);
-        doReturn(page).when(pageAPIImpl).convertToPage(any(SPage.class));
+        doReturn(sPage).when(pageAPIDelegate).constructPage(pageCreator, userId);
+        doReturn(page).when(pageAPIDelegate).convertToPage(any(SPage.class));
         final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
         doThrow(SObjectAlreadyExistsException.class).when(pageService).addPage(sPage, content);
 
         // when
-        pageAPIImpl.createPage(pageCreator, content);
+        pageAPIDelegate.createPage(pageCreator, content);
 
         // then
         // AlreadyExistsException
@@ -316,7 +292,7 @@ public class PageAPIImplTest {
         doReturn(properties).when(pageService).readPageZip(content);
         doReturn(null).when(pageService).getPageByName("MyPage");
         // when
-        final Properties pageProperties = pageAPIImpl.getPageProperties(content, true);
+        final Properties pageProperties = pageAPIDelegate.getPageProperties(content, true);
 
         // then
         assertThat(pageProperties).isEqualTo(properties);
@@ -332,7 +308,7 @@ public class PageAPIImplTest {
         doReturn(mock(SPage.class)).when(pageService).getPageByName("MyPage");
         // when
         expectedException.expect(AlreadyExistsException.class);
-        pageAPIImpl.getPageProperties(content, true);
+        pageAPIDelegate.getPageProperties(content, true);
 
         // then
         // AlreadyExistsException
@@ -348,7 +324,7 @@ public class PageAPIImplTest {
         doThrow(new SBonitaReadException(new IOException("IO issue"))).when(pageService).getPageByName("MyPage");
         // when
         expectedException.expect(RetrieveException.class);
-        pageAPIImpl.getPageProperties(content, true);
+        pageAPIDelegate.getPageProperties(content, true);
 
         // then
         // AlreadyExistsException
@@ -363,7 +339,7 @@ public class PageAPIImplTest {
         doReturn(properties).when(pageService).readPageZip(content);
         doReturn(mock(SPage.class)).when(pageService).getPageByName("MyPage");
         // when
-        final Properties pageProperties = pageAPIImpl.getPageProperties(content, false);
+        final Properties pageProperties = pageAPIDelegate.getPageProperties(content, false);
 
         // then
         assertThat(pageProperties).isEqualTo(properties);
@@ -376,7 +352,7 @@ public class PageAPIImplTest {
         doThrow(SInvalidPageZipMissingIndexException.class).when(pageService).readPageZip(content);
         // when
         expectedException.expect(InvalidPageZipMissingIndexException.class);
-        pageAPIImpl.getPageProperties(content, false);
+        pageAPIDelegate.getPageProperties(content, false);
     }
 
     @Test
@@ -386,7 +362,7 @@ public class PageAPIImplTest {
         doThrow(SInvalidPageZipMissingPropertiesException.class).when(pageService).readPageZip(content);
         // when
         expectedException.expect(InvalidPageZipMissingPropertiesException.class);
-        pageAPIImpl.getPageProperties(content, false);
+        pageAPIDelegate.getPageProperties(content, false);
     }
 
     @Test
@@ -396,7 +372,7 @@ public class PageAPIImplTest {
         doThrow(SInvalidPageZipMissingAPropertyException.class).when(pageService).readPageZip(content);
         // when
         expectedException.expect(InvalidPageZipMissingAPropertyException.class);
-        pageAPIImpl.getPageProperties(content, false);
+        pageAPIDelegate.getPageProperties(content, false);
     }
 
     @Test
@@ -406,7 +382,7 @@ public class PageAPIImplTest {
         doThrow(SInvalidPageZipInconsistentException.class).when(pageService).readPageZip(content);
         // when
         expectedException.expect(InvalidPageZipInconsistentException.class);
-        pageAPIImpl.getPageProperties(content, false);
+        pageAPIDelegate.getPageProperties(content, false);
     }
 
     @Test
@@ -416,6 +392,6 @@ public class PageAPIImplTest {
         doThrow(SInvalidPageTokenException.class).when(pageService).readPageZip(content);
         // when
         expectedException.expect(InvalidPageTokenException.class);
-        pageAPIImpl.getPageProperties(content, false);
+        pageAPIDelegate.getPageProperties(content, false);
     }
 }
