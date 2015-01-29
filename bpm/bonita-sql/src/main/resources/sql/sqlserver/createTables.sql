@@ -370,7 +370,6 @@ CREATE TABLE flownode_instance (
   abortedByBoundary NUMERIC(19, 0),
   triggeredByEvent BIT,
   interrupting BIT,
-  deleted BIT DEFAULT 0,
   tokenCount INT NOT NULL,
   token_ref_id NUMERIC(19, 0) NULL,
   PRIMARY KEY (tenantid, id)
@@ -380,7 +379,7 @@ CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId)
 GO
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4)
 GO
-CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid, deleted)
+CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid)
 GO
 
 CREATE TABLE connector_instance (
