@@ -58,21 +58,6 @@ public class TaskListIT extends CommonAPISPIT {
     }
 
     @Test
-    public void should_retrieve_only_not_deleted_tasks() throws Exception {
-        SUserImpl user = createUser();
-        SProcessDefinitionDeployInfoImpl processDef = createApps();
-        SProcessInstanceImpl processInstance = createInstance(processDef);
-        SUserTaskInstanceImpl deletedTask = createDeletedUserTask(1L, "shouldNotBeRetrieved", processInstance, user);
-        SUserTaskInstanceImpl expectedTask = createUserTask(2L, "shouldBeRetrieved", processInstance, user);
-        insert(processDef, processInstance, user, deletedTask, expectedTask);
-
-        String csv = executeQuery(getTaskListQuery());
-
-        assertThat(csv).contains(expectedTask.getDisplayName());
-        assertThat(csv).doesNotContain(deletedTask.getDisplayName());
-    }
-
-    @Test
     public void update_report() throws Exception {
         BitronixTransactionManager transactionManager = TransactionManagerServices.getTransactionManager();
         transactionManager.begin();
@@ -137,13 +122,6 @@ public class TaskListIT extends CommonAPISPIT {
         tsk.setReachedStateDate(new Date().getTime());
         tsk.setTenantId(1L);
         tsk.setDisplayName(displayName);
-        tsk.setDeleted(false);
-        return tsk;
-    }
-
-    private SUserTaskInstanceImpl createDeletedUserTask(long id, String displayName, SProcessInstanceImpl instance, SUserImpl user) {
-        SUserTaskInstanceImpl tsk = createUserTask(id, displayName, instance, user);
-        tsk.setDeleted(true);
         return tsk;
     }
 

@@ -23,7 +23,6 @@ import com.bonitasoft.engine.theme.ThemeTest;
 @SuiteClasses({ BPMSPTests.class,
         BPMLocalSuiteTests.class,
         LocalLogTest.class,
-        JobSPIT.class,
         APIMethodSPIT.class,
         ConnectorExecutionTimeOutTest.class,
         ConnectorImplementationLocalSPTest.class,
