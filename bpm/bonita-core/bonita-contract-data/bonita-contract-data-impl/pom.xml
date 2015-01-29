@@ -40,6 +40,11 @@
             <artifactId>bonita-log-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.archive</groupId>
+            <artifactId>bonita-archive-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>

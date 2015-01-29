@@ -131,6 +131,7 @@ SALongTextDataInstance --> 20050
 SAXMLDataInstance --> 20050
 SABlobDataInstance --> 20050
 
+SContractData -> 20210
 
 =TESTS=
 HUMAN -> 1000

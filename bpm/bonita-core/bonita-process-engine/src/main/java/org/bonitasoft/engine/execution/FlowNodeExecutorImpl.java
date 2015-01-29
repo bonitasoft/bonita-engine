@@ -49,7 +49,6 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilderFactory;
@@ -287,8 +286,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         // TODO check deletion here
         archiveFlowNodeInstance(sFlowNodeInstanceChild, true, processDefinitionId);
 
-        deleteContractInputs(sFlowNodeInstanceChild);
-
         final SActivityInstance activityInstanceParent = (SActivityInstance) activityInstanceService.getFlowNodeInstance(parentId);
         decrementToken(activityInstanceParent);
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
@@ -297,12 +294,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         if (hit) {// we continue parent if hit of the parent return true
             // in a new work?
             stepForward(parentId, null, null, sFlowNodeInstanceChild.getParentProcessInstanceId(), null, null);
-        }
-    }
-
-    private void deleteContractInputs(final SFlowNodeInstance flowNodeInstance) throws SContractDataDeletionException {
-        if (flowNodeInstance instanceof SUserTaskInstance) {
-            contractDataService.deleteUserTaskData(flowNodeInstance.getId());
         }
     }
 
@@ -352,7 +343,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     public void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive, final long processDefinitionId)
             throws SArchivingException {
         ProcessArchiver.archiveFlowNodeInstance(flowNodeInstance, deleteAfterArchive, processDefinitionId, processInstanceService, processDefinitionService,
-                archiveService, dataInstanceService, activityInstanceService, connectorInstanceService);
+                archiveService, dataInstanceService, activityInstanceService, connectorInstanceService, contractDataService);
     }
 
 }

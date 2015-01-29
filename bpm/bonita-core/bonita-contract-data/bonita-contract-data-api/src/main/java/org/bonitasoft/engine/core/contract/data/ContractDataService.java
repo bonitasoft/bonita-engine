@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
@@ -27,5 +28,7 @@ public interface ContractDataService {
     Object getUserTaskData(final long userTaskId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
 
     void deleteUserTaskData(final long userTaskId) throws SContractDataDeletionException;
+
+    void archiveUserTaskData(final long userTaskId, final long archiveDate) throws SObjectModificationException;
 
 }

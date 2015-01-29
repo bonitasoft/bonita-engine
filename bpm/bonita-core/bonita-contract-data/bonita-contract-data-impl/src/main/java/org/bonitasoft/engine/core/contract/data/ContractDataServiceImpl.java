@@ -14,20 +14,25 @@
 package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.archive.ArchiveInsertRecord;
+import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
-import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -37,7 +42,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
-import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
+import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
@@ -54,12 +59,15 @@ public class ContractDataServiceImpl implements ContractDataService {
 
     private final QueriableLoggerService queriableLoggerService;
 
+    private final ArchiveService archiveService;
+
     public ContractDataServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final QueriableLoggerService queriableLoggerService) {
+            final QueriableLoggerService queriableLoggerService, final ArchiveService archiveService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
         this.queriableLoggerService = queriableLoggerService;
+        this.archiveService = archiveService;
     }
 
     @Override
@@ -101,14 +109,60 @@ public class ContractDataServiceImpl implements ContractDataService {
 
     @Override
     public void deleteUserTaskData(final long userTaskId) throws SContractDataDeletionException {
-        final List<FilterOption> filterOptions = new ArrayList<FilterOption>();
-        filterOptions.add(new FilterOption(SContractData.class, "scopeId", userTaskId));
-        final DeleteAllRecord record = new DeleteAllRecord(SContractData.class, filterOptions);
         try {
-            recorder.recordDeleteAll(record);
-        } catch (final SRecorderException re) {
-            throw new SContractDataDeletionException(re);
+            final List<SContractData> contractData = getContractDataOfUserTask(userTaskId);
+            for (final SContractData data : contractData) {
+                deleteUserTaskData(data);
+            }
+        } catch (final SBonitaReadException sbre) {
+            throw new SContractDataDeletionException(sbre);
         }
+    }
+
+    protected void deleteUserTaskData(final SContractData contractData) throws SContractDataDeletionException {
+        final DeleteRecord deleteRecord = new DeleteRecord(contractData);
+        SDeleteEvent deleteEvent = null;
+        if (eventService.hasHandlers("CONTRACT_DATA", EventActionType.DELETED)) {
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("CONTRACT_DATA").setObject(contractData).done();
+        }
+        try {
+            recorder.recordDelete(deleteRecord, deleteEvent);
+        } catch (final SRecorderException sre) {
+            throw new SContractDataDeletionException(sre);
+        }
+    }
+
+    @Override
+    public void archiveUserTaskData(final long userTaskId, final long archiveDate) throws SObjectModificationException {
+        try {
+            final List<SContractData> contractData = getContractDataOfUserTask(userTaskId);
+            if (!contractData.isEmpty()) {
+                final ArchiveInsertRecord[] records = buildArchiveRecords(contractData);
+            archiveService.recordInserts(archiveDate, records);
+            }
+        } catch (final SBonitaException sbe) {
+            throw new SObjectModificationException(sbe);
+        }
+    }
+
+    private ArchiveInsertRecord[] buildArchiveRecords(final List<SContractData> contractData) {
+        final ArchiveInsertRecord[] records = new ArchiveInsertRecord[contractData.size()];
+        int i = 0;
+        for (final SContractData data : contractData) {
+            final SAContractData aData = new SAContractData(data);
+            records[i] = new ArchiveInsertRecord(aData);
+            i++;
+        }
+        return records;
+    }
+
+    private List<SContractData> getContractDataOfUserTask(final long userTaskId) throws SBonitaReadException {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("scopeId", userTaskId);
+        final QueryOptions queryOptions = new QueryOptions(0, 1000);
+        final SelectListDescriptor<SContractData> descriptor = new SelectListDescriptor<SContractData>("getContractDataByUserTaskId", parameters,
+                SContractData.class, queryOptions);
+        return persistenceService.selectList(descriptor);
     }
 
     private SContractDataLogBuilder getQueriableLog(final ActionType actionType, final String message) {

@@ -1,3 +1,4 @@
+DROP TABLE arch_contract_data;
 DROP TABLE contract_data;
 DROP TABLE actormember;
 DROP TABLE actor;

@@ -22,6 +22,7 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
@@ -110,13 +111,6 @@ public class ProcessArchiver {
         archiveProcessInstance(processDefinition, processInstance, saProcessInstance, archiveDate, archiveService, processInstanceService, logger);
     }
 
-    /**
-     * @param connectorInstanceService
-     * @param archiveDate
-     * @param containerId
-     * @param containerType
-     * @throws SArchivingException
-     */
     private static void archiveConnectors(final ConnectorInstanceService connectorInstanceService, final long archiveDate, final long containerId,
             final String containerType) throws SArchivingException {
         try {
@@ -208,7 +202,7 @@ public class ProcessArchiver {
     private static void archiveDataInstances(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
             final DataInstanceService dataInstanceService, final long archiveDate) throws SArchivingException {
         try {
-            long processInstanceId = processInstance.getId();
+            final long processInstanceId = processInstance.getId();
             final int archiveBatchSize = 50;
             int currentIndex = 0;
             List<SDataInstance> sDataInstances = dataInstanceService.getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,
@@ -321,7 +315,7 @@ public class ProcessArchiver {
     public static void archiveFlowNodeInstance(final SFlowNodeInstance intTxflowNodeInstance, final boolean deleteAfterArchive, final long processDefinitionId,
             final ProcessInstanceService processInstanceService, final ProcessDefinitionService processDefinitionService, final ArchiveService archiveService,
             final DataInstanceService dataInstanceService, final ActivityInstanceService activityInstanceService,
-            final ConnectorInstanceService connectorInstanceService) throws SArchivingException {
+            final ConnectorInstanceService connectorInstanceService, final ContractDataService contractDataService) throws SArchivingException {
         try {
             final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             final long archiveDate = System.currentTimeMillis();
@@ -343,6 +337,9 @@ public class ProcessArchiver {
                         archiveConnectors(connectorInstanceService, archiveDate, intTxflowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
                     }
                 }
+                if (intTxflowNodeInstance instanceof SUserTaskInstance) {
+                    archiveContractData(contractDataService, archiveDate, intTxflowNodeInstance.getId());
+                }
 
                 // then archive the flow node instance:
                 archiveFlowNodeInstance(intTxflowNodeInstance, archiveService, archiveDate);
@@ -359,6 +356,16 @@ public class ProcessArchiver {
             throw new SArchivingException(e);
         }
 
+    }
+
+    private static void archiveContractData(final ContractDataService contractDataService, final long archiveDate, final long userTaskId)
+            throws SArchivingException {
+        try {
+            contractDataService.archiveUserTaskData(userTaskId, archiveDate);
+            //contractDataService.deleteUserTaskData(userTaskId);
+        } catch (final SBonitaException e) {
+            throw new SArchivingException("Unable to archive contract data of container instance with id " + userTaskId, e);
+        }
     }
 
     public static boolean willBeArchived(final SFlowNodeInstance flowNodeInstance, final ArchiveService archiveService) {
