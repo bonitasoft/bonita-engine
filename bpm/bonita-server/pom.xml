@@ -186,11 +186,6 @@
             <artifactId>bonita-delete-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.bonitasoft.engine</groupId>
-            <artifactId>bonita-delete-batch</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- Dependency -->
         <dependency>
@@ -791,7 +786,6 @@
                                     <!-- Delete -->
                                     <include>org.bonitasoft.engine.persistence:bonita-delete-api</include>
                                     <include>org.bonitasoft.engine.persistence:bonita-delete-impl</include>
-                                    <include>com.bonitasoft.engine:bonita-delete-batch</include>
                                     <!-- Dependency -->
                                     <include>org.bonitasoft.engine.dependency:bonita-dependency-api</include>
                                     <include>org.bonitasoft.engine.dependency:bonita-dependency-impl</include>
