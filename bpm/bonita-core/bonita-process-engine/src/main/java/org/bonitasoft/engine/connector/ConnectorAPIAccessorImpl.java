@@ -102,12 +102,12 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     }
 
     @Override
-    public PageAPI getOrgPageAPI() {
+    public PageAPI getPageAPICommunity() {
         return getAPI(PageAPI.class, getAPISession());
     }
 
     @Override
-    public ApplicationAPI getOrgApplicationAPI() {
+    public ApplicationAPI getApplicationAPICommunity() {
         return getAPI(ApplicationAPI.class, getAPISession());
     }
 

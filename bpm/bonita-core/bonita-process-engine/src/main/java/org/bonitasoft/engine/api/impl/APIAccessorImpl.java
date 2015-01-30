@@ -62,12 +62,12 @@ public class APIAccessorImpl implements APIAccessor {
         return new PermissionAPIImpl();
     }
 
-    public PageAPI getOrgPageAPI() {
+    public PageAPI getPageAPICommunity() {
         return new PageAPIImpl();
     }
 
     @Override
-    public ApplicationAPI getOrgApplicationAPI() {
+    public ApplicationAPI getApplicationAPICommunity() {
         return new ApplicationAPIImpl();
     }
 }
