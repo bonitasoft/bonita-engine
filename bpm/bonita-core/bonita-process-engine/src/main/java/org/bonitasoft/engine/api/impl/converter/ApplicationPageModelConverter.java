@@ -20,7 +20,7 @@ import org.bonitasoft.engine.business.application.model.SApplicationPage;
  * @author Elias Ricken de Medeiros
  *
  */
-public class ApplicationPageConvertor {
+public class ApplicationPageModelConverter {
 
     public ApplicationPage toApplicationPage(final SApplicationPage sApplicationPage) {
         final ApplicationPageImpl appPage = new ApplicationPageImpl(sApplicationPage.getApplicationId(), sApplicationPage.getPageId(),

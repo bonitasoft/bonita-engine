@@ -8,7 +8,6 @@ import static org.mockito.Mockito.spy;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationMenuConvertor;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 import org.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import org.bonitasoft.engine.business.application.ApplicationMenuUpdater;
@@ -22,14 +21,14 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApplicationMenuConvertorTest {
+public class ApplicationMenuModelConverterTest {
 
 
-    private ApplicationMenuConvertor convertor;
+    private ApplicationMenuModelConverter convertor;
 
     @Before
     public void setUp() throws Exception {
-        convertor = new ApplicationMenuConvertor();
+        convertor = new ApplicationMenuModelConverter();
     }
 
     @Test
@@ -92,7 +91,7 @@ public class ApplicationMenuConvertorTest {
         final SApplicationMenu sMenu2 = mock(SApplicationMenu.class);
         final ApplicationMenu menu1 = mock(ApplicationMenu.class);
         final ApplicationMenu menu2 = mock(ApplicationMenu.class);
-        final ApplicationMenuConvertor convertorMock = spy(convertor);
+        final ApplicationMenuModelConverter convertorMock = spy(convertor);
         doReturn(menu1).when(convertorMock).toApplicationMenu(sMenu1);
         doReturn(menu2).when(convertorMock).toApplicationMenu(sMenu2);
 

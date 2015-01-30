@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationPageConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
@@ -58,7 +58,7 @@ public class ApplicationPageAPIDelegateTest {
     private TenantServiceAccessor accessor;
 
     @Mock
-    private ApplicationPageConvertor convertor;
+    private ApplicationPageModelConverter converter;
 
     @Mock
     private SearchApplicationPages searchApplicationPages;
@@ -84,7 +84,7 @@ public class ApplicationPageAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationPageAPIDelegate(accessor, convertor, searchApplicationPages, 9999L);
+        delegate = new ApplicationPageAPIDelegate(accessor, converter, 9999L);
     }
 
     @Test
@@ -112,7 +112,7 @@ public class ApplicationPageAPIDelegateTest {
         //given
         final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
-        given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
+        given(converter.toApplicationPage(sAppPage)).willReturn(appPage);
         given(applicationService.createApplicationPage(sAppPage)).willReturn(sAppPage);
 
         //when
@@ -183,7 +183,7 @@ public class ApplicationPageAPIDelegateTest {
         final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_TOKEN)).willReturn(sAppPage);
-        given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
+        given(converter.toApplicationPage(sAppPage)).willReturn(appPage);
 
         //when
         final ApplicationPage retrievedAppPage = delegate.getApplicationPage(APP_NAME, APP_PAGE_TOKEN);
@@ -221,7 +221,7 @@ public class ApplicationPageAPIDelegateTest {
         final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         given(applicationService.getApplicationPage(APPLICATION_PAGE_ID)).willReturn(sAppPage);
-        given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
+        given(converter.toApplicationPage(sAppPage)).willReturn(appPage);
 
         //when
         final ApplicationPage retrievedAppPage = delegate.getApplicationPage(APPLICATION_PAGE_ID);
@@ -293,7 +293,7 @@ public class ApplicationPageAPIDelegateTest {
         final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         given(applicationService.getApplicationHomePage(APPLICATION_ID)).willReturn(sAppPage);
-        given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
+        given(converter.toApplicationPage(sAppPage)).willReturn(appPage);
 
         //when
         final ApplicationPage retrievedAppPage = delegate.getApplicationHomePage(APPLICATION_ID);
@@ -330,7 +330,7 @@ public class ApplicationPageAPIDelegateTest {
         given(searchApplicationPages.getResult()).willReturn(appPageSearchResult);
 
         //when
-        final SearchResult<ApplicationPage> retrievedSearchResult = delegate.searchApplicationPages();
+        final SearchResult<ApplicationPage> retrievedSearchResult = delegate.searchApplicationPages(searchApplicationPages);
 
         //then
         assertThat(retrievedSearchResult).isEqualTo(appPageSearchResult);
@@ -343,7 +343,7 @@ public class ApplicationPageAPIDelegateTest {
         doThrow(new SBonitaReadException("")).when(searchApplicationPages).execute();
 
         //when
-        delegate.searchApplicationPages();
+        delegate.searchApplicationPages(searchApplicationPages);
 
         //then exception
     }

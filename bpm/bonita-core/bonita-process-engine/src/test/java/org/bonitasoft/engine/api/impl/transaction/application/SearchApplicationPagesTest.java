@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationPageConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -44,7 +44,7 @@ public class SearchApplicationPagesTest {
     private ApplicationService applicationService;
 
     @Mock
-    private ApplicationPageConvertor convertor;
+    private ApplicationPageModelConverter convertor;
 
     @InjectMocks
     private SearchApplicationPages search;

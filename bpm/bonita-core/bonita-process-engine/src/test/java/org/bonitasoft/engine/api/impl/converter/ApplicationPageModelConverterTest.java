@@ -7,7 +7,6 @@ import static org.mockito.Mockito.spy;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationPageConvertor;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -15,13 +14,13 @@ import org.bonitasoft.engine.business.application.model.impl.SApplicationPageImp
 import org.junit.Test;
 
 
-public class ApplicationPageConvertorTest {
+public class ApplicationPageModelConverterTest {
 
     private static final long ID = 11;
     private static final long APPLICATION_ID = 20;
     private static final long PAGE_ID = 30;
     private static final String APP_PAGE_NAME = "firstPage";
-    private final ApplicationPageConvertor convertor = new ApplicationPageConvertor();
+    private final ApplicationPageModelConverter convertor = new ApplicationPageModelConverter();
 
     @Test
     public void toApplicationPage_should_map_all_server_fields() throws Exception {
@@ -47,7 +46,7 @@ public class ApplicationPageConvertorTest {
         final SApplicationPageImpl sAppPage2 = new SApplicationPageImpl(10, 21, "appPage2");
         final ApplicationPageImpl appPage1 = new ApplicationPageImpl(10, 21, "appPage1");
         final ApplicationPageImpl appPage2 = new ApplicationPageImpl(10, 21, "appPage2");
-        final ApplicationPageConvertor convertorMock = spy(convertor);
+        final ApplicationPageModelConverter convertorMock = spy(convertor);
         doReturn(appPage1).when(convertorMock).toApplicationPage(sAppPage1);
         doReturn(appPage2).when(convertorMock).toApplicationPage(sAppPage2);
 

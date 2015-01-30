@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationModelConvertor;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationState;
@@ -30,7 +29,7 @@ import org.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 
-public class ApplicationModelConvertorTest {
+public class ApplicationModelConverterTest {
 
     private static final String ICON_PATH = "/icon.jpg";
     private static final long TENANT_ID = 1;
@@ -43,7 +42,7 @@ public class ApplicationModelConvertorTest {
     private static final String APP_NAME = "app";
     private static final String APP_DISPLAY_NAME = "My application";
     private static final long LOGGED_USER_ID = 10;
-    private final ApplicationModelConvertor convertor = new ApplicationModelConvertor();
+    private final ApplicationModelConverter convertor = new ApplicationModelConverter();
 
     @Test
     public void buildSApplication_should_map_all_information_from_creator_and_initialize_mandatory_fields() throws Exception {
@@ -116,7 +115,7 @@ public class ApplicationModelConvertorTest {
                 SApplicationState.DEACTIVATED.name());
         final ApplicationImpl app1 = new ApplicationImpl(APP_NAME, APP_VERSION, APP_DESC);
         final ApplicationImpl app2 = new ApplicationImpl("app2", APP_VERSION, APP_DESC);
-        final ApplicationModelConvertor convertorMock = spy(convertor);
+        final ApplicationModelConverter convertorMock = spy(convertor);
         doReturn(app1).when(convertorMock).toApplication(sApp1);
         doReturn(app2).when(convertorMock).toApplication(sApp2);
 

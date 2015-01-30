@@ -15,7 +15,7 @@ package org.bonitasoft.engine.api.impl.application;
 
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationPageConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import org.bonitasoft.engine.api.impl.validator.TokenValidator;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -47,16 +47,13 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class ApplicationPageAPIDelegate {
 
-    private final ApplicationPageConvertor convertor;
+    private final ApplicationPageModelConverter converter;
     private final ApplicationService applicationService;
-    private final SearchApplicationPages searchApplicationPages;
     private final long loggedUserId;
 
-    public ApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationPageConvertor convertor,
-            final SearchApplicationPages searchApplicationPages, final long loggedUserId) {
-        this.searchApplicationPages = searchApplicationPages;
+    public ApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationPageModelConverter converter, final long loggedUserId) {
         applicationService = accessor.getApplicationService();
-        this.convertor = convertor;
+        this.converter = converter;
         this.loggedUserId = loggedUserId;
     }
 
@@ -82,7 +79,7 @@ public class ApplicationPageAPIDelegate {
             sAppPage = applicationService.createApplicationPage(pageBuilder.done());
             applicationService.updateApplication(applicationId, BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId)
                     .done());
-            return convertor.toApplicationPage(sAppPage);
+            return converter.toApplicationPage(sAppPage);
         } catch (final SObjectCreationException e) {
             throw new CreationException(e);
         } catch (final SObjectAlreadyExistsException e) {
@@ -102,7 +99,7 @@ public class ApplicationPageAPIDelegate {
     public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageToken) throws ApplicationPageNotFoundException {
         try {
             final SApplicationPage sAppPage = applicationService.getApplicationPage(applicationName, applicationPageToken);
-            return convertor.toApplicationPage(sAppPage);
+            return converter.toApplicationPage(sAppPage);
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (final SObjectNotFoundException e) {
@@ -113,7 +110,7 @@ public class ApplicationPageAPIDelegate {
     public ApplicationPage getApplicationPage(final long applicationPageId) throws ApplicationPageNotFoundException {
         try {
             final SApplicationPage sApplicationPage = applicationService.getApplicationPage(applicationPageId);
-            return convertor.toApplicationPage(sApplicationPage);
+            return converter.toApplicationPage(sApplicationPage);
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (final SObjectNotFoundException e) {
@@ -135,7 +132,7 @@ public class ApplicationPageAPIDelegate {
         SApplicationPage sHomePage;
         try {
             sHomePage = applicationService.getApplicationHomePage(applicationId);
-            return convertor.toApplicationPage(sHomePage);
+            return converter.toApplicationPage(sHomePage);
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (final SObjectNotFoundException e) {
@@ -143,7 +140,7 @@ public class ApplicationPageAPIDelegate {
         }
     }
 
-    public SearchResult<ApplicationPage> searchApplicationPages() throws SearchException {
+    public SearchResult<ApplicationPage> searchApplicationPages(final SearchApplicationPages searchApplicationPages) throws SearchException {
         try {
             searchApplicationPages.execute();
             return searchApplicationPages.getResult();

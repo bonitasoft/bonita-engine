@@ -15,7 +15,7 @@ package org.bonitasoft.engine.api.impl.transaction.application;
 
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationMenuConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
@@ -34,9 +34,9 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 public class SearchApplicationMenus extends AbstractSearchEntity<ApplicationMenu, SApplicationMenu> {
 
     private final ApplicationService applicationService;
-    private final ApplicationMenuConvertor convertor;
+    private final ApplicationMenuModelConverter convertor;
 
-    public SearchApplicationMenus(final ApplicationService applicationService, final ApplicationMenuConvertor convertor,
+    public SearchApplicationMenus(final ApplicationService applicationService, final ApplicationMenuModelConverter convertor,
             final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);
         this.applicationService = applicationService;

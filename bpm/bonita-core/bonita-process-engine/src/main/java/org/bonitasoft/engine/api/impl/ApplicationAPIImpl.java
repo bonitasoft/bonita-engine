@@ -16,9 +16,9 @@ import org.bonitasoft.engine.api.impl.application.ApplicationAPIDelegate;
 import org.bonitasoft.engine.api.impl.application.ApplicationExporterDelegate;
 import org.bonitasoft.engine.api.impl.application.ApplicationMenuAPIDelegate;
 import org.bonitasoft.engine.api.impl.application.ApplicationPageAPIDelegate;
-import org.bonitasoft.engine.api.impl.converter.ApplicationModelConvertor;
-import org.bonitasoft.engine.api.impl.converter.ApplicationMenuConvertor;
-import org.bonitasoft.engine.api.impl.converter.ApplicationPageConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
+import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
+import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
@@ -76,46 +76,24 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     private ApplicationAPIDelegate getApplicationAPIDelegate() {
-        return getApplicationAPIDelegate(null);
-    }
-
-    private ApplicationAPIDelegate getApplicationAPIDelegate(final SearchOptions searchOptions) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SearchApplicationDescriptor appSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationDescriptor();
-        final ApplicationModelConvertor convertor = new ApplicationModelConvertor();
-        final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        final SearchApplications searchApplications = new SearchApplications(applicationService, appSearchDescriptor, searchOptions, convertor);
-        final ApplicationAPIDelegate delegate = new ApplicationAPIDelegate(tenantAccessor, convertor,
-                SessionInfos.getUserIdFromSession(), searchApplications);
+        final ApplicationModelConverter converter = new ApplicationModelConverter();
+        final ApplicationAPIDelegate delegate = new ApplicationAPIDelegate(tenantAccessor, converter,
+                SessionInfos.getUserIdFromSession());
         return delegate;
     }
 
     private ApplicationPageAPIDelegate getApplicationPageAPIDelegate() {
-        return getApplicationPageAPIDelegate(null);
-    }
-
-    private ApplicationPageAPIDelegate getApplicationPageAPIDelegate(final SearchOptions searchOptions) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SearchApplicationPageDescriptor appPageSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationPageDescriptor();
-        final ApplicationPageConvertor convertor = new ApplicationPageConvertor();
-        final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        final SearchApplicationPages searchApplicationPages = new SearchApplicationPages(applicationService, convertor, appPageSearchDescriptor,
-                searchOptions);
-        return new ApplicationPageAPIDelegate(tenantAccessor, convertor, searchApplicationPages, SessionInfos.getUserIdFromSession());
+        final ApplicationPageModelConverter converter = new ApplicationPageModelConverter();
+        return new ApplicationPageAPIDelegate(tenantAccessor, converter, SessionInfos.getUserIdFromSession());
     }
 
     private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate() {
-        return getApplicationMenuAPIDelegate(null);
-    }
-
-    private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate(final SearchOptions searchOptions) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        final ApplicationMenuConvertor convertor = new ApplicationMenuConvertor();
-        final SearchApplicationMenuDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationMenuDescriptor();
-        final SearchApplicationMenus searchApplicationMenus = new SearchApplicationMenus(applicationService, convertor, searchDescriptor, searchOptions);
+        final ApplicationMenuModelConverter converter = new ApplicationMenuModelConverter();
         final ApplicationMenuCreatorValidator validator = new ApplicationMenuCreatorValidator();
-        final ApplicationMenuAPIDelegate delegate = new ApplicationMenuAPIDelegate(tenantAccessor, convertor, searchApplicationMenus, validator,
+        final ApplicationMenuAPIDelegate delegate = new ApplicationMenuAPIDelegate(tenantAccessor, converter, validator,
                 SessionInfos.getUserIdFromSession());
         return delegate;
     }
@@ -177,7 +155,12 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
-        return getApplicationAPIDelegate(searchOptions).searchApplications();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SearchApplicationDescriptor appSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationDescriptor();
+        final ApplicationModelConverter converter = new ApplicationModelConverter();
+        final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        final SearchApplications searchApplications = new SearchApplications(applicationService, appSearchDescriptor, searchOptions, converter);
+        return getApplicationAPIDelegate().searchApplications(searchApplications);
     }
 
     @Override
@@ -193,7 +176,12 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException {
-        return getApplicationPageAPIDelegate(searchOptions).searchApplicationPages();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SearchApplicationPageDescriptor appPageSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationPageDescriptor();
+        final ApplicationPageModelConverter converter = new ApplicationPageModelConverter();
+        final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        final SearchApplicationPages searchApplicationPages = new SearchApplicationPages(applicationService, converter, appPageSearchDescriptor, searchOptions);
+        return getApplicationPageAPIDelegate().searchApplicationPages(searchApplicationPages);
     }
 
     @Override
@@ -239,7 +227,12 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException {
-        return getApplicationMenuAPIDelegate(searchOptions).searchApplicationMenus();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        final ApplicationMenuModelConverter converter = new ApplicationMenuModelConverter();
+        final SearchApplicationMenuDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationMenuDescriptor();
+        final SearchApplicationMenus searchApplicationMenus = new SearchApplicationMenus(applicationService, converter, searchDescriptor, searchOptions);
+        return getApplicationMenuAPIDelegate().searchApplicationMenus(searchApplicationMenus);
     }
 
     @Override

@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationModelConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
@@ -59,7 +59,7 @@ public class ApplicationAPIDelegateTest {
     private TenantServiceAccessor accessor;
 
     @Mock
-    private ApplicationModelConvertor convertor;
+    private ApplicationModelConverter convertor;
 
     @Mock
     private SearchApplications searchApplications;
@@ -87,7 +87,7 @@ public class ApplicationAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationAPIDelegate(accessor, convertor, LOGGED_USER_ID, searchApplications);
+        delegate = new ApplicationAPIDelegate(accessor, convertor, LOGGED_USER_ID);
     }
 
     @Test
@@ -419,7 +419,7 @@ public class ApplicationAPIDelegateTest {
         given(searchApplications.getResult()).willReturn(appSearchResult);
 
         //when
-        final SearchResult<Application> retrievedSearchResult = delegate.searchApplications();
+        final SearchResult<Application> retrievedSearchResult = delegate.searchApplications(searchApplications);
 
         //then
         assertThat(retrievedSearchResult).isEqualTo(appSearchResult);
@@ -432,7 +432,7 @@ public class ApplicationAPIDelegateTest {
         doThrow(new SBonitaReadException("")).when(searchApplications).execute();
 
         //when
-        delegate.searchApplications();
+        delegate.searchApplications(searchApplications);
 
         //then exception
     }

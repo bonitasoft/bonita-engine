@@ -30,7 +30,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationMenuConvertor {
+public class ApplicationMenuModelConverter {
 
     public SApplicationMenu buildSApplicationMenu(final ApplicationMenuCreator creator, int menuIndex) {
         final Map<ApplicationMenuField, Serializable> fields = creator.getFields();

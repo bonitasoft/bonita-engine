@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationMenuConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
@@ -44,7 +44,7 @@ public class SearchApplicationMenusTest {
     private ApplicationService applicationService;
 
     @Mock
-    private ApplicationMenuConvertor convertor;
+    private ApplicationMenuModelConverter convertor;
 
     @InjectMocks
     private SearchApplicationMenus search;

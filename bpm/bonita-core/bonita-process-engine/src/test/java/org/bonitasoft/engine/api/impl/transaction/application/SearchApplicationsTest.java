@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationModelConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -54,7 +54,7 @@ public class SearchApplicationsTest {
     private SearchOptions options;
 
     @Mock
-    private ApplicationModelConvertor convertor;
+    private ApplicationModelConverter convertor;
 
     @InjectMocks
     private SearchApplications searchApplications;

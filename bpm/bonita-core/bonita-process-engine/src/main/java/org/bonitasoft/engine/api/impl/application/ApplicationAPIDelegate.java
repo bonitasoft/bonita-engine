@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl.application;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationModelConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import org.bonitasoft.engine.api.impl.validator.TokenValidator;
 import org.bonitasoft.engine.business.application.Application;
@@ -41,24 +41,21 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class ApplicationAPIDelegate {
 
-    private final ApplicationModelConvertor convertor;
+    private final ApplicationModelConverter converter;
     private final long loggedUserId;
-    private final SearchApplications searchApplications;
     private final ApplicationService applicationService;
 
-    public ApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationModelConvertor convertor, final long loggedUserId,
-            final SearchApplications searchApplications) {
+    public ApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationModelConverter converter, final long loggedUserId) {
         applicationService = accessor.getApplicationService();
-        this.convertor = convertor;
+        this.converter = converter;
         this.loggedUserId = loggedUserId;
-        this.searchApplications = searchApplications;
     }
 
     public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
         try {
             validateCreator(applicationCreator);
-            final SApplication sApplication = applicationService.createApplication(convertor.buildSApplication(applicationCreator, loggedUserId));
-            return convertor.toApplication(sApplication);
+            final SApplication sApplication = applicationService.createApplication(converter.buildSApplication(applicationCreator, loggedUserId));
+            return converter.toApplication(sApplication);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SBonitaException e) {
@@ -80,7 +77,7 @@ public class ApplicationAPIDelegate {
     public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
         try {
             final SApplication sApplication = applicationService.getApplication(applicationId);
-            return convertor.toApplication(sApplication);
+            return converter.toApplication(sApplication);
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (final SObjectNotFoundException e) {
@@ -96,7 +93,7 @@ public class ApplicationAPIDelegate {
         }
     }
 
-    public SearchResult<Application> searchApplications() throws SearchException {
+    public SearchResult<Application> searchApplications(final SearchApplications searchApplications) throws SearchException {
         try {
             searchApplications.execute();
             return searchApplications.getResult();
@@ -111,11 +108,11 @@ public class ApplicationAPIDelegate {
             validateUpdater(updater);
             SApplication sApplication;
             if (!updater.getFields().isEmpty()) {
-                sApplication = applicationService.updateApplication(applicationId, convertor.toApplicationUpdateDescriptor(updater, loggedUserId));
+                sApplication = applicationService.updateApplication(applicationId, converter.toApplicationUpdateDescriptor(updater, loggedUserId));
             } else {
                 sApplication = applicationService.getApplication(applicationId);
             }
-            return convertor.toApplication(sApplication);
+            return converter.toApplication(sApplication);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SObjectNotFoundException e) {

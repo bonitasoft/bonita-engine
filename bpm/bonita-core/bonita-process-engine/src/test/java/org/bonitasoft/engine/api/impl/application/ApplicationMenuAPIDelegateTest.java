@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.bonitasoft.engine.api.impl.converter.ApplicationMenuConvertor;
+import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
 import org.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.business.application.ApplicationMenu;
@@ -58,7 +58,7 @@ public class ApplicationMenuAPIDelegateTest {
     private TenantServiceAccessor accessor;
 
     @Mock
-    private ApplicationMenuConvertor convertor;
+    private ApplicationMenuModelConverter convertor;
 
     @Mock
     private ApplicationMenuCreatorValidator creatorValidator;
@@ -81,7 +81,7 @@ public class ApplicationMenuAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationMenuAPIDelegate(accessor, convertor, searchApplicatonMenus, creatorValidator, 911L);
+        delegate = new ApplicationMenuAPIDelegate(accessor, convertor, creatorValidator, 911L);
         given(creatorValidator.isValid(any(ApplicationMenuCreator.class))).willReturn(true);
     }
 
@@ -313,7 +313,7 @@ public class ApplicationMenuAPIDelegateTest {
         given(searchApplicatonMenus.getResult()).willReturn(appMenuSearchResult);
 
         //when
-        final SearchResult<ApplicationMenu> retrievedResult = delegate.searchApplicationMenus();
+        final SearchResult<ApplicationMenu> retrievedResult = delegate.searchApplicationMenus(searchApplicatonMenus);
 
         //then
         assertThat(retrievedResult).isEqualTo(appMenuSearchResult);
@@ -326,7 +326,7 @@ public class ApplicationMenuAPIDelegateTest {
         doThrow(new SBonitaReadException("")).when(searchApplicatonMenus).execute();
 
         //when
-        delegate.searchApplicationMenus();
+        delegate.searchApplicationMenus(searchApplicatonMenus);
 
         //then exception
     }
