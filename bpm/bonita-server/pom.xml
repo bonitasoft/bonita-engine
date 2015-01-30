@@ -180,12 +180,6 @@
             <artifactId>bonita-data-instance-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- Delete -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.persistence</groupId>
-            <artifactId>bonita-delete-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- Dependency -->
         <dependency>
@@ -783,9 +777,6 @@
                                     <!-- Data Instance -->
                                     <include>org.bonitasoft.engine.data.instance:bonita-data-instance-api</include>
                                     <include>org.bonitasoft.engine.data.instance:bonita-data-instance-impl</include>
-                                    <!-- Delete -->
-                                    <include>org.bonitasoft.engine.persistence:bonita-delete-api</include>
-                                    <include>org.bonitasoft.engine.persistence:bonita-delete-impl</include>
                                     <!-- Dependency -->
                                     <include>org.bonitasoft.engine.dependency:bonita-dependency-api</include>
                                     <include>org.bonitasoft.engine.dependency:bonita-dependency-impl</include>
