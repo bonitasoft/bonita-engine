@@ -239,7 +239,7 @@ public class SearchEntitiesDescriptor {
         return searchEventTriggerInstanceDescriptor;
     }
 
-    public SearchPageDescriptor getOrgSearchPageDescriptor() {
+    public SearchPageDescriptor getSearchPageDescriptor() {
         return searchPageDescriptor;
     }
 
@@ -247,11 +247,11 @@ public class SearchEntitiesDescriptor {
         return searchApplicationDescriptor;
     }
 
-    public SearchApplicationMenuDescriptor getOrgSearchApplicationMenuDescriptor() {
+    public SearchApplicationMenuDescriptor getSearchApplicationMenuDescriptor() {
         return searchApplicationMenuDescriptor;
     }
 
-    public SearchApplicationPageDescriptor getOrgSearchApplicationPageDescriptor() {
+    public SearchApplicationPageDescriptor getSearchApplicationPageDescriptor() {
         return searchApplicationPageDescriptor;
     }
 

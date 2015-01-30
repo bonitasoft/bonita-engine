@@ -110,7 +110,7 @@ public class PageAPIDelegate {
     }
 
     protected SearchPages getSearchPages(final SearchOptions searchOptions) {
-        return new SearchPages(pageService, searchEntitiesDescriptor.getOrgSearchPageDescriptor(), searchOptions);
+        return new SearchPages(pageService, searchEntitiesDescriptor.getSearchPageDescriptor(), searchOptions);
     }
 
     public Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,

@@ -96,7 +96,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     private ApplicationPageAPIDelegate getApplicationPageAPIDelegate(final SearchOptions searchOptions) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SearchApplicationPageDescriptor appPageSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getOrgSearchApplicationPageDescriptor();
+        final SearchApplicationPageDescriptor appPageSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationPageDescriptor();
         final ApplicationPageConvertor convertor = new ApplicationPageConvertor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final SearchApplicationPages searchApplicationPages = new SearchApplicationPages(applicationService, convertor, appPageSearchDescriptor,
@@ -112,7 +112,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final ApplicationMenuConvertor convertor = new ApplicationMenuConvertor();
-        final SearchApplicationMenuDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getOrgSearchApplicationMenuDescriptor();
+        final SearchApplicationMenuDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationMenuDescriptor();
         final SearchApplicationMenus searchApplicationMenus = new SearchApplicationMenus(applicationService, convertor, searchDescriptor, searchOptions);
         final ApplicationMenuCreatorValidator validator = new ApplicationMenuCreatorValidator();
         final ApplicationMenuAPIDelegate delegate = new ApplicationMenuAPIDelegate(tenantAccessor, convertor, searchApplicationMenus, validator,

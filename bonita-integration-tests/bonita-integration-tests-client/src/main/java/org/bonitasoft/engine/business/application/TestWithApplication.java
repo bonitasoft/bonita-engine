@@ -42,9 +42,9 @@ public class TestWithApplication extends CommonAPIIT {
 
     @After
     public void tearDown() throws Exception {
-        final SearchResult<Application> searchResult = getOrgApplicationAPI().searchApplications(new SearchOptionsBuilder(0, 1000).done());
+        final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(new SearchOptionsBuilder(0, 1000).done());
         for (final Application app : searchResult.getResult()) {
-            getOrgApplicationAPI().deleteApplication(app.getId());
+            getApplicationAPI().deleteApplication(app.getId());
         }
         logoutThenlogin();
         deleteUser(user);

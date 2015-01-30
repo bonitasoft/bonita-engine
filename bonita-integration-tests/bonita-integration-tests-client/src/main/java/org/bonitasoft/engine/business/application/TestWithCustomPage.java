@@ -42,7 +42,7 @@ public class TestWithCustomPage extends TestWithApplication {
         super.tearDown();
         loginOnDefaultTenantWithDefaultTechnicalUser();
         if (page != null) {
-            getOrgPageAPI().deletePage(page.getId());
+            getPageAPI().deletePage(page.getId());
         }
         logoutOnTenant();
     }
@@ -52,7 +52,7 @@ public class TestWithCustomPage extends TestWithApplication {
     }
 
     protected Page createPage(final String pageName) throws Exception {
-        return getOrgPageAPI().createPage(new PageCreator(pageName, "content.zip").setDisplayName(pageName), createPageContent(pageName));
+        return getPageAPI().createPage(new PageCreator(pageName, "content.zip").setDisplayName(pageName), createPageContent(pageName));
     }
 
     private byte[] createPageContent(final String pageName)

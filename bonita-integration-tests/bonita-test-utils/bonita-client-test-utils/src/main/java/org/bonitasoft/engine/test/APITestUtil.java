@@ -1459,11 +1459,11 @@ public class APITestUtil extends PlatformTestUtil {
         this.pageAPI = pageAPI;
     }
 
-    public PageAPI getOrgPageAPI() {
+    public PageAPI getPageAPI() {
         return pageAPI;
     }
 
-    public ApplicationAPI getOrgApplicationAPI() {
+    public ApplicationAPI getApplicationAPI() {
         return applicationAPI;
     }
 
