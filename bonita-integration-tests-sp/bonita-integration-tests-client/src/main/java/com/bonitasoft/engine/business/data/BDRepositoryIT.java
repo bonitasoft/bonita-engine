@@ -85,15 +85,19 @@ import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 public class BDRepositoryIT extends CommonAPISPIT {
 
     private static final String COUNTRY_QUALIF_NAME = "org.bonita.pojo.Country";
+
     private static final String ADDRESS_QUALIF_NAME = "org.bonita.pojo.Address";
+
     private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.Employee";
 
     private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "findByLastName";
+
     private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
 
     private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
 
     private User matti;
+
     private File clientFolder;
 
     private BusinessObjectModel buildBOM() {
@@ -221,6 +225,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         return model;
     }
 
+    private Long tenantId;
+
     @Before
     public void setUp() throws Exception {
         clientFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("bdr_it_client");
@@ -232,6 +238,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         getTenantManagementAPI().pause();
         getTenantManagementAPI().installBusinessDataModel(zip);
         getTenantManagementAPI().resume();
+
+        tenantId = getSession().getTenantId();
     }
 
     @After
@@ -505,9 +513,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
     @Test
     public void should_deploy_generate_client_bdm_jar_in_bonita_home() throws Exception {
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
-        final String clientBdmJarPath = bonitaHomePath + File.separator + "server" + File.separator + "tenants" + File.separator + "1" + File.separator
-                + "data-management" + File.separator + "client";
-        assertThat(new File(clientBdmJarPath, CLIENT_BDM_ZIP_FILENAME)).exists().isFile();
+        assertThat(new File(getClientBdmJarClassPath(bonitaHomePath), CLIENT_BDM_ZIP_FILENAME)).exists().isFile();
 
         assertThat(getTenantManagementAPI().getClientBDMZip()).isNotEmpty();
     }
@@ -520,9 +526,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         getTenantManagementAPI().resume();
 
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
-        final String clientBdmJarPath = bonitaHomePath + File.separator + "server" + File.separator + "tenants" + File.separator + "1" + File.separator
-                + "data-management" + File.separator + "client";
-        assertThat(new File(clientBdmJarPath, CLIENT_BDM_ZIP_FILENAME)).doesNotExist();
+        assertThat(new File(getClientBdmJarClassPath(bonitaHomePath), CLIENT_BDM_ZIP_FILENAME)).doesNotExist();
 
         getTenantManagementAPI().getClientBDMZip();
     }
@@ -851,7 +855,9 @@ public class BDRepositoryIT extends CommonAPISPIT {
     class AddressRef {
 
         private final String varName;
+
         private final String street;
+
         private final String city;
 
         AddressRef(final String varName, final String street, final String city) {
@@ -1231,7 +1237,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    //    @Test
+    // @Test
     public void should_get_the_lazy_list_in_a_multiple_business_data() throws Exception {
         final Expression initProducts = new ExpressionBuilder().createGroovyScriptExpression("initProducts", "import org.bonita.pojo.Product;"
                 + " Product p1 = new Product(); p1.name = 'Rock'; "
@@ -1267,4 +1273,10 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(definition.getId());
     }
 
+    private String getClientBdmJarClassPath(String bonitaHomePath) {
+        String clientBdmJarPath;
+        clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("server").append(File.separator).append("tenants")
+                .append(File.separator).append(tenantId).append(File.separator).append("data-management").append(File.separator).append("client").toString();
+        return clientBdmJarPath;
+    }
 }
