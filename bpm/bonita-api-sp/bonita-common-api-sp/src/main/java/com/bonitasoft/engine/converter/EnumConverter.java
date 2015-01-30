@@ -12,11 +12,16 @@ package com.bonitasoft.engine.converter;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Elias Ricken de Medeiros
+ * @deprecated for internal use only. Please, don't use this class
+ */
+@Deprecated
 public class EnumConverter {
 
-    public <S extends Enum<S>, D extends Enum<D>, V> Map<D, V> convert(Map<S, V> toConvert, Class<D> targetEnumClass) {
-        final Map<D, V> fields = new HashMap<D, V>(toConvert.size());
-        for (final Map.Entry<S, V> entry : toConvert.entrySet()) {
+    public <SOURCE extends Enum<SOURCE>, TARGET extends Enum<TARGET>, VALUE> Map<TARGET, VALUE> convert(Map<SOURCE, VALUE> toConvert, Class<TARGET> targetEnumClass) {
+        final Map<TARGET, VALUE> fields = new HashMap<TARGET, VALUE>(toConvert.size());
+        for (final Map.Entry<SOURCE, VALUE> entry : toConvert.entrySet()) {
             fields.put(Enum.valueOf(targetEnumClass, entry.getKey().name()), entry.getValue());
         }
         return fields;
