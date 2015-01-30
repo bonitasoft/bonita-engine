@@ -1,6 +1,7 @@
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.business.application.ApplicationAPIITs;
+import org.bonitasoft.engine.page.PageAPIIT;
 import org.bonitasoft.engine.test.APIMethodIT;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
@@ -14,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         BPMLocalSuiteTests.class,
         BPMRemoteTests.class,
+        PageAPIIT.class,
         ApplicationAPIITs.class,
         APIMethodIT.class })
 @Initializer(TestsInitializer.class)
