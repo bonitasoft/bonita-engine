@@ -9,28 +9,32 @@
 package com.bonitasoft.engine.business.application;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.profile.Profile;
+
+import com.bonitasoft.engine.converter.EnumConverter;
 
 /**
  * Allows to define which {@link Application} fields will be updated
  *
  * @author Elias Ricken de Medeiros
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationUpdater} instead.
  * @see Application
+ * @see org.bonitasoft.engine.business.application.ApplicationUpdater
  */
+@Deprecated
 public class ApplicationUpdater implements Serializable {
 
     private static final long serialVersionUID = 4565052647320534796L;
 
-    private final Map<ApplicationField, Serializable> fields;
+    org.bonitasoft.engine.business.application.ApplicationUpdater delegate;
 
     /**
      * Creates an instance of <code>ApplicationUpdater</code>
      */
     public ApplicationUpdater() {
-        fields = new HashMap<ApplicationField, Serializable>(8);
+        delegate = new org.bonitasoft.engine.business.application.ApplicationUpdater();
     }
 
     /**
@@ -40,7 +44,7 @@ public class ApplicationUpdater implements Serializable {
      * @see ApplicationField
      */
     public Map<ApplicationField, Serializable> getFields() {
-        return fields;
+        return new EnumConverter().convert(delegate.getFields(), ApplicationField.class);
     }
 
     /**
@@ -52,7 +56,7 @@ public class ApplicationUpdater implements Serializable {
      * @see Application
      */
     public ApplicationUpdater setToken(final String token) {
-        fields.put(ApplicationField.TOKEN, token);
+        delegate.setToken(token);
         return this;
     }
 
@@ -64,7 +68,7 @@ public class ApplicationUpdater implements Serializable {
      * @see Application
      */
     public ApplicationUpdater setDisplayName(final String displayName) {
-        fields.put(ApplicationField.DISPLAY_NAME, displayName);
+        delegate.setDisplayName(displayName);
         return this;
     }
 
@@ -76,7 +80,7 @@ public class ApplicationUpdater implements Serializable {
      * @see Application
      */
     public ApplicationUpdater setVersion(final String version) {
-        fields.put(ApplicationField.VERSION, version);
+        delegate.setVersion(version);
         return this;
     }
 
@@ -88,7 +92,7 @@ public class ApplicationUpdater implements Serializable {
      * @see Application
      */
     public ApplicationUpdater setDescription(final String description) {
-        fields.put(ApplicationField.DESCRIPTION, description);
+        delegate.setDescription(description);
         return this;
     }
 
@@ -100,7 +104,7 @@ public class ApplicationUpdater implements Serializable {
      * @see Application
      */
     public ApplicationUpdater setIconPath(final String iconPath) {
-        fields.put(ApplicationField.ICON_PATH, iconPath);
+        delegate.setIconPath(iconPath);
         return this;
     }
 
@@ -112,7 +116,7 @@ public class ApplicationUpdater implements Serializable {
      * @see Application
      */
     public ApplicationUpdater setState(final String state) {
-        fields.put(ApplicationField.STATE, state);
+        delegate.setState(state);
         return this;
     }
 
@@ -125,7 +129,7 @@ public class ApplicationUpdater implements Serializable {
      * @see Profile
      */
     public ApplicationUpdater setProfileId(final Long profileId) {
-        fields.put(ApplicationField.PROFILE_ID, profileId);
+        delegate.setProfileId(profileId);
         return this;
     }
 
@@ -138,7 +142,7 @@ public class ApplicationUpdater implements Serializable {
      * @see com.bonitasoft.engine.business.application.ApplicationPage
      */
     public ApplicationUpdater setHomePageId(final Long applicationPageId) {
-        fields.put(ApplicationField.HOME_PAGE_ID, applicationPageId);
+        delegate.setHomePageId(applicationPageId);
         return this;
     }
 
@@ -149,5 +153,19 @@ public class ApplicationUpdater implements Serializable {
      */
     public boolean hasFields() {
         return !getFields().isEmpty();
+    }
+
+    public org.bonitasoft.engine.business.application.ApplicationUpdater getDelegate() {
+        return delegate;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return delegate.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return delegate.hashCode();
     }
 }

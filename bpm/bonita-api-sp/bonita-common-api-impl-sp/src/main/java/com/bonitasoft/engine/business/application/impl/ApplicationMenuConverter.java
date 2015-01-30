@@ -6,19 +6,21 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
+
 package com.bonitasoft.engine.business.application.impl;
 
+import org.bonitasoft.engine.business.application.ApplicationMenu;
+
 import com.bonitasoft.engine.api.converter.Converter;
-import com.bonitasoft.engine.business.application.Application;
 
 /**
- * @author Emmanuel Duchastenier
+ * @author Elias Ricken de Medeiros
  */
-public class ApplicationConverter implements Converter<org.bonitasoft.engine.business.application.Application, Application> {
+public class ApplicationMenuConverter implements Converter<ApplicationMenu, com.bonitasoft.engine.business.application.ApplicationMenu> {
 
     @Override
-    public Application convert(final org.bonitasoft.engine.business.application.Application application) {
-        return new ApplicationImpl(application);
+    public com.bonitasoft.engine.business.application.ApplicationMenu convert(final ApplicationMenu toConvert) {
+        return new ApplicationMenuImpl(toConvert);
     }
 
 }

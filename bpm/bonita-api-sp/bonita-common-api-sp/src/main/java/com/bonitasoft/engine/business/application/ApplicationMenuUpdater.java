@@ -10,18 +10,22 @@
 package com.bonitasoft.engine.business.application;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
+
+import com.bonitasoft.engine.converter.EnumConverter;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationMenuUpdater} instead.
+ * @see org.bonitasoft.engine.business.application.ApplicationMenuUpdater
  */
+@Deprecated
 public class ApplicationMenuUpdater implements Serializable {
 
-    private final Map<ApplicationMenuField, Serializable> fields;
+    private org.bonitasoft.engine.business.application.ApplicationMenuUpdater delegate;
 
     public ApplicationMenuUpdater() {
-        fields = new HashMap<ApplicationMenuField, Serializable>(4);
+        delegate = new org.bonitasoft.engine.business.application.ApplicationMenuUpdater();
     }
 
     /**
@@ -31,7 +35,7 @@ public class ApplicationMenuUpdater implements Serializable {
      * @see ApplicationMenuField
      */
     public Map<ApplicationMenuField, Serializable> getFields() {
-        return fields;
+        return new EnumConverter().convert(delegate.getFields(), ApplicationMenuField.class);
     }
 
     /**
@@ -44,7 +48,7 @@ public class ApplicationMenuUpdater implements Serializable {
      * @see com.bonitasoft.engine.business.application.ApplicationMenu
      */
     public ApplicationMenuUpdater setApplicationPageId(final Long applicationPageId) {
-        fields.put(ApplicationMenuField.APPLICATION_PAGE_ID, applicationPageId);
+        delegate.setApplicationPageId(applicationPageId);
         return this;
     }
 
@@ -56,7 +60,7 @@ public class ApplicationMenuUpdater implements Serializable {
      * @see ApplicationMenu
      */
     public ApplicationMenuUpdater setDisplayName(final String displayName) {
-        fields.put(ApplicationMenuField.DISPLAY_NAME, displayName);
+        delegate.setDisplayName(displayName);
         return this;
     }
 
@@ -68,7 +72,7 @@ public class ApplicationMenuUpdater implements Serializable {
      * @see ApplicationMenu
      */
     public ApplicationMenuUpdater setIndex(final int index) {
-        fields.put(ApplicationMenuField.INDEX, index);
+        delegate.setIndex(index);
         return this;
     }
 
@@ -80,7 +84,7 @@ public class ApplicationMenuUpdater implements Serializable {
      * @see ApplicationMenu
      */
     public ApplicationMenuUpdater setParentId(final Long parentId) {
-        fields.put(ApplicationMenuField.PARENT_ID, parentId);
+        delegate.setParentId(parentId);
         return this;
     }
 
@@ -91,5 +95,19 @@ public class ApplicationMenuUpdater implements Serializable {
      */
     public boolean hasFields() {
         return !getFields().isEmpty();
+    }
+
+    public org.bonitasoft.engine.business.application.ApplicationMenuUpdater getDelegate() {
+        return delegate;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return delegate.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return delegate.hashCode();
     }
 }

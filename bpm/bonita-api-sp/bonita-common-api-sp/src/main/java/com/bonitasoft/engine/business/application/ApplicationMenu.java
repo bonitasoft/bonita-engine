@@ -8,53 +8,15 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
-import org.bonitasoft.engine.bpm.BaseElement;
-
-
 /**
  * Represents an {@link Application} menu
  *
  * @author Elias Ricken de Medeiros
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationMenu} instead.
  * @since 6.4
  * @see Application
+ * @see org.bonitasoft.engine.business.application.ApplicationMenu
  */
-public interface ApplicationMenu extends BaseElement {
-
-    /**
-     * Retrieves the {@code ApplicationMenu} display name
-     *
-     * @return the {@code ApplicationMenu} display name
-     */
-    String getDisplayName();
-
-    /**
-     * Retrieves the identifier of related {@link ApplicationPage}. If the {@code ApplicationMenu} is not related to an {@code ApplicationPage}, this method will return null.
-     *
-     * @return the identifier of related {@code ApplicationPage} or null if the menu is not related to {@code ApplicationPage}
-     * @see ApplicationPage
-     */
-    Long getApplicationPageId();
-
-    /**
-     * Retrieves the identifier of related {@link Application}
-     *
-     * @return the identifier of related {@code Application}
-     * @see Application
-     */
-    long getApplicationId();
-
-    /**
-     * Retrieves the identifier of the parent {@code ApplicationMenu}. If the menu does not have a parent menu, this method will return null.
-     *
-     * @return the identifier of the parent {@code ApplicationMenu} or null if the menu has no parent.
-     */
-    Long getParentId();
-
-    /**
-     * Retrieves the {@code ApplicationMenu} index
-     *
-     * @return the {@code ApplicationMenu} index
-     */
-    int getIndex();
-
+@Deprecated
+public interface ApplicationMenu extends org.bonitasoft.engine.business.application.ApplicationMenu {
 }

@@ -8,14 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
-import org.bonitasoft.engine.exception.NotFoundException;
-
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
-public class ApplicationPageNotFoundException extends NotFoundException {
+public class ApplicationPageNotFoundException extends org.bonitasoft.engine.business.application.ApplicationPageNotFoundException {
 
     private static final long serialVersionUID = -5011088434149162619L;
 

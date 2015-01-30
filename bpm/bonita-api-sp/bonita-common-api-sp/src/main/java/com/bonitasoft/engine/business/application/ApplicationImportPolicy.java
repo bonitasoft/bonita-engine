@@ -11,8 +11,11 @@ package com.bonitasoft.engine.business.application;
 /**
  * Contains available policies during {@link Application}s import
  * @author Elias Ricken de Medeiros
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationImportPolicy} instead.
  * @see com.bonitasoft.engine.business.application.Application
+ * @see org.bonitasoft.engine.business.application.ApplicationImportPolicy
  */
+@Deprecated
 public enum ApplicationImportPolicy {
 
     /**

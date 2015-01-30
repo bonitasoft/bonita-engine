@@ -13,7 +13,10 @@ package com.bonitasoft.engine.business.application;
      * Contains fields used by {@link ApplicationMenuCreator} and {@link ApplicationMenuUpdater}
      * @author Elias Ricken de Medeiros
      * @since 6.4
+     * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationMenuField} instead.
+     * @see org.bonitasoft.engine.business.application.ApplicationMenuField
      */
+    @Deprecated
     public enum ApplicationMenuField {
 
         /**

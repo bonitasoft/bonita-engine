@@ -19,8 +19,23 @@ import org.bonitasoft.engine.api.impl.application.ApplicationPageAPIDelegate;
 import org.bonitasoft.engine.api.impl.converter.ApplicationMenuConvertor;
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConvertor;
 import org.bonitasoft.engine.api.impl.converter.ApplicationPageConvertor;
+import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
+import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
+import org.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
+import org.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
+import org.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
+import org.bonitasoft.engine.business.application.converter.ApplicationPageNodeConverter;
+import org.bonitasoft.engine.business.application.exporter.ApplicationContainerExporter;
+import org.bonitasoft.engine.business.application.exporter.ApplicationExporter;
+import org.bonitasoft.engine.business.application.importer.ApplicationContainerImporter;
+import org.bonitasoft.engine.business.application.importer.ApplicationImporter;
+import org.bonitasoft.engine.business.application.importer.ApplicationMenuImporter;
+import org.bonitasoft.engine.business.application.importer.ApplicationPageImporter;
+import org.bonitasoft.engine.business.application.importer.ApplicationsImporter;
+import org.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -37,9 +52,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.converter.CollectionConverter;
-import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
-import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
-import com.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationImportPolicy;
@@ -51,19 +63,9 @@ import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
-import com.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
-import com.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
-import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
-import com.bonitasoft.engine.business.application.converter.ApplicationPageNodeConverter;
-import com.bonitasoft.engine.business.application.exporter.ApplicationContainerExporter;
-import com.bonitasoft.engine.business.application.exporter.ApplicationExporter;
 import com.bonitasoft.engine.business.application.impl.ApplicationConverter;
-import com.bonitasoft.engine.business.application.importer.ApplicationContainerImporter;
-import com.bonitasoft.engine.business.application.importer.ApplicationImporter;
-import com.bonitasoft.engine.business.application.importer.ApplicationMenuImporter;
-import com.bonitasoft.engine.business.application.importer.ApplicationPageImporter;
-import com.bonitasoft.engine.business.application.importer.ApplicationsImporter;
-import com.bonitasoft.engine.business.application.importer.StrategySelector;
+import com.bonitasoft.engine.business.application.impl.ApplicationMenuConverter;
+import com.bonitasoft.engine.business.application.impl.ApplicationPageConverter;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -137,7 +139,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return new ApplicationExporterDelegate(tenantAccessor.getApplicationService(), applicationExporter);
     }
 
-    private ApplicationsImporter getApplicationImporter(final ApplicationImportPolicy policy) {
+    private ApplicationsImporter getApplicationImporter(final org.bonitasoft.engine.business.application.ApplicationImportPolicy policy) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final StrategySelector strategySelector = new StrategySelector();
         final ApplicationContainerImporter containerImporter = new ApplicationContainerImporter();
@@ -172,7 +174,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException,
             AlreadyExistsException {
-        return getApplicationAPIDelegate().updateApplication(applicationId, updater);
+        try {
+            return new ApplicationConverter().convert(getApplicationAPIDelegate().updateApplication(applicationId, updater.getDelegate()));
+        } catch (org.bonitasoft.engine.business.application.ApplicationNotFoundException e) {
+            throw new ApplicationNotFoundException(applicationId);
+        }
     }
 
     private TenantServiceAccessor getTenantAccessor() {
@@ -188,31 +194,38 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
         final SearchResult<org.bonitasoft.engine.business.application.Application> searchResult = getApplicationAPIDelegate(searchOptions).searchApplications();
-        final List<org.bonitasoft.engine.business.application.Application> results = searchResult.getResult();
-        final CollectionConverter<org.bonitasoft.engine.business.application.Application, Application> applicationsConverter = new CollectionConverter<org.bonitasoft.engine.business.application.Application, Application>(
-                new ApplicationConverter());
-        return new SearchResultImpl<Application>(searchResult.getCount(), applicationsConverter.convert(results));
+        return new SearchResultImpl<Application>(searchResult.getCount(), new CollectionConverter().convert(searchResult.getResult(), new ApplicationConverter()));
     }
 
     @Override
     public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String token) throws AlreadyExistsException,
             CreationException {
-        return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pageId, token);
+        return new ApplicationPageConverter().convert(getApplicationPageAPIDelegate().createApplicationPage(applicationId, pageId, token));
     }
 
     @Override
     public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageToken) throws ApplicationPageNotFoundException {
-        return getApplicationPageAPIDelegate().getApplicationPage(applicationName, applicationPageToken);
+        try {
+            return new ApplicationPageConverter().convert(getApplicationPageAPIDelegate().getApplicationPage(applicationName, applicationPageToken));
+        } catch (org.bonitasoft.engine.business.application.ApplicationPageNotFoundException e) {
+            throw new ApplicationPageNotFoundException(e.getMessage());
+        }
     }
 
     @Override
     public SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException {
-        return getApplicationPageAPIDelegate(searchOptions).searchApplicationPages();
+        SearchResult<org.bonitasoft.engine.business.application.ApplicationPage> applicationPages = getApplicationPageAPIDelegate(searchOptions)
+                .searchApplicationPages();
+        return new SearchResultImpl<ApplicationPage>(applicationPages.getCount(), new CollectionConverter().convert(applicationPages.getResult(), new ApplicationPageConverter()));
     }
 
     @Override
     public ApplicationPage getApplicationPage(final long applicationPageId) throws ApplicationPageNotFoundException {
-        return getApplicationPageAPIDelegate().getApplicationPage(applicationPageId);
+        try {
+            return new ApplicationPageConverter().convert(getApplicationPageAPIDelegate().getApplicationPage(applicationPageId));
+        } catch (org.bonitasoft.engine.business.application.ApplicationPageNotFoundException e) {
+            throw new ApplicationPageNotFoundException(e.getMessage());
+        }
     }
 
     @Override
@@ -222,28 +235,44 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, ApplicationNotFoundException {
-        getApplicationPageAPIDelegate().setApplicationHomePage(applicationId, applicationPageId);
+        try {
+            getApplicationPageAPIDelegate().setApplicationHomePage(applicationId, applicationPageId);
+        } catch (org.bonitasoft.engine.business.application.ApplicationNotFoundException e) {
+            throw new ApplicationNotFoundException(applicationId);
+        }
     }
 
     @Override
     public ApplicationPage getApplicationHomePage(final long applicationId) throws ApplicationPageNotFoundException {
-        return getApplicationPageAPIDelegate().getApplicationHomePage(applicationId);
+        try {
+            return new ApplicationPageConverter().convert(getApplicationPageAPIDelegate().getApplicationHomePage(applicationId));
+        } catch (org.bonitasoft.engine.business.application.ApplicationPageNotFoundException e) {
+            throw new ApplicationPageNotFoundException(e.getMessage());
+        }
     }
 
     @Override
     public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator) throws CreationException {
-        return getApplicationMenuAPIDelegate().createApplicationMenu(applicationMenuCreator);
+        return new ApplicationMenuConverter().convert(getApplicationMenuAPIDelegate().createApplicationMenu(applicationMenuCreator.getDelegate()));
     }
 
     @Override
     public ApplicationMenu updateApplicationMenu(final long applicationMenuId, final ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException,
             UpdateException {
-        return getApplicationMenuAPIDelegate().updateApplicationMenu(applicationMenuId, updater);
+        try {
+            return new ApplicationMenuConverter().convert(getApplicationMenuAPIDelegate().updateApplicationMenu(applicationMenuId, updater.getDelegate()));
+        } catch (org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException e) {
+            throw new ApplicationMenuNotFoundException(e.getMessage());
+        }
     }
 
     @Override
     public ApplicationMenu getApplicationMenu(final long applicationMenuId) throws ApplicationMenuNotFoundException {
-        return getApplicationMenuAPIDelegate().getApplicationMenu(applicationMenuId);
+        try {
+            return new ApplicationMenuConverter().convert(getApplicationMenuAPIDelegate().getApplicationMenu(applicationMenuId));
+        } catch (org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException e) {
+            throw new ApplicationMenuNotFoundException(e.getMessage());
+        }
     }
 
     @Override
@@ -253,7 +282,9 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException {
-        return getApplicationMenuAPIDelegate(searchOptions).searchApplicationMenus();
+        SearchResult<org.bonitasoft.engine.business.application.ApplicationMenu> applicationMenus = getApplicationMenuAPIDelegate(searchOptions)
+                .searchApplicationMenus();
+        return new SearchResultImpl<ApplicationMenu>(applicationMenus.getCount(), new CollectionConverter().convert(applicationMenus.getResult(), new ApplicationMenuConverter()));
     }
 
     @Override
@@ -268,7 +299,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ImportException, AlreadyExistsException {
-        return getApplicationImporter(policy).importApplications(xmlContent, SessionInfos.getUserIdFromSession());
+        return getApplicationImporter(org.bonitasoft.engine.business.application.ApplicationImportPolicy.valueOf(policy.name())).importApplications(xmlContent,
+                SessionInfos.getUserIdFromSession());
     }
 
 }

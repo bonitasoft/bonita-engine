@@ -9,11 +9,11 @@
 package com.bonitasoft.engine.business.application;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bonitasoft.engine.profile.Profile;
+
+import com.bonitasoft.engine.converter.EnumConverter;
 
 /**
  * Describes the information about an {@link Application} to be created
@@ -42,7 +42,7 @@ public class ApplicationCreator implements Serializable {
      */
     @Deprecated
     public ApplicationCreator(final String token, final String displayName, final String version) {
-        delegate = new org.bonitasoft.engine.business.application.ApplicationCreator(token, version, displayName);
+        delegate = new org.bonitasoft.engine.business.application.ApplicationCreator(token, displayName, version);
     }
 
     /**
@@ -99,12 +99,7 @@ public class ApplicationCreator implements Serializable {
      * @see ApplicationField
      */
     public Map<ApplicationField, Serializable> getFields() {
-        final Map<org.bonitasoft.engine.business.application.ApplicationField, Serializable> superFields = delegate.getFields();
-        final Map<ApplicationField, Serializable> fields = new HashMap<ApplicationField, Serializable>(superFields.size());
-        for (final Entry<org.bonitasoft.engine.business.application.ApplicationField, Serializable> entry : superFields.entrySet()) {
-            fields.put(ApplicationField.valueOf(entry.getKey().name()), entry.getValue());
-        }
-        return fields;
+        return new EnumConverter().convert(delegate.getFields(), ApplicationField.class);
     }
 
     /**
