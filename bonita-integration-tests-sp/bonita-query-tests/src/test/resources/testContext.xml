@@ -14,8 +14,6 @@
        <property name="dataSource" ref="dataSource" />
        <property name="mappingResources">
            <list>
-               <value>/com/bonitasoft/engine/page/impl/hibernate/page.hbm.xml</value>
-               <value>/com/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
                <value>/com/bonitasoft/engine/business/application/impl/hibernate/application.hbm.xml</value>
                <value>/com/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
            </list>

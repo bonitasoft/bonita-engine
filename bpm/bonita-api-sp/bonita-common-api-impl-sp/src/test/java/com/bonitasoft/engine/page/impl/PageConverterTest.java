@@ -6,7 +6,6 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
-
 package com.bonitasoft.engine.page.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,17 +23,16 @@ public class PageConverterTest {
     @Before
     public void setUp() throws Exception {
         converter = new PageConverter();
-
     }
 
     @Test
     public void convert_should_map_all_fields() throws Exception {
         //given
-        long now = System.currentTimeMillis();
-        PageImpl sourcePage = new PageImpl(1, "name", "display", true, "description", now, 2, now + 10, 3, "contentName");
+        final long now = System.currentTimeMillis();
+        final PageImpl sourcePage = new PageImpl(1, "name", "display", true, "description", now, 2, now + 10, 3, "contentName");
 
         //when
-        Page convertedPage = converter.convert(sourcePage);
+        final Page convertedPage = converter.convert(sourcePage);
 
         //then
         assertThat(convertedPage.getId()).isEqualTo(1);
