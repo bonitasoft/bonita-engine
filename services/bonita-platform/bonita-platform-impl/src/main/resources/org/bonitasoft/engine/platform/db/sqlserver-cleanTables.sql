@@ -1,5 +1,0 @@
-DELETE FROM tenant
-GO
-
-DELETE FROM platform
-GO
