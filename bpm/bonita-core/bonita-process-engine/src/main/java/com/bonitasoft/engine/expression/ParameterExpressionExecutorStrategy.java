@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013-2014 Bonitasoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
