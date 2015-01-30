@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -102,8 +102,7 @@ public class PageAPIIT extends CommonAPISPIT {
         final String name = generateUniquePageName(0);
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, name, DISPLAY_NAME, PAGE_DESCRIPTION);
         final Page page = getSubscriptionPageAPI().createPage(
-                new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
-                pageContent);
+                new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME), pageContent);
 
         // when
         final Page returnedPage = getSubscriptionPageAPI().getPage(page.getId());
@@ -123,8 +122,7 @@ public class PageAPIIT extends CommonAPISPIT {
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
         final Page page = getSubscriptionPageAPI().createPage(
-                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
-                pageContent);
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME), pageContent);
         assertThat(page.getInstalledBy()).isEqualTo(john.getId());
         assertThat(page.getLastUpdatedBy()).isEqualTo(john.getId());
         logoutOnTenant();
