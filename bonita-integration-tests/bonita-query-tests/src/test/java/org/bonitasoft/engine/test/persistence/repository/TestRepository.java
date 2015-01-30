@@ -4,6 +4,12 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
+import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationMenu;
+import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
+import org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
+import org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -208,6 +214,28 @@ public class TestRepository {
         getSession().save(sPageWithContentImpl);
         return (SPageWithContentImpl) getSession().get(sPageWithContentImpl.getClass(),
                 new PersistentObjectId(sPageWithContentImpl.getId(), sPageWithContentImpl.getTenantId()));
+    }
+
+    public SApplication add(final SApplicationImpl application) {
+        getSession().save(application);
+        return (SApplication) getSession().get(application.getClass(),
+                new PersistentObjectId(application.getId(), application.getTenantId()));
+    }
+
+    public SApplicationPage add(final SApplicationPageImpl applicationPage) {
+        getSession().save(applicationPage);
+        return (SApplicationPage) getSession().get(applicationPage.getClass(),
+                new PersistentObjectId(applicationPage.getId(), applicationPage.getTenantId()));
+    }
+
+    public SApplicationMenu add(final SApplicationMenuImpl applicationMenu) {
+        getSession().save(applicationMenu);
+        return (SApplicationMenu) getSession().get(applicationMenu.getClass(),
+                new PersistentObjectId(applicationMenu.getId(), applicationMenu.getTenantId()));
+    }
+
+    public void update(final SApplicationImpl application) {
+        getSession().update(application);
     }
 
 }
