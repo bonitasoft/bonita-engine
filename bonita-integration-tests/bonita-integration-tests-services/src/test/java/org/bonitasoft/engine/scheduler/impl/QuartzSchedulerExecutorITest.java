@@ -21,7 +21,7 @@ import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
-import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
+import org.bonitasoft.engine.scheduler.trigger.UnixCronTriggerForTest;
 import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
@@ -125,7 +125,7 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName).done());
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobKey", "1").done());
-        Trigger trigger = new UnixCronTrigger("events", now, 10, "0/1 * * * * ?");
+        Trigger trigger = new UnixCronTriggerForTest("events", now, 10, "0/1 * * * * ?");
 
         // trigger it
         getTransactionService().begin();

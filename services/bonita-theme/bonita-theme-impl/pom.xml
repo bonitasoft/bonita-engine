@@ -54,11 +54,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-builder</artifactId>
 			<version>${project.version}</version>

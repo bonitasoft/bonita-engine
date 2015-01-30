@@ -1,2 +1,0 @@
-DROP TABLE processsupervisor
-GO
