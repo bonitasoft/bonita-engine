@@ -14,18 +14,11 @@ import java.util.List;
 /**
  * @author Emmanuel Duchastenier
  */
-public class CollectionConverter<S, D> {
+public class CollectionConverter {
 
-    private final Converter<S, D> converter;
-
-    public CollectionConverter(final Converter<S, D> convertor) {
-        this.converter = convertor;
-
-    }
-
-    public List<D> convert(final List<S> toConvert) {
-        final ArrayList<D> converted = new ArrayList<D>(toConvert.size());
-        for (final S source : toConvert) {
+    public <SOURCE, DESTINATION> List<DESTINATION> convert(final List<SOURCE> toConvert, final Converter<SOURCE, DESTINATION> converter) {
+        final ArrayList<DESTINATION> converted = new ArrayList<DESTINATION>(toConvert.size());
+        for (final SOURCE source : toConvert) {
             converted.add(converter.convert(source));
         }
         return converted;
