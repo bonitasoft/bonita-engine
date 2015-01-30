@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.search.descriptor;
 
-
 /**
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
@@ -22,21 +21,11 @@ public final class SearchEntitiesDescriptor extends org.bonitasoft.engine.search
 
     protected final SearchArchivedProcessInstanceDescriptorExt searchArchivedProcessInstanceDescriptorExt;
 
-    private final SearchPageDescriptor searchPageDescriptor;
-
-    private final SearchApplicationPageDescriptor searchApplicationPageDescriptor;
-
-    private final SearchApplicationMenuDescriptor searchApplicationMenuDescriptor;
-
     public SearchEntitiesDescriptor() {
         super();
         searchLogDescriptor = new SearchLogDescriptor();
         searchProcessInstanceDescriptorExt = new SearchProcessInstanceDescriptorExt();
         searchArchivedProcessInstanceDescriptorExt = new SearchArchivedProcessInstanceDescriptorExt();
-        searchPageDescriptor = new SearchPageDescriptor();
-        searchApplicationPageDescriptor = new SearchApplicationPageDescriptor();
-        searchApplicationMenuDescriptor = new SearchApplicationMenuDescriptor();
-
     }
 
     public SearchLogDescriptor getSearchLogDescriptor() {
@@ -55,18 +44,6 @@ public final class SearchEntitiesDescriptor extends org.bonitasoft.engine.search
 
     public SearchReportDescriptor getSearchReportDescriptor() {
         return new SearchReportDescriptor();
-    }
-
-    public SearchPageDescriptor getSearchPageDescriptor() {
-        return searchPageDescriptor;
-    }
-
-    public SearchApplicationPageDescriptor getSearchApplicationPageDescriptor() {
-        return searchApplicationPageDescriptor;
-    }
-
-    public SearchApplicationMenuDescriptor getSearchApplicationMenuDescriptor() {
-        return searchApplicationMenuDescriptor;
     }
 
 }

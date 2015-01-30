@@ -47,6 +47,8 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
 import org.bonitasoft.engine.search.impl.SearchResultImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -66,8 +68,6 @@ import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.business.application.impl.ApplicationConverter;
 import com.bonitasoft.engine.business.application.impl.ApplicationMenuConverter;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageConverter;
-import com.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
-import com.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
@@ -176,7 +176,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
             AlreadyExistsException {
         try {
             return new ApplicationConverter().convert(getApplicationAPIDelegate().updateApplication(applicationId, updater.getDelegate()));
-        } catch (org.bonitasoft.engine.business.application.ApplicationNotFoundException e) {
+        } catch (final org.bonitasoft.engine.business.application.ApplicationNotFoundException e) {
             throw new ApplicationNotFoundException(applicationId);
         }
     }
@@ -194,7 +194,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
         final SearchResult<org.bonitasoft.engine.business.application.Application> searchResult = getApplicationAPIDelegate(searchOptions).searchApplications();
-        return new SearchResultImpl<Application>(searchResult.getCount(), new CollectionConverter().convert(searchResult.getResult(), new ApplicationConverter()));
+        return new SearchResultImpl<Application>(searchResult.getCount(), new CollectionConverter().convert(searchResult.getResult(),
+                new ApplicationConverter()));
     }
 
     @Override
@@ -207,23 +208,24 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageToken) throws ApplicationPageNotFoundException {
         try {
             return new ApplicationPageConverter().convert(getApplicationPageAPIDelegate().getApplicationPage(applicationName, applicationPageToken));
-        } catch (org.bonitasoft.engine.business.application.ApplicationPageNotFoundException e) {
+        } catch (final org.bonitasoft.engine.business.application.ApplicationPageNotFoundException e) {
             throw new ApplicationPageNotFoundException(e.getMessage());
         }
     }
 
     @Override
     public SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException {
-        SearchResult<org.bonitasoft.engine.business.application.ApplicationPage> applicationPages = getApplicationPageAPIDelegate(searchOptions)
+        final SearchResult<org.bonitasoft.engine.business.application.ApplicationPage> applicationPages = getApplicationPageAPIDelegate(searchOptions)
                 .searchApplicationPages();
-        return new SearchResultImpl<ApplicationPage>(applicationPages.getCount(), new CollectionConverter().convert(applicationPages.getResult(), new ApplicationPageConverter()));
+        return new SearchResultImpl<ApplicationPage>(applicationPages.getCount(), new CollectionConverter().convert(applicationPages.getResult(),
+                new ApplicationPageConverter()));
     }
 
     @Override
     public ApplicationPage getApplicationPage(final long applicationPageId) throws ApplicationPageNotFoundException {
         try {
             return new ApplicationPageConverter().convert(getApplicationPageAPIDelegate().getApplicationPage(applicationPageId));
-        } catch (org.bonitasoft.engine.business.application.ApplicationPageNotFoundException e) {
+        } catch (final org.bonitasoft.engine.business.application.ApplicationPageNotFoundException e) {
             throw new ApplicationPageNotFoundException(e.getMessage());
         }
     }
@@ -237,7 +239,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, ApplicationNotFoundException {
         try {
             getApplicationPageAPIDelegate().setApplicationHomePage(applicationId, applicationPageId);
-        } catch (org.bonitasoft.engine.business.application.ApplicationNotFoundException e) {
+        } catch (final org.bonitasoft.engine.business.application.ApplicationNotFoundException e) {
             throw new ApplicationNotFoundException(applicationId);
         }
     }
@@ -246,7 +248,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     public ApplicationPage getApplicationHomePage(final long applicationId) throws ApplicationPageNotFoundException {
         try {
             return new ApplicationPageConverter().convert(getApplicationPageAPIDelegate().getApplicationHomePage(applicationId));
-        } catch (org.bonitasoft.engine.business.application.ApplicationPageNotFoundException e) {
+        } catch (final org.bonitasoft.engine.business.application.ApplicationPageNotFoundException e) {
             throw new ApplicationPageNotFoundException(e.getMessage());
         }
     }
@@ -261,7 +263,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
             UpdateException {
         try {
             return new ApplicationMenuConverter().convert(getApplicationMenuAPIDelegate().updateApplicationMenu(applicationMenuId, updater.getDelegate()));
-        } catch (org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException e) {
+        } catch (final org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException e) {
             throw new ApplicationMenuNotFoundException(e.getMessage());
         }
     }
@@ -270,7 +272,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     public ApplicationMenu getApplicationMenu(final long applicationMenuId) throws ApplicationMenuNotFoundException {
         try {
             return new ApplicationMenuConverter().convert(getApplicationMenuAPIDelegate().getApplicationMenu(applicationMenuId));
-        } catch (org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException e) {
+        } catch (final org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException e) {
             throw new ApplicationMenuNotFoundException(e.getMessage());
         }
     }
@@ -282,9 +284,10 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException {
-        SearchResult<org.bonitasoft.engine.business.application.ApplicationMenu> applicationMenus = getApplicationMenuAPIDelegate(searchOptions)
+        final SearchResult<org.bonitasoft.engine.business.application.ApplicationMenu> applicationMenus = getApplicationMenuAPIDelegate(searchOptions)
                 .searchApplicationMenus();
-        return new SearchResultImpl<ApplicationMenu>(applicationMenus.getCount(), new CollectionConverter().convert(applicationMenus.getResult(), new ApplicationMenuConverter()));
+        return new SearchResultImpl<ApplicationMenu>(applicationMenus.getCount(), new CollectionConverter().convert(applicationMenus.getResult(),
+                new ApplicationMenuConverter()));
     }
 
     @Override

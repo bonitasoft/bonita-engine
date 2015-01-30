@@ -9,9 +9,9 @@
 package com.bonitasoft.engine.page;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
+
+import com.bonitasoft.engine.converter.EnumConverter;
 
 /**
  * @author Laurent Leseigneur
@@ -54,12 +54,7 @@ public class PageUpdater implements Serializable {
     }
 
     public Map<PageUpdateField, Serializable> getFields() {
-        final Map<org.bonitasoft.engine.page.PageUpdater.PageUpdateField, Serializable> superFields = delegate.getFields();
-        final Map<PageUpdateField, Serializable> fields = new HashMap<PageUpdateField, Serializable>(superFields.size());
-        for (final Entry<org.bonitasoft.engine.page.PageUpdater.PageUpdateField, Serializable> entry : superFields.entrySet()) {
-            fields.put(PageUpdateField.valueOf(entry.getKey().name()), entry.getValue());
-        }
-        return fields;
+        return new EnumConverter().convert(delegate.getFields(), PageUpdateField.class);
     }
 
     public org.bonitasoft.engine.page.PageUpdater getDelegate() {

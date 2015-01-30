@@ -45,11 +45,8 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.page.Page;
@@ -214,12 +211,13 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
     private void checkOrCreateCustomPage(final String pageName) throws AlreadyExistsException, CreationException, BonitaException, IOException {
         Page customPage = null;
         try {
-            customPage = getPageAPI().getPageByName(pageName);
+            customPage = getSubscriptionPageAPI().getPageByName(pageName);
         } catch (final PageNotFoundException p) {
             final Map<String, byte[]> map = new HashMap<String, byte[]>();
             map.put("index.html", "return \"\";".getBytes());
             map.put("page.properties", ("name=" + pageName + "\ndisplayName=" + pageName + "\ndescription=description of " + pageName).getBytes());
-            customPage = getPageAPI().createPage(new PageCreator(pageName, "content.zip").setDescription("description").setDisplayName("display name"),
+            customPage = getSubscriptionPageAPI().createPage(
+                    new PageCreator(pageName, "content.zip").setDescription("description").setDisplayName("display name"),
                     IOUtil.zip(map));
         }
         assertThat(customPage).as("custompage %s should exists", pageName).isNotNull();

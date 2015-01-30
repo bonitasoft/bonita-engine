@@ -34,10 +34,10 @@ public class PageAPILocalIT extends CommonAPISPIT {
 
     @After
     public void after() throws BonitaException {
-        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 1000).done());
+        final SearchResult<Page> searchPages = getSubscriptionPageAPI().searchPages(new SearchOptionsBuilder(0, 1000).done());
         for (final Page page : searchPages.getResult()) {
             if (!page.isProvided()) {
-                getPageAPI().deletePage(page.getId());
+                getSubscriptionPageAPI().deletePage(page.getId());
             }
         }
         logoutOnTenant();
@@ -52,8 +52,8 @@ public class PageAPILocalIT extends CommonAPISPIT {
         // engine started
 
         // when
-        final Page pageGroovy = getPageAPI().getPageByName("custompage_groovyexample");
-        final Page pageHtml = getPageAPI().getPageByName("custompage_htmlexample");
+        final Page pageGroovy = getSubscriptionPageAPI().getPageByName("custompage_groovyexample");
+        final Page pageHtml = getSubscriptionPageAPI().getPageByName("custompage_htmlexample");
 
         // then
         assertThat(pageGroovy).isNotNull();

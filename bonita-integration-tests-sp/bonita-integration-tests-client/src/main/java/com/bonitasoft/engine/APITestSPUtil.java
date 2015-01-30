@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
@@ -56,6 +55,7 @@ import org.bonitasoft.engine.test.BuildTestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
@@ -168,7 +168,7 @@ public class APITestSPUtil extends APITestUtil {
         return tenantManagementAPI;
     }
 
-    public ApplicationAPI getApplicationAPI() {
+    public ApplicationAPI getSubscriptionApplicationAPI() {
         return applicationAPI;
     }
 
@@ -218,7 +218,7 @@ public class APITestSPUtil extends APITestUtil {
         this.pageAPI = pageAPI;
     }
 
-    public PageAPI getPageAPI() {
+    public PageAPI getSubscriptionPageAPI() {
         return pageAPI;
     }
 

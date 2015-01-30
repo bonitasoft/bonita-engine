@@ -15,19 +15,9 @@ import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
-import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.SearchResult;
 import org.junit.After;
 import org.junit.Before;
 
-import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPIT;
-import com.bonitasoft.engine.api.ApplicationAPI;
-import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 
@@ -38,6 +28,7 @@ public class TestWithCustomPage extends TestWithApplication {
 
     private Page page;
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -48,12 +39,13 @@ public class TestWithCustomPage extends TestWithApplication {
         }
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         super.tearDown();
         loginOnDefaultTenantWithDefaultTechnicalUser();
         if (page != null) {
-            getPageAPI().deletePage(page.getId());
+            getSubscriptionPageAPI().deletePage(page.getId());
         }
         logoutOnTenant();
     }
@@ -63,7 +55,7 @@ public class TestWithCustomPage extends TestWithApplication {
     }
 
     protected Page createPage(final String pageName) throws Exception {
-        final Page page = getPageAPI().createPage(new PageCreator(pageName, "content.zip").setDisplayName(pageName), createPageContent(pageName));
+        final Page page = getSubscriptionPageAPI().createPage(new PageCreator(pageName, "content.zip").setDisplayName(pageName), createPageContent(pageName));
         return page;
     }
 

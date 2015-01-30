@@ -60,7 +60,7 @@ public class TenantLocalIT extends CommonAPISPIT {
         loginOnTenantWithTechnicalLogger(tenantId);
 
         // when
-        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, EXPECTED_PAGE_SEARCH_RESULT_COUNT).done());
+        final SearchResult<Page> searchPages = getSubscriptionPageAPI().searchPages(new SearchOptionsBuilder(0, EXPECTED_PAGE_SEARCH_RESULT_COUNT).done());
 
         // then
         assertThat(searchPages.getResult()).as("should have:" + EXPECTED_PAGE_SEARCH_RESULT_COUNT + " provided pages on tenantId:" + tenantId).hasSize(

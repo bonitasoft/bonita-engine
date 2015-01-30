@@ -32,9 +32,9 @@ public class TestWithApplication extends CommonAPISPIT {
 
     @After
     public void tearDown() throws Exception {
-        final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(new SearchOptionsBuilder(0, 1000).done());
+        final SearchResult<Application> searchResult = getSubscriptionApplicationAPI().searchApplications(new SearchOptionsBuilder(0, 1000).done());
         for (final Application app : searchResult.getResult()) {
-            getApplicationAPI().deleteApplication(app.getId());
+            getSubscriptionApplicationAPI().deleteApplication(app.getId());
         }
         logoutOnTenant();
         BPMTestSPUtil.deleteUserOnDefaultTenant(user);
