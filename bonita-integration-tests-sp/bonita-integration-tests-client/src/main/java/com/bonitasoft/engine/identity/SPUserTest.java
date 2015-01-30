@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Date;
+import java.util.List;
 
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -21,12 +22,16 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.Test;
 
 import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.LoginAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.platform.Tenant;
+import com.bonitasoft.engine.platform.TenantCriterion;
 
 /**
  * @author Matthieu Chaffotte
@@ -34,11 +39,21 @@ import com.bonitasoft.engine.api.TenantAPIAccessor;
 public class SPUserTest extends CommonAPISPIT {
 
     @Test(expected = LoginException.class)
-    public void loginFailsUsingWrongTenant() throws BonitaException {
+    public void loginFailsUsingWrongTenant() throws LoginException, BonitaException {
         final String userName = "install";
         final String password = "install";
-        final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
-        loginTenant.login(2, userName, password);
+        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+
+        // in case we don't have the expected exception (to track down the problem):
+        final APISession session = loginAPI.login(2, userName, password);
+        System.out
+                .println("################### Erroneous successful login on tenant with id " + session.getTenantId() + " and name " + session.getTenantName());
+        loginAPI.logout(session);
+        final PlatformSession platformSession = loginOnPlatform();
+        final List<Tenant> tenants = PlatformAPIAccessor.getPlatformAPI(platformSession).getTenants(0, 100, TenantCriterion.CREATION_DESC);
+        for (final Tenant tenant : tenants) {
+            System.out.println("========================== " + tenant.toString());
+        }
     }
 
     @Test(expected = LoginException.class)
