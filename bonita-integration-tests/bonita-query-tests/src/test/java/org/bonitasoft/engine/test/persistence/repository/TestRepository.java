@@ -35,6 +35,8 @@ import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
 import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
+import org.bonitasoft.engine.page.SPageWithContent;
+import org.bonitasoft.engine.page.impl.SPageWithContentImpl;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
@@ -197,6 +199,15 @@ public class TestRepository {
     public SADataInstance add(final SADataInstanceImpl dataInstance) {
         getSession().save(dataInstance);
         return (SADataInstance) getSession().get(dataInstance.getClass(), new PersistentObjectId(dataInstance.getId(), dataInstance.getTenantId()));
+    }
+
+    /**
+     * Need to replicate add method for each object because we don't have any superclass or interface providing getTenantId method
+     */
+    public SPageWithContent add(final SPageWithContentImpl sPageWithContentImpl) {
+        getSession().save(sPageWithContentImpl);
+        return (SPageWithContentImpl) getSession().get(sPageWithContentImpl.getClass(),
+                new PersistentObjectId(sPageWithContentImpl.getId(), sPageWithContentImpl.getTenantId()));
     }
 
 }
