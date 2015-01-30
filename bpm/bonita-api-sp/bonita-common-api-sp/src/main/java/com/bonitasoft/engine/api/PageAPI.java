@@ -40,7 +40,9 @@ import com.bonitasoft.engine.page.PageUpdater;
  *
  * @author Laurent Leseigneur
  * @see Page
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.api.PageAPI} instead.
  */
+@Deprecated
 public interface PageAPI {
 
     /**

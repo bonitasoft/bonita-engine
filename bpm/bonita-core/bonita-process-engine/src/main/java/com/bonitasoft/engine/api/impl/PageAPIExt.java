@@ -11,6 +11,7 @@ package com.bonitasoft.engine.api.impl;
 import java.util.List;
 import java.util.Properties;
 
+import org.bonitasoft.engine.api.impl.PageAPIImpl;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.api.impl.page.PageAPIDelegate;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -43,6 +44,11 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
+/**
+ * @author Emmanuel Duchastenier
+ * @deprecated from version 7.0 on, use {@link PageAPIImpl} instead.
+ */
+@Deprecated
 @AvailableWhenTenantIsPaused
 public class PageAPIExt implements PageAPI {
 

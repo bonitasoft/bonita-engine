@@ -13,7 +13,9 @@ import com.bonitasoft.engine.business.application.ApplicationPage;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @deprecated this class is only intended to convert BOS to SP model objects during the time the SP API is kept as deprecated, and must be deleted after that.
  */
+@Deprecated
 public class ApplicationPageConverter implements Converter<org.bonitasoft.engine.business.application.ApplicationPage, ApplicationPage> {
 
     @Override

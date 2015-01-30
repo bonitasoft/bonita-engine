@@ -76,15 +76,19 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
      *
      * @return
      * @since 6.3
+     * @deprecated from version 7.0 on, use {@link #getPageAPICommunity()} instead.
      */
+    @Deprecated
     PageAPI getPageAPI();
 
     /**
      * Gives access to {@link ApplicationAPI}
-     * 
+     *
      * @return
      * @since 6.4
+     * @deprecated from version 7.0 on, use {@link #getApplicationAPICommunity()} instead.
      */
+    @Deprecated
     ApplicationAPI getApplicationAPI();
 
 }

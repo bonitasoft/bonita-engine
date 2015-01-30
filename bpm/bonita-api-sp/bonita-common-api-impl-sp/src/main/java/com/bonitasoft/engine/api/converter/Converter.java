@@ -11,8 +11,8 @@ package com.bonitasoft.engine.api.converter;
 /**
  * @author Emmanuel Duchastenier
  */
-public interface Converter<S, D> {
+public interface Converter<SOURCE, DESTINATION> {
 
-    D convert(S toConvert);
+    DESTINATION convert(SOURCE toConvert);
 
 }

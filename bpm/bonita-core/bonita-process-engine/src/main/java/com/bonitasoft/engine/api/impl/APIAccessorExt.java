@@ -83,11 +83,19 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
         return new ThemeAPIExt();
     }
 
+    /**
+     * @deprecated from version 7.0 on, use {@link #getPageAPICommunity()} instead.
+     */
+    @Deprecated
     @Override
     public PageAPI getPageAPI() {
         return new PageAPIExt();
     }
 
+    /**
+     * @deprecated from version 7.0 on, use {@link #getApplicationAPICommunity()} instead.
+     */
+    @Deprecated
     @Override
     public ApplicationAPI getApplicationAPI() {
         return new ApplicationAPIImpl();

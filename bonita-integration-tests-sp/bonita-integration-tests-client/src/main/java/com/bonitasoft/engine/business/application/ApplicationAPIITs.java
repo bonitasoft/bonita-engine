@@ -26,5 +26,6 @@ import com.bonitasoft.engine.TestsInitializerSP;
         ApplicationAPIImportExportIT.class
 })
 @Initializer(TestsInitializerSP.class)
+@Deprecated
 public class ApplicationAPIITs {
 }

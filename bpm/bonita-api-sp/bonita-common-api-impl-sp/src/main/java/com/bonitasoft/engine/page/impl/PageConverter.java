@@ -8,12 +8,15 @@
  *******************************************************************************/
 package com.bonitasoft.engine.page.impl;
 
-import com.bonitasoft.engine.api.converter.Converter;
 import org.bonitasoft.engine.page.Page;
+
+import com.bonitasoft.engine.api.converter.Converter;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @deprecated this class is only intended to convert BOS to SP model objects during the time the SP API is kept as deprecated, and must be deleted after that.
  */
+@Deprecated
 public class PageConverter implements Converter<Page, com.bonitasoft.engine.page.Page> {
 
     @Override

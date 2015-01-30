@@ -39,7 +39,9 @@ import com.bonitasoft.engine.business.application.ApplicationUpdater;
  * @author Elias Ricken de Medeiros
  * @see Application
  * @since 6.4
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.api.ApplicationAPI} instead.
  */
+@Deprecated
 public interface ApplicationAPI {
 
     /**

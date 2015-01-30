@@ -51,6 +51,7 @@ import com.bonitasoft.engine.profile.ProfileEntryCreator;
 import com.bonitasoft.engine.profile.ProfileEntryType;
 
 @SuppressWarnings("javadoc")
+@Deprecated
 public class PageAPIIT extends CommonAPISPIT {
 
     @Rule

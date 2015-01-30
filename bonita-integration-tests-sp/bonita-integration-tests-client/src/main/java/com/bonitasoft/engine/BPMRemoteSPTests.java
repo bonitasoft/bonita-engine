@@ -35,8 +35,10 @@ import com.bonitasoft.engine.tenant.TenantIT;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
+        // When removing this 2 test suites, maybe include BOS version instead:
         PageAPIIT.class,
         ApplicationAPIITs.class,
+
         TenantIT.class,
         NodeAPITest.class,
         LogTest.class,
