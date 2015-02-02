@@ -27,7 +27,7 @@ public class ApplicationMenuUpdater implements Serializable {
     /**
      * Retrieves all fields to be updated
      *
-     * @return a {@link Map}<{@link ApplicationMenuField}, {@link Serializable}> containing all fields to be updated
+     * @return a {@link Map}&lt;{@link ApplicationMenuField}, {@link Serializable}&gt; containing all fields to be updated
      * @see ApplicationMenuField
      */
     public Map<ApplicationMenuField, Serializable> getFields() {

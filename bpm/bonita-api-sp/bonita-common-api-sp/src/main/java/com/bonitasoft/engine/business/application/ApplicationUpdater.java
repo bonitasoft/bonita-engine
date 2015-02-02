@@ -36,7 +36,7 @@ public class ApplicationUpdater implements Serializable {
     /**
      * Retrieves all fields to be updated
      *
-     * @return a {@link Map}<{@link ApplicationField}, {@link Serializable}> containing all fields to be updated
+     * @return a {@link Map}&lt;{@link ApplicationField}, {@link Serializable}&gt; containing all fields to be updated
      * @see ApplicationField
      */
     public Map<ApplicationField, Serializable> getFields() {
