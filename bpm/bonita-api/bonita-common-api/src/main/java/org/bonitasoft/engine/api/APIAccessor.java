@@ -71,12 +71,12 @@ public interface APIAccessor extends Serializable {
      *
      * @return an <code>PageAPI</code>
      */
-    PageAPI getPageAPICommunity();
+    PageAPI getCustomPageAPI();
 
     /**
      * Gives access to the <code>ApplicationAPI</code>
      *
      * @return an <code>ApplicationAPI</code>
      */
-    ApplicationAPI getApplicationAPICommunity();
+    ApplicationAPI getLivingApplicationAPI();
 }

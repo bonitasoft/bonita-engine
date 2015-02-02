@@ -78,7 +78,7 @@ public class APIAccessorImplTest {
     @Test
     public void getPageAPI_should_return_the_default_implementation() throws SBonitaException {
         initAPIAccessor();
-        final org.bonitasoft.engine.api.PageAPI pageAPI = apiAccessor.getPageAPICommunity();
+        final org.bonitasoft.engine.api.PageAPI pageAPI = apiAccessor.getCustomPageAPI();
 
         assertThat(pageAPI).isNotNull().isExactlyInstanceOf(PageAPIImpl.class);
     }
@@ -86,7 +86,7 @@ public class APIAccessorImplTest {
     @Test
     public void getApplicationAPI_should_return_the_default_implementation() throws SBonitaException {
         initAPIAccessor();
-        final ApplicationAPI applicationAPI = apiAccessor.getApplicationAPICommunity();
+        final ApplicationAPI applicationAPI = apiAccessor.getLivingApplicationAPI();
 
         assertThat(applicationAPI).isNotNull().isExactlyInstanceOf(ApplicationAPIImpl.class);
     }

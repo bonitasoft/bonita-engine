@@ -220,8 +220,8 @@ public class APITestUtil extends PlatformTestUtil {
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
-        setPageAPI(TenantAPIAccessor.getPageAPI(getSession()));
-        applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
+        setPageAPI(TenantAPIAccessor.getCustomPageAPI(getSession()));
+        applicationAPI = TenantAPIAccessor.getLivingApplicationAPI(getSession());
     }
 
     public void logoutOnTenant() throws BonitaException {
