@@ -56,16 +56,9 @@
                         <type>link</type>
                         <page>caselistingadmin</page>
                     </profileEntry>
-                    <profileEntry name="Processes" isCustom="false">
-                        <parentName>BPM</parentName>
-                        <index>6</index>
-                        <description>All processes</description>
-                        <type>link</type>
-                        <page>processlistingadmin</page>
-                    </profileEntry>
 		            <profileEntry name="Analytics" isCustom="false">
 		                <parentName>BPM</parentName>
-		                <index>8</index>
+		                <index>6</index>
 		                <description>Monitoring</description>
 		                <type>link</type>
 		                <page>reportlistingadminext</page>
