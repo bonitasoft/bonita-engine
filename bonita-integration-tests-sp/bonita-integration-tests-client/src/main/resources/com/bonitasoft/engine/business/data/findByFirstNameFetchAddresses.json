@@ -4,6 +4,7 @@
     "persistenceVersion": 0,
     "firstName": "Alphonse",
     "lastName": "Dupond",
+    "hireDate":"123456789",
     "phoneNumbers": ["123456789"],
     "addresses": [
       {

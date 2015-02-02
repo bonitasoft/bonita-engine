@@ -18,12 +18,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
+import org.bonitasoft.engine.commons.TypeConverterUtil;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
 
+import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
@@ -36,19 +37,23 @@ import com.bonitasoft.engine.business.data.BusinessDataService;
 import com.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import com.toddfast.util.convert.TypeConverter;
 
 public class BusinessDataServiceImpl implements BusinessDataService {
 
     private final BusinessDataRepository businessDataRepository;
+
     private final JsonBusinessDataSerializer jsonBusinessDataSerializer;
+
     private final BusinessDataModelRepository businessDataModelRepository;
 
+    private final TypeConverterUtil typeConverterUtil;
+
     public BusinessDataServiceImpl(final BusinessDataRepository businessDataRepository, final JsonBusinessDataSerializer jsonBusinessDataSerializer,
-            BusinessDataModelRepository businessDataModelRepository) {
+            BusinessDataModelRepository businessDataModelRepository, TypeConverterUtil typeConverterUtil) {
         this.businessDataRepository = businessDataRepository;
         this.jsonBusinessDataSerializer = jsonBusinessDataSerializer;
         this.businessDataModelRepository = businessDataModelRepository;
+        this.typeConverterUtil = typeConverterUtil;
     }
 
     @Override
@@ -222,7 +227,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     private Set<Class<? extends Annotation>> getAnnotationKeySet() {
-        //FIXME use custom annotation on methods
+        // FIXME use custom annotation on methods
         final Set<Class<? extends Annotation>> annotationKeySet = new HashSet<Class<? extends Annotation>>();
         annotationKeySet.add(OneToOne.class);
         annotationKeySet.add(OneToMany.class);
@@ -329,8 +334,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         for (QueryParameter queryParameter : queryDefinition.getQueryParameters()) {
             if (parameters != null && parameters.containsKey(queryParameter.getName())) {
                 queryParameters.put(queryParameter.getName(),
-                        TypeConverter.convert(loadSerializableClass(queryParameter.getClassName()),
-                                parameters.get(queryParameter.getName())));
+                        convertToType(loadSerializableClass(queryParameter.getClassName()), parameters.get(queryParameter.getName())));
             } else {
                 errors.add(queryParameter.getName());
             }
@@ -342,6 +346,10 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             throw new SBusinessDataRepositoryException(errorMessage.toString());
         }
         return queryParameters;
+    }
+
+    private Serializable convertToType(Class<? extends Serializable> clazz, Serializable parameterValue) {
+        return (Serializable) typeConverterUtil.convertToType(clazz, parameterValue);
     }
 
     private Query getQueryDefinition(String className, String queryName) throws SBusinessDataRepositoryException {

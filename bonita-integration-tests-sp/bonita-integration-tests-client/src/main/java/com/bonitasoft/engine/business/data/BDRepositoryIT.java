@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,20 +87,31 @@ import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 public class BDRepositoryIT extends CommonAPISPIT {
 
     private static final String COUNTRY_QUALIF_NAME = "org.bonita.pojo.Country";
+
     private static final String ADDRESS_QUALIF_NAME = "org.bonita.pojo.Address";
+
     private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.Employee";
 
     private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "findByLastName";
+
     private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
+
     private static final String FIND_BY_FIRST_NAME_FETCH_ADDRESSES = "findByFirstNameFetchAddresses";
+
     private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
+
     private static final String COUNT_EMPLOYEE = "countEmployee";
 
     private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
+
     public static final String BUSINESS_DATA_CLASS_NAME_ID_FIELD = "/businessdata/{className}/{id}/{field}";
+
     public static final String ENTITY_CLASS_NAME = "entityClassName";
 
+    public static final String FIND_BY_HIRE_DATE_RANGE = "findByHireDateRange";
+
     private User matti;
+
     private File clientFolder;
 
     private BusinessObjectModel buildBOM() {
@@ -165,8 +177,13 @@ public class BDRepositoryIT extends CommonAPISPIT {
         phoneNumbers.setLength(Integer.valueOf(10));
         phoneNumbers.setCollection(Boolean.TRUE);
 
+        final SimpleField hireDate = new SimpleField();
+        hireDate.setName("hireDate");
+        hireDate.setType(FieldType.DATE);
+
         final BusinessObject employee = new BusinessObject();
         employee.setQualifiedName(EMPLOYEE_QUALIF_CLASSNAME);
+        employee.addField(hireDate);
         employee.addField(firstName);
         employee.addField(lastName);
         employee.addField(phoneNumbers);
@@ -176,17 +193,22 @@ public class BDRepositoryIT extends CommonAPISPIT {
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
         final Query getEmployeeByPhoneNumber = employee.addQuery(GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME,
-                "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)",  List.class.getName());
+                "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)", List.class.getName());
         getEmployeeByPhoneNumber.addQueryParameter("phoneNumber", String.class.getName());
 
         final Query findByFirstNAmeAndLastNameNewOrder = employee.addQuery(FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER,
-                "SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName = :lastName ORDER BY e.lastName",  List.class.getName());
+                "SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName = :lastName ORDER BY e.lastName", List.class.getName());
         findByFirstNAmeAndLastNameNewOrder.addQueryParameter("firstName", String.class.getName());
         findByFirstNAmeAndLastNameNewOrder.addQueryParameter("lastName", String.class.getName());
 
         final Query findByFirstNameFetchAddresses = employee.addQuery(FIND_BY_FIRST_NAME_FETCH_ADDRESSES,
-                "SELECT e FROM Employee e INNER JOIN FETCH e.addresses WHERE e.firstName =:firstName ORDER BY e.lastName",  List.class.getName());
+                "SELECT e FROM Employee e INNER JOIN FETCH e.addresses WHERE e.firstName =:firstName ORDER BY e.lastName", List.class.getName());
         findByFirstNameFetchAddresses.addQueryParameter("firstName", String.class.getName());
+
+        final Query findByHireDate = employee.addQuery(FIND_BY_HIRE_DATE_RANGE,
+                "SELECT e FROM Employee e WHERE e.hireDate >=:date1 and e.hireDate <=:date2", List.class.getName());
+        findByHireDate.addQueryParameter("date1", Date.class.getName());
+        findByHireDate.addQueryParameter("date2", Date.class.getName());
 
         employee.addQuery(COUNT_EMPLOYEE, "SELECT COUNT(e) FROM Employee e", Long.class.getName());
 
@@ -194,6 +216,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         final BusinessObject person = new BusinessObject();
         person.setQualifiedName("org.bonitasoft.pojo.Person");
+        person.addField(hireDate);
         person.addField(firstName);
         person.addField(lastName);
         person.addField(phoneNumbers);
@@ -857,7 +880,9 @@ public class BDRepositoryIT extends CommonAPISPIT {
     class AddressRef {
 
         private final String varName;
+
         private final String street;
+
         private final String city;
 
         AddressRef(final String varName, final String street, final String city) {
@@ -1154,6 +1179,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessDefinitionBuilderExt processDefinitionBuilder;
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; import org.bonita.pojo.Address; Employee e = new Employee(); e.firstName = 'Alphonse';"
+                + " e.hireDate=new Date(1422742559000L); "
                 + " e.lastName = 'Dupond'; e.addToPhoneNumbers('123456789'); e.setAddress(myAddress);e.addToAddresses(myAddress); return e;",
                 EMPLOYEE_QUALIF_CLASSNAME,
                 new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME));
@@ -1193,7 +1219,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         verifyCommandGetQuery_getEmployeeByPhoneNumber();
         verifyCommandGetQuery_findByFirstNameFetchAddresses();
         verifyCommandGetQuery_countEmployee();
-
+        verifyCommandGetQuery_findByHireDate();
 
         disableAndDeleteProcess(processDefinition.getId());
     }
@@ -1205,18 +1231,18 @@ public class BDRepositoryIT extends CommonAPISPIT {
         parameters.put("businessDataChildName", "address");
         parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
 
-        //when
+        // when
         final String lazyAddressResultWithChildName = (String) getCommandAPI().execute("getBusinessDataById", parameters);
 
-        //then
+        // then
         assertThatJson(lazyAddressResultWithChildName).as("should get address with lazy link to country")
                 .hasSameStructureAs(getJsonContent("getBusinessDataByIdAddress.json"));
 
-        //when
+        // when
         parameters.remove("businessDataChildName");
         final String employeeResultWithAddress = (String) getCommandAPI().execute("getBusinessDataById", parameters);
 
-        //then
+        // then
         assertThatJson(employeeResultWithAddress).as("should get employee with lazy link to country in addresses")
                 .hasSameStructureAs(getJsonContent("getBusinessDataByIdEmployee.json"));
 
@@ -1236,10 +1262,10 @@ public class BDRepositoryIT extends CommonAPISPIT {
         parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
         parameters.put("queryParameters", (Serializable) queryParameters);
 
-        //when
+        // when
         final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
-        //then
+        // then
         assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameAndLastNameNewOrder.json"));
 
     }
@@ -1257,10 +1283,10 @@ public class BDRepositoryIT extends CommonAPISPIT {
         parameters.put("businessDataURIPattern", BUSINESS_DATA_CLASS_NAME_ID_FIELD);
         parameters.put("queryParameters", (Serializable) queryParameters);
 
-        //when
+        // when
         final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
-        //then
+        // then
         assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("getEmployeeByPhoneNumber.json"));
 
     }
@@ -1278,33 +1304,51 @@ public class BDRepositoryIT extends CommonAPISPIT {
         parameters.put("businessDataURIPattern", BUSINESS_DATA_CLASS_NAME_ID_FIELD);
         parameters.put("queryParameters", (Serializable) queryParameters);
 
-        //when
+        // when
         final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
-        //then
+        // then
         assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByFirstNameFetchAddresses.json"));
 
     }
 
     private void verifyCommandGetQuery_countEmployee() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        //Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
 
         parameters.put("queryName", COUNT_EMPLOYEE);
         parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put("startIndex", 0);
         parameters.put("maxResults", 10);
         parameters.put("businessDataURIPattern", BUSINESS_DATA_CLASS_NAME_ID_FIELD);
-        //parameters.put("queryParameters", null);
 
-        //when
+        // when
         final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
-        //then
+        // then
         assertThatJson(jsonResult).as("should get employee count ").isEqualTo(getJsonContent("countEmployee.json"));
 
     }
 
+    private void verifyCommandGetQuery_findByHireDate() throws Exception {
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        queryParameters.put("date1","1930-01-15");
+        queryParameters.put("date2","2050-12-31" );
+
+        parameters.put("queryName", FIND_BY_HIRE_DATE_RANGE);
+        parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put("startIndex", 0);
+        parameters.put("maxResults", 10);
+        parameters.put("businessDataURIPattern", BUSINESS_DATA_CLASS_NAME_ID_FIELD);
+        parameters.put("queryParameters", (Serializable) queryParameters);
+
+        // when
+        final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
+
+        // then
+        assertThatJson(jsonResult).as("should get employee").hasSameStructureAs(getJsonContent("findByHireDate.json"));
+
+    }
 
     private String getJsonContent(String jsonFileName) throws IOException {
         final String json;

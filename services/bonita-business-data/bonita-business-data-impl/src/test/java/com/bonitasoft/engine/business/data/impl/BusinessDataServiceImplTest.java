@@ -19,6 +19,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.bonitasoft.engine.commons.TypeConverterUtil;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -178,9 +179,13 @@ public class BusinessDataServiceImplTest {
     @Mock
     BusinessDataModelRepository businessDataModelRepository;
 
+    private TypeConverterUtil typeConverterUtil;
+
     @Before
     public void before() throws Exception {
-        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository));
+        String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss.SSS" };
+        typeConverterUtil=new TypeConverterUtil(datePatterns);
+        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository,typeConverterUtil ));
     }
 
     @Test
