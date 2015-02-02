@@ -63,13 +63,13 @@
                         <type>link</type>
                         <page>processlistingadmin</page>
                     </profileEntry>
-		            <parentProfileEntry name="Analytics" isCustom="false">
+		            <profileEntry name="Analytics" isCustom="false">
 		                <parentName>BPM</parentName>
 		                <index>8</index>
 		                <description>Monitoring</description>
 		                <type>link</type>
 		                <page>reportlistingadminext</page>
-		            </parentProfileEntry>
+		            </profileEntry>
                 </childrenEntries>
             </parentProfileEntry>
             <parentProfileEntry name="Organization" isCustom="false">
