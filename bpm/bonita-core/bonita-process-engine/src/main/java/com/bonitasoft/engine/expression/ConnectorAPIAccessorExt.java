@@ -102,11 +102,19 @@ public class ConnectorAPIAccessorExt extends ConnectorAPIAccessorImpl implements
         return getAPI(ThemeAPI.class, getAPISession());
     }
 
+    /**
+     * @deprecated from version 7.0 on, use {@link #getCustomPageAPI()} instead.
+     */
+    @Deprecated
     @Override
     public PageAPI getPageAPI() {
         return getAPI(PageAPI.class, getAPISession());
     }
 
+    /**
+     * @deprecated from version 7.0 on, use {@link #getLivingApplicationAPI()} instead.
+     */
+    @Deprecated
     @Override
     public ApplicationAPI getApplicationAPI() {
         return getAPI(ApplicationAPI.class, getAPISession());

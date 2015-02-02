@@ -84,7 +84,7 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
     }
 
     /**
-     * @deprecated from version 7.0 on, use {@link #getPageAPICommunity()} instead.
+     * @deprecated from version 7.0 on, use {@link #getCustomPageAPI()} instead.
      */
     @Deprecated
     @Override
@@ -93,7 +93,7 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
     }
 
     /**
-     * @deprecated from version 7.0 on, use {@link #getApplicationAPICommunity()} instead.
+     * @deprecated from version 7.0 on, use {@link #getLivingApplicationAPI()} instead.
      */
     @Deprecated
     @Override
