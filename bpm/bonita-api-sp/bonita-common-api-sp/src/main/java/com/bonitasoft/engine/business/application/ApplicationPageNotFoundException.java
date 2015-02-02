@@ -10,7 +10,10 @@ package com.bonitasoft.engine.business.application;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @see org.bonitasoft.engine.business.application.ApplicationPageNotFoundException
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationPageNotFoundException} instead.
  */
+@Deprecated
 public class ApplicationPageNotFoundException extends org.bonitasoft.engine.business.application.ApplicationPageNotFoundException {
 
     private static final long serialVersionUID = -5011088434149162619L;

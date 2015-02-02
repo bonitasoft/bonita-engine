@@ -10,7 +10,12 @@ package com.bonitasoft.engine.business.application;
 
 /**
  * @author Elias Ricken de Medeiros
+ *
+ * @see org.bonitasoft.engine.business.application.ApplicationNotFoundException
+ *
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationNotFoundException} instead.
  */
+@Deprecated
 public class ApplicationNotFoundException extends org.bonitasoft.engine.business.application.ApplicationNotFoundException {
 
     private static final long serialVersionUID = -4073233652785845623L;

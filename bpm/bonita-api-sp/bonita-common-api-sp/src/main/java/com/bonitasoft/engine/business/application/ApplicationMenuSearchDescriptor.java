@@ -17,54 +17,15 @@ import com.bonitasoft.engine.api.ApplicationAPI;
  *
  * @author Elias Ricken de Medeiros
  * @since 6.4
+ *
  * @see SearchOptions
  * @see ApplicationMenu
  * @see ApplicationAPI#searchApplicationMenus(SearchOptions)
+ * @see org.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor
+ *
+ *  @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor} instead.
  */
-public class ApplicationMenuSearchDescriptor {
-
-    /**
-     * Used to filter or order by {@link ApplicationMenu} identifier
-     *
-     * @see ApplicationMenu
-     */
-    public static final String ID = "id";
-
-    /**
-     * Used to filter or order by {@link ApplicationMenu} display name
-     *
-     * @see ApplicationMenu
-     */
-    public static final String DISPLAY_NAME = "displayName";
-
-    /**
-     * Used to filter or order by the identifier of {@link ApplicationPage} related to the {@link ApplicationMenu}
-     *
-     * @see ApplicationMenu
-     * @see ApplicationPage
-     */
-    public static final String APPLICATION_PAGE_ID = "applicationPageId";
-
-    /**
-     * Used to filter or order by the identifier of {@link Application} containing the {@link ApplicationMenu}
-     *
-     * @see ApplicationMenu
-     * @see Application
-     */
-    public static final String APPLICATION_ID = "applicationId";
-
-    /**
-     * Used to filter or order by {@link ApplicationMenu} index
-     *
-     * @see ApplicationMenu
-     */
-    public static final String INDEX = "index";
-
-    /**
-     * Used to filter or order by the identifier of parent {@link ApplicationMenu}
-     *
-     * @see ApplicationMenu
-     */
-    public static final String PARENT_ID = "parentId";
+@Deprecated
+public class ApplicationMenuSearchDescriptor extends org.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor {
 
 }
