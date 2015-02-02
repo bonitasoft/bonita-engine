@@ -80,7 +80,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     private final TechnicalLoggerService logger;
 
     public GatewayInstanceServiceImpl(final Recorder recorder, final EventService eventService, final ReadPersistenceService persistenceRead,
-            final TechnicalLoggerService logger, final TokenService tokenService, FlowNodeInstanceService flowNodeInstanceService) {
+                                      final TechnicalLoggerService logger, final TokenService tokenService, FlowNodeInstanceService flowNodeInstanceService) {
         this.recorder = recorder;
         this.eventService = eventService;
         this.persistenceRead = persistenceRead;
@@ -176,9 +176,9 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         List<STransitionDefinition> incomingWithoutTokens = new ArrayList<STransitionDefinition>();
         List<STransitionDefinition> incomingTransitions = gatewayDefinition.getIncomingTransitions();
 
-        logger.log(TAG, TechnicalLogSeverity.DEBUG, "HitBys = "+gatewayInstance.getHitBys());
+        logger.log(TAG, TechnicalLogSeverity.DEBUG, "HitBys = " + gatewayInstance.getHitBys());
         for (int i = 0; i < incomingTransitions.size(); i++) {
-            if (hitByTransitionList.contains(String.valueOf(i+1))) {
+            if (hitByTransitionList.contains(String.valueOf(i + 1))) {
                 incomingWithTokens.add(incomingTransitions.get(i));
             } else {
                 incomingWithoutTokens.add(incomingTransitions.get(i));
@@ -192,7 +192,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         List<STransitionDefinition> green = new ArrayList<STransitionDefinition>();
         //        while there exist edges e = (v1, v2) ∈ Red and e0 = (v3, v4) < Red such that v4 = v1 , A do
         //            Red := Red ∪{e
-        addBackwardReachableTransitions(processContainer, gatewayDefinition, incomingWithTokens, red, Collections.<STransitionDefinition> emptyList());
+        addBackwardReachableTransitions(processContainer, gatewayDefinition, incomingWithTokens, red, Collections.<STransitionDefinition>emptyList());
 
         //            Green := {e | e is an incoming edge of A such that s(e) = 0}
         //            while there exist an edge e = (v1, v2) ∈ Green and e0 = (v3, v4) < (Green ∪ Red) such that
@@ -210,7 +210,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     private boolean greenContainsToken(List<STransitionDefinition> green, SFlowNodeDefinition gatewayDefinition, SGatewayInstance gatewayInstance,
-            SFlowElementContainerDefinition processContainer) throws SBonitaReadException {
+                                       SFlowElementContainerDefinition processContainer) throws SBonitaReadException {
         List<SFlowNodeDefinition> sourceElements = new ArrayList<SFlowNodeDefinition>();
         List<SFlowNodeDefinition> targetElements = new ArrayList<SFlowNodeDefinition>();
 
@@ -229,7 +229,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             List<FilterOption> filters = new ArrayList<FilterOption>();
             filters.add(new FilterOption(SFlowNodeInstance.class, "name", sourceElement.getName()));
             filters.add(new FilterOption(SFlowNodeInstance.class, "parentContainerId", gatewayInstance.getParentContainerId()));
-            QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption> emptyList(), filters, null);
+            QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption>emptyList(), filters, null);
             List<SFlowNodeInstance> sFlowNodeInstances = flowNodeInstanceService.searchFlowNodeInstances(
                     SFlowNodeInstance.class,
                     searchOptions);
@@ -246,7 +246,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             List<FilterOption> filters = new ArrayList<FilterOption>();
             filters.add(new FilterOption(SFlowNodeInstance.class, "name", targetElement.getName()));
             filters.add(new FilterOption(SFlowNodeInstance.class, "parentContainerId", gatewayInstance.getParentContainerId()));
-            QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption> emptyList(), filters, null);
+            QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption>emptyList(), filters, null);
             List<SFlowNodeInstance> sFlowNodeInstances = flowNodeInstanceService.searchFlowNodeInstances(
                     SFlowNodeInstance.class,
                     searchOptions);
@@ -263,7 +263,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     private void addBackwardReachableTransitions(SFlowElementContainerDefinition processContainer, SFlowNodeDefinition gatewayDefinition,
-            List<STransitionDefinition> transitions, List<STransitionDefinition> backwardReachable, List<STransitionDefinition> notIn) {
+                                                 List<STransitionDefinition> transitions, List<STransitionDefinition> backwardReachable, List<STransitionDefinition> notIn) {
         for (STransitionDefinition sTransitionDefinition : transitions) {
             if (!backwardReachable.contains(sTransitionDefinition) && !notIn.contains(sTransitionDefinition)) {
                 backwardReachable.add(sTransitionDefinition);
@@ -288,8 +288,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     /**
-     * @return
-     *         the list of transition indexes that hit the gateway
+     * @return the list of transition indexes that hit the gateway
      */
     private List<String> getHitByTransitionList(final SGatewayInstance gatewayInstance) {
         return Arrays.asList(gatewayInstance.getHitBys().split(","));
@@ -357,6 +356,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     @Override
     public void setFinish(final SGatewayInstance gatewayInstance) throws SGatewayModificationException {
         final String columnValue = FINISH + gatewayInstance.getHitBys().split(",").length;
+        logger.log(TAG, TechnicalLogSeverity.TRACE, "set finish on gateway " + gatewayInstance.getName() + " " + columnValue);
         updateOneColum(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
 
