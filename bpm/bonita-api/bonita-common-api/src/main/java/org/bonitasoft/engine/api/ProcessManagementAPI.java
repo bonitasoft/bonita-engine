@@ -35,6 +35,8 @@ import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
+import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
+import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.Problem;
@@ -51,6 +53,8 @@ import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -1722,7 +1726,7 @@ public interface ProcessManagementAPI {
      * @param maxResults
      *        The list of users
      * @return The list of users.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @throws RetrieveException
      *         If an exception occurs while retrieving the users
@@ -1758,5 +1762,52 @@ public interface ProcessManagementAPI {
      * @since 6.4.0
      */
     void purgeClassLoader(long processDefinitionId) throws ProcessDefinitionNotFoundException, UpdateException;
+
+
+    /**
+     * Gets how many parameters the process definition contains.
+     *
+     * @param processDefinitionId
+     *            The identifier of the processDefinition
+     * @return The number of parameters of a process definition
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @since 7.0
+     */
+    int getNumberOfParameterInstances(long processDefinitionId);
+
+    /**
+     * Get a parameter instance by process definition UUID
+     *
+     * @param processDefinitionId
+     *            The identifier of the processDefinition
+     * @param parameterName
+     *            The parameter name for get ParameterInstance
+     * @return The ParameterInstance of the process with processDefinitionUUID and name parameterName
+     * @throws org.bonitasoft.engine.exception.NotFoundException
+     *             Error thrown if the given parameter is not found.
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @since 7.0
+     */
+    ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws NotFoundException;
+
+    /**
+     * Returns the parameters of a process definition or an empty map if the process does not contain any parameter.
+     *
+     * @param processDefinitionId
+     *            The identifier of the processDefinition
+     * @param startIndex
+     *            The index of the page to be returned. First page has index 0.
+     * @param maxResults
+     *            The number of result per page. Maximum number of result returned.
+     * @param sort
+     *            The criterion to sort the result
+     * @return The ordered list of parameter instances
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @since 7.0
+     */
+    List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort);
 
 }

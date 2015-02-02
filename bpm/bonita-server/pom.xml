@@ -271,7 +271,14 @@
 			<artifactId>bonita-page-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
+		<!-- Parameter -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-parameter-propertyfile</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Persistence -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
@@ -643,6 +650,9 @@
 									<!-- Page -->
 									<include>org.bonitasoft.engine.page:bonita-page-api</include>
 									<include>org.bonitasoft.engine.page:bonita-page-impl</include>
+									<!-- Parameter -->
+									<include>org.bonitasoft.engine.core:bonita-parameter-api</include>
+									<include>org.bonitasoft.engine.core:bonita-parameter-propertyfile</include>
 									<!-- Persistence -->
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-api</include>
 									<include>org.bonitasoft.engine.persistence:bonita-persistence-db</include>

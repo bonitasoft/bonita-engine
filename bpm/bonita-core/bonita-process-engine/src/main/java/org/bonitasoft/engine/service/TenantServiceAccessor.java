@@ -58,6 +58,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -221,6 +222,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     TimeTracker getTimeTracker();
 
     PermissionService getPermissionService();
+
+    ParameterService getParameterService();
 
     PageService getPageService();
 
