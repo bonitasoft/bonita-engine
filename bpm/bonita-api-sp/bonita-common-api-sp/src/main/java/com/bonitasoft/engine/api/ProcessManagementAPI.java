@@ -36,20 +36,8 @@ import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessManagementAPI {
 
     /**
-     * Gets how many parameters the process definition contains.
-     * 
-     * @param processDefinitionId
-     *            The identifier of the processDefinition
-     * @return The number of parameters of a process definition
-     * @throws InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since 6.0
-     */
-    int getNumberOfParameterInstances(long processDefinitionId);
-
-    /**
      * Get a parameter instance by process definition UUID
-     * 
+     *
      * @param processDefinitionId
      *            The identifier of the processDefinition
      * @param parameterName
@@ -57,15 +45,17 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @return The ParameterInstance of the process with processDefinitionUUID and name parameterName
      * @throws ParameterNotFoundException
      *             Error thrown if the given parameter is not found.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
+     * @deprecated use {@link org.bonitasoft.engine.api.ProcessManagementAPI#getParameterInstance(long, String)}
      */
+    @Deprecated
     ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws ParameterNotFoundException;
 
     /**
      * Returns the parameters of a process definition or an empty map if the process does not contain any parameter.
-     * 
+     *
      * @param processDefinitionId
      *            The identifier of the processDefinition
      * @param startIndex
@@ -75,15 +65,17 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @param sort
      *            The criterion to sort the result
      * @return The ordered list of parameter instances
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
+     * @deprecated use {@link org.bonitasoft.engine.api.ProcessManagementAPI#getParameterInstances(long, int, int, org.bonitasoft.engine.bpm.parameter.ParameterCriterion)}
      */
+    @Deprecated
     List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort);
 
     /**
      * Update an existing parameter of a process definition.
-     * 
+     *
      * @param processDefinitionId
      *            The identifier of the processDefinition
      * @param parameterName
@@ -94,7 +86,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             Error thrown if the given parameter is not found.
      * @throws UpdateException
      *             If the update cannot be fullfilled.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -103,7 +95,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
     /**
      * Imports the parameters of the process definition.
      * The parameters are stored in a properties file.
-     * 
+     *
      * @param processDefinitionId
      *            The identifier of the process definition
      * @param parameters
@@ -111,7 +103,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *            stays the same.
      * @throws ImportParameterException
      *             If an exception occurs while importing the parameters
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -160,7 +152,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             If the set operation cannot be fullfilled.
      * @throws ConnectorInstanceNotFoundException
      *             If the connector instance cannot be found with the provided connectorInstanceId
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If no current valid engine session is found
      * @since 6.0
      */

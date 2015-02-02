@@ -35,11 +35,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.bonitasoft.engine.core.parameter</groupId>
-            <artifactId>bonita-parameter-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.bonitasoft.engine.core.process.instance</groupId>
             <artifactId>bonita-process-instance-api-sp</artifactId>
             <version>${project.version}</version>

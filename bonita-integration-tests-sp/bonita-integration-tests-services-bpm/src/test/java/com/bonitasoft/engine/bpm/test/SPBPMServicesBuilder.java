@@ -21,7 +21,7 @@ import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
 import com.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
 import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
-import com.bonitasoft.engine.parameter.ParameterService;
+import org.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.service.BroadcastService;

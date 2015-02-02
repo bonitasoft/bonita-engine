@@ -8,15 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.parameter;
 
-import org.bonitasoft.engine.bpm.DescriptionElement;
-
 /**
  * @author Matthieu Chaffotte
+ * @deprecated use {@link org.bonitasoft.engine.bpm.parameter.ParameterInstance}
  */
-public interface ParameterInstance extends DescriptionElement {
+public interface ParameterInstance extends org.bonitasoft.engine.bpm.parameter.ParameterInstance {
 
-    Object getValue();
-
-    String getType();
 
 }

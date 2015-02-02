@@ -17,12 +17,11 @@ public class ImportParameterException extends ExecutionException {
 
     private static final long serialVersionUID = 7463213076180306458L;
 
-    public ImportParameterException(final String message) {
-        super(message);
-    }
-
-    public ImportParameterException(final Throwable e) {
+    public ImportParameterException(Exception e) {
         super(e);
     }
 
+    public ImportParameterException(String s) {
+        super(s);
+    }
 }
