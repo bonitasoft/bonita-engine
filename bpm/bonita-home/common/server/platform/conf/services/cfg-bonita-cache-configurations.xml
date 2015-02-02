@@ -52,4 +52,8 @@
 		<property name="eternal" value="true" />
 	</bean>
 
+	<bean id="parameterCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="parameters" />
+	</bean>
+
 </beans>

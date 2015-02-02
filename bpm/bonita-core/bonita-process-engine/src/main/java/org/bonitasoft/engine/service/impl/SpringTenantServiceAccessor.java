@@ -71,6 +71,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.xml.ChildrenEntriesBinding;
@@ -235,6 +236,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private PermissionService permissionService;
 
     private ParentContainerResolver parentContainerResolver;
+
+    private ParameterService parameterService;
 
     private PageService pageService;
 
@@ -817,6 +820,13 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return permissionService;
     }
 
+    @Override
+    public ParameterService getParameterService() {
+        if (parameterService == null) {
+            parameterService = beanAccessor.getService(ParameterService.class);
+        }
+        return parameterService;
+    }
     /**
      * might not be an available service
      */

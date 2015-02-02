@@ -212,6 +212,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.bonitasoft.engine.core</groupId>
+            <artifactId>bonita-parameter-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine.persistence</groupId>
             <artifactId>bonita-persistence-read</artifactId>
             <version>${project.version}</version>

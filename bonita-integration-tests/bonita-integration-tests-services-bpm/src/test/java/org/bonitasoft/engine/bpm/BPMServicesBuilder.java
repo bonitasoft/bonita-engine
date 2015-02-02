@@ -72,6 +72,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
@@ -562,6 +563,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public TenantConfiguration getTenantConfiguration() {
         return getInstanceOf(TenantConfiguration.class);
+    }
+
+    @Override
+    public ParameterService getParameterService() {
+        return getInstanceOf(ParameterService.class);
     }
 
     @Override

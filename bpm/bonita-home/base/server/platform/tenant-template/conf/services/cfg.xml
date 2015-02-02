@@ -156,6 +156,7 @@
                 <bean class="org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyResolver"/>
                 <bean class="org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyResolver"/>
                 <bean class="org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver"/>
+                <bean class="org.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver"/>
             </list>
         </constructor-arg>
     </bean>
