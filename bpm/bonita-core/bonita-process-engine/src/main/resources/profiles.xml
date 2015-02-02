@@ -29,33 +29,26 @@
 	<profile name="Administrator" isDefault="true">
 		<description>The administrator can install a process, manage the organization, and handle some errors (for example, by replaying a task).</description>
 		<profileEntries>
-			<parentProfileEntry name="Process management"
+			<parentProfileEntry name="BPM"
 				isCustom="false">
 				<parentName>NULL</parentName>
 				<index>0</index>
 				<description>BPM</description>
 				<type>folder</type>
 				<childrenEntries>
-					<profileEntry name="Tasks" isCustom="false">
-						<parentName>BPM</parentName>
-						<index>0</index>
-						<description>All tasks</description>
-						<type>link</type>
-						<page>tasklistingadmin</page>
-					</profileEntry>
 					<profileEntry name="Cases" isCustom="false">
 						<parentName>BPM</parentName>
-						<index>2</index>
+						<index>0</index>
 						<description>All cases</description>
 						<type>link</type>
 						<page>caselistingadmin</page>
 					</profileEntry>
-					<profileEntry name="Processes" isCustom="false">
+					<profileEntry name="Tasks" isCustom="false">
 						<parentName>BPM</parentName>
-						<index>4</index>
-						<description>All processes</description>
+						<index>2</index>
+						<description>All tasks</description>
 						<type>link</type>
-						<page>processlistingadmin</page>
+						<page>tasklistingadmin</page>
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
@@ -93,23 +86,44 @@
 						<type>link</type>
 						<page>importexportorganization</page>
 					</profileEntry>
-				</childrenEntries>
-			</parentProfileEntry>
-			<parentProfileEntry name="Configuration" isCustom="false">
-				<parentName>NULL</parentName>
-				<index>6</index>
-				<description>Portal</description>
-				<type>folder</type>
-				<childrenEntries>
 					<profileEntry name="Profiles" isCustom="false">
-						<parentName>Portal</parentName>
-						<index>0</index>
+						<parentName>Organization</parentName>
+						<index>8</index>
 						<description>All profiles</description>
 						<type>link</type>
 						<page>profilelisting</page>
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
+			<parentProfileEntry name="Resources" isCustom="false">
+				<parentName>NULL</parentName>
+				<index>4</index>
+				<description>Resources</description>
+				<type>folder</type>
+				<childrenEntries>
+					<profileEntry name="Processes" isCustom="false">
+						<parentName>Resources</parentName>
+						<index>0</index>
+						<description>All processes</description>
+						<type>link</type>
+						<page>processlistingadmin</page>
+					</profileEntry>
+                    <profileEntry name="Custom Pages" isCustom="false">
+                        <parentName>Resources</parentName>
+                        <index>2</index>
+                        <description>All custom pages</description>
+                        <type>link</type>
+                        <page>pagelisting</page>
+                    </profileEntry>
+				</childrenEntries>
+			</parentProfileEntry>
+            <parentProfileEntry name="Applications" isCustom="false">
+                <parentName>NULL</parentName>
+                <index>8</index>
+                <description>Applications</description>
+                <type>link</type>
+                <page>applicationslistingadmin</page>
+            </parentProfileEntry>
 		</profileEntries>
 	</profile>
 </profiles:profiles>
