@@ -113,11 +113,15 @@ public class PlatformTestUtil {
         platformAPI.startNode();
 
         if (deployCommands) {
-            final LoginAPI loginAPI = getLoginAPI();
-            final APISession session = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
-            ClientEventUtil.deployCommand(session);
-            loginAPI.logout(session);
+            deployCommandsOnDefaultTenant();
         }
+    }
+
+    public void deployCommandsOnDefaultTenant() throws BonitaException {
+        final LoginAPI loginAPI = getLoginAPI();
+        final APISession session = loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
+        ClientEventUtil.deployCommand(session);
+        loginAPI.logout(session);
     }
 
     public void stopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {

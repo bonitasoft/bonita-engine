@@ -36,7 +36,7 @@ import org.bonitasoft.engine.search.SearchResult;
 /**
  * Profiles are a notion used in BonitaBPM Portal to give and control access to some specific features of the Bonita BPM suite.
  * Profiles are associated to Bonita Identity / Organization notions: users, groups, roles, memberships. <code>ProfileAPI</code> gives access to some of the
- * profile administation: adding / removing members to / from a profile, retrieving / searching for profiles. <br/>
+ * profile administration: adding / removing members to / from a profile, retrieving / searching for profiles. <br>
  * Full control on profiles is part of <b>Subscription</b> editions of Bonita BPM suite.
  *
  * @author Celine Souchet
@@ -53,9 +53,9 @@ public interface ProfileAPI {
      * @return the searched profile
      * @throws ProfileNotFoundException
      *         If the identifier does not refer to an existing profile
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the profile retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -69,9 +69,9 @@ public interface ProfileAPI {
      * @return The 1000 first profiles of the user, ordered by name
      * @throws UserNotFoundException
      *         If the user identifier does not refer to an existing user
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the profile retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      * @deprecated since 6.3
@@ -92,9 +92,9 @@ public interface ProfileAPI {
      * @param criterion
      *        The criterion for sorting the items over pages.
      * @return The paginated and ordered profiles of the user
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the profile retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.3.2
      */
@@ -108,7 +108,7 @@ public interface ProfileAPI {
      * @return the search result
      * @throws SearchException
      *         If an exception occurs during the profile searching
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -116,15 +116,15 @@ public interface ProfileAPI {
 
     /**
      * Retrieves the number of profile members for the profiles. The map contains the couples profileId/numberOfProfileMembers.
-     * <b>
+     * <p>
      * If a profile does not exists, no exception is thrown and no value is added in the map.
-     *
+     * </p>
      * @param profileIds
      *        The identifiers of the profiles
      * @return the number of profile members for the profiles
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the profile retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -140,7 +140,7 @@ public interface ProfileAPI {
      * @return the search result
      * @throws SearchException
      *         If an exception occurs during the profile searching
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -154,7 +154,7 @@ public interface ProfileAPI {
      * @return the search result
      * @throws SearchException
      *         If an exception occurs during the profile searching
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -179,9 +179,9 @@ public interface ProfileAPI {
      * @return the searched profile entry
      * @throws ProfileEntryNotFoundException
      *         If the profile entry identifier does not refer to an existing user
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the user retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -203,7 +203,7 @@ public interface ProfileAPI {
      *         If the tuple profileId/userId/roleId/groupId is already taken by an existing profile member
      * @throws CreationException
      *         If an exception occurs during the profile member creation
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -211,9 +211,9 @@ public interface ProfileAPI {
 
     /**
      * Creates a profile member.
-     * <b>
+     * <p>
      * It takes the values of the creator in order to create the profile member.
-     *
+     * </p>
      * @param creator
      *        The profile member to create
      * @return the created profile member
@@ -221,7 +221,7 @@ public interface ProfileAPI {
      *         If the tuple profileId/userId/roleId/groupId is already taken by an existing profile member
      * @throws CreationException
      *         If an exception occurs during the profile member creation
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -234,7 +234,7 @@ public interface ProfileAPI {
      *        The identifier of the profile member
      * @throws DeletionException
      *         If an exception occurs during the profile member deletion
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */

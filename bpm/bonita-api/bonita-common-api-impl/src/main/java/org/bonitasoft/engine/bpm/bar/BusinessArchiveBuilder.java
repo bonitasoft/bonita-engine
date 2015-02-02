@@ -50,7 +50,7 @@ public class BusinessArchiveBuilder {
      * Set the process definition of the {@link BusinessArchive} that is currently build
      * <p> {@link DesignProcessDefinition} can be constructed using {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder}
      *
-     * @see ProcessDefinitionBuilder
+     * @see org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder
      * @param processDefinition
      * @return
      *         the same {@link BusinessArchiveBuilder} in order to chain calls
@@ -67,8 +67,9 @@ public class BusinessArchiveBuilder {
      * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder} <p> {@link DesignProcessDefinition} can be
      * constructed using {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder}
      *
-     * @see ProcessDefinitionBuilder
-     * @param processDefinition
+     * @see org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder
+     * @param parameters
+     *      the parameters value to use
      * @return
      *         the same {@link BusinessArchiveBuilder} in order to chain calls
      */
@@ -133,8 +134,8 @@ public class BusinessArchiveBuilder {
 
     /**
      * Set the actor mapping for this {@link BusinessArchive} <p>
-     * The file must be compliant with the xsd actorMapping.xsd The actor mapping specify for each {@link org.bonitasoft.engine.bpm.actor.ActorDefinition} of
-     * the process who it is in the organization.
+     * The file must be compliant with the xsd actorMapping.xsd The actor mapping specify for each {@link org.bonitasoft.engine.bpm.actor.ActorDefinition} of the process who it is in the
+     * organization.
      * <p>
      * It is not mandatory to set it in the {@link BusinessArchive}, it can be set after the process was deployed using
      * {@link org.bonitasoft.engine.api.ProcessAPI#addUserToActor(long, long)}, {@link org.bonitasoft.engine.api.ProcessAPI#addGroupToActor(long, long)},

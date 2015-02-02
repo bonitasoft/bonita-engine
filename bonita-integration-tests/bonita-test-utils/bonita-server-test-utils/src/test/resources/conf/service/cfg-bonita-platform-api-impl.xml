@@ -12,6 +12,14 @@
 		<constructor-arg ref="platformCacheService" />
 		<constructor-arg ref="platformProperties" />
 		<constructor-arg name="recorder" ref="platformRecorderSync" />
+		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+		<constructor-arg name="sqlFolders">
+			<list>
+                <value>/sql/${db.vendor}</value>
+                <value>target/test-classes/sql-test/sql/${db.vendor}</value>
+			</list>
+        </constructor-arg>
+        <constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 	</bean>
 	
 </beans>

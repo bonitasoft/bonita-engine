@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * represents a helper for updating a {@link Role}. Chaining is possible with this updator to ease the {@link Role} update.
- * <br/>
+ * <br>
  * For instance, new RoleUpdater("member").setDisplayName("Member").setIconName("userIcon");
  *
  * @author Matthieu Chaffotte

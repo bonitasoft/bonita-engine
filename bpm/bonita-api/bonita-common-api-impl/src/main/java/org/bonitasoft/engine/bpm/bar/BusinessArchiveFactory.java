@@ -142,7 +142,7 @@ public class BusinessArchiveFactory {
      *
      * @param businessArchive
      *        the {@link BusinessArchive} to write
-     * @param folderPath
+     * @param businessArchiveFile
      *        the folder into the business archive must be written
      * @throws IOException
      */

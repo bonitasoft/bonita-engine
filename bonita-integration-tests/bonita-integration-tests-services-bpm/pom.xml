@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -11,13 +10,14 @@
 
 	<artifactId>bonita-integration-tests-services-bpm</artifactId>
 
-    <name>Bonita Service BPM Integration Tests</name>
+    <name>Bonita Integration Tests Service BPM</name>
 
 	<properties>
-		<bonita.home>${project.build.directory}/home</bonita.home>
+        <bonita.home>${project.build.directory}/test-classes/home</bonita.home>
 	</properties>
 
 	<dependencies>
+
 		<!-- Actor Mapping -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
@@ -483,12 +483,6 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.6.1</version>
-			<scope>test</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>org.bonitasoft.engine.test</groupId>
@@ -509,13 +503,18 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-sql</artifactId>
+            <version>${project.version}</version>
+			<scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -561,13 +560,13 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>generate bonita home</id>
+                        <id>generate bonita home version file</id>
 						<phase>compile</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<target name="copy-bos-home">
+                            <target name="copy-bos-home-version-file">
 								<copy todir="${bonita.home}">
 									<fileset dir="${basedir}/home" />
 									<filterset>
@@ -585,15 +584,13 @@
 						</goals>
 						<configuration>
 							<target name="copy-bpm-test-conf">
-                                <copy todir="${project.build.directory}/conf">
+                                <copy todir="${project.build.directory}/test-classes/conf">
                                     <fileset dir="${project.build.directory}/server/conf/service" />
                                 </copy>
-                                <copy todir="${project.build.directory}/conf" overwrite="true">
+                                <!-- Need this order to overwrite existing files -->
+                                <copy todir="${project.build.directory}/test-classes/conf" overwrite="true">
                                     <fileset dir="${project.build.directory}/server/conf/bpm" />
                                 </copy>
-<!-- 								<copy todir="${project.build.directory}/conf" overwrite="true"> -->
-<!-- 									<fileset dir="${basedir}/src/test/resources/conf" /> -->
-<!-- 								</copy> -->
 							</target>
 						</configuration>
 					</execution>
@@ -627,15 +624,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
-					<properties>
-						<property>
-							<name>listener</name>
-							<value>org.bonitasoft.engine.test.annotation.CustomListener</value>
-						</property>
-					</properties>
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
-						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
+                        <bonita.services.folder>${project.build.directory}/test-classes/conf</bonita.services.folder>
 						<sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
 					</systemPropertyVariables>
 					<includes>
