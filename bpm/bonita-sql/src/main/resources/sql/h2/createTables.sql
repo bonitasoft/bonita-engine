@@ -3,7 +3,7 @@ CREATE TABLE contract_data (
   id BIGINT NOT NULL,
   scopeId BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
-  value LONGBLOB
+  val LONGBLOB
 );
 ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id);
 ALTER TABLE contract_data ADD CONSTRAINT uc_cd_scope_name UNIQUE (scopeId, name, tenantid);
@@ -14,7 +14,7 @@ CREATE TABLE arch_contract_data (
   id BIGINT NOT NULL,
   scopeId BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
-  value LONGBLOB,
+  val LONGBLOB,
   archiveDate BIGINT NOT NULL,
   sourceObjectId BIGINT NOT NULL,
 );

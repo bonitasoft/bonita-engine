@@ -13,7 +13,7 @@
 		</composite-id>
 		<property name="scopeId" type="long" column="scopeid" />
 		<property name="name" type="java.lang.String" column="name" />
-		<property name="value" column="value" />
+		<property name="value" column="val" />
 		<filter name="tenantFilter" />
 	</class>
 
@@ -24,7 +24,7 @@
         </composite-id>
         <property name="scopeId" type="long" column="scopeid" />
         <property name="name" type="java.lang.String" column="name" />
-        <property name="value" column="value" />
+        <property name="value" column="val" />
         <property name="archiveDate" column="archiveDate" type="long" />
         <property name="sourceObjectId" column="sourceObjectId" type="long" />
         <filter name="tenantFilter" />
