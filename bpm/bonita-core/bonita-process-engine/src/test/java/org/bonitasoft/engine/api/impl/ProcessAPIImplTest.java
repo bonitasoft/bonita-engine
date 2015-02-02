@@ -62,6 +62,7 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
@@ -71,6 +72,8 @@ import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.parser.JarDependencies;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
+import org.bonitasoft.engine.core.contract.data.SContractDataNotFoundException;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -105,6 +108,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExceptionContext;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
@@ -221,6 +225,9 @@ public class ProcessAPIImplTest {
     @Mock
     private GetConnectorImplementations getConnectorImplementation;
 
+    @Mock
+    private ContractDataService contractDataService;
+
     @Spy
     @InjectMocks
     private ProcessAPIImpl processAPI;
@@ -251,6 +258,7 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
         when(tenantAccessor.getFlowNodeStateManager()).thenReturn(flowNodeStateManager);
         when(tenantAccessor.getParentContainerResolver()).thenReturn(parentContainerResolver);
+        when(tenantAccessor.getContractDataService()).thenReturn(contractDataService);
     }
 
     @Test
@@ -1090,11 +1098,27 @@ public class ProcessAPIImplTest {
                 eq(orderAndField.getOrder()));
     }
 
+    @Test
+    public void getUserTaskContractVariableValue_should_return_archived_value() throws Exception {
+        when(contractDataService.getArchivedUserTaskDataValue(1983L, "id")).thenReturn(10L);
 
+        final Long id = (Long) processAPI.getUserTaskContractVariableValue(1983L, "id");
 
+        assertThat(id).isEqualTo(10L);
+    }
 
+    @Test(expected = BonitaRuntimeException.class)
+    public void getUserTaskContractVariableValue_should_throw_an_exception_if_an_exception_occurs_when_reading_data() throws Exception {
+        when(contractDataService.getArchivedUserTaskDataValue(1983L, "id")).thenThrow(new SBonitaReadException("exception"));
 
+        processAPI.getUserTaskContractVariableValue(1983L, "id");
+    }
 
+    @Test(expected = UserTaskNotFoundException.class)
+    public void getUserTaskContractVariableValue_should_throw_an_exception_if_an_exception_occurs_when_getting_data() throws Exception {
+        when(contractDataService.getArchivedUserTaskDataValue(1983L, "id")).thenThrow(new SContractDataNotFoundException("exception"));
 
+        processAPI.getUserTaskContractVariableValue(1983L, "id");
+    }
 
 }

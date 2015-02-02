@@ -41,6 +41,7 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -68,12 +69,17 @@ public class ContractDataServiceImplTest {
     @InjectMocks
     private ContractDataServiceImpl contractDataService;
 
+    @Before
+    public void setUp() {
+        when(archiveService.getDefinitiveArchiveReadPersistenceService()).thenReturn(persistenceService);
+    }
+
     @Test
     public void getUserTaskData_returns_the_stored_value() throws Exception {
         final SContractData contractData = new SContractData("id", 10L, 1983L);
         when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(contractData);
 
-        final Long id = (Long) contractDataService.getUserTaskData(1983L, "id");
+        final Long id = (Long) contractDataService.getUserTaskDataValue(1983L, "id");
 
         assertThat(id).isEqualTo(10L);
     }
@@ -82,14 +88,14 @@ public class ContractDataServiceImplTest {
     public void getUserTaskData_throws_an_exception_when_data_not_found() throws Exception {
         when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
 
-        contractDataService.getUserTaskData(1983L, "id");
+        contractDataService.getUserTaskDataValue(1983L, "id");
     }
 
     @Test(expected = SBonitaReadException.class)
     public void getUserTaskData_throws_an_exception_with_a_read_exception() throws Exception {
         when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
 
-        contractDataService.getUserTaskData(1983L, "id");
+        contractDataService.getUserTaskDataValue(1983L, "id");
     }
 
     @Test
@@ -185,6 +191,32 @@ public class ContractDataServiceImplTest {
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
 
         contractDataService.archiveUserTaskData(usertTaskId, time);
+    }
+
+    @Test
+    public void getArchivedUserTaskData_returns_the_stored_value() throws Exception {
+        final SContractData contractData = new SContractData("id", 10L, 1983L);
+        final SAContractData saContractData = new SAContractData(contractData);
+        saContractData.setArchiveDate(768468743687L);
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(saContractData);
+
+        final Long id = (Long) contractDataService.getArchivedUserTaskDataValue(1983L, "id");
+
+        assertThat(id).isEqualTo(10L);
+    }
+
+    @Test(expected = SContractDataNotFoundException.class)
+    public void getArchivedUserTaskData_throws_an_exception_when_data_not_found() throws Exception {
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+
+        contractDataService.getArchivedUserTaskDataValue(1983L, "id");
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void getArchivedUserTaskData_throws_an_exception_with_a_read_exception() throws Exception {
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+
+        contractDataService.getArchivedUserTaskDataValue(1983L, "id");
     }
 
 }

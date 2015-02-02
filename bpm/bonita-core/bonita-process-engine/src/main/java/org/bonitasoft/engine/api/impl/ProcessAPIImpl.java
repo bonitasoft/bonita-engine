@@ -227,6 +227,8 @@ import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
+import org.bonitasoft.engine.core.contract.data.SContractDataNotFoundException;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -6091,6 +6093,18 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void purgeClassLoader(final long processDefinitionId) throws ProcessDefinitionNotFoundException, UpdateException {
         processManagementAPIImplDelegate.purgeClassLoader(processDefinitionId);
+    }
+
+    @Override
+    public Serializable getUserTaskContractVariableValue(final long userTaskInstanceId, final String name) throws UserTaskNotFoundException {
+        final ContractDataService contractDataService = getTenantAccessor().getContractDataService();
+        try {
+            return (Serializable) contractDataService.getArchivedUserTaskDataValue(userTaskInstanceId, name);
+        } catch (final SContractDataNotFoundException scdnfe) {
+            throw new UserTaskNotFoundException(scdnfe);
+        } catch (final SBonitaReadException sbe) {
+            throw new RetrieveException(sbe);
+        }
     }
 
 }

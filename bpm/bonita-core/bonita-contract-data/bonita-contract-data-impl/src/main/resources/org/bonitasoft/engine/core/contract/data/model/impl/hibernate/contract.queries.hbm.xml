@@ -15,4 +15,11 @@
         AND cd.name = :name
     </query>
 
+    <query name="getArchivedContractDataByUserTaskIdAndDataName">
+        SELECT acd
+        FROM org.bonitasoft.engine.core.contract.data.SAContractData AS acd
+        WHERE acd.scopeId = :scopeId
+        AND acd.name = :name
+    </query>
+
 </hibernate-mapping>

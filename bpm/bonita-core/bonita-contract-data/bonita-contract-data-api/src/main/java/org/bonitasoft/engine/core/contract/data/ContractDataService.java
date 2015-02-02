@@ -25,10 +25,12 @@ public interface ContractDataService {
 
     void addUserTaskData(final long userTaskId, Map<String, Object> data) throws SContractDataCreationException;
 
-    Object getUserTaskData(final long userTaskId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
+    Object getUserTaskDataValue(final long userTaskId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
 
     void deleteUserTaskData(final long userTaskId) throws SContractDataDeletionException;
 
     void archiveUserTaskData(final long userTaskId, final long archiveDate) throws SObjectModificationException;
+
+    Object getArchivedUserTaskDataValue(final long userTaskId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
 
 }

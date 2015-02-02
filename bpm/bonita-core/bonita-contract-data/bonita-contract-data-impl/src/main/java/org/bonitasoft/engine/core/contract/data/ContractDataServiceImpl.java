@@ -94,7 +94,7 @@ public class ContractDataServiceImpl implements ContractDataService {
     }
 
     @Override
-    public Object getUserTaskData(final long userTaskId, final String dataName) throws SContractDataNotFoundException, SBonitaReadException {
+    public Object getUserTaskDataValue(final long userTaskId, final String dataName) throws SContractDataNotFoundException, SBonitaReadException {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("name", dataName);
         parameters.put("scopeId", userTaskId);
@@ -159,7 +159,7 @@ public class ContractDataServiceImpl implements ContractDataService {
     private List<SContractData> getContractDataOfUserTask(final long userTaskId) throws SBonitaReadException {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("scopeId", userTaskId);
-        final QueryOptions queryOptions = new QueryOptions(0, 1000);
+        final QueryOptions queryOptions = new QueryOptions(0, 10000);
         final SelectListDescriptor<SContractData> descriptor = new SelectListDescriptor<SContractData>("getContractDataByUserTaskId", parameters,
                 SContractData.class, queryOptions);
         return persistenceService.selectList(descriptor);
@@ -188,6 +188,21 @@ public class ContractDataServiceImpl implements ContractDataService {
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
+    }
+
+    @Override
+    public Object getArchivedUserTaskDataValue(final long userTaskId, final String dataName) throws SContractDataNotFoundException, SBonitaReadException {
+        final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("scopeId", userTaskId);
+        parameters.put("name", dataName);
+        final SelectOneDescriptor<SAContractData> descriptor = new SelectOneDescriptor<SAContractData>("getArchivedContractDataByUserTaskIdAndDataName",
+                parameters, SAContractData.class);
+        final SAContractData contractData = readPersistenceService.selectOne(descriptor);
+        if (contractData == null) {
+            throw new SContractDataNotFoundException("No contract data found named: " + dataName + " of user task: " + userTaskId);
+        }
+        return contractData.getValue();
     }
 
 }

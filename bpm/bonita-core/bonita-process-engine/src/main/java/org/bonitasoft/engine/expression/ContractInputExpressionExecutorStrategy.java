@@ -43,7 +43,7 @@ public class ContractInputExpressionExecutorStrategy implements ExpressionExecut
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final Long containerId = (Long) context.get(CONTAINER_ID_KEY);
         try {
-            return contractDataService.getUserTaskData(containerId, expression.getContent());
+            return contractDataService.getUserTaskDataValue(containerId, expression.getContent());
         } catch (final SContractDataNotFoundException scdnfe) {
             throw new SExpressionEvaluationException(scdnfe, expression.getName());
         } catch (final SBonitaReadException sre) {

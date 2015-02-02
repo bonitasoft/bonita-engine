@@ -440,6 +440,9 @@ public class UserTaskContractITest extends CommonAPIIT {
 
         waitForProcessToBeInState(processInstance, ProcessInstanceState.COMPLETED);
 
+        final BigInteger processInputId = (BigInteger) getProcessAPI().getUserTaskContractVariableValue(userTask.getId(), "processInputId");
+        assertThat(processInputId).isEqualTo(BigInteger.valueOf(45L));
+
         disableAndDeleteProcess(processDefinition);
     }
 
