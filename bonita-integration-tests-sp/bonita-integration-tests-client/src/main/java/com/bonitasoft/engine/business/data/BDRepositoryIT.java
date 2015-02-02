@@ -250,6 +250,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         return model;
     }
 
+    private Long tenantId;
+
     @Before
     public void setUp() throws Exception {
         clientFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("bdr_it_client");
@@ -261,6 +263,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         getTenantManagementAPI().pause();
         getTenantManagementAPI().installBusinessDataModel(zip);
         getTenantManagementAPI().resume();
+
+        tenantId = getSession().getTenantId();
     }
 
     @After
@@ -534,9 +538,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
     @Test
     public void should_deploy_generate_client_bdm_jar_in_bonita_home() throws Exception {
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
-        final String clientBdmJarPath = bonitaHomePath + File.separator + "server" + File.separator + "tenants" + File.separator + "1" + File.separator
-                + "data-management" + File.separator + "client";
-        assertThat(new File(clientBdmJarPath, CLIENT_BDM_ZIP_FILENAME)).exists().isFile();
+        assertThat(new File(getClientBdmJarClassPath(bonitaHomePath), CLIENT_BDM_ZIP_FILENAME)).exists().isFile();
 
         assertThat(getTenantManagementAPI().getClientBDMZip()).isNotEmpty();
     }
@@ -549,9 +551,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         getTenantManagementAPI().resume();
 
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
-        final String clientBdmJarPath = bonitaHomePath + File.separator + "server" + File.separator + "tenants" + File.separator + "1" + File.separator
-                + "data-management" + File.separator + "client";
-        assertThat(new File(clientBdmJarPath, CLIENT_BDM_ZIP_FILENAME)).doesNotExist();
+        assertThat(new File(getClientBdmJarClassPath(bonitaHomePath), CLIENT_BDM_ZIP_FILENAME)).doesNotExist();
 
         getTenantManagementAPI().getClientBDMZip();
     }
@@ -1423,4 +1423,10 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(definition.getId());
     }
 
+    private String getClientBdmJarClassPath(String bonitaHomePath) {
+        String clientBdmJarPath;
+        clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("server").append(File.separator).append("tenants")
+                .append(File.separator).append(tenantId).append(File.separator).append("data-management").append(File.separator).append("client").toString();
+        return clientBdmJarPath;
+    }
 }
