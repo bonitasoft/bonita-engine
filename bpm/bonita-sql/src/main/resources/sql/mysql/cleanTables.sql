@@ -1,3 +1,4 @@
+DELETE FROM arch_contract_data;
 DELETE FROM contract_data;
 
 DELETE FROM actormember;

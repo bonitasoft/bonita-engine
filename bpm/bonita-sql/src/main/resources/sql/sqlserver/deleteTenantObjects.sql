@@ -1,3 +1,5 @@
+DELETE FROM arch_contract_data WHERE tenantid = ${tenantid}
+GO
 DELETE FROM contract_data WHERE tenantid = ${tenantid}
 GO
 DELETE FROM actormember WHERE tenantid = ${tenantid}

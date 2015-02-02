@@ -1,3 +1,4 @@
+DROP TABLE arch_contract_data cascade constraints purge;
 DROP TABLE contract_data cascade constraints purge;
 DROP TABLE actormember cascade constraints purge;
 DROP TABLE actor cascade constraints purge;

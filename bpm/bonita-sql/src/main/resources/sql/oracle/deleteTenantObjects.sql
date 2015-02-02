@@ -1,3 +1,4 @@
+DELETE FROM arch_contract_data WHERE tenantid = ${tenantid};
 DELETE FROM contract_data WHERE tenantid = ${tenantid};
 DELETE FROM actormember WHERE tenantid = ${tenantid};
 DELETE FROM actor WHERE tenantid = ${tenantid};
