@@ -13,8 +13,9 @@ import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
  * @author Elias Ricken de Medeiros
- *
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationMenuNotFoundException} instead.
  */
+@Deprecated
 public class ApplicationMenuNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = -5011088434149162619L;

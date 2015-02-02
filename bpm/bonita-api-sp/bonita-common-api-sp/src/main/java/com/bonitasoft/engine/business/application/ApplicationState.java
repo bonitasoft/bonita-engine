@@ -12,7 +12,11 @@ package com.bonitasoft.engine.business.application;
 /**
  * @author Elias Ricken de Medeiros
  *
+ * @see org.bonitasoft.engine.business.application.ApplicationState
+ *
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationState} instead.
  */
+@Deprecated
 public enum ApplicationState {
 
     ACTIVATED,

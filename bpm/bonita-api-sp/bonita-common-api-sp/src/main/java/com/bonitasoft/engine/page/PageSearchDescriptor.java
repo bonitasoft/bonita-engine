@@ -10,23 +10,12 @@ package com.bonitasoft.engine.page;
 
 /**
  * @author Laurent Leseigneur
+ *
+ * @see org.bonitasoft.engine.page.PageSearchDescriptor
+ *
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor} instead.
  */
-public class PageSearchDescriptor {
-
-    public static final String ID = "id";
-
-    public static final String NAME = "name";
-
-    public static final String DISPLAY_NAME = "displayName";
-
-    public static final String INSTALLED_BY = "installedBy";
-
-    public static final String PROVIDED = "provided";
-
-    public static final String INSTALLATION_DATE = "installationDate";
-
-    public static final String LAST_MODIFICATION_DATE = "lastModificationDate";
-
-
+@Deprecated
+public class PageSearchDescriptor extends org.bonitasoft.engine.page.PageSearchDescriptor {
 
 }
