@@ -21,7 +21,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
 
 /**
- * Service that handle the creation/deletion of tokens.<br/>
+ * Service that handle the creation/deletion of tokens.<br>
  * A token represent an active branch of a process.
  * 
  * @author Baptiste Mesta

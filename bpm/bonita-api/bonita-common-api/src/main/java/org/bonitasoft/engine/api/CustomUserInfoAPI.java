@@ -134,7 +134,7 @@ public interface CustomUserInfoAPI {
      * optionsBuilder.filter(CustomUserInfoValueSearchDescriptor.DEFINITION_ID, userInfoDefinition.getId());
      * optionsBuilder.filter(CustomUserInfoValueSearchDescriptor.VALUE, value);
      * optionsBuilder.sort(CustomUserInfoValueSearchDescriptor.USER_ID, Order.ASC);
-     * SearchResult<CustomUserInfoValue> searchResult = identityAPI.searchCustomUserInfoValues(optionsBuilder.done());
+     * SearchResult&lt;CustomUserInfoValue&gt; searchResult = identityAPI.searchCustomUserInfoValues(optionsBuilder.done());
      * </pre>
      *
      * @param options

@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * represents a helper for creating a {@link Role}. Chaining is possible with this creator to ease the {@link Role} creation.
- * <br/>
+ * <br>
  * For instance, new RoleCreator("member").setDisplayName("Member").setIconName("userIcon");
  *
  * @author Matthieu Chaffotte
