@@ -50,14 +50,13 @@ public class ExecutorWorkService implements WorkService {
     private final int workTerminationTimeout;
 
     /**
-     *
      * @param transactionService
      * @param workSynchronizationFactory
      * @param loggerService
      * @param sessionAccessor
      * @param bonitaExecutorServiceFactory
      * @param workTerminationTimeout
-     *            time in secondes to wait for works to finish
+     *        time in secondes to wait for works to finish
      */
     public ExecutorWorkService(final TransactionService transactionService, final WorkSynchronizationFactory workSynchronizationFactory,
             final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor, final BonitaExecutorServiceFactory bonitaExecutorServiceFactory,
@@ -78,6 +77,7 @@ public class ExecutorWorkService implements WorkService {
         }
         final AbstractWorkSynchronization synchro = getContinuationSynchronization();
         if (synchro != null) {
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Registered work " + work.getDescription());
             synchro.addWork(work);
         }
     }

@@ -550,7 +550,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The flow node <" + sFlowNodeInstanceChild.getName() + "> with id<"
                 + flowNodeInstanceId + "> of process instance <" + processInstanceId + "> finished");
         if (tokensOfProcess == 0) {
-            logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The process isntance <" + processInstanceId + "> from definition <"
+            logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The process instance <" + processInstanceId + "> from definition <"
                     + sProcessDefinition.getName() + ":" + sProcessDefinition.getVersion() + "> finished");
             boolean hasActionsToExecute = false;
             if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
