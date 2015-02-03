@@ -159,26 +159,19 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
     @Override
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        final long eventInstanceId = eventInstance.getId();
-        final String eventInstanceName = eventInstance.getName();
-        final long parentContainerId = eventInstance.getParentContainerId();
         final Long processDefinitionId = processDefinition.getId();
-        final SExpressionContext expressionContext = new SExpressionContext(parentContainerId, getParentContainerType(eventInstance).name(),
+        final SExpressionContext expressionContext = new SExpressionContext(eventInstance.getParentContainerId(), getParentContainerType(eventInstance).name(),
                 processDefinitionId);
 
-        handleThrowMessage(sEventTriggerDefinition, eventInstanceId, eventInstanceName, processDefinitionId, expressionContext);
+        handleThrowMessage(sEventTriggerDefinition, eventInstance.getId(), eventInstance.getName(), processDefinitionId, expressionContext);
     }
 
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SSendTaskInstance sendTaskInstance,
             final SThrowMessageEventTriggerDefinition messageTrigger) throws SEventTriggerInstanceCreationException, SMessageInstanceCreationException,
             SDataInstanceException, SExpressionException {
-        final long eventInstanceId = sendTaskInstance.getId();
-        final String eventInstanceName = sendTaskInstance.getName();
-        final long parentContainerId = sendTaskInstance.getParentContainerId();
-        final Long processDefinitionId = processDefinition.getId();
-        final SExpressionContext expressionContext = new SExpressionContext(parentContainerId, getParentContainerType(sendTaskInstance).name(),
-                processDefinitionId);
-        handleThrowMessage(messageTrigger, eventInstanceId, eventInstanceName, processDefinitionId, expressionContext);
+        final SExpressionContext expressionContext = new SExpressionContext(sendTaskInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                processDefinition.getId());
+        handleThrowMessage(messageTrigger, sendTaskInstance.getId(), sendTaskInstance.getName(), processDefinition.getId(), expressionContext);
     }
 
     private void handleThrowMessage(final SEventTriggerDefinition sEventTriggerDefinition, final long eventInstanceId, final String eventInstanceName,

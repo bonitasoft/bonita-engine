@@ -105,6 +105,8 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public static final String SIGNAL_NAME = "canStart";
 
+    public static final String START_EVENT_NAME = "startEvent";
+
     /**
      * Deploy and enable a process with a human task having a timer boundary event followed by another human task without boundary
      *
@@ -803,7 +805,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, PROCESS_VERSION);
         addProcessData(processData, processBuilder);
-        processBuilder.addStartEvent("startEvent");
+        processBuilder.addStartEvent(START_EVENT_NAME);
         processBuilder.addAutomaticTask("auto1");
         // create expression for target process/flowNode
         final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression(targetProcess);
@@ -818,7 +820,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
         addCorrelations(throwMessageEventTriggerBuilder, correlations);
         addMessageData(messageData, dataInputMapping, throwMessageEventTriggerBuilder);
-        processBuilder.addTransition("startEvent", "auto1");
+        processBuilder.addTransition(START_EVENT_NAME, "auto1");
         processBuilder.addTransition("auto1", "endEvent");
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
 
@@ -863,7 +865,7 @@ public abstract class AbstractEventIT extends TestWithUser {
             final List<String> targetFlowNodes) throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(SEND_MESSAGE_PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addStartEvent("startEvent");
+        processBuilder.addStartEvent(START_EVENT_NAME);
         processBuilder.addAutomaticTask("auto1");
 
         final IntermediateThrowEventDefinitionBuilder intermediateThrowEvent = processBuilder.addIntermediateThrowEvent("sendMessage");
@@ -875,7 +877,7 @@ public abstract class AbstractEventIT extends TestWithUser {
             intermediateThrowEvent.addMessageEventTrigger(messageNames.get(indexOfTargetProcess), targetProcessExpression, targetFlowNodeExpression);
         }
         processBuilder.addEndEvent("endEvent");
-        processBuilder.addTransition("startEvent", "auto1");
+        processBuilder.addTransition(START_EVENT_NAME, "auto1");
         processBuilder.addTransition("auto1", "sendMessage");
         processBuilder.addTransition("sendMessage", "endEvent");
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
@@ -897,19 +899,20 @@ public abstract class AbstractEventIT extends TestWithUser {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, PROCESS_VERSION);
         addProcessData(data, processBuilder);
-        final CatchMessageEventTriggerDefinitionBuilder messageEventTrigger = processBuilder.addStartEvent("startEvent").addMessageEventTrigger(messageName);
+        final CatchMessageEventTriggerDefinitionBuilder messageEventTrigger = processBuilder.addStartEvent(START_EVENT_NAME)
+                .addMessageEventTrigger(messageName);
         addOperations(messageEventTrigger, catchMessageOperations);
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.addUserTask(START_WITH_MESSAGE_STEP1_NAME, ACTOR_NAME);
         processBuilder.addEndEvent("endEvent");
-        processBuilder.addTransition("startEvent", START_WITH_MESSAGE_STEP1_NAME);
+        processBuilder.addTransition(START_EVENT_NAME, START_WITH_MESSAGE_STEP1_NAME);
         processBuilder.addTransition(START_WITH_MESSAGE_STEP1_NAME, "endEvent");
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
 
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(designProcessDefinition);
-        final BusinessArchive receiveMessaceArchive = archiveBuilder.done();
-        final ProcessDefinition receiveMessageProcess = getProcessAPI().deploy(receiveMessaceArchive);
+        final BusinessArchive receiveMessageArchive = archiveBuilder.done();
+        final ProcessDefinition receiveMessageProcess = getProcessAPI().deploy(receiveMessageArchive);
 
         final List<ActorInstance> actors = getProcessAPI().getActors(receiveMessageProcess.getId(), 0, 1, ActorCriterion.NAME_ASC);
         getProcessAPI().addUserToActor(actors.get(0).getId(), user.getId());
@@ -923,7 +926,8 @@ public abstract class AbstractEventIT extends TestWithUser {
     }
 
     public ProcessDefinition deployAndEnableProcessWithStartMessageEvent(final String processName, final String messageName) throws BonitaException {
-        return deployAndEnableProcessWithStartMessageEvent(processName, messageName, Collections.<String, String>emptyMap(), Collections.<Operation>emptyList());
+        return deployAndEnableProcessWithStartMessageEvent(processName, messageName, Collections.<String, String> emptyMap(),
+                Collections.<Operation> emptyList());
     }
 
     public void addOperations(final CatchMessageEventTriggerDefinitionBuilder messageEventTrigger, final List<Operation> catchMessageOperations) {
@@ -945,7 +949,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance(processName, PROCESS_VERSION);
         addProcessData(processData, processBuilder);
-        processBuilder.addStartEvent("startEvent");
+        processBuilder.addStartEvent(START_EVENT_NAME);
         processBuilder.addAutomaticTask("auto1");
         final CatchMessageEventTriggerDefinitionBuilder catchMessageEventTriggerDefinitionBuilder = processBuilder.addIntermediateCatchEvent(CATCH_EVENT_NAME)
                 .addMessageEventTrigger(messageName);
@@ -954,7 +958,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.addUserTask(CATCH_MESSAGE_STEP1_NAME, ACTOR_NAME);
         processBuilder.addEndEvent("endEvent");
-        processBuilder.addTransition("startEvent", "auto1");
+        processBuilder.addTransition(START_EVENT_NAME, "auto1");
         processBuilder.addTransition("auto1", CATCH_EVENT_NAME);
         processBuilder.addTransition(CATCH_EVENT_NAME, CATCH_MESSAGE_STEP1_NAME);
         processBuilder.addTransition(CATCH_MESSAGE_STEP1_NAME, "endEvent");
@@ -982,7 +986,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         final Expression targetProcessExpression = new ExpressionBuilder().createConstantStringExpression(targetProcess);
         final Expression targetFlowNodeExpression = new ExpressionBuilder().createConstantStringExpression(targetFlowNode);
         processBuilder.createNewInstance(processName, PROCESS_VERSION);
-        processBuilder.addStartEvent("startEvent");
+        processBuilder.addStartEvent(START_EVENT_NAME);
         processBuilder.addAutomaticTask("auto1");
         processBuilder.addGateway("gateway1", GatewayType.PARALLEL);
         processBuilder.addIntermediateThrowEvent("sendMessage").addMessageEventTrigger(messageName, targetProcessExpression, targetFlowNodeExpression);
@@ -991,7 +995,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.addUserTask("userTask1", ACTOR_NAME).addUserTask("userTask2", ACTOR_NAME).addUserTask("userTask3", ACTOR_NAME);
         processBuilder.addEndEvent("endEvent");
-        processBuilder.addTransition("startEvent", "auto1");
+        processBuilder.addTransition(START_EVENT_NAME, "auto1");
         processBuilder.addTransition("auto1", "gateway1");
         processBuilder.addTransition("gateway1", "userTask2");
         processBuilder.addTransition("userTask2", "sendMessage");
@@ -1121,9 +1125,9 @@ public abstract class AbstractEventIT extends TestWithUser {
     public ProcessDefinition deployAndEnableProcessWithIntermediateCatchTimerEventAndUserTask(final TimerType timerType, final Expression timerValue,
             final String step1Name, final String step2Name) throws BonitaException {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0")
-                .addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addStartEvent("startEvent").addUserTask(step1Name, ACTOR_NAME)
+                .addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addStartEvent(START_EVENT_NAME).addUserTask(step1Name, ACTOR_NAME)
                 .addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(step2Name, ACTOR_NAME)
-                .addEndEvent("endEvent").addTransition("startEvent", step1Name).addTransition(step1Name, "intermediateCatchEvent")
+                .addEndEvent("endEvent").addTransition(START_EVENT_NAME, step1Name).addTransition(step1Name, "intermediateCatchEvent")
                 .addTransition("intermediateCatchEvent", step2Name).addTransition(step2Name, "endEvent").getProcess();
         final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
@@ -1134,9 +1138,9 @@ public abstract class AbstractEventIT extends TestWithUser {
     public ProcessDefinition deployAndEnableProcessWithStartTimerEventAndUserTask(final TimerType timerType, final Expression timerValue, final String stepName)
             throws BonitaException {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0")
-                .addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addStartEvent("startEvent")
+                .addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addStartEvent(START_EVENT_NAME)
                 .addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(stepName, ACTOR_NAME).addEndEvent("endEvent")
-                .addTransition("startEvent", stepName).addTransition(stepName, "endEvent").getProcess();
+                .addTransition(START_EVENT_NAME, stepName).addTransition(stepName, "endEvent").getProcess();
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
@@ -1144,7 +1148,8 @@ public abstract class AbstractEventIT extends TestWithUser {
         return definition;
     }
 
-    public ProcessDefinition deployAndEnableProcessSendingMessageUsingVariableAsTarget(final String targetProcessName, final String targetFlowNode, final String messageName) throws BonitaException {
+    public ProcessDefinition deployAndEnableProcessSendingMessageUsingVariableAsTarget(final String targetProcessName, final String targetFlowNode,
+            final String messageName) throws BonitaException {
         Expression targetProcessExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
         Expression targetFlowNodeExpr = new ExpressionBuilder().createConstantStringExpression(targetFlowNode);
         Expression targetProcessVarExpr = new ExpressionBuilder().createDataExpression("targetProcess", String.class.getName());
