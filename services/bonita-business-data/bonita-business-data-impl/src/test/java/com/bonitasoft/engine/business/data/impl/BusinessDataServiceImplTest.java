@@ -45,6 +45,9 @@ public class BusinessDataServiceImplTest {
 
     private static final String PARAMETER_BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
     private static final String NEW_NAME = "new name";
+    public static final String PARAMETER_STRING = "parameterString";
+    public static final String PARAMETER_INTEGER = "parameterInteger";
+    public static final String PARAMETER_LONG = "parameterLong";
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -559,9 +562,9 @@ public class BusinessDataServiceImplTest {
         //given
         final EntityPojo entity = new EntityPojo(1562L);
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put("string", "a");
-        parameters.put("integer", "12");
-        parameters.put("long", "34");
+        parameters.put(PARAMETER_STRING, "a");
+        parameters.put(PARAMETER_INTEGER, "12");
+        parameters.put(PARAMETER_LONG, "34");
 
         doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
 
@@ -589,9 +592,9 @@ public class BusinessDataServiceImplTest {
         //given
         final EntityPojo entity = new EntityPojo(1562L);
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put("string", "a");
-        parameters.put("integer", "12");
-        parameters.put("long", "34");
+        parameters.put(PARAMETER_STRING, "a");
+        parameters.put(PARAMETER_INTEGER, "12");
+        parameters.put(PARAMETER_LONG, "34");
 
         doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
 
@@ -609,9 +612,9 @@ public class BusinessDataServiceImplTest {
         //given
         final EntityPojo entity = new EntityPojo(1562L);
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put("string", "a");
-        parameters.put("integer", "12");
-        parameters.put("long", "34");
+        parameters.put(PARAMETER_STRING, "a");
+        parameters.put(PARAMETER_INTEGER, "12");
+        parameters.put(PARAMETER_LONG, "34");
 
         doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
         BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
@@ -625,7 +628,10 @@ public class BusinessDataServiceImplTest {
     @Test
     public void getJsonQueryEntities_should_check_parameters() throws Exception {
         expectedException.expect(SBusinessDataRepositoryException.class);
-        expectedException.expectMessage("parameter(s) are missing for query named query : integer,string,long");
+        expectedException.expectMessage("parameter(s) are missing for query named query :");
+        expectedException.expectMessage(PARAMETER_INTEGER);
+        expectedException.expectMessage(PARAMETER_STRING);
+        expectedException.expectMessage(PARAMETER_LONG);
 
         //given
         final EntityPojo entity = new EntityPojo(1562L);
@@ -644,9 +650,9 @@ public class BusinessDataServiceImplTest {
         businessObjectModel = new BusinessObjectModel();
 
         Query query = new Query("query", "content", String.class.getName());
-        query.getQueryParameters().add(new QueryParameter("string", String.class.getName()));
-        query.getQueryParameters().add(new QueryParameter("integer", Integer.class.getName()));
-        query.getQueryParameters().add(new QueryParameter("long", Long.class.getName()));
+        query.getQueryParameters().add(new QueryParameter(PARAMETER_STRING, String.class.getName()));
+        query.getQueryParameters().add(new QueryParameter(PARAMETER_INTEGER, Integer.class.getName()));
+        query.getQueryParameters().add(new QueryParameter(PARAMETER_LONG, Long.class.getName()));
 
         BusinessObject businessObject = new BusinessObject();
         businessObject.setQualifiedName(entity.getClass().getName());
