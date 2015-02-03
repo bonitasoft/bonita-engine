@@ -29,13 +29,13 @@ public interface OrganizationAPI {
 
     /**
      * Deletes the organization.
-     * <b>
+     * <p>
      * It deletes all user memberships, roles, groups, users and custom user info.
-     * </b>
+     * </p>
      * 
      * @throws DeletionException
      *             If an exception occurs during the organization deletion
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0.0
      */
@@ -43,14 +43,15 @@ public interface OrganizationAPI {
 
     /**
      * Imports the organization using the {@link ImportPolicy#MERGE_DUPLICATES} policy.
-     * <b>
+     * <p>
      * An organization is composed by users, roles, groups and user memberships.
-     * 
+     * </p>
+     *
      * @param organizationContent
      *            the XML content of the organization
      * @throws OrganizationImportException
      *             If an exception occurs during the organization import
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0.0
      */
@@ -58,16 +59,16 @@ public interface OrganizationAPI {
 
     /**
      * Imports the organization.
-     * <b>
+     * <p>
      * An organization is composed by users, roles, groups and user memberships.
-     * 
+     * </p>
      * @param organizationContent
      *            the XML content of the organization
      * @param policy
      *            the import policy
      * @throws OrganizationImportException
      *             If an exception occurs during the organization import
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0.0
      */
@@ -75,13 +76,14 @@ public interface OrganizationAPI {
 
     /**
      * Exports the organization.
-     * <b>
+     * <p>
      * An organization is composed by users, roles, groups and user memberships.
-     * 
+     * </p>
+     *
      * @return the organization contented in an XML format
      * @throws OrganizationExportException
      *             If an exception occurs during the organization export
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0.0
      */

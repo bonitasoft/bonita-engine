@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * Represents a helper for creating {@link ContactData}. Chaining is possible with this creator to ease the ContactData creation.
- * <br/>
+ * <br>
  * For instance, new ContactDataCreator().setEmail("john.doe@bonitasoft.com").setPhoneNumber("012456789");
  *
  * @author Matthieu Chaffotte

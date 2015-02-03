@@ -14,7 +14,7 @@ import org.bonitasoft.engine.theme.Theme;
 import org.bonitasoft.engine.theme.ThemeType;
 
 /**
- * Manage mobile and portal theme. A Theme is a look & feel in Bonita BPM Portal.
+ * Manage mobile and portal theme. A Theme is a look &amp; feel in Bonita BPM Portal.
  * 
  * @author Celine Souchet
  */
@@ -26,9 +26,9 @@ public interface ThemeAPI {
      * @param type
      *            The type of the theme
      * @return The theme
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs while retrieving the theme
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
@@ -40,9 +40,9 @@ public interface ThemeAPI {
      * @param type
      *            The type of the theme
      * @return The theme
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs while retrieving the theme
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
@@ -54,7 +54,7 @@ public interface ThemeAPI {
      * @param type
      *            The type of theme
      * @return The last updated date of the theme
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
