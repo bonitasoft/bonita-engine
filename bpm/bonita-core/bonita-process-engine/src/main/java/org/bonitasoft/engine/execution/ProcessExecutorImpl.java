@@ -405,10 +405,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         flowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, 0, stateCategory, -1, tokenRefId);
     }
 
-    protected void executeOperations(final List<SOperation> operations, final Map<String, Object> context, final SExpressionContext expressionContext, SProcessInstance sProcessInstance) throws SBonitaException {
+    protected void executeOperations(final List<SOperation> operations, final Map<String, Object> context, final SExpressionContext expressionContext,
+            SProcessInstance sProcessInstance) throws SBonitaException {
         if (operations != null && !operations.isEmpty()) {
             expressionContext.setInputValues(context);
-            if(expressionContext.getContainerId() == null){
+            if (expressionContext.getContainerId() == null) {
                 expressionContext.setContainerId(sProcessInstance.getId());
                 expressionContext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
             }
@@ -546,7 +547,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
         final int tokensOfProcess = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
+        logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The flow node <" + sFlowNodeInstanceChild.getName() + "> with id<"
+                + flowNodeInstanceId + "> of process instance <" + processInstanceId + "> finished");
         if (tokensOfProcess == 0) {
+            logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The process isntance <" + processInstanceId + "> from definition <"
+                    + sProcessDefinition.getName() + ":" + sProcessDefinition.getVersion() + "> finished");
             boolean hasActionsToExecute = false;
             if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
                 hasActionsToExecute = executePostThrowEventHandlers(sProcessDefinition, sProcessInstance, sFlowNodeInstanceChild);
