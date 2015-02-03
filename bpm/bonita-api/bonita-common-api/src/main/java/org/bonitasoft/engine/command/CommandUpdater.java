@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Updater for <code>Commands</code> <br/>
+ * Updater for <code>Commands</code> <br>
  *
  * @author Matthieu Chaffotte
  * @see org.bonitasoft.engine.api.CommandAPI#update(long, CommandUpdater)
