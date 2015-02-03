@@ -24,7 +24,7 @@ public interface MonitoringAPI {
      * @return the total number of active transaction
      * @throws MonitoringException
      *         occurs when an exception is thrown during monitoring
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      */
     long getNumberOfActiveTransactions() throws MonitoringException;
@@ -36,7 +36,7 @@ public interface MonitoringAPI {
      * @return The total number of executing process
      * @throws MonitoringException
      *         occurs when an exception is thrown during monitoring
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @deprecated since 6.3.0, use {@link ProcessAPI#getNumberOfProcessInstances()}
      */
@@ -50,7 +50,7 @@ public interface MonitoringAPI {
      * @return The number of users
      * @throws MonitoringException
      *         occurs when an exception is thrown during monitoring
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      */
     long getNumberOfUsers() throws MonitoringException;

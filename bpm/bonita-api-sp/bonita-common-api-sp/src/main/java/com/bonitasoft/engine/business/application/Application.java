@@ -85,8 +85,7 @@ public interface Application extends BaseElement {
     long getUpdatedBy();
 
     /**
-     * Retrieves the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED#name()} and {@link ApplicationState#DEACTIVATED
-     * #name()}
+     * Retrieves the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED} and {@link ApplicationState#DEACTIVATED}
      *
      * @return the <code>Application</code> state
      * @see ApplicationState

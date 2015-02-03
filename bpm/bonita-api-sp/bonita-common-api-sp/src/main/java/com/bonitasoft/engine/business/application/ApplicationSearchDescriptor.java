@@ -65,8 +65,8 @@ public class ApplicationSearchDescriptor {
     public static final String UPDATED_BY = "updatedBy";
 
     /**
-     * Used to filter or order by the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED#name()} and
-     * {@link ApplicationState#DEACTIVATED#name()}
+     * Used to filter or order by the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED} and
+     * {@link ApplicationState#DEACTIVATED}
      *
      * @see ApplicationState
      */
