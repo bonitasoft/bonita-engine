@@ -74,8 +74,8 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public SToken createToken(final Long processInstanceId, final Long refId, final Long parentRefId) throws SObjectCreationException {
-        final SToken token = BuilderFactory.get(STokenBuilderFactory.class).createNewInstance(processInstanceId, refId, parentRefId).done();
+    public SToken createToken(final Long processInstanceId) throws SObjectCreationException {
+        final SToken token = BuilderFactory.get(STokenBuilderFactory.class).createNewInstance(processInstanceId).done();
         final InsertRecord insertRecord = new InsertRecord(token);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(PROCESS_INSTANCE_TOKEN_COUNT, EventActionType.CREATED)) {
@@ -88,27 +88,33 @@ public class TokenServiceImpl implements TokenService {
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Create token with id = <" + token.getId() + ">, process instance id = <"
-                    + processInstanceId + ">, refId = <" + refId + ">, parentRefId = <" + parentRefId + ">");
+                    + processInstanceId + ">");
         }
         return token;
     }
 
     @Override
-    public void createTokens(final Long processInstanceId, final Long refId, final Long parentRefId, final int numberOfToken) throws SObjectCreationException {
+    public void createTokens(final Long processInstanceId, final int numberOfToken) throws SObjectCreationException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Creating "+numberOfToken+" token of process instance <"+processInstanceId+">");
+        }
         if (numberOfToken > 0) {
             for (int i = 0; i < numberOfToken; i++) {
-                createToken(processInstanceId, refId, parentRefId);
+                createToken(processInstanceId);
             }
         }
     }
 
     @Override
-    public void deleteTokens(final Long processInstanceId, final Long refId, final int numberOfToken) throws SObjectModificationException,
+    public void deleteTokens(final Long processInstanceId, final int numberOfToken) throws SObjectModificationException,
             SObjectNotFoundException, SObjectReadException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Deleting "+numberOfToken+" token of process instance <"+processInstanceId+">");
+        }
         if (numberOfToken > 0) {
             for (int i = 0; i < numberOfToken; i++) {
                 // delete get...
-                final SToken token = getToken(processInstanceId, refId);
+                final SToken token = getTokenOfProcessInstance(processInstanceId);
                 deleteToken(token);
             }
         }
@@ -126,7 +132,7 @@ public class TokenServiceImpl implements TokenService {
             recorder.recordDelete(deleteRecord, deleteEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Delete token with id = <" + token.getId() + ">, process instance id = <"
-                        + token.getProcessInstanceId() + ">, refId = <" + token.getRefId() + ">, parentRefId = <" + token.getParentRefId() + ">");
+                        + token.getProcessInstanceId() + ">");
             }
         } catch (final SBonitaException e) {
             throw new SObjectModificationException(e);
@@ -194,23 +200,11 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public int getNumberOfToken(final long processInstanceId, final long refId) throws SObjectReadException {
+    public SToken getTokenOfProcessInstance(final long processInstanceId) throws SObjectNotFoundException, SObjectReadException {
         try {
-            return persistenceRead.selectOne(SelectDescriptorBuilder.getNumberOfToken(processInstanceId, refId)).intValue();
-        } catch (final SBonitaReadException e) {
-            throw new SObjectReadException(e);
-        }
-    }
-
-    @Override
-    public SToken getToken(final long processInstanceId, final long refId) throws SObjectNotFoundException, SObjectReadException {
-        try {
-            final List<SToken> selectList = persistenceRead.selectList(SelectDescriptorBuilder.getToken(processInstanceId, refId));
+            final List<SToken> selectList = persistenceRead.selectList(SelectDescriptorBuilder.getToken(processInstanceId));
             if (selectList.isEmpty()) {
-                final SObjectNotFoundException exception = new SObjectNotFoundException("No token found for reference = <" + refId
-                        + "> . The design may be invalid. Check that all branches are correctly merged.");
-                exception.setProcessInstanceIdOnContext(processInstanceId);
-                throw exception;
+                return null;
             }
             return selectList.get(0);
         } catch (final SBonitaReadException e) {

@@ -32,12 +32,12 @@ public interface TokenService {
 
     String PROCESS_INSTANCE_TOKEN_COUNT = "ACTIVITY_INSTANCE_TOKEN_COUNT";
 
-    SToken createToken(Long processInstanceId, Long refId, Long parentRefId) throws SObjectCreationException;
+    SToken createToken(Long processInstanceId) throws SObjectCreationException;
 
-    void createTokens(Long processInstanceId, Long refId, Long parentRefId, int numberOfToken) throws SObjectCreationException, SObjectModificationException,
+    void createTokens(Long processInstanceId, int numberOfToken) throws SObjectCreationException, SObjectModificationException,
             SObjectNotFoundException, SObjectReadException;
 
-    void deleteTokens(Long processInstanceId, Long refId, int numberOfToken) throws SObjectModificationException, SObjectNotFoundException,
+    void deleteTokens(Long processInstanceId, int numberOfToken) throws SObjectModificationException, SObjectNotFoundException,
             SObjectReadException;
 
     void deleteToken(SToken token) throws SObjectModificationException;
@@ -46,9 +46,9 @@ public interface TokenService {
 
     int getNumberOfToken(long processInstanceId) throws SObjectReadException;
 
-    int getNumberOfToken(long processInstanceId, long refId) throws SObjectReadException;
+    SToken getToken(long tokenId) throws SObjectReadException, SObjectNotFoundException;
 
-    SToken getToken(long processInstanceId, long refId) throws SObjectReadException, SObjectNotFoundException;
+    SToken getTokenOfProcessInstance(long processInstanceId) throws SObjectReadException, SObjectNotFoundException;
 
     void deleteAllTokens() throws SObjectReadException, SObjectModificationException;
 

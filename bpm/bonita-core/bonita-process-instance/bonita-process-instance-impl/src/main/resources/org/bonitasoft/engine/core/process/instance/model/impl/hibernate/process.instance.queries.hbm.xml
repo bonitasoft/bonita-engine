@@ -82,15 +82,6 @@
 		AND g.terminal = FALSE
 	</query>
 
-	<query name="getGatewayMergingToken">
-		SELECT g
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl AS g
-		WHERE g.logicalGroup4 = :processInstanceId
-		AND g.deleted = FALSE
-		AND g.tokenRefId = :tokenRefId
-		AND g.terminal = FALSE
-	</query>
-
 	<query name="getActivitiesWithStates">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
@@ -1418,13 +1409,6 @@
 	</query>
 
 	<!-- Token -->
-	<query name="getNumberToken">
-		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
-		WHERE t.processInstanceId = :processInstanceId
-		AND t.refId = :refId
-	</query>
-
 	<query name="getNumberOfTokensOfProcessInstance">
 		SELECT COUNT(t)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
@@ -1441,7 +1425,6 @@
 		SELECT t
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
 		WHERE t.processInstanceId = :processInstanceId
-		AND t.refId = :refId
         ORDER BY t.id ASC
 	</query>
 
