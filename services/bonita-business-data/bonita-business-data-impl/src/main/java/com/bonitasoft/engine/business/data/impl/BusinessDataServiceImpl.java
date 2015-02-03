@@ -329,7 +329,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private Map<String, Serializable> getQueryParameters(Query queryDefinition, final Map<String, Serializable> parameters)
             throws SBusinessDataRepositoryException {
-        Set<String> errors = new HashSet<String>();
+        List<String> errors = new ArrayList<String>();
         final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
         for (QueryParameter queryParameter : queryDefinition.getQueryParameters()) {
             if (parameters != null && parameters.containsKey(queryParameter.getName())) {
