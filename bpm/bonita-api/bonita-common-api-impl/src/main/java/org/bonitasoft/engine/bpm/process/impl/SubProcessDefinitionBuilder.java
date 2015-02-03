@@ -33,7 +33,6 @@ public class SubProcessDefinitionBuilder extends FlowElementContainerBuilder imp
 
     /**
      * Add a document list definition in this container.
-     * <p/>
      *
      * @param name the name of the list
      * @return the builder to add the optional description and initial value expression

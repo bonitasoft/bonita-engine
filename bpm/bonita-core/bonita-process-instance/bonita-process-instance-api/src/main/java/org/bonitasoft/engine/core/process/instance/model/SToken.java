@@ -17,7 +17,7 @@ package org.bonitasoft.engine.core.process.instance.model;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
- * A token is an element that allows the tracking of active branch of the process.<br/>
+ * A token is an element that allows the tracking of active branch of the process.<br>
  * When the process starts, we create a token
  * When a gateway splits a branch, we create as many token as activated branch. these tokens are children of the token that activated the branch
  * When we merge branch, token are deleted and we take the parent token as the active one

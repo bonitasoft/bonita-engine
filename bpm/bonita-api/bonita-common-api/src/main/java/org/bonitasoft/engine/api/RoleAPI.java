@@ -52,7 +52,7 @@ public interface RoleAPI {
      *             If the name is already taken by an existing role
      * @throws CreationException
      *             If an exception occurs during the role creation
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -60,9 +60,9 @@ public interface RoleAPI {
 
     /**
      * Create the role.
-     * <b>
+     * <p>
      * It takes the values of the creator in order to create the role.
-     * 
+     * </p>
      * @param creator
      *            the role creator
      * @return the created role.
@@ -70,7 +70,7 @@ public interface RoleAPI {
      *             If the name is already taken by an existing role
      * @throws CreationException
      *             If an exception occurs during the role creation
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -88,7 +88,7 @@ public interface RoleAPI {
      *             If the role identifier does not refer to an existing role
      * @throws UpdateException
      *             If an exception occurs during the role update
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -101,7 +101,7 @@ public interface RoleAPI {
      *            the role identifier
      * @throws DeletionException
      *             If an exception occurs during the role deletion
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -114,7 +114,7 @@ public interface RoleAPI {
      *            the list of role identifiers
      * @throws DeletionException
      *             If an exception occurs during the role deletion
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -128,9 +128,9 @@ public interface RoleAPI {
      * @return the role
      * @throws RoleNotFoundException
      *             If the role identifier does not refer to an existing role
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the role retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -144,9 +144,9 @@ public interface RoleAPI {
      * @return the role.
      * @throws RoleNotFoundException
      *             If the role name does not refer to an existing role
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the role retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -156,9 +156,9 @@ public interface RoleAPI {
      * Returns the total number of roles.
      * 
      * @return the total number of roles
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the count retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -166,8 +166,9 @@ public interface RoleAPI {
 
     /**
      * Retrieves the paginated list of roles.
-     * <b>
+     * <p>
      * It retrieves from the startIndex to the startIndex + maxResults.
+     * </p>
      * 
      * @param startIndex
      *            the start index
@@ -176,9 +177,9 @@ public interface RoleAPI {
      * @param criterion
      *            the sorting criterion
      * @return the paginated list of roles
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the role retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -186,15 +187,16 @@ public interface RoleAPI {
 
     /**
      * Retrieves the roles. The map contains the couples roleId/Role.
-     * <b>
+     * <p>
      * If a role does not exists, no exception is thrown and no value is added in the map.
-     * 
+     * </p>
+     *
      * @param roleIds
      *            the identifiers of the roles
      * @return the roles
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the role retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -208,7 +210,7 @@ public interface RoleAPI {
      * @return the search result
      * @throws SearchException
      *             If an exception occurs during the role searching
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
