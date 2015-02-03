@@ -33,7 +33,7 @@ public interface ThemeAPI extends org.bonitasoft.engine.api.ThemeAPI {
      * @return The current theme
      * @throws SetThemeException
      *             If can't set theme
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
