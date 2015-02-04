@@ -11,7 +11,7 @@
 				<entry key="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory" />
 				<entry key="net.sf.ehcache.configurationResourceName">
 					<bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
-						<property name="filePath" value="/server/platform/conf/ehcache.xml" />
+						<property name="filePath" value="/server/platform/conf/hibernate-cache.xml" />
 						<property name="baseFolder" value="${bonita.home}" />
 					</bean>
 				</entry>
