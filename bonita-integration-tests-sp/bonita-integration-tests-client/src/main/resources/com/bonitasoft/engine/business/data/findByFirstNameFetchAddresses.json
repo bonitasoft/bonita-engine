@@ -5,6 +5,7 @@
     "firstName": "Alphonse",
     "lastName": "Dupond",
     "hireDate":"123456789",
+    "booleanField":true,
     "phoneNumbers": ["123456789"],
     "addresses": [
       {

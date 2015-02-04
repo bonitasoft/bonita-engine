@@ -181,9 +181,14 @@ public class BDRepositoryIT extends CommonAPISPIT {
         hireDate.setName("hireDate");
         hireDate.setType(FieldType.DATE);
 
+        final SimpleField booleanField = new SimpleField();
+        booleanField.setName("booleanField");
+        booleanField.setType(FieldType.BOOLEAN);
+
         final BusinessObject employee = new BusinessObject();
         employee.setQualifiedName(EMPLOYEE_QUALIF_CLASSNAME);
         employee.addField(hireDate);
+        employee.addField(booleanField);
         employee.addField(firstName);
         employee.addField(lastName);
         employee.addField(phoneNumbers);
