@@ -348,11 +348,11 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         List<String> merged = getMergedTokens(gatewayInstance, hitBys);
         setFinished(gatewayInstance, merged.size());
         List<String> remaining = getRemainingTokens(hitBys, merged);
+        logger.log(TAG, TechnicalLogSeverity.DEBUG, "There is "+remaining+" remaining token to merge on gateway "+gatewayInstance.getName()+" will create a new if there is");
         if(remaining.isEmpty()){
             return Collections.emptyList();
         }
         List<SGatewayInstance> toFire = new ArrayList<SGatewayInstance>();
-        logger.log(TAG, TechnicalLogSeverity.DEBUG, "There is still "+remaining+" token to merge on gateway "+gatewayInstance.getName()+"will create a new one");
         SGatewayInstance newGatewayInstance = createGatewayWithRemainingTokens(gatewayInstance, remaining);
         if(checkMergingCondition(processDefinition,newGatewayInstance)){
             toFire.add(newGatewayInstance);
@@ -386,11 +386,9 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     ArrayList<String> getRemainingTokens(List<String> hitBys, List<String> merged) {
-        ArrayList<String> remaining = new ArrayList<String>();
-        for (String hitBy : hitBys) {
-            if(!merged.contains(hitBy)){
-                remaining.add(hitBy);
-            }
+        ArrayList<String> remaining = new ArrayList<String>(hitBys);
+        for (String mergedToken : merged) {
+            remaining.remove(mergedToken);
         }
         return remaining;
     }
