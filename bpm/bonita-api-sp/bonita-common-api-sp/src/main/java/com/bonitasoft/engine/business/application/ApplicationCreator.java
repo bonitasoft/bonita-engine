@@ -95,7 +95,7 @@ public class ApplicationCreator implements Serializable {
     /**
      * Retrieves all fields defined in this <code>ApplicationCreator</code>
      *
-     * @return a {@link Map}<{@link ApplicationField}, {@link Serializable}> containing all fields defined in this <code>ApplicationCreator</code>
+     * @return a {@link Map}&lt;{@link ApplicationField}, {@link Serializable}&gt; containing all fields defined in this <code>ApplicationCreator</code>
      * @see ApplicationField
      */
     public Map<ApplicationField, Serializable> getFields() {

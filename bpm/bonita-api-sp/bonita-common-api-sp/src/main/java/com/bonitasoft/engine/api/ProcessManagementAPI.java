@@ -37,7 +37,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
 
     /**
      * Get a parameter instance by process definition UUID
-     *
+     * 
      * @param processDefinitionId
      *            The identifier of the processDefinition
      * @param parameterName
@@ -55,7 +55,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
 
     /**
      * Returns the parameters of a process definition or an empty map if the process does not contain any parameter.
-     *
+     * 
      * @param processDefinitionId
      *            The identifier of the processDefinition
      * @param startIndex
@@ -75,7 +75,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
 
     /**
      * Update an existing parameter of a process definition.
-     *
+     * 
      * @param processDefinitionId
      *            The identifier of the processDefinition
      * @param parameterName
@@ -95,7 +95,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
     /**
      * Imports the parameters of the process definition.
      * The parameters are stored in a properties file.
-     *
+     * 
      * @param processDefinitionId
      *            The identifier of the process definition
      * @param parameters
@@ -168,7 +168,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             If the connector instance cannot be found with the provided connectorInstanceId
      * @throws UpdateException
      *             If the set operation cannot be fullfilled.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If no current valid engine session is found
      * @since 6.0
      */
@@ -191,7 +191,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             If the implementation is not valid. (e.g. wrong format)
      * @throws UpdateException
      *             If the set operation cannot be fullfilled.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -210,7 +210,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             If no activity instance can be found with the provided activityInstanceId
      * @throws ActivityExecutionException
      *             If the activity failed to replay.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -228,66 +228,48 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *             If no activity instance can be found with the provided activityInstanceId
      * @throws ActivityExecutionException
      *             If the activity failed to replay.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             When the activity can't be modified
      * @since 6.0
      */
     void replayActivity(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
     /**
-     * Get the number of processes supervisors mapped to a specific user.
+     * Get the number of processes supervisors mapped to a user on a specific process definition.
      * 
-     * @param userId
-     *            The identifier of the user
-     * @param searchOptions
-     *            The search criteria.
-     * @return The number of processes supervisors for a given user
-     * @throws SearchException
-     *             If an exception occurs when getting the processes supervisors.
+     * @param processDefinitionId
+     *            the id of the process definition
+     * @return The number of processes supervisors mapped to a user for the process definition
      * @since 6.3
      */
     long getNumberOfProcessSupervisorsForUser(long processDefinitionId);
 
     /**
-     * Get the number of processes supervisors mapped to a specific group.
+     * Get the number of processes supervisors mapped to a group on a specific process definition.
      * 
-     * @param groupId
-     *            The identifier of the group
-     * @param searchOptions
-     *            The search criteria.
-     * @return The number of processes supervisors for a given group
-     * @throws SearchException
-     *             If an exception occurs when getting the processes supervisors.
+     * @param processDefinitionId
+     *            the id of the process definition
+     * @return The number of processes supervisors mapped to a group for the process definition
      * @since 6.3
      */
     long getNumberOfProcessSupervisorsForGroup(long processDefinitionId);
 
     /**
-     * Get the number of processes supervisors mapped to a specific role.
+     * Get the number of processes supervisors mapped to a role on a specific process definition.
      * 
-     * @param roleId
-     *            The identifier of the role
-     * @param searchOptions
-     *            The search criteria.
-     * @return The number of processes supervisors for a given role
-     * @throws SearchException
-     *             If an exception occurs when getting the processes supervisors.
+     * @param processDefinitionId
+     *            the id of the process definition
+     * @return The number of processes supervisors mapped to a role for the process definition
      * @since 6.3
      */
     long getNumberOfProcessSupervisorsForRole(long processDefinitionId);
 
     /**
-     * Get the number of processes supervisors mapped to a specific membership.
+     * Get the number of processes supervisors mapped to a membership on a specific process definition.
      * 
-     * @param groupId
-     *            The identifier of the group
-     * @param roleId
-     *            The identifier of the role
-     * @param searchOptions
-     *            The search criteria.
-     * @return The number of processes supervisors for a given user
-     * @throws SearchException
-     *             If an exception occurs when getting the processes supervisors.
+     * @param processDefinitionId
+     *            the id of the process definition
+     * @return The number of processes supervisors mapped to a membership for the process definition
      * @since 6.3
      */
     long getNumberOfProcessSupervisorsForMembership(long processDefinitionId);

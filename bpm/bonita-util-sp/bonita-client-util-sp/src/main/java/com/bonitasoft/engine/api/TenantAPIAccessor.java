@@ -25,9 +25,9 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.util.APITypeManager;
 
 /**
- * Accessor class that retrieve APIs in Bonita BPM <b>Subscription</b> Edition.<br/>
- * Be aware that if you accidently use {@link org.bonitasoft.engine.api.TenantAPIAccessor} instead, you will have only access to <b>Community</b> Edition
- * APIs, which give access to less functionalities.
+ * Accessor class that retrieve APIs in Bonita BPM <b>Subscription</b> Edition.<br>
+ * Be aware that if you use {@link org.bonitasoft.engine.api.TenantAPIAccessor} instead, you will have only access to <b>Community</b> Edition
+ * APIs, which give access to less features.
  * <ul>
  * <li>{@link ProcessAPI},</li>
  * <li>{@link CommandAPI},</li>

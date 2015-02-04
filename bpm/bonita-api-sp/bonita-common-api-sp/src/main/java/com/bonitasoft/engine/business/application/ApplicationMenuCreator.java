@@ -77,7 +77,7 @@ public class ApplicationMenuCreator implements Serializable {
     /**
      * Retrieves all fields defined in this {@code ApplicationMenuCreator}
      *
-     * @return a {@link Map}<{@link ApplicationMenuField}, {@link Serializable}> containing all fields defined in this {@code ApplicationMenuCreator}
+     * @return a {@link Map}&lt;{@link ApplicationMenuField}, {@link Serializable}&gt; containing all fields defined in this {@code ApplicationMenuCreator}
      */
     public Map<ApplicationMenuField, Serializable> getFields() {
         return new EnumConverter().convert(delegate.getFields(), ApplicationMenuField.class);

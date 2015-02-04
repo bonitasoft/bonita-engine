@@ -112,7 +112,7 @@ public interface PageAPI {
      * @param pageId
      *        the Identifier of the page to update
      * @param pageUpdater
-     *        the creator object to instantiate the new page.
+     *            the creator object to instantiate the new page.
      * @return the newly created page.
      * @throws UpdateException
      *         if an error occurs during the update.

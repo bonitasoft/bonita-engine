@@ -42,7 +42,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when an exception is thrown during tenant creation
      * @throws AlreadyExistsException
      *             occurs when a tenant with the same name already exists
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -55,7 +55,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *            the tenant identifier
      * @throws DeletionException
      *             occurs when an exception is thrown during tenant deletion
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -70,7 +70,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when the identifier does not refer to an existing tenant
      * @throws TenantActivationException
      *             occurs when an exception is thrown during tenant activation
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -85,7 +85,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      *             occurs when the identifier does not refer to an existing tenant
      * @throws TenantDeactivationException
      *             occurs when an exception is thrown during tenant deactivation
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -101,7 +101,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @param pagingCriterion
      *            the criterion used to sort the retrieved tenants
      * @return the list of Tenant objects
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -115,7 +115,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @return Tenant object
      * @throws TenantNotFoundException
      *             occurs when the identifier does not refer to an existing tenant
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -127,7 +127,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @return Tenant object
      * @throws TenantNotFoundException
      *             occurs when the identifier does not refer to an existing tenant
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -141,7 +141,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @return Tenant object
      * @throws TenantNotFoundException
      *             occurs when the identifier does not refer to an existing tenant
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -151,7 +151,7 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * Return the total number of tenants.
      * 
      * @return the total number of tenants
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -162,16 +162,16 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * 
      * @param tenantId
      *            the tenant identifier
-     * @param udpater
+     * @param updater
      *            the update descriptor
      * @return Tenant object
      * @throws UpdateException
      *             occurs when an exception is thrown during tenant updated
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
-    Tenant updateTenant(long tenantId, TenantUpdater udpater) throws UpdateException;
+    Tenant updateTenant(long tenantId, TenantUpdater updater) throws UpdateException;
 
     /**
      * Search tenant under the given condition, including pagination, term, filter, sort.
@@ -179,10 +179,10 @@ public interface PlatformAPI extends org.bonitasoft.engine.api.PlatformAPI {
      * @param searchOptions
      *            the search options (pagination parameters, filters, sort)
      * @return {@link SearchResult} The criterion used to search tenants
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws SearchException
-     *             if the search could not be fulfilled correcly
+     *             if the search could not be fulfilled correctly
      * @since 6.0
      */
     SearchResult<Tenant> searchTenants(SearchOptions searchOptions) throws SearchException;

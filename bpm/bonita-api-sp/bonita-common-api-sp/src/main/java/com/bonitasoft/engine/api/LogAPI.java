@@ -19,7 +19,7 @@ import com.bonitasoft.engine.log.LogCriterion;
 import com.bonitasoft.engine.log.LogNotFoundException;
 
 /**
- * When some actions are performed in Bonita BPM Execution Engine, some business logs are stored.<br/>
+ * When some actions are performed in Bonita BPM Execution Engine, some business logs are stored.<br>
  * The LogAPI allows to get / search those logs.
  * <p>
  * The stored logs depend on which bonita objects have been enabled for logging (this is configurable in bonita-home configuration files)
@@ -40,9 +40,9 @@ public interface LogAPI {
      * @return the role
      * @throws LogNotFoundException
      *             If the log identifier does not refer to an existing log
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the role retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -52,9 +52,9 @@ public interface LogAPI {
      * Returns the total number of logs.
      * 
      * @return the total number of logs
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the count retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -62,9 +62,9 @@ public interface LogAPI {
 
     /**
      * Retrieves the paginated list of logs.
-     * <b>
+     * <p>
      * It retrieves from the startIndex to the startIndex + maxResults.
-     * 
+     * </p>
      * @param startIndex
      *            the start index
      * @param maxResults
@@ -72,9 +72,9 @@ public interface LogAPI {
      * @param criterion
      *            the sorting criterion
      * @return the paginated list of logs
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the log retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -88,7 +88,7 @@ public interface LogAPI {
      * @return the search result
      * @throws SearchException
      *             If an exception occurs during the log searching
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
