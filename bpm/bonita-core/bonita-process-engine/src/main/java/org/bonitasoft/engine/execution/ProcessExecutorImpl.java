@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -324,14 +323,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         boolean toExecute = false;
         final Long nextFlowNodeInstanceId;
         try {
+            List<SGatewayInstance> otherMergedGateways = null;
             final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
             final SStateCategory stateCategory = parentProcessInstance.getStateCategory();
             if (isGateway) {
-                final SGatewayInstance gatewayInstance = createOrRetrieveGateway(sProcessDefinition, sFlowNodeDefinition, stateCategory, parentProcessInstanceId, rootProcessInstanceId, sTransitionDefinition);
+                final SGatewayInstance gatewayInstance = getActivateGateway(sProcessDefinition, sFlowNodeDefinition, stateCategory, parentProcessInstanceId, rootProcessInstanceId);
                 gatewayInstanceService.hitTransition(gatewayInstance, sFlowNodeDefinition.getTransitionIndex(sTransitionDefinition.getName()));
                 nextFlowNodeInstanceId = gatewayInstance.getId();
                 if (gatewayInstanceService.checkMergingCondition(sProcessDefinition, gatewayInstance)) {
-                    gatewayInstanceService.setFinish(gatewayInstance);
+                    otherMergedGateways = gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(sProcessDefinition, gatewayInstance);
                     toExecute = true;
                 }
             } else {
@@ -346,6 +346,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             if (toExecute) {
                 workService.registerWork(WorkFactory
                         .createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, nextFlowNodeInstanceId, null, null));
+                if(otherMergedGateways != null){
+                    for (SGatewayInstance otherMergedGateway : otherMergedGateways) {
+                        workService.registerWork(WorkFactory
+                                .createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, otherMergedGateway.getId(), null, null));
+                    }
+                }
             }
         } catch (final SBonitaException e) {
             setExceptionContext(sProcessDefinition, flowNodeThatTriggeredTheTransition, e);
@@ -360,28 +366,16 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      * try to gate active gateway.
      * if the gateway is already hit by this transition or by the same token, we create a new gateway
      */
-    //FIXME no more multiple waiting gateways, we must wait all transitions on a gateway and when it fires we trigger the next things while creating a new gateways with remaining tokens
-    private SGatewayInstance createOrRetrieveGateway(final SProcessDefinition sProcessDefinition, final SFlowNodeDefinition flowNodeDefinition,
-            final SStateCategory stateCategory, final long parentProcessInstanceId, final long rootProcessInstanceId,
-            final STransitionDefinition transitionDefinition) throws SBonitaException {
+    private SGatewayInstance getActivateGateway(final SProcessDefinition sProcessDefinition, final SFlowNodeDefinition flowNodeDefinition,
+                                                final SStateCategory stateCategory, final long parentProcessInstanceId, final long rootProcessInstanceId) throws SBonitaException {
         SGatewayInstance gatewayInstance = null;
         try {
             gatewayInstance = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(parentProcessInstanceId, flowNodeDefinition.getName());
         } catch (final SGatewayNotFoundException e) {
             // no gateway found we create one
+            return createGateway(sProcessDefinition.getId(), flowNodeDefinition, stateCategory, parentProcessInstanceId, rootProcessInstanceId);
         }
-
-        // check if it's already hit
-        if (gatewayInstance != null
-                && gatewayInstance.getHitBys() != null
-                && (gatewayInstance.getHitBys().contains(GatewayInstanceService.FINISH) || Arrays.asList(gatewayInstance.getHitBys().split(",")).contains(
-                        String.valueOf(flowNodeDefinition.getTransitionIndex(transitionDefinition.getName()))))) {
-            gatewayInstance = null;// already hit we create a new one
-        }
-        if (gatewayInstance != null) {
-            return gatewayInstance;
-        }
-        return createGateway(sProcessDefinition.getId(), flowNodeDefinition, stateCategory, parentProcessInstanceId, rootProcessInstanceId);
+        return gatewayInstance;
     }
 
     private SGatewayInstance createGateway(final Long processDefinitionId, final SFlowNodeDefinition flowNodeDefinition, final SStateCategory stateCategory,
@@ -673,9 +667,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             logger.log(getClass(),TechnicalLogSeverity.DEBUG, "some branches died, will check again all inclusive gateways");
             List<SGatewayInstance> inclusiveGatewaysOfProcessInstance = gatewayInstanceService.getInclusiveGatewaysOfProcessInstanceThatShouldFire(processDefinition, processInstanceId);
             for (SGatewayInstance gatewayInstance : inclusiveGatewaysOfProcessInstance) {
-                gatewayInstanceService.setFinish(gatewayInstance);
+                List<SGatewayInstance> otherMergedGateways = gatewayInstanceService.setFinishAndCreateNewGatewayForRemainingToken(processDefinition, gatewayInstance);
                 workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinition.getId(), processInstanceId, gatewayInstance.getId(), null,
                         null));
+                if(otherMergedGateways != null){
+                    for (SGatewayInstance otherMergedGateway : otherMergedGateways) {
+                        workService.registerWork(WorkFactory
+                                .createExecuteFlowNodeWork(processDefinition.getId(), processInstanceId, otherMergedGateway.getId(), null, null));
+                    }
+                }
             }
 
         }

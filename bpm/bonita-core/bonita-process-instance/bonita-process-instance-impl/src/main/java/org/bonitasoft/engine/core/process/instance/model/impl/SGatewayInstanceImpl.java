@@ -39,6 +39,13 @@ public class SGatewayInstanceImpl extends SFlowNodeInstanceImpl implements SGate
         this.gatewayType = gatewayType;
     }
 
+    public SGatewayInstanceImpl(SGatewayInstance gatewayInstance) {
+        super(gatewayInstance.getName(), gatewayInstance.getFlowNodeDefinitionId(), gatewayInstance.getRootContainerId(), gatewayInstance.getParentContainerId(),
+                gatewayInstance.getLogicalGroup(0), gatewayInstance.getLogicalGroup(1));
+        this.gatewayType = gatewayInstance.getGatewayType();
+        setStateId(gatewayInstance.getStateId());
+    }
+
     @Override
     public SGatewayType getGatewayType() {
         return gatewayType;

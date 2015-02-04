@@ -105,7 +105,7 @@ public interface GatewayInstanceService {
      */
     SGatewayInstance getActiveGatewayInstanceOfTheProcess(long parentProcessInstanceId, String name) throws SGatewayNotFoundException, SGatewayReadException;
 
-    void setFinish(SGatewayInstance gatewayInstance) throws SGatewayModificationException;
+    List<SGatewayInstance> setFinishAndCreateNewGatewayForRemainingToken(SProcessDefinition processDefinition, SGatewayInstance gatewayInstance) throws SBonitaException;
 
 
     List<SGatewayInstance> getInclusiveGatewaysOfProcessInstanceThatShouldFire(SProcessDefinition processDefinition, long processInstanceId) throws SBonitaReadException;

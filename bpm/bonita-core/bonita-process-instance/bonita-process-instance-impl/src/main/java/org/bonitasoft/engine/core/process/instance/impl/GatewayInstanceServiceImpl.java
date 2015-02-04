@@ -38,6 +38,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayReadEx
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
@@ -342,8 +343,81 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     @Override
-    public void setFinish(final SGatewayInstance gatewayInstance) throws SGatewayModificationException {
-        final String columnValue = FINISH + gatewayInstance.getHitBys().split(",").length;
+    public List<SGatewayInstance> setFinishAndCreateNewGatewayForRemainingToken(SProcessDefinition processDefinition, final SGatewayInstance gatewayInstance) throws SBonitaException {
+        List<String> hitBys = getHitByTransitionList(gatewayInstance);
+        List<String> merged = getMergedTokens(gatewayInstance, hitBys);
+        setFinished(gatewayInstance, merged.size());
+        List<String> remaining = getRemainingTokens(hitBys, merged);
+        if(remaining.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<SGatewayInstance> toFire = new ArrayList<SGatewayInstance>();
+        logger.log(TAG, TechnicalLogSeverity.DEBUG, "There is still "+remaining+" token to merge on gateway "+gatewayInstance.getName()+"will create a new one");
+        SGatewayInstance newGatewayInstance = createGatewayWithRemainingTokens(gatewayInstance, remaining);
+        if(checkMergingCondition(processDefinition,newGatewayInstance)){
+            toFire.add(newGatewayInstance);
+            toFire.addAll(setFinishAndCreateNewGatewayForRemainingToken(processDefinition, newGatewayInstance));
+        }
+        return toFire;
+    }
+
+    ArrayList<String> getMergedTokens(SGatewayInstance gatewayInstance, List<String> hitBys) {
+        ArrayList<String> merged = new ArrayList<String>();
+        switch (gatewayInstance.getGatewayType()){
+            case PARALLEL:
+                for (String hitBy : hitBys) {
+                    if(!merged.contains(hitBy)){
+                        merged.add(hitBy);
+                    }
+                }
+                break;
+            case INCLUSIVE:
+                for (String hitBy : hitBys) {
+                    if(!merged.contains(hitBy)){
+                        merged.add(hitBy);
+                    }
+                }
+                break;
+            case EXCLUSIVE:
+                merged.add(hitBys.get(0));
+                break;
+        }
+        return merged;
+    }
+
+    ArrayList<String> getRemainingTokens(List<String> hitBys, List<String> merged) {
+        ArrayList<String> remaining = new ArrayList<String>();
+        for (String hitBy : hitBys) {
+            if(!merged.contains(hitBy)){
+                remaining.add(hitBy);
+            }
+        }
+        return remaining;
+    }
+
+    /**
+     * create a new gateway instance with the remaining token
+     * 
+     * @param gatewayInstance
+     *        the original gatewayInstance
+     * @param remaining
+     *        the token that already hit the gateway
+     * @return
+     *         the new gateway
+     */
+    private SGatewayInstance createGatewayWithRemainingTokens(SGatewayInstance gatewayInstance, List<String> remaining) throws SGatewayCreationException {
+        SGatewayInstanceImpl sGatewayInstance = new SGatewayInstanceImpl(gatewayInstance);
+        String remainingTokenAsString = "";
+        for (String token : remaining) {
+            remainingTokenAsString += token + ",";
+        }
+        sGatewayInstance.setHitBys(remainingTokenAsString.substring(0, remainingTokenAsString.length() - 1));
+        createGatewayInstance(sGatewayInstance);
+        return sGatewayInstance;
+    }
+
+    void setFinished(SGatewayInstance gatewayInstance, int numberOfTokenToMerge) throws SGatewayModificationException {
+        final String columnValue = FINISH + numberOfTokenToMerge;
         logger.log(TAG, TechnicalLogSeverity.TRACE, "set finish on gateway " + gatewayInstance.getName() + " " + columnValue);
         updateOneColum(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
