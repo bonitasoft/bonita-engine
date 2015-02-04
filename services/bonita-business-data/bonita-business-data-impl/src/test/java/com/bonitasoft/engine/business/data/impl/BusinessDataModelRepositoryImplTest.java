@@ -8,19 +8,20 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.io.IOUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,4 +82,45 @@ public class BusinessDataModelRepositoryImplTest {
 
         businessDataModelRepository.uninstall(45l);
     }
+
+    @Test
+    public void should_return_getBusinessObjectModel_return_null_when_no_bdm() throws Exception {
+        //given
+        doReturn(false).when(businessDataModelRepository).isDBMDeployed();
+
+        //when then
+        assertThat(businessDataModelRepository.getBusinessObjectModel()).isNull();
+    }
+
+    @Test
+    public void should_return_getBusinessObjectModel_return_bdm() throws Exception {
+        //given
+        final InputStream resourceAsStream = this.getClass().getResourceAsStream("client-bdm.zip");
+        final byte[] clientBDMZip = IOUtil.getAllContentFrom(resourceAsStream);
+
+        doReturn(true).when(businessDataModelRepository).isDBMDeployed();
+        doReturn(clientBDMZip).when(businessDataModelRepository).getClientBDMZip();
+
+        //when
+        final BusinessObjectModel model = businessDataModelRepository.getBusinessObjectModel();
+
+        //then
+        assertThat(model).as("should return the business model").as("should return the bom").isNotNull();
+
+    }
+
+    @Test(expected = SBusinessDataRepositoryException.class)
+    public void should_getBusinessObjectModel_throw_exception() throws Exception {
+        //given
+        final InputStream resourceAsStream = this.getClass().getResourceAsStream("client-bdm.zip");
+        final byte[] clientBDMZip = IOUtil.getAllContentFrom(resourceAsStream);
+
+        doReturn(true).when(businessDataModelRepository).isDBMDeployed();
+        doReturn(clientBDMZip).when(businessDataModelRepository).getClientBDMZip();
+        doThrow(IOException.class).when(businessDataModelRepository).getBusinessObjectModel(any(clientBDMZip.getClass()));
+
+        //when then exception
+         businessDataModelRepository.getBusinessObjectModel();
+    }
+
 }
