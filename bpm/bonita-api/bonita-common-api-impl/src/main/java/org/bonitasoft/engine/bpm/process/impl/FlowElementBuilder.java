@@ -153,7 +153,7 @@ public interface FlowElementBuilder {
      * <p>
      * Must also add connector dependencies and connector implementation descriptor
      * <p>
-     *
+     * 
      * @see org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder#addClasspathResource(org.bonitasoft.engine.bpm.bar.BarResource)
      * @see org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder#addConnectorImplementation(org.bonitasoft.engine.bpm.bar.BarResource)
      * @param name

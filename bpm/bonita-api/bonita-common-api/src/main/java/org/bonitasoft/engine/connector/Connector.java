@@ -32,6 +32,7 @@ public interface Connector {
      * Validate the input parameters. Check the parameters types and boundaries.
      * 
      * @throws ConnectorValidationException
+     *      when the input parameters are not valid
      */
     void validateInputParameters() throws ConnectorValidationException;
 
@@ -40,6 +41,7 @@ public interface Connector {
      * 
      * @return the connector outputs map corresponding to the output definition.
      * @throws ConnectorException
+     *      when something went wrong during connector execution
      */
     Map<String, Object> execute() throws ConnectorException;
 
@@ -48,6 +50,7 @@ public interface Connector {
      * This method can be implemented by connectors to handle here opening of connections like database connection
      * 
      * @throws ConnectorException
+     *      when something went wrong during connector connection
      */
     void connect() throws ConnectorException;
 
@@ -57,6 +60,7 @@ public interface Connector {
      * The typical use of this is to be able to return connected objects that will be used in output operation and then disconnect them.
      * 
      * @throws ConnectorException
+     *      when something went wrong during connector disconnection
      */
     void disconnect() throws ConnectorException;
 }

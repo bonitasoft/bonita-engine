@@ -158,7 +158,7 @@ public interface ProcessManagementAPI {
      *        The identifier of the process definition.
      * @throws DeletionException
      *         If an exception occurs during process deletion.
-     * @throws ProcessInstanceHierarchicalDeletionException
+     * @throws org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException
      *         If a process instance cannot be deleted because of a parent that is still active
      * @since 6.0
      * @see #deleteProcessDefinition(long)
@@ -175,7 +175,7 @@ public interface ProcessManagementAPI {
      *        The list of identifiers of process definitions.
      * @throws DeletionException
      *         If an exception occurs during process deletion.
-     * @throws ProcessInstanceHierarchicalDeletionException
+     * @throws org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException
      *         If a process instance cannot be deleted because of a parent that is still active
      * @see #deleteProcessDefinitions(List)
      * @since 6.0
@@ -1664,7 +1664,7 @@ public interface ProcessManagementAPI {
      *
      * @param processInstanceIds
      *        Identifier of the processInstance
-     * @return A map of <processInstantsIds,ProcessDeploymentInfos>, ordered by the name of the process ascending
+     * @return A map of &lt;processInstantsIds,ProcessDeploymentInfos&gt;, ordered by the name of the process ascending
      * @since 6.0
      */
     Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromProcessInstanceIds(List<Long> processInstanceIds);
@@ -1674,7 +1674,7 @@ public interface ProcessManagementAPI {
      *
      * @param archivedProcessInstantsIds
      *        Identifier of the archived process instance
-     * @return A map of <archivedProcessInstantsIds,ProcessDeploymentInfos>
+     * @return A map of &lt;archivedProcessInstantsIds,ProcessDeploymentInfos&gt;
      * @since 6.0
      */
     Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromArchivedProcessInstanceIds(List<Long> archivedProcessInstantsIds);
@@ -1710,7 +1710,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Lists the possible users (candidates) of the specified human task definition.
-     * <b>
+     * <br>
      * If the task contains a user filter, it is not executed.
      * Users are ordered by user name.
      * An empty list is returned if:

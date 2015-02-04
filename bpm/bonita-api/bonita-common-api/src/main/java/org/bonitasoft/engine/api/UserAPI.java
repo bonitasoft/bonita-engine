@@ -59,7 +59,7 @@ public interface UserAPI {
      *         If the name is already taken by an existing user
      * @throws CreationException
      *         If an exception occurs during the user creation
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -68,7 +68,7 @@ public interface UserAPI {
     /**
      * Creates a user.
      * The password can't be empty.
-     * 
+     *
      * @param userName
      *        The name of the user
      * @param password
@@ -82,7 +82,7 @@ public interface UserAPI {
      *         If the name is already taken by an existing user
      * @throws CreationException
      *         If an exception occurs during the user creation
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -91,7 +91,7 @@ public interface UserAPI {
     /**
      * Creates a user.
      * It takes the values of the creator in order to create the user.
-     * 
+     *
      * @param creator
      *        The user to create
      * @return The created user
@@ -99,7 +99,7 @@ public interface UserAPI {
      *         If the name is already taken by an existing user
      * @throws CreationException
      *         If an exception occurs during the user creation
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -107,7 +107,7 @@ public interface UserAPI {
 
     /**
      * Updates the user according to the updater values.
-     * 
+     *
      * @param userId
      *        The identifier of the user
      * @param updater
@@ -117,7 +117,7 @@ public interface UserAPI {
      *         If the user identifier does not refer to an existing user
      * @throws UpdateException
      *         If an exception occurs during the user update
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -125,12 +125,12 @@ public interface UserAPI {
 
     /**
      * Deletes the user.
-     * 
+     *
      * @param userId
      *        The identifier of the user
      * @throws DeletionException
      *         If an exception occurs during the user deletion
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -138,12 +138,12 @@ public interface UserAPI {
 
     /**
      * Deletes the user.
-     * 
+     *
      * @param userName
      *        The name of the user
      * @throws DeletionException
      *         If an exception occurs during the user deletion
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -151,12 +151,12 @@ public interface UserAPI {
 
     /**
      * Deletes the users.
-     * 
+     *
      * @param userIds
      *        The identifiers of the users
      * @throws DeletionException
      *         If an exception occurs during the user deletion
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -165,15 +165,15 @@ public interface UserAPI {
     /**
      * Retrieves the user.
      * It throws a {@link UserNotFoundException} if the user identifier equals the technical user identifier (-1).
-     * 
+     *
      * @param userId
      *        The identifier of the user
      * @return The searched user
      * @throws UserNotFoundException
      *         If the user identifier does not refer to an existing user
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the user retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -181,15 +181,15 @@ public interface UserAPI {
 
     /**
      * Retrieves the user.
-     * 
+     *
      * @param userName
      *        The name of the user
      * @return The role
      * @throws UserNotFoundException
      *         If the user name does not refer to an existing user
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the role retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -197,15 +197,15 @@ public interface UserAPI {
 
     /**
      * Retrieves the professional details of the user.
-     * 
+     *
      * @param userId
      *        The identifier of the user
      * @return The user and the professional details
      * @throws UserNotFoundException
      *         If the user identifier does not refer to an existing user, or is -1 (the technical user identifier)
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs while retrieving the user
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
@@ -213,7 +213,7 @@ public interface UserAPI {
 
     /**
      * Retrieves the contact data (personal or professional) of the user.
-     * 
+     *
      * @param userId
      *        The identifier of the user
      * @param personal
@@ -221,9 +221,9 @@ public interface UserAPI {
      * @return The contact data
      * @throws UserNotFoundException
      *         If the user name does not refer to an existing user
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the role retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -231,11 +231,11 @@ public interface UserAPI {
 
     /**
      * Returns the total number of users.
-     * 
+     *
      * @return The total number of users
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the count retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -243,7 +243,7 @@ public interface UserAPI {
 
     /**
      * Retrieves the paginated list of users. It retrieves from the startIndex to the startIndex + maxResults.
-     * 
+     *
      * @param startIndex
      *        The start index
      * @param maxResults
@@ -251,9 +251,9 @@ public interface UserAPI {
      * @param criterion
      *        The sorting criterion
      * @return The paginated list of users
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the user retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -262,13 +262,13 @@ public interface UserAPI {
     /**
      * Retrieves the users. The map contains the couples userId/User.
      * If a user does not exists, no exception is thrown and no value is added in the map.
-     * 
+     *
      * @param userIds
      *        The identifiers of the users
      * @return The users
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the user retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -277,13 +277,13 @@ public interface UserAPI {
     /**
      * Retrieves the identifiers of the named users. The map contains the couples userName/User.
      * If a user does not exists, no exception is thrown and no value is added in the map.
-     * 
+     *
      * @param userNames
      *        The names of the users
      * @return The users ordered by the user name ascending
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the user retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
@@ -291,13 +291,13 @@ public interface UserAPI {
 
     /**
      * Searches users according to the criteria containing in the options.
-     * 
+     *
      * @param options
      *        The search criteria
      * @return The search result
      * @throws SearchException
      *         If an exception occurs during the user searching
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -305,13 +305,13 @@ public interface UserAPI {
 
     /**
      * Returns the total number of users of the role.
-     * 
+     *
      * @param roleId
      *        The identifier of the role
      * @return The total number of users of the role
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the count retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -320,7 +320,7 @@ public interface UserAPI {
     /**
      * Retrieves the paginated list of roles.
      * It retrieves from the startIndex to the startIndex + maxResults.
-     * 
+     *
      * @param roleId
      *        The identifier of the role
      * @param startIndex
@@ -330,9 +330,9 @@ public interface UserAPI {
      * @param criterion
      *        The sorting criterion
      * @return The paginated list of roles
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the role retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -340,14 +340,14 @@ public interface UserAPI {
 
     /**
      * Returns the total number of users of the group.
-     * 
+     *
      * @param groupId
      *        The identifier of the group
      * @return The total number of users of the group
      * @throws BonitaException
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the count retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -356,7 +356,7 @@ public interface UserAPI {
     /**
      * Retrieves the paginated list of groups.
      * It retrieves from the startIndex to the startIndex + maxResults.
-     * 
+     *
      * @param groupId
      *        The identifier of the group
      * @param startIndex
@@ -366,9 +366,9 @@ public interface UserAPI {
      * @param criterion
      *        The sorting criterion
      * @return The paginated list of groups
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs during the group retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */

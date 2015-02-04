@@ -43,8 +43,9 @@ public interface GroupAPI {
 
     /**
      * Creates a group from its name and parent path.
-     * <b>
+     * <p>
      * If the group is a top level one, the parent path must be null.
+     * </p>
      * 
      * @param name
      *            the name of the group
@@ -55,7 +56,7 @@ public interface GroupAPI {
      *             If the couple name/parentPath is already taken by an existing group
      * @throws CreationException
      *             If an exception occurs during the group creation
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -63,8 +64,9 @@ public interface GroupAPI {
 
     /**
      * Creates a group.
-     * <b>
+     * <p>
      * It takes the values of the creator in order to create a group.
+     * </p>
      * 
      * @param creator
      *            the group creator
@@ -73,7 +75,7 @@ public interface GroupAPI {
      *             If the couple name/parentPath is already taken by an existing group
      * @throws CreationException
      *             If an exception occurs during group creation
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -91,7 +93,7 @@ public interface GroupAPI {
      *             If the group identifier does not refer to an existing group
      * @throws UpdateException
      *             If an exception occurs during the group update
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -104,7 +106,7 @@ public interface GroupAPI {
      *            the identifier of the group
      * @throws DeletionException
      *             If an exception occurs during the group deletion
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -117,7 +119,7 @@ public interface GroupAPI {
      *            the list of group identifiers
      * @throws DeletionException
      *             If an exception occurs during the group deletion
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -131,9 +133,9 @@ public interface GroupAPI {
      * @return the group
      * @throws GroupNotFoundException
      *             If the group identifier does not refer to an existing group
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the group retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -147,9 +149,9 @@ public interface GroupAPI {
      * @return the group
      * @throws GroupNotFoundException
      *             If the group path does not refer to an existing group
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the group retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -159,9 +161,9 @@ public interface GroupAPI {
      * Returns the total number of groups.
      * 
      * @return the total number of groups
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the count retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -169,9 +171,9 @@ public interface GroupAPI {
 
     /**
      * Retrieves the paginated list of groups.
-     * <b>
+     * <p>
      * It retrieves from the startIndex to the startIndex + maxResults.
-     * 
+     * </p>
      * @param startIndex
      *            the start index
      * @param maxResults
@@ -179,9 +181,9 @@ public interface GroupAPI {
      * @param criterion
      *            the sorting criterion
      * @return the list of groups
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the group retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -189,16 +191,17 @@ public interface GroupAPI {
 
     /**
      * Retrieves the groups.
-     * <b>
+     * <p>
      * The map contains the couples groupId/Group.
      * If a group does not exists, no exception is thrown and no value is added in the map.
+     * </p>
      * 
      * @param groupIds
      *            the identifiers of the groups
      * @return the groups
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *             If an exception occurs during the group retrieving
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -212,7 +215,7 @@ public interface GroupAPI {
      * @return the search result
      * @throws SearchException
      *             If an exception occurs during the group searching
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */

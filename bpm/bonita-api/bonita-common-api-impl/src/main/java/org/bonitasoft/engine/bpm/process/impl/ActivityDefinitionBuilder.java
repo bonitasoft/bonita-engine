@@ -303,12 +303,10 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     }
 
     /**
-     * Adds a Business Data on the activity. The activity must contain a
-     * {@link org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics} using dataInput or dataOutput.
+     * Adds a Business Data on the activity. The activity must contain a {@link org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics} using dataInput or dataOutput.
      *
      * @param name the name of the business data
      * @param className complete name of class defining the Business Data Type
-     * @param defaultValue expression representing the default value
      * @return
      */
     public ActivityDefinitionBuilder addBusinessData(final String name, final String className) {

@@ -36,10 +36,8 @@ public class SearchOptionsBuilder {
     /**
      * Builds a new <code>SearchOptions</code> with results limited to startIndex and maxResults
      *
-     * @param startIndex
-     *        the first result to return
-     * @param maxResults
-     *        the maximum results to return. The actual number can be smaller, if the end of the list has been reached.
+     * @param startIndex the first result to return
+     * @param maxResults the maximum results to return. The actual number can be smaller, if the end of the list has been reached.
      */
     public SearchOptionsBuilder(final int startIndex, final int maxResults) {
         options = new SearchOptionsImpl(startIndex, maxResults);
@@ -81,7 +79,7 @@ public class SearchOptionsBuilder {
      * @param value
      *        the value to compare.
      * @return this builder itself
-     * @see SearchOptionsBuilder#filter(String, Serializable) for field values
+     * @see SearchOptionsBuilder#filter(String, java.io.Serializable) for field values
      */
     public SearchOptionsBuilder greaterThan(final String field, final Serializable value) {
         options.addGreaterThanFilter(field, value);
@@ -92,7 +90,7 @@ public class SearchOptionsBuilder {
      * @param field
      * @param value
      * @return this builder itself
-     * @see SearchOptionsBuilder#filter(String, Serializable) for field values
+     * @see SearchOptionsBuilder#filter(String, java.io.Serializable) for field values
      */
     public SearchOptionsBuilder greaterOrEquals(final String field, final Serializable value) {
         options.addGreaterOrEqualsFilter(field, value);
@@ -100,10 +98,10 @@ public class SearchOptionsBuilder {
     }
 
     /**
-     * @param field
+     * @param field the field that should be less than
      * @param value
      * @return this builder itself
-     * @see SearchOptionsBuilder#filter(String, Serializable) for field values
+     * @see SearchOptionsBuilder#filter(String, java.io.Serializable) for field values
      */
     public SearchOptionsBuilder lessThan(final String field, final Serializable value) {
         options.addLessThanFilter(field, value);
@@ -111,10 +109,10 @@ public class SearchOptionsBuilder {
     }
 
     /**
-     * @param field
-     * @param value
+     * @param field the field that should be less or equals
+     * @param value the value
      * @return this builder itself
-     * @see SearchOptionsBuilder#filter(String, Serializable) for field values
+     * @see SearchOptionsBuilder#filter(String, java.io.Serializable) for field values
      */
     public SearchOptionsBuilder lessOrEquals(final String field, final Serializable value) {
         options.addLessOrEqualsFilter(field, value);
@@ -122,11 +120,11 @@ public class SearchOptionsBuilder {
     }
 
     /**
-     * @param field
-     * @param from
-     * @param to
+     * @param field the field that should be between
+     * @param from  from this value
+     * @param to    to this value
      * @return this builder itself
-     * @see SearchOptionsBuilder#filter(String, Serializable) for field values
+     * @see SearchOptionsBuilder#filter(String, java.io.Serializable) for field values
      */
     public SearchOptionsBuilder between(final String field, final Serializable from, final Serializable to) {
         options.addBetweenFilter(field, from, to);
@@ -137,7 +135,7 @@ public class SearchOptionsBuilder {
      * @param field
      * @param value
      * @return this builder itself
-     * @see SearchOptionsBuilder#filter(String, Serializable) for field values
+     * @see SearchOptionsBuilder#filter(String, java.io.Serializable) for field values
      */
     public SearchOptionsBuilder differentFrom(final String field, final Serializable value) {
         options.addDifferentFromFilter(field, value);
@@ -177,7 +175,7 @@ public class SearchOptionsBuilder {
     }
 
     /**
-     * @param value
+     * @param value the search term
      * @return this builder itself
      */
     public SearchOptionsBuilder searchTerm(final String value) {
@@ -200,7 +198,7 @@ public class SearchOptionsBuilder {
     }
 
     /**
-     * @param filters
+     * @param filters the filters to set
      * @return this builder itself
      */
     public SearchOptionsBuilder setFilters(final List<SearchFilter> filters) {
@@ -209,7 +207,7 @@ public class SearchOptionsBuilder {
     }
 
     /**
-     * @param sorts
+     * @param sorts the sorts to set
      * @return this builder itself
      */
     public SearchOptionsBuilder setSort(final List<Sort> sorts) {

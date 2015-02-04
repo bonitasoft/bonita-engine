@@ -366,7 +366,6 @@ public class IOUtil {
      * @param dir2zip
      * @param zos
      * @param root
-     * @param filenameFilter
      * @throws IOException
      */
     public static void zipDir(final String dir2zip, final ZipOutputStream zos, final String root) throws IOException {

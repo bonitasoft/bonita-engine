@@ -146,7 +146,7 @@ public class OperationBuilder {
     }
 
     /**
-     * Creates a new operation of type {@link OperatorType#BUSINESS_DATA_JAVA_SETTER} that allows to update a Business Data by calling a Java setter on one of
+     * Creates a new operation of type {@link org.bonitasoft.engine.operation.LeftOperand#TYPE_BUSINESS_DATA} that allows to update a Business Data by calling a Java setter on one of
      * its attributes.
      *
      * @param businessDataName
@@ -173,7 +173,7 @@ public class OperationBuilder {
      * @param expressionReturningBusinessData
      *        the expression returning an existing business data.
      * @return the newly created <code>Operation</code>.
-     * @see OperatorType#ATTACH_EXISTING_BUSINESS_DATA
+     * @see org.bonitasoft.engine.operation.LeftOperand#TYPE_BUSINESS_DATA
      */
     public Operation attachBusinessDataSetAttributeOperation(final String businessDataName, final Expression expressionReturningBusinessData) {
         return createNewInstance().setLeftOperand(new LeftOperandBuilder().createBusinessDataLeftOperand(businessDataName))

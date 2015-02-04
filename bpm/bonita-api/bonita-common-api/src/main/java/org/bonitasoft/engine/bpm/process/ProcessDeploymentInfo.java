@@ -19,7 +19,7 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.DescriptionElement;
 
 /**
- * Gives access to the {@link ProcessDefinition} deployment information.<br/>
+ * Gives access to the {@link ProcessDefinition} deployment information.<br>
  * A <code>ProcessDeploymentInfo</code> has a {@link ConfigurationState}, which says if the process is <code>resolved</code> (all its basic configuration has a
  * proper value), or <code>unresolved</code> (some configuration has to be done before the process can be activated).
  * <p>

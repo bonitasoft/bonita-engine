@@ -33,7 +33,7 @@ public class BonitaResponseHandler extends BasicResponseHandler {
     /**
      * Returns the response body as a String if the response was successful (a
      * 2xx status code). If no response body exists, this returns null. If the
-     * response was unsuccessful (>= 300 status code), throws an {@link HttpResponseException}.
+     * response was unsuccessful (&gt;= 300 status code), throws an {@link org.apache.http.client.HttpResponseException}.
      */
     @Override
     public String handleResponse(final HttpResponse response) throws HttpResponseException, IOException {

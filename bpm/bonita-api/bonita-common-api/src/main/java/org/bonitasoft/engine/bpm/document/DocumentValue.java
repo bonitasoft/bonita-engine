@@ -188,7 +188,7 @@ public class DocumentValue implements Serializable {
     }
 
     /**
-     * Indicate which document will be updated <br/>
+     * Indicate which document will be updated <br>
      * Used only when updating list of document
      *
      * @return the id of the document to update

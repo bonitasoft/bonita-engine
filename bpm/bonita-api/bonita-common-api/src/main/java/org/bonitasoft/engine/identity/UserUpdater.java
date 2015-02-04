@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * represents a helper for updating a {@link User}. Chaining is possible with this updator to ease the {@link User} update.
- * <br/>
+ * <br>
  * For instance, new UserUpdater.setUsername("john.doe").setFirstname("John").setLastname("Doe");
  *
  * @author Matthieu Chaffotte

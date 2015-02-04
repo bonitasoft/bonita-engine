@@ -25,11 +25,11 @@ import org.bonitasoft.engine.exception.NotFoundException;
 public interface PermissionAPI {
 
     /**
-     * Execute a groovy class stored in bonita-home/server/tenants/<tenant id>/conf/security-scripts/ using it's class name
+     * Execute a groovy class stored in bonita-home/server/tenants/&lt;tenant id&gt;/conf/security-scripts/ using it's class name
      * <p>
      * The class MUST implements {@link org.bonitasoft.engine.api.permission.PermissionRule} If the script is executed without exceptions it means that the user
      * is authorized to access the resource.
-     * The class must be put by hand in the bonita home folder bonita-home/server/tenants/<tenant id>/conf/security-scripts/<scriptName>.groovy
+     * The class must be put by hand in the bonita home folder bonita-home/server/tenants/&lt;tenant id&gt;/conf/security-scripts/&lt;scriptName&gt;.groovy
      * You can also add jar containing class implementing {@link org.bonitasoft.engine.api.permission.PermissionRule} and execute them using their class name.
      * </p>
      *
