@@ -51,7 +51,7 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -144,18 +144,6 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     private boolean inclusiveBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) throws SObjectReadException {
-
-        /*
-         * final SFlowNodeDefinition flowNode = sDefinition.getProcessContainer().getFlowNode(gatewayInstance.getFlowNodeDefinitionId());
-         * if (flowNode.getIncomingTransitions().size() == 1) {
-         * return true;
-         * }
-         * // get the token refId that hit the gate
-         * final Long tokenRefId = gatewayInstance.getTokenRefId();
-         * // if there is NO more token than the number of transitions that hit the gate merge is ok
-         * final int size = getHitByTransitionList(gatewayInstance).size();
-         * return tokenService.getNumberOfToken(gatewayInstance.getParentContainerId(), tokenRefId) <= size;
-         */
         try {
             logger.log(TAG, TechnicalLogSeverity.DEBUG,
                     "Evaluate if gateway " + gatewayInstance.getName() + " of instance " + gatewayInstance.getRootProcessInstanceId() + " of definition "
@@ -360,16 +348,23 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         updateOneColum(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
 
+
     @Override
-    public SGatewayInstance getGatewayMergingToken(final long processInstanceId, final Long tokenRefId) throws SGatewayReadException {
-        final HashMap<String, Object> hashMap = new HashMap<String, Object>(2);
-        hashMap.put("processInstanceId", processInstanceId);
-        hashMap.put("tokenRefId", tokenRefId);
-        try {
-            return persistenceRead.selectOne(new SelectOneDescriptor<SGatewayInstance>("getGatewayMergingToken", hashMap, SGatewayInstance.class));
-        } catch (final SBonitaReadException e) {
-            throw new SGatewayReadException(e);
+    public List<SGatewayInstance> getInclusiveGatewaysOfProcessInstanceThatShouldFire(SProcessDefinition processDefinition, long processInstanceId) throws SBonitaReadException {
+        List<SGatewayInstance> sGatewayInstances = getInclusiveGatewayInstanceOfProcessInstance(processInstanceId);
+        ArrayList<SGatewayInstance> shouldFire = new ArrayList<SGatewayInstance>();
+        for (SGatewayInstance sGatewayInstance : sGatewayInstances) {
+            if(shouldFire(processDefinition, sGatewayInstance)){
+                shouldFire.add(sGatewayInstance);
+            }
         }
+        return shouldFire;
     }
 
+    private List<SGatewayInstance> getInclusiveGatewayInstanceOfProcessInstance(long processInstanceId) throws SBonitaReadException {
+        final HashMap<String, Object> hashMap = new HashMap<String, Object>(2);
+        hashMap.put("processInstanceId", processInstanceId);
+        SelectListDescriptor<SGatewayInstance> getGatewayMergingToken = new SelectListDescriptor<SGatewayInstance>("getInclusiveGatewayInstanceOfProcessInstance", hashMap, SGatewayInstance.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
+        return persistenceRead.selectList(getGatewayMergingToken);
+    }
 }

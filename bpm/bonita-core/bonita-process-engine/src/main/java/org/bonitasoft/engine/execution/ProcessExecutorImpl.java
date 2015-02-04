@@ -360,6 +360,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      * try to gate active gateway.
      * if the gateway is already hit by this transition or by the same token, we create a new gateway
      */
+    //FIXME no more multiple waiting gateways, we must wait all transitions on a gateway and when it fires we trigger the next things while creating a new gateways with remaining tokens
     private SGatewayInstance createOrRetrieveGateway(final SProcessDefinition sProcessDefinition, final SFlowNodeDefinition flowNodeDefinition,
             final SStateCategory stateCategory, final long parentProcessInstanceId, final long rootProcessInstanceId,
             final STransitionDefinition transitionDefinition) throws SBonitaException {
@@ -643,7 +644,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             executeGateway(sProcessDefinition, sTransitionDefinition, child);
         }
 
-        return updateTokens(sProcessInstance, numberOfTokenToMerge, transitionsDescriptor);
+        return updateTokens(sProcessInstance, numberOfTokenToMerge, transitionsDescriptor, child, sProcessDefinition);
     }
 
     private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
@@ -655,20 +656,47 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private int updateTokens(final SProcessInstance sProcessInstance,
-            final int numberOfTokenToMerge, final FlowNodeTransitionsWrapper transitionsDescriptor)
+                             final int numberOfTokenToMerge, final FlowNodeTransitionsWrapper transitionsDescriptor, SFlowNodeInstance child, SProcessDefinition processDefinition)
             throws SBonitaException {
         // handle token creation/deletion
         int takenTransitions = transitionsDescriptor
                 .getValidOutgoingTransitionDefinitions().size();
         int numberOfTokenToCreate = takenTransitions - numberOfTokenToMerge;
+        logger.log(getClass(),TechnicalLogSeverity.DEBUG, "merge "+numberOfTokenToMerge+" and create "+takenTransitions +" tokens while executing "+child.getName());
+        long processInstanceId = sProcessInstance.getId();
         if(numberOfTokenToCreate < 0){
-            tokenService.deleteTokens(sProcessInstance.getId(), -numberOfTokenToCreate);
-            //FIXME warn inclusive gateways
+            tokenService.deleteTokens(processInstanceId, -numberOfTokenToCreate);
         } else if (numberOfTokenToCreate > 0 ){
-            tokenService.createTokens(sProcessInstance.getId(), transitionsDescriptor
-                    .getValidOutgoingTransitionDefinitions().size());
+            tokenService.createTokens(processInstanceId, numberOfTokenToCreate);
         }
-        return tokenService.getNumberOfToken(sProcessInstance.getId());
+        if(processDefinition.getProcessContainer().containsInclusiveGateway() && needToReevaluateInclusiveGateways(transitionsDescriptor)){
+            logger.log(getClass(),TechnicalLogSeverity.DEBUG, "some branches died, will check again all inclusive gateways");
+            List<SGatewayInstance> inclusiveGatewaysOfProcessInstance = gatewayInstanceService.getInclusiveGatewaysOfProcessInstanceThatShouldFire(processDefinition, processInstanceId);
+            for (SGatewayInstance gatewayInstance : inclusiveGatewaysOfProcessInstance) {
+                gatewayInstanceService.setFinish(gatewayInstance);
+                workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinition.getId(), processInstanceId, gatewayInstance.getId(), null,
+                        null));
+            }
+
+        }
+        return tokenService.getNumberOfToken(processInstanceId);
+    }
+
+    private boolean needToReevaluateInclusiveGateways(FlowNodeTransitionsWrapper transitionsDescriptor) {
+        int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size();
+        int takenTransition = transitionsDescriptor.getValidOutgoingTransitionDefinitions().size();
+        /*
+            need to reevaluate if some branches are dead
+
+            Why?
+            the algorithm that check the completion of gateways fire gateway if some path to goes to the gateways does not have a token
+            It means that if a gateway was blocked because it was waiting for a token to come it will not be unblock when all transitions
+              are taken but only if some are not.
+            The fact that a token goes forward will trigger the transition if it goes to the gateway but this work is not done here.
+
+            In conclusion if all declared transition it means that a branch died and that some inclusive gateways might be triggered
+         */
+        return transitionsDescriptor.isLastFlowNode() || takenTransition < allOutgoingTransitions;
     }
 
     private void archiveInvalidTransitions(final SFlowNodeInstance child, final FlowNodeTransitionsWrapper transitionsDescriptor)

@@ -101,7 +101,7 @@ public class TokenServiceIntegrationTest extends CommonBPMServicesTest {
         // Get Token
         transactionService.begin();
         final SToken result = tokenService.createToken(111l);
-        final SToken token = tokenService.getToken(111l);
+        final SToken token = tokenService.getTokenOfProcessInstance(111l);
         transactionService.complete();
         assertEquals(result, token);
     }

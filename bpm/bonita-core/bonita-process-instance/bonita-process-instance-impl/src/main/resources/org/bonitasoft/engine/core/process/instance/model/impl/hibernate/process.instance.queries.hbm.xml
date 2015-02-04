@@ -73,6 +73,14 @@
 		ORDER BY id
 	</query>
 
+	<query name="getInclusiveGatewayInstanceOfProcessInstance">
+		SELECT g
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl AS g
+		WHERE g.logicalGroup4 = :processInstanceId
+		AND g.deleted = FALSE
+		AND g.terminal = FALSE
+		AND g.gatewayType = 'INCLUSIVE'
+	</query>
 	<query name="getActiveGatewayInstanceOfProcess">
 		SELECT g
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl AS g
