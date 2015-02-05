@@ -55,3 +55,4 @@ DELETE FROM job_log WHERE tenantid = ${tenantid};
 DELETE FROM job_param WHERE tenantid = ${tenantid};
 DELETE FROM job_desc WHERE tenantid = ${tenantid};
 DELETE FROM theme WHERE tenantid = ${tenantid};
+DELETE FROM form_mapping WHERE tenantid = ${tenantid};

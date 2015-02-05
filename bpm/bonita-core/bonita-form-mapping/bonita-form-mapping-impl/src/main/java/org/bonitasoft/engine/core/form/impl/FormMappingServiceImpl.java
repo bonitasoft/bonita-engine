@@ -1,0 +1,123 @@
+/*
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2.0 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.bonitasoft.engine.core.form.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.core.form.FormMappingService;
+import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.events.model.SDeleteEvent;
+import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
+
+/**
+ * @author Baptiste Mesta
+ */
+public class FormMappingServiceImpl implements FormMappingService {
+
+    public static final String FORM_MAPPING = "FORM_MAPPING";
+    private Recorder recorder;
+    private ReadPersistenceService persistenceService;
+
+    public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService) {
+        this.recorder = recorder;
+        this.persistenceService = persistenceService;
+    }
+
+    @Override
+    public SFormMapping create(long processDefinitionId, String task, String form, boolean isExternal, String type) throws SObjectCreationException {
+        SFormMappingImpl sFormMapping = new SFormMappingImpl(processDefinitionId, task, form, isExternal, type);
+        InsertRecord record = new InsertRecord(sFormMapping);
+
+        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class)
+                .createInsertEvent(FORM_MAPPING)
+                .setObject(sFormMapping).done();
+        try {
+            recorder.recordInsert(record, insertEvent);
+        } catch (SRecorderException e) {
+            throw new SObjectCreationException(e);
+        }
+        return sFormMapping;
+    }
+
+    @Override
+    public void update(SFormMapping formMapping, String form, boolean isExternal) throws SObjectModificationException {
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class)
+                .createUpdateEvent(FORM_MAPPING)
+                .setObject(formMapping).done();
+        EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+        entityUpdateDescriptor.addField("form", form);
+        entityUpdateDescriptor.addField("isExternal", isExternal);
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(formMapping,
+                entityUpdateDescriptor);
+        try {
+            recorder.recordUpdate(updateRecord, updateEvent);
+        } catch (SRecorderException e) {
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    @Override
+    public void delete(SFormMapping formMapping) throws SObjectModificationException {
+        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class)
+                .createDeleteEvent(FORM_MAPPING)
+                .setObject(formMapping).done();
+        try {
+            recorder.recordDelete(new DeleteRecord(formMapping), deleteEvent);
+        } catch (SRecorderException e) {
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    @Override
+    public SFormMapping get(long formMappingId) throws SBonitaReadException {
+        return persistenceService.selectById(new SelectByIdDescriptor<SFormMapping>("getFormMappingById", SFormMapping.class, formMappingId));
+    }
+
+    @Override
+    public SFormMapping get(long processDefinitionId, String type, String task) throws SBonitaReadException {
+        Map<String,Object> parameters = new HashMap<String, Object>(3);
+        parameters.put("processDefinitionId", processDefinitionId);
+        parameters.put("type", type);
+        parameters.put("task", task);
+        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMapping", parameters, SFormMapping.class));
+    }
+
+    @Override
+    public List<SFormMapping> list(long processDefinitionId, int fromIndex, int numberOfResults) throws SBonitaReadException {
+        Map<String,Object> parameters = new HashMap<String, Object>(3);
+        parameters.put("processDefinitionId", processDefinitionId);
+        return persistenceService.selectList(new SelectListDescriptor<SFormMapping>("getFormMappings", parameters, SFormMapping.class, new QueryOptions(fromIndex, numberOfResults)));
+    }
+}

@@ -301,6 +301,11 @@
             <artifactId>bonita-business-application-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core</groupId>
+            <artifactId>bonita-form-mapping-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Others -->
         <dependency>

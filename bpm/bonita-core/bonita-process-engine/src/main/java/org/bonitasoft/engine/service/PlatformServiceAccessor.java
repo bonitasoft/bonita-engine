@@ -17,6 +17,7 @@ import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -68,5 +69,4 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
     PlatformCacheService getPlatformCacheService();
 
     void destroy();
-
 }

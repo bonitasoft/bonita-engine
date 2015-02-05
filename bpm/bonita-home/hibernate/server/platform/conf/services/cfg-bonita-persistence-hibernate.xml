@@ -175,6 +175,7 @@
 				<entry key="org.bonitasoft.engine.business.application.model.SApplication" value="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" />
 				<entry key="org.bonitasoft.engine.business.application.model.SApplicationPage" value="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" />
 				<entry key="org.bonitasoft.engine.business.application.model.SApplicationMenu" value="org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" />
+				<entry key="org.bonitasoft.engine.core.form.SFormMapping" value="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" />
 
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
@@ -234,6 +235,7 @@
 				<ref bean="hbm-bos-supervisor-mapping" />
 				<ref bean="hbm-bos-page-model" />
 				<ref bean="hbm-bos-application-model" />
+				<ref bean="hbm-bos-form-mapping-model" />
 			</list>
 		</property>
 	</bean>

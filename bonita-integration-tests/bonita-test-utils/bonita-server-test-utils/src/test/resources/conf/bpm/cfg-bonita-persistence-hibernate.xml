@@ -168,6 +168,7 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SToken" value="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" />
+				<entry key="org.bonitasoft.engine.core.form.SFormMapping" value="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" />
 
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
@@ -225,6 +226,7 @@
 				<ref bean="hbm-bos-process-comment-model-arch" />
 				<ref bean="hbm-bos-profile-model" />
 				<ref bean="hbm-bos-supervisor-mapping" />
+				<ref bean="hbm-bos-form-mapping-model" />
 			</list>
 		</property>
 	</bean>

@@ -193,6 +193,17 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-form-mapping-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-form-mapping-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- Home Server -->
 
 		<!-- Incident -->
@@ -618,6 +629,9 @@
 									<!-- External Identity Mapping -->
 									<include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-api</include>
 									<include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl</include>
+									<!-- Form mapping -->
+									<include>org.bonitasoft.engine.core:bonita-form-mapping-api</include>
+									<include>org.bonitasoft.engine.core:bonita-form-mapping-impl</include>
 									<!-- Home Server -->
 									<include>org.bonitasoft.engine.core:bonita-home-server</include>
 									<!-- Incident -->
