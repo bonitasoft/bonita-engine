@@ -48,9 +48,23 @@
 	</bean>
     
     <bean id="jsonBusinessDataSerializer" class="com.bonitasoft.engine.business.data.impl.JsonBusinessDataSerializerImpl"/>
-       
+
+    <bean id="typeConverterUtil" class="org.bonitasoft.engine.commons.TypeConverterUtil">
+        <constructor-arg name="datePatterns" type="java.lang.String[]">
+            <list>
+                <value>yyyy-MM-dd</value>
+                <value>HH:mm:ss</value>
+                <value>yyyy-MM-dd HH:mm:ss</value>
+                <value>yyyy-MM-dd'T'HH:mm:ss</value>
+                <value>yyyy-MM-dd'T'HH:mm:ss.SSS</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
     <bean id="businessDataService" class="com.bonitasoft.engine.business.data.impl.BusinessDataServiceImpl">
         <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
         <constructor-arg name="jsonBusinessDataSerializer" ref="jsonBusinessDataSerializer" />
+		<constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
+        <constructor-arg name="typeConverterUtil" ref="typeConverterUtil" />
     </bean>
 </beans>

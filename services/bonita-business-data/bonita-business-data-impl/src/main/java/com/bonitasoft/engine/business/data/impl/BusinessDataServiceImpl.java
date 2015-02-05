@@ -2,13 +2,14 @@ package com.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -17,12 +18,20 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
+import org.bonitasoft.engine.commons.TypeConverterUtil;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
 
+import com.bonitasoft.engine.bdm.BDMQueryUtil;
 import com.bonitasoft.engine.bdm.Entity;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.QueryParameter;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.BusinessDataService;
 import com.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
@@ -32,11 +41,19 @@ import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 public class BusinessDataServiceImpl implements BusinessDataService {
 
     private final BusinessDataRepository businessDataRepository;
+
     private final JsonBusinessDataSerializer jsonBusinessDataSerializer;
 
-    public BusinessDataServiceImpl(final BusinessDataRepository businessDataRepository, final JsonBusinessDataSerializer jsonBusinessDataSerializer) {
+    private final BusinessDataModelRepository businessDataModelRepository;
+
+    private final TypeConverterUtil typeConverterUtil;
+
+    public BusinessDataServiceImpl(final BusinessDataRepository businessDataRepository, final JsonBusinessDataSerializer jsonBusinessDataSerializer,
+            BusinessDataModelRepository businessDataModelRepository, TypeConverterUtil typeConverterUtil) {
         this.businessDataRepository = businessDataRepository;
         this.jsonBusinessDataSerializer = jsonBusinessDataSerializer;
+        this.businessDataModelRepository = businessDataModelRepository;
+        this.typeConverterUtil = typeConverterUtil;
     }
 
     @Override
@@ -131,8 +148,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         if (isEntity(valueToSetObjectWith)) {
             final Type relationType = getRelationType(businessObject, methodName);
             valueToSet = getPersistedValue((Entity) valueToSetObjectWith, relationType);
-        }
-        else if (isListOfEntities(valueToSetObjectWith)) {
+        } else if (isListOfEntities(valueToSetObjectWith)) {
             final Type relationType = getRelationType(businessObject, methodName);
             valueToSet = getPersistedValues((List<Entity>) valueToSetObjectWith, relationType);
         } else {
@@ -159,8 +175,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
         if (Type.AGGREGATION.equals(type)) {
             return businessDataRepository.findByIds(entities.get(0).getClass(), getPrimaryKeys(entities));
-        }
-        else {
+        } else {
             return copyForServer(entities);
         }
     }
@@ -168,8 +183,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     private Entity getPersistedValue(final Entity entity, final Type type) throws SBusinessDataNotFoundException {
         if (Type.AGGREGATION.equals(type)) {
             return businessDataRepository.findById(entity.getClass(), entity.getPersistenceId());
-        }
-        else {
+        } else {
             return copyForServer(entity);
         }
     }
@@ -213,7 +227,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     private Set<Class<? extends Annotation>> getAnnotationKeySet() {
-        //FIXME use custom annotation on methods
+        // FIXME use custom annotation on methods
         final Set<Class<? extends Annotation>> annotationKeySet = new HashSet<Class<? extends Annotation>>();
         annotationKeySet.add(OneToOne.class);
         annotationKeySet.add(OneToMany.class);
@@ -275,12 +289,102 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     }
 
+    @Override
+    public Serializable getJsonQueryEntities(final String entityClassName, final String queryName, final Map<String, Serializable> parameters,
+            final Integer startIndex,
+            final Integer maxResults, final String businessDataURIPattern) throws SBusinessDataRepositoryException {
+        final Class<? extends Entity> businessDataClass = loadClass(entityClassName);
+        final Query queryDefinition = getQueryDefinition(entityClassName, queryName);
+
+        final List<? extends Serializable> list = businessDataRepository.findListByNamedQuery(getQualifiedQueryName(businessDataClass, queryName),
+                getQueryReturnType(queryDefinition, entityClassName),
+                getQueryParameters(queryDefinition, parameters), startIndex,
+                maxResults);
+        try {
+            return jsonBusinessDataSerializer.serializeEntity((List<Entity>) list, businessDataURIPattern);
+        } catch (final Exception e) {
+            throw new SBusinessDataRepositoryException(e);
+        }
+    }
+
+    private Class<? extends Serializable> getQueryReturnType(Query queryDefinition, String entityClassName) throws SBusinessDataRepositoryException {
+        String returnType = queryDefinition.getReturnType();
+        if (queryReturnsMultipleResults(returnType)) {
+            return loadClass(entityClassName);
+        }
+        try {
+            return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(queryDefinition.getReturnType());
+        } catch (ClassNotFoundException e) {
+            throw new SBusinessDataRepositoryException("unable to load class " + queryDefinition.getReturnType());
+        }
+    }
+
+    private boolean queryReturnsMultipleResults(String returnType) {
+        return returnType.equals(List.class.getName());
+    }
+
+    private String getQualifiedQueryName(Class<? extends Entity> businessDataClass, String queryName) {
+        return String.format("%s.%s", businessDataClass.getSimpleName(), queryName);
+    }
+
+    private Map<String, Serializable> getQueryParameters(Query queryDefinition, final Map<String, Serializable> parameters)
+            throws SBusinessDataRepositoryException {
+        Set<String> errors = new HashSet<String>();
+        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        for (QueryParameter queryParameter : queryDefinition.getQueryParameters()) {
+            if (parameters != null && parameters.containsKey(queryParameter.getName())) {
+                queryParameters.put(queryParameter.getName(),
+                        convertToType(loadSerializableClass(queryParameter.getClassName()), parameters.get(queryParameter.getName())));
+            } else {
+                errors.add(queryParameter.getName());
+            }
+        }
+        if (!errors.isEmpty()) {
+            final StringBuilder errorMessage = new StringBuilder().append("parameter(s) are missing for query named ").append(queryDefinition.getName())
+                    .append(" : ");
+            errorMessage.append(StringUtils.join(errors, ","));
+            throw new SBusinessDataRepositoryException(errorMessage.toString());
+        }
+        return queryParameters;
+    }
+
+    private Serializable convertToType(Class<? extends Serializable> clazz, Serializable parameterValue) {
+        return (Serializable) typeConverterUtil.convertToType(clazz, parameterValue);
+    }
+
+    private Query getQueryDefinition(String className, String queryName) throws SBusinessDataRepositoryException {
+        final BusinessObjectModel businessObjectModel = businessDataModelRepository.getBusinessObjectModel();
+        if (businessObjectModel != null) {
+            for (BusinessObject businessObject : businessObjectModel.getBusinessObjects()) {
+                if (businessObject.getQualifiedName().equals(className)) {
+                    List<Query> allQueries = new ArrayList<Query>();
+                    allQueries.addAll(businessObject.getQueries());
+                    allQueries.addAll(BDMQueryUtil.createProvidedQueriesForBusinessObject(businessObject));
+                    for (Query query : allQueries) {
+                        if (query.getName().equals(queryName)) {
+                            return query;
+                        }
+                    }
+                }
+            }
+        }
+        throw new SBusinessDataRepositoryException("unable to get query " + queryName + " for business object " + className);
+    }
+
     @SuppressWarnings("unchecked")
     protected Class<? extends Entity> loadClass(final String returnType) throws SBusinessDataRepositoryException {
         try {
             return (Class<? extends Entity>) Thread.currentThread().getContextClassLoader().loadClass(returnType);
         } catch (final ClassNotFoundException e) {
             throw new SBusinessDataRepositoryException(e);
+        }
+    }
+
+    protected Class<? extends Serializable> loadSerializableClass(final String className) throws SBusinessDataRepositoryException {
+        try {
+            return (Class<? extends Serializable>) Thread.currentThread().getContextClassLoader().loadClass(className);
+        } catch (final ClassNotFoundException e) {
+            throw new SBusinessDataRepositoryException("unable to load class " + className);
         }
     }
 
