@@ -196,7 +196,7 @@ public interface ProcessRuntimeAPI {
      * @param criterion
      *        The sort criterion.
      * @return The list of process instances.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -283,7 +283,7 @@ public interface ProcessRuntimeAPI {
      *
      * @param processInstanceId
      *        The identifier of the process instance to delete.
-     * @throws ProcessInstanceHierarchicalDeletionException
+     * @throws org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException
      *         If a process instance cannot be deleted because of a parent that is still active.
      * @throws DeletionException
      *         If an error occurs during deletion.
@@ -297,7 +297,7 @@ public interface ProcessRuntimeAPI {
      *
      * @param processDefinitionId
      *        The identifier of the processDefinition.
-     * @throws ProcessInstanceHierarchicalDeletionException
+     * @throws org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException
      *         If a process instance cannot be deleted because of a parent that still exists.
      * @throws DeletionException
      *         If other deletion problem occurs.
@@ -305,16 +305,16 @@ public interface ProcessRuntimeAPI {
      * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int)} and {@link #deleteArchivedProcessInstances(long, int, int)}.
      *             As these new methods are paginated, to delete ALL archived and non-archived process instances, use some code like:
      *             <pre>
-     *             <blockquote>
+     *             <code>
      *             long nbDeleted = 0;
      *             processAPI.disableProcess(processDefinitionId);
      *             do {
      *             nbDeleted = processAPI.deleteProcessInstances(processDefinitionId, 0, 100);
-     *             } while (nbDeleted > 0);
+     *             } while (nbDeleted &gt; 0);
      *             do {
      *             nbDeleted = processAPI.deleteArchivedProcessInstances(processDefinitionId, 0, 100);
-     *             } while (nbDeleted > 0);
-     *             </blockquote>
+     *             } while (nbDeleted &gt; 0);
+     *             </code>
      *             </pre>
      */
     @Deprecated
@@ -403,7 +403,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Instantiates a process.
-     * <b>
+     * <br>
      * The process variables will be initialized by the initialVariables.
      *
      * @param processDefinitionId
@@ -477,7 +477,7 @@ public interface ProcessRuntimeAPI {
      * @param context
      *        The context in which the operations are executed.
      * @return An instance of the process.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ProcessDefinitionNotFoundException
      *         If no matching process definition is found.
@@ -503,7 +503,7 @@ public interface ProcessRuntimeAPI {
      * @param initialVariables
      *        The couples of initial variable/value
      * @return An instance of the process.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ProcessDefinitionNotFoundException
      *         If no matching process definition is found.
@@ -576,11 +576,11 @@ public interface ProcessRuntimeAPI {
      * @param activityInstanceId
      *        The identifier of the activity instance.
      * @return The matching activity instance.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
      *         If the activity cannot be found.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If the activity instance cannot be retrieved.
      * @since 6.0
      */
@@ -604,11 +604,11 @@ public interface ProcessRuntimeAPI {
      * @param activityInstanceId
      *        The identifier of the activity instance.
      * @return The matching archived activity instance.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
      *         If the archived activity instance cannot be found.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If the archived activity instance cannot be retrieved.
      * @since 6.0
      */
@@ -626,9 +626,9 @@ public interface ProcessRuntimeAPI {
      * @param criterion
      *        The sort criterion.
      * @return The matching list of task instances.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Occurs when the session is invalid.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If a task instance cannot be retrieved.
      * @since 6.0
      */
@@ -637,8 +637,8 @@ public interface ProcessRuntimeAPI {
     /**
      * Get the list of pending human task instances available to the specified user.
      * A human task is pending for a given user if it is not yet assigned and if the
-     * user is a candidate either through an {@link org.bonitasoft.engine.bpm.actor.ActorMember} or through a {@link org.bonitasoft.engine.filter.UserFilter}.
-     * Hidden tasks for this user are not retrieved (see {@link #hideTasks(long, Long...)}).
+     * user is a candidate either through an {@link org.bonitasoft.engine.bpm.actor.ActorMember} or through a {@link org.bonitasoft.engine.filter.UserFilter}. Hidden tasks for this user are not retrieved (see
+     * {@link #hideTasks(long, Long...)}).
      *
      * @param userId
      *        The identifier of the user.
@@ -649,7 +649,7 @@ public interface ProcessRuntimeAPI {
      * @param pagingCriterion
      *        The criterion for sorting the items over pages.
      * @return The list of matching task instances.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Occurs when the session is invalid.
      * @since 6.0
      */
@@ -661,9 +661,9 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of a user.
      * @return A number of human task instances assigned.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an error occurs while retrieving an instance of an activity.
      * @since 6.0
      */
@@ -675,9 +675,9 @@ public interface ProcessRuntimeAPI {
      * @param userIds
      *        A list of user identifiers.
      * @return A map with userId as key and number of tasks as value.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         can't retrieve an instance of activity
      * @since 6.0
      */
@@ -689,9 +689,9 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of a user.
      * @return A number of pending human task instances.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an error occurs while retrieving an instance of an activity.
      * @since 6.0
      */
@@ -703,11 +703,11 @@ public interface ProcessRuntimeAPI {
      * @param activityInstanceId
      *        The identifier of the activity instance.
      * @return The matching instance of human task.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
      *         If the human task cannot be found.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an error occurs while retrieving the instance of the activity.
      * @since 6.0
      */
@@ -725,7 +725,7 @@ public interface ProcessRuntimeAPI {
      * @param sortingType
      *        The criterion for sorting event instances.
      * @return The matching list of event instances.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -738,7 +738,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the user task.
      * @param userId
      *        The identifier of the user.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws UpdateException
      *         If an error occurs while updating the activity instance.
@@ -780,7 +780,7 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId
      *        The identifier of the process instance.
      * @return An instance of the data
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws DataNotFoundException
      *         If the specified data value cannot be found.
@@ -797,7 +797,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the process instance.
      * @param dataValue
      *        The new value for the data item.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws UpdateException
      *         If a problem occurs while updating the data value.
@@ -812,7 +812,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the process instance.
      * @param dataNameValues
      *        The mapping between the data name and its value to update to.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws UpdateException
      *         If a problem occurs while updating the data value.
@@ -842,7 +842,7 @@ public interface ProcessRuntimeAPI {
      * @param activityInstanceId
      *        The identifier of the activity instance.
      * @return An instance of data.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws DataNotFoundException
      *         If the specified data value cannot be found.
@@ -863,7 +863,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the activity instance.
      * @param dataValue
      *        The new value of the data to set.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws UpdateException
      *         If an error occurs during the update.
@@ -880,7 +880,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the activity instance.
      * @param dataValue
      *        The new value of the data to set.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws UpdateException
      *         If an error occurs during the update.
@@ -910,7 +910,7 @@ public interface ProcessRuntimeAPI {
      * @param activityInstanceId
      *        The identifier of the activity instance.
      * @return An instance of data.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws DataNotFoundException
      *         If the specified data value cannot be found.
@@ -926,9 +926,9 @@ public interface ProcessRuntimeAPI {
      * @param state
      *        The state of interest.
      * @return The date at which the activity instance reached the state.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an error occurs while retrieving the activity instance.
      * @since 6.0
      */
@@ -944,7 +944,7 @@ public interface ProcessRuntimeAPI {
      *        A map which contains several pairs of variable name and value.
      * @throws UpdateException
      *         If a problem occurs while updating one of the data instance value.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -959,7 +959,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the activity instance.
      * @param expressionContexts
      *        Store all information identifying the container that the data belongs to.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws UpdateException
      *         If an error occurs during the update.
@@ -977,7 +977,7 @@ public interface ProcessRuntimeAPI {
      *        The new due date for the task.
      * @throws UpdateException
      *         If the activity does not exist or the update cannot be fulfilled.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -993,11 +993,11 @@ public interface ProcessRuntimeAPI {
      * @return The identifier of a user task from the process instance that is assigned to the user.
      * @throws ProcessInstanceNotFoundException
      *         If the given process instance does not exist.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws UserNotFoundException
      *         If there is no user with the specified id.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an error occurs happen while retrieving the activity instance.
      * @since 6.0
      */
@@ -1015,9 +1015,9 @@ public interface ProcessRuntimeAPI {
      *         If the given process definition does not exist.
      * @throws UserNotFoundException
      *         If the given user does not exist.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an error occurs happen while retrieving the activity instance.
      * @since 6.0
      */
@@ -1044,13 +1044,13 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of a user.
      * @return A flag that indicates whether task can be executed by the user.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
      *         If the activity cannot be found.
      * @throws UserNotFoundException
      *         If there is no user with the specified userId.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an error occurs happen while retrieving the activity instance.
      * @since 6.0
      */
@@ -1061,7 +1061,7 @@ public interface ProcessRuntimeAPI {
      *
      * @param userTaskId
      *        The identifier of the user task.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
      *         If the activity cannot be found.
@@ -1082,9 +1082,9 @@ public interface ProcessRuntimeAPI {
      * @param maxResults
      *        The maximum number of results to get.
      * @return The list of archived process instances.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If no current valid session is found.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If the search fails because an archived process instance cannot be read.
      * @since 6.0
      */
@@ -1096,13 +1096,13 @@ public interface ProcessRuntimeAPI {
      * The last archived instance is returned.
      *
      * @param processInstanceId
-     *        The identifier of the process instance.
+     *        The identifier of the source process instance, i.e. not an archived version, the original process instance id.
      * @return The archived process instance.
      * @throws ArchivedProcessInstanceNotFoundException
      *         If no archived process instance can be found with the provided Id.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If no current valid session is found.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If the search fails because an archived process instance cannot be read.
      * @since 6.0
      */
@@ -1115,7 +1115,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the activity instance.
      * @param stateId
      *        The identifier of the required state.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If no current valid session is found.
      * @throws UpdateException
      *         If an error occurs during the update.
@@ -1130,7 +1130,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the activity instance.
      * @param state
      *        The name of the required state.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If no current valid session is found.
      * @throws UpdateException
      *         If an error occurs during the update.
@@ -1145,7 +1145,7 @@ public interface ProcessRuntimeAPI {
      *        The process instance.
      * @param state
      *        The name of the required state.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws UpdateException
      *         If an error occurs during the update.
@@ -1160,7 +1160,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of user task instance.
      * @param priority
      *        The new priority of this task.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws UpdateException
      *         If an error occurs during the update.
@@ -1186,7 +1186,7 @@ public interface ProcessRuntimeAPI {
      *         If an error occurs during connector execution.
      * @throws ConnectorNotFoundException
      *         If there is no connector definition with the specified identifier or version.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -1216,7 +1216,7 @@ public interface ProcessRuntimeAPI {
      *         If an error occurs during connector execution.
      * @throws ConnectorNotFoundException
      *         If there is no connector definition with the specified identifier or version.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -1228,12 +1228,13 @@ public interface ProcessRuntimeAPI {
      * Search the archived human tasks for tasks that match the search options.
      *
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See
-     *        {@link org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search conditions and the options for sorting and paging the results. See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
+     *        fields
+     *        for searching and sorting.
      * @return The archived human tasks that match the search conditions.
      * @throws SearchException
      *         If the search could not be completed correctly.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -1293,7 +1294,7 @@ public interface ProcessRuntimeAPI {
      *        The search conditions and the options for sorting and paging the results. See
      *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The pending human tasks that match the search conditions and are managed by the user.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If there is an error in the search conditions.
@@ -1341,7 +1342,7 @@ public interface ProcessRuntimeAPI {
      * @param userIds
      *        A list of user identifiers.
      * @return A map of user identifiers and numbers of overdue tasks.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -1356,7 +1357,7 @@ public interface ProcessRuntimeAPI {
      *         If the process instance identifier does not refer to a process instance.
      * @throws UpdateException
      *         If an exception occurs during the process instance canceling.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
@@ -1368,7 +1369,7 @@ public interface ProcessRuntimeAPI {
      *
      * @param activityInstanceId
      *        The identifier of the activity instance.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
      *         If there is no activity instance with the specified identifier.
@@ -1387,7 +1388,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the user.
      * @param activityInstanceId
      *        The list of identifiers of the tasks to be hidden.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If there is no current valid session.
      * @throws UpdateException
      *         If a problem occurs when hiding one of the tasks.
@@ -1403,7 +1404,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the user.
      * @param activityInstanceId
      *        The list of identifiers of the tasks to be hidden.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If there is no current valid session.
      * @throws UpdateException
      *         If a problem occurs when un-hiding one of the tasks.
@@ -1423,7 +1424,7 @@ public interface ProcessRuntimeAPI {
      * @param processDefinitionId
      *        The identifier of the process definition in which the expression is evaluated.
      * @return The result of the evaluation.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If there is no current valid session.
      * @throws ExpressionEvaluationException
      *         If an error occurs while evaluating the expression.
@@ -1440,9 +1441,9 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @return True if the task is hidden from the user.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If there is no current valid session
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an error occurs while retreiving the task.
      * @since 6.0
      */
@@ -1478,7 +1479,7 @@ public interface ProcessRuntimeAPI {
      *
      * @param signalName
      *        The signal name.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If there is no current valid session.
      * @throws SendEventException
      *         If an exception occurs while sending signal.
@@ -1496,8 +1497,8 @@ public interface ProcessRuntimeAPI {
      * @param targetFlowNode
      *        An expression representing the target flow node name.
      * @param messageContent
-     *        A key->value map containing the message data, with the data name as key.
-     * @throws InvalidSessionException
+     *        A key-&gt;value map containing the message data, with the data name as key.
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If there is no current valid session.
      * @throws SendEventException
      *         If an exception occurs while sending message.
@@ -1516,10 +1517,10 @@ public interface ProcessRuntimeAPI {
      * @param targetFlowNode
      *        An expression representing the target flow node name.
      * @param messageContent
-     *        A key->value map containing the message data, with the data name as key.
+     *        A key-&gt;value map containing the message data, with the data name as key.
      * @param correlations
      *        The message correlations (five maximum).
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If there is no current valid session.
      * @throws SendEventException
      *         If there are too many correlations (more than 5) or an exception occurs while sending message.
@@ -1536,9 +1537,9 @@ public interface ProcessRuntimeAPI {
      * @return The <code>ArchivedProcessInstance</code> instance.
      * @throws ArchivedProcessInstanceNotFoundException
      *         If the <code>ArchivedProcessInstance</code> was not found.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an error occurs while trying to retrieve the <code>ArchivedProcessInstance</code>.
      * @since 6.0
      */
@@ -1552,9 +1553,9 @@ public interface ProcessRuntimeAPI {
      * @return The <code>ArchivedFlowNodeInstance</code> instance.
      * @throws ArchivedFlowNodeInstanceNotFoundException
      *         If the <code>ArchivedFlowNodeInstance</code> was not found.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an error occurs while trying to retrieve the <code>ArchivedFlowNodeInstance</code>.
      * @since 6.0
      */
@@ -1566,9 +1567,9 @@ public interface ProcessRuntimeAPI {
      * @param archivedCommentId
      *        The identifier of the <code>ArchivedComment</code> to be retrieved.
      * @return The <code>ArchivedComment</code> instance.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an error occurs while trying to retrieve the <code>ArchivedComment</code>.
      * @throws NotFoundException
      *         If no <code>ArchivedComment</code> was found with the specified archivedCommentId.
@@ -1583,7 +1584,7 @@ public interface ProcessRuntimeAPI {
      *        The search conditions and the options for sorting and paging the results. See
      *        {@link org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor} for valid fields for searching and sorting.
      * @return The {@link SearchResult} containing the <code>ConnectorInstance</code>s matching the search options.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1598,7 +1599,7 @@ public interface ProcessRuntimeAPI {
      *        The search options parameters. See {@link org.bonitasoft.engine.bpm.connector.ArchiveConnectorInstancesSearchDescriptor} for valid fields for
      *        searching and sorting.
      * @return The {@link SearchResult} containing the <code>ArchivedConnectorInstance</code>s matching the search options.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1618,7 +1619,7 @@ public interface ProcessRuntimeAPI {
      * @param maxResults
      *        The maximum number of results to retrieve.
      * @return The list of matching human task instances.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -1634,7 +1635,7 @@ public interface ProcessRuntimeAPI {
      * @return A HumanTaskInstance, in its latest state.
      * @throws NotFoundException
      *         If no current task with provided name is found.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -1647,7 +1648,7 @@ public interface ProcessRuntimeAPI {
      *        The criterion used to search for archived activity instances. See
      *        {@link org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If an exception occurs during the search.
@@ -1662,7 +1663,7 @@ public interface ProcessRuntimeAPI {
      *        The criterion used to search for activity instances. See {@link org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor} for valid
      *        fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1677,7 +1678,7 @@ public interface ProcessRuntimeAPI {
      *        The criterion used to search for flow node instances. See {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor} for valid
      *        fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the ession is invalid, e.g session has expired.
      * @throws SearchException
      *         If an exception occurs during the search.
@@ -1692,7 +1693,7 @@ public interface ProcessRuntimeAPI {
      *        The options used to search for flow node instances. See {@link org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor} for
      *        valid fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g session has expired.
      * @throws SearchException
      *         If an exception occurs during the search.
@@ -1712,7 +1713,7 @@ public interface ProcessRuntimeAPI {
      *        The options used to search for tasks. See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
      *        searching and sorting.
      * @return The list of tasks matching the search options.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the current session is invalid.
      * @throws SearchException
      *         If an exception occurs during the search.
@@ -1727,7 +1728,7 @@ public interface ProcessRuntimeAPI {
      *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching
      *        and sorting.
      * @return The matching comments.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If an exception occurs during the search.
@@ -1743,7 +1744,7 @@ public interface ProcessRuntimeAPI {
      * @param comment
      *        The content of the comment.
      * @return The newly created comment.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @deprecated use {@link #addProcessComment(long, String)} instead, that can throw CreationException is case of inexistant Process Instance
      * @since 6.0
@@ -1759,7 +1760,7 @@ public interface ProcessRuntimeAPI {
      * @param comment
      *        The content of the comment.
      * @return The newly created comment.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws CreationException
      *         If the parameter processInstanceId does not refer to any active process instance (existing and non-archived).
@@ -1773,7 +1774,7 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId
      *        The identifier of the process instance.
      * @return The list of comments found
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @deprecated use paginated version {@link #searchComments(SearchOptions)} instead, passing a filter on processInstanceId field.
      * @since 6.0
@@ -1794,7 +1795,7 @@ public interface ProcessRuntimeAPI {
      *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching and
      *        sorting.
      * @return The comments managed by the user that match the search options.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1811,7 +1812,7 @@ public interface ProcessRuntimeAPI {
      *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching and
      *        sorting.
      * @return The comments on process instances that the user can access.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1832,14 +1833,14 @@ public interface ProcessRuntimeAPI {
      * @param criterion
      *        The criterion used to sort the result.
      * @return The list of children instance identifiers.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     List<Long> getChildrenInstanceIdsOfProcessInstance(long processInstanceId, int startIndex, int maxResults, ProcessInstanceCriterion criterion);
 
     /**
-     * Check whether a specified user is involved in a process instance.<br/>
+     * Check whether a specified user is involved in a process instance.<br>
      * User A is involved with a process instance if any of the following is true:
      * <ul>
      * <li>user A has started the process instance</li>
@@ -1855,7 +1856,7 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId
      *        The identifier of the process instance.
      * @return True if the user is involved with the process instance.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ProcessInstanceNotFoundException
      *         If there is no processInstance with the specified identifier.
@@ -1871,7 +1872,7 @@ public interface ProcessRuntimeAPI {
      * @param activityInstanceId
      *        The identifier of the activity instance.
      * @return The corresponding process instance id.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ProcessInstanceNotFoundException
      *         If there is no process instance with the specified identifier.
@@ -1885,7 +1886,7 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId
      *        The identifier of the process instance.
      * @return The corresponding process definition id.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ProcessDefinitionNotFoundException
      *         If there is no process definition with the specified identifier.
@@ -1899,7 +1900,7 @@ public interface ProcessRuntimeAPI {
      * @param activityInstanceId
      *        The identifier of the activity instance.
      * @return The corresponding process definition id.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws ProcessDefinitionNotFoundException
      *         If no ProcessDefinition have an id corresponding to the parameter.
@@ -1946,7 +1947,7 @@ public interface ProcessRuntimeAPI {
      *        The options used to search for process instance. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields
      *        for searching and sorting.
      * @return The <code>ProcessInstance</code>s that match the search options.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1965,7 +1966,7 @@ public interface ProcessRuntimeAPI {
      * @return The <code>ProcessInstance</code>s that match the search options.
      * @throws SearchException
      *         If the search could not be completed correctly.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -1980,7 +1981,7 @@ public interface ProcessRuntimeAPI {
      *         {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for valid fields for searching and sorting.
      * @throws SearchException
      *         If the search could not be full filled correctly
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
@@ -2010,7 +2011,7 @@ public interface ProcessRuntimeAPI {
      *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for
      *        valid fields for searching and sorting.
      * @return The archived process instances supervised by the user that match the search options.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -2027,7 +2028,7 @@ public interface ProcessRuntimeAPI {
      *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for
      *        valid fields for searching and sorting.
      * @return The archived process instances that the user can access that match the search options.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -2042,7 +2043,7 @@ public interface ProcessRuntimeAPI {
      *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
      *        fields for searching and sorting.
      * @return The human task instances that match the search options.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -2059,7 +2060,7 @@ public interface ProcessRuntimeAPI {
      *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
      *        fields for searching and sorting.
      * @return The human task instances that match the search options.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -2076,7 +2077,7 @@ public interface ProcessRuntimeAPI {
      *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor} for
      *        valid fields for searching and sorting.
      * @return The archived human task instances that match the search options.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -2093,7 +2094,7 @@ public interface ProcessRuntimeAPI {
      *        The map of expressions to evaluate.
      * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
      *         Occurs when an exception is thrown during expression evaluation.
@@ -2111,7 +2112,7 @@ public interface ProcessRuntimeAPI {
      *        The map of expressions to evaluate.
      * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the API session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
      *         Occurs when an exception is thrown during expression evaluation.
@@ -2129,7 +2130,7 @@ public interface ProcessRuntimeAPI {
      *        The map of expressions to evaluate.
      * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the API session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
      *         Occurs when an exception is thrown during expression evaluation.
@@ -2147,7 +2148,7 @@ public interface ProcessRuntimeAPI {
      *        The map of expressions to evaluate.
      * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the API session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
      *         Occurs when an exception is thrown during expression evaluation.
@@ -2165,7 +2166,7 @@ public interface ProcessRuntimeAPI {
      *        The map of expressions to evaluate.
      * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the API session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
      *         Occurs when an exception is thrown during expression evaluation.
@@ -2183,7 +2184,7 @@ public interface ProcessRuntimeAPI {
      *        The map of expressions to evaluate.
      * @return The result of the expression execution. Content of the resulting map depends on the incoming expression map. The returned key is The name of the
      *         expression (or its content if name is empty), the returned value is the evaluated expression result.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the API session is invalid, e.g session has expired.
      * @throws ExpressionEvaluationException
      *         Occurs when an exception is thrown during expression evaluation.
@@ -2200,7 +2201,7 @@ public interface ProcessRuntimeAPI {
      * @param maxResults
      *        The maximum number of results to retrieve.
      * @return The list of failed jobs.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
@@ -2213,7 +2214,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the job descriptor.
      * @throws ExecutionException
      *         Occurs when an exception is thrown during the job replay
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
@@ -2229,7 +2230,7 @@ public interface ProcessRuntimeAPI {
      *        The job parameters.
      * @throws ExecutionException
      *         Occurs when an exception is thrown during the job replay
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
@@ -2243,7 +2244,7 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId
      *        The identifier of the process instance
      * @return An archived instance of data.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @throws ArchivedDataNotFoundException
      *         If the specified data cannot be found.
@@ -2259,7 +2260,7 @@ public interface ProcessRuntimeAPI {
      * @param activityInstanceId
      *        The identifier of the activity instance
      * @return An archived instance of data.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
      * @throws ArchivedDataNotFoundException
      *         If the specified data cannot be found
@@ -2277,9 +2278,9 @@ public interface ProcessRuntimeAPI {
      * @param maxResults
      *        The max number of archived data instances
      * @return The list of archived data instances.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs while retrieving the archived instances of data
      * @since 6.1
      */
@@ -2295,9 +2296,9 @@ public interface ProcessRuntimeAPI {
      * @param maxResults
      *        The max number of archived data instances
      * @return The list of archived data instances.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs while retrieving the archived instances of data
      * @since 6.1
      */
@@ -2314,9 +2315,9 @@ public interface ProcessRuntimeAPI {
      * @param maxResults
      *        The max number of users
      * @return The list of users.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs while retrieving the users
      * @since 6.1
      */
@@ -2331,9 +2332,9 @@ public interface ProcessRuntimeAPI {
      * @param searchOptions
      *        the search options. See {@link org.bonitasoft.engine.identity.UserSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of users.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
-     * @throws RetrieveException
+     * @throws org.bonitasoft.engine.exception.RetrieveException
      *         If an exception occurs while retrieving the users
      * @since 6.3
      */

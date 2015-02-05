@@ -248,7 +248,7 @@ public class OperationServiceImplTest {
         final Map<SLeftOperand, Boolean> updates = spy.executeOperators(operations, expressionContext);
 
         // then
-        assertThat(updates).containsExactly(MapEntry.entry(buildLeftOperand("type1", "data2"), true), MapEntry.entry(buildLeftOperand("type1", "data1"), true));
+        assertThat(updates).containsOnly(MapEntry.entry(buildLeftOperand("type1", "data2"), true), MapEntry.entry(buildLeftOperand("type1", "data1"), true));
     }
 
 
