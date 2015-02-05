@@ -1,0 +1,58 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
+package org.bonitasoft.engine.bdm;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Map;
+
+import javax.xml.bind.JAXBException;
+
+import org.xml.sax.SAXException;
+
+import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.io.IOUtils;
+
+/**
+ * @author Matthieu Chaffotte
+ */
+public class BusinessObjectModelConverter {
+
+    private static final String BOM_XSD = "/bom.xsd";
+
+    private static final String BOM_XML = "bom.xml";
+
+    private final URL xsdUrl;
+
+    public BusinessObjectModelConverter() {
+        xsdUrl = BusinessObjectModel.class.getResource(BOM_XSD);
+    }
+
+    public byte[] zip(final BusinessObjectModel bom) throws IOException, JAXBException, SAXException {
+        return IOUtils.zip(BOM_XML, marshall(bom));
+    }
+
+    public byte[] marshall(final BusinessObjectModel bom) throws JAXBException, IOException, SAXException {
+        return IOUtils.marshallObjectToXML(bom, xsdUrl);
+    }
+
+    public BusinessObjectModel unzip(final byte[] zippedBOM) throws IOException, JAXBException, SAXException {
+        final Map<String, byte[]> files = IOUtils.unzip(zippedBOM);
+        final byte[] bomXML = files.get(BOM_XML);
+        if (bomXML == null) {
+            throw new IOException("the file " + BOM_XML + " is missing in the zip");
+        }
+        return unmarshall(bomXML);
+    }
+
+    public BusinessObjectModel unmarshall(final byte[] bomXML) throws JAXBException, IOException, SAXException {
+        return IOUtils.unmarshallXMLtoObject(bomXML, BusinessObjectModel.class, xsdUrl);
+    }
+
+}

@@ -1,0 +1,28 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties">
+			<props>
+				<prop key="db.hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+				<prop key="db.datasource.classname">org.h2.jdbcx.JdbcDataSource</prop>
+				<prop key="db.url">jdbc:h2:mem:datamanagement;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;AUTOCOMMIT=OFF;</prop>
+				<prop key="db.user">sa</prop>
+				<prop key="db.password"></prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="driverProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="user">${db.user}</prop>
+				<prop key="password">${db.password}</prop>
+				<prop key="URL">${db.url}</prop>
+			</props>
+		</property>
+	</bean>
+
+</beans>

@@ -49,6 +49,7 @@
 		<module>bonita-page</module>
 		<module>bonita-time-tracker</module>
 		<module>bonita-business-application</module>
-			</modules>
+		<module>bonita-business-data</module>
+    </modules>
 		
 </project>
