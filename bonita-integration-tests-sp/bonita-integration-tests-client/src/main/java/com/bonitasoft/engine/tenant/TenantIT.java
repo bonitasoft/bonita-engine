@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -212,7 +212,7 @@ public class TenantIT {
             apiTestSPUtil.getThemeAPI().getLastUpdateDate(ThemeType.PORTAL);
             apiTestSPUtil.getIdentityAPI().getNumberOfUsers();
             apiTestSPUtil.getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).done());
-            apiTestSPUtil.getPageAPI().searchPages(new SearchOptionsBuilder(0, 1).done());
+            apiTestSPUtil.getSubscriptionPageAPI().searchPages(new SearchOptionsBuilder(0, 1).done());
             // test with bos accessor
             org.bonitasoft.engine.api.TenantAPIAccessor.getThemeAPI(apiTestSPUtil.getSession()).getLastUpdateDate(ThemeType.PORTAL);
             org.bonitasoft.engine.api.TenantAPIAccessor.getIdentityAPI(apiTestSPUtil.getSession()).getNumberOfUsers();

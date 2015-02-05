@@ -37,9 +37,7 @@
                 <module>bonita-platform-session-clustered</module>
                 <module>bonita-monitoring</module>
                 <module>bonita-builder-sp</module>
-                <module>bonita-page</module>
                 <module>bonita-business-data</module>
-                <module>bonita-business-application</module>
             </modules>
         </profile>
     </profiles>

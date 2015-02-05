@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.parameter.impl.ParameterDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.DescriptionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 
@@ -22,9 +21,9 @@ import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionIm
  * @version 6.4.1
  * @since 6.0.0
  */
-public class ParameterDefinitionBuilder extends ProcessBuilderExt implements DescriptionBuilder {
+public class ParameterDefinitionBuilder extends org.bonitasoft.engine.bpm.process.impl.ParameterDefinitionBuilder implements DescriptionBuilder {
 
-    private final ParameterDefinitionImpl parameter;
+    private org.bonitasoft.engine.bpm.process.impl.ParameterDefinitionBuilder delegate;
 
     /**
      * Default Constructor.
@@ -43,15 +42,30 @@ public class ParameterDefinitionBuilder extends ProcessBuilderExt implements Des
      */
     ParameterDefinitionBuilder(final ProcessDefinitionBuilderExt processDefinitionBuilder, final DesignProcessDefinitionImpl designProcessDefinitionImpl,
             final String parameterName, final String type) {
-        super(designProcessDefinitionImpl, processDefinitionBuilder);
-        parameter = new ParameterDefinitionImpl(parameterName, type);
-        designProcessDefinitionImpl.addParameter(parameter);
+        super(processDefinitionBuilder, designProcessDefinitionImpl, parameterName, type);
+    }
+    ParameterDefinitionBuilder(final ProcessDefinitionBuilderExt processDefinitionBuilder, final DesignProcessDefinitionImpl designProcessDefinitionImp, org.bonitasoft.engine.bpm.process.impl.ParameterDefinitionBuilder delegate){
+        super(processDefinitionBuilder,designProcessDefinitionImp);
+        this.delegate = delegate;
+    }
+
+
+    @Override
+    public ParameterDefinitionBuilder addParameter(String parameterName, String type) {
+        org.bonitasoft.engine.bpm.process.impl.ParameterDefinitionBuilder parameterDefinitionBuilder = super.addParameter(parameterName, type);
+        return wrap(parameterDefinitionBuilder);
+    }
+
+    private ParameterDefinitionBuilder wrap(org.bonitasoft.engine.bpm.process.impl.ParameterDefinitionBuilder parameterDefinitionBuilder) {
+        return new ParameterDefinitionBuilder((ProcessDefinitionBuilderExt) getProcessBuilder(), process, parameterDefinitionBuilder);
     }
 
     @Override
-    public ParameterDefinitionBuilder addDescription(final String description) {
-        parameter.setDescription(description);
-        return this;
+    public ParameterDefinitionBuilder addDescription(String description) {
+        if(delegate != null){
+            return wrap(delegate.addDescription(description));
+        }else{
+            return wrap(super.addDescription(description));
+        }
     }
-
 }

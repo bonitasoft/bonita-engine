@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -22,6 +22,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
@@ -30,7 +31,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;

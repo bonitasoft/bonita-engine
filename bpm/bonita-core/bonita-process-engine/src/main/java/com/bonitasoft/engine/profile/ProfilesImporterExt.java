@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (C) 2014 Bonitasoft S.A.
- * Bonitasoft is a trademark of Bonitasoft SA.
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
- * Bonitasoft, 32 rue Gustave Eiffel – 38000 Grenoble
- * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
 package com.bonitasoft.engine.profile;
 
@@ -18,6 +18,7 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportError.Type;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
@@ -33,13 +34,11 @@ import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 
-import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.manager.Features;
 
 /**
  * @author Baptiste Mesta
- * 
  */
 public class ProfilesImporterExt extends ProfilesImporter {
 
@@ -149,7 +148,6 @@ public class ProfilesImporterExt extends ProfilesImporter {
     }
 
     /**
-     * 
      * @param exportedProfile
      * @return
      *         true when needed features are present

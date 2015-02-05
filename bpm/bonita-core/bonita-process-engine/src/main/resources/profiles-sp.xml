@@ -29,7 +29,7 @@
     <profile name="Administrator" isDefault="true">
         <description>The administrator can install a process, manage the organization, and handle some errors (for example, by replaying a task).</description>
         <profileEntries>
-            <parentProfileEntry name="Process management" isCustom="false">
+            <parentProfileEntry name="BPM" isCustom="false">
                 <parentName>NULL</parentName>
                 <index>0</index>
                 <description>BPM</description>
@@ -56,13 +56,13 @@
                         <type>link</type>
                         <page>caselistingadmin</page>
                     </profileEntry>
-                    <profileEntry name="Processes" isCustom="false">
-                        <parentName>BPM</parentName>
-                        <index>6</index>
-                        <description>All processes</description>
-                        <type>link</type>
-                        <page>processlistingadmin</page>
-                    </profileEntry>
+		            <profileEntry name="Analytics" isCustom="false">
+		                <parentName>BPM</parentName>
+		                <index>6</index>
+		                <description>Monitoring</description>
+		                <type>link</type>
+		                <page>reportlistingadminext</page>
+		            </profileEntry>
                 </childrenEntries>
             </parentProfileEntry>
             <parentProfileEntry name="Organization" isCustom="false">
@@ -71,65 +71,65 @@
                 <description>Organization</description>
                 <type>folder</type>
                 <childrenEntries>
-                    <profileEntry name="Users" isCustom="false">
-                        <parentName>Organization</parentName>
-                        <index>0</index>
-                        <description>All users</description>
-                        <type>link</type>
-                        <page>userlistingadmin</page>
-                    </profileEntry>
-                    <profileEntry name="Groups" isCustom="false">
-                        <parentName>Organization</parentName>
-                        <index>2</index>
-                        <description>All groups</description>
-                        <type>link</type>
-                        <page>grouplistingadmin</page>
-                    </profileEntry>
-                    <profileEntry name="Roles" isCustom="false">
-                        <parentName>Organization</parentName>
-                        <index>4</index>
-                        <description>All roles</description>
-                        <type>link</type>
-                        <page>rolelistingadmin</page>
-                    </profileEntry>
-                    <profileEntry name="Import / Export" isCustom="false">
-                        <parentName>Organization</parentName>
-                        <index>6</index>
-                        <description>Import / Export an final organization</description>
-                        <type>link</type>
-                        <page>importexportorganization</page>
-                    </profileEntry>
+					<profileEntry name="Users" isCustom="false">
+						<parentName>Organization</parentName>
+						<index>0</index>
+						<description>All users</description>
+						<type>link</type>
+						<page>userlistingadmin</page>
+					</profileEntry>
+					<profileEntry name="Groups" isCustom="false">
+						<parentName>Organization</parentName>
+						<index>2</index>
+						<description>All groups</description>
+						<type>link</type>
+						<page>grouplistingadmin</page>
+					</profileEntry>
+					<profileEntry name="Roles" isCustom="false">
+						<parentName>Organization</parentName>
+						<index>4</index>
+						<description>All roles</description>
+						<type>link</type>
+						<page>rolelistingadmin</page>
+					</profileEntry>
+					<profileEntry name="Import / Export" isCustom="false">
+						<parentName>Organization</parentName>
+						<index>6</index>
+						<description>Import / Export an final organization</description>
+						<type>link</type>
+						<page>importexportorganization</page>
+					</profileEntry>
+					<profileEntry name="Profiles" isCustom="false">
+						<parentName>Organization</parentName>
+						<index>8</index>
+						<description>All profiles</description>
+						<type>link</type>
+						<page>profilelisting</page>
+					</profileEntry>
                 </childrenEntries>
             </parentProfileEntry>
-            <parentProfileEntry name="Analytics" isCustom="false">
-                <parentName>NULL</parentName>
-                <index>4</index>
-                <description>Monitoring</description>
-                <type>link</type>
-                <page>reportlistingadminext</page>
-            </parentProfileEntry>
-            <parentProfileEntry name="Configuration" isCustom="false">
-                <parentName>NULL</parentName>
-                <index>6</index>
-                <description>Portal</description>
-                <type>folder</type>
-                <childrenEntries>
-                    <profileEntry name="Profiles" isCustom="false">
-                        <parentName>Portal</parentName>
-                        <index>0</index>
-                        <description>All profiles</description>
-                        <type>link</type>
-                        <page>profilelisting</page>
-                    </profileEntry>
+			<parentProfileEntry name="Resources" isCustom="false">
+				<parentName>NULL</parentName>
+				<index>4</index>
+				<description>Resources</description>
+				<type>folder</type>
+				<childrenEntries>
+					<profileEntry name="Processes" isCustom="false">
+						<parentName>Resources</parentName>
+						<index>0</index>
+						<description>All processes</description>
+						<type>link</type>
+						<page>processlistingadmin</page>
+					</profileEntry>
                     <profileEntry name="Look &amp; Feel" isCustom="false">
-                        <parentName>Portal</parentName>
+                        <parentName>Resources</parentName>
                         <index>2</index>
                         <description>LooknFeel</description>
                         <type>link</type>
                         <page>thememoredetailsadminext</page>
                     </profileEntry>
                     <profileEntry name="Custom Pages" isCustom="false">
-                        <parentName>Portal</parentName>
+                        <parentName>Resources</parentName>
                         <index>4</index>
                         <description>All custom pages</description>
                         <type>link</type>
@@ -139,7 +139,7 @@
             </parentProfileEntry>
             <parentProfileEntry name="Applications" isCustom="false">
                 <parentName>NULL</parentName>
-                <index>8</index>
+                <index>6</index>
                 <description>Applications</description>
                 <type>link</type>
                 <page>applicationslistingadmin</page>
