@@ -1021,9 +1021,9 @@ public class GatewayExecutionIT extends TestWithUser {
         // should also get the exception...not yet in the task
         disableAndDeleteProcess(processDefinition);
     }
-    
+
     @Test
-    public void processWithDiedBranchInclu() throws Exception {
+    public void processWithDiedBranchInclusive() throws Exception {
         ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         processDefinitionBuilder = processDefinitionBuilder.createNewInstance("processWithDiedBranch", PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);

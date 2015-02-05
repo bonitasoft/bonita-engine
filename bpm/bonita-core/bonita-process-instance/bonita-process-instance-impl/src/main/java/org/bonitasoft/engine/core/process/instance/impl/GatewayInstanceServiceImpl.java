@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
@@ -141,66 +141,45 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         }
     }
 
-    private boolean inclusiveBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) throws SObjectReadException {
-        try {
+    private boolean inclusiveBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) throws SBonitaReadException {
             logger.log(TAG, TechnicalLogSeverity.DEBUG,
                     "Evaluate if gateway " + gatewayInstance.getName() + " of instance " + gatewayInstance.getRootProcessInstanceId() + " of definition "
                             + sDefinition.getName() + " must be activated ");
-            return shouldFire(sDefinition, gatewayInstance);
-        } catch (SBonitaReadException e) {
-            throw new SObjectReadException(e);
-        }
-    }
-
-    private boolean shouldFire(SProcessDefinition sDefinition, SGatewayInstance gatewayInstance) throws SBonitaReadException {
-        //        IsEnabled(Workflow graph G, State s, Or-join A)
         SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
         SFlowNodeDefinition gatewayDefinition = processContainer.getFlowNode(gatewayInstance.getFlowNodeDefinitionId());
-        //        Red := {e | e is an incoming edge of A such that s(e) > 0}
+        long processInstanceId = gatewayInstance.getParentContainerId();
+
         List<String> hitByTransitionList = getHitByTransitionList(gatewayInstance);
+        List<STransitionDefinition> incomingTransitions = gatewayDefinition.getIncomingTransitions();
         List<STransitionDefinition> incomingWithTokens = new ArrayList<STransitionDefinition>();
         List<STransitionDefinition> incomingWithoutTokens = new ArrayList<STransitionDefinition>();
-        List<STransitionDefinition> incomingTransitions = gatewayDefinition.getIncomingTransitions();
 
         logger.log(TAG, TechnicalLogSeverity.DEBUG, "HitBys = " + gatewayInstance.getHitBys());
         for (int i = 0; i < incomingTransitions.size(); i++) {
+            STransitionDefinition currentTransition = incomingTransitions.get(i);
             if (hitByTransitionList.contains(String.valueOf(i + 1))) {
-                incomingWithTokens.add(incomingTransitions.get(i));
+                incomingWithTokens.add(currentTransition);
             } else {
-                incomingWithoutTokens.add(incomingTransitions.get(i));
+                incomingWithoutTokens.add(currentTransition);
             }
         }
         if (incomingWithTokens.size() == 0) {
             logger.log(TAG, TechnicalLogSeverity.DEBUG, "Not transition with token on it");
             return true;
         }
-        List<STransitionDefinition> red = new ArrayList<STransitionDefinition>();
-        List<STransitionDefinition> green = new ArrayList<STransitionDefinition>();
-        //        while there exist edges e = (v1, v2) ∈ Red and e0 = (v3, v4) < Red such that v4 = v1 , A do
-        //            Red := Red ∪{e
-        addBackwardReachableTransitions(processContainer, gatewayDefinition, incomingWithTokens, red, Collections.<STransitionDefinition>emptyList());
-
-        //            Green := {e | e is an incoming edge of A such that s(e) = 0}
-        //            while there exist an edge e = (v1, v2) ∈ Green and e0 = (v3, v4) < (Green ∪ Red) such that
-        //            v4 = v1 , A do
-        //                Green := Green ∪{e
-        //            }
-        //        }
-        addBackwardReachableTransitions(processContainer, gatewayDefinition, incomingWithoutTokens, green, red);
-
-        logger.log(TAG, TechnicalLogSeverity.DEBUG, "Green transitions: " + green);
-        logger.log(TAG, TechnicalLogSeverity.DEBUG, "Red transitions: " + red);
-
-        //                return Green ∩{e | s(e) > 0} = ∅.
-        return !greenContainsToken(green, gatewayDefinition, gatewayInstance, processContainer);
+        List<STransitionDefinition> finishWithAToken = new ArrayList<STransitionDefinition>();
+        List<STransitionDefinition> doesNotFinishWithAToken = new ArrayList<STransitionDefinition>();
+        addBackwardReachableTransitions(processContainer, gatewayDefinition, incomingWithTokens, finishWithAToken, Collections.<STransitionDefinition>emptyList());
+        addBackwardReachableTransitions(processContainer, gatewayDefinition, incomingWithoutTokens, doesNotFinishWithAToken, finishWithAToken);
+        return !transitionsContainsAToken(doesNotFinishWithAToken, gatewayDefinition, processInstanceId, processContainer);
     }
 
-    private boolean greenContainsToken(List<STransitionDefinition> green, SFlowNodeDefinition gatewayDefinition, SGatewayInstance gatewayInstance,
-                                       SFlowElementContainerDefinition processContainer) throws SBonitaReadException {
+    boolean transitionsContainsAToken(List<STransitionDefinition> transitions, SFlowNodeDefinition gatewayDefinition, long processInstanceId,
+                                              SFlowElementContainerDefinition processContainer) throws SBonitaReadException {
         List<SFlowNodeDefinition> sourceElements = new ArrayList<SFlowNodeDefinition>();
         List<SFlowNodeDefinition> targetElements = new ArrayList<SFlowNodeDefinition>();
 
-        for (STransitionDefinition sTransitionDefinition : green) {
+        for (STransitionDefinition sTransitionDefinition : transitions) {
             SFlowNodeDefinition source = processContainer.getFlowNode(sTransitionDefinition.getSource());
             if (!source.equals(gatewayDefinition) && !sourceElements.contains(source)) {
                 sourceElements.add(source);
@@ -210,42 +189,49 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
                 targetElements.add(target);
             }
         }
-        for (SFlowNodeDefinition sourceElement : sourceElements) {
-            logger.log(TAG, TechnicalLogSeverity.DEBUG, "check if there is a token on source element of transition " + sourceElement.getName());
-            List<FilterOption> filters = new ArrayList<FilterOption>();
-            filters.add(new FilterOption(SFlowNodeInstance.class, "name", sourceElement.getName()));
-            filters.add(new FilterOption(SFlowNodeInstance.class, "parentContainerId", gatewayInstance.getParentContainerId()));
-            QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption>emptyList(), filters, null);
-            List<SFlowNodeInstance> sFlowNodeInstances = flowNodeInstanceService.searchFlowNodeInstances(
-                    SFlowNodeInstance.class,
-                    searchOptions);
-            logger.log(TAG, TechnicalLogSeverity.DEBUG, (sFlowNodeInstances.isEmpty() ? "No" : "") + " flow node found for " + sourceElement.getName());
-            for (SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
-                if (sFlowNodeInstance.isTerminal()) {
-                    logger.log(TAG, TechnicalLogSeverity.DEBUG, "flow node " + sFlowNodeInstance.getName() + " contain a token, gateway not merged");
-                    return true;
-                }
-            }
-        }
-        for (SFlowNodeDefinition targetElement : targetElements) {
-            logger.log(TAG, TechnicalLogSeverity.DEBUG, "check if there is a token on target element of transition " + targetElement.getName());
-            List<FilterOption> filters = new ArrayList<FilterOption>();
-            filters.add(new FilterOption(SFlowNodeInstance.class, "name", targetElement.getName()));
-            filters.add(new FilterOption(SFlowNodeInstance.class, "parentContainerId", gatewayInstance.getParentContainerId()));
-            QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption>emptyList(), filters, null);
-            List<SFlowNodeInstance> sFlowNodeInstances = flowNodeInstanceService.searchFlowNodeInstances(
-                    SFlowNodeInstance.class,
-                    searchOptions);
-            logger.log(TAG, TechnicalLogSeverity.DEBUG, (sFlowNodeInstances.isEmpty() ? "No" : "") + " flow node found for " + targetElement.getName());
-            for (SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
-                if (!sFlowNodeInstance.isTerminal()) {
-                    logger.log(TAG, TechnicalLogSeverity.DEBUG, "flow node " + sFlowNodeInstance.getName() + " contain a token, gateway not merged");
-                    return true;
-                }
-            }
-        }
+        List<SFlowNodeDefinition> sourceAndTarget = extractElementThatAreSourceAndTarget(sourceElements, targetElements);
+        if (containsToken(processInstanceId, sourceAndTarget, null)) return true;
+        if (containsToken(processInstanceId, sourceElements, true)) return true;
+        if (containsToken(processInstanceId, targetElements, false)) return true;
         logger.log(TAG, TechnicalLogSeverity.DEBUG, "No token to wait, gateway will fire");
         return false;
+    }
+
+    List<SFlowNodeDefinition> extractElementThatAreSourceAndTarget(List<SFlowNodeDefinition> sourceElements, List<SFlowNodeDefinition> targetElements) {
+        List<SFlowNodeDefinition> sourceAndTarget = new ArrayList<SFlowNodeDefinition>();
+        Iterator<SFlowNodeDefinition> iterator = sourceElements.iterator();
+        while (iterator.hasNext()){
+            SFlowNodeDefinition sourceElement = iterator.next();
+            if(targetElements.contains(sourceElement)){
+                iterator.remove();
+                targetElements.remove(sourceElement);
+                sourceAndTarget.add(sourceElement);
+            }
+        }
+        return sourceAndTarget;
+    }
+
+    boolean containsToken(long processInstanceId, List<SFlowNodeDefinition> elements, Boolean shouldBeTerminal) throws SBonitaReadException {
+        for (SFlowNodeDefinition element : elements) {
+            List<SFlowNodeInstance> sFlowNodeInstances = getFlowNodes(processInstanceId, element);
+            for (SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
+                if (shouldBeTerminal == null || (!shouldBeTerminal ^ sFlowNodeInstance.isTerminal())) {
+                    logger.log(TAG, TechnicalLogSeverity.DEBUG, "flow node " + sFlowNodeInstance.getName() + " contain a token, gateway not merged");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private List<SFlowNodeInstance> getFlowNodes(long processInstanceId, SFlowNodeDefinition sourceElement) throws SBonitaReadException {
+        List<FilterOption> filters = new ArrayList<FilterOption>();
+        filters.add(new FilterOption(SFlowNodeInstance.class, "name", sourceElement.getName()));
+        filters.add(new FilterOption(SFlowNodeInstance.class, "parentContainerId", processInstanceId));
+        QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption>emptyList(), filters, null);
+        return flowNodeInstanceService.searchFlowNodeInstances(
+                SFlowNodeInstance.class,
+                searchOptions);
     }
 
     private void addBackwardReachableTransitions(SFlowElementContainerDefinition processContainer, SFlowNodeDefinition gatewayDefinition,
@@ -423,7 +409,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         List<SGatewayInstance> sGatewayInstances = getInclusiveGatewayInstanceOfProcessInstance(processInstanceId);
         ArrayList<SGatewayInstance> shouldFire = new ArrayList<SGatewayInstance>();
         for (SGatewayInstance sGatewayInstance : sGatewayInstances) {
-            if(shouldFire(processDefinition, sGatewayInstance)){
+            if(inclusiveBehavior(processDefinition, sGatewayInstance)){
                 shouldFire.add(sGatewayInstance);
             }
         }
