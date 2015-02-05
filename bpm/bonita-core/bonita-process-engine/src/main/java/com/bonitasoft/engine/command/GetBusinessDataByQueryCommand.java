@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -14,8 +14,6 @@ import java.util.Map;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 
-import com.bonitasoft.engine.business.data.BusinessDataService;
-import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -23,34 +21,31 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  * @author Laurent Leseigneur
  */
-public class GetBusinessDataByIdCommand extends TenantCommand {
+public class GetBusinessDataByQueryCommand extends TenantCommand {
 
+    public static final String QUERY_PARAMETERS = "queryParameters";
     public static final String ENTITY_CLASS_NAME = "entityClassName";
-    public static final String BUSINESS_DATA_ID = "businessDataId";
-    public static final String BUSINESS_DATA_CHILD_NAME = "businessDataChildName";
+    public static final String QUERY_NAME = "queryName";
+
+    public static final String START_INDEX = "startIndex";
+    public static final String MAX_RESULTS = "maxResults";
 
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
 
-        final BusinessDataService businessDataService = serviceAccessor.getBusinessDataService();
-
-        final Long identifier = getLongMandadoryParameter(parameters, BUSINESS_DATA_ID);
+        final String queryName = getStringMandadoryParameter(parameters, QUERY_NAME);
+        @SuppressWarnings("unchecked")
+        final Map<String, Serializable> queryParameters = (Map<String, Serializable>) parameters.get(QUERY_PARAMETERS);
         final String entityClassName = getStringMandadoryParameter(parameters, ENTITY_CLASS_NAME);
-        final String businessDataURIPattern = getStringMandadoryParameter(parameters, BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN);
-        final String childName = getParameter(parameters, BUSINESS_DATA_CHILD_NAME);
+        final Integer startIndex = getIntegerMandadoryParameter(parameters, START_INDEX);
+        final Integer maxResults = getIntegerMandadoryParameter(parameters, MAX_RESULTS);
+        String businessDataURIPattern = getStringMandadoryParameter(parameters, BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN);
         try {
-            if (childName != null && !childName.isEmpty()) {
-                return businessDataService.getJsonChildEntity(entityClassName, identifier, childName, businessDataURIPattern);
-            }
-            else {
-                return businessDataService.getJsonEntity(entityClassName, identifier, businessDataURIPattern);
-            }
-        } catch (final SBusinessDataNotFoundException e) {
-            throw new SCommandExecutionException(e);
-        } catch (final SBusinessDataRepositoryException e) {
+            return serviceAccessor.getBusinessDataService().getJsonQueryEntities(entityClassName, queryName, queryParameters, startIndex, maxResults,
+                    businessDataURIPattern);
+        } catch (SBusinessDataRepositoryException e) {
             throw new SCommandExecutionException(e);
         }
     }
-
 }

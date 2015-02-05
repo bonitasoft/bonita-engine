@@ -36,6 +36,11 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-assertj</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>com.bonitasoft.engine.util</groupId>
             <artifactId>bonita-common-util-sp</artifactId>
             <version>${project.version}</version>

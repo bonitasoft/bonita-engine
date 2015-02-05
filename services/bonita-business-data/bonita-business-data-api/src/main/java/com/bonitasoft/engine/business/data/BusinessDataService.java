@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.business.data;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public interface BusinessDataService {
 
@@ -20,7 +21,11 @@ public interface BusinessDataService {
     Serializable getJsonEntity(String entityClassName, Long identifier, String businessDataURIPattern) throws SBusinessDataNotFoundException,
             SBusinessDataRepositoryException;
 
-    Serializable getJsonChildEntity(String entityClassName, Long identifier, String childName, String businessDataURIPattern) throws SBusinessDataNotFoundException,
+    Serializable getJsonChildEntity(String entityClassName, Long identifier, String childName, String businessDataURIPattern)
+            throws SBusinessDataNotFoundException,
             SBusinessDataRepositoryException;
+
+    Serializable getJsonQueryEntities(String entityClassName, String queryName, Map<String, Serializable> queryParameters, Integer startIndex, Integer maxResults, String businessDataURIPattern)
+            throws SBusinessDataRepositoryException;
 
 }
