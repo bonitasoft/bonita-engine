@@ -18,7 +18,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <create.sources.jar>true</create.sources.jar>
-        <jackson.version>2.2.3</jackson.version>
     </properties>
 
     <dependencyManagement>
@@ -47,34 +46,6 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-ehcache</artifactId>
                 <version>${hibernate.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-entitymanager</artifactId>
-                <version>${hibernate.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.jboss.spec.javax.transaction</groupId>
-                        <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.javax.persistence</groupId>
-                <artifactId>hibernate-jpa-2.0-api</artifactId>
-                <version>1.0.1.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.javacrumbs.json-unit</groupId>
-                <artifactId>json-unit-assertj</artifactId>
-                <version>0.0.15</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
