@@ -42,6 +42,7 @@
 		<constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="tokenService" ref="tokenService" />
+		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
     </bean>
 
 	<bean id="transitionService" class="org.bonitasoft.engine.core.process.instance.impl.TransitionServiceImpl">

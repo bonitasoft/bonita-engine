@@ -321,18 +321,11 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SToken>("getTokens", Collections.<String, Object> emptyMap(), SToken.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SToken> getToken(final long processInstanceId, final long refId) {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>(2);
+    public static SelectListDescriptor<SToken> getToken(final long processInstanceId) {
+        final Map<String, Object> singletonMap = new HashMap<String, Object>(1);
         singletonMap.put("processInstanceId", processInstanceId);
-        singletonMap.put("refId", refId);
         return new SelectListDescriptor<SToken>("getToken", singletonMap, SToken.class, new QueryOptions(0, 1));
     }
 
-    public static SelectOneDescriptor<Long> getNumberOfToken(final long processInstanceId, final long refId) {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>(2);
-        singletonMap.put("processInstanceId", processInstanceId);
-        singletonMap.put("refId", refId);
-        return new SelectOneDescriptor<Long>("getNumberToken", singletonMap, SToken.class);
-    }
 
 }

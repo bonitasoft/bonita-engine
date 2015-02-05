@@ -48,40 +48,18 @@ public class TokenServiceIntegrationTest extends CommonBPMServicesTest {
     @Test
     public void getNumberOfTokens() throws Exception {
         transactionService.begin();
-        tokenService.createToken(123l, 124l, 125l);
-        tokenService.createToken(123l, 126l, 127l);
-        tokenService.createToken(111l, 126l, 127l);
+        tokenService.createToken(123l);
+        tokenService.createToken(123l);
+        tokenService.createToken(111l);
         final long numberOfToken = tokenService.getNumberOfToken(123l);
         transactionService.complete();
         assertEquals(2, numberOfToken);
     }
 
     @Test
-    public void getNumberOfTokensByRefId() throws Exception {
-        transactionService.begin();
-        tokenService.createToken(123l, 124l, 125l);
-        tokenService.createToken(123l, 126l, 127l);
-        final long numberOfToken = tokenService.getNumberOfToken(123l, 124l);
-        transactionService.complete();
-        assertEquals(1, numberOfToken);
-    }
-
-    @Test
-    public void getTokenByRefId() throws Exception {
-        transactionService.begin();
-        tokenService.createToken(123l, 124l, 125l);
-        tokenService.createToken(123l, 126l, 127l);
-        final SToken token = tokenService.getToken(123l, 124l);
-        transactionService.complete();
-        assertEquals(123l, token.getProcessInstanceId());
-        assertEquals(124l, token.getRefId().longValue());
-        assertEquals(125l, token.getParentRefId().longValue());
-    }
-
-    @Test
     public void createMultipleTokens() throws Exception {
         transactionService.begin();
-        tokenService.createTokens(123l, 124l, 125l, 3);
+        tokenService.createTokens(123l, 3);
         final int numberOfToken = tokenService.getNumberOfToken(123l);
         transactionService.complete();
         assertEquals(3, numberOfToken);
@@ -90,8 +68,8 @@ public class TokenServiceIntegrationTest extends CommonBPMServicesTest {
     @Test
     public void deleteMultipleTokens() throws Exception {
         transactionService.begin();
-        tokenService.createTokens(123l, 124l, 125l, 3);
-        tokenService.deleteTokens(123l, 124l, 2);
+        tokenService.createTokens(123l, 3);
+        tokenService.deleteTokens(123l, 2);
         final int numberOfToken = tokenService.getNumberOfToken(123l);
         transactionService.complete();
         assertEquals(1, numberOfToken);
@@ -100,7 +78,7 @@ public class TokenServiceIntegrationTest extends CommonBPMServicesTest {
     @Test
     public void deleteToken() throws Exception {
         transactionService.begin();
-        final SToken token = tokenService.createToken(123l, 124l, 125l);
+        final SToken token = tokenService.createToken(123l);
         tokenService.deleteToken(token);
         final int numberOfToken = tokenService.getNumberOfToken(123l);
         transactionService.complete();
@@ -110,8 +88,8 @@ public class TokenServiceIntegrationTest extends CommonBPMServicesTest {
     @Test
     public void deleteTokens() throws Exception {
         transactionService.begin();
-        tokenService.createToken(123l, 124l, 125l);
-        tokenService.createToken(123l, 124l, 125l);
+        tokenService.createToken(123l);
+        tokenService.createToken(123l);
         tokenService.deleteTokens(123l);
         final int numberOfToken = tokenService.getNumberOfToken(123l);
         transactionService.complete();
@@ -122,8 +100,8 @@ public class TokenServiceIntegrationTest extends CommonBPMServicesTest {
     public void getToken() throws Exception {
         // Get Token
         transactionService.begin();
-        final SToken result = tokenService.createToken(111l, 222l, 333l);
-        final SToken token = tokenService.getToken(111l, 222l);
+        final SToken result = tokenService.createToken(111l);
+        final SToken token = tokenService.getTokenOfProcessInstance(111l);
         transactionService.complete();
         assertEquals(result, token);
     }

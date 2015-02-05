@@ -360,10 +360,10 @@ public class EventsHandler {
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(subProcessId);
         final SFlowNodeInstance subProcflowNodeInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, rootProcessInstanceId,
                 parentProcessInstanceId, SFlowElementsContainerType.PROCESS, sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, 0,
-                SStateCategory.NORMAL, -1, processDefinitionId);
+                SStateCategory.NORMAL, -1);
         // FIXME: the token count will be inconsistent if a ProcessExecutor.childReachedState is called at same time.
         final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
-        tokenService.createToken(parentProcessInstanceId, parentProcessInstance.getProcessDefinitionId(), null);
+        tokenService.createToken(parentProcessInstanceId);
         if (triggerType.equals(SEventTriggerType.ERROR)) {
             // if error interrupt directly.
             final TransactionContainedProcessInstanceInterruptor interruptor = new TransactionContainedProcessInstanceInterruptor(

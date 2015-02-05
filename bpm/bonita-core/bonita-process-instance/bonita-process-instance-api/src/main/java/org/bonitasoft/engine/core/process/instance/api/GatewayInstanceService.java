@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.api;
 
+import java.util.List;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayCreationException;
@@ -20,6 +22,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayModifi
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayReadException;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Feng Hui
@@ -102,14 +105,8 @@ public interface GatewayInstanceService {
      */
     SGatewayInstance getActiveGatewayInstanceOfTheProcess(long parentProcessInstanceId, String name) throws SGatewayNotFoundException, SGatewayReadException;
 
-    void setFinish(SGatewayInstance gatewayInstance) throws SGatewayModificationException;
+    List<SGatewayInstance> setFinishAndCreateNewGatewayForRemainingToken(SProcessDefinition processDefinition, SGatewayInstance gatewayInstance) throws SBonitaException;
 
-    /**
-     * @param processInstanceId
-     * @param tokenRefId
-     * @return
-     * @throws SGatewayReadException
-     */
-    SGatewayInstance getGatewayMergingToken(long processInstanceId, Long tokenRefId) throws SGatewayReadException;
 
+    List<SGatewayInstance> getInclusiveGatewaysOfProcessInstanceThatShouldFire(SProcessDefinition processDefinition, long processInstanceId) throws SBonitaReadException;
 }

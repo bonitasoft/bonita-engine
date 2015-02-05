@@ -56,8 +56,6 @@
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
 		<property name="processInstanceId" column="processInstanceId" />
-		<property name="refId" column="ref_id" />
-		<property name="parentRefId" column="parent_ref_id" />
 		<filter name="tenantFilter" />
 	</class>
 

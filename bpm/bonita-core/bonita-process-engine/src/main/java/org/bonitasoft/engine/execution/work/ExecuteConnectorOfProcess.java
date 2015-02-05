@@ -116,7 +116,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         final BPMInstancesCreator bpmInstancesCreator = getTenantAccessor(context).getBPMInstancesCreator();
         final SFlowNodeInstance createFlowNodeInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, rootProcessInstanceId,
                 processInstanceId, SFlowElementsContainerType.PROCESS, eventDefinition, rootProcessInstanceId, processInstanceId, false, -1,
-                SStateCategory.NORMAL, -1, null);
+                SStateCategory.NORMAL, -1);
         return (SThrowEventInstance) createFlowNodeInstance;
     }
 
