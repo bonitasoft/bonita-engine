@@ -71,8 +71,8 @@ public class GatewayInstanceServiceImplTest {
         SFlowNodeDefinition step2 = node(2, "step2");
         SFlowNodeDefinition step3 = node(3, "step3");
 
-        List<SFlowNodeDefinition> sourceElements = new ArrayList<SFlowNodeDefinition>(Arrays.<SFlowNodeDefinition>asList(step1, step2));
-        List<SFlowNodeDefinition> targetElements = new ArrayList<SFlowNodeDefinition>(Arrays.<SFlowNodeDefinition>asList(step2, step3));
+        List<SFlowNodeDefinition> sourceElements = new ArrayList<SFlowNodeDefinition>(Arrays.<SFlowNodeDefinition> asList(step1, step2));
+        List<SFlowNodeDefinition> targetElements = new ArrayList<SFlowNodeDefinition>(Arrays.<SFlowNodeDefinition> asList(step2, step3));
         List<SFlowNodeDefinition> sourceAndTarget = gatewayInstanceService.extractElementThatAreSourceAndTarget(sourceElements, targetElements);
 
         assertThat(sourceElements).containsOnly(step1);
@@ -80,12 +80,14 @@ public class GatewayInstanceServiceImplTest {
         assertThat(sourceAndTarget).containsOnly(step2);
     }
 
-    SFlowNodeDefinition node(long id, String name) {
+    SFlowNodeDefinition node(long id, String name, STransitionDefinition... incomingTransitions) {
         SUserTaskDefinitionImpl definition = new SUserTaskDefinitionImpl(id, name, "actor");
+        for (STransitionDefinition incommingTransition : incomingTransitions) {
+            definition.addIncomingTransition(incommingTransition);
+        }
         doReturn(definition).when(processContainer).getFlowNode(id);
         return definition;
     }
-
 
     @Test
     public void should_containsToken_for_source_element_with_one_token_return_true() throws Exception {
@@ -148,17 +150,15 @@ public class GatewayInstanceServiceImplTest {
     @Test
     public void should_containsToken_for_both_element_with_no_token_return_false() throws Exception {
 
-
         boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID, flowNodeDefList("step0", "step1", "step2"), null);
 
         assertThat(containsToken).isFalse();
     }
 
-
     List<SFlowNodeDefinition> flowNodeDefList(String... names) {
         ArrayList<SFlowNodeDefinition> list = new ArrayList<SFlowNodeDefinition>();
         for (String name : names) {
-            list.add(node(1,name));
+            list.add(node(1, name));
         }
         return list;
     }
@@ -167,7 +167,7 @@ public class GatewayInstanceServiceImplTest {
         List<FilterOption> filters = new ArrayList<FilterOption>();
         filters.add(new FilterOption(SFlowNodeInstance.class, "name", name));
         filters.add(new FilterOption(SFlowNodeInstance.class, "parentContainerId", processInstanceId));
-        QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption>emptyList(), filters, null);
+        QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption> emptyList(), filters, null);
         SUserTaskInstanceImpl sUserTaskInstance = new SUserTaskInstanceImpl();
         sUserTaskInstance.setName(name);
         sUserTaskInstance.setTerminal(terminal);
@@ -180,12 +180,13 @@ public class GatewayInstanceServiceImplTest {
     @Test
     public void should_transitionsContainsAToken_calls_containsToken_with_middle_node_terminal() throws Exception {
         SFlowNodeDefinition gate = node(666, "gate");
-        node(1,"step1");
-        node(2,"step2");
-        node(3,"step3");
+        node(1, "step1");
+        node(2, "step2");
+        node(3, "step3");
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, true);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2),transition(2, 3)), gate, PROCESS_INSTANCE_ID, processContainer);
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+                processContainer);
 
         assertThat(containsAToken).isTrue();
     }
@@ -193,85 +194,102 @@ public class GatewayInstanceServiceImplTest {
     @Test
     public void should_transitionsContainsAToken_calls_containsToken_with_middle_node_not_terminal() throws Exception {
         SFlowNodeDefinition gate = node(666, "gate");
-        node(1,"step1");
-        node(2,"step2");
-        node(3,"step3");
+        node(1, "step1");
+        node(2, "step2");
+        node(3, "step3");
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, false);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2),transition(2, 3)), gate, PROCESS_INSTANCE_ID, processContainer);
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+                processContainer);
 
         assertThat(containsAToken).isTrue();
     }
-
 
     @Test
     public void should_transitionsContainsAToken_calls_containsToken_with_source_node_true() throws Exception {
         SFlowNodeDefinition gate = node(666, "gate");
-        node(1,"step1");
-        node(2,"step2");
-        node(3,"step3");
+        node(1, "step1");
+        node(2, "step2");
+        node(3, "step3");
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, true);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2),transition(2, 3)), gate, PROCESS_INSTANCE_ID, processContainer);
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+                processContainer);
 
         assertThat(containsAToken).isTrue();
     }
-
 
     @Test
     public void should_transitionsContainsAToken_calls_containsToken_with_source_node_false() throws Exception {
         SFlowNodeDefinition gate = node(666, "gate");
-        node(1,"step1");
-        node(2,"step2");
-        node(3,"step3");
+        node(1, "step1");
+        node(2, "step2");
+        node(3, "step3");
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, false);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2),transition(2, 3)), gate, PROCESS_INSTANCE_ID, processContainer);
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+                processContainer);
 
         assertThat(containsAToken).isFalse();
     }
-
 
     @Test
     public void should_transitionsContainsAToken_calls_containsToken_with_target_node_true() throws Exception {
         SFlowNodeDefinition gate = node(666, "gate");
-        node(1,"step1");
-        node(2,"step2");
-        node(3,"step3");
+        node(1, "step1");
+        node(2, "step2");
+        node(3, "step3");
         instanceInDatabase("step3", PROCESS_INSTANCE_ID, false);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2),transition(2, 3)), gate, PROCESS_INSTANCE_ID, processContainer);
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+                processContainer);
 
         assertThat(containsAToken).isTrue();
     }
+
     @Test
     public void should_transitionsContainsAToken_calls_containsToken_with_target_node_false() throws Exception {
         SFlowNodeDefinition gate = node(666, "gate");
-        node(1,"step1");
-        node(2,"step2");
-        node(3,"step3");
+        node(1, "step1");
+        node(2, "step2");
+        node(3, "step3");
         instanceInDatabase("step3", PROCESS_INSTANCE_ID, true);
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2),transition(2, 3)), gate, PROCESS_INSTANCE_ID, processContainer);
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+                processContainer);
 
         assertThat(containsAToken).isFalse();
     }
-
-
 
     @Test
     public void should_transitionsContainsAToken_calls_containsToken_with_no_node() throws Exception {
         SFlowNodeDefinition gate = node(666, "gate");
-        node(1,"step1");
-        node(2,"step2");
+        node(1, "step1");
+        node(2, "step2");
         node(3, "step3");
 
-        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2),transition(2, 3)), gate, PROCESS_INSTANCE_ID, processContainer);
+        boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
+                processContainer);
 
         assertThat(containsAToken).isFalse();
     }
 
+    @Test
+    public void should_addBackwardReachableTransitions_complete_list() {
+        SFlowNodeDefinition gate = node(666, "gate");
+        node(1, "stepa1");
+        node(2, "stepa2", transition(1, 2));
+        node(3, "stepa3", transition(2, 3));
+        node(4, "stepb4");
+        node(5, "stepb5");
+        node(6, "stepb6", transition(5, 6), transition(4, 6));
 
+        List<STransitionDefinition> startTransition = Arrays.asList(transition(6, 666), transition(3, 666));
+        List<STransitionDefinition> toComplete = new ArrayList<STransitionDefinition>();
+        gatewayInstanceService.addBackwardReachableTransitions(processContainer, gate, startTransition, toComplete, Collections.<STransitionDefinition>emptyList());
+
+        assertThat(toComplete).containsOnly(transition(1, 2), transition(2, 3), transition(4, 6), transition(5, 6), transition(3, 666), transition(6, 666));
+    }
 
     private STransitionDefinition transition(long source, long target) {
         return new STransitionDefinitionImpl("name", source, target);

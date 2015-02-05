@@ -234,7 +234,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
                 searchOptions);
     }
 
-    private void addBackwardReachableTransitions(SFlowElementContainerDefinition processContainer, SFlowNodeDefinition gatewayDefinition,
+    void addBackwardReachableTransitions(SFlowElementContainerDefinition processContainer, SFlowNodeDefinition gatewayDefinition,
                                                  List<STransitionDefinition> transitions, List<STransitionDefinition> backwardReachable, List<STransitionDefinition> notIn) {
         for (STransitionDefinition sTransitionDefinition : transitions) {
             if (!backwardReachable.contains(sTransitionDefinition) && !notIn.contains(sTransitionDefinition)) {
