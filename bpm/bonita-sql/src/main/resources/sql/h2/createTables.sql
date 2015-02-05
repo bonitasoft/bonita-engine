@@ -279,16 +279,9 @@ CREATE TABLE process_instance (
   stringIndex3 VARCHAR(50),
   stringIndex4 VARCHAR(50),
   stringIndex5 VARCHAR(50),
+  tokenCount INT NOT NULL,
   PRIMARY KEY (tenantid, id)
 );
-
-CREATE TABLE token (
-  tenantid BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  processInstanceId BIGINT NOT NULL,
-  PRIMARY KEY (tenantid, id)
-);
-CREATE INDEX idx1_token ON token(tenantid,processInstanceId);
 
 CREATE TABLE flownode_instance (
   tenantid BIGINT NOT NULL,
@@ -340,7 +333,6 @@ CREATE TABLE flownode_instance (
   interrupting BOOLEAN,
   deleted BOOLEAN DEFAULT FALSE,
   tokenCount INT NOT NULL,
-  token_ref_id BIGINT NULL,
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);

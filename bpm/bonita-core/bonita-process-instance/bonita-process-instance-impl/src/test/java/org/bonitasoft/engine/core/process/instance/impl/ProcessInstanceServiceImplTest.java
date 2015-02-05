@@ -46,7 +46,6 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
@@ -144,9 +143,6 @@ public class ProcessInstanceServiceImplTest {
 
     @Mock
     private SCommentService sCommentService;
-
-    @Mock
-    private TokenService tokenService;
 
     @Spy
     @InjectMocks

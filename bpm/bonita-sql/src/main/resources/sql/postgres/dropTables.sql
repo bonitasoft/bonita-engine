@@ -23,7 +23,6 @@ DROP TABLE event_trigger_instance;
 DROP TABLE waiting_event;
 DROP TABLE message_instance;
 DROP TABLE hidden_activity;
-DROP TABLE token;
 DROP TABLE breakpoint;
 DROP TABLE report;
 DROP TABLE processsupervisor;

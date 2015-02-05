@@ -47,18 +47,9 @@
 		<property name="stringIndex3" column="stringIndex3" />
 		<property name="stringIndex4" column="stringIndex4" />
 		<property name="stringIndex5" column="stringIndex5" />
+		<property name="tokenCount" column="tokenCount" />
 		<filter name="tenantFilter" />
 	</class>
-	
-	<class name="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" table="token">
-		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-			<key-property name="tenantId" column="tenantid" type="long" />
-			<key-property name="id" column="id" type="long" />
-		</composite-id>
-		<property name="processInstanceId" column="processInstanceId" />
-		<filter name="tenantFilter" />
-	</class>
-
 
 	<class name="SFlowNodeInstanceImpl" abstract="true" table="flownode_instance">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
@@ -77,7 +68,6 @@
 		<property name="previousStateId" column="prev_state_id" />
 		<property name="stable" column="stable" type="boolean" />
 		<property name="terminal" column="terminal" type="boolean" />
-		<property name="tokenRefId" column="token_ref_id" type="long" />
 		<property name="stateCategory" column="stateCategory">
 			<type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
 				<param name="enumClass">

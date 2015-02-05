@@ -1416,31 +1416,6 @@
 			)
 	</query>
 
-	<!-- Token -->
-	<query name="getNumberOfTokensOfProcessInstance">
-		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
-		WHERE t.processInstanceId = :processInstanceId
-	</query>
-
-	<query name="getTokensOfProcessInstance">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
-		WHERE t.processInstanceId = :processInstanceId
-	</query>
-
-	<query name="getToken">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
-		WHERE t.processInstanceId = :processInstanceId
-        ORDER BY t.id ASC
-	</query>
-
-	<query name="getTokens">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
-	</query>
-
 	<query name="purgeSFlowNodeInstanceImpl">
 		DELETE FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS flowNode
 		WHERE flowNode.deleted = TRUE

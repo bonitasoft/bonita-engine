@@ -30,7 +30,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
@@ -75,18 +74,16 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     private final SGatewayInstanceBuilderFactory sGatewayInstanceBuilderFactory;
 
-    private final TokenService tokenService;
     private FlowNodeInstanceService flowNodeInstanceService;
 
     private final TechnicalLoggerService logger;
 
     public GatewayInstanceServiceImpl(final Recorder recorder, final EventService eventService, final ReadPersistenceService persistenceRead,
-                                      final TechnicalLoggerService logger, final TokenService tokenService, FlowNodeInstanceService flowNodeInstanceService) {
+                                      final TechnicalLoggerService logger, FlowNodeInstanceService flowNodeInstanceService) {
         this.recorder = recorder;
         this.eventService = eventService;
         this.persistenceRead = persistenceRead;
         this.logger = logger;
-        this.tokenService = tokenService;
         this.flowNodeInstanceService = flowNodeInstanceService;
         sGatewayInstanceBuilderFactory = BuilderFactory.get(SGatewayInstanceBuilderFactory.class);
     }

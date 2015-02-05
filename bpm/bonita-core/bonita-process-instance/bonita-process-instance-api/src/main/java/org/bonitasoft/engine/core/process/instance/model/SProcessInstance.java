@@ -90,4 +90,5 @@ public interface SProcessInstance extends SFlowElementsContainer {
 
     boolean hasBeenInterruptedByEvent();
 
+    int getTokenCount();
 }

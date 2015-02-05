@@ -64,7 +64,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefi
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SThrowEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
@@ -182,9 +182,9 @@ public class StateBehaviors {
 
     private final IdentityService identityService;
 
-    private final TokenService tokenService;
-
     protected final ParentContainerResolver parentContainerResolver;
+
+    private final ProcessInstanceService processInstanceService;
 
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
@@ -192,7 +192,7 @@ public class StateBehaviors {
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService,
+            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final ProcessInstanceService processInstanceService,
             final ParentContainerResolver parentContainerResolver) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
@@ -213,7 +213,7 @@ public class StateBehaviors {
         this.commentService = commentService;
         this.identityService = identityService;
         this.logger = logger;
-        this.tokenService = tokenService;
+        this.processInstanceService = processInstanceService;
         this.parentContainerResolver = parentContainerResolver;
     }
 
@@ -743,7 +743,7 @@ public class StateBehaviors {
         );
 
         // we create token here to be sure the token is put synchronously
-        tokenService.createTokens(activityInstance.getParentProcessInstanceId(), 1);
+        processInstanceService.addToken(processInstanceService.getProcessInstance(activityInstance.getParentProcessInstanceId()), 1);
         // no need to handle failed state, creation is in the same tx
         containerRegistry.executeFlowNodeInSameThread(parentProcessInstanceId, boundaryEventInstance.getId(), null, null, containerType.name());
     }

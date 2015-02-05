@@ -15,9 +15,6 @@
 	<!-- Show events of synchro repository -->
 	<!-- <logger name="org.bonitasoft.engine.test.synchro.SynchroRepository" level="DEBUG" /> -->
 	
-	<!-- Show token addition/deletion -->
-	<!-- <logger name="org.bonitasoft.engine.core.process.instance.impl.TokenServiceImpl" level="DEBUG" /> -->
-	
 	<!-- Show stack traces when there is error on jobs -->
 	<!-- <logger name="org.bonitasoft.engine.scheduler.impl.JobWrapper" level="DEBUG" /> -->
 	
@@ -25,8 +22,6 @@
  	<!--<logger name="org.bonitasoft.engine.lock.impl.MemoryLockService" level="TRACE" />-->
  	<!--<logger name="org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork" level="TRACE" />-->
  	<!--<logger name="org.bonitasoft.engine.core.process.instance.impl.GatewayInstanceServiceImpl" level="TRACE" />-->
- 	<!--<logger name="org.bonitasoft.engine.core.process.instance.impl.TokenServiceImpl" level="DEBUG" />-->
-
 	<!--<logger name="org.bonitasoft.engine.execution.ProcessExecutorImpl" level="DEBUG" />-->
 	<!---<logger name="org.bonitasoft.engine.execution.FlowNodeExecutorImpl" level="DEBUG" />-->
 	<!--<logger name="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl" level="DEBUG" /> -->

@@ -67,7 +67,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefini
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
@@ -136,8 +135,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected final ProcessInstanceService processInstanceService;
 
-    private final TokenService tokenService;
-
     private final WorkService workService;
 
     private final ProcessDefinitionService processDefinitionService;
@@ -176,12 +173,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
-            final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager) {
+            final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
         this.connectorInstanceService = connectorInstanceService;
-        this.tokenService = tokenService;
         this.logger = logger;
         this.flowNodeExecutor = flowNodeExecutor;
         this.workService = workService;
@@ -578,7 +574,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 break;
         }
         processInstanceService.setState(sProcessInstance, processInstanceState);
-        if (tokenService.getNumberOfToken(sProcessInstance.getId()) == 0) {
+        if (sProcessInstance.getTokenCount() == 0) {
             flowNodeExecutor.childReachedState(sProcessInstance, processInstanceState, hasActionsToExecute);
         }
 
@@ -658,10 +654,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         int numberOfTokenToCreate = takenTransitions - numberOfTokenToMerge;
         logger.log(getClass(),TechnicalLogSeverity.DEBUG, "merge "+numberOfTokenToMerge+" and create "+takenTransitions +" tokens while executing "+child.getName());
         long processInstanceId = sProcessInstance.getId();
-        if(numberOfTokenToCreate < 0){
-            tokenService.deleteTokens(processInstanceId, -numberOfTokenToCreate);
-        } else if (numberOfTokenToCreate > 0 ){
-            tokenService.createTokens(processInstanceId, numberOfTokenToCreate);
+        if(numberOfTokenToCreate != 0){
+            processInstanceService.addToken(sProcessInstance, numberOfTokenToCreate);
         }
         if(processDefinition.getProcessContainer().containsInclusiveGateway() && needToReevaluateInclusiveGateways(transitionsDescriptor)){
             logger.log(getClass(),TechnicalLogSeverity.DEBUG, "some branches died, will check again all inclusive gateways");
@@ -679,7 +673,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             }
 
         }
-        return tokenService.getNumberOfToken(processInstanceId);
+        return sProcessInstance.getTokenCount();
     }
 
     private boolean needToReevaluateInclusiveGateways(FlowNodeTransitionsWrapper transitionsDescriptor) {
@@ -837,7 +831,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             state = ProcessInstanceState.STARTED;
         }
         try {
-            tokenService.createTokens(sProcessInstance.getId(), size);
+            processInstanceService.addToken(sProcessInstance, size);
             processInstanceService.setState(sProcessInstance, state);
         } catch (final SBonitaException e) {
             throw new SProcessInstanceCreationException("Unable to set the state on the process.", e);

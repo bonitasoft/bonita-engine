@@ -48,8 +48,6 @@ DROP TABLE message_instance
 GO
 DROP TABLE hidden_activity
 GO
-DROP TABLE token
-GO
 DROP TABLE breakpoint
 GO
 DROP TABLE report

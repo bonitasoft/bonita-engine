@@ -41,7 +41,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowE
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -91,8 +90,6 @@ public class EventsHandler {
 
     private final ProcessDefinitionService processDefinitionService;
 
-    private final TokenService tokenService;
-
     private final EventInstanceService eventInstanceService;
 
     private final BPMInstancesCreator bpmInstancesCreator;
@@ -106,14 +103,12 @@ public class EventsHandler {
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
             final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
-            final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final TokenService tokenService,
-            final TechnicalLoggerService logger) {
+            final ProcessInstanceService processInstanceService, final FlowNodeInstanceService flowNodeInstanceService, final TechnicalLoggerService logger) {
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.processInstanceService = processInstanceService;
-        this.tokenService = tokenService;
         this.logger = logger;
         handlers = new HashMap<SEventTriggerType, EventHandlerStrategy>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, eventInstanceService, logger));
@@ -168,8 +163,6 @@ public class EventsHandler {
      *
      * @param processDefinition
      * @param eventDefinition
-     * @param eventInstance
-     * @param subProcessName
      * @param parentProcessInstance
      * @throws SBonitaException
      */
@@ -363,7 +356,7 @@ public class EventsHandler {
                 SStateCategory.NORMAL, -1);
         // FIXME: the token count will be inconsistent if a ProcessExecutor.childReachedState is called at same time.
         final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
-        tokenService.createToken(parentProcessInstanceId);
+        processInstanceService.addToken(parentProcessInstance, 1);
         if (triggerType.equals(SEventTriggerType.ERROR)) {
             // if error interrupt directly.
             final TransactionContainedProcessInstanceInterruptor interruptor = new TransactionContainedProcessInstanceInterruptor(
