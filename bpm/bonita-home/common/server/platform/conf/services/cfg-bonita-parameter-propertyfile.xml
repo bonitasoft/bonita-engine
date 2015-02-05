@@ -1,0 +1,13 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="parameterService" class="org.bonitasoft.engine.parameter.propertyfile.PropertyFileParameterService">
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="cacheService" ref="platformCacheService" />
+	</bean>
+	
+	<bean id="parameterExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
+		<constructor-arg name="parameterService" ref="parameterService" />
+	</bean>
+
+</beans>

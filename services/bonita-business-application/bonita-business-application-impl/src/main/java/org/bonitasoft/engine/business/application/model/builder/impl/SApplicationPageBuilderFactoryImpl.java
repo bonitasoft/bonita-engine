@@ -1,0 +1,54 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.business.application.model.builder.impl;
+
+import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilder;
+import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
+import org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
+
+
+/**
+ * @author Elias Ricken de Medeiros
+ *
+ */
+public class SApplicationPageBuilderFactoryImpl implements SApplicationPageBuilderFactory {
+
+
+    @Override
+    public SApplicationPageBuilder createNewInstance(final long applicationId, final long pageId, final String token) {
+        return new SApplicationPageBuilderImpl(new SApplicationPageImpl(applicationId, pageId, token));
+    }
+
+    @Override
+    public String getIdKey() {
+        return "id";
+    }
+
+    @Override
+    public String getTokenKey() {
+        return "token";
+    }
+
+
+    @Override
+    public String getPageIdKey() {
+        return "pageId";
+    }
+
+    @Override
+    public String getApplicationIdKey() {
+        return "applicationId";
+    }
+
+}

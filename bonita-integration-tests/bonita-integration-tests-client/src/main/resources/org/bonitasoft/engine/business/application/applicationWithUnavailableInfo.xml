@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) 2014 BonitaSoft S.A.
+  ~ BonitaSoft is a trademark of BonitaSoft SA.
+  ~ This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+  ~ For commercial licensing information, contact:
+  ~ BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+  ~ or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
+    <application profile="ThisProfileNotExists" state="ACTIVATED" token="HR-dashboard" version="2.0">
+        <displayName>My HR dashboard</displayName>
+        <description>This is the HR dashboard.</description>
+        <iconPath>/icon.jpg</iconPath>
+        <applicationPages>
+            <applicationPage customPage="custompage_notexists" token="will-not-be-imported" />
+            <applicationPage customPage="custompage_mynewcustompage" token="my-new-custom-page" />
+        </applicationPages>
+        <applicationMenus>
+            <applicationMenu>
+                <displayName>HR follow-up</displayName>
+                <applicationMenus>
+                    <applicationMenu applicationPage="will-not-be-imported">
+                        <displayName>Wrong menu 1</displayName>
+                    </applicationMenu>
+                    <applicationMenu applicationPage="my-new-custom-page">
+                        <displayName>Daily HR follow-up</displayName>
+                    </applicationMenu>
+                    <applicationMenu applicationPage="never-existed">
+                        <displayName>Wrong menu 2</displayName>
+                    </applicationMenu>
+                </applicationMenus>
+            </applicationMenu>
+            <applicationMenu>
+                <displayName>Empty menu</displayName>
+            </applicationMenu>
+        </applicationMenus>
+    </application>
+</applications>

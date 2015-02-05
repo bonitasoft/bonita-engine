@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Bonitasoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,7 +11,6 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import static org.junit.Assert.assertTrue;

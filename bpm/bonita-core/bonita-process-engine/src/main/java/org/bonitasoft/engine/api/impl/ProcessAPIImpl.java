@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -174,6 +174,8 @@ import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
+import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
@@ -6082,6 +6084,21 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void purgeClassLoader(final long processDefinitionId) throws ProcessDefinitionNotFoundException, UpdateException {
         processManagementAPIImplDelegate.purgeClassLoader(processDefinitionId);
+    }
+
+    @Override
+    public int getNumberOfParameterInstances(long processDefinitionId) {
+        return processManagementAPIImplDelegate.getNumberOfParameterInstances(processDefinitionId);
+    }
+
+    @Override
+    public ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws NotFoundException {
+        return processManagementAPIImplDelegate.getParameterInstance(processDefinitionId, parameterName);
+    }
+
+    @Override
+    public List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort) {
+        return processManagementAPIImplDelegate.getParameterInstances(processDefinitionId,startIndex,maxResults,sort);
     }
 
 }
