@@ -88,7 +88,7 @@ public class GatewayInstanceServiceImplTest {
 
 
     @Test
-    public void shouldContainsToken_for_source_element_with_one_token_return_true() throws Exception {
+    public void should_containsToken_for_source_element_with_one_token_return_true() throws Exception {
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, false);
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, true);
 
@@ -98,7 +98,7 @@ public class GatewayInstanceServiceImplTest {
     }
 
     @Test
-    public void shouldContainsToken_for_source_element_with_no_token_return_false() throws Exception {
+    public void should_containsToken_for_source_element_with_no_token_return_false() throws Exception {
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, false);
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, false);
 
@@ -108,7 +108,7 @@ public class GatewayInstanceServiceImplTest {
     }
 
     @Test
-    public void shouldContainsToken_for_target_element_with_token_return_true() throws Exception {
+    public void should_containsToken_for_target_element_with_token_return_true() throws Exception {
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, true);
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, false);
 
@@ -118,7 +118,7 @@ public class GatewayInstanceServiceImplTest {
     }
 
     @Test
-    public void shouldContainsToken_for_target_element_with_no_token_return_false() throws Exception {
+    public void should_containsToken_for_target_element_with_no_token_return_false() throws Exception {
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, true);
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, true);
 
@@ -128,7 +128,7 @@ public class GatewayInstanceServiceImplTest {
     }
 
     @Test
-    public void shouldContainsToken_for_both_element_with_token_return_true1() throws Exception {
+    public void should_containsToken_for_both_element_with_token_return_true1() throws Exception {
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, true);
 
         boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID, flowNodeDefList("step0", "step1", "step2"), null);
@@ -137,7 +137,7 @@ public class GatewayInstanceServiceImplTest {
     }
 
     @Test
-    public void shouldContainsToken_for_both_element_with_token_return_true2() throws Exception {
+    public void should_containsToken_for_both_element_with_token_return_true2() throws Exception {
         instanceInDatabase("step2", PROCESS_INSTANCE_ID, false);
 
         boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID, flowNodeDefList("step0", "step1", "step2"), null);
@@ -146,7 +146,7 @@ public class GatewayInstanceServiceImplTest {
     }
 
     @Test
-    public void shouldContainsToken_for_both_element_with_no_token_return_false() throws Exception {
+    public void should_containsToken_for_both_element_with_no_token_return_false() throws Exception {
 
 
         boolean containsToken = gatewayInstanceService.containsToken(PROCESS_INSTANCE_ID, flowNodeDefList("step0", "step1", "step2"), null);
