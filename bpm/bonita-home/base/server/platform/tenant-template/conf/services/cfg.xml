@@ -76,7 +76,6 @@
         <constructor-arg name="userFilterService" ref="userFilterService"/>
         <constructor-arg name="actorMappingService" ref="actorMappingService"/>
         <constructor-arg name="workService" ref="workService"/>
-        <constructor-arg name="tokenService" ref="tokenService"/>
         <constructor-arg name="identityService" ref="identityService"/>
         <constructor-arg name="breakpointService" ref="breakpointService"/>
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
@@ -93,7 +92,6 @@
         <constructor-arg name="containerRegistry" ref="containerRegistry"/>
         <constructor-arg name="processInstanceService" ref="processInstanceService"/>
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService"/>
-        <constructor-arg name="tokenService" ref="tokenService"/>
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService"/>
     </bean>
 

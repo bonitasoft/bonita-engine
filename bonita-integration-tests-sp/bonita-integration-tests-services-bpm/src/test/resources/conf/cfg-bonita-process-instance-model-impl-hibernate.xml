@@ -26,7 +26,6 @@
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="p" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.SToken" value="t" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="g" />
