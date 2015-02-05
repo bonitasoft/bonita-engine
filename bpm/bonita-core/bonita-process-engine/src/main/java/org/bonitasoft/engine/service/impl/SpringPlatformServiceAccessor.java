@@ -24,6 +24,7 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
@@ -62,6 +63,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     private NodeConfiguration platformConfguration;
 
     private PlatformCacheService platformCacheService;
+    private BroadcastService broadcastService;
 
     @Override
     public TransactionService getTransactionService() {
@@ -182,4 +184,11 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
         SpringPlatformFileSystemBeanAccessor.destroy();
     }
 
+    @Override
+    public BroadcastService getBroadcastService() {
+        if (broadcastService == null) {
+            broadcastService = SpringPlatformFileSystemBeanAccessor.getService(BroadcastService.class);
+        }
+        return broadcastService;
+    }
 }

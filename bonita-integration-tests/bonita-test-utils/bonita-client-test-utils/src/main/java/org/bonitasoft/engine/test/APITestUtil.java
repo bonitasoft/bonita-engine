@@ -40,6 +40,7 @@ import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.api.TenantManagementAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
@@ -91,6 +92,7 @@ import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.connector.AbstractConnector;
+import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -181,6 +183,8 @@ public class APITestUtil extends PlatformTestUtil {
 
     private ApplicationAPI applicationAPI;
 
+    private TenantManagementAPI tenantManagementCommunityAPI;
+
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
         if (strTimeout != null) {
@@ -221,7 +225,8 @@ public class APITestUtil extends PlatformTestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
         setPageAPI(TenantAPIAccessor.getCustomPageAPI(getSession()));
-        applicationAPI = TenantAPIAccessor.getLivingApplicationAPI(getSession());
+        setApplicationAPI(TenantAPIAccessor.getLivingApplicationAPI(getSession()));
+        setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantManagementCommunityAPI(getSession()));
     }
 
     public void logoutOnTenant() throws BonitaException {
@@ -234,6 +239,9 @@ public class APITestUtil extends PlatformTestUtil {
         setProfileAPI(null);
         setThemeAPI(null);
         setPermissionAPI(null);
+        setApplicationAPI(null);
+        setTenantManagementCommunityAPI(null);
+        setPageAPI(null);
     }
 
     public void logoutThenlogin() throws BonitaException {
@@ -586,6 +594,12 @@ public class APITestUtil extends PlatformTestUtil {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
                 Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
                 Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)), null);
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(final ProcessDefinitionBuilder processDefinitionBuilder,
+                                                                                                   final String actorName, final User user) throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, actorName, user, "TestConnectorEngineExecutionContext.impl",
+                TestConnectorEngineExecutionContext.class, "TestConnectorEngineExecutionContext.jar");
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
@@ -1465,6 +1479,18 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ApplicationAPI getApplicationAPI() {
         return applicationAPI;
+    }
+
+    public void setApplicationAPI(final ApplicationAPI applicationAPI) {
+        this.applicationAPI = applicationAPI;
+    }
+
+    public TenantManagementAPI getTenantManagementCommunityAPI() {
+        return tenantManagementCommunityAPI;
+    }
+
+    public void setTenantManagementCommunityAPI(final TenantManagementAPI tenantManagementCommunityAPI) {
+        this.tenantManagementCommunityAPI = tenantManagementCommunityAPI;
     }
 
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {

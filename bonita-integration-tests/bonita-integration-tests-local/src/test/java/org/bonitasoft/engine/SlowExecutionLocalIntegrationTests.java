@@ -23,6 +23,7 @@ import org.bonitasoft.engine.event.TimerEventSubProcessIT;
 import org.bonitasoft.engine.event.TimerEventIT;
 import org.bonitasoft.engine.platform.PlatformLoginIT;
 import org.bonitasoft.engine.platform.PlatformIT;
+import org.bonitasoft.engine.tenant.TenantMaintenanceIT;
 import org.bonitasoft.engine.test.APIMethodIT;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
@@ -48,7 +49,8 @@ import org.junit.runners.Suite.SuiteClasses;
         TimerEventSubProcessIT.class,
         MessageEventSubProcessIT.class,
         PlatformLoginIT.class,
-        PlatformIT.class
+        PlatformIT.class,
+        TenantMaintenanceIT.class
 
 })
 @Initializer(TestsInitializer.class)

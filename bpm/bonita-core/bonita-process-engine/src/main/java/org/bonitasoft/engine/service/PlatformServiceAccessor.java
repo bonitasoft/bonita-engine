@@ -69,4 +69,5 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
 
     void destroy();
 
+    BroadcastService getBroadcastService();
 }

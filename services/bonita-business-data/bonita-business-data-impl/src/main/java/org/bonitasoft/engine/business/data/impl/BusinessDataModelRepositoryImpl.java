@@ -30,9 +30,20 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
+import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import org.bonitasoft.engine.bdm.client.ClientBDMJarBuilder;
+import org.bonitasoft.engine.bdm.client.ResourcesLoader;
+import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.bdm.server.ServerBDMJarBuilder;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.impl.filter.OnlyDAOImplementationFileFilter;
+import org.bonitasoft.engine.business.data.impl.filter.WithoutDAOImplementationFileFilter;
 import org.bonitasoft.engine.commons.io.IOUtil;
+import org.bonitasoft.engine.compiler.JDTCompiler;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
@@ -41,24 +52,12 @@ import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
+import org.bonitasoft.engine.io.IOUtils;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.xml.sax.SAXException;
-
-import org.bonitasoft.engine.bdm.AbstractBDMJarBuilder;
-import org.bonitasoft.engine.bdm.BusinessObjectModelConverter;
-import org.bonitasoft.engine.bdm.client.ResourcesLoader;
-import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import org.bonitasoft.engine.bdm.server.ServerBDMJarBuilder;
-import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import org.bonitasoft.engine.business.data.impl.filter.OnlyDAOImplementationFileFilter;
-import org.bonitasoft.engine.business.data.impl.filter.WithoutDAOImplementationFileFilter;
-import org.bonitasoft.engine.compiler.JDTCompiler;
-import org.bonitasoft.engine.io.IOUtils;
 
 /**
  * @author Colin PUY
@@ -113,6 +112,23 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         final List<SDependency> searchBDMDependencies = searchBDMDependencies();
         if (searchBDMDependencies != null && searchBDMDependencies.size() > 0) {
             return String.valueOf(searchBDMDependencies.get(0).getId());
+        }
+        return null;
+    }
+
+    @Override
+    public BusinessObjectModel getBusinessObjectModel() throws SBusinessDataRepositoryException {
+        if (isDBMDeployed()) {
+            byte[] clientBdmZip = getClientBDMZip();
+            try {
+                final Map<String, byte[]> zipContent = IOUtils.unzip(clientBdmZip);
+                if (zipContent.containsKey(BOM_NAME)) {
+                    final byte[] bomZip = zipContent.get(BOM_NAME);
+                    return getBusinessObjectModel(bomZip);
+                }
+            } catch (IOException e) {
+                throw new SBusinessDataRepositoryException(e);
+            }
         }
         return null;
     }

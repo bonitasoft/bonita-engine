@@ -15,6 +15,7 @@ package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.business.application.ApplicationAPIITs;
 import org.bonitasoft.engine.page.PageAPIIT;
+import org.bonitasoft.engine.tenant.TenantMaintenanceLocalIT;
 import org.bonitasoft.engine.test.APIMethodIT;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
@@ -30,7 +31,9 @@ import org.junit.runners.Suite.SuiteClasses;
         BPMRemoteTests.class,
         PageAPIIT.class,
         ApplicationAPIITs.class,
-        APIMethodIT.class })
+        APIMethodIT.class,
+        TenantMaintenanceLocalIT.class
+})
 @Initializer(TestsInitializer.class)
 public class LocalIntegrationTests {
 

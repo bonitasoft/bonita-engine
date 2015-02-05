@@ -11,8 +11,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  ******************************************************************************/
-
 package org.bonitasoft.engine.business.data;
+
+import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 
 /**
  * @author Colin PUY
@@ -23,12 +24,12 @@ public interface BusinessDataModelRepository {
      * Deploys a Business Data Model / repository on the specified tenant.
      * 
      * @param bdmArchive
-     *            the Business Data Model, as a jar containing the Business Object classes to deploy.
+     *        the Business Data Model, as a jar containing the Business Object classes to deploy.
      * @param tenantId
-     *            the ID of the tenant to deploy the Business Data Model to.
+     *        the ID of the tenant to deploy the Business Data Model to.
      * @return the version of the BDM just deployed.
      * @throws SBusinessDataRepositoryDeploymentException
-     *             if a deployment exception occurs.
+     *         if a deployment exception occurs.
      */
     String install(byte[] bdmArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
 
@@ -36,9 +37,9 @@ public interface BusinessDataModelRepository {
      * Undeploy Business Data Model from specified tenant
      * 
      * @param tenantId
-     *            the ID of the tenant to undeploy the Business Data Model from
+     *        the ID of the tenant to undeploy the Business Data Model from
      * @throws SBusinessDataRepositoryException
-     *             if error occurs during undeployement
+     *         if error occurs during undeployement
      */
     void uninstall(long tenantId) throws SBusinessDataRepositoryException;
 
@@ -60,7 +61,16 @@ public interface BusinessDataModelRepository {
      * 
      * @return the currently deployed BDM version, or null if no BDM is deployed.
      * @throws SBusinessDataRepositoryException
-     *             if the BDM cannot be retrieved.
+     *         if the BDM cannot be retrieved.
      */
     String getInstalledBDMVersion() throws SBusinessDataRepositoryException;
+
+    /**
+     * Returns the currently deployed Business Object Data Model, or null if no BDM is deployed.
+     *
+     * @return the currently deployed Business Object Data Model, or null if no BDM is deployed.
+     * @throws SBusinessDataRepositoryException
+     *         if the BDM cannot be retrieved.
+     */
+    BusinessObjectModel getBusinessObjectModel() throws SBusinessDataRepositoryException;
 }

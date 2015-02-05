@@ -11,9 +11,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  ******************************************************************************/
-
 package org.bonitasoft.engine.business.data.impl;
 
+import static com.company.pojo.EmployeeBuilder.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
@@ -40,9 +40,6 @@ import javax.transaction.UserTransaction;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.transaction.TransactionService;
-import com.company.pojo.Employee;
-import com.company.pojo.EmployeeBuilder;
-import com.company.pojo.Person;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -59,6 +56,8 @@ import bitronix.tm.TransactionManagerServices;
 
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import com.company.pojo.Employee;
+import com.company.pojo.Person;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -149,7 +148,7 @@ public class JPABusinessDataRepositoryImplITest {
 
     @Test
     public void findAnEmployeeByPrimaryKey() throws Exception {
-        Employee expectedEmployee = EmployeeBuilder.anEmployee().build();
+        Employee expectedEmployee = anEmployee().build();
         expectedEmployee = addEmployeeToRepository(expectedEmployee);
 
         final Employee employee = businessDataRepository.findById(Employee.class, expectedEmployee.getPersistenceId());
@@ -164,7 +163,7 @@ public class JPABusinessDataRepositoryImplITest {
 
     @Test
     public void persistNewEmployeeShouldAddEmployeeInRepository() throws Exception {
-        final Employee employee = EmployeeBuilder.anEmployee().build();
+        final Employee employee = anEmployee().build();
         businessDataRepository.persist(employee);
 
         final Employee myEmployee = businessDataRepository.findById(Employee.class, employee.getPersistenceId());
@@ -182,7 +181,7 @@ public class JPABusinessDataRepositoryImplITest {
     @Test
     public void findListShouldAcceptParameterizedQuery() throws Exception {
         final String firstName = "anyName";
-        Employee expectedEmployee = EmployeeBuilder.anEmployee().withFirstName(firstName).build();
+        Employee expectedEmployee = anEmployee().withFirstName(firstName).build();
         expectedEmployee = addEmployeeToRepository(expectedEmployee);
 
         final Map<String, Serializable> parameters = Collections.singletonMap("firstName", (Serializable) firstName);
@@ -194,8 +193,8 @@ public class JPABusinessDataRepositoryImplITest {
     @Test(expected = NonUniqueResultException.class)
     public void findShouldThrowExceptionWhenSeveralResultsMatch() throws Exception {
         final String lastName = "Kangaroo";
-        addEmployeeToRepository(EmployeeBuilder.anEmployee().withLastName(lastName).build());
-        addEmployeeToRepository(EmployeeBuilder.anEmployee().withLastName(lastName).build());
+        addEmployeeToRepository(anEmployee().withLastName(lastName).build());
+        addEmployeeToRepository(anEmployee().withLastName(lastName).build());
 
         final Map<String, Serializable> parameters = Collections.singletonMap("lastName", (Serializable) lastName);
         businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
@@ -204,9 +203,9 @@ public class JPABusinessDataRepositoryImplITest {
     @Test
     public void should_get_employees_by_id() throws Exception {
         final String lastName = "Kangaroo";
-        Employee emp1 = addEmployeeToRepository(EmployeeBuilder.anEmployee().withLastName(lastName).build());
-        Employee emp2 = addEmployeeToRepository(EmployeeBuilder.anEmployee().withLastName(lastName).build());
-        Employee emp3 = addEmployeeToRepository(EmployeeBuilder.anEmployee().withLastName(lastName).build());
+        Employee emp1 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
+        Employee emp2 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
+        Employee emp3 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
         
         List<Employee> emps = businessDataRepository.findByIds(Employee.class, Arrays.asList(emp1.getPersistenceId(), emp2.getPersistenceId()));
         
@@ -249,7 +248,7 @@ public class JPABusinessDataRepositoryImplITest {
 
     @Test
     public void updateTwoFieldsInSameTransactionShouldModifySameObject() throws Exception {
-        final Employee originalEmployee = addEmployeeToRepository(EmployeeBuilder.anEmployee().build());
+        final Employee originalEmployee = addEmployeeToRepository(anEmployee().build());
         originalEmployee.setLastName("NewLastName");
         originalEmployee.setFirstName("NewFirstName");
 
@@ -268,7 +267,7 @@ public class JPABusinessDataRepositoryImplITest {
     public void aRemovedEntityShouldNotBeRetrievableAnyLonger() throws SBusinessDataNotFoundException {
         Employee employee = null;
         try {
-            employee = addEmployeeToRepository(EmployeeBuilder.anEmployee().build());
+            employee = addEmployeeToRepository(anEmployee().build());
 
             businessDataRepository.remove(employee);
         } catch (final Exception e) {
@@ -286,21 +285,21 @@ public class JPABusinessDataRepositoryImplITest {
 
     @Test
     public void remove_should_not_throw_an_exception_with_an_unknown_entity_without_an_id() {
-        businessDataRepository.remove(EmployeeBuilder.anEmployee().build());
+        businessDataRepository.remove(anEmployee().build());
     }
 
     @Test
     public void remove_should_not_throw_an_exception_with_an_unknown_entity() {
-        final Employee newEmployee = addEmployeeToRepository(EmployeeBuilder.anEmployee().build());
+        final Employee newEmployee = addEmployeeToRepository(anEmployee().build());
         businessDataRepository.remove(newEmployee);
         businessDataRepository.remove(newEmployee);
     }
 
     @Test
     public void findList_should_return_employee_list() {
-        final Employee e1 = addEmployeeToRepository(EmployeeBuilder.anEmployee().withFirstName("Hannu").withLastName("balou").build());
-        final Employee e2 = addEmployeeToRepository(EmployeeBuilder.anEmployee().withFirstName("Aliz").withLastName("akkinen").build());
-        final Employee e3 = addEmployeeToRepository(EmployeeBuilder.anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").build());
+        final Employee e1 = addEmployeeToRepository(anEmployee().withFirstName("Hannu").withLastName("balou").build());
+        final Employee e2 = addEmployeeToRepository(anEmployee().withFirstName("Aliz").withLastName("akkinen").build());
+        final Employee e3 = addEmployeeToRepository(anEmployee().withFirstName("Jean-Luc").withLastName("akkinen").build());
 
         final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName ASC, e.firstName ASC",
                 null, 0, 10);
