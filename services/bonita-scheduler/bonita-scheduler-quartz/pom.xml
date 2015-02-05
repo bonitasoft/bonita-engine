@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-scheduler</artifactId>
 		<groupId>org.bonitasoft.engine.scheduler</groupId>
-		<version>6.4.2</version>
+		<version>6.4.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-scheduler-quartz</artifactId>
