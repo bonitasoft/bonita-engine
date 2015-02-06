@@ -1,29 +1,39 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.bonitasoft.engine.commons.TypeConverterUtil;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.bdm.Entity;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.QueryParameter;
+import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
@@ -35,6 +45,12 @@ public class BusinessDataServiceImplTest {
 
     private static final String PARAMETER_BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
     private static final String NEW_NAME = "new name";
+    public static final String PARAMETER_STRING = "parameterString";
+    public static final String PARAMETER_INTEGER = "parameterInteger";
+    public static final String PARAMETER_LONG = "parameterLong";
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     public class EntityPojo implements Entity {
 
@@ -163,9 +179,16 @@ public class BusinessDataServiceImplTest {
     @Mock
     JsonBusinessDataSerializer jsonEntitySerializer;
 
+    @Mock
+    BusinessDataModelRepository businessDataModelRepository;
+
+    private TypeConverterUtil typeConverterUtil;
+
     @Before
     public void before() throws Exception {
-        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer));
+        String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss.SSS" };
+        typeConverterUtil=new TypeConverterUtil(datePatterns);
+        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository,typeConverterUtil ));
     }
 
     @Test
@@ -534,4 +557,108 @@ public class BusinessDataServiceImplTest {
 
     }
 
+    @Test
+    public void getJsonQueryEntities_should_return_json() throws Exception {
+        //given
+        final EntityPojo entity = new EntityPojo(1562L);
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(PARAMETER_STRING, "a");
+        parameters.put(PARAMETER_INTEGER, "12");
+        parameters.put(PARAMETER_LONG, "34");
+
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        final List<Entity> entities = new ArrayList<Entity>();
+        entities.add(entity);
+        doReturn(entities).when(businessDataRepository).findListByNamedQuery(anyString(), any(Class.class), anyMap(), anyInt(), anyInt());
+
+        //given
+        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
+
+        //when
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "query", parameters, 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        //then
+        verify(jsonEntitySerializer).serializeEntity(entities, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_throw_exception_when_query_not_found() throws Exception {
+        expectedException.expect(SBusinessDataRepositoryException.class);
+        expectedException.expectMessage("unable to get query wrongQuery for business object " + EntityPojo.class.getName());
+
+        //given
+        final EntityPojo entity = new EntityPojo(1562L);
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(PARAMETER_STRING, "a");
+        parameters.put(PARAMETER_INTEGER, "12");
+        parameters.put(PARAMETER_LONG, "34");
+
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
+
+        //when then exception
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "wrongQuery", parameters, 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_find_provided_query() throws Exception {
+
+        //given
+        final EntityPojo entity = new EntityPojo(1562L);
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(PARAMETER_STRING, "a");
+        parameters.put(PARAMETER_INTEGER, "12");
+        parameters.put(PARAMETER_LONG, "34");
+
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
+
+        //when then no exception
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "find", parameters, 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    @Test
+    public void getJsonQueryEntities_should_check_parameters() throws Exception {
+        expectedException.expect(SBusinessDataRepositoryException.class);
+        expectedException.expectMessage("parameter(s) are missing for query named query :");
+        expectedException.expectMessage(PARAMETER_INTEGER);
+        expectedException.expectMessage(PARAMETER_STRING);
+        expectedException.expectMessage(PARAMETER_LONG);
+
+        //given
+        final EntityPojo entity = new EntityPojo(1562L);
+        doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
+
+        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
+
+        //when then exception
+        businessDataService.getJsonQueryEntities(entity.getClass().getName(), "query", null, 0, 10,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    private BusinessObjectModel getBusinessObjectModel(EntityPojo entity) {
+        BusinessObjectModel businessObjectModel;
+        businessObjectModel = new BusinessObjectModel();
+
+        Query query = new Query("query", "content", String.class.getName());
+        query.getQueryParameters().add(new QueryParameter(PARAMETER_STRING, String.class.getName()));
+        query.getQueryParameters().add(new QueryParameter(PARAMETER_INTEGER, Integer.class.getName()));
+        query.getQueryParameters().add(new QueryParameter(PARAMETER_LONG, Long.class.getName()));
+
+        BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName(entity.getClass().getName());
+        businessObject.setQueries(Arrays.asList(query));
+        businessObjectModel.getBusinessObjects().add(businessObject);
+
+        return businessObjectModel;
+    }
 }
