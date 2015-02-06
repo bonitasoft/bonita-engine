@@ -126,7 +126,6 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor"/>
         <constructor-arg name="containerRegistry" ref="containerRegistry"/>
         <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator"/>
-        <constructor-arg name="tokenService" ref="tokenService"/>
         <constructor-arg name="eventsHandler" ref="eventsHandler"/>
         <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager"/>
         <constructor-arg name="businessDataRepository" ref="businessDataRepository"/>
