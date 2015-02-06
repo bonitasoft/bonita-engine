@@ -27,7 +27,6 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
 
     public static final String ENTITY_CLASS_NAME = "entityClassName";
     public static final String BUSINESS_DATA_ID = "businessDataId";
-    public static final String BUSINESS_DATA_URI_PATTERN = "businessDataURIPattern";
     public static final String BUSINESS_DATA_CHILD_NAME = "businessDataChildName";
 
     @Override
@@ -38,7 +37,7 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
 
         final Long identifier = getLongMandadoryParameter(parameters, BUSINESS_DATA_ID);
         final String entityClassName = getStringMandadoryParameter(parameters, ENTITY_CLASS_NAME);
-        final String businessDataURIPattern = getStringMandadoryParameter(parameters, BUSINESS_DATA_URI_PATTERN);
+        final String businessDataURIPattern = getStringMandadoryParameter(parameters, BusinessDataCommandField.BUSINESS_DATA_URI_PATTERN);
         final String childName = getParameter(parameters, BUSINESS_DATA_CHILD_NAME);
         try {
             if (childName != null && !childName.isEmpty()) {

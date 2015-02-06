@@ -31,7 +31,7 @@ public interface PlatformMonitoringAPI {
      * @return a quantity number of memory occupied currently
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -39,12 +39,12 @@ public interface PlatformMonitoringAPI {
 
     /**
      * Returns the percentage of memory used compare to maximum available memory.
-     * This calculation is based on both the heap & non-heap maximum amount of memory that can be used.
+     * This calculation is based on both the heap &amp; non-heap maximum amount of memory that can be used.
      * 
      * @return a percentage of memory occupied compare to maximum available memory
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -61,7 +61,7 @@ public interface PlatformMonitoringAPI {
      * @return a average number of system load for the last minute
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -73,7 +73,7 @@ public interface PlatformMonitoringAPI {
      * @return a number of milliseconds elapsed since the Java Virtual Machine started
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -85,7 +85,7 @@ public interface PlatformMonitoringAPI {
      * Usually, a timestamp represents the time elapsed since the 1st of January, 1970.
      * 
      * @return a timestamp (in millisecond) which indicates the date when the Java virtual machine started
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -98,7 +98,7 @@ public interface PlatformMonitoringAPI {
      * consumed by each live threads.
      * 
      * @return the total CPU time for all live threads in nanoseconds
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -110,7 +110,7 @@ public interface PlatformMonitoringAPI {
      * Returns the current number of live threads including both daemon and non-daemon threads.
      * 
      * @return the current number of live threads including both daemon and non-daemon threads
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -122,7 +122,7 @@ public interface PlatformMonitoringAPI {
      * Returns the number of processors available to the Java virtual machine.
      * 
      * @return the number of processors available to the Java virtual machine
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -134,7 +134,7 @@ public interface PlatformMonitoringAPI {
      * Returns the operating system architecture.
      * 
      * @return the operating system architecture as a string
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -146,7 +146,7 @@ public interface PlatformMonitoringAPI {
      * Return the OS name.
      * 
      * @return the OS name
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -158,7 +158,7 @@ public interface PlatformMonitoringAPI {
      * Return the OS version.
      * 
      * @return the OS version
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -170,7 +170,7 @@ public interface PlatformMonitoringAPI {
      * Returns the Java virtual machine implementation name.
      * 
      * @return the Java virtual machine implementation name
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -182,7 +182,7 @@ public interface PlatformMonitoringAPI {
      * Returns the Java virtual machine implementation vendor.
      * 
      * @return the Java virtual machine implementation vendor
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -194,7 +194,7 @@ public interface PlatformMonitoringAPI {
      * Returns the Java virtual machine implementation version.
      * 
      * @return the Java virtual machine implementation version
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -206,7 +206,7 @@ public interface PlatformMonitoringAPI {
      * Returns the Java virtual machine System properties list.
      * 
      * @return a map of the Java virtual machine System properties
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -219,7 +219,7 @@ public interface PlatformMonitoringAPI {
      * If it is started, return true. else return false.
      * 
      * @return if the scheduler is started
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -232,7 +232,7 @@ public interface PlatformMonitoringAPI {
      * If no active transactions there, return 0
      * 
      * @return a number of active transaction
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -245,7 +245,7 @@ public interface PlatformMonitoringAPI {
      * not necessarily nanoseconds accuracy. This method returns -1 if the the platform does not support this operation.
      * 
      * @return the CPU time used by the process in nanoseconds, or -1 if this operation is not supported.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -259,7 +259,7 @@ public interface PlatformMonitoringAPI {
      * Returns the amount of virtual memory that is guaranteed to be available to the running process in bytes, or -1 if this operation is not supported.
      * 
      * @return the amount of virtual memory
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -273,7 +273,7 @@ public interface PlatformMonitoringAPI {
      * Get the total amount of swap space in bytes.
      * 
      * @return the total amount of swap space in bytes
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -287,7 +287,7 @@ public interface PlatformMonitoringAPI {
      * Get the amount of free swap space in bytes.
      * 
      * @return the amount of free swap space in bytes
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -301,7 +301,7 @@ public interface PlatformMonitoringAPI {
      * Get the amount of free physical memory in bytes.
      * 
      * @return the amount of free physical memory in bytes.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -315,7 +315,7 @@ public interface PlatformMonitoringAPI {
      * Get the total amount of physical memory in bytes.
      * 
      * @return the total amount of physical memory in bytes
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -329,7 +329,7 @@ public interface PlatformMonitoringAPI {
      * Returns true if engine is running on top of a SUN/Oracle JVM
      * 
      * @return true if engine is running on top of a SUN/Oracle JVM, false otherwise
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
@@ -340,11 +340,11 @@ public interface PlatformMonitoringAPI {
     /**
      * Returns the last GC info.
      * The key 'GcName' of the outer map is the GarbageCollectorMXBean's instance name.
-     * The inner Map<String key, String value> represents the LastGcInfo instance.
+     * The inner Map&lt;String key, String value&gt; represents the LastGcInfo instance.
      * The possible keys are StartTime, EndTime, Duration, MemoryUsageBeforeGc and MemoryUsageAfterGc.
      * 
      * @return the resulting map
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring

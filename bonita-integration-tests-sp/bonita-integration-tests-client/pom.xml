@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.bonitasoft.engine.test</groupId>
         <artifactId>bonita-integration-tests-sp</artifactId>
-        <version>6.5.0-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-integration-tests-client-sp</artifactId>
@@ -28,6 +28,11 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-assertj</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
