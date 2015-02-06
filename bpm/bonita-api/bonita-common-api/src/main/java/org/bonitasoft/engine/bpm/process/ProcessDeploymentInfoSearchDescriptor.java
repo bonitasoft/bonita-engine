@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.process;
 
 /**
  * Search descriptors are used to filter / sort results of a generic search. <br>
- * ProcessDeploymentInfoSearchDescriptor defines the fields that can be used as filters or sort fields on <code>List{@literal <}ProcessDeploymentInfo></code>
+ * ProcessDeploymentInfoSearchDescriptor defines the fields that can be used as filters or sort fields on <code>List&lt;ProcessDeploymentInfo&gt;</code>
  * returning methods.
  *
  * @author Zhao Na

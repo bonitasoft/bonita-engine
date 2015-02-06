@@ -16,8 +16,7 @@ package org.bonitasoft.engine.platform.command;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * Describes a <code>Platform command</code>. Actions related to <code>platform commands</code> are managed by the
- * {@link org.bonitasoft.engine.api.PlatformCommandAPI}
+ * Describes a <code>Platform command</code>. Actions related to <code>platform commands</code> are managed by the {@link org.bonitasoft.engine.api.PlatformCommandAPI}
  *
  * @author Zhang Bole
  * @see org.bonitasoft.engine.api.PlatformCommandAPI

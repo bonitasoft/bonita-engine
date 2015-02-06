@@ -30,10 +30,10 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
 
 /**
- * Manipulates a platform command. A command can be registered, unregistered and executed with parameters.<br/>
+ * Manipulates a platform command. A command can be registered, unregistered and executed with parameters.<br>
  * These commands are executed in a platform scope, see {@link CommandAPI} for an explanation of how to deploy, execute, ... a command. The only
  * difference between the {@link CommandAPI} and the {@link PlatformCommandAPI} is that a platform command must extend
- * {@link org.bonitasoft.engine.command.PlatformCommand}.
+ * {@code org.bonitasoft.engine.command.PlatformCommand}.
  *
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
@@ -48,7 +48,7 @@ public interface PlatformCommandAPI {
      *        the dependency name.
      * @param jar
      *        the JAR content
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         occurs when the session is not valid
      * @throws AlreadyExistsException
      *         occurs when the dependency name is already used for another dependency
@@ -62,7 +62,7 @@ public interface PlatformCommandAPI {
      *
      * @param name
      *        the dependency name.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         if the current platform session is not valid
      * @throws DependencyNotFoundException
      *         if no dependency can be found with the specified name
@@ -81,7 +81,7 @@ public interface PlatformCommandAPI {
      * @param implementation
      *        the implementation class which will be used when executing the command
      * @return the descriptor of the command
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         occurs when the session is not valid
      * @throws AlreadyExistsException
      *         occurs when the command name is already used for another command
@@ -98,7 +98,7 @@ public interface PlatformCommandAPI {
      * @param parameters
      *        the parameters (specific to the command to execute)
      * @return the result of the command execution
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         occurs when the session is not valid
      * @throws CommandNotFoundException
      *         occurs when the name does not refer to any existing command
@@ -115,7 +115,7 @@ public interface PlatformCommandAPI {
      *
      * @param name
      *        the command name
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         occurs when the session is not valid
      * @throws CommandNotFoundException
      *         occurs when the name does not refer to an existing command
@@ -130,7 +130,7 @@ public interface PlatformCommandAPI {
      * @param name
      *        the command name
      * @return the descriptor of the command
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         occurs when the session is not valid
      * @throws CommandNotFoundException
      *         occurs when the command name does not refer to an existing command.
@@ -145,7 +145,7 @@ public interface PlatformCommandAPI {
      * @param commandName
      *        the name of the command
      * @return the descriptor of the command
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         occurs when the session is not valid
      * @throws CommandNotFoundException
      *         occurs when the command name does not refer to an existing command.
@@ -163,7 +163,7 @@ public interface PlatformCommandAPI {
      * @param sort
      *        the sorting criterion
      * @return the paginated list of command descriptors
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         occurs when the session is not valid
      */
     List<CommandDescriptor> getCommands(int startIndex, int maxResults, CommandCriterion sort);
@@ -175,7 +175,7 @@ public interface PlatformCommandAPI {
      *        the command name
      * @param updater
      *        the update descriptor
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         if the session is not valid
      * @throws CommandNotFoundException
      *         occurs when the name does not refer to any existing command
