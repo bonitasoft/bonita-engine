@@ -176,7 +176,7 @@ public class APITestUtil extends PlatformTestUtil {
         if (strTimeout != null) {
             DEFAULT_TIMEOUT = Integer.valueOf(strTimeout);
         } else {
-            DEFAULT_TIMEOUT = 10 * 1000;
+            DEFAULT_TIMEOUT = 2* 60  * 1000;
         }
     }
 
