@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceCreationException;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionException;
@@ -120,36 +121,9 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                 throw new SProcessInstanceCreationException("Unable to initialize string index on process instance.", e);
             }
 
-            final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
-            for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
-                final SExpression expression = bdd.getDefaultValueExpression();
-                if (bdd.isMultiple()) {
-                    final List<Long> dataIds = new ArrayList<Long>();
-                    if (expression != null) {
-                        final List<Entity> businessData = (List<Entity>) expressionResolverService.evaluate(expression, expressionContext);
-                        for (final Entity entity : businessData) {
-                            final Entity tmp = businessDataRepository.merge(entity);
-                            dataIds.add(tmp.getPersistenceId());
-                        }
-                    }
-                    final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
-                    final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), dataIds, bdd.getClassName())
-                            .done();
-                    refBusinessDataService.addRefBusinessDataInstance(instance);
-                } else {
-                    Long primaryKey = null;
-                    if (expression != null) {
-                        Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
-                        businessData = businessDataRepository.merge(businessData);
-                        primaryKey = businessData.getPersistenceId();
-                    }
-                    final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
-                    final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey,
-                            bdd.getClassName())
-                            .done();
-                    refBusinessDataService.addRefBusinessDataInstance(instance);
-                }
-            }
+            initializeBusinessData(sDefinition, sInstance, expressionContext);
+
+
             createDocuments(sDefinition, sInstance, userId);
             createDocumentLists(sDefinition, sInstance, userId, expressionContext, context);
             if (connectors != null) {
@@ -171,6 +145,39 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             throw new SProcessInstanceCreationException(e);
         } catch (final InvalidEvaluationConnectorConditionException e) {
             throw new SProcessInstanceCreationException(e);
+        }
+    }
+
+    private void initializeBusinessData(SProcessDefinition sDefinition, SProcessInstance sInstance, SExpressionContext expressionContext) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SRefBusinessDataInstanceCreationException {
+        final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
+        for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
+            final SExpression expression = bdd.getDefaultValueExpression();
+            if (bdd.isMultiple()) {
+                final List<Long> dataIds = new ArrayList<Long>();
+                if (expression != null) {
+                    final List<Entity> businessData = (List<Entity>) expressionResolverService.evaluate(expression, expressionContext);
+                    for (final Entity entity : businessData) {
+                        final Entity tmp = businessDataRepository.merge(entity);
+                        dataIds.add(tmp.getPersistenceId());
+                    }
+                }
+                final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
+                final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), dataIds, bdd.getClassName())
+                        .done();
+                refBusinessDataService.addRefBusinessDataInstance(instance);
+            } else {
+                Long primaryKey = null;
+                if (expression != null) {
+                    Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
+                    businessData = businessDataRepository.merge(businessData);
+                    primaryKey = businessData.getPersistenceId();
+                }
+                final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
+                final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey,
+                        bdd.getClassName())
+                        .done();
+                refBusinessDataService.addRefBusinessDataInstance(instance);
+            }
         }
     }
 
