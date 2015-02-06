@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -667,6 +667,20 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      */
     public DesignProcessDefinition getProcess() throws InvalidProcessDefinitionException {
         return done();
+    }
+
+
+    /**
+     * Add a parameter on this process.
+     *
+     * @param parameterName
+     *        The name of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
+     * @param type
+     *        The type of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition} (complete class name)
+     * @return The {@link ParameterDefinitionBuilder} containing the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
+     */
+    public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
+        return new ParameterDefinitionBuilder(this, process, parameterName, type);
     }
 
 }

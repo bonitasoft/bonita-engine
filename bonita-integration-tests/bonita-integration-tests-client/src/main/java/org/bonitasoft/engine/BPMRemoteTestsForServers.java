@@ -1,7 +1,21 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.accessors.TenantAccessorTest;
 import org.bonitasoft.engine.activity.PendingTasksIT;
+import org.bonitasoft.engine.business.application.ApplicationIT;
 import org.bonitasoft.engine.command.AdvancedStartProcessCommandIT;
 import org.bonitasoft.engine.command.CommandIT;
 import org.bonitasoft.engine.command.web.ExternalCommandsTests;
@@ -10,6 +24,7 @@ import org.bonitasoft.engine.identity.UserIT;
 import org.bonitasoft.engine.login.LoginAPIIT;
 import org.bonitasoft.engine.login.PlatformLoginAPIIT;
 import org.bonitasoft.engine.operation.OperationIT;
+import org.bonitasoft.engine.page.PageAPIIT;
 import org.bonitasoft.engine.platform.command.PlatformCommandIT;
 import org.bonitasoft.engine.process.ProcessManagementIT;
 import org.bonitasoft.engine.profile.ProfileIT;
@@ -39,7 +54,11 @@ import org.junit.runners.Suite.SuiteClasses;
         OperationIT.class,
         TenantAccessorTest.class,
         MultiThreadCallsIT.class,
-        AdvancedStartProcessCommandIT.class })
+        AdvancedStartProcessCommandIT.class,
+        PageAPIIT.class,
+        ApplicationIT.class
+
+})
 @Initializer(BPMRemoteTestsForServers.class)
 public class BPMRemoteTestsForServers {
 

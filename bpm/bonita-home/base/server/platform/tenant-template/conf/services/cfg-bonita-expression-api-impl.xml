@@ -23,6 +23,7 @@
 				<ref bean="listExpressionExecutorStrategy" />
 				<ref bean="conditionExpressionExecutorStrategy" />
 				<ref bean="javaMethodCallExpressionExecutorStrategy" />
+				<ref bean="parameterExpressionExecutorStrategy" />
 				<ref bean="xPathReadExpressionExecutorStrategy" />
 			</list>
 		</property>
@@ -50,9 +51,13 @@
 	</bean>
 
 	<bean id="listExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ListExpressionExecutorStrategy" />
-	
+
 	<bean id="conditionExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConditionExpressionExecutorStrategy" />
 
 	<bean id="javaMethodCallExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.JavaMethodCallExpressionExecutorStrategy" />
+
+	<bean id="parameterExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
+		<constructor-arg name="parameterService" ref="parameterService" />
+	</bean>
 
 </beans>

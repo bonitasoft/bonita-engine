@@ -169,6 +169,12 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SToken" value="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" />
+				<entry key="org.bonitasoft.engine.page.SPage" value="org.bonitasoft.engine.page.impl.SPageImpl" />
+				<entry key="org.bonitasoft.engine.page.SPageContent" value="org.bonitasoft.engine.page.impl.SPageContentImpl" />
+				<entry key="org.bonitasoft.engine.page.SPageWithContent" value="org.bonitasoft.engine.page.impl.SPageWithContentImpl" />
+				<entry key="org.bonitasoft.engine.business.application.model.SApplication" value="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" />
+				<entry key="org.bonitasoft.engine.business.application.model.SApplicationPage" value="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" />
+				<entry key="org.bonitasoft.engine.business.application.model.SApplicationMenu" value="org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" />
 
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
@@ -226,6 +232,8 @@
 				<ref bean="hbm-bos-profile-model" />
 				<ref bean="hbm-bos-theme-model" />
 				<ref bean="hbm-bos-supervisor-mapping" />
+				<ref bean="hbm-bos-page-model" />
+				<ref bean="hbm-bos-application-model" />
 			</list>
 		</property>
 	</bean>

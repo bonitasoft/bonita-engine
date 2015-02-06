@@ -31,5 +31,6 @@
 		<module>bonita-user-filter</module>
 		<module>bonita-instance-migration</module>
 		<module>bonita-reporting</module>
+		<module>bonita-parameter</module>
 	</modules>
 </project>

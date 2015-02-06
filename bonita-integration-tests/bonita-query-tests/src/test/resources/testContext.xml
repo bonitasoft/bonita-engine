@@ -38,6 +38,12 @@
                 <!-- GLUPSSSS Needed by process instance queries -->
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
+
+                <value>/org/bonitasoft/engine/page/impl/hibernate/page.hbm.xml</value>
+                <value>/org/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
+
+               <value>/org/bonitasoft/engine/business/application/impl/hibernate/application.hbm.xml</value>
+               <value>/org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -89,5 +95,13 @@
     <bean id="saDataInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.SADataInstanceRepository">
         <constructor-arg ref="sessionFactory" />
     </bean>
+
+    <bean id="pageRepository" class="org.bonitasoft.engine.test.persistence.repository.PageRepository">
+        <constructor-arg ref="sessionFactory" />
+    </bean>
+    
+   <bean id="applicationRepository" class="org.bonitasoft.engine.test.persistence.repository.ApplicationRepository">
+        <constructor-arg ref="sessionFactory" />
+   </bean>
 
 </beans>
