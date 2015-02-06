@@ -157,4 +157,41 @@ public class FlowPatternsIT extends TestWithUser {
 
     }
 
+
+    @Test
+    public void process_with_branch_out() throws Exception {
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MultipleMergeProcess", PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME);
+        builder.addStartEvent("Start");
+        builder.addUserTask("Step1", ACTOR_NAME);
+        builder.addUserTask("Step2", ACTOR_NAME);
+        builder.addUserTask("Step3", ACTOR_NAME);
+        builder.addUserTask("Step4", ACTOR_NAME);
+        builder.addGateway("Gateway1", GatewayType.PARALLEL);
+        builder.addGateway("Gateway2", GatewayType.PARALLEL);
+        builder.addEndEvent("End1");
+        builder.addEndEvent("End2");
+        builder.addTransition("Start", "Gateway1");
+        builder.addTransition("Gateway1", "Step1");
+        builder.addTransition("Gateway1", "Step2");
+        builder.addTransition("Step1", "Gateway2");
+        builder.addTransition("Step2", "Gateway2");
+        builder.addTransition("Step2", "Step3");
+        builder.addTransition("Gateway2", "Step4");
+        builder.addTransition("Step4", "End1");
+        builder.addTransition("Step3", "End2");
+        final DesignProcessDefinition designProcessDefinition = builder.getProcess();
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        waitForUserTaskAndExecuteIt("Step2",user);
+        waitForUserTaskAndExecuteIt("Step1",user);
+        waitForUserTaskAndExecuteIt("Step4",user);
+        waitForUserTaskAndExecuteIt("Step3",user);
+        waitForProcessToFinish(processInstance);
+
+        disableAndDeleteProcess(processDefinition);
+
+    }
+
 }
