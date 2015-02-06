@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -36,11 +37,16 @@ public class ClassReflectorTest {
     @Test
     public void testGetGetterName() throws Exception {
         // can't work with boolean since field name type is unknown
-        // assertThat(ClassReflector.getGetterName("choice")).isEqualTo("isChoice");
-
         assertThat(ClassReflector.getGetterName("longs")).isEqualTo("getLongs");
-        assertThat(ClassReflector.getGetterName("bigChoice")).isEqualTo("getBigChoice");
         assertThat(ClassReflector.getGetterName("bigChoices")).isEqualTo("getBigChoices");
+
+    }
+
+    @Test
+    public void testGetGetterMethod() throws Exception {
+        assertThat(ClassReflector.getGetterName("bigChoice", Boolean.class)).isEqualTo("isBigChoice");
+        assertThat(ClassReflector.getGetterName("longs", Long.class)).isEqualTo("getLongs");
+        assertThat(ClassReflector.getGetterName("bigChoices", new ArrayList<Boolean>().getClass())).isEqualTo("getBigChoices");
 
     }
 
@@ -53,7 +59,7 @@ public class ClassReflectorTest {
     public void testGetAccessibleGetters() throws Exception {
         final Collection<Method> accessibleGetters = ClassReflector.getAccessibleGetters(pojo.getClass());
 
-        //isChoice, getDate, getClass, getLongs, getBigChoice, getBigChoices
+        // isChoice, getDate, getClass, getLongs, getBigChoice, getBigChoices
         assertThat(accessibleGetters).hasSize(6);
     }
 
@@ -245,7 +251,7 @@ public class ClassReflectorTest {
     public void testGetDeclaredGetters() throws Exception {
         final Method[] declaredSetters = ClassReflector.getDeclaredGetters(pojo.getClass());
 
-        //isChoice, getDate, getLongs, getBigChoice, getBigChoices
+        // isChoice, getDate, getLongs, getBigChoice, getBigChoices
         assertThat(declaredSetters).hasSize(5);
 
         for (final Method method : declaredSetters) {
