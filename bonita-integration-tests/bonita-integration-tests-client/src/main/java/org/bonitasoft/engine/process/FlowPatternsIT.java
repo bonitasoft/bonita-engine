@@ -23,7 +23,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -34,7 +33,6 @@ import org.junit.Test;
 public class FlowPatternsIT extends TestWithUser {
 
     @Test
-    @Ignore
     public void process_with_inclusive() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithInclusiveGateway();
 
@@ -97,7 +95,8 @@ public class FlowPatternsIT extends TestWithUser {
         builder.addGateway("Gateway2", GatewayType.INCLUSIVE);
         builder.addUserTask("Step6", ACTOR_NAME);
         builder.addEndEvent("End");
-        builder.addTransition("Start", "Gateway1");
+        builder.addTransition("Start", "Step0");
+        builder.addTransition("Step0", "Gateway1");
         builder.addTransition("Gateway1", "Step1", new ExpressionBuilder().createDataExpression("cond1", Boolean.class.getName()));
         builder.addTransition("Gateway1", "Step2", new ExpressionBuilder().createDataExpression("cond2", Boolean.class.getName()));
         builder.addTransition("Gateway1", "Step3", new ExpressionBuilder().createDataExpression("cond3", Boolean.class.getName()));
@@ -115,7 +114,6 @@ public class FlowPatternsIT extends TestWithUser {
     }
 
     @Test
-    @Ignore
     public void process_that_merge_different_branches() throws Exception {
         /*
          * step 1 and 2 are merged into step 4 by gateway 2 and step 3 and step4 are merged by gateway3
@@ -151,7 +149,7 @@ public class FlowPatternsIT extends TestWithUser {
         waitForUserTaskAndExecuteIt("Step2",user);
         waitForUserTaskAndExecuteIt("Step4",user);
         waitForUserTaskAndExecuteIt("Step3",user);
-        waitForUserTaskAndExecuteIt("Step5", user);
+        waitForUserTaskAndExecuteIt("Step5",user);
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(processDefinition);
