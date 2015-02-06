@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data;
 
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+
 /**
  * @author Colin PUY
  */
@@ -57,4 +59,13 @@ public interface BusinessDataModelRepository {
      *             if the BDM cannot be retrieved.
      */
     String getInstalledBDMVersion() throws SBusinessDataRepositoryException;
+
+    /**
+     * Returns the currently deployed Business Object Data Model, or null if no BDM is deployed.
+     *
+     * @return the currently deployed  Business Object Data Model, or null if no BDM is deployed.
+     * @throws SBusinessDataRepositoryException
+     *             if the BDM cannot be retrieved.
+     */
+    BusinessObjectModel getBusinessObjectModel() throws SBusinessDataRepositoryException;
 }

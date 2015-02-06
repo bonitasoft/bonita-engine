@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.xml.bind.JAXBException;
 
@@ -108,6 +110,23 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         final List<SDependency> searchBDMDependencies = searchBDMDependencies();
         if (searchBDMDependencies != null && searchBDMDependencies.size() > 0) {
             return String.valueOf(searchBDMDependencies.get(0).getId());
+        }
+        return null;
+    }
+
+    @Override
+    public BusinessObjectModel getBusinessObjectModel() throws SBusinessDataRepositoryException {
+        if (isDBMDeployed()) {
+            byte[] clientBdmZip = getClientBDMZip();
+            try {
+                final Map<String, byte[]> zipContent = IOUtils.unzip(clientBdmZip);
+                if (zipContent.containsKey(BOM_NAME)) {
+                    final byte[] bomZip = zipContent.get(BOM_NAME);
+                    return getBusinessObjectModel(bomZip);
+                }
+            } catch (IOException e) {
+                throw new SBusinessDataRepositoryException(e);
+            }
         }
         return null;
     }
