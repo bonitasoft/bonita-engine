@@ -1,9 +1,7 @@
 <ehcache>
 
-    <!-- This configuration is for Hibernate only. The engine cache configuration is in bonita-server-sp.jar!ehcache.xml-->
-
     <!-- nothing is stored to disk but ehcache generate a NPE if not specified -->
-    <diskStore path="java.io.tmpdir/hibernate.cache"/>
+    <diskStore path="java.io.tmpdir/hibernate-tenant.cache"/>
 
     <defaultCache maxElementsInMemory="10000" eternal="false"
                   timeToIdleSeconds="120" timeToLiveSeconds="120" overflowToDisk="false"

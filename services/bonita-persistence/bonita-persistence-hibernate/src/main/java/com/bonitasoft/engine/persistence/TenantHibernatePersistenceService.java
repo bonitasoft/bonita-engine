@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.persistence;
 
+import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -29,12 +30,12 @@ public class TenantHibernatePersistenceService extends org.bonitasoft.engine.per
     private static final String DELETED_KEY = "deleted";
 
     public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor,
-            final HibernateConfigurationProvider hbmConfigurationProvider, final DBConfigurationsProvider tenantConfigurationsProvider,
-            final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
-            final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException,
-            ClassNotFoundException {
-        super(name, sessionAccessor, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger,
-                sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
+            final HibernateConfigurationProvider hbmConfigurationProvider, final Properties extraHibernateProperties,
+            final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
+            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
+            final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
+        super(name, sessionAccessor, hbmConfigurationProvider, extraHibernateProperties, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter,
+                logger, sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
     }
 
     @Override
