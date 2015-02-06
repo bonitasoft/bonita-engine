@@ -74,7 +74,6 @@ public interface GatewayInstanceService {
     /**
      * @param sDefinition
      * @param gatewayInstance
-     * @param transitionInstance
      * @return
      * @throws SBonitaException
      */

@@ -141,7 +141,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         }
     }
 
-    private boolean inclusiveBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) throws SBonitaReadException {
+    boolean inclusiveBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) throws SBonitaReadException {
             logger.log(TAG, TechnicalLogSeverity.DEBUG,
                     "Evaluate if gateway " + gatewayInstance.getName() + " of instance " + gatewayInstance.getRootProcessInstanceId() + " of definition "
                             + sDefinition.getName() + " must be activated ");
@@ -162,10 +162,6 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             } else {
                 incomingWithoutTokens.add(currentTransition);
             }
-        }
-        if (incomingWithTokens.size() == 0) {
-            logger.log(TAG, TechnicalLogSeverity.DEBUG, "Not transition with token on it");
-            return true;
         }
         List<STransitionDefinition> finishWithAToken = new ArrayList<STransitionDefinition>();
         List<STransitionDefinition> doesNotFinishWithAToken = new ArrayList<STransitionDefinition>();
@@ -247,7 +243,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         }
     }
 
-    private boolean parallelBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) {
+    boolean parallelBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) {
         final List<String> hitsBy = getHitByTransitionList(gatewayInstance);
         final List<STransitionDefinition> trans = getTransitionDefinitions(gatewayInstance, sDefinition);
         boolean go = true;
@@ -268,7 +264,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     protected List<STransitionDefinition> getTransitionDefinitions(final SGatewayInstance gatewayInstance, final SProcessDefinition processDefinition) {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
-        final SGatewayDefinition gatewayDefinition = processContainer.getGateway(gatewayInstance.getName());
+        final SFlowNodeDefinition gatewayDefinition = processContainer.getFlowNode(gatewayInstance.getFlowNodeDefinitionId());
         return gatewayDefinition.getIncomingTransitions();
     }
 
@@ -314,8 +310,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             SGatewayReadException {
         SGatewayInstance selectOne;
         try {
-            selectOne = persistenceRead.selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(parentProcessInstanceId, name));// FIXME select more
-            // one and get the oldest
+            selectOne = persistenceRead.selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(parentProcessInstanceId, name));
         } catch (final SBonitaReadException e) {
             throw new SGatewayReadException(e);
         }
@@ -344,26 +339,28 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         return toFire;
     }
 
-    ArrayList<String> getMergedTokens(SGatewayInstance gatewayInstance, List<String> hitBys) {
-        ArrayList<String> merged = new ArrayList<String>();
+    List<String> getMergedTokens(SGatewayInstance gatewayInstance, List<String> hitBys) {
+        List<String> merged = null;
         switch (gatewayInstance.getGatewayType()){
             case PARALLEL:
-                for (String hitBy : hitBys) {
-                    if(!merged.contains(hitBy)){
-                        merged.add(hitBy);
-                    }
-                }
+                merged = unique(hitBys);
                 break;
             case INCLUSIVE:
-                for (String hitBy : hitBys) {
-                    if(!merged.contains(hitBy)){
-                        merged.add(hitBy);
-                    }
-                }
+                merged = unique(hitBys);
                 break;
             case EXCLUSIVE:
-                merged.add(hitBys.get(0));
+                merged = Collections.singletonList(hitBys.get(0));
                 break;
+        }
+        return merged;
+    }
+
+    private ArrayList<String> unique(List<String> hitBys) {
+        ArrayList<String> merged = new ArrayList<String>();
+        for (String hitBy : hitBys) {
+            if(!merged.contains(hitBy)){
+                merged.add(hitBy);
+            }
         }
         return merged;
     }

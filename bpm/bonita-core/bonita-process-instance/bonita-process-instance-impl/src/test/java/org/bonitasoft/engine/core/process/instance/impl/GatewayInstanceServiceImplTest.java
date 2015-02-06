@@ -16,7 +16,16 @@
 package org.bonitasoft.engine.core.process.instance.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,11 +34,16 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.STransitionDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SUserTaskDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -37,6 +51,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,8 +86,8 @@ public class GatewayInstanceServiceImplTest {
         SFlowNodeDefinition step2 = node(2, "step2");
         SFlowNodeDefinition step3 = node(3, "step3");
 
-        List<SFlowNodeDefinition> sourceElements = new ArrayList<SFlowNodeDefinition>(Arrays.<SFlowNodeDefinition> asList(step1, step2));
-        List<SFlowNodeDefinition> targetElements = new ArrayList<SFlowNodeDefinition>(Arrays.<SFlowNodeDefinition> asList(step2, step3));
+        List<SFlowNodeDefinition> sourceElements = new ArrayList<SFlowNodeDefinition>(Arrays.asList(step1, step2));
+        List<SFlowNodeDefinition> targetElements = new ArrayList<SFlowNodeDefinition>(Arrays.asList(step2, step3));
         List<SFlowNodeDefinition> sourceAndTarget = gatewayInstanceService.extractElementThatAreSourceAndTarget(sourceElements, targetElements);
 
         assertThat(sourceElements).containsOnly(step1);
@@ -82,8 +97,8 @@ public class GatewayInstanceServiceImplTest {
 
     SFlowNodeDefinition node(long id, String name, STransitionDefinition... incomingTransitions) {
         SUserTaskDefinitionImpl definition = new SUserTaskDefinitionImpl(id, name, "actor");
-        for (STransitionDefinition incommingTransition : incomingTransitions) {
-            definition.addIncomingTransition(incommingTransition);
+        for (STransitionDefinition incomingTransition : incomingTransitions) {
+            definition.addIncomingTransition(incomingTransition);
         }
         doReturn(definition).when(processContainer).getFlowNode(id);
         return definition;
@@ -286,7 +301,8 @@ public class GatewayInstanceServiceImplTest {
 
         List<STransitionDefinition> startTransition = Arrays.asList(transition(6, 666), transition(3, 666));
         List<STransitionDefinition> toComplete = new ArrayList<STransitionDefinition>();
-        gatewayInstanceService.addBackwardReachableTransitions(processContainer, gate, startTransition, toComplete, Collections.<STransitionDefinition>emptyList());
+        gatewayInstanceService.addBackwardReachableTransitions(processContainer, gate, startTransition, toComplete,
+                Collections.<STransitionDefinition> emptyList());
 
         assertThat(toComplete).containsOnly(transition(1, 2), transition(2, 3), transition(4, 6), transition(5, 6), transition(3, 666), transition(6, 666));
     }
@@ -295,4 +311,129 @@ public class GatewayInstanceServiceImplTest {
         return new STransitionDefinitionImpl("name", source, target);
     }
 
+    @Test
+    public void should_checkMergingCondition_on_inclusive() throws Exception {
+        doReturn(true).when(gatewayInstanceService).inclusiveBehavior(any(SProcessDefinition.class), any(SGatewayInstance.class));
+        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
+        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        gate.setGatewayType(SGatewayType.INCLUSIVE);
+
+        boolean mergingCondition = gatewayInstanceService.checkMergingCondition(processDefinition, gate);
+
+        verify(gatewayInstanceService).inclusiveBehavior(processDefinition, gate);
+        assertThat(mergingCondition).isTrue();
+    }
+
+    @Test
+    public void should_checkMergingCondition_on_parallel() throws Exception {
+        doReturn(true).when(gatewayInstanceService).parallelBehavior(any(SProcessDefinition.class), any(SGatewayInstance.class));
+        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
+        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        gate.setGatewayType(SGatewayType.PARALLEL);
+
+        boolean mergingCondition = gatewayInstanceService.checkMergingCondition(processDefinition, gate);
+
+        verify(gatewayInstanceService).parallelBehavior(processDefinition, gate);
+        assertThat(mergingCondition).isTrue();
+    }
+
+    @Test
+    public void should_checkMergingCondition_on_exclusive() throws Exception {
+        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
+        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        gate.setGatewayType(SGatewayType.EXCLUSIVE);
+
+        boolean mergingCondition = gatewayInstanceService.checkMergingCondition(processDefinition, gate);
+
+        assertThat(mergingCondition).isTrue();
+    }
+
+    @Test
+    public void should_getMergedTokens_on_exclusive_return_the_first_token() throws Exception {
+        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        gate.setGatewayType(SGatewayType.EXCLUSIVE);
+
+        List<String> mergedTokens = gatewayInstanceService.getMergedTokens(gate, Arrays.asList("1", "2"));
+
+        assertThat(mergedTokens).containsOnly("1");
+    }
+
+    @Test
+    public void should_getMergedTokens_on_parallel() throws Exception {
+        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        gate.setGatewayType(SGatewayType.PARALLEL);
+
+        List<String> mergedTokens = gatewayInstanceService.getMergedTokens(gate, Arrays.asList("1", "2", "3", "2"));
+
+        assertThat(mergedTokens).containsOnly("1", "2", "3");
+    }
+
+    @Test
+    public void should_getMergedTokens_on_inclusive() throws Exception {
+        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        gate.setGatewayType(SGatewayType.INCLUSIVE);
+
+        List<String> mergedTokens = gatewayInstanceService.getMergedTokens(gate, Arrays.asList("1", "2", "3", "2"));
+
+        assertThat(mergedTokens).containsOnly("1", "2", "3");
+    }
+
+    @Test
+    public void should_getRemainingToken_return_not_merged_tokens() {
+        List<String> remainingTokens = gatewayInstanceService.getRemainingTokens(Arrays.asList("1", "2", "3", "2", "1"), Arrays.asList("1", "2", "3"));
+
+        assertThat(remainingTokens).containsOnly("2", "1");
+    }
+
+    @Test
+    public void should_parallelBehavior_merged(){
+        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
+        processDefinition.setProcessContainer(processContainer);
+        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        gate.setName("gate");
+        gate.setHitBys("1,2,3,2");
+        gate.setFlowNodeDefinitionId(666);
+        node(666, "gate", transition(1, 666), transition(2,666),transition(3,666));
+
+        boolean isMerged = gatewayInstanceService.parallelBehavior(processDefinition, gate);
+
+        assertThat(isMerged).isTrue();
+    }
+
+    @Test
+    public void should_parallelBehavior_not_merged(){
+        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
+        processDefinition.setProcessContainer(processContainer);
+        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        gate.setName("gate");
+        gate.setHitBys("2,3,2");
+        gate.setFlowNodeDefinitionId(666);
+        node(666, "gate", transition(1, 666), transition(2,666),transition(3,666));
+
+        boolean isMerged = gatewayInstanceService.parallelBehavior(processDefinition, gate);
+
+        assertThat(isMerged).isFalse();
+    }
+
+
+
+    @Test
+    public void should_inclusiveBehavior_merged() throws SBonitaReadException {
+        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
+        processDefinition.setProcessContainer(processContainer);
+        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        gate.setName("gate");
+        gate.setHitBys("1,2,3,2");
+        gate.setFlowNodeDefinitionId(666);
+        gate.setParentContainerId(PROCESS_INSTANCE_ID);
+        SFlowNodeDefinition nodeDefinition = node(666, "gate", transition(1, 666), transition(2, 666), transition(3, 666));
+        doNothing().when(gatewayInstanceService).addBackwardReachableTransitions(any(SFlowElementContainerDefinition.class), any(SFlowNodeDefinition.class), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class));
+        doReturn(true).when(gatewayInstanceService).transitionsContainsAToken(anyListOf(STransitionDefinition.class), any(SFlowNodeDefinition.class), anyLong(), any(SFlowElementContainerDefinition.class));
+
+        boolean isMerged = gatewayInstanceService.inclusiveBehavior(processDefinition, gate);
+
+        assertThat(isMerged).isFalse();
+        verify(gatewayInstanceService, times(2)).addBackwardReachableTransitions(eq(processContainer),eq(nodeDefinition), anyListOf(STransitionDefinition.class) , anyListOf(STransitionDefinition.class) , anyListOf(STransitionDefinition.class));
+        verify(gatewayInstanceService).transitionsContainsAToken(anyListOf(STransitionDefinition.class), eq(nodeDefinition), eq(PROCESS_INSTANCE_ID), eq(processContainer));
+    }
 }
