@@ -21,22 +21,19 @@ import com.bonitasoft.engine.bdm.Entity;
  * The BusinessDataRepository service allows to manage Business Data operations. It includes deploy / undeploy of a Business Data Model, search / find / create
  * / update of Business Data entity objects.
  *
- * @see Entity
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @see Entity
  */
 public interface BusinessDataRepository extends TenantLifecycleService {
 
     /**
      * Finds an Entity that is defined in a deployed Business Data Model.
      *
-     * @param entityClass
-     *            the class of the entity to search for.
-     * @param primaryKey
-     *            the primary key to search by.
+     * @param entityClass the class of the entity to search for.
+     * @param primaryKey the primary key to search by.
      * @return the found entity, if any.
-     * @throws SBusinessDataNotFoundException
-     *             if the Business Data could not be found with the provided primary key.
+     * @throws SBusinessDataNotFoundException if the Business Data could not be found with the provided primary key.
      */
     <T extends Entity> T findById(Class<T> entityClass, Long primaryKey) throws SBusinessDataNotFoundException;
 
@@ -44,10 +41,8 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * Finds entities that is defined in a deployed Business Data Model. If a primary key does not match an existing entity no exception is thrown and nothing
      * is added in the list.
      *
-     * @param entityClass
-     *        the class of the entity to search for.
-     * @param primaryKeys
-     *        the primary keys.
+     * @param entityClass the class of the entity to search for.
+     * @param primaryKeys the primary keys.
      * @return the list of found entities
      */
     <T extends Entity> List<T> findByIds(Class<T> entityClass, List<Long> primaryKeys);
@@ -55,17 +50,12 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     /**
      * Finds an Entity that is defined in a deployed Business Data Model, through JPQL query.
      *
-     * @param entityClass
-     *            the class of the entity to search for.
-     * @param qlString
-     *            the JPQL query string to search the entity.
-     * @param parameters
-     *            the parameters needed to execute the query.
+     * @param resultClass the class of the entity to search for.
+     * @param jpqlQuery the JPQL query string to search the entity.
+     * @param parameters the parameters needed to execute the query.
      * @return the found entity, if any.
-     * @throws SBusinessDataNotFoundException
-     *             if the Business Data could not be found with the provided primary key.
-     * @throws NonUniqueResultException
-     *             if more than one result was found.
+     * @throws SBusinessDataNotFoundException if the Business Data could not be found with the provided primary key.
+     * @throws NonUniqueResultException if more than one result was found.
      */
     <T extends Serializable> T find(Class<T> resultClass, String jpqlQuery, Map<String, Serializable> parameters) throws NonUniqueResultException;
 
@@ -79,8 +69,7 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     /**
      * Saves or updates an entity in the Business Data Repository.
      *
-     * @param entity
-     *            the entity to save / update.
+     * @param entity the entity to save / update.
      * @return the freshly persisted entity.
      */
     void persist(Entity entity);
@@ -88,15 +77,14 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     /**
      * Removes an entity from the Business Data Repository.
      *
-     * @param entity
-     *            the entity to remove.
+     * @param entity the entity to remove.
      */
     void remove(Entity entity);
 
     /**
      * Reconnect the given entity with the persistence unit
-     * @param entity
-     *        the entity to reconnect.
+     *
+     * @param entity the entity to reconnect.
      * @return the connected entity.
      */
     Entity merge(Entity entity);

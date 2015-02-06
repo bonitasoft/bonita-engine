@@ -1,57 +1,76 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-	<bean id="businessDataRepository" class="com.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl">
-		<constructor-arg name="transactionService" ref="transactionService" />
-		<constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
-		<constructor-arg name="configuration">
-			<map>
-				<entry key="hibernate.dialect" value="${businessdata.hibernate.dialect}" />
-				<entry key="hibernate.connection.datasource" value="${businessdata.datasource.jndi.path}" />
-				<entry key="hibernate.show_sql" value="false" />
-				<entry key="hibernate.format_sql" value="false" />
-				<entry key="hibernate.transaction.jta.platform" value="${businessdata.hibernate.transaction.jta_platform}" />
-				<entry key="hibernate.validator.autoregister_listeners" value="false" />
-				<entry key="hibernate.validator.apply_to_ddl" value="false" />
-				<entry key="javax.persistence.validation.mode" value="NONE" />
-			</map>
-		</constructor-arg>
-	</bean>
-
-	<bean id="businessDataModelRepository" class="com.bonitasoft.engine.business.data.impl.BusinessDataModelRepositoryImpl">
-		<constructor-arg name="dependencyService" ref="dependencyService" />
-		<constructor-arg name="schemaManager" ref="schemaManager" />
-		<constructor-arg name="compilationPath">
-			<value>${bonita.home}/server/platform/data-management/compilation-dependencies</value>
-		</constructor-arg>
-		<constructor-arg name="clientStoragePath">
-			<value>${bonita.home}/server/tenants/${tenantId}/data-management/client</value>
-		</constructor-arg>
-	</bean>
-
-	<bean id="schemaManager" class="com.bonitasoft.engine.business.data.impl.SchemaManager">
-		<constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
-		<constructor-arg name="configuration">
-			<map>
-				<entry key="hibernate.dialect" value="${businessdata.hibernate.dialect}" />
-				<entry key="hibernate.connection.datasource" value="${businessdata.notmanageddatasource.jndi.path}" />
-				<entry key="hibernate.show_sql" value="true" />
-				<entry key="hibernate.format_sql" value="true" />
-				<entry key="hibernate.transaction.jta.platform" value="${businessdata.hibernate.transaction.jta_platform}" />
-				<entry key="hibernate.validator.autoregister_listeners" value="false" />
-				<entry key="hibernate.validator.apply_to_ddl" value="false" />
-				<entry key="javax.persistence.validation.mode" value="NONE" />
-			</map>
-		</constructor-arg>
-	</bean>
-    
-    <bean id="jsonBusinessDataSerializer" class="com.bonitasoft.engine.business.data.impl.JsonBusinessDataSerializerImpl"/>
-         
-    <bean id="businessDataService" class="com.bonitasoft.engine.business.data.impl.BusinessDataServiceImpl">
-        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
-        <constructor-arg name="jsonBusinessDataSerializer" ref="jsonBusinessDataSerializer" />
+    <bean id="businessDataRepository" class="com.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl">
+        <constructor-arg name="transactionService" ref="transactionService"/>
+        <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository"/>
+        <constructor-arg name="configuration">
+            <map>
+                <entry key="hibernate.dialect" value="${businessdata.hibernate.dialect}"/>
+                <entry key="hibernate.connection.datasource" value="${businessdata.datasource.jndi.path}"/>
+                <entry key="hibernate.show_sql" value="false"/>
+                <entry key="hibernate.format_sql" value="false"/>
+                <entry key="hibernate.transaction.jta.platform"
+                       value="${businessdata.hibernate.transaction.jta_platform}"/>
+                <entry key="hibernate.validator.autoregister_listeners" value="false"/>
+                <entry key="hibernate.validator.apply_to_ddl" value="false"/>
+                <entry key="javax.persistence.validation.mode" value="NONE"/>
+            </map>
+        </constructor-arg>
     </bean>
-        
+
+    <bean id="businessDataModelRepository"
+          class="com.bonitasoft.engine.business.data.impl.BusinessDataModelRepositoryImpl">
+        <constructor-arg name="dependencyService" ref="dependencyService"/>
+        <constructor-arg name="schemaManager" ref="schemaManager"/>
+        <constructor-arg name="compilationPath">
+            <value>${bonita.home}/server/platform/data-management/compilation-dependencies</value>
+        </constructor-arg>
+        <constructor-arg name="clientStoragePath">
+            <value>${bonita.home}/server/tenants/${tenantId}/data-management/client</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="schemaManager" class="com.bonitasoft.engine.business.data.impl.SchemaManager">
+        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService"/>
+        <constructor-arg name="configuration">
+            <map>
+                <entry key="hibernate.dialect" value="${businessdata.hibernate.dialect}"/>
+                <entry key="hibernate.connection.datasource" value="${businessdata.notmanageddatasource.jndi.path}"/>
+                <entry key="hibernate.show_sql" value="true"/>
+                <entry key="hibernate.format_sql" value="true"/>
+                <entry key="hibernate.transaction.jta.platform"
+                       value="${businessdata.hibernate.transaction.jta_platform}"/>
+                <entry key="hibernate.validator.autoregister_listeners" value="false"/>
+                <entry key="hibernate.validator.apply_to_ddl" value="false"/>
+                <entry key="javax.persistence.validation.mode" value="NONE"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="jsonBusinessDataSerializer"
+          class="com.bonitasoft.engine.business.data.impl.JsonBusinessDataSerializerImpl"/>
+
+    <bean id="typeConverterUtil" class="org.bonitasoft.engine.commons.TypeConverterUtil">
+        <constructor-arg name="datePatterns" type="java.lang.String[]">
+            <list>
+                <value>yyyy-MM-dd</value>
+                <value>HH:mm:ss</value>
+                <value>yyyy-MM-dd HH:mm:ss</value>
+                <value>yyyy-MM-dd'T'HH:mm:ss</value>
+                <value>yyyy-MM-dd'T'HH:mm:ss.SSS</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="businessDataService" class="com.bonitasoft.engine.business.data.impl.BusinessDataServiceImpl">
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository"/>
+        <constructor-arg name="jsonBusinessDataSerializer" ref="jsonBusinessDataSerializer"/>
+        <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository"/>
+        <constructor-arg name="typeConverterUtil" ref="typeConverterUtil"/>
+    </bean>
+
 </beans>
