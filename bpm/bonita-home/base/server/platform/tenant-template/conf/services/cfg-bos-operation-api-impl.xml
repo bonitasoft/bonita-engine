@@ -19,8 +19,15 @@
                 <ref bean="externalDataLeftOperandHandler"/>
                 <ref bean="documentLeftOperandHandler"/>
                 <ref bean="documentListLeftOperandHandler"/>
+                <ref bean="businessDataLeftOperandHandler" />
             </list>
         </property>
+    </bean>
+
+    <bean id="businessDataLeftOperandHandler" class="org.bonitasoft.engine.operation.BusinessDataLeftOperandHandler">
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository"/>
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService"/>
     </bean>
 
     <bean id="assignmentOperationExecutorStrategy"

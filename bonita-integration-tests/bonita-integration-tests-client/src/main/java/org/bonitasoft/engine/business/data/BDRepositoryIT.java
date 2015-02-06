@@ -338,7 +338,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "business data java setter operation" }, jira = "BS-7217", story = "update a business data using a java setter operation")
-    @Test
+   @Test
     public void shouldBeAbleToUpdateBusinessDataUsingBizDataJavaSetterOperation() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'Jules'; e.lastName = 'UnNamed'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -384,7 +384,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    @Test
+   @Test
     public void deployABDRAndCreateADefaultBusinessDataAndReuseReference() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -416,7 +416,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    @Test
+   @Test
     public void deployABDRAndCreateABOAndUdpateThroughAGroovyScript() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -441,7 +441,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    @Test(expected = ProcessEnablementException.class)
+   @Test(expected = ProcessEnablementException.class)
     public void deployProcessWithWrongBusinessDataTypeShouldNotBeDeployable() throws Exception {
         final User user = createUser("login1", "password");
         ProcessDefinition processDefinition = null;
@@ -460,7 +460,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
     }
 
-    @Test
+   @Test
     public void deployABDRAndExecuteAGroovyScriptWhichContainsAPOJOFromTheBDR() throws BonitaException {
         final Expression stringExpression = new ExpressionBuilder()
                 .createGroovyScriptExpression(
@@ -486,7 +486,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Test(expected = BonitaRuntimeException.class)
+   @Test(expected = BonitaRuntimeException.class)
     public void createAnEmployeeWithARequiredFieldAtNullThrowsAnException() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
                 "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -504,7 +504,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
     }
 
-    @Test(expected = BonitaRuntimeException.class)
+   @Test(expected = BonitaRuntimeException.class)
     public void createAnEmployeeWithATooSmallFieldAtNullThrowsAnException() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
                 "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John124578/'; e.lastName = 'Doe'; return e;",
@@ -523,7 +523,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
     }
 
-    @Test
+   @Test
     public void updateBusinessDataShouldWorkOutsideATransaction() throws Exception {
         final String taskName = "step";
 
@@ -538,7 +538,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(definition);
     }
 
-    @Test
+   @Test
     public void should_deploy_generate_client_bdm_jar_in_bonita_home() throws Exception {
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
         assertThat(new File(getClientBdmJarClassPath(bonitaHomePath), CLIENT_BDM_ZIP_FILENAME)).exists().isFile();
@@ -546,7 +546,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(getTenantManagementCommunityAPI().getClientBDMZip()).isNotEmpty();
     }
 
-    @Test(expected = BusinessDataRepositoryException.class)
+   @Test(expected = BusinessDataRepositoryException.class)
     public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         getTenantManagementCommunityAPI().pause();
@@ -559,7 +559,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         getTenantManagementCommunityAPI().getClientBDMZip();
     }
 
-    @Test
+   @Test
     public void shouldBeAbleToRunDAOCallThroughGroovy() throws Exception {
         final String firstName = "FlofFlof";
         final String lastName = "Boudin";
@@ -620,7 +620,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    @Test
+   @Test
     public void should_use_factory_to_instantiate_dao_on_client_side() throws Exception {
         final AddressRef ref1 = new AddressRef("newYorkAddr", "33, corner street", "NY");
         final AddressRef ref2 = new AddressRef("romeAddr", "2, plaza del popolo", "Roma");
@@ -757,7 +757,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
         processDefinitionBuilder
                 .addUserTask(taskName, ACTOR_NAME)
-                .addConnector("updateBusinessData", "com.bonitasoft.connector.BusinessDataUpdateConnector", "1.0", ConnectorEvent.ON_ENTER)
+                .addConnector("updateBusinessData", "org.bonitasoft.connector.BusinessDataUpdateConnector" , "1.0", ConnectorEvent.ON_ENTER)
                 .addInput("bizData", getEmployeeExpression)
                 .addOutput(
                         new OperationBuilder().createBusinessDataSetAttributeOperation("myEmployee", "setLastName", String.class.getName(),
@@ -766,7 +766,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 processDefinitionBuilder.done());
-        BarResource barResource = getBarResource("/com/bonitasoft/engine/business/data/BusinessDataUpdateConnector.impl", "BusinessDataUpdateConnector.impl",
+        BarResource barResource = getBarResource("/org/bonitasoft/engine/business/data/BusinessDataUpdateConnector.impl", "BusinessDataUpdateConnector.impl",
                 BDRepositoryIT.class);
         businessArchiveBuilder.addConnectorImplementation(barResource);
 
@@ -794,7 +794,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "java setter operation", "mandatory field",
             "intermixed" }, jira = "BS-8591", story = "Create business datas using intermixed java setter operations.")
-    @Test
+   @Test
     public void shouldBeAbleToCreate2BusinessDataUsingIntermixedBizDataJavaSetterOperations() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", PROCESS_VERSION);
@@ -827,7 +827,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    @Test
+   @Test
     public void shouldBeAbleToDeleteABusinessDataUsingOperation() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -902,7 +902,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     }
 
-    @Test
+   @Test
     public void deployABDRAndCreateAndUdpateAMultipleBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
@@ -950,7 +950,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
     }
 
-    @Test
+   @Test
     public void useMultipleBusinessDataInAUserTaskWithMultiInstance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
@@ -992,7 +992,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         return StringUtils.split(lastNames, ", ");
     }
 
-    @Test
+   @Test
     public void useMultipleBusinessDataInACallActivityWithSequentialMultiInstance() throws Exception {
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("UpdateEmployee", "1.2-beta");
         builder.addActor(ACTOR_NAME);
@@ -1035,7 +1035,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(subProcessDefinition);
     }
 
-    @Test
+   @Test
     public void useMultipleBusinessDataInACallActivityWithInDataMultiInstance() throws Exception {
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("UpdateEmployee", "1.2-beta");
         builder.addActor(ACTOR_NAME);
@@ -1082,7 +1082,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(subProcessDefinition);
     }
 
-    @Test
+   @Test
     public void useMultipleBusinessDataInACallActivityWithOutDataMultiInstance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John' + activityInstanceId; john.lastName = 'Doe'; john;",
@@ -1122,7 +1122,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(subProcessDefinition);
     }
 
-    @Test
+   @Test
     public void should_return_the_list_of_entities_from_the_multiple_instance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
@@ -1166,7 +1166,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(definition);
     }
 
-    @Test
+   @Test
     public void getBusinessDataCommand_should_return_json_entities() throws Exception {
         final ProcessDefinition processDefinition;
         final ProcessDefinitionBuilder processDefinitionBuilder;
@@ -1350,7 +1350,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         return json;
     }
 
-    @Test
+   @Test
     public void deployABDRAndCreateInOperationAMultipleBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
@@ -1381,7 +1381,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    @Test
+   @Test
     public void should_get_the_lazy_list_in_a_multiple_business_data() throws Exception {
         final Expression initProducts = new ExpressionBuilder().createGroovyScriptExpression("initProducts", "import org.bonita.pojo.Product;"
                 + " Product p1 = new Product(); p1.name = 'Rock'; "

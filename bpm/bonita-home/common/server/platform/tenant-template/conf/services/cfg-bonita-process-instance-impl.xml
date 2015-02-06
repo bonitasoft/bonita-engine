@@ -56,5 +56,11 @@
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
     </bean>
+    <bean id="refBusinessDataService" class="org.bonitasoft.engine.core.process.instance.impl.RefBusinessDataServiceImpl">
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="persistenceRead" ref="persistenceService" />
+        <constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+    </bean>
 
 </beans>

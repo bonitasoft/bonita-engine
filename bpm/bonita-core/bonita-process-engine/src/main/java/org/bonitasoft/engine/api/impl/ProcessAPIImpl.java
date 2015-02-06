@@ -2506,7 +2506,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long processDefinitionId = processInstanceService.getProcessInstance(processInstanceId).getProcessDefinitionId();
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(), parentContainerResolver,
+            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(),
+                    parentContainerResolver,
                     startIndex, maxResults);
             return convertModelToDataInstances(dataInstances);
         } catch (final SBonitaException e) {
@@ -2637,7 +2638,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = activityInstanceService.getFlowNodeInstance(activityInstanceId).getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver,
+            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                    parentContainerResolver,
                     startIndex, maxResults);
             return convertModelToDataInstances(dataInstances);
         } catch (final SBonitaException e) {
@@ -2663,7 +2665,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            data = dataInstanceService.getDataInstance(dataName, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
+            data = dataInstanceService.getDataInstance(dataName, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
+                    parentContainerResolver);
             return convertModeltoDataInstance(data);
         } catch (final SBonitaException e) {
             throw new DataNotFoundException(e);
@@ -2869,7 +2872,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 sHumanTaskInstances = activityInstanceService.searchHumanTasks(queryOptions);
             }
 
-            //search in archived human tasks
+            // search in archived human tasks
 
             checkIfProcessInstanceExistsWhenNoHumanTask(processInstanceId);
             return false;
@@ -2999,8 +3002,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             Thread.currentThread().setContextClassLoader(processClassLoader);
             List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(variables.keySet()), activityInstanceId,
                     DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
-            if(dataInstances.size()<variables.size()){
-                throw new UpdateException("Some data does not exists, wanted to update "+variables.keySet()+" but there is only "+dataInstances);
+            if (dataInstances.size() < variables.size()) {
+                throw new UpdateException("Some data does not exists, wanted to update " + variables.keySet() + " but there is only " + dataInstances);
             }
             for (SDataInstance dataInstance : dataInstances) {
                 Serializable newValue = variables.get(dataInstance.getName());
@@ -3034,7 +3037,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     activityInstance.getProcessDefinitionId());
             sExpressionContext.setSerializableInputValues(expressionContexts);
 
-            operationService.execute(sOperations,sExpressionContext);
+            operationService.execute(sOperations, sExpressionContext);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         } finally {
@@ -3045,6 +3048,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     protected SOperation convertOperation(final Operation operation) {
         return ModelConvertor.convertOperation(operation);
     }
+
     protected List<SOperation> convertOperations(final List<Operation> operations) {
         return ModelConvertor.convertOperations(operations);
     }
@@ -3557,7 +3561,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                 tenantAccessor.getProcessDefinitionService(), tenantAccessor.getDataInstanceService(), tenantAccessor.getOperationService(),
                 tenantAccessor.getWorkService(), tenantAccessor.getContainerRegistry(), tenantAccessor.getEventInstanceService(),
                 tenantAccessor.getSchedulerService(), tenantAccessor.getCommentService(), tenantAccessor.getIdentityService(),
-                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getTokenService(), tenantAccessor.getParentContainerResolver());
+                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getTokenService(), tenantAccessor.getParentContainerResolver(),
+                tenantAccessor.getRefBusinessDataService());
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
             if (sActivityInstance instanceof SHumanTaskInstance) {
@@ -4497,7 +4502,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     /**
      * @param orAssignedToUser
-     *        do we also want to retrieve tasks directly assigned to this user ?
+     *            do we also want to retrieve tasks directly assigned to this user ?
      * @throws SearchException
      */
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions, final boolean orAssignedToUser)
@@ -6038,9 +6043,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     private class ExecuteFlowNode implements TransactionContent {
 
         private final long userId;
+
         private final ActivityInstanceService activityInstanceService;
+
         private final long flownodeInstanceId;
+
         private final ProcessExecutor processExecutor;
+
         private final TechnicalLoggerService logger;
 
         public ExecuteFlowNode(final long userId, final ActivityInstanceService activityInstanceService, final long flownodeInstanceId,
@@ -6098,7 +6107,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort) {
-        return processManagementAPIImplDelegate.getParameterInstances(processDefinitionId,startIndex,maxResults,sort);
+        return processManagementAPIImplDelegate.getParameterInstances(processDefinitionId, startIndex, maxResults, sort);
     }
 
 }

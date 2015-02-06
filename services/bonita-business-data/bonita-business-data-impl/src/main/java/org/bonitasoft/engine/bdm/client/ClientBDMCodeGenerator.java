@@ -109,7 +109,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         final JBlock tryBody = tryBlock.body();
 
         // Get CommandAPI
-        final JClass tenantApiAccessorClass = getModel().ref("com.bonitasoft.engine.api.TenantAPIAccessor");
+        final JClass tenantApiAccessorClass = getModel().ref("org.bonitasoft.engine.api.TenantAPIAccessor");
         final JClass commandApiType = getModel().ref("org.bonitasoft.engine.api.CommandAPI");
         final JVar commandApiRef = tryBody.decl(commandApiType, "commandApi", tenantApiAccessorClass.staticInvoke("getCommandAPI").arg(JExpr.ref("session")));
 

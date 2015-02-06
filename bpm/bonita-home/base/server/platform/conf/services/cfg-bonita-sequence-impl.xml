@@ -49,11 +49,12 @@
 				<!-- <entry key="10001" value="100" />actorMapping -->
 				<!-- <entry key="10095" value="100" />HiddenTask -->
 				<!-- <entry key="10030" value="100" />category -->
-				<!-- <entry key="10040" value="100" />SDocumentMapping -->
-				<!-- <entry key="10050" value="100" />supervisor -->
-				<!-- <entry key="10070" value="100" />ExternalIdentityMapping -->
-				<!-- <entry key="10090" value="100" />document_content -->
-				<!-- <entry key="20040" value="100" />SADocumentMapping -->
+                <!-- <entry key="10040" value="100" />SDocumentMapping -->
+                <!-- <entry key="10050" value="100" />supervisor -->
+                <!-- <entry key="10070" value="100" />ExternalIdentityMapping -->
+                <!-- <entry key="10090" value="100" />document_content -->
+                <!-- <entry key="10096" value="100" />RefBusinessDataInstance -->
+                <!-- <entry key="20040" value="100" />SADocumentMapping -->
 			</map>
 		</constructor-arg>
 		<constructor-arg name="defaultRangeSize" value="100" />
@@ -148,6 +149,12 @@
 				<entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" value="10200" />
 				<entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" value="10201" />
 				<entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" value="10202" />
+                <!--business data-->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl" value="10096" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl" value="10096" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl" value="10096" />
+
+
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />

@@ -1771,4 +1771,32 @@
         WHERE p.processDefinitionId = :processDefinitionId
     </query>
 
+    <query name="getSRefBusinessDataInstance">
+        SELECT ref
+        FROM org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl AS ref
+        WHERE ref.name = :name
+        AND ref.processInstanceId = :processInstanceId
+    </query>
+
+    <query name="getSRefBusinessDataInstancesOfProcess">
+        SELECT ref
+        FROM org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl AS ref
+        WHERE ref.processInstanceId = :processInstanceId
+        ORDER BY ref.id
+    </query>
+
+    <query name="getSFlowNodeRefBusinessDataInstance">
+        SELECT ref
+        FROM org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl AS ref
+        WHERE ref.name = :name
+        AND ref.flowNodeInstanceId = :flowNodeInstanceId
+    </query>
+
+    <query name="getNumberOfDataOfMultiRefBusinessData">
+        SELECT ref.dataIds.size
+        FROM org.bonitasoft.engine.core.process.instance.model.impl.business.data.SMultiRefBusinessDataInstanceImpl AS
+        ref
+        WHERE ref.name = :name
+        AND ref.processInstanceId = :processInstanceId
+    </query>
 </hibernate-mapping>

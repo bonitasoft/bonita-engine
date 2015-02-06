@@ -47,6 +47,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -64,6 +65,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefi
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SThrowEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
@@ -187,14 +189,16 @@ public class StateBehaviors {
 
     protected final ParentContainerResolver parentContainerResolver;
 
+    private RefBusinessDataService refBusinessDataService;
+
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
-            final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
-            final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
-            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
-            final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
-            final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService,
-            final ParentContainerResolver parentContainerResolver) {
+                          final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
+                          final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
+                          final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
+                          final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
+                          final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SchedulerService schedulerService,
+                          final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService,
+                          final ParentContainerResolver parentContainerResolver, RefBusinessDataService refBusinessDataService) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -216,6 +220,7 @@ public class StateBehaviors {
         this.logger = logger;
         this.tokenService = tokenService;
         this.parentContainerResolver = parentContainerResolver;
+        this.refBusinessDataService = refBusinessDataService;
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -916,6 +921,21 @@ public class StateBehaviors {
 
     public int getNumberOfInstancesToCreateFromInputRef(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SMultiInstanceLoopCharacteristics miLoop, final int numberOfInstanceMax) throws SDataInstanceException, SActivityStateExecutionException {
+        final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+        final SBusinessDataDefinition businessData = processContainer.getBusinessDataDefinition(miLoop.getLoopDataInputRef());
+        if (businessData == null) {
+            return getNumberOfInstanceToCreateFromSimpleData(processDefinition, flowNodeInstance, miLoop, numberOfInstanceMax);
+        }
+        try {
+            return refBusinessDataService.getNumberOfDataOfMultiRefBusinessData(businessData.getName(), flowNodeInstance.getParentProcessInstanceId());
+        } catch (final SBonitaReadException sbre) {
+            throw new SActivityStateExecutionException(sbre);
+        }
+
+    }
+
+    private int getNumberOfInstanceToCreateFromSimpleData(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance,
+            SMultiInstanceLoopCharacteristics miLoop, int numberOfInstanceMax) throws SDataInstanceException, SActivityStateExecutionException {
         final SDataInstance loopDataInput = dataInstanceService.getDataInstance(miLoop.getLoopDataInputRef(), flowNodeInstance.getId(),
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         if (loopDataInput != null) {

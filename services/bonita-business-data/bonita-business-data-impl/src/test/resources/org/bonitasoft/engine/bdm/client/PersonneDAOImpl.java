@@ -29,7 +29,7 @@ public class PersonneDAOImpl
 
     public com.test.model.Personne findByPrenomAndNomAndBirthDate(String prenom, String nom, Date birthDate) {
         try {
-            CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
+            CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Personne.findByPrenomAndNomAndBirthDate");
             commandParameters.put("returnsList", false);
@@ -47,7 +47,7 @@ public class PersonneDAOImpl
 
     public List<com.test.model.Personne> findByPrenom(String prenom, int startIndex, int maxResults) {
         try {
-            CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
+            CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Personne.findByPrenom");
             commandParameters.put("returnsList", true);
@@ -65,7 +65,7 @@ public class PersonneDAOImpl
 
     public List<com.test.model.Personne> findByNom(String nom, int startIndex, int maxResults) {
         try {
-            CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
+            CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Personne.findByNom");
             commandParameters.put("returnsList", true);
@@ -83,7 +83,7 @@ public class PersonneDAOImpl
 
     public List<com.test.model.Personne> findByBirthDate(Date birthDate, int startIndex, int maxResults) {
         try {
-            CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
+            CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Personne.findByBirthDate");
             commandParameters.put("returnsList", true);
@@ -101,7 +101,7 @@ public class PersonneDAOImpl
 
     public List<com.test.model.Personne> find(int startIndex, int maxResults) {
         try {
-            CommandAPI commandApi = com.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
+            CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Personne.find");
             commandParameters.put("returnsList", true);
