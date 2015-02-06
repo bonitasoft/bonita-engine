@@ -29,13 +29,18 @@ import org.bonitasoft.engine.commons.exceptions.SReflectException;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Laurent Leseigneur
  */
 public class ClassReflector {
 
     private static final String EMPTY = "";
+
     private static final String SET = "set";
+
     private static final String IS = "is";
+
     private static final String GET = "get";
+
     private static final Map<String, Method> methods;
 
     static {
@@ -287,11 +292,27 @@ public class ClassReflector {
     }
 
     public static String getGetterName(final String fieldName) {
-        //NOTE: can't work with boolean since field name type is unknown
+        // NOTE: can't work with boolean since field name type is unknown
         final StringBuilder builder = new StringBuilder(GET);
         builder.append(String.valueOf(fieldName.charAt(0)).toUpperCase());
         builder.append(fieldName.substring(1));
         return builder.toString();
+    }
+
+    public static String getGetterName(final String fieldName, final Class<?> fieldType) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(getGetterPrefix(fieldType));
+        builder.append(String.valueOf(fieldName.charAt(0)).toUpperCase());
+        builder.append(fieldName.substring(1));
+        return builder.toString();
+    }
+
+    private static String getGetterPrefix(Class<?> fieldType) {
+        if (fieldType.isAssignableFrom(Boolean.class)) {
+            return IS;
+        }
+        return GET;
+
     }
 
     public static String getFieldName(final String methodName) {
