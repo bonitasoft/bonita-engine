@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -31,7 +31,7 @@ public class APIAccessorTest {
 
     private void checkMethodReturnExpectedReturnType(final String methodName, final String expected) throws Exception {
         final Method method = getAPIMethod(methodName);
-        assertThat(method.getReturnType().getName()).as("method " + methodName + " sould return type " + expected).isEqualTo(expected);
+        assertThat(method.getReturnType().getName()).as("method " + methodName + " should return type " + expected).isEqualTo(expected);
     }
 
     @Test

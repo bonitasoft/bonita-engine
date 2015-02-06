@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -12,7 +12,11 @@ package com.bonitasoft.engine.business.application;
 /**
  * @author Elias Ricken de Medeiros
  *
+ * @see org.bonitasoft.engine.business.application.ApplicationState
+ *
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationState} instead.
  */
+@Deprecated
 public enum ApplicationState {
 
     ACTIVATED,

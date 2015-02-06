@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -128,12 +128,29 @@ public final class TenantAPIAccessor {
         return getAPI(TenantManagementAPI.class, session);
     }
 
+    public static org.bonitasoft.engine.api.PageAPI getCustomPageAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
+            UnknownAPITypeException {
+        return getAPI(org.bonitasoft.engine.api.PageAPI.class, session);
+    }
+
+    /**
+     * @deprecated from version 7.0 on, use {@link #getCustomPageAPI(APISession)} instead.
+     */
+    @Deprecated
     public static PageAPI getPageAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(PageAPI.class, session);
     }
 
+    public static org.bonitasoft.engine.api.ApplicationAPI getLivingApplicationAPI(final APISession session) throws BonitaHomeNotSetException,
+            ServerAPIException, UnknownAPITypeException {
+        return getAPI(org.bonitasoft.engine.api.ApplicationAPI.class, session);
+    }
+
+    /**
+     * @deprecated from version 7.0 on, use {@link #getLivingApplicationAPI(APISession)} instead.
+     */
+    @Deprecated
     public static ApplicationAPI getApplicationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ApplicationAPI.class, session);
     }
-
 }

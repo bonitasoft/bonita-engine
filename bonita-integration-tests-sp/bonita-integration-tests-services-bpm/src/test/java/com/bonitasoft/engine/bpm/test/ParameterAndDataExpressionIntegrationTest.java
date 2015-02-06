@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -44,8 +44,8 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.api.impl.LoginAPIExt;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.parameter.SParameter;
-import com.bonitasoft.engine.parameter.propertyfile.SParameterImpl;
+import org.bonitasoft.engine.parameter.SParameter;
+import org.bonitasoft.engine.parameter.propertyfile.SParameterImpl;
 
 public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServicesSPTest {
 

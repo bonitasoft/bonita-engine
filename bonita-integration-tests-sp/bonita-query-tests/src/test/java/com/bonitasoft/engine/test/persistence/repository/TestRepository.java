@@ -1,18 +1,20 @@
+/*******************************************************************************
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.test.persistence.repository;
 
+import org.bonitasoft.engine.page.SPageWithContent;
+import org.bonitasoft.engine.page.impl.SPageWithContentImpl;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.SApplicationMenu;
-import com.bonitasoft.engine.business.application.model.SApplicationPage;
-import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
-import com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
-import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
-import com.bonitasoft.engine.page.SPageWithContent;
-import com.bonitasoft.engine.page.impl.SPageWithContentImpl;
 import com.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 
 /**
@@ -48,27 +50,5 @@ public class TestRepository {
         getSession().save(sPageWithContentImpl);
         return (SPageWithContentImpl) getSession().get(sPageWithContentImpl.getClass(),
                 new PersistentObjectId(sPageWithContentImpl.getId(), sPageWithContentImpl.getTenantId()));
-    }
-
-    public SApplication add(final SApplicationImpl application) {
-        getSession().save(application);
-        return (SApplication) getSession().get(application.getClass(),
-                new PersistentObjectId(application.getId(), application.getTenantId()));
-    }
-
-    public SApplicationPage add(final SApplicationPageImpl applicationPage) {
-        getSession().save(applicationPage);
-        return (SApplicationPage) getSession().get(applicationPage.getClass(),
-                new PersistentObjectId(applicationPage.getId(), applicationPage.getTenantId()));
-    }
-
-    public SApplicationMenu add(final SApplicationMenuImpl applicationMenu) {
-        getSession().save(applicationMenu);
-        return (SApplicationMenu) getSession().get(applicationMenu.getClass(),
-                new PersistentObjectId(applicationMenu.getId(), applicationMenu.getTenantId()));
-    }
-
-    public void update(final SApplicationImpl application) {
-        getSession().update(application);
     }
 }

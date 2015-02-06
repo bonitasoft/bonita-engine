@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2012 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,15 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.parameter;
 
-import org.bonitasoft.engine.bpm.DescriptionElement;
-
 /**
  * @author Matthieu Chaffotte
+ * @deprecated use {@link org.bonitasoft.engine.bpm.parameter.ParameterInstance}
  */
-public interface ParameterInstance extends DescriptionElement {
+public interface ParameterInstance extends org.bonitasoft.engine.bpm.parameter.ParameterInstance {
 
-    Object getValue();
-
-    String getType();
 
 }

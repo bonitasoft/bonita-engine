@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -52,6 +52,7 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
      * @param type
      *        The type of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition} (complete class name)
      * @return The {@link ParameterDefinitionBuilder} containing the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
+     * @deprecated use {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder#addParameter(String, String)}
      */
     public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
         return new ParameterDefinitionBuilder(this, process, parameterName, type);
