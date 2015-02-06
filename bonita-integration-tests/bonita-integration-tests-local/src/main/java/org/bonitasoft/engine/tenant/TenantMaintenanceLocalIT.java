@@ -20,6 +20,7 @@ import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.TestsInitializer;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -51,7 +52,7 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
         pdb.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(100));
         final DesignProcessDefinition dpd = pdb.done();
         final ProcessDefinition pd = deployAndEnableProcess(dpd);
-        getProcessAPI().startProcess(pd.getId());
+        ProcessInstance processInstance = getProcessAPI().startProcess(pd.getId());
         logoutThenlogin();
 
         getTenantManagementCommunityAPI().pause();
@@ -66,7 +67,10 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
         assertTrue(workService.isStopped());
 
         // cleanup
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         getTenantManagementCommunityAPI().resume();
+
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(pd);
     }
 

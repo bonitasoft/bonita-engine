@@ -58,7 +58,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Baptiste Mesta
  */
 @AvailableWhenTenantIsPaused
-public class TenantManagementAPIExt implements TenantManagementAPI {
+public class TenantManagementAPIImpl implements TenantManagementAPI {
 
     protected PlatformServiceAccessor getPlatformAccessorNoException() {
         try {

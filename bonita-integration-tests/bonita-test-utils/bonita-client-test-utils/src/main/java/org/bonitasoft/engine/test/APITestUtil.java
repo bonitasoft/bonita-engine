@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
+import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
@@ -185,6 +186,9 @@ public class APITestUtil extends PlatformTestUtil {
 
     private TenantManagementAPI tenantManagementCommunityAPI;
 
+    private BusinessDataAPI businessDataAPI;
+
+
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
         if (strTimeout != null) {
@@ -227,6 +231,14 @@ public class APITestUtil extends PlatformTestUtil {
         setPageAPI(TenantAPIAccessor.getCustomPageAPI(getSession()));
         setApplicationAPI(TenantAPIAccessor.getLivingApplicationAPI(getSession()));
         setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantManagementCommunityAPI(getSession()));
+        setBusinessDataAPI(TenantAPIAccessor.getBusinessDataAPI(getSession()));
+    }
+    public BusinessDataAPI getBusinessDataAPI() {
+        return businessDataAPI;
+    }
+
+    public void setBusinessDataAPI(final BusinessDataAPI businessDataAPI) {
+        this.businessDataAPI = businessDataAPI;
     }
 
     public void logoutOnTenant() throws BonitaException {
@@ -242,6 +254,7 @@ public class APITestUtil extends PlatformTestUtil {
         setApplicationAPI(null);
         setTenantManagementCommunityAPI(null);
         setPageAPI(null);
+        setBusinessDataAPI(null);
     }
 
     public void logoutThenlogin() throws BonitaException {

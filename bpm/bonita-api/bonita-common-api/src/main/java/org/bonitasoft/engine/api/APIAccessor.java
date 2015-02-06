@@ -79,4 +79,12 @@ public interface APIAccessor extends Serializable {
      * @return an <code>ApplicationAPI</code>
      */
     ApplicationAPI getLivingApplicationAPI();
+
+    /**
+     * Gives access to the <code>BusinessDataAPI</code>
+     *
+     * @return an <code>BusinessDataAPI</code>
+     */
+    BusinessDataAPI getBusinessDataAPI();
+
 }

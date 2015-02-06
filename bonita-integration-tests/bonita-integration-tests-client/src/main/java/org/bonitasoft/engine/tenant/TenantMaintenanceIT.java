@@ -22,7 +22,6 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.test.runner.BonitaTestRunner;
@@ -52,11 +51,13 @@ public class TenantMaintenanceIT extends TestWithUser {
         final long numberOfArchivedJobsBeforeTenantPause = getNumberOfArchivedJobs();
 
         // when the tenant is paused and then resume
+        logoutThenlogin();
         pauseTenant();
         waitForPauseTime();
         resumeTenant();
 
         // then process is resume
+        logoutThenloginAs(USERNAME, PASSWORD); // normal user
         waitArchivedProcessCount(2);
         final long numberOfArchivedJobsAfterTenantPauseAfterResume = getNumberOfArchivedJobs();
         Assert.assertTrue(numberOfArchivedJobsAfterTenantPauseAfterResume >= numberOfArchivedJobsBeforeTenantPause);
@@ -113,11 +114,11 @@ public class TenantMaintenanceIT extends TestWithUser {
         return deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, getSession().getUserId());
     }
 
-    private void pauseTenant() throws BonitaException, UpdateException {
+    private void pauseTenant() throws BonitaException {
         getTenantManagementCommunityAPI().pause();
     }
 
-    private void resumeTenant() throws BonitaException, UpdateException {
+    private void resumeTenant() throws BonitaException {
         getTenantManagementCommunityAPI().resume();
     }
 }

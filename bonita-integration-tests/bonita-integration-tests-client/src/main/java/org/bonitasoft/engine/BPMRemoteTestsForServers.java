@@ -16,6 +16,7 @@ package org.bonitasoft.engine;
 import org.bonitasoft.engine.accessors.TenantAccessorTest;
 import org.bonitasoft.engine.activity.PendingTasksIT;
 import org.bonitasoft.engine.business.application.ApplicationIT;
+import org.bonitasoft.engine.business.data.BDRepositoryIT;
 import org.bonitasoft.engine.command.AdvancedStartProcessCommandIT;
 import org.bonitasoft.engine.command.CommandIT;
 import org.bonitasoft.engine.command.web.ExternalCommandsTests;
@@ -56,7 +57,8 @@ import org.junit.runners.Suite.SuiteClasses;
         MultiThreadCallsIT.class,
         AdvancedStartProcessCommandIT.class,
         PageAPIIT.class,
-        ApplicationIT.class
+        ApplicationIT.class,
+        BDRepositoryIT.class
 
 })
 @Initializer(BPMRemoteTestsForServers.class)

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.business.data.BDRepositoryIT;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -124,11 +126,18 @@ public abstract class CommonAPIIT extends APITestUtil {
     }
 
     public BarResource getResource(final String path, final String name) throws IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream(path);
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
-        return new BarResource(name, byteArray);
+        return getBarResource(path, name, BPMRemoteTests.class);
+    }
+
+    public BarResource getBarResource(final String path, final String name, Class<?> clazz) throws IOException {
+        final InputStream stream = BDRepositoryIT.class.getResourceAsStream(path);
+        assertThat(stream).isNotNull();
+        try {
+            final byte[] byteArray = IOUtils.toByteArray(stream);
+            return new BarResource(name, byteArray);
+        } finally {
+            stream.close();
+        }
     }
 
     public void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {

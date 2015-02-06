@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
+import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
@@ -29,8 +30,10 @@ import org.bonitasoft.engine.api.PlatformCommandAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.api.TenantManagementAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.api.impl.ApplicationAPIImpl;
+import org.bonitasoft.engine.api.impl.BusinessDataAPIImpl;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
@@ -41,6 +44,7 @@ import org.bonitasoft.engine.api.impl.PlatformCommandAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformLoginAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
+import org.bonitasoft.engine.api.impl.TenantManagementAPIImpl;
 import org.bonitasoft.engine.api.impl.ThemeAPIImpl;
 import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
 import org.bonitasoft.engine.service.APIAccessResolver;
@@ -68,6 +72,8 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(PermissionAPI.class.getName(), new PermissionAPIImpl());
         apis.put(PageAPI.class.getName(), new PageAPIImpl());
         apis.put(ApplicationAPI.class.getName(), new ApplicationAPIImpl());
+        apis.put(TenantManagementAPI.class.getName(), new TenantManagementAPIImpl());
+        apis.put(BusinessDataAPI.class.getName(), new BusinessDataAPIImpl());
     }
 
     @Override
