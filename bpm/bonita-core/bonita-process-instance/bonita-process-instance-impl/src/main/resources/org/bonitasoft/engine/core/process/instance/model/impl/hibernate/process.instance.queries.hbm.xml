@@ -28,7 +28,13 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE a.rootContainerId = :rootContainerId
 		AND a.deleted = FALSE
-        ORDER BY a.id ASC
+		ORDER BY a.id ASC
+	</query>
+
+	<query name="getNumberOfFlowNode">
+		SELECT count(f)
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
+		WHERE f.rootContainerId = :rootContainerId
 	</query>
 	
 	<query name="getNumberOfActivitiesFromProcessInstance">

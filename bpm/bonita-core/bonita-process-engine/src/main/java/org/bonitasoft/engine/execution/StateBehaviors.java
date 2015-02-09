@@ -742,8 +742,6 @@ public class StateBehaviors {
                 rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId()
         );
 
-        // we create token here to be sure the token is put synchronously
-        processInstanceService.addToken(processInstanceService.getProcessInstance(activityInstance.getParentProcessInstanceId()), 1);
         // no need to handle failed state, creation is in the same tx
         containerRegistry.executeFlowNodeInSameThread(parentProcessInstanceId, boundaryEventInstance.getId(), null, null, containerType.name());
     }

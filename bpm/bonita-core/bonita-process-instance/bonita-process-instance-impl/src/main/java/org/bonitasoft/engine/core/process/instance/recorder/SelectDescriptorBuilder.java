@@ -193,6 +193,11 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<Long>("getNumberOfActivitiesFromProcessInstance", parameters, SFlowNodeInstance.class, Long.class);
     }
 
+    public static SelectOneDescriptor<Long> getNumberOfFlowNode(final long rootContainerId) {
+        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+        return new SelectOneDescriptor<Long>("getNumberOfFlowNode", parameters, SFlowNodeInstance.class, Long.class);
+    }
+
     public static SelectListDescriptor<SEventInstance> getEventsFromRootContainer(final long rootContainerId, final int fromIndex, final int maxResults,
             final String field, final OrderByType orderByType) {
         final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);

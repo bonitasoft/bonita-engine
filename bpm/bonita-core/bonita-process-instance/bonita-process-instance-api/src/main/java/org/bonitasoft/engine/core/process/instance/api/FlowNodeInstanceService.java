@@ -344,4 +344,12 @@ public interface FlowNodeInstanceService {
      */
     List<Long> getFlowNodeInstanceIdsToRestart(QueryOptions queryOptions) throws SBonitaReadException;
 
+    /**
+     *
+     * get the number of flow node is this root container
+     * @param rootContainerId
+     * @return the number of flow node
+     * @since 6.5
+     */
+    int getNumberOfFlowNodes(long rootContainerId) throws SBonitaReadException;
 }

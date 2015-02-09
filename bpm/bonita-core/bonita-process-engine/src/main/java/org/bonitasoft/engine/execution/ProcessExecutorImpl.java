@@ -218,15 +218,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return flowNodeExecutor.stepForward(flowNodeInstanceId, contextDependency, operations, processInstanceId, executerId, executerSubstituteId);
     }
 
-    private int getNumberOfTokenToMerge(final SFlowNodeInstance sFlownodeInstance) {
-        if (SFlowNodeType.GATEWAY.equals(sFlownodeInstance.getType())) {
-            final String hitBys = ((SGatewayInstance) sFlownodeInstance).getHitBys();
-            final String nbOfTokenToMerge = hitBys.substring(GatewayInstanceService.FINISH.length());
-            return Integer.parseInt(nbOfTokenToMerge);
-        }
-        return 1;
-    }
-
     private SConnectorInstance getNextConnectorInstance(final SProcessInstance processInstance, final ConnectorEvent event)
             throws SConnectorInstanceReadException {
         final List<SConnectorInstance> connectorInstances = connectorInstanceService.getConnectorInstances(processInstance.getId(),
@@ -522,10 +513,17 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final long processInstanceId = sFlowNodeInstanceChild.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
 
         SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
-        final int tokensOfProcess = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
+        final boolean isEnd = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
         logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The flow node <" + sFlowNodeInstanceChild.getName() + "> with id<"
                 + flowNodeInstanceId + "> of process instance <" + processInstanceId + "> finished");
-        if (tokensOfProcess == 0) {
+        if (isEnd) {
+            int numberOfFlowNode = activityInstanceService.getNumberOfFlowNodes(sProcessInstance.getId());
+            if (numberOfFlowNode > 0) {
+                logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The process instance <" + processInstanceId + "> from definition <"
+                        + sProcessDefinition.getName() + ":" + sProcessDefinition.getVersion() + "> executed a branch that is finished but there is still <"
+                        + numberOfFlowNode + "> to execute");
+                return;
+            }
             logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The process instance <" + processInstanceId + "> from definition <"
                     + sProcessDefinition.getName() + ":" + sProcessDefinition.getVersion() + "> finished");
             boolean hasActionsToExecute = false;
@@ -574,9 +572,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 break;
         }
         processInstanceService.setState(sProcessInstance, processInstanceState);
-        if (sProcessInstance.getTokenCount() == 0) {
-            flowNodeExecutor.childReachedState(sProcessInstance, processInstanceState, hasActionsToExecute);
-        }
+        flowNodeExecutor.childReachedState(sProcessInstance, processInstanceState, hasActionsToExecute);
 
     }
 
@@ -600,12 +596,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      * @return
      *         number of token of the process
      */
-    private int executeValidOutgoingTransitionsAndUpdateTokens(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child,
-            final SProcessInstance sProcessInstance) throws SBonitaException {
+    private boolean executeValidOutgoingTransitionsAndUpdateTokens(final SProcessDefinition processDefinition, final SFlowNodeInstance child,
+                                                                   final SProcessInstance sProcessInstance) throws SBonitaException {
         // token we merged
-        final int numberOfTokenToMerge = getNumberOfTokenToMerge(child);
-        final SFlowNodeDefinition sFlowNodeDefinition = sProcessDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
-        final FlowNodeTransitionsWrapper transitionsDescriptor = transitionEvaluator.buildTransitionsWrapper(sFlowNodeDefinition, sProcessDefinition, child);
+        final SFlowNodeDefinition sFlowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
+        final FlowNodeTransitionsWrapper transitionsDescriptor = transitionEvaluator.buildTransitionsWrapper(sFlowNodeDefinition, processDefinition, child);
 
 
         archiveInvalidTransitions(child, transitionsDescriptor);
@@ -615,7 +610,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final List<SFlowNodeDefinition> chosenFlowNode = new ArrayList<SFlowNodeDefinition>(transitionsDescriptor.getValidOutgoingTransitionDefinitions()
                 .size());
         for (final STransitionDefinition sTransitionDefinition : transitionsDescriptor.getValidOutgoingTransitionDefinitions()) {
-            final SFlowNodeDefinition flowNodeDefinition = processDefinitionService.getNextFlowNode(sProcessDefinition, sTransitionDefinition.getName());
+            final SFlowNodeDefinition flowNodeDefinition = processDefinitionService.getNextFlowNode(processDefinition, sTransitionDefinition.getName());
             // we archive a transition to keep a track of where the flow was
             transitionService.archive(sTransitionDefinition, child, TransitionState.TAKEN);
             if (flowNodeDefinition instanceof SGatewayDefinition) {
@@ -626,37 +621,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             }
         }
 
-        archiveFlowNodeInstance(sProcessDefinition, child, sProcessInstance);
+        archiveFlowNodeInstance(processDefinition, child, sProcessInstance);
 
         // execute transition/activities
-        createAndExecuteActivities(sProcessDefinition.getId(), child, sProcessInstance.getId(), chosenFlowNode, child.getRootProcessInstanceId());
-        for (final STransitionDefinition sTransitionDefinition : chosenGatewaysTransitions) {
-            executeGateway(sProcessDefinition, sTransitionDefinition, child);
-        }
-
-        return updateTokens(sProcessInstance, numberOfTokenToMerge, transitionsDescriptor, child, sProcessDefinition);
-    }
-
-    private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
-            throws SArchivingException {
-        if (child.getId() != sProcessInstance.getInterruptingEventId() || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
-            // Let's archive the final state of the child:
-            flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
-        }
-    }
-
-    private int updateTokens(final SProcessInstance sProcessInstance,
-                             final int numberOfTokenToMerge, final FlowNodeTransitionsWrapper transitionsDescriptor, SFlowNodeInstance child, SProcessDefinition processDefinition)
-            throws SBonitaException {
-        // handle token creation/deletion
-        int takenTransitions = transitionsDescriptor
-                .getValidOutgoingTransitionDefinitions().size();
-        int numberOfTokenToCreate = takenTransitions - numberOfTokenToMerge;
-        logger.log(getClass(),TechnicalLogSeverity.DEBUG, "merge "+numberOfTokenToMerge+" and create "+takenTransitions +" tokens while executing "+child.getName());
         long processInstanceId = sProcessInstance.getId();
-        if(numberOfTokenToCreate != 0){
-            processInstanceService.addToken(sProcessInstance, numberOfTokenToCreate);
+        createAndExecuteActivities(processDefinition.getId(), child, processInstanceId, chosenFlowNode, child.getRootProcessInstanceId());
+        for (final STransitionDefinition sTransitionDefinition : chosenGatewaysTransitions) {
+            executeGateway(processDefinition, sTransitionDefinition, child);
         }
+
         if(processDefinition.getProcessContainer().containsInclusiveGateway() && needToReevaluateInclusiveGateways(transitionsDescriptor)){
             logger.log(getClass(),TechnicalLogSeverity.DEBUG, "some branches died, will check again all inclusive gateways");
             List<SGatewayInstance> inclusiveGatewaysOfProcessInstance = gatewayInstanceService.getInclusiveGatewaysOfProcessInstanceThatShouldFire(processDefinition, processInstanceId);
@@ -673,8 +646,17 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             }
 
         }
-        return sProcessInstance.getTokenCount();
+        return transitionsDescriptor.isLastFlowNode();
     }
+
+    private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
+            throws SArchivingException {
+        if (child.getId() != sProcessInstance.getInterruptingEventId() || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
+            // Let's archive the final state of the child:
+            flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
+        }
+    }
+
 
     private boolean needToReevaluateInclusiveGateways(FlowNodeTransitionsWrapper transitionsDescriptor) {
         int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size();
@@ -831,7 +813,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             state = ProcessInstanceState.STARTED;
         }
         try {
-            processInstanceService.addToken(sProcessInstance, size);
             processInstanceService.setState(sProcessInstance, state);
         } catch (final SBonitaException e) {
             throw new SProcessInstanceCreationException("Unable to set the state on the process.", e);

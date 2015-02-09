@@ -521,4 +521,8 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         throw new IllegalArgumentException("Invalid container type: " + containerType);
     }
 
+    @Override
+    public int getNumberOfFlowNodes(long rootContainerId) throws SBonitaReadException {
+        return getPersistenceService().selectOne(SelectDescriptorBuilder.getNumberOfFlowNode(rootContainerId)).intValue();
+    }
 }
