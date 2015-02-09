@@ -110,10 +110,10 @@
   <query name="getMostRecentArchivedActivityInstance">
 	    SELECT aa
 	    FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa
-	    WHERE aa.archiveDate = (
+        WHERE aa.sourceObjectId = :activityInstanceId
+        AND aa.archiveDate = (
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = aa.sourceObjectId
-			AND aa2.sourceObjectId = :activityInstanceId
 		)
   </query>
 
@@ -139,18 +139,14 @@
   
   <!-- External Service Queries -->
 	<query name="getNumberOfSAHumanTaskInstanceManagedBy">
-		SELECT COUNT(aa) 
+		SELECT COUNT(aa)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl AS aa
 		WHERE terminal = TRUE
 		AND assigneeId IN ( SELECT u.id
 							FROM org.bonitasoft.engine.identity.model.impl.SUserImpl u
 							WHERE u.managerUserId = :managerUserId )
-		AND aa.archiveDate = (
-			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2 
-			WHERE aa2.sourceObjectId = aa.sourceObjectId
-		)
-	</query>  	
-	
+	</query>
+
 	<!-- AND u.tenantId = :tenantId -->
 	<query name="searchSAHumanTaskInstanceManagedBy">
 		SELECT aa
