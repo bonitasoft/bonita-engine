@@ -937,14 +937,4 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         return persistenceRead.selectOne(countDescriptor);
     }
 
-    @Override
-    public int addToken(SProcessInstance processInstance, int numberOfToken) throws SObjectModificationException {
-        try {
-            recorder.recordUpdate(UpdateRecord.buildSetFields(processInstance, Collections.<String,Object>singletonMap("tokenCount", processInstance.getTokenCount() + numberOfToken)), null);
-        } catch (SRecorderException e) {
-            throw new SObjectModificationException(e);
-        }
-        return processInstance.getTokenCount();
-    }
-
 }

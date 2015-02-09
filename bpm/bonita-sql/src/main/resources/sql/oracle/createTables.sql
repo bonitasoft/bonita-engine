@@ -279,7 +279,6 @@ CREATE TABLE process_instance (
   stringIndex3 VARCHAR2(50 CHAR),
   stringIndex4 VARCHAR2(50 CHAR),
   stringIndex5 VARCHAR2(50 CHAR),
-  tokenCount INT NOT NULL,
   PRIMARY KEY (tenantid, id)
 );
 

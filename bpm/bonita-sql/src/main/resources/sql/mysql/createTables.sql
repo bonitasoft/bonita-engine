@@ -285,7 +285,6 @@ CREATE TABLE process_instance (
   stringIndex3 VARCHAR(50),
   stringIndex4 VARCHAR(50),
   stringIndex5 VARCHAR(50),
-  tokenCount INT NOT NULL,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 

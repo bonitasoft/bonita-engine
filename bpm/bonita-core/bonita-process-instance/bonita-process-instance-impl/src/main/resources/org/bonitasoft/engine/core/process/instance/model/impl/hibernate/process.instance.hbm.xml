@@ -47,7 +47,6 @@
 		<property name="stringIndex3" column="stringIndex3" />
 		<property name="stringIndex4" column="stringIndex4" />
 		<property name="stringIndex5" column="stringIndex5" />
-		<property name="tokenCount" column="tokenCount" />
 		<filter name="tenantFilter" />
 	</class>
 

@@ -71,8 +71,6 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
 
     private long migrationPlanId;
 
-    private int tokenCount = 0;
-
     public SProcessInstanceImpl() {
         super();
     }
@@ -282,15 +280,6 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
     }
 
     @Override
-    public int getTokenCount() {
-        return tokenCount;
-    }
-
-    public void setTokenCount(int tokenCount) {
-        this.tokenCount = tokenCount;
-    }
-
-    @Override
     public boolean hasBeenInterruptedByEvent() {
         return getInterruptingEventId() != -1;
     }
@@ -315,7 +304,6 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
         if (startedBy != that.startedBy) return false;
         if (startedBySubstitute != that.startedBySubstitute) return false;
         if (stateId != that.stateId) return false;
-        if (tokenCount != that.tokenCount) return false;
         if (callerType != that.callerType) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (stateCategory != that.stateCategory) return false;
@@ -351,7 +339,6 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
         result = 31 * result + (stringIndex4 != null ? stringIndex4.hashCode() : 0);
         result = 31 * result + (stringIndex5 != null ? stringIndex5.hashCode() : 0);
         result = 31 * result + (int) (migrationPlanId ^ (migrationPlanId >>> 32));
-        result = 31 * result + tokenCount;
         return result;
     }
 
@@ -378,7 +365,6 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
                 ", stringIndex4='" + stringIndex4 + '\'' +
                 ", stringIndex5='" + stringIndex5 + '\'' +
                 ", migrationPlanId=" + migrationPlanId +
-                ", tokenCount=" + tokenCount +
                 '}';
     }
 }

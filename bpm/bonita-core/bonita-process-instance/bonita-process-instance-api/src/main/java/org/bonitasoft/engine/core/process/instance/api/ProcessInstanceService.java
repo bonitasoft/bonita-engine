@@ -576,14 +576,4 @@ public interface ProcessInstanceService {
 
     long getNumberOfProcessInstances(long processDefinitionId) throws SBonitaReadException;
 
-    /**
-     * add or remove token
-     * @param processInstance
-     *      process instance to update
-     * @param numberOfToken
-     *      number of token to add or to remove if it's a negative number
-     * @return new number of token
-     */
-    int addToken(SProcessInstance processInstance, int numberOfToken) throws SObjectModificationException;
-
 }

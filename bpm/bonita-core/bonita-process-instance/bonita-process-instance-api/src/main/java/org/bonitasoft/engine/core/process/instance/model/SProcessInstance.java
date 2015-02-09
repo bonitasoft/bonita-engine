@@ -89,6 +89,4 @@ public interface SProcessInstance extends SFlowElementsContainer {
     String getStringIndex5();
 
     boolean hasBeenInterruptedByEvent();
-
-    int getTokenCount();
 }

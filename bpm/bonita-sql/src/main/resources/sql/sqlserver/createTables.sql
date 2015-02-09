@@ -306,7 +306,6 @@ CREATE TABLE process_instance (
   stringIndex3 NVARCHAR(50),
   stringIndex4 NVARCHAR(50),
   stringIndex5 NVARCHAR(50),
-  tokenCount INT NOT NULL,
   PRIMARY KEY (tenantid, id)
 )
 GO
