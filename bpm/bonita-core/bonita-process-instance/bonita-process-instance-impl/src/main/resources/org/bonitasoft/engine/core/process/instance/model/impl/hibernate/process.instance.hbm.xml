@@ -5,9 +5,6 @@
 	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
 		<filter-param name="tenantId" type="long" />
 	</filter-def>
-	<filter-def name="deletedFilter" condition=":tenantId = tenantid">
-		<filter-param name="tenantId" type="long" />
-	</filter-def>
 
 	<class name="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" table="process_instance">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
@@ -96,7 +93,6 @@
 		<property name="loopCounter" column="loop_counter" />
 		<property name="executedBy" column="executedBy" />
 		<property name="executedBySubstitute" column="executedBySubstitute" />
-		<property name="deleted" column="deleted" />
 		<property name="stateExecuting" column="state_executing" />
 		<filter name="tenantFilter" />
 	</class>

@@ -7,7 +7,6 @@ CREATE TABLE human (
     parent_id BIGINT DEFAULT NULL,
     car_id BIGINT DEFAULT NULL,
     discriminant VARCHAR(10) NOT NULL,
-    deleted BOOLEAN,
     PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE car (
