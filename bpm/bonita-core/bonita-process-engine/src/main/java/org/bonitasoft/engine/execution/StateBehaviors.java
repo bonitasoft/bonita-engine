@@ -75,6 +75,8 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityState
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
@@ -92,6 +94,9 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceA
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventKeyProviderBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
@@ -251,13 +256,34 @@ public class StateBehaviors {
                     final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
                     if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics
                             && ((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataOutputItemRef() != null) {
-                        mapDataOutputOfMultiInstance(flowNodeInstance, (SMultiInstanceLoopCharacteristics) loopCharacteristics);
+                        final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
+                        final SBusinessDataDefinition businessData = processContainer.getBusinessDataDefinition(miLoop.getLoopDataOutputRef());
+                        if (businessData == null) {
+                            mapDataOutputOfMultiInstance(flowNodeInstance, miLoop);
+                        } else {
+                            MapMultiInstanceBusinessDataOutput(flowNodeInstance, miLoop);
+                        }
                     }
-                } catch (final SBonitaException e) {
-                    throw new SActivityStateExecutionException(e);
+                } catch (final SBonitaException sbe) {
+                    throw new SActivityStateExecutionException(sbe);
                 }
             }
         }
+    }
+
+    private void MapMultiInstanceBusinessDataOutput(final SFlowNodeInstance flowNodeInstance, final SMultiInstanceLoopCharacteristics miLoop) throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException, SRefBusinessDataInstanceModificationException {
+        final SRefBusinessDataInstance outputMIRef = refBusinessDataService.getFlowNodeRefBusinessDataInstance(
+                miLoop.getDataOutputItemRef(), flowNodeInstance.getId());
+        final SRefBusinessDataInstance outputMILoopRef = refBusinessDataService.getRefBusinessDataInstance(
+                miLoop.getLoopDataOutputRef(), flowNodeInstance.getParentProcessInstanceId());
+        final SMultiRefBusinessDataInstance multiRefBusinessDataInstance = (SMultiRefBusinessDataInstance) outputMILoopRef;
+        List<Long> dataIds = multiRefBusinessDataInstance.getDataIds();
+        if (dataIds == null) {
+            dataIds = new ArrayList<Long>();
+        }
+        final Long dataId = ((SFlowNodeSimpleRefBusinessDataInstance) outputMIRef).getDataId();
+        dataIds.add(dataId);
+        refBusinessDataService.updateRefBusinessDataInstance(multiRefBusinessDataInstance, dataIds);
     }
 
     @SuppressWarnings("unchecked")
@@ -955,44 +981,56 @@ public class StateBehaviors {
         if (loopCharacteristics.getLoopCardinality() != null) {
             return miActivityInstance.getLoopCardinality() > numberOfInstances;
         }
-        final SDataInstance dataInstance = dataInstanceService.getDataInstance(loopCharacteristics.getLoopDataInputRef(), miActivityInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
-        if (dataInstance != null) {
-            final List<?> loopDataInputCollection = (List<?>) dataInstance.getValue();
-            return numberOfInstances < loopDataInputCollection.size();
+        List<?> possibleValues = null;
+        try {
+            //FIXME find if a business data is used if instead of try catch
+            final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) refBusinessDataService.getRefBusinessDataInstance(
+                    loopCharacteristics.getLoopDataInputRef(), miActivityInstance.getParentProcessInstanceId());
+            possibleValues = multiRef.getDataIds();
+        } catch (final SBonitaException sbe) {
+            final SDataInstance dataInstance = getDataInstanceService().getDataInstance(loopCharacteristics.getLoopDataInputRef(),
+                    miActivityInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
+            possibleValues = (List<?>) dataInstance.getValue();
+        }
+        if (possibleValues != null) {
+            return numberOfInstances < possibleValues.size();
         }
         return false;
     }
 
     public void updateOutputData(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SMultiInstanceLoopCharacteristics miLoop, final int numberOfInstanceMax) throws SDataInstanceException, SActivityStateExecutionException {
-        final String loopDataOutputRef = miLoop.getLoopDataOutputRef();
-        if (loopDataOutputRef != null) {
-            final SDataInstance loopDataOutput = dataInstanceService.getDataInstance(loopDataOutputRef, flowNodeInstance.getId(),
-                    DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
-            if (loopDataOutput != null) {
-                final Serializable outValue = loopDataOutput.getValue();
-                if (outValue instanceof List) {
-                    final List<?> loopDataOutputCollection = (List<?>) outValue;
-                    if (loopDataOutputCollection.size() < numberOfInstanceMax) {
-                        // output data is too small
+        final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+        final SBusinessDataDefinition businessData = processContainer.getBusinessDataDefinition(miLoop.getLoopDataOutputRef());
+        if (businessData == null) {
+            final String loopDataOutputRef = miLoop.getLoopDataOutputRef();
+            if (loopDataOutputRef != null) {
+                final SDataInstance loopDataOutput = dataInstanceService.getDataInstance(loopDataOutputRef, flowNodeInstance.getId(),
+                        DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
+                if (loopDataOutput != null) {
+                    final Serializable outValue = loopDataOutput.getValue();
+                    if (outValue instanceof List) {
+                        final List<?> loopDataOutputCollection = (List<?>) outValue;
+                        if (loopDataOutputCollection.size() < numberOfInstanceMax) {
+                            // output data is too small
+                            final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
+                            newOutputList.addAll(loopDataOutputCollection);
+                            for (int i = loopDataOutputCollection.size(); i < numberOfInstanceMax; i++) {
+                                newOutputList.add(null);
+                            }
+                            updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
+                        }
+                    } else if (outValue == null) {
                         final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
-                        newOutputList.addAll(loopDataOutputCollection);
-                        for (int i = loopDataOutputCollection.size(); i < numberOfInstanceMax; i++) {
+                        for (int i = 0; i < numberOfInstanceMax; i++) {
                             newOutputList.add(null);
                         }
                         updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
+                    } else {
+                        throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName()
+                                + " of process " + processDefinition.getName() + " " + processDefinition.getVersion()
+                                + " have a loop data output which is not a java.util.List");
                     }
-                } else if (outValue == null) {
-                    final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
-                    for (int i = 0; i < numberOfInstanceMax; i++) {
-                        newOutputList.add(null);
-                    }
-                    updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
-                } else {
-                    throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName()
-                            + " of process " + processDefinition.getName() + " " + processDefinition.getVersion()
-                            + " have a loop data output which is not a java.util.List");
                 }
             }
         }
