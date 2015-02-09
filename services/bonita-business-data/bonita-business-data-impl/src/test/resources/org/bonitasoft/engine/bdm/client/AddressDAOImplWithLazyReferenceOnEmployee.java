@@ -41,7 +41,7 @@ public class AddressDAOImpl
 
     public List<Address> findByStreet(String street, int startIndex, int maxResults) {
         try {
-            CommandAPI commandApi = TenantAPIAccessor.getCommandAPI(session);
+            CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Address.findByStreet");
             commandParameters.put("returnsList", true);
@@ -59,7 +59,7 @@ public class AddressDAOImpl
 
     public List<Address> find(int startIndex, int maxResults) {
         try {
-            CommandAPI commandApi = TenantAPIAccessor.getCommandAPI(session);
+            CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
             Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
             commandParameters.put("queryName", "Address.find");
             commandParameters.put("returnsList", true);
