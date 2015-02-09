@@ -60,7 +60,6 @@ CREATE TABLE human (
     parent_id NUMBER(19, 0) DEFAULT NULL,
     car_id NUMBER(19, 0) DEFAULT NULL,
     discriminant VARCHAR2(10) NOT NULL,
-    deleted NUMBER(1),
     PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE car (

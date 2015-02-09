@@ -767,7 +767,6 @@
         WHERE process_definition.processId = p.processDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 
@@ -820,7 +819,6 @@
         WHERE process_definition.processId = p.processDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 
@@ -888,7 +886,6 @@
         AND process_definition.processId = p.processDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 
@@ -956,7 +953,6 @@
         AND process_definition.processId = p.processDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 
@@ -1010,7 +1006,6 @@
         WHERE process_definition.processId = p.processDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 
@@ -1064,7 +1059,6 @@
         WHERE process_definition.processId = p.processDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 

@@ -17,7 +17,6 @@
 		<property name="lastName" column="LASTNAME" />
 		<property name="age" column="AGE" />
 		<property name="carId" column="CAR_ID" type="long" />
-		<property name="deleted" column="deleted" type="boolean" />
 		<filter name="tenantFilter"></filter>
 	</class>
 

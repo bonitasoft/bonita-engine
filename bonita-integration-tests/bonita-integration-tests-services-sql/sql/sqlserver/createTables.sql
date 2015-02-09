@@ -66,7 +66,6 @@ CREATE TABLE human (
     parent_id NUMERIC(19, 0) DEFAULT NULL,
     car_id NUMERIC(19, 0) DEFAULT NULL,
     discriminant NVARCHAR(10) NOT NULL,
-    deleted BIT,
     PRIMARY KEY (tenantid, id)
 )
 GO
