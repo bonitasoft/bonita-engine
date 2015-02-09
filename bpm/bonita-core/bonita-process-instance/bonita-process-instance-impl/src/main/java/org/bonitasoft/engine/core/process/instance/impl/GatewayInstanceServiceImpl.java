@@ -175,6 +175,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         List<SFlowNodeDefinition> sourceElements = new ArrayList<SFlowNodeDefinition>();
         List<SFlowNodeDefinition> targetElements = new ArrayList<SFlowNodeDefinition>();
 
+        logger.log(TAG, TechnicalLogSeverity.DEBUG, "Check if there is a token on "+transitions);
         for (STransitionDefinition sTransitionDefinition : transitions) {
             SFlowNodeDefinition source = processContainer.getFlowNode(sTransitionDefinition.getSource());
             if (!source.equals(gatewayDefinition) && !sourceElements.contains(source)) {
@@ -198,7 +199,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         Iterator<SFlowNodeDefinition> iterator = sourceElements.iterator();
         while (iterator.hasNext()){
             SFlowNodeDefinition sourceElement = iterator.next();
-            if(targetElements.contains(sourceElement)){
+            if(targetElements.contains(sourceElement) || sourceElement.getIncomingTransitions().isEmpty() /* if it's a start element it's also considered as a target */){
                 iterator.remove();
                 targetElements.remove(sourceElement);
                 sourceAndTarget.add(sourceElement);

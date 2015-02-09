@@ -184,9 +184,34 @@ public class FlowPatternsIT extends TestWithUser {
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        waitForUserTaskAndExecuteIt("Step2",user);
+        waitForUserTaskAndExecuteIt("Step2", user);
         waitForUserTaskAndExecuteIt("Step1",user);
         waitForUserTaskAndExecuteIt("Step4",user);
+        waitForUserTaskAndExecuteIt("Step3",user);
+        waitForProcessToFinish(processInstance);
+
+        disableAndDeleteProcess(processDefinition);
+
+    }
+
+
+    @Test
+    public void inclusive_merge_with_no_start() throws Exception {
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MultipleMergeProcess", PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("Step1", ACTOR_NAME);
+        builder.addUserTask("Step2", ACTOR_NAME);
+        builder.addUserTask("Step3", ACTOR_NAME);
+        builder.addGateway("Gateway1", GatewayType.INCLUSIVE);
+        builder.addTransition("Step1", "Gateway1");
+        builder.addTransition("Step2", "Gateway1");
+        builder.addTransition("Gateway1", "Step3");
+        final DesignProcessDefinition designProcessDefinition = builder.getProcess();
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        waitForUserTaskAndExecuteIt("Step1",user);
+        waitForUserTaskAndExecuteIt("Step2",user);
         waitForUserTaskAndExecuteIt("Step3",user);
         waitForProcessToFinish(processInstance);
 
