@@ -90,6 +90,13 @@
             <artifactId>json-unit-assertj</artifactId>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.bonitasoft.engine.util</groupId>
+            <artifactId>bonita-common-util</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+        </dependency>
 		
 		<!-- Just for the conf of the datasource -->
 		<dependency>
