@@ -16,7 +16,7 @@ CREATE TABLE arch_contract_data (
   name VARCHAR(50) NOT NULL,
   val BYTEA,
   archiveDate INT8 NOT NULL,
-  sourceObjectId INT8 NOT NULL,
+  sourceObjectId INT8 NOT NULL
 );
 ALTER TABLE arch_contract_data ADD CONSTRAINT pk_arch_contract_data PRIMARY KEY (tenantid, id);
 ALTER TABLE arch_contract_data ADD CONSTRAINT uc_acd_scope_name UNIQUE (scopeId, name, tenantid);

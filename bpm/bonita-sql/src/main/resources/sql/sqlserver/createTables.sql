@@ -20,7 +20,7 @@ CREATE TABLE arch_contract_data (
   name NVARCHAR(50) NOT NULL,
   val VARBINARY(MAX),
   archiveDate NUMERIC(19, 0) NOT NULL,
-  sourceObjectId NUMERIC(19, 0) NOT NULL,
+  sourceObjectId NUMERIC(19, 0) NOT NULL
 )
 GO
 ALTER TABLE arch_contract_data ADD CONSTRAINT pk_arch_contract_data PRIMARY KEY (tenantid, id)

@@ -16,7 +16,7 @@ CREATE TABLE arch_contract_data (
   name VARCHAR(50) NOT NULL,
   val LONGBLOB,
   archiveDate BIGINT NOT NULL,
-  sourceObjectId BIGINT NOT NULL,
+  sourceObjectId BIGINT NOT NULL
 ) ENGINE = INNODB;
 ALTER TABLE arch_contract_data ADD CONSTRAINT pk_arch_contract_data PRIMARY KEY (tenantid, id);
 ALTER TABLE arch_contract_data ADD CONSTRAINT uc_acd_scope_name UNIQUE (scopeId, name, tenantid);
