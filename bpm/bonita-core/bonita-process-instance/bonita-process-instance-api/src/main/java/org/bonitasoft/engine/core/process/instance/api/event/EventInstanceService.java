@@ -55,8 +55,6 @@ public interface EventInstanceService extends FlowNodeInstanceService {
 
     String EVENT_TRIGGER_INSTANCE = "EVENT_TRIGGER_INSTANCE";
 
-    String EVENT_VISIBILITY_MAPPING = "EVENT_VISIBILITY_MAPPING";
-
     String MESSAGE_INSTANCE = "MESSAGE_INSTANCE";
 
     void createEventInstance(SEventInstance eventInstance) throws SEventInstanceCreationException;

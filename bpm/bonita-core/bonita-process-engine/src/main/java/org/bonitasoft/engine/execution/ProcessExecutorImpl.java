@@ -519,9 +519,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (isEnd) {
             int numberOfFlowNode = activityInstanceService.getNumberOfFlowNodes(sProcessInstance.getId());
             if (numberOfFlowNode > 0) {
-                logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The process instance <" + processInstanceId + "> from definition <"
-                        + sProcessDefinition.getName() + ":" + sProcessDefinition.getVersion() + "> executed a branch that is finished but there is still <"
-                        + numberOfFlowNode + "> to execute");
+                if(logger.isLoggable(ProcessExecutorImpl.class,TechnicalLogSeverity.DEBUG)){
+
+                    logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The process instance <" + processInstanceId + "> from definition <"
+                            + sProcessDefinition.getName() + ":" + sProcessDefinition.getVersion() + "> executed a branch that is finished but there is still <"
+                            + numberOfFlowNode + "> to execute");
+                    logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, activityInstanceService.getFlowNodeInstances(processInstanceId,0,numberOfFlowNode).toString());
+                }
                 return;
             }
             logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "The process instance <" + processInstanceId + "> from definition <"

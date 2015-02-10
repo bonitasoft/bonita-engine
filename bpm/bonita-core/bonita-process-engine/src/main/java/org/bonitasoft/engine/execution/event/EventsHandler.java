@@ -61,6 +61,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
+import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
@@ -235,7 +236,7 @@ public class EventsHandler {
     }
 
     public boolean handlePostThrowEvent(final SProcessDefinition sProcessDefinition, final SEndEventDefinition sEndEventDefinition,
-            final SThrowEventInstance sThrowEventInstance, final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
+                                        final SThrowEventInstance sThrowEventInstance, final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
         boolean hasActionsToExecute = false;
         if (sEndEventDefinition == null) {
             /*
