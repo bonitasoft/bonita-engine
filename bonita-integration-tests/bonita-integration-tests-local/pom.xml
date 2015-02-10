@@ -12,6 +12,7 @@
 
     <properties>
         <bonita.home>${project.build.directory}/home</bonita.home>
+        <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
     </properties>
 
     <dependencies>
@@ -111,6 +112,26 @@
                             <overWriteSnapshots>true</overWriteSnapshots>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>unpack server test util</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.bonitasoft.engine.test</groupId>
+                                    <artifactId>bonita-server-test-utils</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -143,7 +164,7 @@
                             <target>
                                 <!-- Change Dialect of BDR -->
                                 <property file="${bonita.home}/server/platform/conf/bonita-platform.properties" />
-                                <property file="${basedir}/src/test/resources/jdbc-${sysprop.bonita.db.vendor}.properties" />
+                                <property file="${project.build.directory}/jdbc-${sysprop.bonita.db.vendor}.properties" />
                                 <replaceregexp file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties" match="businessdata.hibernate.dialect=(.*)"
                                                replace="businessdata.hibernate.dialect=${db.hibernate.dialect}" byline="true" />
                             </target>
