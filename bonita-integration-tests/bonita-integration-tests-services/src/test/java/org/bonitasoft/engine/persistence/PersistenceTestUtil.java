@@ -30,7 +30,6 @@ public class PersistenceTestUtil {
         human.setFirstName(firstName);
         human.setLastName(lastName);
         human.setAge(age);
-        human.setDeleted(false);
         return human;
     }
 

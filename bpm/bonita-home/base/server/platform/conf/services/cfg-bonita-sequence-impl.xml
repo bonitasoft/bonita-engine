@@ -46,7 +46,6 @@
 				<!-- <entry key="4" value="100" />platform command -->
 				<!-- <entry key="10000" value="100" />actor -->
 				<!-- <entry key="10001" value="100" />actorMapping -->
-				<!-- <entry key="10095" value="100" />HiddenTask -->
 				<!-- <entry key="10030" value="100" />category -->
 				<!-- <entry key="10040" value="100" />SDocumentMapping -->
 				<!-- <entry key="10050" value="100" />supervisor -->
@@ -139,7 +138,6 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="10080" />
                 <entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" value="10090" />
                 <entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="10090" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="10095" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />

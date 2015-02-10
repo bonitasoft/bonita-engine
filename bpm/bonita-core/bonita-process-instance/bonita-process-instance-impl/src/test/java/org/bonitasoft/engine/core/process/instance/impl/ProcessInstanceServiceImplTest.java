@@ -701,7 +701,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void deleteFlowNodeInstanceElements_should_call_deleteHiddenTasksForActivity_and_deletePendingMappings_when_flownode_is_type_USER_TASK()
+    public void deleteFlowNodeInstanceElements_should_call_deletePendingMappings_when_flownode_is_type_USER_TASK()
             throws Exception {
         // Given
         final SFlowNodeInstance flowNodeInstance = new SUserTaskInstanceImpl("name", 3L, 6L, 9L, 12L, STaskPriority.ABOVE_NORMAL, 7L, 8L);
@@ -713,12 +713,11 @@ public class ProcessInstanceServiceImplTest {
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
 
         // Then
-        verify(activityInstanceService).deleteHiddenTasksForActivity(flowNodeInstance.getId());
         verify(activityInstanceService).deletePendingMappings(flowNodeInstance.getId());
     }
 
     @Test
-    public void deleteFlowNodeInstanceElements_should_call_deleteHiddenTasksForActivity_and_deletePendingMappings_when_flownode_is_type_MANUAL_TASK()
+    public void deleteFlowNodeInstanceElements_should_call_deletePendingMappings_when_flownode_is_type_MANUAL_TASK()
             throws Exception {
         // Given
         final SFlowNodeInstance flowNodeInstance = new SManualTaskInstanceImpl("name", 1L, 2L, 3L, 4L, STaskPriority.ABOVE_NORMAL, 5L, 6L);
@@ -730,7 +729,6 @@ public class ProcessInstanceServiceImplTest {
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
 
         // Then
-        verify(activityInstanceService).deleteHiddenTasksForActivity(flowNodeInstance.getId());
         verify(activityInstanceService).deletePendingMappings(flowNodeInstance.getId());
     }
 
@@ -747,7 +745,6 @@ public class ProcessInstanceServiceImplTest {
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
 
         // Then
-        verify(activityInstanceService, never()).deleteHiddenTasksForActivity(flowNodeInstance.getId());
         verify(activityInstanceService, never()).deletePendingMappings(flowNodeInstance.getId());
         verify(processInstanceService, never()).deleteSubProcess(flowNodeInstance, processDefinition);
     }

@@ -6,28 +6,24 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE a.id = :id
-		AND a.deleted = FALSE
 	</query>
 
 	<query name="getSHumanTaskInstanceById">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.id = :id
-		AND a.deleted = FALSE
 	</query>
 
 	<query name="getSFlowNodeInstanceById">
 		SELECT flowNode
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS flowNode
 		WHERE flowNode.id = :id
-		AND flowNode.deleted = FALSE
 	</query>
 
 	<query name="getActivitiesFromProcessInstance">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE a.rootContainerId = :rootContainerId
-		AND a.deleted = FALSE
 		ORDER BY a.id ASC
 	</query>
 
@@ -41,14 +37,12 @@
 		SELECT count(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE a.rootContainerId = :rootContainerId
-		AND a.deleted = FALSE
 	</query>
 
 	<query name="getFlowNodesFromProcessInstance">
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
 		WHERE f.logicalGroup4 = :parentProcessInstanceId
-		AND f.deleted = FALSE
         ORDER BY f.id ASC
 	</query>
 
@@ -56,7 +50,6 @@
 		SELECT new org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter(name AS name, stateName AS statename, count(f) AS numberof)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
 		WHERE logicalGroup4 = :parentProcessInstanceId
-		AND deleted = FALSE
 		GROUP BY name, stateName
 		ORDER BY name ASC, stateName ASC
 	</query>
@@ -65,7 +58,6 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.rootContainerId = :rootContainerId
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
@@ -74,8 +66,7 @@
 	<query name="getFlowNodeInstanceIdsToRestart">
 		SELECT f.id
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
-		WHERE f.deleted = FALSE
-		AND (f.stateExecuting = TRUE OR f.stable = FALSE OR f.terminal = TRUE)
+		WHERE (f.stateExecuting = TRUE OR f.stable = FALSE OR f.terminal = TRUE)
 		ORDER BY id
 	</query>
 
@@ -83,7 +74,6 @@
 		SELECT g
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl AS g
 		WHERE g.logicalGroup4 = :processInstanceId
-		AND g.deleted = FALSE
 		AND g.terminal = FALSE
 		AND g.gatewayType = 'INCLUSIVE'
 	</query>
@@ -91,7 +81,6 @@
 		SELECT g
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl AS g
 		WHERE g.logicalGroup4 = :parentProcessInstanceId
-		AND g.deleted = FALSE
 		AND g.name = :name
 		AND g.terminal = FALSE
 	</query>
@@ -100,7 +89,6 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE a.rootContainerId = :rootContainerId
-		AND a.deleted = FALSE
 		AND a.stateId IN (:stateIds)
 	</query>
 
@@ -108,7 +96,6 @@
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
 		WHERE f.logicalGroup3 = :parentActivityInstanceId
-		AND f.deleted = FALSE
 		AND f.terminal = FALSE
 	</query>
 
@@ -116,7 +103,6 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.assigneeId = :assigneeId
-		AND a.deleted = FALSE
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
 	</query>
@@ -125,7 +111,6 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
@@ -134,12 +119,6 @@
 			WHERE mapping.activityId=a.id
 			AND ( mapping.userId = :userId
 				OR mapping.actorId in (:actorIds))
-		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = :userId
 		)
 	</query>
 
@@ -153,7 +132,6 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
@@ -163,19 +141,12 @@
 			WHERE mapping.activityId=a.id
 			AND mapping.userId = :userId
 		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = :userId
-		)
 	</query>
 
 	<query name="getSGatewayInstanceById">
 		SELECT g
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl AS g
 		WHERE g.id = :id
-		AND g.deleted = FALSE
 	</query>
 
 
@@ -183,14 +154,12 @@
 		SELECT e
 		FROM org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
 		WHERE e.id = :id
-		AND e.deleted = FALSE
 	</query>
 
 	<query name="getActivityBoundaryEventInstances">
 		SELECT e
 		FROM org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl AS e
 		WHERE e.activityInstanceId = :activityInstanceId
-		AND e.deleted = FALSE
 		ORDER BY e.id
 	</query>
 
@@ -198,7 +167,6 @@
 		SELECT e
 		FROM org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
 		WHERE e.rootContainerId = :rootContainerId
-		AND e.deleted = FALSE
 	</query>
 
 	<query name="getEventTriggerInstances">
@@ -218,7 +186,6 @@
 		SELECT count(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.assigneeId = :assigneeId
-		AND a.deleted = FALSE
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
 	</query>
@@ -227,7 +194,6 @@
 		SELECT new map(a.assigneeId as userId, count(a) as numberOfTasks)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.assigneeId IN (:assigneeIds)
-		AND a.deleted = FALSE
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
 		GROUP BY a.assigneeId
@@ -238,7 +204,6 @@
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
@@ -264,12 +229,6 @@
      				)
 				)
 			)
-		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = :userId
 		)
 	</query>
 	
@@ -277,7 +236,6 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
@@ -304,19 +262,12 @@
 				)
 			)
 		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = :userId
-		)
 	</query>
 	
 	<query name="getNumberOfSHumanTaskInstancePendingOrAssigned">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND (
@@ -348,12 +299,6 @@
 					)
 				)
 			)
-		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = :userId
 		)
 	</query>
 	
@@ -361,7 +306,6 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND (
@@ -394,19 +338,12 @@
 				)
 			)
 		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = :userId
-		)
 	</query>
 
 	<query name="getNumberOfOpenActivities">
 		SELECT count(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE a.rootContainerId = :rootContainerId
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
@@ -600,7 +537,6 @@
 			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
 		WHERE t.eventInstanceId = e.id 
 		AND e.logicalGroup4 = :processInstanceId
-		AND e.deleted = FALSE
 	</query>
 	
 	<query name="searchSTimerEventTriggerInstanceByProcessInstance">
@@ -609,7 +545,6 @@
 			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
 		WHERE t.eventInstanceId = e.id 
 		AND e.logicalGroup4 = :processInstanceId
-		AND e.deleted = FALSE
 	</query>	
 	
 	<query name="getNumberOfSTimerEventTriggerInstancewithSEventInstanceByProcessInstance">
@@ -618,7 +553,6 @@
 			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
 		WHERE t.eventInstanceId = e.id 
 		AND e.logicalGroup4 = :processInstanceId
-		AND e.deleted = FALSE
 	</query>
 	
 	<query name="searchSTimerEventTriggerInstancewithSEventInstanceByProcessInstance">
@@ -627,7 +561,6 @@
 			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
 		WHERE t.eventInstanceId = e.id 
 		AND e.logicalGroup4 = :processInstanceId
-		AND e.deleted = FALSE
 	</query>	
 	
 	<query name="getNumberOfSTimerEventTriggerInstance">
@@ -675,37 +608,32 @@
 	<query name="getNumberOfSHumanTaskInstance">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 
 	<query name="searchSHumanTaskInstance">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="getNumberOfSHumanTaskInstancewithSProcessSupervisor">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
-		WHERE a.deleted = FALSE
-		AND a.logicalGroup1 =  processsupervisor.processDefId
+		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="searchSHumanTaskInstancewithSProcessSupervisor">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
-		WHERE a.deleted = FALSE
-		AND a.logicalGroup1 =  processsupervisor.processDefId
+		WHERE a.logicalGroup1 =  processsupervisor.processDefId
 	</query>
 
 	<query name="getNumberOfSHumanTaskInstanceSupervisedBy">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-		WHERE a.deleted = FALSE
-		AND a.logicalGroup1 =  supervisor.processDefId
+		WHERE a.logicalGroup1 =  supervisor.processDefId
 		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
@@ -726,8 +654,7 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-		WHERE a.deleted = FALSE
-		AND a.logicalGroup1 =  supervisor.processDefId
+		WHERE a.logicalGroup1 =  supervisor.processDefId
 		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
@@ -749,8 +676,7 @@
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-		WHERE a.deleted = FALSE
-		AND a.stateExecuting = FALSE
+		WHERE a.stateExecuting = FALSE
 		AND a.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
@@ -773,8 +699,7 @@
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-		WHERE a.deleted = FALSE
-		AND a.stateExecuting = FALSE
+		WHERE a.stateExecuting = FALSE
 		AND a.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
@@ -796,7 +721,6 @@
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.terminal = FALSE
 		AND a.assigneeId IN (
 			SELECT u.id
@@ -809,7 +733,6 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.terminal = FALSE
 		AND a.assigneeId IN (
 			SELECT u.id
@@ -822,7 +745,6 @@
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.stateId = 4
-		AND a.deleted = FALSE
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
 		AND exists (
@@ -865,7 +787,6 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.stateId = 4
-		AND a.deleted = FALSE
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
 		AND exists (
@@ -908,7 +829,6 @@
 		SELECT new map(a.assigneeId as userId, count(a) as numberOfTasks)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.assigneeId IN (:assigneeIds)
-		AND a.deleted = FALSE
 		AND a.stable = TRUE
 		AND a.terminal = FALSE
 		AND a.expectedEndDate &lt; :currentTime
@@ -920,7 +840,6 @@
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.terminal = FALSE
 		AND a.assigneeId = 0
 		AND a.expectedEndDate &lt; :currentTime
@@ -948,50 +867,38 @@
 				)
 			)
 		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = :userId
-		)
 	</query>
 	
 	<query name="getNumberOfSActivityInstance">
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="searchSActivityInstance">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 
 	<query name="getNumberOfSFlowNodeInstance">
 		SELECT COUNT(f)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
-		WHERE f.deleted = FALSE
 	</query>
 	
 	<query name="searchSFlowNodeInstance">
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
-		WHERE f.deleted = FALSE
 	</query>
 	
 	<query name="searchSCatchEventInstance">
 		SELECT e
 		FROM org.bonitasoft.engine.core.process.instance.model.event.impl.SCatchEventInstanceImpl AS e
-		WHERE e.deleted = FALSE
 	</query>
 	
 	<query name="getNumberOfSFlowNodeInstanceSupervisedBy">
 		SELECT count(DISTINCT f)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-		WHERE f.deleted = FALSE
-		AND f.logicalGroup1 = supervisor.processDefId
+		WHERE f.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
@@ -1012,8 +919,7 @@
 		SELECT DISTINCT f
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-		WHERE f.deleted = FALSE
-		AND f.logicalGroup1 = supervisor.processDefId
+		WHERE f.logicalGroup1 = supervisor.processDefId
 		AND (supervisor.userId = :supervisorId
 			OR (supervisor.id IN (
 					SELECT supervisor.id
@@ -1033,218 +939,93 @@
 	<query name="getNumberOfSAutomaticTaskInstance">
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="searchSAutomaticTaskInstance">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="getNumberOfSReceiveTaskInstance">
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="searchSReceiveTaskInstance">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="getNumberOfSUserTaskInstance">
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="searchSUserTaskInstance">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>	
 		
 	<query name="getNumberOfSManualTaskInstance">
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="searchSManualTaskInstance">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="getNumberOfSAutomaticTaskInstancewithSActivityInstance">
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="searchSAutomaticTaskInstancewithSActivityInstance">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="getNumberOfSReceiveTaskInstancewithSActivityInstance">
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="searchSReceiveTaskInstancewithSActivityInstance">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="getNumberOfSUserTaskInstancewithSActivityInstance">
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="searchSUserTaskInstancewithSActivityInstance">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>	
 		
 	<query name="getNumberOfSManualTaskInstancewithSActivityInstance">
 		SELECT COUNT(DISTINCT a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl AS a
-        WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="searchSManualTaskInstancewithSActivityInstance">
 		SELECT DISTINCT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="getNumberOfSHumanTaskInstancewithSActivityInstance">
 		SELECT COUNT(a)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 	
 	<query name="searchSHumanTaskInstancewithSActivityInstance">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
-		WHERE a.deleted = FALSE
 	</query>
 
-	<query name="getNumberOfSHumanTaskInstancePendingHiddenForUser">
-		SELECT COUNT(a)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-			 org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-		WHERE a.id = h.activityId
-		AND a.deleted = FALSE
-		AND h.userId = :userId
-		AND a.stable = TRUE
-		AND a.terminal = FALSE
-		AND (
-			(
-				a.assigneeId = :userId
-			) OR
-			(
-				a.assigneeId = 0
-				AND EXISTS (
-					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
-					WHERE mapping.activityId = a.id
-					AND ( mapping.userId = :userId
-						  OR mapping.actorId in (SELECT actor
-								FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-									org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
-								WHERE actor.id = actormember.actorId
-								AND ( actormember.userId = :userId
-			 	  					OR actormember.id IN (
-										SELECT actormember.id
-										FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-										WHERE um.userId = :userId
-										AND (
-											(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-											OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
-											OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
-										)
-									)
-			     				)
-							)
-						)
-					)
-				)
-			)
-	</query>
-	
-	<query name="searchSHumanTaskInstancePendingHiddenForUser">
-		SELECT a
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
-			 org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-		WHERE a.id = h.activityId
-		AND a.deleted = FALSE
-		AND h.userId = :userId
-		AND a.stable = TRUE
-		AND a.terminal = FALSE
-		AND (
-			(
-				a.assigneeId = :userId
-			) OR
-			(
-				a.assigneeId = 0
-				AND EXISTS (
-					SELECT mapping.id
-					FROM org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
-					WHERE mapping.activityId = a.id
-					AND ( mapping.userId = :userId
-						  OR mapping.actorId in (SELECT actor
-								FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-									org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
-								WHERE actor.id = actormember.actorId
-								AND ( actormember.userId = :userId
-			 	  					OR actormember.id IN (
-										SELECT actormember.id
-										FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember, org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-										WHERE um.userId = :userId
-										AND (
-											(actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
-											OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
-											OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
-										)
-									)
-			     				)
-							)
-						)
-					)
-				)
-			)
-	</query>
-	
-	<query name="isTaskHidden">
-		SELECT COUNT(h)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-		WHERE h.activityId = :activityId
-		AND h.userId = :userId
-	</query>
-	
-	<query name="getSHiddenTaskByUserAndActivity">
-		SELECT h
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-		WHERE h.activityId = :activityInstanceId
-		AND h.userId = :userId
-	</query>
-	
-	<query name="getSHiddenTasksForActivity">
-		SELECT h
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-		WHERE h.activityId = :activityInstanceId
-        ORDER BY h.id ASC
-	</query>
-	
 	<!-- Process Instance  -->
 	<query name="getNumberOfSProcessInstance">
 		SELECT COUNT(DISTINCT p)
@@ -1280,7 +1061,6 @@
     			FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
     			WHERE f.logicalGroup4 = p.id 
     			AND f.stateId = 3
-    			AND f.deleted = FALSE
     		)
         )
 	</query>
@@ -1295,7 +1075,6 @@
     			FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
     			WHERE f.logicalGroup4 = p.id 
     			AND f.stateId = 3
-    			AND f.deleted = FALSE
     		)
         )
 	</query>
@@ -1422,11 +1201,6 @@
 			)
 	</query>
 
-	<query name="purgeSFlowNodeInstanceImpl">
-		DELETE FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS flowNode
-		WHERE flowNode.deleted = TRUE
-	</query>
-
 	<query name="getPossibleUserIdsOfPendingTasks">
         SELECT user.id
         FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
@@ -1534,7 +1308,6 @@
         WHERE p.processDefinitionId = :rootProcessDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 
@@ -1570,12 +1343,6 @@
 					)
 				)
 			)
-		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = :userId
 		)
     </query>
 	
@@ -1586,7 +1353,6 @@
         WHERE p.processDefinitionId = :rootProcessDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 
@@ -1622,12 +1388,6 @@
 					)
 				)
 			)
-		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = :userId
 		)
     </query>
  
@@ -1639,7 +1399,6 @@
         WHERE p.processDefinitionId = :rootProcessDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 
@@ -1675,12 +1434,6 @@
 					)
 				)
 			)
-		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = user.id
 		)
     </query>
 	
@@ -1692,7 +1445,6 @@
         WHERE p.processDefinitionId = :rootProcessDefinitionId
         AND p.id = a.logicalGroup2
         AND a.stable = TRUE
-		AND a.deleted = FALSE
 		AND a.stateExecuting = FALSE
 		AND a.terminal = FALSE
 		AND ( 
@@ -1728,12 +1480,6 @@
 					)
 				)
 			)
-		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = user.id
 		)
     </query>
     

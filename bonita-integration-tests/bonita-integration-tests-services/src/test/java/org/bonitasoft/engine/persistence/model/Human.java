@@ -18,8 +18,6 @@ public class Human implements PersistentObject {
 
     private long carId;
 
-    private boolean deleted;
-
     public long getTenantId() {
         return tenantId;
     }
@@ -76,21 +74,12 @@ public class Human implements PersistentObject {
         return null;
     }
 
-    public void setDeleted(final boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + age;
         result = prime * result + (int) (carId ^ (carId >>> 32));
-        result = prime * result + (deleted ? 1231 : 1237);
         result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
         result = prime * result + (int) (id ^ (id >>> 32));
         result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
@@ -110,8 +99,6 @@ public class Human implements PersistentObject {
         if (age != other.age)
             return false;
         if (carId != other.carId)
-            return false;
-        if (deleted != other.deleted)
             return false;
         if (firstName == null) {
             if (other.firstName != null)

@@ -86,8 +86,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     int stat_display_count;
 
-    List<String> classesToPurge;
-
     // ----
 
     /**
@@ -188,14 +186,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     private OrderByCheckingMode getOrderByCheckingMode() {
         final String property = System.getProperty("sysprop.bonita.orderby.checking.mode");
         return property != null && !property.isEmpty() ? OrderByCheckingMode.valueOf(property) : OrderByCheckingMode.NONE;
-    }
-
-    /**
-     * @param classesToPurge
-     *        the classesToPurge to set
-     */
-    public void setClassesToPurge(final List<String> classesToPurge) {
-        this.classesToPurge = classesToPurge;
     }
 
     /**
@@ -342,36 +332,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 setId(entity);
                 session.save(entity);
             }
-        }
-    }
-
-    @Override
-    public void purge() throws SPersistenceException {
-        if (classesToPurge != null) {
-            for (final String classToPurge : classesToPurge) {
-                purge(classToPurge);
-            }
-        }
-    }
-
-    @Override
-    public void purge(final String classToPurge) throws SPersistenceException {
-        final int index = classToPurge.lastIndexOf('.');
-        String suffix = classToPurge;
-        if (index != -1) {
-            suffix = classToPurge.substring(index + 1, classToPurge.length());
-        }
-        final Query query = getSession(true).getNamedQuery("purge" + suffix);
-        try {
-            query.executeUpdate();
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException he) {
-            throw new SPersistenceException(he);
         }
     }
 
