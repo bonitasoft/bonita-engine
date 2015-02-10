@@ -4502,7 +4502,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     /**
      * @param orAssignedToUser
-     *            do we also want to retrieve tasks directly assigned to this user ?
+     *        do we also want to retrieve tasks directly assigned to this user ?
      * @throws SearchException
      */
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions, final boolean orAssignedToUser)
@@ -5718,7 +5718,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Map<Expression, Map<String, Serializable>> expressionsAndTheirPartialContext, final long processDefinitionId,
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService) {
         return new EvaluateExpressionsDefinitionLevel(expressionsAndTheirPartialContext, processDefinitionId,
-                expressionResolverService, processDefinitionService);
+                expressionResolverService, processDefinitionService, getTenantAccessor().getBusinessDataRepository());
     }
 
     private Map<String, Serializable> evaluateExpressionsInstanceLevel(final Map<Expression, Map<String, Serializable>> expressions, final long containerId,
@@ -5735,7 +5735,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     protected EvaluateExpressionsInstanceLevel createInstanceLevelExpressionEvaluator(final Map<Expression, Map<String, Serializable>> expressions,
             final long containerId, final String containerType, final long processDefinitionId, final ExpressionResolverService expressionService) {
         return new EvaluateExpressionsInstanceLevel(expressions, containerId, containerType, processDefinitionId,
-                expressionService);
+                expressionService, getTenantAccessor().getBusinessDataRepository());
     }
 
     private Map<String, Serializable> evaluateExpressionsInstanceLevelAndArchived(final Map<Expression, Map<String, Serializable>> expressions,
@@ -5751,8 +5751,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     protected EvaluateExpressionsInstanceLevelAndArchived createInstanceAndArchivedLevelExpressionEvaluator(
             final Map<Expression, Map<String, Serializable>> expressions, final long containerId, final String containerType, final long processDefinitionId,
             final long time, final ExpressionResolverService expressionService) {
-        return new EvaluateExpressionsInstanceLevelAndArchived(expressions, containerId,
-                containerType, processDefinitionId, time, expressionService);
+        return new EvaluateExpressionsInstanceLevelAndArchived(expressions, containerId, containerType, processDefinitionId, time, expressionService,
+                getTenantAccessor().getBusinessDataRepository());
     }
 
     private ArchivedProcessInstance getStartedArchivedProcessInstance(final long processInstanceId) throws SBonitaException {

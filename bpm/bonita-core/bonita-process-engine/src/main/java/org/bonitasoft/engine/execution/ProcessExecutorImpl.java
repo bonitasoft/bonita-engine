@@ -436,9 +436,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors,
             final FlowNodeSelector selectorForConnectorOnEnter) throws BonitaHomeNotSetException, IOException,
             InvalidEvaluationConnectorConditionException, SBonitaException {
+        if (expressionContext == null) {
+            expressionContext = new SExpressionContext();
+        }
+        expressionContext.setProcessDefinitionId(sProcessDefinition.getId());
+
         // Create SDataInstances
         bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition, expressionContext, operations, context);
 
+        initializeData(sProcessDefinition, sProcessInstance);
         initializeBusinessData(sProcessDefinition, sProcessInstance, expressionContext);
 
         createDocuments(sProcessDefinition, sProcessInstance, userId);
@@ -446,15 +452,16 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (connectors != null) {
             executeConnectors(sProcessDefinition, sProcessInstance, connectors);
         }
-        if (expressionContext == null) {
-            expressionContext = new SExpressionContext();
-        }
         executeOperations(operations, context, expressionContext, sProcessInstance);
 
         // Create connectors
         bpmInstancesCreator.createConnectorInstances(sProcessInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
 
         return executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_ENTER, selectorForConnectorOnEnter);
+    }
+
+    protected void initializeData(final SProcessDefinition sDefinition, final SProcessInstance sInstance) throws SProcessInstanceCreationException {
+        // nothing to do
     }
 
     private void initializeBusinessData(SProcessDefinition sDefinition, SProcessInstance sInstance, SExpressionContext expressionContext)
