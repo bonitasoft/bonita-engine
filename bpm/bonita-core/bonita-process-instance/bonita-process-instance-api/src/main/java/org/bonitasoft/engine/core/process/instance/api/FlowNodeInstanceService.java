@@ -81,7 +81,7 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeReadException
      * @since 6.0
      */
-    List<SFlowNodeInstance> getFlowNodeInstances(long rootContainerId, int fromIndex, int maxResults) throws SFlowNodeReadException;
+    List<SFlowNodeInstance> getFlowNodeInstances(long parentContainerId, int fromIndex, int maxResults) throws SFlowNodeReadException;
 
     /**
      * @param flowNodeInstance

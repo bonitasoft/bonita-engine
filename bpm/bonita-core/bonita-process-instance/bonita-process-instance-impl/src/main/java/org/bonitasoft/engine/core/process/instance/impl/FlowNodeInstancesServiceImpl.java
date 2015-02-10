@@ -271,10 +271,10 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public List<SFlowNodeInstance> getFlowNodeInstances(final long rootContainerId, final int fromIndex, final int maxResults) throws SFlowNodeReadException {
+    public List<SFlowNodeInstance> getFlowNodeInstances(final long parentProcessInstanceId, final int fromIndex, final int maxResults) throws SFlowNodeReadException {
         List<SFlowNodeInstance> selectList;
         try {
-            selectList = getPersistenceService().selectList(SelectDescriptorBuilder.getFlowNodesFromProcessInstance(rootContainerId, fromIndex, maxResults));
+            selectList = getPersistenceService().selectList(SelectDescriptorBuilder.getFlowNodesFromProcessInstance(parentProcessInstanceId, fromIndex, maxResults));
         } catch (final SBonitaReadException e) {
             throw new SFlowNodeReadException(e);
         }
@@ -522,7 +522,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public int getNumberOfFlowNodes(long rootContainerId) throws SBonitaReadException {
-        return getPersistenceService().selectOne(SelectDescriptorBuilder.getNumberOfFlowNode(rootContainerId)).intValue();
+    public int getNumberOfFlowNodes(long parentProcessInstanceId) throws SBonitaReadException {
+        return getPersistenceService().selectOne(SelectDescriptorBuilder.getNumberOfFlowNode(parentProcessInstanceId)).intValue();
     }
 }

@@ -34,7 +34,7 @@
 	<query name="getNumberOfFlowNode">
 		SELECT count(f)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
-		WHERE f.rootContainerId = :rootContainerId
+		WHERE f.logicalGroup4 = :parentProcessInstanceId
 	</query>
 	
 	<query name="getNumberOfActivitiesFromProcessInstance">
@@ -47,7 +47,7 @@
 	<query name="getFlowNodesFromProcessInstance">
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
-		WHERE f.rootContainerId = :rootContainerId
+		WHERE f.logicalGroup4 = :parentProcessInstanceId
 		AND f.deleted = FALSE
         ORDER BY f.id ASC
 	</query>

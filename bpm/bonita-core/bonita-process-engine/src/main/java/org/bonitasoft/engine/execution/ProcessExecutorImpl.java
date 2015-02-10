@@ -518,6 +518,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 + flowNodeInstanceId + "> of process instance <" + processInstanceId + "> finished");
         if (isEnd) {
             int numberOfFlowNode = activityInstanceService.getNumberOfFlowNodes(sProcessInstance.getId());
+            if(sProcessInstance.getInterruptingEventId() > 0){
+                ///the event is deleted by latter...
+                numberOfFlowNode -= 1;
+            }
             if (numberOfFlowNode > 0) {
                 if(logger.isLoggable(ProcessExecutorImpl.class,TechnicalLogSeverity.DEBUG)){
 
@@ -534,6 +538,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             if (ProcessInstanceState.ABORTING.getId() != sProcessInstance.getStateId()) {
                 hasActionsToExecute = executePostThrowEventHandlers(sProcessDefinition, sProcessInstance, sFlowNodeInstanceChild);
                 // the process instance has maybe changed
+                logger.log(ProcessExecutorImpl.class, TechnicalLogSeverity.DEBUG, "has action to execute");
                 if (hasActionsToExecute) {
                     sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
                 }
@@ -655,6 +660,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
             throws SArchivingException {
+        //FIXME HERRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEEE
         if (child.getId() != sProcessInstance.getInterruptingEventId() || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
             // Let's archive the final state of the child:
             flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());

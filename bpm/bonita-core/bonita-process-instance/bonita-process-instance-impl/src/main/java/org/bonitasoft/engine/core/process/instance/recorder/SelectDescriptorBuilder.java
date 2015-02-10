@@ -70,8 +70,8 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SHiddenTaskInstance>("getSHiddenTasksForActivity", parameters, SHiddenTaskInstance.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SFlowNodeInstance> getFlowNodesFromProcessInstance(final long rootContainerId, final int fromIndex, final int maxResults) {
-        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+    public static SelectListDescriptor<SFlowNodeInstance> getFlowNodesFromProcessInstance(final long parentProcessInstanceId, final int fromIndex, final int maxResults) {
+        final Map<String, Object> parameters = Collections.singletonMap("parentProcessInstanceId", (Object) parentProcessInstanceId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<SFlowNodeInstance>("getFlowNodesFromProcessInstance", parameters, SFlowNodeInstance.class, queryOptions);
     }
@@ -193,8 +193,8 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<Long>("getNumberOfActivitiesFromProcessInstance", parameters, SFlowNodeInstance.class, Long.class);
     }
 
-    public static SelectOneDescriptor<Long> getNumberOfFlowNode(final long rootContainerId) {
-        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+    public static SelectOneDescriptor<Long> getNumberOfFlowNode(final long parentProcessInstanceId) {
+        final Map<String, Object> parameters = Collections.singletonMap("parentProcessInstanceId", (Object) parentProcessInstanceId);
         return new SelectOneDescriptor<Long>("getNumberOfFlowNode", parameters, SFlowNodeInstance.class, Long.class);
     }
 
