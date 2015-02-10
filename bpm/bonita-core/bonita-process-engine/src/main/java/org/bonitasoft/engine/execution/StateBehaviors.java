@@ -992,17 +992,12 @@ public class StateBehaviors {
                     miActivityInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
             possibleValues = (List<?>) dataInstance.getValue();
         }
-        if (possibleValues != null) {
-            return numberOfInstances < possibleValues.size();
-        }
-        return false;
+        return possibleValues != null && numberOfInstances < possibleValues.size();
     }
 
     public void updateOutputData(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SMultiInstanceLoopCharacteristics miLoop, final int numberOfInstanceMax) throws SDataInstanceException, SActivityStateExecutionException {
-        final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
-        final SBusinessDataDefinition businessData = processContainer.getBusinessDataDefinition(miLoop.getLoopDataOutputRef());
-        if (businessData == null) {
+        if (!isBusinessData(processDefinition, miLoop)) {
             final String loopDataOutputRef = miLoop.getLoopDataOutputRef();
             if (loopDataOutputRef != null) {
                 final SDataInstance loopDataOutput = dataInstanceService.getDataInstance(loopDataOutputRef, flowNodeInstance.getId(),
@@ -1010,22 +1005,9 @@ public class StateBehaviors {
                 if (loopDataOutput != null) {
                     final Serializable outValue = loopDataOutput.getValue();
                     if (outValue instanceof List) {
-                        final List<?> loopDataOutputCollection = (List<?>) outValue;
-                        if (loopDataOutputCollection.size() < numberOfInstanceMax) {
-                            // output data is too small
-                            final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
-                            newOutputList.addAll(loopDataOutputCollection);
-                            for (int i = loopDataOutputCollection.size(); i < numberOfInstanceMax; i++) {
-                                newOutputList.add(null);
-                            }
-                            updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
-                        }
+                        updateLoopDataOutputWithListContent((List<?>) outValue, loopDataOutput, numberOfInstanceMax);
                     } else if (outValue == null) {
-                        final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
-                        for (int i = 0; i < numberOfInstanceMax; i++) {
-                            newOutputList.add(null);
-                        }
-                        updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
+                        updateLoopDataOutputWithNull(loopDataOutput, numberOfInstanceMax);
                     } else {
                         throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName()
                                 + " of process " + processDefinition.getName() + " " + processDefinition.getVersion()
@@ -1033,6 +1015,32 @@ public class StateBehaviors {
                     }
                 }
             }
+        }
+    }
+
+    boolean isBusinessData(final SProcessDefinition processDefinition,  final SMultiInstanceLoopCharacteristics miLoop) {
+        final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+        final SBusinessDataDefinition businessData = processContainer.getBusinessDataDefinition(miLoop.getLoopDataOutputRef());
+        return businessData != null;
+    }
+
+    private void updateLoopDataOutputWithNull(final SDataInstance loopDataOutput, final int numberOfInstanceMax) throws SDataInstanceException {
+        final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
+        for (int i = 0; i < numberOfInstanceMax; i++) {
+            newOutputList.add(null);
+        }
+        updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
+    }
+
+    private void updateLoopDataOutputWithListContent(final List<?> outValue, final SDataInstance loopDataOutput, final int numberOfInstanceMax) throws SDataInstanceException {
+        if (outValue.size() < numberOfInstanceMax) {
+            // output data is too small
+            final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
+            newOutputList.addAll(outValue);
+            for (int i = outValue.size(); i < numberOfInstanceMax; i++) {
+                newOutputList.add(null);
+            }
+            updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
         }
     }
 
