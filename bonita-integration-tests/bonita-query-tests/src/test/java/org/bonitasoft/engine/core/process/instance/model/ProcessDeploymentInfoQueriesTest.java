@@ -32,8 +32,6 @@ import javax.inject.Inject;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl;
 import org.bonitasoft.engine.test.persistence.repository.ProcessDeploymentInfoRepository;
 import org.junit.Before;
@@ -175,18 +173,6 @@ public class ProcessDeploymentInfoQueriesTest {
     }
 
     @Test
-    public void getNumberOfProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksFor_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-
-        // When
-        final long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
-
-        // Then
-        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(0);
-    }
-
-    @Test
     public void searchProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksFor_should_return_number_of_process_definition_if_one_instance_has_assigned_tasks_to_the_user() {
         // Given
         buildAndAddAssignedTasks();
@@ -240,19 +226,6 @@ public class ProcessDeploymentInfoQueriesTest {
         // Then
         assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(1);
         assertThat(sProcessDefinitionDeployInfos.get(0).getProcessId()).isEqualTo(PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN);
-    }
-
-    @Test
-    public void searchProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksFor_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-
-        // When
-        final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
-                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(JACK_ID);
-
-        // Then
-        assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(0);
     }
 
     // Supervised By
@@ -358,32 +331,6 @@ public class ProcessDeploymentInfoQueriesTest {
 
         // Then
         assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(1);
-    }
-
-    @Test
-    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy_should_not_count_the_hidden_human_for_process_definition_supervised_by_user() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-        buildAndAddSupervisorMappedToUser();
-
-        // When
-        final long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
-
-        // Then
-        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(0);
-    }
-
-    @Test
-    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy_should_not_count_the_hidden_human_for_process_definition_supervised_by_userMembership() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-        buildAndAddSupervisorMappedToUserMembershipMappedToUser();
-
-        // When
-        final long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
-
-        // Then
-        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(0);
     }
 
     @Test
@@ -506,34 +453,6 @@ public class ProcessDeploymentInfoQueriesTest {
         assertThat(sProcessDefinitionDeployInfos.get(0).getProcessId()).isEqualTo(PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN);
     }
 
-    @Test
-    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy_should_not_count_the_hidden_human_for_process_definition_supervised_by_user() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-        buildAndAddSupervisorMappedToUser();
-
-        // When
-        final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
-                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
-
-        // Then
-        assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(0);
-    }
-
-    @Test
-    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy_should_not_count_the_hidden_human_for_process_definition_supervised_by_userMembership() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-        buildAndAddSupervisorMappedToUserMembershipMappedToUser();
-
-        // When
-        final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
-                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(JOHN_ID);
-
-        // Then
-        assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(0);
-    }
-
     // All (for admin)
     @Test
     public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_return_number_of_process_definition_supervised_if_one_instance_has_assigned_tasks() {
@@ -585,19 +504,6 @@ public class ProcessDeploymentInfoQueriesTest {
 
         // Then
         assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(3);
-    }
-
-    @Test
-    public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-        buildAndAddSupervisorMappedToUser();
-
-        // When
-        final long numberOfProcessDefinitionDeployInfos = repository.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
-
-        // Then
-        assertThat(numberOfProcessDefinitionDeployInfos).isEqualTo(0);
     }
 
     @Test
@@ -658,20 +564,6 @@ public class ProcessDeploymentInfoQueriesTest {
         // Then
         assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(3);
         assertThat(sProcessDefinitionDeployInfos.get(0).getProcessId()).isEqualTo(PROCESS_DEFINITION_ID_SUPERVISED_BY_JOHN);
-    }
-
-    @Test
-    public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-        buildAndAddSupervisorMappedToUser();
-
-        // When
-        final List<SProcessDefinitionDeployInfo> sProcessDefinitionDeployInfos = repository
-                .searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks();
-
-        // Then
-        assertThat(sProcessDefinitionDeployInfos.size()).isEqualTo(0);
     }
 
     private void buildAndAddSupervisorMappedToUser() {
@@ -792,19 +684,6 @@ public class ProcessDeploymentInfoQueriesTest {
         // Tasks OK not assigned & pending for Bob, process not supervised
         final SFlowNodeInstance normalTask5 = buildAndAddNormalTask("normalTask1", ROOT_PROCESS_INSTANCE_ID_NOT_SUPERVISED);
         repository.add(aPendingActivityMapping().withActorId(actorForBob.getId()).withActivityId(normalTask5.getId()).build());
-    }
-
-    private void buildAndAddAssigneeAndHiddenTask() {
-        final SUserTaskInstanceImpl activity = (SUserTaskInstanceImpl) repository.add(aUserTask().withName("normalTask1").withStateExecuting(false)
-                .withStable(true).withTerminal(false).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID_SUPERVISED_BY_JOHN)
-                .withAssigneeId(JACK_ID).build());
-
-        final SHiddenTaskInstanceImpl sHiddenTaskInstanceImpl = new SHiddenTaskInstanceImpl();
-        sHiddenTaskInstanceImpl.setActivityId(activity.getId());
-        sHiddenTaskInstanceImpl.setUserId(JACK_ID);
-        sHiddenTaskInstanceImpl.setTenantId(1L);
-        sHiddenTaskInstanceImpl.setId(48L);
-        repository.add(sHiddenTaskInstanceImpl);
     }
 
     private SFlowNodeInstance buildAndAddNormalTask(final String taskName, final long rootProcessInstanceId) {

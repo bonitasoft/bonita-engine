@@ -18,7 +18,6 @@ ALTER TABLE event_trigger_instance DROP CONSTRAINT fk_event_trigger_instance_ten
 ALTER TABLE external_identity_mapping DROP CONSTRAINT fk_external_identity_mapping_tenantId;
 ALTER TABLE flownode_instance DROP CONSTRAINT fk_flownode_instance_tenantId;
 ALTER TABLE group_ DROP CONSTRAINT fk_group__tenantId;
-ALTER TABLE hidden_activity DROP CONSTRAINT fk_hidden_activity_tenantId;
 ALTER TABLE job_desc DROP CONSTRAINT fk_job_desc_tenantId;
 ALTER TABLE job_param DROP CONSTRAINT fk_job_param_tenantId;
 ALTER TABLE message_instance DROP CONSTRAINT fk_message_instance_tenantId;

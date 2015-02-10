@@ -803,12 +803,6 @@
 				)
 			)
 		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = :userId
-		)
     </query>
 	
 	<query name="searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksFor">
@@ -854,12 +848,6 @@
 					)
 				)
 			)
-		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = :userId
 		)
     </query>
 
@@ -922,12 +910,6 @@
 				)
 			)
 		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = user.id
-		)
     </query>
 	
 	<query name="searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasksSupervisedBy">
@@ -989,12 +971,6 @@
 				)
 			)
 		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = user.id
-		)
     </query>
  
  	<query name="getNumberOfSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasks">
@@ -1042,12 +1018,6 @@
 				)
 			)
 		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = user.id
-		)
     </query>
 	
 	<query name="searchSProcessDefinitionDeployInfoWithAssignedOrPendingHumanTasks">
@@ -1094,12 +1064,6 @@
 					)
 				)
 			)
-		)
-		AND NOT EXISTS (
-			SELECT h.id
-			FROM org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl AS h
-			WHERE a.id = h.activityId
-			AND h.userId = user.id
 		)
     </query>   
 </hibernate-mapping>

@@ -18,7 +18,6 @@ ALTER TABLE event_trigger_instance DROP FOREIGN KEY fk_event_trigger_instance_te
 ALTER TABLE external_identity_mapping DROP FOREIGN KEY fk_external_identity_mapping_tenantId;
 ALTER TABLE flownode_instance DROP FOREIGN KEY fk_flownode_instance_tenantId;
 ALTER TABLE group_ DROP FOREIGN KEY fk_group__tenantId;
-ALTER TABLE hidden_activity DROP FOREIGN KEY fk_hidden_activity_tenantId;
 ALTER TABLE job_desc DROP FOREIGN KEY fk_job_desc_tenantId;
 ALTER TABLE job_param DROP FOREIGN KEY fk_job_param_tenantId;
 ALTER TABLE message_instance DROP FOREIGN KEY fk_message_instance_tenantId;
