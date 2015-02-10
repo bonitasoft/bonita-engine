@@ -582,8 +582,8 @@ public class ProcessInstanceQueriesTest {
         // Then
         assertEquals(3, failedSProcessInstance.size());
         assertEquals(failedProcessInstance, failedSProcessInstance.get(0));
-        assertEquals(failedProcessInstanceWithFailedFlowNode, failedSProcessInstance.get(1));
-        assertEquals(processInstanceWithFailedFlowNode, failedSProcessInstance.get(2));
+        assertEquals(processInstanceWithFailedFlowNode, failedSProcessInstance.get(1));
+        assertEquals(failedProcessInstanceWithFailedFlowNode, failedSProcessInstance.get(2));
     }
 
     @Test
