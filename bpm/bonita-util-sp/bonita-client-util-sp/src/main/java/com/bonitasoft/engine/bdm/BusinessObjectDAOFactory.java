@@ -21,7 +21,9 @@ import com.bonitasoft.engine.bdm.model.BusinessObject;
  *
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
+ * @deprecated since version 7.0.0. Use {@link org.bonitasoft.engine.bdm.BusinessObjectDAOFactory} instead.
  */
+@Deprecated
 public class BusinessObjectDAOFactory {
 
     private static final String IMPL_SUFFIX = "Impl";
