@@ -65,7 +65,7 @@
             <version>3.18.1-GA</version>
         </dependency>
         <dependency>
-            <groupId>com.bonitasoft.engine.data</groupId>
+            <groupId>org.bonitasoft.engine.data</groupId>
             <artifactId>bonita-business-data-api</artifactId>
             <version>${project.version}</version>
         </dependency>

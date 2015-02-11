@@ -20,41 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.LoginAPI;
-import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.PlatformLoginAPI;
-import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.flownode.TaskPriority;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.command.CommandExecutionException;
-import org.bonitasoft.engine.command.CommandNotFoundException;
-import org.bonitasoft.engine.command.CommandParameterizationException;
-import org.bonitasoft.engine.connectors.TestConnector;
-import org.bonitasoft.engine.connectors.TestConnector3;
-import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
-import org.bonitasoft.engine.connectors.TestConnectorLongToExecute;
-import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
-import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
-import org.bonitasoft.engine.connectors.TestExternalConnector;
-import org.bonitasoft.engine.connectors.VariableStorage;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.UnknownAPITypeException;
-import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.platform.StartNodeException;
-import org.bonitasoft.engine.platform.StopNodeException;
-import org.bonitasoft.engine.search.SearchOptionsBuilder;
-import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.APITestUtil;
-import org.bonitasoft.engine.test.BuildTestUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
@@ -76,6 +41,39 @@ import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.monitoring.MonitoringException;
 import com.bonitasoft.engine.reporting.Report;
 import com.bonitasoft.engine.reporting.ReportSearchDescriptor;
+import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.command.CommandExecutionException;
+import org.bonitasoft.engine.command.CommandNotFoundException;
+import org.bonitasoft.engine.command.CommandParameterizationException;
+import org.bonitasoft.engine.connectors.TestConnector;
+import org.bonitasoft.engine.connectors.TestConnector3;
+import org.bonitasoft.engine.connectors.TestConnectorLongToExecute;
+import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
+import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
+import org.bonitasoft.engine.connectors.TestExternalConnector;
+import org.bonitasoft.engine.connectors.VariableStorage;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.platform.StartNodeException;
+import org.bonitasoft.engine.platform.StopNodeException;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.BuildTestUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class APITestSPUtil extends APITestUtil {
 
@@ -164,6 +162,11 @@ public class APITestSPUtil extends APITestUtil {
         return logAPI;
     }
 
+    /**
+     * @return
+     * @deprecated use {@link org.bonitasoft.engine.test.APITestUtil#getTenantManagementCommunityAPI()}
+     */
+    @Deprecated
     public TenantManagementAPI getTenantManagementAPI() {
         return tenantManagementAPI;
     }
@@ -172,6 +175,11 @@ public class APITestSPUtil extends APITestUtil {
         return applicationAPI;
     }
 
+    /**
+     * @param tenantManagementAPI
+     * @deprecated use {@link APITestUtil#setTenantManagementCommunityAPI(org.bonitasoft.engine.api.TenantManagementAPI)}
+     */
+    @Deprecated
     public void setTenantManagementAPI(final TenantManagementAPI tenantManagementAPI) {
         this.tenantManagementAPI = tenantManagementAPI;
     }
@@ -250,15 +258,6 @@ public class APITestSPUtil extends APITestUtil {
             StartNodeException {
         final PlatformSession loginPlatform = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        platformAPI.startNode();
-        logoutOnPlatform(loginPlatform);
-    }
-
-    public void stopAndStartPlatform() throws BonitaException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, StopNodeException,
-            StartNodeException {
-        final PlatformSession loginPlatform = loginOnPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        platformAPI.stopNode();
         platformAPI.startNode();
         logoutOnPlatform(loginPlatform);
     }
@@ -382,12 +381,6 @@ public class APITestSPUtil extends APITestUtil {
                 BuildTestUtil.generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar"));
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, connectorImplementations,
                 generateConnectorDependencies, null);
-    }
-
-    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(final ProcessDefinitionBuilder processDefinitionBuilder,
-            final String actorName, final User user) throws BonitaException, IOException {
-        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, actorName, user, "TestConnectorEngineExecutionContext.impl",
-                TestConnectorEngineExecutionContext.class, "TestConnectorEngineExecutionContext.jar");
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorWithCustomType(final ProcessDefinitionBuilder processDefinitionBuilder,

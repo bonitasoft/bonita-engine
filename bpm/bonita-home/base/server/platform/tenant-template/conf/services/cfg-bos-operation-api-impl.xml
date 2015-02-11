@@ -45,7 +45,7 @@
           class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>
 
     <bean id="javaMethodOperationExecutorStrategy"
-          class="com.bonitasoft.engine.operation.BusinessDataJavaMethodOperationExecutorStrategy">
+          class="org.bonitasoft.engine.operation.BusinessDataJavaMethodOperationExecutorStrategy">
         <constructor-arg name="businessDataService" ref="businessDataService"/>
     </bean>
 
@@ -68,7 +68,7 @@
         <constructor-arg name="processInstanceService" ref="processInstanceService"/>
     </bean>
 
-    <bean id="businessDataLeftOperandHandler" class="com.bonitasoft.engine.operation.BusinessDataLeftOperandHandler">
+    <bean id="businessDataLeftOperandHandler" class="org.bonitasoft.engine.operation.BusinessDataLeftOperandHandler">
         <constructor-arg name="businessDataRepository" ref="businessDataRepository"/>
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService"/>

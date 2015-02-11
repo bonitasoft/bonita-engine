@@ -8,16 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
-import java.io.Serializable;
-
 /**
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
+ * @deprecated since version 7.0.0. Use {@link org.bonitasoft.engine.bdm.Entity} instead.
  */
-public interface Entity extends Serializable {
-
-    Long getPersistenceId();
-
-    Long getPersistenceVersion();
+@Deprecated
+public interface Entity extends org.bonitasoft.engine.bdm.Entity {
 
 }

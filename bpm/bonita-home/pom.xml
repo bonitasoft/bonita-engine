@@ -71,7 +71,7 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>com.bonitasoft.engine.data</groupId>
+									<groupId>org.bonitasoft.engine.data</groupId>
 									<artifactId>bonita-business-data-api</artifactId>
 									<version>${project.version}</version>
 									<type>jar</type>

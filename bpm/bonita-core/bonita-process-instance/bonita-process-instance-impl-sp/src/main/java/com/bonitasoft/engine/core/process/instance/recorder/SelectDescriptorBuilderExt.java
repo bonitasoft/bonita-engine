@@ -9,16 +9,11 @@
 package com.bonitasoft.engine.core.process.instance.recorder;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 
-import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
-import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 
 /**
