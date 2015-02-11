@@ -11,14 +11,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  ******************************************************************************/
-package org.bonitasoft.engine.bdm.dao;
+package com.bonitasoft.engine.bdm.dao;
 
 /**
- * Common interface for business object DAOs.
- * <p>This class extends deprecated {@link com.bonitasoft.engine.bdm.dao.BusinessObjectDAO} to avoid an API break of Bonita Engine Subscription version. This inheritance will be removed in next releases</p>
  * @author Romain Bioteau
- * @since 7.0.0
+ * @deprecated since version 7.0.0. This class was only introduced to avoid an API break of Bonita Engine Subscription version. Use {@link org.bonitasoft.engine.bdm.dao.BusinessObjectDAO} instead.
  */
-public interface BusinessObjectDAO extends com.bonitasoft.engine.bdm.dao.BusinessObjectDAO {
+@Deprecated
+public interface BusinessObjectDAO {
 
 }
