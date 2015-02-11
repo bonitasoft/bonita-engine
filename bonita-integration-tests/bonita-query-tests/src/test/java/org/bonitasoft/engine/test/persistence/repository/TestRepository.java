@@ -18,7 +18,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWa
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
@@ -160,12 +159,6 @@ public class TestRepository {
     public SAFlowNodeInstance add(final SAFlowNodeInstanceImpl saFlowNode) {
         getSession().save(saFlowNode);
         return (SAFlowNodeInstance) getSession().get(saFlowNode.getClass(), new PersistentObjectId(saFlowNode.getId(), saFlowNode.getTenantId()));
-    }
-
-    public SHiddenTaskInstanceImpl add(final SHiddenTaskInstanceImpl sHiddenTaskInstanceImpl) {
-        getSession().save(sHiddenTaskInstanceImpl);
-        return (SHiddenTaskInstanceImpl) getSession().get(sHiddenTaskInstanceImpl.getClass(),
-                new PersistentObjectId(sHiddenTaskInstanceImpl.getId(), sHiddenTaskInstanceImpl.getTenantId()));
     }
 
     public SEventTriggerInstanceImpl add(final SEventTriggerInstanceImpl sEventTriggerInstanceImpl) {
