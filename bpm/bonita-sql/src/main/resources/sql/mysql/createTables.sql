@@ -3,7 +3,7 @@ CREATE TABLE contract_data (
   id BIGINT NOT NULL,
   scopeId BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
-  val LONGBLOB,
+  val LONGBLOB
 ) ENGINE = INNODB;
 ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id);
 ALTER TABLE contract_data ADD CONSTRAINT uc_cd_scope_name UNIQUE (scopeId, name, tenantid);
