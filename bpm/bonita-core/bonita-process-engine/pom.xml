@@ -118,14 +118,10 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.api</groupId>
-            <artifactId>bonita-common-api</artifactId>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-common</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.api</groupId>
-            <artifactId>bonita-common-api-impl</artifactId>
-            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.archive</groupId>
@@ -310,11 +306,6 @@
         <dependency>
             <groupId>org.bonitasoft.engine.data</groupId>
             <artifactId>bonita-business-data-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.util</groupId>
-            <artifactId>bonita-common-util</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
