@@ -61,6 +61,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
 
     @Override
     @CustomTransactions
+    @AvailableWhenTenantIsPaused
     public APISession login(final String userName, final String password) throws LoginException {
         try {
             return loginInternal(userName, password, null);
@@ -72,6 +73,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     }
 
     @CustomTransactions
+    @AvailableWhenTenantIsPaused
     protected APISession login(final String userName, final String password, final Long tenantId) throws LoginException {
         try {
             return loginInternal(userName, password, tenantId);
@@ -84,6 +86,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
 
     @Override
     @CustomTransactions
+    @AvailableWhenTenantIsPaused
     public APISession login(final Map<String, Serializable> credentials) throws LoginException {
         checkCredentialsAreNotNullOrEmpty(credentials);
         try {

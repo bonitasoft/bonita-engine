@@ -230,7 +230,7 @@ public class APITestUtil extends PlatformTestUtil {
         setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
         setPageAPI(TenantAPIAccessor.getCustomPageAPI(getSession()));
         setApplicationAPI(TenantAPIAccessor.getLivingApplicationAPI(getSession()));
-        setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantManagementCommunityAPI(getSession()));
+        setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
         setBusinessDataAPI(TenantAPIAccessor.getBusinessDataAPI(getSession()));
     }
     public BusinessDataAPI getBusinessDataAPI() {

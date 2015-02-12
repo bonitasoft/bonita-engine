@@ -117,7 +117,7 @@ public final class TenantAPIAccessor {
         return getAPI(ApplicationAPI.class, session);
     }
 
-    public static TenantManagementAPI getTenantManagementCommunityAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
+    public static TenantManagementAPI getTenantManagementAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         return getAPI(TenantManagementAPI.class, session);
     }

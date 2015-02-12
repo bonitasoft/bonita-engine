@@ -156,6 +156,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Hongwen Zang
  * @author Celine Souchet
  */
+@AvailableWhenTenantIsPaused
 public class IdentityAPIImpl implements IdentityAPI {
 
     protected TenantServiceAccessor getTenantAccessor() {
