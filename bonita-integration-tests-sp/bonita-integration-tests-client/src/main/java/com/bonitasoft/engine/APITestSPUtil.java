@@ -164,7 +164,7 @@ public class APITestSPUtil extends APITestUtil {
 
     /**
      * @return
-     * @deprecated use {@link org.bonitasoft.engine.test.APITestUtil#getTenantManagementCommunityAPI()}
+     * @deprecated use {@link org.bonitasoft.engine.test.APITestUtil#getTenantAdministrationAPI()}
      */
     @Deprecated
     public TenantManagementAPI getTenantManagementAPI() {
@@ -177,7 +177,7 @@ public class APITestSPUtil extends APITestUtil {
 
     /**
      * @param tenantManagementAPI
-     * @deprecated use {@link APITestUtil#setTenantManagementCommunityAPI(org.bonitasoft.engine.api.TenantManagementAPI)}
+     * @deprecated use {@link APITestUtil#setTenantManagementCommunityAPI(org.bonitasoft.engine.api.TenantAdministrationAPI)}
      */
     @Deprecated
     public void setTenantManagementAPI(final TenantManagementAPI tenantManagementAPI) {

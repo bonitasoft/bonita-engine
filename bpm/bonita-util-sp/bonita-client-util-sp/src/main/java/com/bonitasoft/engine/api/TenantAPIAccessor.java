@@ -15,6 +15,7 @@ import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.EJB3ServerAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
@@ -123,9 +124,23 @@ public final class TenantAPIAccessor {
         return getAPI(ReportingAPI.class, session);
     }
 
+    /**
+     * @param session
+     * @return
+     * @throws BonitaHomeNotSetException
+     * @throws ServerAPIException
+     * @throws UnknownAPITypeException
+     * @deprecated since 7.0.0. Use {@link #getTenantAdministrationAPI(org.bonitasoft.engine.session.APISession)} instead.
+     */
+    @Deprecated
     public static TenantManagementAPI getTenantManagementAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         return getAPI(TenantManagementAPI.class, session);
+    }
+
+    public static TenantAdministrationAPI getTenantAdministrationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
+            UnknownAPITypeException {
+        return getAPI(TenantAdministrationAPI.class, session);
     }
 
     public static org.bonitasoft.engine.api.PageAPI getCustomPageAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
