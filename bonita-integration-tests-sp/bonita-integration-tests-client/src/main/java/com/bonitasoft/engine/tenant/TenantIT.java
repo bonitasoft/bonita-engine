@@ -148,7 +148,7 @@ public class TenantIT {
 
     }
 
-    @Test(expected = TenantStatusException.class)
+    @Test(expected = org.bonitasoft.engine.exception.TenantStatusException.class)
     @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "TenantIsPausedException, tenant paused" }, concept = BPMNConcept.NONE)
     public void cannotAccessTenantAPIsOnPausedTenant() throws Exception {
         final APITestSPUtil apiTestSPUtil = new APITestSPUtil();

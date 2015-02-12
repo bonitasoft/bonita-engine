@@ -54,6 +54,9 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
  */
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
+@Deprecated // Please, do not delete this class when cleaning deprecated TenantMaintenanceAPI. The following tests must be kept:
+//- twoTenantPauseMode
+//- can_executeConnectorOnActivityInstance_after_resume_tenant
 public class TenantMaintenanceIT extends CommonAPISPIT {
 
     private static final String CRON_EXPRESSION_EACH_SECOND = "*/1 * * * * ?";

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.api.impl.AvailableWhenTenantIsPaused;
 import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;

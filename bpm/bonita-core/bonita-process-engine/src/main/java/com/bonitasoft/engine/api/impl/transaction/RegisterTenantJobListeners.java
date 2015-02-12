@@ -23,7 +23,7 @@ import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
  * Register TenantJobListeners. This class must extend {@link java.util.concurrent.Callable} because it will be executed by
- * {@link com.bonitasoft.engine.service.BroadcastService} in order to register the tenant job listeners in all cluster nodes.
+ * {@link org.bonitasoft.engine.service.BroadcastService} in order to register the tenant job listeners in all cluster nodes.
  * 
  * @author Elias Ricken de Medeiros
  */

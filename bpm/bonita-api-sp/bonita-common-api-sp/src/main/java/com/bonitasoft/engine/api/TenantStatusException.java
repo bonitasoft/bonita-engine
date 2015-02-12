@@ -15,7 +15,9 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
  * method that cannot be called on a running tenant.
  * 
  * @author Emmanuel Duchastenier
+ * @deprecated since version 7.0.0. Use {@link org.bonitasoft.engine.exception.TenantStatusException} instead.
  */
+@Deprecated
 public class TenantStatusException extends BonitaRuntimeException {
 
     private static final long serialVersionUID = 1L;

@@ -13,8 +13,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.bonitasoft.engine.api.TenantManagementAPI;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
+import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
+import com.bonitasoft.engine.service.PlatformServiceAccessor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
+import org.bonitasoft.engine.api.impl.AvailableWhenTenantIsPaused;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.StarterThread;
+import org.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
+import org.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.ServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
@@ -39,17 +50,6 @@ import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-
-import com.bonitasoft.engine.api.TenantManagementAPI;
-import com.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
-import com.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
-import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
 /**
  * @author Matthieu Chaffotte

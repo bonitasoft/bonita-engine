@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import org.bonitasoft.engine.api.impl.AvailableWhenTenantIsPaused;
 import org.bonitasoft.engine.api.impl.ThemeAPIImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
