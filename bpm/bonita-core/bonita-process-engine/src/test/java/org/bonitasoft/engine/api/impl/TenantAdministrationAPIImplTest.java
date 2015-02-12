@@ -70,11 +70,11 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author Celine Souchet
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TenantManagementAPIImplTest {
+public class TenantAdministrationAPIImplTest {
 
     @Spy
     @InjectMocks
-    private TenantManagementAPIImpl tenantManagementAPI;
+    private TenantAdministrationAPIImpl tenantManagementAPI;
 
     @Mock
     private PlatformService platformService;
@@ -246,10 +246,10 @@ public class TenantManagementAPIImplTest {
 
     @Test
     public void resume_should_have_annotation_available_when_tenant_is_paused() throws Exception {
-        final Method method = TenantManagementAPIImpl.class.getMethod("resume");
+        final Method method = TenantAdministrationAPIImpl.class.getMethod("resume");
 
         final boolean present = method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
-                || TenantManagementAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class);
+                || TenantAdministrationAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class);
 
         assertThat(present).as("Annotation @AvailableWhenTenantIsPaused should be present on API method 'resume' or directly on class TenantManagementAPIExt")
                 .isTrue();
@@ -257,10 +257,10 @@ public class TenantManagementAPIImplTest {
 
     @Test
     public void pause_should_have_annotation_available_when_tenant_is_paused() throws Exception {
-        final Method method = TenantManagementAPIImpl.class.getMethod("pause");
+        final Method method = TenantAdministrationAPIImpl.class.getMethod("pause");
 
         final boolean present = method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
-                || TenantManagementAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class);
+                || TenantAdministrationAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class);
 
         assertThat(present).as("Annotation @AvailableWhenTenantIsPaused should be present on API method 'pause' or directly on class TenantManagementAPIExt")
                 .isTrue();
@@ -318,7 +318,7 @@ public class TenantManagementAPIImplTest {
 
     @Test
     public void installBDR_should_be_available_when_tenant_is_paused_ONLY() throws Exception {
-        final Method method = TenantManagementAPIImpl.class.getMethod("installBusinessDataModel", byte[].class);
+        final Method method = TenantAdministrationAPIImpl.class.getMethod("installBusinessDataModel", byte[].class);
         final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
         final boolean present = annotation != null && annotation.only();
@@ -328,7 +328,7 @@ public class TenantManagementAPIImplTest {
 
     @Test
     public void uninstallBDR_should_be_available_when_tenant_is_paused_ONLY() throws Exception {
-        final Method method = TenantManagementAPIImpl.class.getMethod("uninstallBusinessDataModel");
+        final Method method = TenantAdministrationAPIImpl.class.getMethod("uninstallBusinessDataModel");
         final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
         final boolean present = annotation != null && annotation.only();
@@ -378,7 +378,7 @@ public class TenantManagementAPIImplTest {
     @Test
     public void tenantManagementAPI_should_have_class_annotation() {
         // then:
-        assertThat(TenantManagementAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
+        assertThat(TenantAdministrationAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
                 "Annotation @AvailableWhenTenantIsPaused should be present on API class TenantManagementAPIExt").isTrue();
     }
 

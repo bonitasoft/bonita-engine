@@ -130,9 +130,9 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
-        getTenantManagementCommunityAPI().pause();
-        getTenantManagementCommunityAPI().installBusinessDataModel(zip);
-        getTenantManagementCommunityAPI().resume();
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().installBusinessDataModel(zip);
+        getTenantAdministrationAPI().resume();
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
@@ -145,7 +145,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
     protected void loadClientJars() throws Exception {
         contextClassLoader = Thread.currentThread().getContextClassLoader();
-        final byte[] clientBDMZip = getTenantManagementCommunityAPI().getClientBDMZip();
+        final byte[] clientBDMZip = getTenantAdministrationAPI().getClientBDMZip();
         final ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(clientBDMZip, contextClassLoader,
                 EMPLOYEE_QUALIF_CLASSNAME, clientFolder);
         Thread.currentThread().setContextClassLoader(classLoaderWithBDM);
@@ -160,10 +160,10 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
         logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        if (!getTenantManagementCommunityAPI().isPaused()) {
-            getTenantManagementCommunityAPI().pause();
-            getTenantManagementCommunityAPI().cleanAndUninstallBusinessDataModel();
-            getTenantManagementCommunityAPI().resume();
+        if (!getTenantAdministrationAPI().isPaused()) {
+            getTenantAdministrationAPI().pause();
+            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+            getTenantAdministrationAPI().resume();
         }
         deleteUser(businessUser);
         logoutOnTenant();

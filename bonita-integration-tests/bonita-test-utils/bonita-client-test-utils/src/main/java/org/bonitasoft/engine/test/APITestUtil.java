@@ -41,7 +41,7 @@ import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
-import org.bonitasoft.engine.api.TenantManagementAPI;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
@@ -184,7 +184,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     private ApplicationAPI applicationAPI;
 
-    private TenantManagementAPI tenantManagementCommunityAPI;
+    private TenantAdministrationAPI tenantManagementCommunityAPI;
 
     private BusinessDataAPI businessDataAPI;
 
@@ -230,7 +230,7 @@ public class APITestUtil extends PlatformTestUtil {
         setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
         setPageAPI(TenantAPIAccessor.getCustomPageAPI(getSession()));
         setApplicationAPI(TenantAPIAccessor.getLivingApplicationAPI(getSession()));
-        setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
+        setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantAdministrationAPI(getSession()));
         setBusinessDataAPI(TenantAPIAccessor.getBusinessDataAPI(getSession()));
     }
     public BusinessDataAPI getBusinessDataAPI() {
@@ -1498,11 +1498,11 @@ public class APITestUtil extends PlatformTestUtil {
         this.applicationAPI = applicationAPI;
     }
 
-    public TenantManagementAPI getTenantManagementCommunityAPI() {
+    public TenantAdministrationAPI getTenantAdministrationAPI() {
         return tenantManagementCommunityAPI;
     }
 
-    public void setTenantManagementCommunityAPI(final TenantManagementAPI tenantManagementCommunityAPI) {
+    public void setTenantManagementCommunityAPI(final TenantAdministrationAPI tenantManagementCommunityAPI) {
         this.tenantManagementCommunityAPI = tenantManagementCommunityAPI;
     }
 

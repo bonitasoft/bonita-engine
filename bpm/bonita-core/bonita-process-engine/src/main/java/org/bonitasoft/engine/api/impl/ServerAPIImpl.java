@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.NoSessionRequired;
 import org.bonitasoft.engine.api.PlatformAPI;
-import org.bonitasoft.engine.api.TenantManagementAPI;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
@@ -361,7 +361,7 @@ public class ServerAPIImpl implements ServerAPI {
     protected boolean isTenantAvailable(final long tenantId, final Session session, boolean isInTransaction) {
         final Object apiImpl;
         try {
-            apiImpl = accessResolver.getAPIImplementation(TenantManagementAPI.class.getName());
+            apiImpl = accessResolver.getAPIImplementation(TenantAdministrationAPI.class.getName());
             final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_PAUSED);
             final Boolean paused;
             if(isInTransaction){

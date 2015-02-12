@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bonitasoft.engine.api.TenantManagementAPI;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.ServiceStrategy;
@@ -58,7 +58,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Baptiste Mesta
  */
 @AvailableWhenTenantIsPaused
-public class TenantManagementAPIImpl implements TenantManagementAPI {
+public class TenantAdministrationAPIImpl implements TenantAdministrationAPI {
 
     protected PlatformServiceAccessor getPlatformAccessorNoException() {
         try {

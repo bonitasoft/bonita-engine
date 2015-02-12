@@ -115,10 +115,10 @@ public class TenantMaintenanceIT extends TestWithUser {
     }
 
     private void pauseTenant() throws BonitaException {
-        getTenantManagementCommunityAPI().pause();
+        getTenantAdministrationAPI().pause();
     }
 
     private void resumeTenant() throws BonitaException {
-        getTenantManagementCommunityAPI().resume();
+        getTenantAdministrationAPI().resume();
     }
 }

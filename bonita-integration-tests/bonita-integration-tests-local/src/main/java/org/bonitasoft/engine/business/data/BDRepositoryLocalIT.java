@@ -88,9 +88,9 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
-        getTenantManagementCommunityAPI().pause();
-        getTenantManagementCommunityAPI().installBusinessDataModel(zip);
-        getTenantManagementCommunityAPI().resume();
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().installBusinessDataModel(zip);
+        getTenantAdministrationAPI().resume();
 
         //needed for remote testing
         addClientBDMZipToClassLoader();
@@ -104,10 +104,10 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
         } catch (final Exception e) {
             clientFolder.deleteOnExit();
         }
-        if (!getTenantManagementCommunityAPI().isPaused()) {
-            getTenantManagementCommunityAPI().pause();
-            getTenantManagementCommunityAPI().cleanAndUninstallBusinessDataModel();
-            getTenantManagementCommunityAPI().resume();
+        if (!getTenantAdministrationAPI().isPaused()) {
+            getTenantAdministrationAPI().pause();
+            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+            getTenantAdministrationAPI().resume();
         }
         resumeClassloader();
 
@@ -178,7 +178,7 @@ public class BDRepositoryLocalIT extends CommonAPIIT {
 
     private void addClientBDMZipToClassLoader() throws Exception {
         contextClassLoaderBeforeAddingBPMClientZip = Thread.currentThread().getContextClassLoader();
-        final byte[] clientBDMZip = getTenantManagementCommunityAPI().getClientBDMZip();
+        final byte[] clientBDMZip = getTenantAdministrationAPI().getClientBDMZip();
         final ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(clientBDMZip,
                 contextClassLoaderBeforeAddingBPMClientZip,
                 EMPLOYEE_QUALIF_CLASSNAME, clientFolder);

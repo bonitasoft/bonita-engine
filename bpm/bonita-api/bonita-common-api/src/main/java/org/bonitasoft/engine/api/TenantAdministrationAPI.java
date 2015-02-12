@@ -24,7 +24,7 @@ import org.bonitasoft.engine.exception.UpdateException;
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
-public interface TenantManagementAPI {
+public interface TenantAdministrationAPI {
 
     /**
      * @return

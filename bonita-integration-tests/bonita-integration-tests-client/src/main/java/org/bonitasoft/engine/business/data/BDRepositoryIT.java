@@ -263,9 +263,9 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
-        getTenantManagementCommunityAPI().pause();
-        getTenantManagementCommunityAPI().installBusinessDataModel(zip);
-        getTenantManagementCommunityAPI().resume();
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().installBusinessDataModel(zip);
+        getTenantAdministrationAPI().resume();
 
         tenantId = getSession().getTenantId();
     }
@@ -277,10 +277,10 @@ public class BDRepositoryIT extends CommonAPIIT {
         } catch (final Exception e) {
             clientFolder.deleteOnExit();
         }
-        if (!getTenantManagementCommunityAPI().isPaused()) {
-            getTenantManagementCommunityAPI().pause();
-            getTenantManagementCommunityAPI().cleanAndUninstallBusinessDataModel();
-            getTenantManagementCommunityAPI().resume();
+        if (!getTenantAdministrationAPI().isPaused()) {
+            getTenantAdministrationAPI().pause();
+            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+            getTenantAdministrationAPI().resume();
         }
 
         deleteUser(matti);
@@ -306,10 +306,10 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     private void installBusinessDataModel(final byte[] bdm) throws Exception {
-        getTenantManagementCommunityAPI().pause();
-        getTenantManagementCommunityAPI().cleanAndUninstallBusinessDataModel();
-        getTenantManagementCommunityAPI().installBusinessDataModel(bdm);
-        getTenantManagementCommunityAPI().resume();
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+        getTenantAdministrationAPI().installBusinessDataModel(bdm);
+        getTenantAdministrationAPI().resume();
     }
 
     private ProcessDefinition deploySimpleProcessWithBusinessData(final String aQualifiedName) throws Exception {
@@ -543,20 +543,20 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
         assertThat(new File(getClientBdmJarClassPath(bonitaHomePath), CLIENT_BDM_ZIP_FILENAME)).exists().isFile();
 
-        assertThat(getTenantManagementCommunityAPI().getClientBDMZip()).isNotEmpty();
+        assertThat(getTenantAdministrationAPI().getClientBDMZip()).isNotEmpty();
     }
 
    @Test(expected = BusinessDataRepositoryException.class)
     public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        getTenantManagementCommunityAPI().pause();
-        getTenantManagementCommunityAPI().uninstallBusinessDataModel();
-        getTenantManagementCommunityAPI().resume();
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().uninstallBusinessDataModel();
+        getTenantAdministrationAPI().resume();
 
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
         assertThat(new File(getClientBdmJarClassPath(bonitaHomePath), CLIENT_BDM_ZIP_FILENAME)).doesNotExist();
 
-        getTenantManagementCommunityAPI().getClientBDMZip();
+        getTenantAdministrationAPI().getClientBDMZip();
     }
 
    @Test
@@ -603,8 +603,8 @@ public class BDRepositoryIT extends CommonAPIIT {
         logoutOnTenant();
 
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        getTenantManagementCommunityAPI().pause();
-        getTenantManagementCommunityAPI().resume();
+        getTenantAdministrationAPI().pause();
+        getTenantAdministrationAPI().resume();
         logoutOnTenant();
 
         loginOnDefaultTenantWith("matti", "bpm");
@@ -626,7 +626,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final AddressRef ref2 = new AddressRef("romeAddr", "2, plaza del popolo", "Roma");
         addEmployee("Marcel", "Pagnol", ref1, ref2);
         final APISession apiSession = getSession();
-        final byte[] clientBDMZip = getTenantManagementCommunityAPI().getClientBDMZip();
+        final byte[] clientBDMZip = getTenantAdministrationAPI().getClientBDMZip();
 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 

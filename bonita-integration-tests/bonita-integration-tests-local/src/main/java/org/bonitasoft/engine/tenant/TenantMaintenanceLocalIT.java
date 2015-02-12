@@ -55,7 +55,7 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
         ProcessInstance processInstance = getProcessAPI().startProcess(pd.getId());
         logoutThenlogin();
 
-        getTenantManagementCommunityAPI().pause();
+        getTenantAdministrationAPI().pause();
         assertTrue(workService.isStopped());
         logoutOnTenant();
 
@@ -68,7 +68,7 @@ public class TenantMaintenanceLocalIT extends TestWithUser {
 
         // cleanup
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        getTenantManagementCommunityAPI().resume();
+        getTenantAdministrationAPI().resume();
 
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(pd);
