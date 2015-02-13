@@ -237,9 +237,9 @@ public class GatewayInstanceServiceImplTest {
         node(1, "step1");
         node(2, "step2");
         node(3, "step3");
-        transition(0,1);
-        transition(1,2);
-        transition(2,3);
+        transition(0, 1);
+        transition(1, 2);
+        transition(2, 3);
         instanceInDatabase("step1", PROCESS_INSTANCE_ID, false);
 
         boolean containsAToken = gatewayInstanceService.transitionsContainsAToken(Arrays.asList(transition(1, 2), transition(2, 3)), gate, PROCESS_INSTANCE_ID,
@@ -310,6 +310,22 @@ public class GatewayInstanceServiceImplTest {
         assertThat(toComplete).containsOnly(transition(1, 2), transition(2, 3), transition(4, 6), transition(5, 6), transition(3, 666), transition(6, 666));
     }
 
+    @Test
+    public void should_addBackwardReachableTransitions_with_gateway_having_a_loop_on_itself() {
+        SFlowNodeDefinition gate = node(666, "gate");
+        node(1, "step1");
+        node(2, "step2");
+        transition(1, 666);
+        transition(666, 1);
+        transition(2,666);
+        List<STransitionDefinition> startTransition = Arrays.asList(transition(1, 666));
+        List<STransitionDefinition> toComplete = new ArrayList<STransitionDefinition>();
+        gatewayInstanceService.addBackwardReachableTransitions(processContainer, gate, startTransition, toComplete,
+                Collections.<STransitionDefinition>emptyList());
+
+        assertThat(toComplete).containsOnly(transition(1, 666), transition(666, 1));
+    }
+
     private STransitionDefinition transition(long source, long target) {
         STransitionDefinitionImpl transition = new STransitionDefinitionImpl("name", source, target);
         ((SFlowNodeDefinitionImpl) processContainer.getFlowNode(target)).addIncomingTransition(transition);
@@ -319,27 +335,27 @@ public class GatewayInstanceServiceImplTest {
 
     @Test
     public void should_checkMergingCondition_on_inclusive() throws Exception {
-        doReturn(true).when(gatewayInstanceService).inclusiveBehavior(any(SProcessDefinition.class), any(SGatewayInstance.class));
+        doReturn(true).when(gatewayInstanceService).isInclusiveGatewayActivated(any(SProcessDefinition.class), any(SGatewayInstance.class));
         SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
         SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
         gate.setGatewayType(SGatewayType.INCLUSIVE);
 
         boolean mergingCondition = gatewayInstanceService.checkMergingCondition(processDefinition, gate);
 
-        verify(gatewayInstanceService).inclusiveBehavior(processDefinition, gate);
+        verify(gatewayInstanceService).isInclusiveGatewayActivated(processDefinition, gate);
         assertThat(mergingCondition).isTrue();
     }
 
     @Test
     public void should_checkMergingCondition_on_parallel() throws Exception {
-        doReturn(true).when(gatewayInstanceService).parallelBehavior(any(SProcessDefinition.class), any(SGatewayInstance.class));
+        doReturn(true).when(gatewayInstanceService).isParallelGatewayActivated(any(SProcessDefinition.class), any(SGatewayInstance.class));
         SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
         SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
         gate.setGatewayType(SGatewayType.PARALLEL);
 
         boolean mergingCondition = gatewayInstanceService.checkMergingCondition(processDefinition, gate);
 
-        verify(gatewayInstanceService).parallelBehavior(processDefinition, gate);
+        verify(gatewayInstanceService).isParallelGatewayActivated(processDefinition, gate);
         assertThat(mergingCondition).isTrue();
     }
 
@@ -408,7 +424,7 @@ public class GatewayInstanceServiceImplTest {
         transition(2, 666);
         transition(3, 666);
 
-        boolean isMerged = gatewayInstanceService.parallelBehavior(processDefinition, gate);
+        boolean isMerged = gatewayInstanceService.isParallelGatewayActivated(processDefinition, gate);
 
         assertThat(isMerged).isTrue();
     }
@@ -430,7 +446,7 @@ public class GatewayInstanceServiceImplTest {
         transition(2, 666);
         transition(3, 666);
 
-        boolean isMerged = gatewayInstanceService.parallelBehavior(processDefinition, gate);
+        boolean isMerged = gatewayInstanceService.isParallelGatewayActivated(processDefinition, gate);
 
         assertThat(isMerged).isFalse();
     }
@@ -456,7 +472,7 @@ public class GatewayInstanceServiceImplTest {
         doNothing().when(gatewayInstanceService).addBackwardReachableTransitions(any(SFlowElementContainerDefinition.class), any(SFlowNodeDefinition.class), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class));
         doReturn(true).when(gatewayInstanceService).transitionsContainsAToken(anyListOf(STransitionDefinition.class), any(SFlowNodeDefinition.class), anyLong(), any(SFlowElementContainerDefinition.class));
 
-        boolean isMerged = gatewayInstanceService.inclusiveBehavior(processDefinition, gate);
+        boolean isMerged = gatewayInstanceService.isInclusiveGatewayActivated(processDefinition, gate);
 
         assertThat(isMerged).isFalse();
         verify(gatewayInstanceService, times(2)).addBackwardReachableTransitions(eq(processContainer), eq(nodeDefinition), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class));

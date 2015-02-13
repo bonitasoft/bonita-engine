@@ -672,17 +672,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size();
         int takenTransition = transitionsDescriptor.getValidOutgoingTransitionDefinitions().size();
         /*
-            need to reevaluate if some branches are dead
-
-            Why?
-            the algorithm that check the completion of gateways fire gateway if some path to goes to the gateways does not have a token
-            It means that if a gateway was blocked because it was waiting for a token to come it will not be unblock when all transitions
-              are taken but only if some are not.
-            The fact that a token goes forward will trigger the transition if it goes to the gateway but this work is not done here.
-
-            In conclusion if all declared transition it means that a branch died and that some inclusive gateways might be triggered
+            Why this condition?
+            If a gateway was blocked because it was waiting for a token to come it will not be unblock when all transitions
+              are taken but only if some transitions are not.
+            In conclusion if all declared transition are not taken it means that a 'branch died' and that some inclusive gateways might be triggered so the reevaluation is needed
          */
-        return transitionsDescriptor.isLastFlowNode() || takenTransition < allOutgoingTransitions;
+        return takenTransition < allOutgoingTransitions;
     }
 
     private void archiveInvalidTransitions(final SFlowNodeInstance child, final FlowNodeTransitionsWrapper transitionsDescriptor)
