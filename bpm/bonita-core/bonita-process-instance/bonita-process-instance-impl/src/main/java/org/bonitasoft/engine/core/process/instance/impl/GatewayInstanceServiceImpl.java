@@ -25,7 +25,6 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
@@ -133,15 +132,15 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             case EXCLUSIVE:
                 return true;
             case INCLUSIVE:
-                return inclusiveBehavior(sDefinition, gatewayInstance);
+                return isInclusiveGatewayActivated(sDefinition, gatewayInstance);
             case PARALLEL:
-                return parallelBehavior(sDefinition, gatewayInstance);
+                return isParallelGatewayActivated(sDefinition, gatewayInstance);
             default:
                 return false;
         }
     }
 
-    boolean inclusiveBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) throws SBonitaReadException {
+    boolean isInclusiveGatewayActivated(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) throws SBonitaReadException {
             logger.log(TAG, TechnicalLogSeverity.DEBUG,
                     "Evaluate if gateway " + gatewayInstance.getName() + " of instance " + gatewayInstance.getRootProcessInstanceId() + " of definition "
                             + sDefinition.getName() + " must be activated ");
@@ -163,10 +162,21 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
                 incomingWithoutTokens.add(currentTransition);
             }
         }
+        /*
+            We create two lists that will contain transition definitions that have a path to the gateway finishing with
+            a token and the list of transition that does not have a path to the gateway finishing with a token
+         */
         List<STransitionDefinition> finishWithAToken = new ArrayList<STransitionDefinition>();
         List<STransitionDefinition> doesNotFinishWithAToken = new ArrayList<STransitionDefinition>();
+
+        /*
+         * we calculate all transition definitions that can block the gateway
+         */
         addBackwardReachableTransitions(processContainer, gatewayDefinition, incomingWithTokens, finishWithAToken, Collections.<STransitionDefinition>emptyList());
         addBackwardReachableTransitions(processContainer, gatewayDefinition, incomingWithoutTokens, doesNotFinishWithAToken, finishWithAToken);
+        /*
+         * we check if one of the transitions that are 'blocking' contains a token in this process instance
+         */
         return !transitionsContainsAToken(doesNotFinishWithAToken, gatewayDefinition, processInstanceId, processContainer);
     }
 
@@ -208,11 +218,22 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         return sourceAndTarget;
     }
 
+    /**
+     *
+     * @param processInstanceId
+     * @param elements
+     * @param shouldBeTerminal
+     *      is true is the element should be in state terminal
+     *      is false if it should not be in terminal
+     *      is null if it should be either in terminal or not
+     * @return
+     * @throws SBonitaReadException
+     */
     boolean containsToken(long processInstanceId, List<SFlowNodeDefinition> elements, Boolean shouldBeTerminal) throws SBonitaReadException {
         for (SFlowNodeDefinition element : elements) {
             List<SFlowNodeInstance> sFlowNodeInstances = getFlowNodes(processInstanceId, element);
             for (SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
-                if (shouldBeTerminal == null || (!shouldBeTerminal ^ sFlowNodeInstance.isTerminal())) {
+                if (shouldBeTerminal == null || (shouldBeTerminal ^ !sFlowNodeInstance.isTerminal())) {
                     logger.log(TAG, TechnicalLogSeverity.DEBUG, "flow node " + sFlowNodeInstance.getName() + " contain a token, gateway not merged");
                     return true;
                 }
@@ -236,6 +257,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         for (STransitionDefinition sTransitionDefinition : transitions) {
             if (!backwardReachable.contains(sTransitionDefinition) && !notIn.contains(sTransitionDefinition)) {
                 backwardReachable.add(sTransitionDefinition);
+                //if the source is the gateway we stop searching backward
                 SFlowNodeDefinition flowNode = processContainer.getFlowNode(sTransitionDefinition.getSource());
                 if (!flowNode.equals(gatewayDefinition)) {
                     addBackwardReachableTransitions(processContainer, gatewayDefinition, flowNode.getIncomingTransitions(), backwardReachable, notIn);
@@ -244,7 +266,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         }
     }
 
-    boolean parallelBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) {
+    boolean isParallelGatewayActivated(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) {
         final List<String> hitsBy = getHitByTransitionList(gatewayInstance);
         final List<STransitionDefinition> trans = getTransitionDefinitions(gatewayInstance, sDefinition);
         boolean go = true;
@@ -407,7 +429,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         List<SGatewayInstance> sGatewayInstances = getInclusiveGatewayInstanceOfProcessInstance(processInstanceId);
         ArrayList<SGatewayInstance> shouldFire = new ArrayList<SGatewayInstance>();
         for (SGatewayInstance sGatewayInstance : sGatewayInstances) {
-            if(inclusiveBehavior(processDefinition, sGatewayInstance)){
+            if(isInclusiveGatewayActivated(processDefinition, sGatewayInstance)){
                 shouldFire.add(sGatewayInstance);
             }
         }
