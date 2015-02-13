@@ -767,8 +767,8 @@ GO
 CREATE TABLE group_ (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(255) NOT NULL,
-  parentPath NVARCHAR(1024),
+  name NVARCHAR(125) NOT NULL,
+  parentPath NVARCHAR(255),
   displayName NVARCHAR(255),
   description NVARCHAR(MAX),
   iconName NVARCHAR(50),

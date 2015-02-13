@@ -677,8 +677,8 @@ CREATE TABLE external_identity_mapping (
 CREATE TABLE group_ (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(255 CHAR) NOT NULL,
-  parentPath VARCHAR2(1024 CHAR),
+  name VARCHAR2(125 CHAR) NOT NULL,
+  parentPath VARCHAR2(255 CHAR),
   displayName VARCHAR2(255 CHAR),
   description VARCHAR2(1024 CHAR),
   iconName VARCHAR2(50 CHAR),

@@ -682,11 +682,12 @@ CREATE TABLE external_identity_mapping (
   UNIQUE (tenantid, kind, externalId, userId, groupId, roleId),
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+
 CREATE TABLE group_ (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  parentPath TEXT,
+  name VARCHAR(125) NOT NULL,
+  parentPath VARCHAR(255),
   displayName VARCHAR(255),
   description TEXT,
   iconName VARCHAR(50),
