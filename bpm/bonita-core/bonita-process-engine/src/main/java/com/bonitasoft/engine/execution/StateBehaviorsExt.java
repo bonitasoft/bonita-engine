@@ -21,7 +21,7 @@ import org.bonitasoft.engine.core.process.definition.model.SLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SMultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -57,11 +57,11 @@ public class StateBehaviorsExt extends StateBehaviors {
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService,
+            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final ProcessInstanceService processInstanceService,
             final RefBusinessDataService refBusinessDataService, final ParentContainerResolver parentContainerResolver) {
         super(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
                 connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
-                containerRegistry, eventInstanceSevice, schedulerService, commentService, identityService, logger, tokenService, parentContainerResolver);
+                containerRegistry, eventInstanceSevice, schedulerService, commentService, identityService, logger, processInstanceService, parentContainerResolver);
         this.refBusinessDataService = refBusinessDataService;
     }
 

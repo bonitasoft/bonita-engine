@@ -18,9 +18,6 @@
 <!--   Show events of synchro repository -->
 <!--   <logger name="org.bonitasoft.engine.test.synchro.SynchroRepository" level="DEBUG" /> -->
 
-<!--   Show token addition/deletion -->
-<!--   <logger name="org.bonitasoft.engine.core.process.instance.impl.TokenServiceImpl" level="DEBUG" /> -->
-
 <!--   Show lock acquire/release-->
 <!--   <logger name="org.bonitasoft.engine.lock.impl.MemoryLockService" level="DEBUG" /> -->
 <!-- 	<logger name="org.bonitasoft.engine.work.BonitaWork" level="DEBUG" /> -->
