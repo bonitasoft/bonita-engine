@@ -24,8 +24,6 @@ DELETE FROM multi_biz_data;
 
 DELETE FROM ref_biz_data_inst;
 
-DELETE FROM hidden_activity;
-
 DELETE FROM pending_mapping;
 
 DELETE FROM message_instance;

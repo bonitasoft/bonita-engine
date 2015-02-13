@@ -43,9 +43,6 @@ GO
 DELETE FROM ref_biz_data_inst
 GO
 
-DELETE FROM hidden_activity
-GO
-
 DELETE FROM pending_mapping
 GO
 

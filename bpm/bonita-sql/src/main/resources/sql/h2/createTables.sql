@@ -364,14 +364,13 @@ CREATE TABLE flownode_instance (
   abortedByBoundary BIGINT,
   triggeredByEvent BOOLEAN,
   interrupting BOOLEAN,
-  deleted BOOLEAN DEFAULT FALSE,
   tokenCount INT NOT NULL,
   token_ref_id BIGINT NULL,
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
-CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid, deleted);
+CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid);
 
 CREATE TABLE connector_instance (
   tenantid BIGINT NOT NULL,
@@ -463,15 +462,6 @@ CREATE TABLE pending_mapping (
   	PRIMARY KEY (tenantid, id)
 );
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
-
-CREATE TABLE hidden_activity (
-	tenantid BIGINT NOT NULL,
-  	id BIGINT NOT NULL,
-  	activityId BIGINT NOT NULL,
-  	userId BIGINT NOT NULL,
-  	UNIQUE (tenantid, activityId, userId),
-  	PRIMARY KEY (tenantid, id)
-);
 
 CREATE TABLE breakpoint (
 	tenantid BIGINT NOT NULL,
