@@ -811,7 +811,6 @@ CREATE TABLE user_ (
   title NVARCHAR(50),
   jobTitle NVARCHAR(255),
   managerUserId NUMERIC(19, 0),
-  delegeeUserName NVARCHAR(255),
   iconName NVARCHAR(50),
   iconPath NVARCHAR(50),
   createdBy NUMERIC(19, 0),

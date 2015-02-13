@@ -727,7 +727,6 @@ CREATE TABLE user_ (
   title VARCHAR(50),
   jobTitle VARCHAR(255),
   managerUserId BIGINT,
-  delegeeUserName VARCHAR(255),
   iconName VARCHAR(50),
   iconPath VARCHAR(50),
   createdBy BIGINT,

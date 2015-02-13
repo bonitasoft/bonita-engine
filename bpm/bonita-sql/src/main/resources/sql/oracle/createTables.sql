@@ -717,7 +717,6 @@ CREATE TABLE user_ (
   title VARCHAR2(50 CHAR),
   jobTitle VARCHAR2(255 CHAR),
   managerUserId NUMBER(19, 0),
-  delegeeUserName VARCHAR2(255 CHAR),
   iconName VARCHAR2(50 CHAR),
   iconPath VARCHAR2(50 CHAR),
   createdBy NUMBER(19, 0),
