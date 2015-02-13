@@ -183,14 +183,6 @@
             <version>${project.version}</version>
         </dependency>
 
-		<!-- Delete -->
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-delete-batch</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
         <!-- Dependency -->
         <dependency>
             <groupId>org.bonitasoft.engine.dependency</groupId>
