@@ -21,6 +21,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ProcessDescriptionIT.class,
         GetProcessDefinitionIT.class,
         GatewayExecutionIT.class,
+        FlowPatternsIT.class,
         ProcessCategoryIT.class,
         ProcessInstanceTests.class,
         ProcessWithExpressionIT.class,

@@ -46,8 +46,6 @@ DROP TABLE waiting_event
 GO
 DROP TABLE message_instance
 GO
-DROP TABLE token
-GO
 DROP TABLE breakpoint
 GO
 DROP TABLE report

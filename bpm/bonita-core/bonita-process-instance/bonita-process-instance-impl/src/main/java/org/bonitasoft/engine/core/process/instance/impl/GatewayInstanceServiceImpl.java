@@ -14,26 +14,30 @@
 package org.bonitasoft.engine.core.process.instance.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayReadException;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
@@ -42,9 +46,12 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -58,6 +65,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
  */
 public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
+    public static final Class<GatewayInstanceServiceImpl> TAG = GatewayInstanceServiceImpl.class;
     private final Recorder recorder;
 
     private final EventService eventService;
@@ -66,17 +74,17 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     private final SGatewayInstanceBuilderFactory sGatewayInstanceBuilderFactory;
 
-    private final TokenService tokenService;
+    private FlowNodeInstanceService flowNodeInstanceService;
 
     private final TechnicalLoggerService logger;
 
     public GatewayInstanceServiceImpl(final Recorder recorder, final EventService eventService, final ReadPersistenceService persistenceRead,
-            final TechnicalLoggerService logger, final TokenService tokenService) {
+                                      final TechnicalLoggerService logger, FlowNodeInstanceService flowNodeInstanceService) {
         this.recorder = recorder;
         this.eventService = eventService;
         this.persistenceRead = persistenceRead;
         this.logger = logger;
-        this.tokenService = tokenService;
+        this.flowNodeInstanceService = flowNodeInstanceService;
         sGatewayInstanceBuilderFactory = BuilderFactory.get(SGatewayInstanceBuilderFactory.class);
     }
 
@@ -133,19 +141,110 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         }
     }
 
-    private boolean inclusiveBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) throws SObjectReadException {
-        final SFlowNodeDefinition flowNode = sDefinition.getProcessContainer().getFlowNode(gatewayInstance.getFlowNodeDefinitionId());
-        if (flowNode.getIncomingTransitions().size() == 1) {
-            return true;
+    boolean inclusiveBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) throws SBonitaReadException {
+            logger.log(TAG, TechnicalLogSeverity.DEBUG,
+                    "Evaluate if gateway " + gatewayInstance.getName() + " of instance " + gatewayInstance.getRootProcessInstanceId() + " of definition "
+                            + sDefinition.getName() + " must be activated ");
+        SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
+        SFlowNodeDefinition gatewayDefinition = processContainer.getFlowNode(gatewayInstance.getFlowNodeDefinitionId());
+        long processInstanceId = gatewayInstance.getParentContainerId();
+
+        List<String> hitByTransitionList = getHitByTransitionList(gatewayInstance);
+        List<STransitionDefinition> incomingTransitions = gatewayDefinition.getIncomingTransitions();
+        List<STransitionDefinition> incomingWithTokens = new ArrayList<STransitionDefinition>();
+        List<STransitionDefinition> incomingWithoutTokens = new ArrayList<STransitionDefinition>();
+
+        logger.log(TAG, TechnicalLogSeverity.DEBUG, "HitBys = " + gatewayInstance.getHitBys());
+        for (int i = 0; i < incomingTransitions.size(); i++) {
+            STransitionDefinition currentTransition = incomingTransitions.get(i);
+            if (hitByTransitionList.contains(String.valueOf(i + 1))) {
+                incomingWithTokens.add(currentTransition);
+            } else {
+                incomingWithoutTokens.add(currentTransition);
+            }
         }
-        // get the token refId that hit the gate
-        final Long tokenRefId = gatewayInstance.getTokenRefId();
-        // if there is NO more token than the number of transitions that hit the gate merge is ok
-        final int size = getHitByTransitionList(gatewayInstance).size();
-        return tokenService.getNumberOfToken(gatewayInstance.getParentContainerId(), tokenRefId) <= size;
+        List<STransitionDefinition> finishWithAToken = new ArrayList<STransitionDefinition>();
+        List<STransitionDefinition> doesNotFinishWithAToken = new ArrayList<STransitionDefinition>();
+        addBackwardReachableTransitions(processContainer, gatewayDefinition, incomingWithTokens, finishWithAToken, Collections.<STransitionDefinition>emptyList());
+        addBackwardReachableTransitions(processContainer, gatewayDefinition, incomingWithoutTokens, doesNotFinishWithAToken, finishWithAToken);
+        return !transitionsContainsAToken(doesNotFinishWithAToken, gatewayDefinition, processInstanceId, processContainer);
     }
 
-    private boolean parallelBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) {
+    boolean transitionsContainsAToken(List<STransitionDefinition> transitions, SFlowNodeDefinition gatewayDefinition, long processInstanceId,
+                                              SFlowElementContainerDefinition processContainer) throws SBonitaReadException {
+        List<SFlowNodeDefinition> sourceElements = new ArrayList<SFlowNodeDefinition>();
+        List<SFlowNodeDefinition> targetElements = new ArrayList<SFlowNodeDefinition>();
+
+        logger.log(TAG, TechnicalLogSeverity.DEBUG, "Check if there is a token on "+transitions);
+        for (STransitionDefinition sTransitionDefinition : transitions) {
+            SFlowNodeDefinition source = processContainer.getFlowNode(sTransitionDefinition.getSource());
+            if (!source.equals(gatewayDefinition) && !sourceElements.contains(source)) {
+                sourceElements.add(source);
+            }
+            SFlowNodeDefinition target = processContainer.getFlowNode(sTransitionDefinition.getTarget());
+            if (!target.equals(gatewayDefinition) && !targetElements.contains(target)) {
+                targetElements.add(target);
+            }
+        }
+        List<SFlowNodeDefinition> sourceAndTarget = extractElementThatAreSourceAndTarget(sourceElements, targetElements);
+        if (containsToken(processInstanceId, sourceAndTarget, null)) return true;
+        if (containsToken(processInstanceId, sourceElements, true)) return true;
+        if (containsToken(processInstanceId, targetElements, false)) return true;
+        logger.log(TAG, TechnicalLogSeverity.DEBUG, "No token to wait, gateway will fire");
+        return false;
+    }
+
+    List<SFlowNodeDefinition> extractElementThatAreSourceAndTarget(List<SFlowNodeDefinition> sourceElements, List<SFlowNodeDefinition> targetElements) {
+        List<SFlowNodeDefinition> sourceAndTarget = new ArrayList<SFlowNodeDefinition>();
+        Iterator<SFlowNodeDefinition> iterator = sourceElements.iterator();
+        while (iterator.hasNext()){
+            SFlowNodeDefinition sourceElement = iterator.next();
+            if(targetElements.contains(sourceElement) || sourceElement.getIncomingTransitions().isEmpty() /* if it's a start element it's also considered as a target */){
+                iterator.remove();
+                targetElements.remove(sourceElement);
+                sourceAndTarget.add(sourceElement);
+            }
+        }
+        return sourceAndTarget;
+    }
+
+    boolean containsToken(long processInstanceId, List<SFlowNodeDefinition> elements, Boolean shouldBeTerminal) throws SBonitaReadException {
+        for (SFlowNodeDefinition element : elements) {
+            List<SFlowNodeInstance> sFlowNodeInstances = getFlowNodes(processInstanceId, element);
+            for (SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
+                if (shouldBeTerminal == null || (!shouldBeTerminal ^ sFlowNodeInstance.isTerminal())) {
+                    logger.log(TAG, TechnicalLogSeverity.DEBUG, "flow node " + sFlowNodeInstance.getName() + " contain a token, gateway not merged");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private List<SFlowNodeInstance> getFlowNodes(long processInstanceId, SFlowNodeDefinition sourceElement) throws SBonitaReadException {
+        List<FilterOption> filters = new ArrayList<FilterOption>();
+        filters.add(new FilterOption(SFlowNodeInstance.class, "name", sourceElement.getName()));
+        filters.add(new FilterOption(SFlowNodeInstance.class, "parentContainerId", processInstanceId));
+        QueryOptions searchOptions = new QueryOptions(0, 20, Collections.<OrderByOption>emptyList(), filters, null);
+        return flowNodeInstanceService.searchFlowNodeInstances(
+                SFlowNodeInstance.class,
+                searchOptions);
+    }
+
+    void addBackwardReachableTransitions(SFlowElementContainerDefinition processContainer, SFlowNodeDefinition gatewayDefinition,
+                                                 List<STransitionDefinition> transitions, List<STransitionDefinition> backwardReachable, List<STransitionDefinition> notIn) {
+        for (STransitionDefinition sTransitionDefinition : transitions) {
+            if (!backwardReachable.contains(sTransitionDefinition) && !notIn.contains(sTransitionDefinition)) {
+                backwardReachable.add(sTransitionDefinition);
+                SFlowNodeDefinition flowNode = processContainer.getFlowNode(sTransitionDefinition.getSource());
+                if (!flowNode.equals(gatewayDefinition)) {
+                    addBackwardReachableTransitions(processContainer, gatewayDefinition, flowNode.getIncomingTransitions(), backwardReachable, notIn);
+                }
+            }
+        }
+    }
+
+    boolean parallelBehavior(final SProcessDefinition sDefinition, final SGatewayInstance gatewayInstance) {
         final List<String> hitsBy = getHitByTransitionList(gatewayInstance);
         final List<STransitionDefinition> trans = getTransitionDefinitions(gatewayInstance, sDefinition);
         boolean go = true;
@@ -158,8 +257,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     /**
-     * @return
-     *         the list of transition indexes that hit the gateway
+     * @return the list of transition indexes that hit the gateway
      */
     private List<String> getHitByTransitionList(final SGatewayInstance gatewayInstance) {
         return Arrays.asList(gatewayInstance.getHitBys().split(","));
@@ -167,7 +265,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     protected List<STransitionDefinition> getTransitionDefinitions(final SGatewayInstance gatewayInstance, final SProcessDefinition processDefinition) {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
-        final SGatewayDefinition gatewayDefinition = processContainer.getGateway(gatewayInstance.getName());
+        final SFlowNodeDefinition gatewayDefinition = processContainer.getFlowNode(gatewayInstance.getFlowNodeDefinitionId());
         return gatewayDefinition.getIncomingTransitions();
     }
 
@@ -178,6 +276,8 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     @Override
     public void hitTransition(final SGatewayInstance gatewayInstance, final long transitionIndex) throws SGatewayModificationException {
+        logger.log(TAG, TechnicalLogSeverity.DEBUG, "Hit gateway " + gatewayInstance.getName() + " of instance " + gatewayInstance.getRootProcessInstanceId()
+                + " with transition index " + transitionIndex);
         final String hitBys = gatewayInstance.getHitBys();
         String columnValue;
         if (hitBys == null || hitBys.isEmpty()) {
@@ -211,8 +311,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             SGatewayReadException {
         SGatewayInstance selectOne;
         try {
-            selectOne = persistenceRead.selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(parentProcessInstanceId, name));// FIXME select more
-            // one and get the oldest
+            selectOne = persistenceRead.selectOne(SelectDescriptorBuilder.getActiveGatewayInstanceOfProcess(parentProcessInstanceId, name));
         } catch (final SBonitaReadException e) {
             throw new SGatewayReadException(e);
         }
@@ -223,21 +322,102 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     @Override
-    public void setFinish(final SGatewayInstance gatewayInstance) throws SGatewayModificationException {
-        final String columnValue = FINISH + gatewayInstance.getHitBys().split(",").length;
+    public List<SGatewayInstance> setFinishAndCreateNewGatewayForRemainingToken(SProcessDefinition processDefinition, final SGatewayInstance gatewayInstance) throws SBonitaException {
+        List<String> hitBys = getHitByTransitionList(gatewayInstance);
+        List<String> merged = getMergedTokens(gatewayInstance, hitBys);
+        setFinished(gatewayInstance, merged.size());
+        List<String> remaining = getRemainingTokens(hitBys, merged);
+        logger.log(TAG, TechnicalLogSeverity.DEBUG, "There is "+remaining+" remaining token to merge on gateway "+gatewayInstance.getName()+" will create a new if there is");
+        if(remaining.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<SGatewayInstance> toFire = new ArrayList<SGatewayInstance>();
+        SGatewayInstance newGatewayInstance = createGatewayWithRemainingTokens(gatewayInstance, remaining);
+        if(checkMergingCondition(processDefinition,newGatewayInstance)){
+            toFire.add(newGatewayInstance);
+            toFire.addAll(setFinishAndCreateNewGatewayForRemainingToken(processDefinition, newGatewayInstance));
+        }
+        return toFire;
+    }
+
+    List<String> getMergedTokens(SGatewayInstance gatewayInstance, List<String> hitBys) {
+        List<String> merged = null;
+        switch (gatewayInstance.getGatewayType()){
+            case PARALLEL:
+                merged = unique(hitBys);
+                break;
+            case INCLUSIVE:
+                merged = unique(hitBys);
+                break;
+            case EXCLUSIVE:
+                merged = Collections.singletonList(hitBys.get(0));
+                break;
+        }
+        return merged;
+    }
+
+    private ArrayList<String> unique(List<String> hitBys) {
+        ArrayList<String> merged = new ArrayList<String>();
+        for (String hitBy : hitBys) {
+            if(!merged.contains(hitBy)){
+                merged.add(hitBy);
+            }
+        }
+        return merged;
+    }
+
+    ArrayList<String> getRemainingTokens(List<String> hitBys, List<String> merged) {
+        ArrayList<String> remaining = new ArrayList<String>(hitBys);
+        for (String mergedToken : merged) {
+            remaining.remove(mergedToken);
+        }
+        return remaining;
+    }
+
+    /**
+     * create a new gateway instance with the remaining token
+     * 
+     * @param gatewayInstance
+     *        the original gatewayInstance
+     * @param remaining
+     *        the token that already hit the gateway
+     * @return
+     *         the new gateway
+     */
+    private SGatewayInstance createGatewayWithRemainingTokens(SGatewayInstance gatewayInstance, List<String> remaining) throws SGatewayCreationException {
+        SGatewayInstanceImpl sGatewayInstance = new SGatewayInstanceImpl(gatewayInstance);
+        String remainingTokenAsString = "";
+        for (String token : remaining) {
+            remainingTokenAsString += token + ",";
+        }
+        sGatewayInstance.setHitBys(remainingTokenAsString.substring(0, remainingTokenAsString.length() - 1));
+        createGatewayInstance(sGatewayInstance);
+        return sGatewayInstance;
+    }
+
+    void setFinished(SGatewayInstance gatewayInstance, int numberOfTokenToMerge) throws SGatewayModificationException {
+        final String columnValue = FINISH + numberOfTokenToMerge;
+        logger.log(TAG, TechnicalLogSeverity.TRACE, "set finish on gateway " + gatewayInstance.getName() + " " + columnValue);
         updateOneColum(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
 
+
     @Override
-    public SGatewayInstance getGatewayMergingToken(final long processInstanceId, final Long tokenRefId) throws SGatewayReadException {
-        final HashMap<String, Object> hashMap = new HashMap<String, Object>(2);
-        hashMap.put("processInstanceId", processInstanceId);
-        hashMap.put("tokenRefId", tokenRefId);
-        try {
-            return persistenceRead.selectOne(new SelectOneDescriptor<SGatewayInstance>("getGatewayMergingToken", hashMap, SGatewayInstance.class));
-        } catch (final SBonitaReadException e) {
-            throw new SGatewayReadException(e);
+    public List<SGatewayInstance> getInclusiveGatewaysOfProcessInstanceThatShouldFire(SProcessDefinition processDefinition, long processInstanceId) throws SBonitaReadException {
+        List<SGatewayInstance> sGatewayInstances = getInclusiveGatewayInstanceOfProcessInstance(processInstanceId);
+        ArrayList<SGatewayInstance> shouldFire = new ArrayList<SGatewayInstance>();
+        for (SGatewayInstance sGatewayInstance : sGatewayInstances) {
+            if(inclusiveBehavior(processDefinition, sGatewayInstance)){
+                shouldFire.add(sGatewayInstance);
+            }
         }
+        return shouldFire;
     }
 
+    private List<SGatewayInstance> getInclusiveGatewayInstanceOfProcessInstance(long processInstanceId) throws SBonitaReadException {
+        final HashMap<String, Object> hashMap = new HashMap<String, Object>(2);
+        hashMap.put("processInstanceId", processInstanceId);
+        SelectListDescriptor<SGatewayInstance> getGatewayMergingToken = new SelectListDescriptor<SGatewayInstance>("getInclusiveGatewayInstanceOfProcessInstance", hashMap, SGatewayInstance.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
+        return persistenceRead.selectList(getGatewayMergingToken);
+    }
 }

@@ -24,7 +24,6 @@
 				<entry key="20050" value="25000" /><!-- archived data --><!-- 5 change by data -->
 				<entry key="10060" value="20000" /><!-- comment -->
 				<entry key="10080" value="20000" /><!-- SAComment -->
-				<entry key="10110" value="20000" /><!-- TokenCount -->
 
 				<!-- less used objects : -->
 				<!-- <entry key="10012" value="100" />ProcessDefinition -->
@@ -139,7 +138,6 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="10080" />
                 <entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" value="10090" />
                 <entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="10090" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" value="10110" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />

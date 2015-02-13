@@ -36,13 +36,6 @@ public interface SFlowElementInstance extends SNamedElement {
     boolean isTerminal();
 
     boolean isStable();
-
-    /**
-     * @see SToken
-     * @return the token refId that triggered this flow element
-     */
-    Long getTokenRefId();
-
     /**
      * @return
      *         the id of the process definition of this element

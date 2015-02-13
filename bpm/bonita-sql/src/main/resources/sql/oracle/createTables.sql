@@ -282,16 +282,6 @@ CREATE TABLE process_instance (
   PRIMARY KEY (tenantid, id)
 );
 
-CREATE TABLE token (
-  tenantid NUMBER(19, 0) NOT NULL,
-  id NUMBER(19, 0) NOT NULL,
-  processInstanceId NUMBER(19, 0) NOT NULL,
-  ref_id NUMBER(19, 0) NOT NULL,
-  parent_ref_id NUMBER(19, 0) NULL,
-  PRIMARY KEY (tenantid, id)
-);
-CREATE INDEX idx1_token ON token(tenantid,processInstanceId);
-
 CREATE TABLE flownode_instance (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
@@ -341,7 +331,6 @@ CREATE TABLE flownode_instance (
   triggeredByEvent NUMBER(1),
   interrupting NUMBER(1),
   tokenCount INT NOT NULL,
-  token_ref_id NUMBER(19, 0) NULL,
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
