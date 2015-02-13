@@ -686,7 +686,7 @@ CREATE TABLE group_ (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   name VARCHAR(255) NOT NULL,
-  parentPath VARCHAR(1024),
+  parentPath TEXT,
   displayName VARCHAR(255),
   description TEXT,
   iconName VARCHAR(50),
