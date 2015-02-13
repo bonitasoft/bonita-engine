@@ -151,11 +151,11 @@ CREATE TABLE arch_process_instance (
   callerId INT8,
   migration_plan INT8,
   sourceObjectId INT8 NOT NULL,
-  stringIndex1 VARCHAR(50),
-  stringIndex2 VARCHAR(50),
-  stringIndex3 VARCHAR(50),
-  stringIndex4 VARCHAR(50),
-  stringIndex5 VARCHAR(50),
+  stringIndex1 VARCHAR(255),
+  stringIndex2 VARCHAR(255),
+  stringIndex3 VARCHAR(255),
+  stringIndex4 VARCHAR(255),
+  stringIndex5 VARCHAR(255),
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, rootProcessInstanceId, callerId);
@@ -274,11 +274,11 @@ CREATE TABLE process_instance (
   callerType VARCHAR(50),
   interruptingEventId INT8,
   migration_plan INT8,
-  stringIndex1 VARCHAR(50),
-  stringIndex2 VARCHAR(50),
-  stringIndex3 VARCHAR(50),
-  stringIndex4 VARCHAR(50),
-  stringIndex5 VARCHAR(50),
+  stringIndex1 VARCHAR(255),
+  stringIndex2 VARCHAR(255),
+  stringIndex3 VARCHAR(255),
+  stringIndex4 VARCHAR(255),
+  stringIndex5 VARCHAR(255),
   PRIMARY KEY (tenantid, id)
 );
 
