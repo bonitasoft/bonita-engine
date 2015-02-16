@@ -57,6 +57,7 @@
 								</artifactItem>
 							</artifactItems>
 							<includes>home/**</includes>
+                            <excludes>home/**/bonita-client-${project.version}.jar,home/**/bonita-common-${project.version}.jar</excludes>
 							<outputDirectory>${project.build.directory}/common</outputDirectory>
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
