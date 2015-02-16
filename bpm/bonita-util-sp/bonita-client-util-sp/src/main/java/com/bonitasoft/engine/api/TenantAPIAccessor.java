@@ -125,12 +125,7 @@ public final class TenantAPIAccessor {
     }
 
     /**
-     * @param session
-     * @return
-     * @throws BonitaHomeNotSetException
-     * @throws ServerAPIException
-     * @throws UnknownAPITypeException
-     * @deprecated since 7.0.0. Use {@link #getTenantAdministrationAPI(org.bonitasoft.engine.session.APISession)} instead.
+     * @deprecated from 7.0.0 on, use {@link #getTenantAdministrationAPI(org.bonitasoft.engine.session.APISession)} instead.
      */
     @Deprecated
     public static TenantManagementAPI getTenantManagementAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,

@@ -468,7 +468,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @throws DataNotFoundException
      *         If the specified business data value cannot be found.
      * @since 6.4
-     * @deprecated since version 7.0. Use {@link org.bonitasoft.engine.api.BusinessDataAPI#getProcessBusinessDataReference(String, long)}
+     * @deprecated since version 7.0.0, use {@link org.bonitasoft.engine.api.BusinessDataAPI#getProcessBusinessDataReference(String, long)}
      * @see org.bonitasoft.engine.api.BusinessDataAPI#getProcessBusinessDataReference(String, long)
      */
     BusinessDataReference getProcessBusinessDataReference(String businessDataName, long processInstanceId) throws DataNotFoundException;
@@ -484,7 +484,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *        the maximum number of result per page
      * @return the paginated references of the business data
      * @since 6.4
-     * @deprecated since version 7.0. Use {@link org.bonitasoft.engine.api.BusinessDataAPI#getProcessBusinessDataReferences(long, int, int)}
+     * @deprecated since version 7.0.0, use {@link org.bonitasoft.engine.api.BusinessDataAPI#getProcessBusinessDataReferences(long, int, int)}
      * @see org.bonitasoft.engine.api.BusinessDataAPI#getProcessBusinessDataReferences(long, int, int)
      */
     List<BusinessDataReference> getProcessBusinessDataReferences(long processInstanceId, int startIndex, int maxResults);
