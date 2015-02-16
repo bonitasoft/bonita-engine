@@ -15,7 +15,7 @@ package com.bonitasoft.engine.bdm.dao;
 
 /**
  * @author Romain Bioteau
- * @deprecated since version 7.0.0. This class was only introduced to avoid an API break of Bonita Engine Subscription version. Use {@link org.bonitasoft.engine.bdm.dao.BusinessObjectDAO} instead.
+ * @deprecated since version 7.0. This class was only introduced to avoid an API break of Bonita Engine Subscription version. Use {@link org.bonitasoft.engine.bdm.dao.BusinessObjectDAO} instead.
  */
 @Deprecated
 public interface BusinessObjectDAO {

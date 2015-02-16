@@ -13,7 +13,7 @@ import java.io.Serializable;
 /**
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
- * @deprecated since version 7.0.0.  This class was only introduced to avoid an API break of Bonita Engine Subscription version. Use {@link org.bonitasoft.engine.bdm.Entity} instead.
+ * @deprecated since version 7.0.  This class was only introduced to avoid an API break of Bonita Engine Subscription version. Use {@link org.bonitasoft.engine.bdm.Entity} instead.
  */
 @Deprecated
 public interface Entity extends Serializable {
