@@ -54,7 +54,7 @@ import com.sun.codemodel.JDefinedClass;
 
 public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
-    private static final String EMPLOYEE_QUALIFIED_NAME = "org.bonitasoft.hr.Employee";
+    private static final String EMPLOYEE_QUALIFIED_NAME = "com.company.hr.Employee";
 
     private AbstractBDMCodeGenerator bdmCodeGenerator;
 

@@ -24,19 +24,11 @@ public class WithoutDAOImplementationFileFilter extends AbstractFileFilter {
 
     @Override
     public boolean accept(final File file) {
-        final String name = file.getName();
-        return acceptClassFile(file, name) || acceptSourceFile(file, name);
+        return acceptFile(file, ".class") || acceptFile(file, ".java");
     }
 
-    private boolean acceptClassFile(final File file, final String name) {
-        return name.endsWith(".class") && !file.getName().endsWith("DAOImpl.class") && notClientResource(file);
+    private boolean acceptFile(File file, String fileExtension) {
+        return file.getName().endsWith(fileExtension) && !file.getName().endsWith("DAOImpl"+fileExtension);
     }
 
-    private boolean notClientResource(final File file) {
-        return !file.getAbsolutePath().contains("com" + File.separatorChar + "bonitasoft");
-    }
-
-    private boolean acceptSourceFile(final File file, final String name) {
-        return name.endsWith(".java") && !file.getName().endsWith("DAOImpl.java") && notClientResource(file);
-    }
 }

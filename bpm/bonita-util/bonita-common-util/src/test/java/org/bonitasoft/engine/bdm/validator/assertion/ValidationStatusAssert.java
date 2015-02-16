@@ -20,8 +20,18 @@ public class ValidationStatusAssert extends AbstractAssert<ValidationStatusAsser
         return this;
     }
 
+    public ValidationStatusAssert isOk(String description) {
+        Assertions.assertThat(actual.isOk()).as(description).isTrue();
+        return this;
+    }
+
     public ValidationStatusAssert isNotOk() {
         Assertions.assertThat(actual.isOk()).isFalse();
+        return this;
+    }
+
+    public ValidationStatusAssert isNotOk(String description) {
+        Assertions.assertThat(actual.isOk()).as(description).isFalse();
         return this;
     }
 }

@@ -41,9 +41,9 @@ import com.sun.codemodel.JDefinedClass;
 @RunWith(MockitoJUnitRunner.class)
 public class ServerBDMCodeGeneratorTest {
 
-    private static final String EMPLOYEE_QUALIFIED_NAME = "org.bonitasoft.hr.Employee";
+    private static final String EMPLOYEE_QUALIFIED_NAME = "com.company.hr.Employee";
 
-    private static final String SERVER_EMPLOYEE_DAO_IMPL_FILE = "org/bonitasoft/hr/server/EmployeeDAOImpl.java";
+    private static final String SERVER_EMPLOYEE_DAO_IMPL_FILE = "com/company/hr/server/EmployeeDAOImpl.java";
 
     private ServerBDMCodeGenerator serverBDMCodeGenerator;
 

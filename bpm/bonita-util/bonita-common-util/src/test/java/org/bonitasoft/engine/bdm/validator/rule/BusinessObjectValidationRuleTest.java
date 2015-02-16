@@ -64,25 +64,25 @@ public class BusinessObjectValidationRuleTest {
     public void should_validate_that_qualified_name_is_not_starting_by_org_bonitasoft() throws Exception {
         checkQualifiedNameValidationStatus("com.bonitasoft.Forbidden", false);
 
-
         checkQualifiedNameValidationStatus("com.bonitasoftextended", true);
-        checkQualifiedNameValidationStatus("org.com.bonitasoft.modem", true);
-        checkQualifiedNameValidationStatus("org.bonitasoft", true);
+        checkQualifiedNameValidationStatus("org.com.bonitasoft.model", true);
+        checkQualifiedNameValidationStatus("org.bonitasoft.model", false);
+        checkQualifiedNameValidationStatus("org.bonitasoftextended", true);
     }
 
     private void checkQualifiedNameValidationStatus(final String qualifiedName, final boolean expectedValidation) {
-        //given
+        // given
         final BusinessObject bo = aValidBusinesObject();
         bo.setQualifiedName(qualifiedName);
 
-        //when
+        // when
         final ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
 
-        //then
+        // then
         if (expectedValidation) {
-            assertThat(validationStatus).isOk();
+            assertThat(validationStatus).isOk("should valid business object with qualified name:" + qualifiedName);
         } else {
-            assertThat(validationStatus).isNotOk();
+            assertThat(validationStatus).isNotOk("should not valid business object with qualified name:" + qualifiedName);
         }
     }
 

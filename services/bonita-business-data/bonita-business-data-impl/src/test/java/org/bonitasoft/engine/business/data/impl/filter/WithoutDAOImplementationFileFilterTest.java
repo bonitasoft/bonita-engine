@@ -14,16 +14,23 @@
 package org.bonitasoft.engine.business.data.impl.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 
-import org.bonitasoft.engine.business.data.impl.filter.WithoutDAOImplementationFileFilter;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class WithoutDAOImplementationFileFilterTest {
 
     private WithoutDAOImplementationFileFilter fileFilter;
+
+    @Mock
+    File file;
 
     /**
      * @throws Exception
@@ -43,12 +50,18 @@ public class WithoutDAOImplementationFileFilterTest {
     }
 
     @Test
-    public void should_accept_return_true() {
-        File f = new File("Employee.class");
-        assertThat(fileFilter.accept(f)).isTrue();
-
-        f = new File("Employee.java");
-        assertThat(fileFilter.accept(f)).isTrue();
+    public void should_accept_exclude_reserved_package() {
+        checkAcceptShouldReturns("net", "bonitasoft", "class", true);
+        checkAcceptShouldReturns("net", "bonitasoft", "java", true);
     }
 
+    private void checkAcceptShouldReturns(String domain, String subDomain, String extension, boolean expectedResult) {
+        // given
+        doReturn("Employee." + extension).when(file).getName();
+        doReturn(domain + File.separatorChar + subDomain + File.separatorChar + "model" + File.separatorChar + "Employee." + extension).when(file)
+                .getAbsolutePath();
+
+        // when then
+        assertThat(fileFilter.accept(file)).as("should return " + expectedResult + " when accepting file " + file.getAbsolutePath()).isEqualTo(expectedResult);
+    }
 }
