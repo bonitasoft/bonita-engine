@@ -310,18 +310,6 @@ CREATE TABLE process_instance (
 )
 GO
 
-CREATE TABLE token (
-  tenantid NUMERIC(19, 0) NOT NULL,
-  id NUMERIC(19, 0) NOT NULL,
-  processInstanceId NUMERIC(19, 0) NOT NULL,
-  ref_id NUMERIC(19, 0) NOT NULL,
-  parent_ref_id NUMERIC(19, 0) NULL,
-  PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx1_token ON token(tenantid,processInstanceId)
-GO
-
 CREATE TABLE flownode_instance (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -371,7 +359,6 @@ CREATE TABLE flownode_instance (
   triggeredByEvent BIT,
   interrupting BIT,
   tokenCount INT NOT NULL,
-  token_ref_id NUMERIC(19, 0) NULL,
   PRIMARY KEY (tenantid, id)
 )
 GO

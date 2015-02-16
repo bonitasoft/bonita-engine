@@ -33,8 +33,6 @@ DELETE FROM connector_instance;
 
 DELETE FROM flownode_instance;
 
-DELETE FROM token;
-
 DELETE FROM process_instance;
 
 DELETE FROM breakpoint;

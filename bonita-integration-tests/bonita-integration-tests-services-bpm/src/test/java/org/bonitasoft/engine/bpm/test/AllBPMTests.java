@@ -10,7 +10,6 @@ import org.bonitasoft.engine.bpm.OperationServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.ProcessDefinitionServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.ProcessInstanceServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.SupervisorServiceTest;
-import org.bonitasoft.engine.bpm.TokenServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceServiceIntegrationTests;
 import org.bonitasoft.engine.bpm.event.EventInstanceServiceTest;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceServiceTest;
@@ -23,7 +22,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         ProcessDefinitionServiceIntegrationTest.class,
         ProcessInstanceServiceIntegrationTest.class,
-        TokenServiceIntegrationTest.class,
         ActorMappingServiceTest.class,
         OperationServiceIntegrationTest.class,
         GatewayInstanceServiceIntegrationTest.class,

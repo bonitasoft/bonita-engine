@@ -56,9 +56,6 @@ GO
 DELETE FROM flownode_instance
 GO
 
-DELETE FROM token
-GO
-
 DELETE FROM process_instance
 GO
 
