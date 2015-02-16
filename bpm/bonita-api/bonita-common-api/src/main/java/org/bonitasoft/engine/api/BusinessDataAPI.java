@@ -20,9 +20,12 @@ import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.business.data.BusinessDataReference;
 
 /**
+ * This API allows to list the {@link org.bonitasoft.engine.business.data.BusinessDataReference} related to specific {@link org.bonitasoft.engine.bpm.process.ProcessInstance}
  * @author Elias Ricken de Medeiros
  * @author Laurent Leseigneur
- * @since 7.0
+ * @since 7.0.0
+ * @see org.bonitasoft.engine.business.data.BusinessDataReference
+ * @see org.bonitasoft.engine.bpm.process.ProcessInstance
  */
 public interface BusinessDataAPI {
 
@@ -39,7 +42,6 @@ public interface BusinessDataAPI {
      *         If the session is invalid, e.g. the session has expired.
      * @throws org.bonitasoft.engine.bpm.data.DataNotFoundException
      *         If the specified business data value cannot be found.
-     * @since 7.0
      */
     BusinessDataReference getProcessBusinessDataReference(String businessDataName, long processInstanceId) throws DataNotFoundException;
 
@@ -53,7 +55,6 @@ public interface BusinessDataAPI {
      * @param maxResults
      *        the maximum number of result per page
      * @return the paginated references of the business data
-     * @since 7.0
      */
     List<BusinessDataReference> getProcessBusinessDataReferences(long processInstanceId, int startIndex, int maxResults);
 
