@@ -1,0 +1,12 @@
+{
+  "persistenceId": 2,
+  "persistenceVersion": 0,
+  "street": "32, rue Gustave Eiffel",
+  "city": "Grenoble",
+  "links": [
+    {
+      "rel": "country",
+      "href": "/businessdata/org.bonita.pojo.Address/2/country"
+    }
+  ]
+}
