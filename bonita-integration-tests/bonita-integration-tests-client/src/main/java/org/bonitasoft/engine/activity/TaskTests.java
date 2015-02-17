@@ -9,7 +9,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        HiddenTaskIT.class,
         UserTaskAssignationIT.class,
         UserFilterIT.class,
         PendingTasksIT.class,

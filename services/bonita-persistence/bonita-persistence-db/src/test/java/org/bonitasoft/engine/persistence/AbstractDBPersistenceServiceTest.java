@@ -57,16 +57,6 @@ public class AbstractDBPersistenceServiceTest {
         }
 
         @Override
-        public void purge(final String classToPurge) throws SPersistenceException {
-
-        }
-
-        @Override
-        public void purge() throws SPersistenceException {
-
-        }
-
-        @Override
         public void insertInBatch(final List<PersistentObject> entities) throws SPersistenceException {
 
         }

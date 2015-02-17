@@ -116,10 +116,5 @@
 		SELECT human
 		FROM org.bonitasoft.engine.persistence.model.Human AS human
 	</query>
-	
-	<query name="purgeHuman">
-	  	DELETE FROM org.bonitasoft.engine.persistence.model.Human AS human
-	  	WHERE human.deleted = TRUE
-  	</query>
 
 </hibernate-mapping>

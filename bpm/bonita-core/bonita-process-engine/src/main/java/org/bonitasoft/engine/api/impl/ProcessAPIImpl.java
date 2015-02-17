@@ -80,10 +80,7 @@ import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressions
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevel;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchived;
 import org.bonitasoft.engine.api.impl.transaction.flownode.GetFlowNodeInstance;
-import org.bonitasoft.engine.api.impl.transaction.flownode.HideTasks;
-import org.bonitasoft.engine.api.impl.transaction.flownode.IsTaskHidden;
 import org.bonitasoft.engine.api.impl.transaction.flownode.SetExpectedEndDate;
-import org.bonitasoft.engine.api.impl.transaction.flownode.UnhideTasks;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.AddProcessDefinitionToCategory;
 import org.bonitasoft.engine.api.impl.transaction.process.DeleteArchivedProcessInstances;
@@ -411,7 +408,6 @@ import org.bonitasoft.engine.search.task.SearchAssignedAndPendingHumanTasks;
 import org.bonitasoft.engine.search.task.SearchAssignedAndPendingHumanTasksFor;
 import org.bonitasoft.engine.search.task.SearchAssignedTaskManagedBy;
 import org.bonitasoft.engine.search.task.SearchHumanTaskInstances;
-import org.bonitasoft.engine.search.task.SearchPendingHiddenTasks;
 import org.bonitasoft.engine.search.task.SearchPendingTasksForUser;
 import org.bonitasoft.engine.search.task.SearchPendingTasksManagedBy;
 import org.bonitasoft.engine.search.task.SearchPendingTasksSupervisedBy;
@@ -3555,7 +3551,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 tenantAccessor.getProcessDefinitionService(), tenantAccessor.getDataInstanceService(), tenantAccessor.getOperationService(),
                 tenantAccessor.getWorkService(), tenantAccessor.getContainerRegistry(), tenantAccessor.getEventInstanceService(),
                 tenantAccessor.getSchedulerService(), tenantAccessor.getCommentService(), tenantAccessor.getIdentityService(),
-                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getTokenService(), tenantAccessor.getParentContainerResolver());
+                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getProcessInstanceService(), tenantAccessor.getParentContainerResolver());
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
             if (sActivityInstance instanceof SHumanTaskInstance) {
@@ -5154,46 +5150,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public SearchResult<HumanTaskInstance> searchPendingHiddenTasks(final long userId, final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
-        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-        final SearchPendingHiddenTasks searchHiddenTasksTx = new SearchPendingHiddenTasks(activityInstanceService, flowNodeStateManager,
-                searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(), userId, searchOptions);
-        try {
-            searchHiddenTasksTx.execute();
-        } catch (final SBonitaException e) {
-            throw new SearchException(e);
-        }
-        return searchHiddenTasksTx.getResult();
-    }
-
-    @Override
-    public void hideTasks(final long userId, final Long... activityInstanceId) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransactionContent hideTasksTx = new HideTasks(tenantAccessor.getActivityInstanceService(), userId, activityInstanceId);
-        try {
-            hideTasksTx.execute();
-        } catch (final SBonitaException e) {
-            throw new UpdateException("Error while trying to hide tasks: " + Arrays.toString(activityInstanceId) + " from user with ID " + userId, e);
-        }
-    }
-
-    @Override
-    public void unhideTasks(final long userId, final Long... activityInstanceId) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
-        final TransactionContent unhideTasksTx = new UnhideTasks(tenantAccessor.getActivityInstanceService(), userId, activityInstanceId);
-        try {
-            unhideTasksTx.execute();
-        } catch (final SBonitaException e) {
-            throw new UpdateException("Error while trying to un-hide tasks: " + Arrays.toString(activityInstanceId) + " from user with ID " + userId, e);
-        }
-    }
-
-    @Override
     public Serializable evaluateExpressionOnProcessDefinition(final Expression expression, final Map<String, Serializable> context,
             final long processDefinitionId) throws ExpressionEvaluationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -5236,19 +5192,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new UpdateException(e);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
-        }
-    }
-
-    @Override
-    public boolean isTaskHidden(final long userTaskId, final long userId) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
-        final IsTaskHidden hideTasksTx = new IsTaskHidden(tenantAccessor.getActivityInstanceService(), userId, userTaskId);
-        try {
-            hideTasksTx.execute();
-            return hideTasksTx.getResult();
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
         }
     }
 
