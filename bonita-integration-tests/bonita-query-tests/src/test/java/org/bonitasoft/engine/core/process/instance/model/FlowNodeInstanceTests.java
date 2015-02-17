@@ -30,7 +30,6 @@ import javax.inject.Inject;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.test.persistence.repository.FlowNodeInstanceRepository;
@@ -93,22 +92,16 @@ public class FlowNodeInstanceTests {
     public void getFlowNodeInstanceIdsToRestart_should_return_ids_of_flow_nodes_that_are_not_deleted_and_is_executing_notStable_or_terminal() {
         // given
         repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
-                .withDeleted(false)
                 .build());
         repository.add(aUserTask().withName("deletedTask").withStateExecuting(false).withStable(true).withTerminal(false)
-                .withDeleted(true)
                 .build());
         final SFlowNodeInstance executing = repository.add(aUserTask().withName("executingTask").withStateExecuting(true).withStable(true).withTerminal(false)
-                .withDeleted(false)
                 .build());
         final SFlowNodeInstance notStable = repository.add(aUserTask().withName("notStableTask").withStateExecuting(false).withStable(false).withTerminal(true)
-                .withDeleted(false)
                 .build());
         final SFlowNodeInstance teminal = repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true)
-                .withDeleted(false)
                 .build());
         repository.add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true).withTerminal(false)
-                .withDeleted(false)
                 .build());
 
         // when
@@ -173,19 +166,6 @@ public class FlowNodeInstanceTests {
     }
 
     @Test
-    public void getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-
-        // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
-
-        // Then
-        assertThat(numberOfHumanTaskInstances).isEqualTo(0);
-    }
-
-    @Test
     public void searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor_should_return_number_of_process_definition_if_one_instance_has_assigned_tasks_to_the_user() {
         // Given
         buildAndAddAssignedTasks();
@@ -241,19 +221,6 @@ public class FlowNodeInstanceTests {
         assertThat(sHumanTaskInstances.get(0).getId()).isEqualTo(NORMAL_HUMAN_INSTANCE_ID);
     }
 
-    @Test
-    public void searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-
-        // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcessFor(PROCESS_DEFINITION_ID,
-                JOHN_ID);
-
-        // Then
-        assertThat(sHumanTaskInstances.size()).isEqualTo(0);
-    }
-
     // All
     @Test
     public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks_should_return_number_of_process_definition_supervised_if_one_instance_has_assigned_tasks() {
@@ -299,7 +266,7 @@ public class FlowNodeInstanceTests {
 
     private SFlowNodeInstance buildAndAddUserTaskWithParentAndRootProcessInstanceId(final String taskName, final long containingProcessInstanceId,
             final long rootProcessInstanceId, int stateId, String stateName) {
-        return repository.add(aUserTask().withName(taskName).withStateExecuting(false).withStable(true).withTerminal(false).withDeleted(false)
+        return repository.add(aUserTask().withName(taskName).withStateExecuting(false).withStable(true).withTerminal(false)
                 .withLogicalGroup4(containingProcessInstanceId).withLogicalGroup2(rootProcessInstanceId).withStateId(stateId).withStateName(stateName).build());
     }
 
@@ -372,18 +339,6 @@ public class FlowNodeInstanceTests {
     }
 
     @Test
-    public void getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-
-        // When
-        final long numberOfHumanTaskInstances = repository.getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
-
-        // Then
-        assertThat(numberOfHumanTaskInstances).isEqualTo(0);
-    }
-
-    @Test
     public void searchSHumanTaskInstanceAssignedAndPendingByRootProcess_should_return_number_of_process_definition_supervised_if_one_instance_has_assigned_tasks() {
         // Given
         buildAndAddAssignedTasks();
@@ -435,43 +390,31 @@ public class FlowNodeInstanceTests {
         assertThat(sHumanTaskInstances.get(0).getId()).isEqualTo(NORMAL_HUMAN_INSTANCE_ID);
     }
 
-    @Test
-    public void searchSHumanTaskInstanceAssignedAndPendingByRootProcess_should_not_count_the_hidden_human() {
-        // Given
-        buildAndAddAssigneeAndHiddenTask();
-
-        // When
-        final List<SHumanTaskInstance> sHumanTaskInstances = repository.searchSHumanTaskInstanceAssignedAndPendingByRootProcess(PROCESS_DEFINITION_ID);
-
-        // Then
-        assertThat(sHumanTaskInstances.size()).isEqualTo(0);
-    }
-
     private void buildAndAddAssignedTasks() {
         // Tasks OK assigned to John
-        repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false).withDeleted(false)
+        repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
                 .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).withId(NORMAL_HUMAN_INSTANCE_ID).build());
 
         // Tasks KO assigned to john & OK not assigned
-        repository.add(aUserTask().withName("deletedTask").withStateExecuting(false).withStable(true).withTerminal(false).withDeleted(true)
+        repository.add(aUserTask().withName("deletedTask").withStateExecuting(false).withStable(true).withTerminal(false)
                 .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).build());
-        repository.add(aUserTask().withName("executingTask").withStateExecuting(true).withStable(true).withTerminal(false).withDeleted(false)
+        repository.add(aUserTask().withName("executingTask").withStateExecuting(true).withStable(true).withTerminal(false)
                 .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).build());
-        repository.add(aUserTask().withName("notStableTask").withStateExecuting(false).withStable(false).withTerminal(true).withDeleted(false)
+        repository.add(aUserTask().withName("notStableTask").withStateExecuting(false).withStable(false).withTerminal(true)
                 .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).build());
-        repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true).withDeleted(false)
+        repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true).withTerminal(true)
                 .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(JOHN_ID).build());
         buildAndAddNormalTask("normalTask4", ROOT_PROCESS_INSTANCE_ID);
 
         // Tasks OK assigned to Bob
-        repository.add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true).withTerminal(false).withDeleted(false)
+        repository.add(aUserTask().withName("normalTask2").withStateExecuting(false).withStable(true).withTerminal(false)
                 .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withAssigneeId(BOB_ID).build());
     }
 
     private void buildAndAddTasksWithPendingMappingForUser() {
         // Tasks OK not assigned & pending for John
         final SFlowNodeInstance normalTask1 = repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
-                .withDeleted(false).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withId(NORMAL_HUMAN_INSTANCE_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withId(NORMAL_HUMAN_INSTANCE_ID).build());
         repository.add(aPendingActivityMapping().withUserId(JOHN_ID).withActivityId(normalTask1.getId()).build());
 
         // Tasks KO not assigned & pending for john, and OK not assigned & not pending
@@ -516,7 +459,7 @@ public class FlowNodeInstanceTests {
     private void buildAndAddTasksWithPendingMappingForActor(final SActor actorForJohn, final SActor actorForBob) {
         // Tasks OK not assigned & pending for John
         final SFlowNodeInstance normalTask1 = repository.add(aUserTask().withName("normalTask1").withStateExecuting(false).withStable(true).withTerminal(false)
-                .withDeleted(false).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withId(NORMAL_HUMAN_INSTANCE_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).withId(NORMAL_HUMAN_INSTANCE_ID).build());
         repository.add(aPendingActivityMapping().withActorId(actorForJohn.getId()).withActivityId(normalTask1.getId()).build());
 
         // Tasks KO not assigned & pending for john, and OK not assigned & not pending
@@ -535,41 +478,28 @@ public class FlowNodeInstanceTests {
         repository.add(aPendingActivityMapping().withActorId(actorForBob.getId()).withActivityId(normalTask4.getId()).build());
     }
 
-    private void buildAndAddAssigneeAndHiddenTask() {
-        final SUserTaskInstanceImpl activity = (SUserTaskInstanceImpl) repository.add(aUserTask().withName("normalTask1").withStateExecuting(false)
-                .withStable(true).withTerminal(false).withDeleted(false).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID)
-                .withAssigneeId(JOHN_ID).build());
-
-        final SHiddenTaskInstanceImpl sHiddenTaskInstanceImpl = new SHiddenTaskInstanceImpl();
-        sHiddenTaskInstanceImpl.setActivityId(activity.getId());
-        sHiddenTaskInstanceImpl.setUserId(JOHN_ID);
-        sHiddenTaskInstanceImpl.setTenantId(1L);
-        sHiddenTaskInstanceImpl.setId(48L);
-        repository.add(sHiddenTaskInstanceImpl);
-    }
-
     private SFlowNodeInstance buildAndAddNormalTask(final String taskName, final long rootProcessInstanceId) {
         return repository.add(aUserTask().withName(taskName).withStateExecuting(false).withStable(true).withTerminal(false)
-                .withDeleted(false).withRootProcessInstanceId(rootProcessInstanceId).build());
+                .withRootProcessInstanceId(rootProcessInstanceId).build());
     }
 
     private SFlowNodeInstance buildAndAddDeletedTask() {
         return repository.add(aUserTask().withName("deletedTask").withStateExecuting(false).withStable(true).withTerminal(false)
-                .withDeleted(true).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).build());
+                .withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).build());
     }
 
     private SFlowNodeInstance buildAndAddExecutingTask() {
         return repository.add(aUserTask().withName("executingTask").withStateExecuting(true).withStable(true)
-                .withTerminal(false).withDeleted(false).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).build());
+                .withTerminal(false).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).build());
     }
 
     private SFlowNodeInstance buildAndAddNotStableTask() {
         return repository.add(aUserTask().withName("notStableTask").withStateExecuting(false).withStable(false)
-                .withTerminal(true).withDeleted(false).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).build());
+                .withTerminal(true).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).build());
     }
 
     private SFlowNodeInstance buildAndAddTerminalTask() {
         return repository.add(aUserTask().withName("terminalTask").withStateExecuting(false).withStable(true)
-                .withTerminal(true).withDeleted(false).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).build());
+                .withTerminal(true).withRootProcessInstanceId(ROOT_PROCESS_INSTANCE_ID).build());
     }
 }

@@ -151,11 +151,11 @@ CREATE TABLE arch_process_instance (
   callerId INT8,
   migration_plan INT8,
   sourceObjectId INT8 NOT NULL,
-  stringIndex1 VARCHAR(50),
-  stringIndex2 VARCHAR(50),
-  stringIndex3 VARCHAR(50),
-  stringIndex4 VARCHAR(50),
-  stringIndex5 VARCHAR(50),
+  stringIndex1 VARCHAR(255),
+  stringIndex2 VARCHAR(255),
+  stringIndex3 VARCHAR(255),
+  stringIndex4 VARCHAR(255),
+  stringIndex5 VARCHAR(255),
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, rootProcessInstanceId, callerId);
@@ -274,23 +274,13 @@ CREATE TABLE process_instance (
   callerType VARCHAR(50),
   interruptingEventId INT8,
   migration_plan INT8,
-  stringIndex1 VARCHAR(50),
-  stringIndex2 VARCHAR(50),
-  stringIndex3 VARCHAR(50),
-  stringIndex4 VARCHAR(50),
-  stringIndex5 VARCHAR(50),
+  stringIndex1 VARCHAR(255),
+  stringIndex2 VARCHAR(255),
+  stringIndex3 VARCHAR(255),
+  stringIndex4 VARCHAR(255),
+  stringIndex5 VARCHAR(255),
   PRIMARY KEY (tenantid, id)
 );
-
-CREATE TABLE token (
-  tenantid INT8 NOT NULL,
-  id INT8 NOT NULL,
-  processInstanceId INT8 NOT NULL,
-  ref_id INT8 NOT NULL,
-  parent_ref_id INT8 NULL,
-  PRIMARY KEY (tenantid, id)
-);
-CREATE INDEX idx1_token ON token(tenantid,processInstanceId);
 
 CREATE TABLE flownode_instance (
   tenantid INT8 NOT NULL,
@@ -340,14 +330,12 @@ CREATE TABLE flownode_instance (
   abortedByBoundary INT8,
   triggeredByEvent BOOLEAN,
   interrupting BOOLEAN,
-  deleted BOOLEAN DEFAULT FALSE,
   tokenCount INT NOT NULL,
-  token_ref_id INT8 NULL,
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
-CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid, deleted);
+CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid);
 
 CREATE TABLE connector_instance (
   tenantid INT8 NOT NULL,
@@ -439,15 +427,6 @@ CREATE TABLE pending_mapping (
   	PRIMARY KEY (tenantid, id)
 );
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
-
-CREATE TABLE hidden_activity (
-	tenantid INT8 NOT NULL,
-  	id INT8 NOT NULL,
-  	activityId INT8 NOT NULL,
-  	userId INT8 NOT NULL,
-  	UNIQUE (tenantid, activityId, userId),
-  	PRIMARY KEY (tenantid, id)
-);
 
 CREATE TABLE breakpoint (
 	tenantid INT8 NOT NULL,

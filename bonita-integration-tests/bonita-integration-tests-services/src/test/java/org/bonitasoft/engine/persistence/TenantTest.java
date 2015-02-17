@@ -857,23 +857,6 @@ public class TenantTest extends CommonServiceTest {
     }
 
     @Test
-    public void purge() throws Exception {
-        getTransactionService().begin();
-        final Human human = PersistenceTestUtil.buildHuman("Matti", "Makela", 27);
-        human.setDeleted(true);
-        final QueryOptions queryOptions = new QueryOptions(0, 10, Human.class, "firstName", OrderByType.ASC);
-        List<Human> humans = persistenceService.selectList(new SelectListDescriptor<Human>("searchHumans", null, Human.class, queryOptions));
-        final int priviousSize = humans.size();
-        persistenceService.insert(human);
-        humans = persistenceService.selectList(new SelectListDescriptor<Human>("searchHumans", null, Human.class, queryOptions));
-        assertEquals(priviousSize + 1, humans.size());
-        persistenceService.purge(Human.class.getName());
-        humans = persistenceService.selectList(new SelectListDescriptor<Human>("searchHumans", null, Human.class, queryOptions));
-        assertEquals(priviousSize, humans.size());
-        getTransactionService().complete();
-    }
-
-    @Test
     public void search_Humans_With_Fields_Starting_With_Prefix() throws Exception {
         getTransactionService().begin();
 

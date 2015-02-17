@@ -94,8 +94,8 @@ public class InitializingLoopActivityStateImpl implements FlowNodeState {
                     final long rootProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getRootProcessInstanceIndex());
                     final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex());
                     bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, flowNodeInstance.getRootContainerId(), flowNodeInstance.getId(),
-                            SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId, parentProcessInstanceId, true, 1, SStateCategory.NORMAL, -1,
-                            null);
+                            SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId, parentProcessInstanceId, true, 1, SStateCategory.NORMAL, -1
+                    );
                     activityInstanceService.incrementLoopCounter(loopActivity);
                     activityInstanceService.setTokenCount(loopActivity, loopActivity.getTokenCount() + 1);
                 }

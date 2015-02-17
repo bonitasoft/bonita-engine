@@ -19,6 +19,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder;
  */
 public interface STokenBuilderFactory {
 
-    STokenBuilder createNewInstance(long processInstanceId, Long refId, Long parentRefId);
+    STokenBuilder createNewInstance(long processInstanceId);
 
 }
