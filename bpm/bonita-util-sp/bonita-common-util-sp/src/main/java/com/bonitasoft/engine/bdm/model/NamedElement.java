@@ -11,6 +11,7 @@ package com.bonitasoft.engine.bdm.model;
 /**
  * @author Colin PUY
  */
+@Deprecated
 public interface NamedElement {
 
     public String getName();

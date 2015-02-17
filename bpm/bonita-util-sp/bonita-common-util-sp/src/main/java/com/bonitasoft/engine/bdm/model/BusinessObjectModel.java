@@ -30,6 +30,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@Deprecated
 public class BusinessObjectModel {
 
     @XmlElementWrapper(name = "businessObjects", required = true)

@@ -18,9 +18,10 @@ import com.bonitasoft.engine.bdm.model.NamedElement;
 /**
  * @author Colin PUY
  */
+@Deprecated
 public class UniqueNameValidator {
 
-    public ValidationStatus validate(Collection<? extends NamedElement> namedElements,  String namedElementTypePluralForm) {
+    public ValidationStatus validate(Collection<? extends NamedElement> namedElements, String namedElementTypePluralForm) {
         ValidationStatus status = new ValidationStatus();
         Set<String> duplicateNames = findDuplicateNames(namedElements);
         for (String name : duplicateNames) {
@@ -28,7 +29,7 @@ public class UniqueNameValidator {
         }
         return status;
     }
-    
+
     private Set<String> findDuplicateNames(Collection<? extends NamedElement> list) {
         Set<String> duplicates = new LinkedHashSet<String>();
         Set<String> uniqueNames = new HashSet<String>();

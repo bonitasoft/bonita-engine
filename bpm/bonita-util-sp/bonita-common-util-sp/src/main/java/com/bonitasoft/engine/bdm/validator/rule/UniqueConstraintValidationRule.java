@@ -12,6 +12,7 @@ import com.bonitasoft.engine.bdm.model.UniqueConstraint;
 import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
+@Deprecated
 public class UniqueConstraintValidationRule extends ValidationRule<UniqueConstraint> {
 
     private static final int MAX_CONSTRAINTNAME_LENGTH = 25;

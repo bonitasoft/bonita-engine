@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@Deprecated
 public class UniqueConstraint implements NamedElement {
 
     @XmlAttribute(required = true)

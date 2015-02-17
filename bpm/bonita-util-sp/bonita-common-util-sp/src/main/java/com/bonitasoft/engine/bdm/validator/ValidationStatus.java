@@ -8,37 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Romain Bioteau
  */
-public class ValidationStatus {
-
-    private final List<String> errorList;
-
-    public ValidationStatus() {
-        errorList = new ArrayList<String>();
-    }
-
-    public void addError(final String errorMessage) {
-        if (errorMessage == null || errorMessage.isEmpty()) {
-            throw new IllegalArgumentException("errorMessage cannot be null or empty");
-        }
-        errorList.add(errorMessage);
-    }
-
-    public boolean isOk() {
-        return errorList.isEmpty();
-    }
-
-    public void addValidationStatus(final ValidationStatus status) {
-        errorList.addAll(status.getErrors());
-    }
-
-    public List<String> getErrors() {
-        return errorList;
-    }
+@Deprecated
+public class ValidationStatus extends org.bonitasoft.engine.bdm.validator.ValidationStatus {
 
 }

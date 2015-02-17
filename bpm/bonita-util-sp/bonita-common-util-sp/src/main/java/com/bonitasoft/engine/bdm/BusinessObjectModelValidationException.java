@@ -13,6 +13,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
+@Deprecated
 public class BusinessObjectModelValidationException extends Exception {
 
     private final ValidationStatus validationStatus;

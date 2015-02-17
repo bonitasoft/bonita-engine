@@ -36,6 +36,7 @@ import com.bonitasoft.engine.bdm.validator.rule.composition.UniquenessCompositio
 /**
  * @author Romain Bioteau
  */
+@Deprecated
 public class BusinessObjectModelValidator {
 
     private final List<ValidationRule<?>> rules = new ArrayList<ValidationRule<?>>();

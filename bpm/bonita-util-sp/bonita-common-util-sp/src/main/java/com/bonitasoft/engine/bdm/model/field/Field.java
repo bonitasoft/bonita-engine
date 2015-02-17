@@ -21,6 +21,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType
+@Deprecated
 public abstract class Field {
 
     public static final String PERSISTENCE_ID = "persistenceId";

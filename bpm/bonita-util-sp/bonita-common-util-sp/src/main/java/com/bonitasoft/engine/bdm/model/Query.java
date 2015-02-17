@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  * @author Romain Bioteau
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@Deprecated
 public class Query {
 
     @XmlAttribute(required = true)

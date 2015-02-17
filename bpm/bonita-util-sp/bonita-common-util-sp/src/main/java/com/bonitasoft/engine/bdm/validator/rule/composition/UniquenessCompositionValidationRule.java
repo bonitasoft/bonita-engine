@@ -21,6 +21,7 @@ import com.bonitasoft.engine.bdm.validator.rule.ValidationRule;
  * 
  * @author Colin PUY
  */
+@Deprecated
 public class UniquenessCompositionValidationRule extends ValidationRule<BusinessObjectModel> {
 
     public UniquenessCompositionValidationRule() {

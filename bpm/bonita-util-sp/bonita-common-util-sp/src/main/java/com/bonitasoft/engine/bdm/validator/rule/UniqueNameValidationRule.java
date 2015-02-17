@@ -15,6 +15,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Colin PUY
  */
+@Deprecated
 public class UniqueNameValidationRule extends ValidationRule<BusinessObjectModel> {
 
     private UniqueNameValidator uniqueNameValidator;

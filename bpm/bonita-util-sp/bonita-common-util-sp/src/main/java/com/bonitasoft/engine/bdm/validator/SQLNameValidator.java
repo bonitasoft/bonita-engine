@@ -17,6 +17,7 @@ import java.util.Set;
 /**
  * @author Romain Bioteau
  */
+@Deprecated
 public class SQLNameValidator {
 
     private final int maxLength;

@@ -13,6 +13,7 @@ import javax.lang.model.SourceVersion;
 import com.bonitasoft.engine.bdm.model.Query;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
+@Deprecated
 public class QueryValidationRule extends ValidationRule<Query> {
 
     private static final int MAX_QUERY_NAME_LENGTH = 150;

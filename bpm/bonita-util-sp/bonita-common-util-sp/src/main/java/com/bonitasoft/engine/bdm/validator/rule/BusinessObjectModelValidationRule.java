@@ -21,6 +21,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
+@Deprecated
 public class BusinessObjectModelValidationRule extends ValidationRule<BusinessObjectModel> {
 
     public BusinessObjectModelValidationRule() {
@@ -41,7 +42,7 @@ public class BusinessObjectModelValidationRule extends ValidationRule<BusinessOb
         for (final BusinessObject bo : bom.getBusinessObjects()) {
             final List<Query> lazyQueries = BDMQueryUtil.createProvidedQueriesForLazyField(bom, bo);
             final Set<String> lazyQueryNames = new HashSet<String>();
-            for(final Query query : lazyQueries){
+            for (final Query query : lazyQueries) {
                 lazyQueryNames.add(query.getName());
             }
             for (final Query q : bo.getQueries()) {

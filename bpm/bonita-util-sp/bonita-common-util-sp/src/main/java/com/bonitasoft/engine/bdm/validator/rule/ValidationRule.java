@@ -13,6 +13,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
+@Deprecated
 public abstract class ValidationRule<T> {
 
     private Class<T> classToApply;
@@ -20,13 +21,13 @@ public abstract class ValidationRule<T> {
     public ValidationRule(Class<T> classToApply) {
         this.classToApply = classToApply;
     }
-    
+
     public boolean appliesTo(Object modelElement) {
         return modelElement != null && classToApply.isAssignableFrom(modelElement.getClass());
     }
 
     protected abstract ValidationStatus validate(T modelElement);
-    
+
     @SuppressWarnings("unchecked")
     public ValidationStatus checkRule(Object modelElement) {
         if (!appliesTo(modelElement)) {

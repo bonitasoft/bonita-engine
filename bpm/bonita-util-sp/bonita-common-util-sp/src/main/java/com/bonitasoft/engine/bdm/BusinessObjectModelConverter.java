@@ -22,6 +22,7 @@ import com.bonitasoft.engine.io.IOUtils;
 /**
  * @author Matthieu Chaffotte
  */
+@Deprecated
 public class BusinessObjectModelConverter {
 
     private static final String BOM_XSD = "/bom.xsd";

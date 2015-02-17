@@ -14,6 +14,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Colin PUY
  */
+@Deprecated
 public class SimpleFieldValidationRule extends ValidationRule<SimpleField> {
 
     public SimpleFieldValidationRule() {

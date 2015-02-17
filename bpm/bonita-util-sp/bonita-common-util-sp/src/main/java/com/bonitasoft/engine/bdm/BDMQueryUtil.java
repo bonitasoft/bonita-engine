@@ -29,6 +29,7 @@ import com.bonitasoft.engine.bdm.model.field.SimpleField;
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
  */
+@Deprecated
 public class BDMQueryUtil {
 
     private static final char BLANK_SPACE = ' ';

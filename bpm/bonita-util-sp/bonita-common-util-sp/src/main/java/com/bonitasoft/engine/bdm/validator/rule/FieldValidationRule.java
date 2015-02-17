@@ -17,6 +17,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 /**
  * @author Romain Bioteau
  */
+@Deprecated
 public class FieldValidationRule extends ValidationRule<Field> {
 
     private static final int MAX_COLUMNAME_LENGTH = 50;

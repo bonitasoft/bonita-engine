@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author Romain Bioteau
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@Deprecated
 public class QueryParameter {
 
     @XmlAttribute(required = true)

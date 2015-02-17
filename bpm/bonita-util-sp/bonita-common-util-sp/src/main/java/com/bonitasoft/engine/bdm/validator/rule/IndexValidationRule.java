@@ -12,6 +12,7 @@ import com.bonitasoft.engine.bdm.model.Index;
 import com.bonitasoft.engine.bdm.validator.SQLNameValidator;
 import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
+@Deprecated
 public class IndexValidationRule extends ValidationRule<Index> {
 
     private static final int MAX_CONSTRAINTNAME_LENGTH = 25;
