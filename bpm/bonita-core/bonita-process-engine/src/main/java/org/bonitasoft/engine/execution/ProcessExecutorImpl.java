@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2014 BonitaSoft S.A.
+ * Copyright (C) 2011, 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -34,8 +34,6 @@ import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -89,7 +87,6 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
@@ -175,8 +172,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private final ConnectorInstanceService connectorInstanceService;
 
-    private final CacheService cacheService;
-
     private final TransitionEvaluator transitionEvaluator;
 
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
@@ -187,7 +182,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
-            final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager, final CacheService cacheService) {
+            final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
@@ -208,7 +203,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.sessionAccessor = sessionAccessor;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
-        this.cacheService = cacheService;
         transitionEvaluator = new TransitionEvaluator(expressionResolverService);
         // dependency injection because of circular references...
         flowNodeStateManager.setProcessExecutor(this);
@@ -411,7 +405,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         flowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, 0, stateCategory, -1, tokenRefId);
     }
 
-    protected void executeOperations(final List<SOperation> operations, final Map<String, Object> context, final SExpressionContext expressionContext, SProcessInstance sProcessInstance) throws SBonitaException {
+    protected void executeOperations(final List<SOperation> operations, final Map<String, Object> context, final SExpressionContext expressionContext, final SProcessInstance sProcessInstance) throws SBonitaException {
         if (operations != null && !operations.isEmpty()) {
             expressionContext.setInputValues(context);
             if(expressionContext.getContainerId() == null){
@@ -549,14 +543,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SUserTaskInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         final long processInstanceId = sFlowNodeInstanceChild.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
-
-        if (sFlowNodeInstanceChild instanceof SUserTaskInstance) {
-            try {
-                cacheService.remove("USER_TASK_CONTRACT", flowNodeInstanceId);
-            } catch (final SCacheException sce) {
-                throw new SFlowNodeExecutionException(sce);
-            }
-        }
 
         SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
         final int tokensOfProcess = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
