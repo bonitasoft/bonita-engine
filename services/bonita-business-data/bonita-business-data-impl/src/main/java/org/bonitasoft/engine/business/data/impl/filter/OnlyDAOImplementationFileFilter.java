@@ -22,9 +22,13 @@ import org.apache.commons.io.filefilter.AbstractFileFilter;
  */
 public class OnlyDAOImplementationFileFilter extends AbstractFileFilter {
 
+    public static final String ORG = "org";
+    public static final String BONITASOFT = "bonitasoft";
+
     @Override
     public boolean accept(final File file) {
         final String name = file.getName();
-        return name.endsWith("DAOImpl.class") || file.getAbsolutePath().contains("com" + File.separator + "bonitasoft");
+        return name.endsWith("DAOImpl.class")
+                || file.getAbsolutePath().contains(new StringBuilder().append(ORG).append(File.separator).append(BONITASOFT).toString());
     }
 }

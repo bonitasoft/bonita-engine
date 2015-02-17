@@ -14,19 +14,28 @@
 package org.bonitasoft.engine.business.data.impl.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
 
 import org.bonitasoft.engine.business.data.impl.filter.OnlyDAOImplementationFileFilter;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Romain
+ * @author Laurent Leseigneur
  */
+@RunWith(MockitoJUnitRunner.class)
 public class OnlyDAOImplementationFileFilterTest {
 
     private OnlyDAOImplementationFileFilter fileFilter;
+
+    @Mock
+    File file;
 
     /**
      * @throws Exception
@@ -43,6 +52,11 @@ public class OnlyDAOImplementationFileFilterTest {
 
         f = new File("EmployeeDAOImpl.class");
         assertThat(fileFilter.accept(f)).isTrue();
+
+        checkAcceptShouldReturns("org", "bonitasoft", "class", true);
+        checkAcceptShouldReturns("com", "bonitasoft", "java", false);
+        checkAcceptShouldReturns("com", "company", "java", false);
+
     }
 
     @Test
@@ -54,4 +68,13 @@ public class OnlyDAOImplementationFileFilterTest {
         assertThat(fileFilter.accept(f)).isFalse();
     }
 
+    private void checkAcceptShouldReturns(String domain, String subDomain, String extension, boolean expectedResult) {
+        // given
+        doReturn("Employee." + extension).when(file).getName();
+        doReturn(domain + File.separatorChar + subDomain + File.separatorChar + "model" + File.separatorChar + "Employee." + extension).when(file)
+                .getAbsolutePath();
+
+        // when then
+        assertThat(fileFilter.accept(file)).as("should return " + expectedResult + " when accepting file " + file.getAbsolutePath()).isEqualTo(expectedResult);
+    }
 }
