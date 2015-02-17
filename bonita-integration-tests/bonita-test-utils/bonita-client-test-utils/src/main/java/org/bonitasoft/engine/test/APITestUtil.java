@@ -14,12 +14,10 @@
 package org.bonitasoft.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
@@ -188,7 +187,6 @@ public class APITestUtil extends PlatformTestUtil {
 
     private BusinessDataAPI businessDataAPI;
 
-
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
         if (strTimeout != null) {
@@ -233,6 +231,7 @@ public class APITestUtil extends PlatformTestUtil {
         setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantAdministrationAPI(getSession()));
         setBusinessDataAPI(TenantAPIAccessor.getBusinessDataAPI(getSession()));
     }
+
     public BusinessDataAPI getBusinessDataAPI() {
         return businessDataAPI;
     }
@@ -610,7 +609,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(final ProcessDefinitionBuilder processDefinitionBuilder,
-                                                                                                   final String actorName, final User user) throws BonitaException, IOException {
+            final String actorName, final User user) throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, actorName, user, "TestConnectorEngineExecutionContext.impl",
                 TestConnectorEngineExecutionContext.class, "TestConnectorEngineExecutionContext.jar");
     }
@@ -1587,4 +1586,14 @@ public class APITestUtil extends PlatformTestUtil {
         assertThat(allDifferences).as("should have no differences between:\n%s\n and:\n%s\n", xmlPrettyFormatExpected, xmlPrettyFormatExported).isEmpty();
     }
 
+    public BarResource getBarResource(final String path, final String name, Class<?> clazz) throws IOException {
+        final InputStream stream = clazz.getResourceAsStream(path);
+        assertThat(stream).isNotNull();
+        try {
+            final byte[] byteArray = IOUtils.toByteArray(stream);
+            return new BarResource(name, byteArray);
+        } finally {
+            stream.close();
+        }
+    }
 }
