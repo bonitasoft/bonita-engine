@@ -166,11 +166,11 @@ CREATE TABLE arch_process_instance (
   callerId NUMERIC(19, 0),
   migration_plan NUMERIC(19, 0),
   sourceObjectId NUMERIC(19, 0) NOT NULL,
-  stringIndex1 NVARCHAR(50),
-  stringIndex2 NVARCHAR(50),
-  stringIndex3 NVARCHAR(50),
-  stringIndex4 NVARCHAR(50),
-  stringIndex5 NVARCHAR(50),
+  stringIndex1 NVARCHAR(255),
+  stringIndex2 NVARCHAR(255),
+  stringIndex3 NVARCHAR(255),
+  stringIndex4 NVARCHAR(255),
+  stringIndex5 NVARCHAR(255),
   PRIMARY KEY (tenantid, id)
 )
 GO
@@ -301,28 +301,16 @@ CREATE TABLE process_instance (
   callerType NVARCHAR(50),
   interruptingEventId NUMERIC(19, 0),
   migration_plan NUMERIC(19, 0),
-  stringIndex1 NVARCHAR(50),
-  stringIndex2 NVARCHAR(50),
-  stringIndex3 NVARCHAR(50),
-  stringIndex4 NVARCHAR(50),
-  stringIndex5 NVARCHAR(50),
+  stringIndex1 NVARCHAR(255),
+  stringIndex2 NVARCHAR(255),
+  stringIndex3 NVARCHAR(255),
+  stringIndex4 NVARCHAR(255),
+  stringIndex5 NVARCHAR(255),
   PRIMARY KEY (tenantid, id)
 )
 GO
 
 CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, processdefinitionid, stateid)
-GO
-
-CREATE TABLE token (
-  tenantid NUMERIC(19, 0) NOT NULL,
-  id NUMERIC(19, 0) NOT NULL,
-  processInstanceId NUMERIC(19, 0) NOT NULL,
-  ref_id NUMERIC(19, 0) NOT NULL,
-  parent_ref_id NUMERIC(19, 0) NULL,
-  PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx1_token ON token(tenantid,processInstanceId)
 GO
 
 CREATE TABLE flownode_instance (
@@ -374,7 +362,6 @@ CREATE TABLE flownode_instance (
   triggeredByEvent BIT,
   interrupting BIT,
   tokenCount INT NOT NULL,
-  token_ref_id NUMERIC(19, 0) NULL,
   PRIMARY KEY (tenantid, id)
 )
 GO

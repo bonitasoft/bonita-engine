@@ -56,8 +56,8 @@ public class SelectDescriptorBuilder {
         return new SelectByIdDescriptor<T>("get" + elementName + "ById", clazz, id);
     }
 
-    public static SelectListDescriptor<SFlowNodeInstance> getFlowNodesFromProcessInstance(final long rootContainerId, final int fromIndex, final int maxResults) {
-        final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
+    public static SelectListDescriptor<SFlowNodeInstance> getFlowNodesFromProcessInstance(final long parentProcessInstanceId, final int fromIndex, final int maxResults) {
+        final Map<String, Object> parameters = Collections.singletonMap("parentProcessInstanceId", (Object) parentProcessInstanceId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<SFlowNodeInstance>("getFlowNodesFromProcessInstance", parameters, SFlowNodeInstance.class, queryOptions);
     }
@@ -177,6 +177,11 @@ public class SelectDescriptorBuilder {
     public static SelectOneDescriptor<Long> getNumberOfActivitiesFromProcessInstance(final long rootContainerId) {
         final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
         return new SelectOneDescriptor<Long>("getNumberOfActivitiesFromProcessInstance", parameters, SFlowNodeInstance.class, Long.class);
+    }
+
+    public static SelectOneDescriptor<Long> getNumberOfFlowNode(final long parentProcessInstanceId) {
+        final Map<String, Object> parameters = Collections.singletonMap("parentProcessInstanceId", (Object) parentProcessInstanceId);
+        return new SelectOneDescriptor<Long>("getNumberOfFlowNode", parameters, SFlowNodeInstance.class, Long.class);
     }
 
     public static SelectListDescriptor<SEventInstance> getEventsFromRootContainer(final long rootContainerId, final int fromIndex, final int maxResults,
@@ -307,18 +312,11 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SToken>("getTokens", Collections.<String, Object> emptyMap(), SToken.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SToken> getToken(final long processInstanceId, final long refId) {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>(2);
+    public static SelectListDescriptor<SToken> getToken(final long processInstanceId) {
+        final Map<String, Object> singletonMap = new HashMap<String, Object>(1);
         singletonMap.put("processInstanceId", processInstanceId);
-        singletonMap.put("refId", refId);
         return new SelectListDescriptor<SToken>("getToken", singletonMap, SToken.class, new QueryOptions(0, 1));
     }
 
-    public static SelectOneDescriptor<Long> getNumberOfToken(final long processInstanceId, final long refId) {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>(2);
-        singletonMap.put("processInstanceId", processInstanceId);
-        singletonMap.put("refId", refId);
-        return new SelectOneDescriptor<Long>("getNumberToken", singletonMap, SToken.class);
-    }
 
 }

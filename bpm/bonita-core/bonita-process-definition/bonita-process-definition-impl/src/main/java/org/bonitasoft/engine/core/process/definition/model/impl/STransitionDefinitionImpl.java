@@ -36,8 +36,6 @@ public class STransitionDefinitionImpl extends SNamedElementImpl implements STra
 
     private SExpression condition;
 
-    private List<SExpression> dependencies;
-
     public STransitionDefinitionImpl(final TransitionDefinition transition) {
         this(transition.getName(), transition.getSource(), transition.getTarget());
         final Expression exp = transition.getCondition();
@@ -86,7 +84,6 @@ public class STransitionDefinitionImpl extends SNamedElementImpl implements STra
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (condition == null ? 0 : condition.hashCode());
-        result = prime * result + (dependencies == null ? 0 : dependencies.hashCode());
         result = prime * result + (int) (source ^ source >>> 32);
         result = prime * result + (int) (target ^ target >>> 32);
         return result;
@@ -111,13 +108,6 @@ public class STransitionDefinitionImpl extends SNamedElementImpl implements STra
         } else if (!condition.equals(other.condition)) {
             return false;
         }
-        if (dependencies == null) {
-            if (other.dependencies != null) {
-                return false;
-            }
-        } else if (!dependencies.equals(other.dependencies)) {
-            return false;
-        }
         if (source != other.source) {
             return false;
         }
@@ -127,4 +117,8 @@ public class STransitionDefinitionImpl extends SNamedElementImpl implements STra
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "["+getName()+"]";
+    }
 }

@@ -81,7 +81,7 @@ public interface FlowNodeInstanceService {
      * @throws SFlowNodeReadException
      * @since 6.0
      */
-    List<SFlowNodeInstance> getFlowNodeInstances(long rootContainerId, int fromIndex, int maxResults) throws SFlowNodeReadException;
+    List<SFlowNodeInstance> getFlowNodeInstances(long parentContainerId, int fromIndex, int maxResults) throws SFlowNodeReadException;
 
     /**
      * @param flowNodeInstance
@@ -344,4 +344,12 @@ public interface FlowNodeInstanceService {
      */
     List<Long> getFlowNodeInstanceIdsToRestart(QueryOptions queryOptions) throws SBonitaReadException;
 
+    /**
+     *
+     * get the number of flow node is this root container
+     * @param rootContainerId
+     * @return the number of flow node
+     * @since 6.5
+     */
+    int getNumberOfFlowNodes(long rootContainerId) throws SBonitaReadException;
 }

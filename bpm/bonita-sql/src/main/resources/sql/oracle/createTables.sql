@@ -151,11 +151,11 @@ CREATE TABLE arch_process_instance (
   callerId NUMBER(19, 0),
   migration_plan NUMBER(19, 0),
   sourceObjectId NUMBER(19, 0) NOT NULL,
-  stringIndex1 VARCHAR2(50 CHAR),
-  stringIndex2 VARCHAR2(50 CHAR),
-  stringIndex3 VARCHAR2(50 CHAR),
-  stringIndex4 VARCHAR2(50 CHAR),
-  stringIndex5 VARCHAR2(50 CHAR),
+  stringIndex1 VARCHAR2(255 CHAR),
+  stringIndex2 VARCHAR2(255 CHAR),
+  stringIndex3 VARCHAR2(255 CHAR),
+  stringIndex4 VARCHAR2(255 CHAR),
+  stringIndex5 VARCHAR2(255 CHAR),
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, rootProcessInstanceId, callerId);
@@ -274,25 +274,15 @@ CREATE TABLE process_instance (
   callerType VARCHAR2(50 CHAR),
   interruptingEventId NUMBER(19, 0),
   migration_plan NUMBER(19, 0),
-  stringIndex1 VARCHAR2(50 CHAR),
-  stringIndex2 VARCHAR2(50 CHAR),
-  stringIndex3 VARCHAR2(50 CHAR),
-  stringIndex4 VARCHAR2(50 CHAR),
-  stringIndex5 VARCHAR2(50 CHAR),
+  stringIndex1 VARCHAR2(255 CHAR),
+  stringIndex2 VARCHAR2(255 CHAR),
+  stringIndex3 VARCHAR2(255 CHAR),
+  stringIndex4 VARCHAR2(255 CHAR),
+  stringIndex5 VARCHAR2(255 CHAR),
   PRIMARY KEY (tenantid, id)
 );
 
 CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, processdefinitionid, stateid);
-
-CREATE TABLE token (
-  tenantid NUMBER(19, 0) NOT NULL,
-  id NUMBER(19, 0) NOT NULL,
-  processInstanceId NUMBER(19, 0) NOT NULL,
-  ref_id NUMBER(19, 0) NOT NULL,
-  parent_ref_id NUMBER(19, 0) NULL,
-  PRIMARY KEY (tenantid, id)
-);
-CREATE INDEX idx1_token ON token(tenantid,processInstanceId);
 
 CREATE TABLE flownode_instance (
   tenantid NUMBER(19, 0) NOT NULL,
@@ -343,7 +333,6 @@ CREATE TABLE flownode_instance (
   triggeredByEvent NUMBER(1),
   interrupting NUMBER(1),
   tokenCount INT NOT NULL,
-  token_ref_id NUMBER(19, 0) NULL,
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);

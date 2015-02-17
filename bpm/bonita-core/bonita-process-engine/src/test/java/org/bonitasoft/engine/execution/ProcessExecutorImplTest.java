@@ -34,7 +34,6 @@ import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -126,9 +125,6 @@ public class ProcessExecutorImplTest {
 
     @Mock
     private ReadSessionAccessor sessionAccessor;
-
-    @Mock
-    private TokenService tokenService;
 
     @Mock
     private TransactionExecutor transactionExecutor;

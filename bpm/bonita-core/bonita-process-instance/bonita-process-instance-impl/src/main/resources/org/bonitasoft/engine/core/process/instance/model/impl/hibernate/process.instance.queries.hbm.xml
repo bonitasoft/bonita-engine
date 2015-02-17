@@ -24,7 +24,13 @@
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE a.rootContainerId = :rootContainerId
-        ORDER BY a.id ASC
+		ORDER BY a.id ASC
+	</query>
+
+	<query name="getNumberOfFlowNode">
+		SELECT count(f)
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
+		WHERE f.logicalGroup4 = :parentProcessInstanceId
 	</query>
 	
 	<query name="getNumberOfActivitiesFromProcessInstance">
@@ -36,7 +42,7 @@
 	<query name="getFlowNodesFromProcessInstance">
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
-		WHERE f.rootContainerId = :rootContainerId
+		WHERE f.logicalGroup4 = :parentProcessInstanceId
         ORDER BY f.id ASC
 	</query>
 
@@ -64,19 +70,18 @@
 		ORDER BY id
 	</query>
 
+	<query name="getInclusiveGatewayInstanceOfProcessInstance">
+		SELECT g
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl AS g
+		WHERE g.logicalGroup4 = :processInstanceId
+		AND g.terminal = FALSE
+		AND g.gatewayType = 'INCLUSIVE'
+	</query>
 	<query name="getActiveGatewayInstanceOfProcess">
 		SELECT g
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl AS g
 		WHERE g.logicalGroup4 = :parentProcessInstanceId
 		AND g.name = :name
-		AND g.terminal = FALSE
-	</query>
-
-	<query name="getGatewayMergingToken">
-		SELECT g
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl AS g
-		WHERE g.logicalGroup4 = :processInstanceId
-		AND g.tokenRefId = :tokenRefId
 		AND g.terminal = FALSE
 	</query>
 
@@ -1194,39 +1199,6 @@
 				)
 			OR (p.startedBy = u.id AND u.managerUserId = :managerUserId)
 			)
-	</query>
-
-	<!-- Token -->
-	<query name="getNumberToken">
-		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
-		WHERE t.processInstanceId = :processInstanceId
-		AND t.refId = :refId
-	</query>
-
-	<query name="getNumberOfTokensOfProcessInstance">
-		SELECT COUNT(t)
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
-		WHERE t.processInstanceId = :processInstanceId
-	</query>
-
-	<query name="getTokensOfProcessInstance">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
-		WHERE t.processInstanceId = :processInstanceId
-	</query>
-
-	<query name="getToken">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
-		WHERE t.processInstanceId = :processInstanceId
-		AND t.refId = :refId
-        ORDER BY t.id ASC
-	</query>
-
-	<query name="getTokens">
-		SELECT t
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl AS t
 	</query>
 
 	<query name="getPossibleUserIdsOfPendingTasks">

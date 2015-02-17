@@ -28,6 +28,8 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceDeletionException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
@@ -42,7 +44,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInstanceNotFoundException;
@@ -142,14 +143,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private final SCommentService commentService;
 
-    private final TokenService tokenService;
-
     public ProcessInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
             final ActivityInstanceService activityService, final TechnicalLoggerService logger, final EventInstanceService bpmEventInstanceService,
             final DataInstanceService dataInstanceService, final ArchiveService archiveService, final TransitionService transitionService,
             final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final DocumentService documentService, final SCommentService commentService,
-            final TokenService tokenService) {
+            final ClassLoaderService classLoaderService, final DocumentService documentService, final SCommentService commentService) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
         this.eventService = eventService;
@@ -160,7 +158,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         this.classLoaderService = classLoaderService;
         this.documentService = documentService;
         this.commentService = commentService;
-        this.tokenService = tokenService;
         processInstanceKeyProvider = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         this.bpmEventInstanceService = bpmEventInstanceService;
         this.dataInstanceService = dataInstanceService;
@@ -421,7 +418,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } catch (final SProcessDefinitionNotFoundException e) {
             // delete anyway
         }
-        tokenService.deleteTokens(processInstance.getId());
         deleteFlowNodeInstances(processInstance.getId(), processDefinition);
         deleteDataInstancesIfNecessary(processInstance, processDefinition);
         documentService.deleteDocumentsFromProcessInstance(processInstance.getId());

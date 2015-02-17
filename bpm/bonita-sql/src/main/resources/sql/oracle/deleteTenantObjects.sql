@@ -22,7 +22,6 @@ DELETE FROM event_trigger_instance WHERE tenantid = ${tenantid};
 DELETE FROM waiting_event WHERE tenantid = ${tenantid};
 DELETE FROM process_instance WHERE tenantid = ${tenantid};
 DELETE FROM flownode_instance WHERE tenantid = ${tenantid};
-DELETE FROM token WHERE tenantid = ${tenantid};
 DELETE FROM breakpoint WHERE tenantid = ${tenantid};
 DELETE FROM report WHERE tenantid = ${tenantid};
 DELETE FROM processsupervisor WHERE tenantid = ${tenantid};
