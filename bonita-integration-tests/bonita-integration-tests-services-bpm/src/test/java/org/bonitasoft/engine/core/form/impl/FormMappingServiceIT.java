@@ -75,7 +75,7 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
         transactionService.begin();
 
-        f ormMappingService.list(15l, 0, 10);
+        formMappingService.list(15l, 0, 10);
         transactionService.complete();
     }
 }
