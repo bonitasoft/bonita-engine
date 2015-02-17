@@ -1028,12 +1028,86 @@ public class GatewayExecutionIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
         waitForUserTaskAndExecuteIt(processInstance, "Step3", user);
-        waitForTaskToFail(processInstance);
+        waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
+        waitForUserTask("Step2");
         // should also get the exception...not yet in the task
         disableAndDeleteProcess(processDefinition);
     }
+
+    @Test
+    public void processWithDiedBranchInclusive() throws Exception {
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
+        processDefinitionBuilder = processDefinitionBuilder.createNewInstance("processWithDiedBranch", PROCESS_VERSION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addStartEvent("Start");
+        processDefinitionBuilder.addGateway("Gateway1", GatewayType.PARALLEL);
+        processDefinitionBuilder.addUserTask("Step1", ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("Step2", ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("Step3", ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("Step4", ACTOR_NAME);
+        processDefinitionBuilder.addGateway("Gateway2", GatewayType.INCLUSIVE);
+        processDefinitionBuilder.addGateway("Exclu", GatewayType.EXCLUSIVE);
+        processDefinitionBuilder.addTransition("Start", "Gateway1");
+        processDefinitionBuilder.addTransition("Gateway1", "Step1");
+        processDefinitionBuilder.addTransition("Gateway1", "Step2");
+        processDefinitionBuilder.addTransition("Step2", "Exclu");
+        processDefinitionBuilder.addTransition("Exclu", "Step3",trueExpression);
+        processDefinitionBuilder.addTransition("Exclu", "Gateway2",falseExpression);
+        processDefinitionBuilder.addTransition("Step1", "Gateway2");
+        processDefinitionBuilder.addTransition("Gateway2", "Step4");
+        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        //branch 1 is executed
+        waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
+        //execute branch 2 that split to step3
+        waitForUserTaskAndExecuteIt(processInstance, "Step2", user);
+        //step3 should be ready (branch does not go to the inclusive anymore
+        waitForUserTask("Step3");
+        //gateway 2 should have merged after the step killed the branch
+        waitForUserTask("Step4");
+        disableAndDeleteProcess(processDefinition);
+    }
+
+
+    @Test
+    public void processWithLoopAndInclusive() throws Exception {
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
+        processDefinitionBuilder = processDefinitionBuilder.createNewInstance("processWithDiedBranch", PROCESS_VERSION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addStartEvent("Start");
+        processDefinitionBuilder.addGateway("Gateway1", GatewayType.PARALLEL);
+        processDefinitionBuilder.addUserTask("Step1", ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("Step2", ACTOR_NAME);
+        processDefinitionBuilder.addGateway("Gateway2", GatewayType.INCLUSIVE);
+        processDefinitionBuilder.addUserTask("Step3", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("Start", "Gateway1");
+        processDefinitionBuilder.addTransition("Gateway1", "Step1");
+        processDefinitionBuilder.addTransition("Step1", "Step1");
+        processDefinitionBuilder.addTransition("Gateway1", "Step2");
+        processDefinitionBuilder.addTransition("Step1", "Gateway2");
+        processDefinitionBuilder.addTransition("Step2", "Gateway2");
+        processDefinitionBuilder.addTransition("Gateway2", "Step3");
+        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        //branch 1 is executed
+        waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
+        waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
+        waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
+        waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
+        waitForUserTaskAndExecuteIt(processInstance, "Step2", user);
+        waitForUserTask("Step3");
+        waitForUserTask("Step3");
+        waitForUserTask("Step3");
+        waitForUserTask("Step3");
+        waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
+        waitForUserTask("Step3");
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
 
     @Test
     @Cover(classes = {}, concept = BPMNConcept.GATEWAY, keywords = { "restart", "Gateway", "Failed" }, jira = "BS-9367")
@@ -1070,4 +1144,7 @@ public class GatewayExecutionIT extends TestWithUser {
 
         disableAndDeleteProcess(processDefinition);
     }
+
+
+
 }

@@ -79,7 +79,6 @@ public class OrganizationAPIImpl {
         actorMappingService.deleteAllActorMembers();
         profileService.deleteAllProfileMembers();
         activityInstanceService.deleteAllPendingMappings();
-        activityInstanceService.deleteAllHiddenTasks();
         supervisorService.deleteAllProcessSupervisors();
         externalIdentityMappingService.deleteAllExternalIdentityMappings();
         identityService.deleteAllUserMemberships();

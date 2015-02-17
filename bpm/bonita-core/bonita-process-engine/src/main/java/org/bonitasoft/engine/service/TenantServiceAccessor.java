@@ -40,7 +40,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -113,8 +112,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     ProcessDefinitionService getProcessDefinitionService();
 
     ProcessInstanceService getProcessInstanceService();
-
-    TokenService getTokenService();
 
     TransitionService getTransitionInstanceService();
 

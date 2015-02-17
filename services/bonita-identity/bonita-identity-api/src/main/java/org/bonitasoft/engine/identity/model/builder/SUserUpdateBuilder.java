@@ -36,8 +36,6 @@ public interface SUserUpdateBuilder extends SIdentityUpdateBuilder {
 
     SUserUpdateBuilder updateManagerUserId(final long managerUserId);
 
-    SUserUpdateBuilder updateDelegeeUserName(final String delegeeUserName);
-
     SUserUpdateBuilder updateIconName(final String iconName);
 
     SUserUpdateBuilder updateIconPath(final String iconPath);

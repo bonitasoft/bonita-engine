@@ -67,7 +67,6 @@ WaitingEvent -> 10016
 MessageInstance -> 10017
 PendingActivityMapping -> 10018
 Breakpoint -> 10019
-HiddenTask -> 10095
 RefBusinessDataInstance -> 10096
 
 Datainstance

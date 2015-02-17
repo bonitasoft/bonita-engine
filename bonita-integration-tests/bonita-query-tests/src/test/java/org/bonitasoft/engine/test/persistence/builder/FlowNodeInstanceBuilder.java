@@ -32,8 +32,6 @@ public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B
 
     protected long executedBySubstitute;
 
-    protected boolean deleted;
-
     protected boolean stateExecuting;
 
     protected long flowNodeDefinitionId;
@@ -58,12 +56,9 @@ public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B
 
     protected boolean stable;
 
-    protected Long tokenRefId;
-
     @Override
     protected T fill(final T persistent) {
         super.fill(persistent);
-        persistent.setDeleted(deleted);
         persistent.setDescription(description);
         persistent.setExecutedBy(executedBy);
         persistent.setExecutedBySubstitute(executedBySubstitute);
@@ -79,7 +74,6 @@ public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B
         persistent.setStateId(stateId);
         persistent.setStateName(stateName);
         persistent.setTerminal(terminal);
-        persistent.setTokenRefId(tokenRefId);
         persistent.setLogicalGroup(0, logicalGroup1);
         persistent.setLogicalGroup(1, logicalGroup2);
         persistent.setLogicalGroup(2, logicalGroup3);
@@ -104,11 +98,6 @@ public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B
 
     public B withStateExecuting(final boolean stateExecuting) {
         this.stateExecuting = stateExecuting;
-        return thisBuilder;
-    }
-
-    public B withDeleted(final boolean deleted) {
-        this.deleted = deleted;
         return thisBuilder;
     }
 
@@ -159,11 +148,6 @@ public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B
 
     public B withParentContainerId(final long processInstanceId) {
         this.parentContainerId = processInstanceId;
-        return thisBuilder;
-    }
-
-    public B withTokenRefId(final Long tokenRefId) {
-        this.tokenRefId = tokenRefId;
         return thisBuilder;
     }
 

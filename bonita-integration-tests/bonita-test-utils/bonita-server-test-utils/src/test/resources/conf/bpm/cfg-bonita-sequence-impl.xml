@@ -12,7 +12,6 @@
 				<entry key="20050" value="25000" /><!-- archived data --><!-- 5 change by data -->
 				<entry key="10060" value="20000" /><!-- comment -->
 				<entry key="10080" value="20000" /><!-- SAComment -->
-				<entry key="10110" value="20000" /><!-- TokenCount -->
 				<entry key="10010" value="1000" /><!-- ProcessInstance -->
 				<entry key="10011" value="20000" /><!-- ActivityInstance --><!-- 20 step by process average -->
 				<entry key="10013" value="20000" /><!-- TransitoinInstance --><!-- same as activity instance -->
@@ -47,7 +46,6 @@
 				<entry key="10090" value="100" /><!-- document_content -->
 				<entry key="10000" value="100" /><!-- actor -->
 				<entry key="10001" value="100" /><!-- actorMapping -->
-				<entry key="10095" value="100" /><!-- HiddenTask -->
 				<entry key="10030" value="100" /><!-- category -->
 				<entry key="10040" value="100" /><!-- SDocumentMapping -->
 				<entry key="10050" value="100" /><!-- supervisor -->
@@ -147,8 +145,6 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl" value="10060" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" value="10060" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="10080" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="10095" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" value="10110" />
 				<entry key="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" value="10300" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" value="20050" />

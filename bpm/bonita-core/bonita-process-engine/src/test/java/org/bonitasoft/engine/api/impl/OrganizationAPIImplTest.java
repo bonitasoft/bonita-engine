@@ -122,7 +122,6 @@ public class OrganizationAPIImplTest {
         verify(actorMappingService, times(1)).deleteAllActorMembers();
         verify(profileService, times(1)).deleteAllProfileMembers();
         verify(activityInstanceService, times(1)).deleteAllPendingMappings();
-        verify(activityInstanceService, times(1)).deleteAllHiddenTasks();
         verify(supervisorService, times(1)).deleteAllProcessSupervisors();
         verify(externalIdentityMappingService, times(1)).deleteAllExternalIdentityMappings();
         verify(identityService, times(1)).deleteAllUserMemberships();

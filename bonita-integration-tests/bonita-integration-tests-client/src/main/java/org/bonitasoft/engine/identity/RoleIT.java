@@ -113,6 +113,28 @@ public class RoleIT extends TestWithTechnicalUser {
     }
 
     @Test
+    public void roleNameAndDisplayNameShouldAccept255Chars() throws BonitaException {
+        final String stringIndex_255_chars = "abcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxy12345";
+        final Role role = getIdentityAPI().createRole(new RoleCreator(stringIndex_255_chars).setDisplayName(stringIndex_255_chars));
+
+        // Should be no exception:
+
+        getIdentityAPI().deleteRole(role.getId());
+    }
+
+    @Test(expected = Exception.class)
+    public void roleNameShouldNotAccept256Chars() throws BonitaException {
+        final String stringIndex_256_chars = "_abcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxy12345";
+        getIdentityAPI().createRole(stringIndex_256_chars);
+    }
+
+    @Test(expected = Exception.class)
+    public void roleDisplayNameShouldNotAccept256Chars() throws BonitaException {
+        final String stringIndex_256_chars = "_abcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxy12345";
+        getIdentityAPI().createRole(new RoleCreator("someName").setDisplayName(stringIndex_256_chars));
+    }
+
+    @Test
     public void getRolesByIDs() throws BonitaException {
         final String manager = "manager";
         final Role roleCreated1 = getIdentityAPI().createRole(manager);

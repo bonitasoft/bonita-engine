@@ -24,9 +24,9 @@ import org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl;
 public class STokenBuilderFactoryImpl implements STokenBuilderFactory {
 
     @Override
-    public STokenBuilder createNewInstance(final long processInstanceId, final Long refId, final Long parentRefId) {
+    public STokenBuilder createNewInstance(final long processInstanceId) {
         NullCheckingUtil.checkArgsNotNull(processInstanceId);
-        final STokenImpl entity = new STokenImpl(processInstanceId, refId, parentRefId);
+        final STokenImpl entity = new STokenImpl(processInstanceId);
         return new STokenBuilderImpl(entity);
     }
 

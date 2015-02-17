@@ -157,11 +157,11 @@ CREATE TABLE arch_process_instance (
   callerId BIGINT,
   migration_plan BIGINT,
   sourceObjectId BIGINT NOT NULL,
-  stringIndex1 VARCHAR(50),
-  stringIndex2 VARCHAR(50),
-  stringIndex3 VARCHAR(50),
-  stringIndex4 VARCHAR(50),
-  stringIndex5 VARCHAR(50),
+  stringIndex1 VARCHAR(255),
+  stringIndex2 VARCHAR(255),
+  stringIndex3 VARCHAR(255),
+  stringIndex4 VARCHAR(255),
+  stringIndex5 VARCHAR(255),
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 CREATE INDEX idx1_arch_process_instance ON arch_process_instance (tenantId, sourceObjectId, rootProcessInstanceId, callerId);
@@ -177,8 +177,8 @@ CREATE TABLE arch_flownode_instance (
   archiveDate BIGINT NOT NULL,
   rootContainerId BIGINT NOT NULL,
   parentContainerId BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  displayName VARCHAR(75),
+  name VARCHAR(255) NOT NULL,
+  displayName VARCHAR(255),
   displayDescription VARCHAR(255),
   stateId INT NOT NULL,
   stateName VARCHAR(50),
@@ -280,23 +280,13 @@ CREATE TABLE process_instance (
   callerType VARCHAR(50),
   interruptingEventId BIGINT,
   migration_plan BIGINT,
-  stringIndex1 VARCHAR(50),
-  stringIndex2 VARCHAR(50),
-  stringIndex3 VARCHAR(50),
-  stringIndex4 VARCHAR(50),
-  stringIndex5 VARCHAR(50),
+  stringIndex1 VARCHAR(255),
+  stringIndex2 VARCHAR(255),
+  stringIndex3 VARCHAR(255),
+  stringIndex4 VARCHAR(255),
+  stringIndex5 VARCHAR(255),
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
-
-CREATE TABLE token (
-  tenantid BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  processInstanceId BIGINT NOT NULL,
-  ref_id BIGINT NOT NULL,
-  parent_ref_id BIGINT NULL,
-  PRIMARY KEY (tenantid, id)
-) ENGINE = INNODB;
-CREATE INDEX idx1_token ON token(tenantid,processInstanceId);
 
 CREATE TABLE flownode_instance (
   tenantid BIGINT NOT NULL,
@@ -305,8 +295,8 @@ CREATE TABLE flownode_instance (
   kind VARCHAR(25) NOT NULL,
   rootContainerId BIGINT NOT NULL,
   parentContainerId BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  displayName VARCHAR(75),
+  name VARCHAR(255) NOT NULL,
+  displayName VARCHAR(255),
   displayDescription VARCHAR(255),
   stateId INT NOT NULL,
   stateName VARCHAR(50),
@@ -346,14 +336,12 @@ CREATE TABLE flownode_instance (
   abortedByBoundary BIGINT,
   triggeredByEvent BOOLEAN,
   interrupting BOOLEAN,
-  deleted BOOLEAN DEFAULT FALSE,
   tokenCount INT NOT NULL,
-  token_ref_id BIGINT NULL,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
-CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid, deleted);
+CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid);
 
 CREATE TABLE connector_instance (
   tenantid BIGINT NOT NULL,
@@ -445,15 +433,6 @@ CREATE TABLE pending_mapping (
   	PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
-
-CREATE TABLE hidden_activity (
-	tenantid BIGINT NOT NULL,
-  	id BIGINT NOT NULL,
-  	activityId BIGINT NOT NULL,
-  	userId BIGINT NOT NULL,
-  	UNIQUE (tenantid, activityId, userId),
-  	PRIMARY KEY (tenantid, id)
-) ENGINE = INNODB;
 
 CREATE TABLE breakpoint (
 	tenantid BIGINT NOT NULL,
@@ -692,12 +671,13 @@ CREATE TABLE external_identity_mapping (
   UNIQUE (tenantid, kind, externalId, userId, groupId, roleId),
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+
 CREATE TABLE group_ (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  name VARCHAR(125) NOT NULL,
   parentPath VARCHAR(255),
-  displayName VARCHAR(75),
+  displayName VARCHAR(255),
   description TEXT,
   iconName VARCHAR(50),
   iconPath VARCHAR(50),
@@ -711,8 +691,8 @@ CREATE TABLE group_ (
 CREATE TABLE role (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  displayName VARCHAR(75),
+  name VARCHAR(255) NOT NULL,
+  displayName VARCHAR(255),
   description TEXT,
   iconName VARCHAR(50),
   iconPath VARCHAR(50),
@@ -736,7 +716,6 @@ CREATE TABLE user_ (
   title VARCHAR(50),
   jobTitle VARCHAR(255),
   managerUserId BIGINT,
-  delegeeUserName VARCHAR(50),
   iconName VARCHAR(50),
   iconPath VARCHAR(50),
   createdBy BIGINT,
@@ -767,10 +746,10 @@ CREATE TABLE user_contactinfo (
   room VARCHAR(50),
   address VARCHAR(255),
   zipCode VARCHAR(50),
-  city VARCHAR(50),
-  state VARCHAR(50),
-  country VARCHAR(50),
-  website VARCHAR(50),
+  city VARCHAR(255),
+  state VARCHAR(255),
+  country VARCHAR(255),
+  website VARCHAR(255),
   personal BOOLEAN NOT NULL,
   UNIQUE (tenantid, userId, personal),
   PRIMARY KEY (tenantid, id)

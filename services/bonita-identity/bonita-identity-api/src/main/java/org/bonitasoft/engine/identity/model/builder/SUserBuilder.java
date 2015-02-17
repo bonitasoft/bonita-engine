@@ -47,8 +47,6 @@ public interface SUserBuilder {
 
     SUserBuilder setManagerUserId(final long managerUserId);
 
-    SUserBuilder setDelegeeUserName(final String delegeeUserName);
-
     SUserBuilder setEnabled(final boolean enabled);
 
     SUser done();

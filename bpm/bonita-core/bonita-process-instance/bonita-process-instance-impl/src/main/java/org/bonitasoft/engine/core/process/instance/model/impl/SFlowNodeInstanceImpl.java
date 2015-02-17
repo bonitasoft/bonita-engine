@@ -17,7 +17,7 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainer;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.persistence.PersistentObjectWithFlag;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Feng Hui
@@ -27,7 +27,7 @@ import org.bonitasoft.engine.persistence.PersistentObjectWithFlag;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl implements SFlowNodeInstance, SFlowElementsContainer, PersistentObjectWithFlag {
+public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl implements SFlowNodeInstance, SFlowElementsContainer, PersistentObject {
 
     private static final long serialVersionUID = -699008235249779931L;
 
@@ -52,8 +52,6 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
     private long executedBy;
 
     private long executedBySubstitute;
-
-    private boolean deleted;
 
     private boolean stateExecuting;
 
@@ -179,16 +177,6 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
     }
 
     @Override
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    @Override
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    @Override
     public boolean isStateExecuting() {
         return stateExecuting;
     }
@@ -215,7 +203,6 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (deleted ? 1231 : 1237);
         result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (executedBy ^ executedBy >>> 32);
@@ -244,9 +231,6 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
             return false;
         }
         final SFlowNodeInstanceImpl other = (SFlowNodeInstanceImpl) obj;
-        if (deleted != other.deleted) {
-            return false;
-        }
         if (displayDescription == null) {
             if (other.displayDescription != null) {
                 return false;
@@ -305,7 +289,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
     public String toString() {
         return "SFlowNodeInstanceImpl [name=" + getName() + ", stateId=" + stateId + ", stateName=" + stateName + ", previousStateId=" + previousStateId
                 + ", reachedStateDate=" + reachedStateDate + ", lastUpdateDate=" + lastUpdateDate + ", displayName=" + displayName + ", displayDescription="
-                + displayDescription + ", tokenCount=" + tokenCount + ", loopCounter=" + loopCounter + ", executedBy=" + executedBy + ", deleted=" + deleted
+                + displayDescription + ", tokenCount=" + tokenCount + ", loopCounter=" + loopCounter + ", executedBy=" + executedBy
                 + ", stateExecuting=" + stateExecuting + ", flownodeDefinitionId=" + flowNodeDefinitionId + "]";
     }
 

@@ -55,8 +55,6 @@ public interface SUserBuilderFactory {
 
     String getManagerUserIdKey();
 
-    String getDelegeeUserNameKey();
-
     String getEnabledKey();
 
 }
