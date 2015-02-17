@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2014 BonitaSoft S.A.
+ * Copyright (C) 2009, 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -18,11 +18,11 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
@@ -31,7 +31,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -93,11 +92,11 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
             final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
-            final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService, final CacheService cacheService) {
+            final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
                 transitionService, eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
                 expressionResolverService, eventService, handlers, documentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
-                tokenService, eventsHandler, flowNodeStateManager, cacheService);
+                tokenService, eventsHandler, flowNodeStateManager);
         this.businessDataRepository = businessDataRepository;
         this.refBusinessDataService = refBusinessDataService;
     }

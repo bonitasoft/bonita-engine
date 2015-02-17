@@ -135,7 +135,6 @@
         <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager"/>
         <constructor-arg name="businessDataRepository" ref="businessDataRepository"/>
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
-        <constructor-arg name="cacheService" ref="cacheService"/>
     </bean>
 
 	<bean id="transactionalProcessInstanceInterruptor" class="org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor">
