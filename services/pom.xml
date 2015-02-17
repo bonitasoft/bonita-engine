@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <artifactId>bonita-engine</artifactId>
-        <groupId>org.bonitasoft.engine</groupId>
-        <version>6.5.0-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<artifactId>bonita-engine</artifactId>
+		<groupId>org.bonitasoft.engine</groupId>
+		<version>7.0.0-SNAPSHOT</version>
+	</parent>
 
-    <artifactId>services</artifactId>
-    <packaging>pom</packaging>
+	<artifactId>services</artifactId>
+	<packaging>pom</packaging>
 
-    <name>Bonita Engine Services</name>
+	<name>Bonita Engine Services</name>
 
-    <modules>
-        <module>bonita-commons</module>
-        <module>bonita-log</module>
-        <module>bonita-recorder</module>
-        <module>bonita-identity</module>
-        <module>bonita-transaction</module>
-        <module>bonita-persistence</module>
-        <module>bonita-cache</module>
-        <module>bonita-classloader</module>
-        <module>bonita-scheduler</module>
-        <module>bonita-xml</module>
-        <module>bonita-events</module>
-        <module>bonita-dependency</module>
-        <module>bonita-platform</module>
-        <module>bonita-archive</module>
-        <module>bonita-authentication</module>
-        <module>bonita-session</module>
-        <module>bonita-platform-authentication</module>
-        <module>bonita-platform-session</module>
-        <module>bonita-session-accessor</module>
-        <module>bonita-expression</module>
-        <module>bonita-external-identity-mapping</module>
-        <module>bonita-data-definition</module>
-        <module>bonita-data-instance</module>
-        <module>bonita-connector-executor</module>
-        <module>bonita-command</module>
-        <module>bonita-platform-command</module>
-        <module>bonita-profile</module>
-        <module>bonita-lock</module>
-        <module>bonita-work</module>
-        <module>bonita-incident</module>
-        <module>bonita-builder</module>
-        <module>bonita-theme</module>
-        <module>bonita-page</module>
-        <module>bonita-time-tracker</module>
-        <module>bonita-business-application</module>
-    </modules>
-
+	<modules>
+		<module>bonita-commons</module>
+		<module>bonita-log</module>
+		<module>bonita-recorder</module>
+		<module>bonita-identity</module>
+		<module>bonita-transaction</module>
+		<module>bonita-persistence</module>		
+		<module>bonita-cache</module>
+		<module>bonita-classloader</module>
+		<module>bonita-scheduler</module>
+		<module>bonita-xml</module>
+		<module>bonita-events</module>
+		<module>bonita-dependency</module>
+		<module>bonita-platform</module>
+		<module>bonita-archive</module>
+		<module>bonita-authentication</module>
+		<module>bonita-session</module>
+		<module>bonita-platform-authentication</module>
+		<module>bonita-platform-session</module>
+		<module>bonita-session-accessor</module>
+		<module>bonita-expression</module>
+		<module>bonita-external-identity-mapping</module>
+		<module>bonita-data-definition</module>
+		<module>bonita-data-instance</module>
+		<module>bonita-connector-executor</module>
+		<module>bonita-command</module>
+		<module>bonita-platform-command</module>
+		<module>bonita-profile</module>
+		<module>bonita-lock</module>
+		<module>bonita-work</module>
+		<module>bonita-incident</module>
+		<module>bonita-builder</module>
+		<module>bonita-theme</module>
+		<module>bonita-page</module>
+		<module>bonita-time-tracker</module>
+		<module>bonita-business-application</module>
+			</modules>
+		
 </project>
