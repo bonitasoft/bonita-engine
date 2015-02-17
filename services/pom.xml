@@ -24,7 +24,6 @@
                 <module>bonita-archive</module>
                 <module>bonita-cache</module>
                 <module>bonita-classloader</module>
-                <module>bonita-delete-batch</module>
                 <module>bonita-events</module>
                 <module>bonita-lock</module>
                 <module>bonita-log</module>
