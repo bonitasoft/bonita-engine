@@ -313,16 +313,6 @@ CREATE TABLE process_instance (
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
-CREATE TABLE token (
-  tenantid BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  processInstanceId BIGINT NOT NULL,
-  ref_id BIGINT NOT NULL,
-  parent_ref_id BIGINT NULL,
-  PRIMARY KEY (tenantid, id)
-) ENGINE = INNODB;
-CREATE INDEX idx1_token ON token(tenantid,processInstanceId);
-
 CREATE TABLE flownode_instance (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -372,7 +362,6 @@ CREATE TABLE flownode_instance (
   triggeredByEvent BOOLEAN,
   interrupting BOOLEAN,
   tokenCount INT NOT NULL,
-  token_ref_id BIGINT NULL,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);

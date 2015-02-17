@@ -88,12 +88,6 @@ public abstract class SFlowNodeInstanceBuilderImpl implements SFlowNodeInstanceB
     }
 
     @Override
-    public SFlowNodeInstanceBuilder setTokenRefId(final Long tokenRefId) {
-        this.entity.setTokenRefId(tokenRefId);
-        return this;
-    }
-
-    @Override
     public SFlowNodeInstanceBuilder setLoopCounter(final int loopCounter) {
         this.entity.setLoopCounter(loopCounter);
         return this;

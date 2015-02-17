@@ -45,8 +45,6 @@ public interface SFlowNodeInstanceBuilder {
 
     SFlowNodeInstanceBuilder setStateCategory(SStateCategory stateCategory);
 
-    SFlowNodeInstanceBuilder setTokenRefId(Long tokenRefId);
-
     SFlowNodeInstance done();
     
     SFlowNodeType getFlowNodeType();

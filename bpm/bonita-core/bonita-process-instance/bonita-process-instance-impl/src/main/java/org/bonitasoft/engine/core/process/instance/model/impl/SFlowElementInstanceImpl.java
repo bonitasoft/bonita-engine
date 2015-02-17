@@ -45,8 +45,6 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
 
     private boolean stable;
 
-    private Long tokenRefId;
-
     public SFlowElementInstanceImpl() {
     }
 
@@ -188,15 +186,6 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
     }
 
     @Override
-    public Long getTokenRefId() {
-        return tokenRefId;
-    }
-
-    public void setTokenRefId(final Long tokenRefId) {
-        this.tokenRefId = tokenRefId;
-    }
-
-    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
@@ -210,7 +199,6 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
         result = prime * result + (stable ? 1231 : 1237);
         result = prime * result + (stateCategory == null ? 0 : stateCategory.hashCode());
         result = prime * result + (terminal ? 1231 : 1237);
-        result = prime * result + (tokenRefId == null ? 0 : tokenRefId.hashCode());
         return result;
     }
 
@@ -260,13 +248,6 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
         if (terminal != other.terminal) {
             return false;
         }
-        if (tokenRefId == null) {
-            if (other.tokenRefId != null) {
-                return false;
-            }
-        } else if (!tokenRefId.equals(other.tokenRefId)) {
-            return false;
-        }
         return true;
     }
 
@@ -274,7 +255,7 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
     public String toString() {
         return "SFlowElementInstanceImpl [rootContainerId=" + rootContainerId + ", parentContainerId=" + parentContainerId + ", stateCategory=" + stateCategory
                 + ", logicalGroup1=" + logicalGroup1 + ", logicalGroup2=" + logicalGroup2 + ", logicalGroup3=" + logicalGroup3 + ", logicalGroup4="
-                + logicalGroup4 + ", description=" + description + ", terminal=" + terminal + ", stable=" + stable + ", tokenRefId=" + tokenRefId + "]";
+                + logicalGroup4 + ", description=" + description + ", terminal=" + terminal + ", stable=" + stable + "]";
     }
 
 }

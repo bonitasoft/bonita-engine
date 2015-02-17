@@ -692,7 +692,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     /**
      * @param processInstanceId
      * @return
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      * @since 6.0
      */
     int getNumberOfActivityInstances(long processInstanceId) throws SActivityReadException;

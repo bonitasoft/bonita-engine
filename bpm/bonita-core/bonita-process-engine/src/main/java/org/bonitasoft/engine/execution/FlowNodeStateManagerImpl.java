@@ -36,7 +36,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
@@ -192,13 +191,13 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
             final TechnicalLoggerService logger, final DocumentService documentService, final SCommentService commentService,
             final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
-            final WorkService workService, final TokenService tokenService, final IdentityService identityService,
+            final WorkService workService, final IdentityService identityService,
             final ParentContainerResolver parentContainerResolver) {
         this(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, expressionResolverService,
                 dataInstanceService, operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentService, commentService,
                 new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
                         connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
-                        containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, tokenService,
+                        containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, processInstanceService,
                         parentContainerResolver));
     }
 

@@ -29,16 +29,4 @@ public interface SToken extends PersistentObject {
 
     long getProcessInstanceId();
 
-    /**
-     * @return
-     *         the id of the element that created this token
-     */
-    Long getRefId();
-
-    /**
-     * @return
-     *         this if of the element that created the parent token of this token
-     */
-    Long getParentRefId();
-
 }

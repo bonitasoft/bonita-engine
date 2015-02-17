@@ -51,7 +51,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -128,8 +127,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ActivityInstanceService activityInstanceService;
 
     private ProcessInstanceService processInstanceService;
-
-    private TokenService tokenCountService;
 
     private FlowNodeExecutor flowNodeExecutor;
 
@@ -339,14 +336,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             processInstanceService = beanAccessor.getService(ProcessInstanceService.class);
         }
         return processInstanceService;
-    }
-
-    @Override
-    public TokenService getTokenService() {
-        if (tokenCountService == null) {
-            tokenCountService = beanAccessor.getService(TokenService.class);
-        }
-        return tokenCountService;
     }
 
     @Override

@@ -53,7 +53,6 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -284,10 +283,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(ProcessInstanceService.class);
     }
 
-    @Override
-    public TokenService getTokenService() {
-        return getInstanceOf(TokenService.class);
-    }
 
     @Override
     public ActivityInstanceService getActivityInstanceService() {

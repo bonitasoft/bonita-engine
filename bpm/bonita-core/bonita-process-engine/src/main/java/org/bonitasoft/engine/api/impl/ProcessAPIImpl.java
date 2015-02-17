@@ -3529,7 +3529,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 tenantAccessor.getProcessDefinitionService(), tenantAccessor.getDataInstanceService(), tenantAccessor.getOperationService(),
                 tenantAccessor.getWorkService(), tenantAccessor.getContainerRegistry(), tenantAccessor.getEventInstanceService(),
                 tenantAccessor.getSchedulerService(), tenantAccessor.getCommentService(), tenantAccessor.getIdentityService(),
-                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getTokenService(), tenantAccessor.getParentContainerResolver());
+                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getProcessInstanceService(), tenantAccessor.getParentContainerResolver());
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
             if (sActivityInstance instanceof SHumanTaskInstance) {
