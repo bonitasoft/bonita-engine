@@ -51,6 +51,7 @@ import com.bonitasoft.engine.tenant.TenantIT;
         PlatformMonitoringAPITest.class,
         TenantIT.class,
         BDRepositoryIT.class,
+        org.bonitasoft.engine.business.data.BDRepositoryIT.class,
         ExecuteBDMQueryCommandIT.class
 })
 @Initializer(BPMSPTestsForServers.class)
