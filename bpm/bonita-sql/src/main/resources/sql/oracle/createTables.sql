@@ -220,7 +220,6 @@ CREATE TABLE arch_transition_instance (
   id NUMBER(19, 0) NOT NULL,
   rootContainerId NUMBER(19, 0) NOT NULL,
   parentContainerId NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(255 CHAR) NOT NULL,
   source NUMBER(19, 0),
   target NUMBER(19, 0),
   state VARCHAR2(50 CHAR),
