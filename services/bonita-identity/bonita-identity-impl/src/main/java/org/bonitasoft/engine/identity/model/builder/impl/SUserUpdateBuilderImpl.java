@@ -79,12 +79,6 @@ public class SUserUpdateBuilderImpl implements SUserUpdateBuilder {
     }
 
     @Override
-    public SUserUpdateBuilder updateDelegeeUserName(final String delegeeUserName) {
-        descriptor.addField(SUserBuilderFactoryImpl.DELEGEE_USER_NAME, delegeeUserName);
-        return this;
-    }
-
-    @Override
     public SUserUpdateBuilder updateIconName(final String iconName) {
         descriptor.addField(SUserBuilderFactoryImpl.ICON_NAME, iconName);
         return this;
@@ -109,7 +103,7 @@ public class SUserUpdateBuilderImpl implements SUserUpdateBuilder {
     }
 
     @Override
-    public SUserUpdateBuilder updateEnabled(boolean enabled) {
+    public SUserUpdateBuilder updateEnabled(final boolean enabled) {
         descriptor.addField(SUserBuilderFactoryImpl.ENABLED, enabled);
         return this;
     }
