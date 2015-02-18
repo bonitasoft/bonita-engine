@@ -29,8 +29,6 @@ public class SUserBuilderFactoryImpl implements SUserBuilderFactory {
 
     static final String ID = "id";
 
-    static final String DELEGEE_USER_NAME = "delegeeUserName";
-
     static final String MANAGER_USER_ID = "managerUserId";
 
     static final String JOB_TITLE = "jobTitle";
@@ -109,11 +107,6 @@ public class SUserBuilderFactoryImpl implements SUserBuilderFactory {
     @Override
     public String getManagerUserIdKey() {
         return MANAGER_USER_ID;
-    }
-
-    @Override
-    public String getDelegeeUserNameKey() {
-        return DELEGEE_USER_NAME;
     }
 
     @Override

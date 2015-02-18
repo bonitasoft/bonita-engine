@@ -554,7 +554,6 @@ public class CommonBPMServicesTest {
         final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance();
         userBuilder.setCreatedBy(2);
         userBuilder.setCreationDate(6);
-        userBuilder.setDelegeeUserName("delegeeUserName");
         userBuilder.setEnabled(true);
         userBuilder.setFirstName(firstName);
         userBuilder.setIconName("iconName");
