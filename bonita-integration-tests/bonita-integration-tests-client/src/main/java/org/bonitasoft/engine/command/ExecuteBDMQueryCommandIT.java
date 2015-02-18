@@ -130,6 +130,8 @@ public class ExecuteBDMQueryCommandIT extends CommonAPIIT {
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
+
+        assertThat(getTenantAdministrationAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().installBusinessDataModel(zip);
         getTenantAdministrationAPI().resume();
