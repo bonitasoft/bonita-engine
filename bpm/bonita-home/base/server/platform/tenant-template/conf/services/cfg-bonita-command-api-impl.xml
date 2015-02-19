@@ -36,6 +36,7 @@
 				<ref bean="deleteEntityMembersCommand" />
 				<ref bean="searchWaitingEventsCommand" />
                 <ref bean="advancedStartProcessCommand" />
+                <ref bean="multipleStartPointsProcessCommand" />
 			</list>
 		</property>
 	</bean>
@@ -333,6 +334,18 @@
         </constructor-arg>
         <constructor-arg name="implementation">
             <value>org.bonitasoft.engine.command.AdvancedStartProcessCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="multipleStartPointsProcessCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+        <constructor-arg name="name">
+            <value>multipleStartPointsProcessCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Advanced start process using multiple start points.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.command.MultipleStartPointsProcessCommand</value>
         </constructor-arg>
     </bean>
 

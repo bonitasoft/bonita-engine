@@ -74,7 +74,7 @@ public class AdvancedStartProcessCommandTest {
         parameters = new HashMap<String, Serializable>(2);
         parameters.put(AdvancedStartProcessCommand.PROCESS_DEFINITION_ID, PROCESS_DEFINITION_ID);
         parameters.put(AdvancedStartProcessCommand.STARTED_BY, 123L);
-        parameters.put(AdvancedStartProcessCommand.ACTIVITY_NAMES, new ArrayList<String>(Collections.singletonList("")));
+        parameters.put(AdvancedStartProcessCommand.ACTIVITY_NAME, new ArrayList<String>(Collections.singletonList("")));
         
         Set<SFlowNodeDefinition> flowNodes = new HashSet<SFlowNodeDefinition>();
         flowNodes.add(userTask);
