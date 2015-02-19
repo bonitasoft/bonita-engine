@@ -287,6 +287,8 @@ CREATE TABLE process_instance (
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, processdefinitionid, stateid);
+
 CREATE TABLE flownode_instance (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,

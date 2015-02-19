@@ -309,6 +309,9 @@ CREATE TABLE process_instance (
 )
 GO
 
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, processdefinitionid, stateid)
+GO
+
 CREATE TABLE flownode_instance (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,

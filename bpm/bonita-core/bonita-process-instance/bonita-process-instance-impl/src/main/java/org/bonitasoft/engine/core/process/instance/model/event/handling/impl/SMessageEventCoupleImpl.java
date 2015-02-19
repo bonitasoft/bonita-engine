@@ -75,5 +75,12 @@ public class SMessageEventCoupleImpl implements SMessageEventCouple {
 	    return eventType;
     }
 
-
+    @Override
+    public String toString() {
+        return "SMessageEventCoupleImpl{" +
+                "waitingMessageId=" + waitingMessageId +
+                ", eventType=" + eventType +
+                ", messageId=" + messageId +
+                '}';
+    }
 }

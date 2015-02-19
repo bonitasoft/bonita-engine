@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.profile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -25,7 +26,9 @@ import org.bonitasoft.engine.api.ImportStatus.Status;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SRoleNotFoundException;
@@ -48,12 +51,12 @@ import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.SValidationException;
 import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
- *
  * Import profiles with mapping and entries using Policy
  *
  * @author Baptiste Mesta
@@ -66,14 +69,14 @@ public class ProfilesImporter {
 
     private final List<ExportedProfile> exportedProfiles;
 
-    private final ProfileImportStategy importStrategy;
+    private final ProfileImportStrategy importStrategy;
 
     public ProfilesImporter(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> exportedProfiles,
             final ImportPolicy policy) {
         this(profileService, identityService, exportedProfiles, getStrategy(profileService, policy));
     }
 
-    private static ProfileImportStategy getStrategy(final ProfileService profileService, final ImportPolicy policy) {
+    private static ProfileImportStrategy getStrategy(final ProfileService profileService, final ImportPolicy policy) {
         switch (policy) {
             case DELETE_EXISTING:
                 return new DeleteExistingImportStrategy(profileService);
@@ -83,6 +86,8 @@ public class ProfilesImporter {
                 return new IgnoreDuplicateImportStrategy(profileService);
             case REPLACE_DUPLICATES:
                 return new ReplaceDuplicateImportStrategy(profileService);
+            case UPDATE_DEFAULTS:
+                return new UpdateDefaultsImportStrategy(profileService);
             default:
                 return null;
 
@@ -90,7 +95,7 @@ public class ProfilesImporter {
     }
 
     ProfilesImporter(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> exportedProfiles,
-            final ProfileImportStategy importStrategy) {
+            final ProfileImportStrategy importStrategy) {
         this.profileService = profileService;
         this.identityService = identityService;
         this.exportedProfiles = exportedProfiles;
@@ -98,7 +103,6 @@ public class ProfilesImporter {
     }
 
     public List<ImportStatus> importProfiles(final long importerId) throws ExecutionException {
-
         importStrategy.beforeImport();
         try {
             final List<ImportStatus> importStatus = new ArrayList<ImportStatus>(exportedProfiles.size());
@@ -128,8 +132,11 @@ public class ProfilesImporter {
                 /*
                  * Import mapping with pages
                  */
-                if (existingProfile == null || !exportedProfile.isDefault() && !existingProfile.isDefault()) {
+                if (existingProfile == null || importStrategy.shouldUpdateProfileEntries(exportedProfile, existingProfile)) {
                     // update entries only if it's a custom profile
+                    if (existingProfile != null) {
+                        profileService.deleteAllProfileEntriesOfProfile(existingProfile);
+                    }
                     currentStatus.getErrors().addAll(importProfileEntries(profileService, exportedProfile.getParentProfileEntries(), profileId));
                 }
 
@@ -236,7 +243,7 @@ public class ProfilesImporter {
         if (existingProfile != null) {
             newProfile = importStrategy.whenProfileExists(importerId, exportedProfile, existingProfile);
         } else if (importStrategy.canCreateProfileIfNotExists(exportedProfile)) {
-                newProfile = profileService.createProfile(createSProfile(exportedProfile, importerId));
+            newProfile = profileService.createProfile(createSProfile(exportedProfile, importerId));
         } else {
             newProfile = null;
         }
@@ -273,7 +280,7 @@ public class ProfilesImporter {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<ExportedProfile> getProfilesFromXML(final String xmlContent, final Parser parser) throws ExecutionException {
+    public static List<ExportedProfile> getProfilesFromXML(final String xmlContent, final Parser parser) throws IOException {
         StringReader reader = new StringReader(xmlContent);
         try {
             parser.validate(reader);
@@ -281,14 +288,17 @@ public class ProfilesImporter {
             reader = new StringReader(xmlContent);
             return (List<ExportedProfile>) parser.getObjectFromXML(reader);
         } catch (final IOException ioe) {
-            throw new ExecutionException(ioe);
+            throw new IOException(ioe);
         } catch (final SValidationException e) {
-            throw new ExecutionException(e);
+            throw new IOException(e);
         } catch (final SXMLParseException e) {
-            throw new ExecutionException(e);
+            throw new IOException(e);
         } finally {
             reader.close();
         }
     }
 
+    public static File getFileContainingMD5(TenantServiceAccessor tenantServiceAccessor) throws BonitaHomeNotSetException {
+        return new File(BonitaHomeServer.getInstance().getTenantWorkFolder(tenantServiceAccessor.getTenantId()), "profiles.md5");
+    }
 }

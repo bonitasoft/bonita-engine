@@ -7,13 +7,10 @@
 		<copy todir="${target.dir}/test-classes/conf" overwrite="true">
 			<fileset dir="${basedir}/../bonita-test-utils/bonita-server-test-utils/src/test/resources/conf/service" />
 		</copy>
-		<!-- Need this order to overwrite existing files -->
+		<!-- Need this in order to overwrite existing files -->
 		<copy todir="${target.dir}/test-classes/conf" overwrite="true">
 			<fileset dir="${basedir}/../bonita-test-utils/bonita-server-test-utils/src/test/resources/conf/bpm" />
 		</copy>
-
-		<!-- sql files -->
-		<delete dir="${target.dir}/server" />
 
 		<copy todir="${target.dir}/test-classes/home">
 			<fileset dir="${basedir}/home" />
