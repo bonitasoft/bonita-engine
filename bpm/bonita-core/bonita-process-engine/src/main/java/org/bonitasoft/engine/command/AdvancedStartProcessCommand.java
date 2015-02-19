@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.command;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +53,7 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
 
     public static final String PROCESS_DEFINITION_ID = "process_definition_id";
 
-    public static final String ACTIVITY_NAME = "activity_name";
+    public static final String ACTIVITY_NAMES = "activity_names";
 
     public static final String OPERATIONS = "operations";
 
@@ -65,7 +64,7 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
             throws SCommandParameterizationException, SCommandExecutionException {
         // get parameters
         final long processDefinitionId = getProcessDefinitionId(parameters);
-        final List<String> activityNames = Collections.singletonList(getActivityName(parameters));
+        final List<String> activityNames = getActivityName(parameters);
         final long startedBy = getStartedBy(parameters);
         final Map<String, Serializable> context = getContext(parameters);
         final List<Operation> operations = getOperations(parameters);
@@ -89,7 +88,7 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
     }
 
     private void validateInputs(final TenantServiceAccessor serviceAccessor, final long processDefinitionId, final List<String> activityNames)
-            throws SBonitaException, SCommandExecutionException {
+            throws SBonitaException {
         final AdvancedStartProcessValidator validator = new AdvancedStartProcessValidator(serviceAccessor.getProcessDefinitionService(), processDefinitionId);
         final List<String> problems = validator.validate(activityNames);
         handleProblems(problems);
@@ -122,8 +121,8 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
         return getParameter(parameters, CONTEXT);
     }
 
-    private String getActivityName(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getStringMandadoryParameter(parameters, ACTIVITY_NAME);
+    private List<String> getActivityName(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+        return getMandatoryParameter(parameters, ACTIVITY_NAMES, "Missing mandatory field: " + ACTIVITY_NAMES);
     }
 
 }

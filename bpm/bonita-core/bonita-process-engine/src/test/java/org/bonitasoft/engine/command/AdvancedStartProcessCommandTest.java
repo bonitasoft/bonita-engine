@@ -13,18 +13,18 @@
  **/
 package org.bonitasoft.engine.command;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-
-import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
@@ -74,7 +74,7 @@ public class AdvancedStartProcessCommandTest {
         parameters = new HashMap<String, Serializable>(2);
         parameters.put(AdvancedStartProcessCommand.PROCESS_DEFINITION_ID, PROCESS_DEFINITION_ID);
         parameters.put(AdvancedStartProcessCommand.STARTED_BY, 123L);
-        parameters.put(AdvancedStartProcessCommand.ACTIVITY_NAME, "");
+        parameters.put(AdvancedStartProcessCommand.ACTIVITY_NAMES, new ArrayList<String>(Collections.singletonList("")));
         
         Set<SFlowNodeDefinition> flowNodes = new HashSet<SFlowNodeDefinition>();
         flowNodes.add(userTask);
@@ -93,7 +93,7 @@ public class AdvancedStartProcessCommandTest {
             command.execute(parameters, serviceAccessor);
             fail("As the activity names is empty and exception must be thrown during the validation");
         } catch (SCommandExecutionException e) {
-            assertTrue(e.getMessage().contains("No flownode named '' was found in the process"));
+            assertThat(e.getMessage()).contains("No flownode named '' was found in the process");
         }
     }
 
