@@ -26,7 +26,7 @@
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
         </composite-id>
-        <property name="processDefinitionId" type="java.lang.String" column="process" />
+        <property name="processDefinitionId" type="long" column="process" />
         <property name="task" type="java.lang.String" column="task" />
         <property name="form" type="java.lang.String" column="form" />
         <property name="isExternal" type="boolean" column="isexternal" />

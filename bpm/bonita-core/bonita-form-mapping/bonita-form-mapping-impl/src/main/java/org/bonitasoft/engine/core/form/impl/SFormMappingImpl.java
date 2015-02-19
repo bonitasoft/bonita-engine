@@ -79,7 +79,7 @@ public class SFormMappingImpl implements SFormMapping {
         return isExternal;
     }
 
-    public void setExternal(boolean isExternal) {
+    public void setIsExternal(boolean isExternal) {
         this.isExternal = isExternal;
     }
 

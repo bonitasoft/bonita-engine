@@ -26,6 +26,7 @@ import org.bonitasoft.engine.bpm.SupervisorServiceTest;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceServiceIntegrationTests;
 import org.bonitasoft.engine.bpm.event.EventInstanceServiceTest;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceServiceTest;
+import org.bonitasoft.engine.core.form.impl.FormMappingServiceIT;
 import org.bonitasoft.engine.platform.login.PlatformLoginServiceTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -46,7 +47,8 @@ import org.junit.runners.Suite.SuiteClasses;
         SupervisorServiceTest.class,
         NodeConfigurationTest.class,
         ConnectorInstanceServiceIntegrationTests.class,
-        PlatformLoginServiceTest.class
+        PlatformLoginServiceTest.class,
+        FormMappingServiceIT.class
 })
 public class AllBPMTests {
 }

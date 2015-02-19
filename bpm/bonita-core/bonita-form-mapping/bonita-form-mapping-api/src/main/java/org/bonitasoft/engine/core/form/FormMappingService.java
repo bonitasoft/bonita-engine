@@ -36,5 +36,9 @@ public interface FormMappingService {
 
     SFormMapping get(long processDefinitionId, String type, String task) throws SBonitaReadException;
 
+    SFormMapping get(long processDefinitionId, String type) throws SBonitaReadException;
+
     List<SFormMapping> list(long processDefinitionId, int fromIndex, int numberOfResults) throws SBonitaReadException;
+
+    List<SFormMapping> list(int fromIndex, int numberOfResults) throws SBonitaReadException;
 }

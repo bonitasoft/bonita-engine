@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.form.FormMappingService;
@@ -40,6 +41,10 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * @author Baptiste Mesta
@@ -49,10 +54,15 @@ public class FormMappingServiceImpl implements FormMappingService {
     public static final String FORM_MAPPING = "FORM_MAPPING";
     private Recorder recorder;
     private ReadPersistenceService persistenceService;
+    private SessionService sessionService;
+    private ReadSessionAccessor sessionAccessor;
 
-    public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService) {
+    public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
+            ReadSessionAccessor sessionAccessor) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
+        this.sessionService = sessionService;
+        this.sessionAccessor = sessionAccessor;
     }
 
     @Override
@@ -76,16 +86,22 @@ public class FormMappingServiceImpl implements FormMappingService {
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class)
                 .createUpdateEvent(FORM_MAPPING)
                 .setObject(formMapping).done();
-        EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        entityUpdateDescriptor.addField("form", form);
-        entityUpdateDescriptor.addField("isExternal", isExternal);
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(formMapping,
-                entityUpdateDescriptor);
         try {
+            EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+            entityUpdateDescriptor.addField("form", form);
+            entityUpdateDescriptor.addField("isExternal", isExternal);
+            entityUpdateDescriptor.addField("lastUpdatedBy", getSessionUserId());
+            entityUpdateDescriptor.addField("lastUpdateDate", System.currentTimeMillis());
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(formMapping,
+                    entityUpdateDescriptor);
             recorder.recordUpdate(updateRecord, updateEvent);
-        } catch (SRecorderException e) {
+        } catch (SBonitaException e) {
             throw new SObjectModificationException(e);
         }
+    }
+
+    private long getSessionUserId() throws SSessionNotFoundException, SessionIdNotSetException {
+        return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
     @Override
@@ -107,17 +123,32 @@ public class FormMappingServiceImpl implements FormMappingService {
 
     @Override
     public SFormMapping get(long processDefinitionId, String type, String task) throws SBonitaReadException {
-        Map<String,Object> parameters = new HashMap<String, Object>(3);
+        Map<String, Object> parameters = new HashMap<String, Object>(3);
         parameters.put("processDefinitionId", processDefinitionId);
         parameters.put("type", type);
         parameters.put("task", task);
-        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMapping", parameters, SFormMapping.class));
+        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingOfProcessDefinitionOnTask", parameters, SFormMapping.class));
+    }
+    @Override
+    public SFormMapping get(long processDefinitionId, String type) throws SBonitaReadException {
+        Map<String, Object> parameters = new HashMap<String, Object>(3);
+        parameters.put("processDefinitionId", processDefinitionId);
+        parameters.put("type", type);
+        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingOfProcessDefinition", parameters, SFormMapping.class));
     }
 
     @Override
     public List<SFormMapping> list(long processDefinitionId, int fromIndex, int numberOfResults) throws SBonitaReadException {
-        Map<String,Object> parameters = new HashMap<String, Object>(3);
+        Map<String, Object> parameters = new HashMap<String, Object>(3);
         parameters.put("processDefinitionId", processDefinitionId);
-        return persistenceService.selectList(new SelectListDescriptor<SFormMapping>("getFormMappings", parameters, SFormMapping.class, new QueryOptions(fromIndex, numberOfResults)));
+        return persistenceService.selectList(new SelectListDescriptor<SFormMapping>("getFormMappingsOfProcessDefinition", parameters, SFormMapping.class, new QueryOptions(
+                fromIndex, numberOfResults)));
+    }
+
+    @Override
+    public List<SFormMapping> list(int fromIndex, int numberOfResults) throws SBonitaReadException {
+        Map<String, Object> parameters = new HashMap<String, Object>(3);
+        return persistenceService.selectList(new SelectListDescriptor<SFormMapping>("getFormMappings", parameters, SFormMapping.class, new QueryOptions(
+                fromIndex, numberOfResults)));
     }
 }

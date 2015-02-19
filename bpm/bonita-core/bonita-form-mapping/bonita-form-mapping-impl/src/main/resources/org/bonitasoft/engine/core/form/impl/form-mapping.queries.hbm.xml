@@ -17,4 +17,31 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false">
 
+    <query name="getFormMappings">
+        SELECT formmap
+        FROM org.bonitasoft.engine.core.form.impl.SFormMappingImpl AS formmap
+    </query>
+
+
+    <query name="getFormMappingsOfProcessDefinition">
+        SELECT formmap
+        FROM org.bonitasoft.engine.core.form.impl.SFormMappingImpl AS formmap
+        WHERE formmap.processDefinitionId = :processDefinitionId
+    </query>
+
+    <query name="getFormMappingOfProcessDefinitionOnTask">
+        SELECT formmap
+        FROM org.bonitasoft.engine.core.form.impl.SFormMappingImpl AS formmap
+        WHERE formmap.processDefinitionId = :processDefinitionId
+        AND formmap.type = :type
+        AND formmap.task = :task
+    </query>
+
+    <query name="getFormMappingOfProcessDefinition">
+        SELECT formmap
+        FROM org.bonitasoft.engine.core.form.impl.SFormMappingImpl AS formmap
+        WHERE formmap.processDefinitionId = :processDefinitionId
+        AND formmap.type = :type
+    </query>
+
 </hibernate-mapping>

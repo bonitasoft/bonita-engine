@@ -31,5 +31,10 @@
             <artifactId>bonita-builder</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.session</groupId>
+            <artifactId>bonita-session-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
