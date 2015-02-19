@@ -29,20 +29,35 @@ public class WithoutDAOImplementationFileFilterTest {
 
     @Test
     public void should_accept_return_false() {
-        File f = new File("EmployeeDAOImpl.class");
-        assertThat(fileFilter.accept(f)).isFalse();
+        String[] rejectedFiles = new String[] { "EmployeeDAOImpl.class", "EmployeeDAOImpl.java", "com.bonitasoft.EmployeeDAOImpl.class",
+                "com" + File.separatorChar + "bonitasoft" + File.separatorChar + "EmployeeDAOImpl.java",
+                "com" + File.separatorChar + "company" + File.separatorChar + "EmployeeDAOImpl.class",
+                "com" + File.separatorChar + "company" + File.separatorChar + "EmployeeDAOImpl.java",
 
-        f = new File("EmployeeDAOImpl.java");
-        assertThat(fileFilter.accept(f)).isFalse();
+                "com" + File.separatorChar + "bonitasoft" + File.separatorChar + "Employee.class",
+                "com" + File.separatorChar + "bonitasoft" + File.separatorChar + "Employee.java",
+        };
+
+        for (String rejectedFile : rejectedFiles) {
+            File f = new File(rejectedFile);
+            assertThat(fileFilter.accept(f)).isFalse();
+        }
+
     }
 
     @Test
     public void should_accept_return_true() {
-        File f = new File("Employee.class");
-        assertThat(fileFilter.accept(f)).isTrue();
+        String[] validFiles = new String[] { "Employee.class", "Employee.java",
+                "com" + File.separatorChar + "bonitasoftextended" + File.separatorChar + "Employee.class",
+                "com" + File.separatorChar + "bonitasoftextended" + File.separatorChar + "Employee.java",
+                "com" + File.separatorChar + "company" + File.separatorChar + "Employee.class",
+                "com" + File.separatorChar + "company" + File.separatorChar + "Employee.java" };
 
-        f = new File("Employee.java");
-        assertThat(fileFilter.accept(f)).isTrue();
+        for (String validFile : validFiles) {
+            File f = new File(validFile);
+            assertThat(fileFilter.accept(f)).isTrue();
+        }
+
     }
 
 }

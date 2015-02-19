@@ -1,6 +1,7 @@
 <ehcache>
+
     <!-- nothing is stored to disk but ehcache generate a NPE if not specified -->
-    <diskStore path="java.io.tmpdir/parent-child.cache"/>
+    <diskStore path="java.io.tmpdir/hibernate-tenant.cache"/>
 
     <defaultCache maxElementsInMemory="10000" eternal="false"
                   timeToIdleSeconds="120" timeToLiveSeconds="120" overflowToDisk="false"
@@ -8,7 +9,6 @@
 
 
     <!-- Hibernate related cache configuration -->
-
 
     <cache name="org.hibernate.cache.spi.UpdateTimestampsCache"
            maxElementsInMemory="10000" timeToLiveSeconds="120"
@@ -141,6 +141,5 @@
             name="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl"
             maxElementsInMemory="10000" timeToLiveSeconds="120"
             memoryStoreEvictionPolicy="LRU" overflowToDisk="false"/>
-
 
 </ehcache>
