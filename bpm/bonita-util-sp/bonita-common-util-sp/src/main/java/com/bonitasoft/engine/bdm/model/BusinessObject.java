@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 Bonitasoft S.A.
+ * Copyright (C) 2014, 2015 Bonitasoft S.A.
  * Bonitasoft is a trademark of Bonitasoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -10,6 +10,7 @@ package com.bonitasoft.engine.bdm.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -97,7 +98,7 @@ public class BusinessObject {
         this.description = description;
     }
 
-    public void addUniqueConstraint(UniqueConstraint uniqueConstraint) {
+    public void addUniqueConstraint(final UniqueConstraint uniqueConstraint) {
         uniqueConstraints.add(uniqueConstraint);
     }
 
@@ -135,7 +136,7 @@ public class BusinessObject {
         this.queries = queries;
     }
 
-    public void addIndex(Index index) {
+    public void addIndex(final Index index) {
         indexes.add(index);
     }
 
@@ -160,8 +161,8 @@ public class BusinessObject {
     }
 
     public List<BusinessObject> getReferencedBusinessObjectsByComposition() {
-        List<BusinessObject> refs = new ArrayList<BusinessObject>();
-        for (Field field : fields) {
+        final List<BusinessObject> refs = new ArrayList<BusinessObject>();
+        for (final Field field : fields) {
             if (isACompositionField(field)) {
                 refs.add(((RelationField) field).getReference());
             }
@@ -169,7 +170,7 @@ public class BusinessObject {
         return refs;
     }
 
-    private boolean isACompositionField(Field field) {
+    private boolean isACompositionField(final Field field) {
         return field instanceof RelationField && Type.COMPOSITION == ((RelationField) field).getType();
     }
 
@@ -208,6 +209,22 @@ public class BusinessObject {
                 .append("queries", queries)
                 .append("uniqueConstraints", uniqueConstraints)
                 .toString();
+    }
+
+    public boolean isARelationField(final String name) {
+        boolean relationField = false;
+        boolean found = false;
+        final Iterator<Field> iter = fields.iterator();
+        while (!found && iter.hasNext()) {
+            final Field field = iter.next();
+            if (field.getName().equals(name)) {
+                found = true;
+                if (field instanceof RelationField) {
+                    relationField = true;
+                }
+            }
+        }
+        return relationField;
     }
 
 }

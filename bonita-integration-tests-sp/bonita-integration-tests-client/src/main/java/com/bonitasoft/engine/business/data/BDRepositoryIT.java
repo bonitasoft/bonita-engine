@@ -218,6 +218,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         employee.addQuery(COUNT_EMPLOYEE, "SELECT COUNT(e) FROM Employee e", Long.class.getName());
 
         employee.addIndex("IDX_LSTNM", "lastName");
+        employee.addIndex("IDX_LSTNM", "address");
 
         final BusinessObject person = new BusinessObject();
         person.setQualifiedName("org.bonitasoft.pojo.Person");
@@ -1229,7 +1230,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    private void verifyCommandGetBusinessDataById(SimpleBusinessDataReference businessDataReference) throws Exception {
+    private void verifyCommandGetBusinessDataById(final SimpleBusinessDataReference businessDataReference) throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("businessDataId", businessDataReference.getStorageId());
         parameters.put("entityClassName", EMPLOYEE_QUALIF_CLASSNAME);
@@ -1255,7 +1256,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private void verifyCommandGetQuery_findByFirstNameAndLastNameNewOrder() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
 
         queryParameters.put("firstName", "Alphonse");
         queryParameters.put("lastName", "Dupond");
@@ -1277,7 +1278,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private void verifyCommandGetQuery_getEmployeeByPhoneNumber() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
 
         queryParameters.put("phoneNumber", "123456789");
 
@@ -1298,7 +1299,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private void verifyCommandGetQuery_findByFirstNameFetchAddresses() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
 
         queryParameters.put("firstName", "Alphonse");
 
@@ -1336,7 +1337,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private void verifyCommandGetQuery_findByHireDate() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
         queryParameters.put("date1","1930-01-15");
         queryParameters.put("date2","2050-12-31" );
 
@@ -1355,7 +1356,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     }
 
-    private String getJsonContent(String jsonFileName) throws IOException {
+    private String getJsonContent(final String jsonFileName) throws IOException {
         final String json;
         json = new String(IOUtils.toByteArray(this.getClass().getResourceAsStream(jsonFileName)));
         return json;
@@ -1428,7 +1429,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    private String getClientBdmJarClassPath(String bonitaHomePath) {
+    private String getClientBdmJarClassPath(final String bonitaHomePath) {
         String clientBdmJarPath;
         clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("server").append(File.separator).append("tenants")
                 .append(File.separator).append(tenantId).append(File.separator).append("data-management").append(File.separator).append("client").toString();
