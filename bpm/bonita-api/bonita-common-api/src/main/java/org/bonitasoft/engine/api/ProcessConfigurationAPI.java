@@ -58,7 +58,7 @@ public interface ProcessConfigurationAPI {
      * @return
      *         the form mapping of the process overview form
      */
-    FormMapping getProcessOverviewForm(long processDefinitionId);
+    FormMapping getProcessOverviewForm(long processDefinitionId) throws NotFoundException;
 
     /**
      * Get the form mapping that contains the link to the task form
@@ -70,7 +70,7 @@ public interface ProcessConfigurationAPI {
      * @return
      *         the form mapping of the task form
      */
-    FormMapping getTaskForm(long processDefinitionId, String taskName);
+    FormMapping getTaskForm(long processDefinitionId, String taskName) throws NotFoundException;
 
     /**
      * Update a form mapping with the given values

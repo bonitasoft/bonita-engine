@@ -84,16 +84,29 @@ public class ProcessConfigurationAPIImplTest {
         return sFormMapping;
     }
 
-    @Ignore
     @Test
     public void testGetProcessOverviewForm() throws Exception {
+        //given
+        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, false, "myForm", PROCESS_DEF_ID);
+        doReturn(sFormMapping).when(formMappingService).get(PROCESS_DEF_ID, FormMappingType.PROCESS_OVERVIEW.name());
+        //when
+        FormMapping processStartForm = processConfigurationAPI.getProcessOverviewForm(PROCESS_DEF_ID);
+        //then
+        verify(formMappingService, times(1)).get(PROCESS_DEF_ID, FormMappingType.PROCESS_OVERVIEW.name());
+        assertThat(processStartForm.getId()).isEqualTo(FORM_MAPPING_ID);
 
     }
 
-    @Ignore
     @Test
     public void testGetHumanTaskForm() throws Exception {
-
+        //given
+        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, false, "myForm", PROCESS_DEF_ID);
+        doReturn(sFormMapping).when(formMappingService).get(PROCESS_DEF_ID, FormMappingType.TASK.name(), "myTask");
+        //when
+        FormMapping processStartForm = processConfigurationAPI.getTaskForm(PROCESS_DEF_ID, "myTask");
+        //then
+        verify(formMappingService, times(1)).get(PROCESS_DEF_ID, FormMappingType.TASK.name(), "myTask");
+        assertThat(processStartForm.getId()).isEqualTo(FORM_MAPPING_ID);
     }
 
     @Ignore
