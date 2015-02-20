@@ -115,12 +115,12 @@
         WHERE actor.id = actormember.actorId
         AND actor.scopeId =:processDefinitionId AND actor.initiator = TRUE
         AND (user.id = :userId OR user.managerUserId = :userId)
-        AND ( actormember.userId = user.id
+        AND ( actormember.userId = :userId
         OR actormember.id IN (
         SELECT actormember2.id
         FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember2,
         org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-        WHERE um.userId = user.id
+        WHERE um.userId = :userId
         AND (
         (actormember2.groupId = um.groupId AND actormember2.roleId &lt;= 0)
         OR (actormember2.roleId = um.roleId AND actormember2.groupId &lt;= 0)
