@@ -68,7 +68,7 @@ public interface ProcessConfigurationAPI {
      * @return
      *         the form mapping of the task form
      */
-    FormMapping getHumanTaskForm(long processDefinitionId, String taskName);
+    FormMapping getTaskForm(long processDefinitionId, String taskName);
 
     /**
      * Update a form mapping with the given values

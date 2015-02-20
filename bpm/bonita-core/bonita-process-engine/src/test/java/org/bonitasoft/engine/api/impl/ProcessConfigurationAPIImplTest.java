@@ -68,16 +68,19 @@ public class ProcessConfigurationAPIImplTest {
         assertThat(processStartForm).isEqualTo(myForm);
     }
 
+    @Ignore
     @Test
     public void testGetProcessOverviewForm() throws Exception {
 
     }
 
+    @Ignore
     @Test
     public void testGetHumanTaskForm() throws Exception {
 
     }
 
+    @Ignore
     @Test
     public void testUpdateFormMapping() throws Exception {
 

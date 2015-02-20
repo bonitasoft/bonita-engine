@@ -61,7 +61,7 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     }
 
     @Override
-    public FormMapping getHumanTaskForm(long processDefinitionId, String taskName) {
+    public FormMapping getTaskForm(long processDefinitionId, String taskName) {
         return null;
     }
 
