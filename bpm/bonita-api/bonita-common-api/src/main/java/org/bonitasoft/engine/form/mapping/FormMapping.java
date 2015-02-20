@@ -15,8 +15,10 @@
 
 package org.bonitasoft.engine.form.mapping;
 
+import java.io.Serializable;
+
 /**
  * @author Baptiste Mesta
  */
-public class FormMapping {
+public class FormMapping implements Serializable {
 }

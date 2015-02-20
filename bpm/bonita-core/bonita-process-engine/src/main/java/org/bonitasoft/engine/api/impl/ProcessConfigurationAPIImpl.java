@@ -23,6 +23,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.form.mapping.FormMapping;
 import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -43,7 +44,7 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         }
     }
     @Override
-    public List<FormMapping> searchFormMappings(SearchOptions searchOptions) {
+    public SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions) {
         return null;
     }
 

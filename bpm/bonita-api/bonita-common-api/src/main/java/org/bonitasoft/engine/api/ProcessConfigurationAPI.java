@@ -15,11 +15,10 @@
 
 package org.bonitasoft.engine.api;
 
-import java.util.List;
-
 import org.bonitasoft.engine.form.mapping.FormMapping;
 import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchResult;
 
 /**
  * Contains methods related to the configuration processes
@@ -29,7 +28,16 @@ import org.bonitasoft.engine.search.SearchOptions;
  */
 public interface ProcessConfigurationAPI {
 
-    List<FormMapping> searchFormMappings(SearchOptions searchOptions);
+    /**
+     *
+     *
+     *
+     * @param searchOptions
+     * @return
+     *
+     * @since 7.0.0
+     */
+    SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions);
 
     FormMapping getProcessStartForm(long processDefinitionId);
 
