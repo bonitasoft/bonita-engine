@@ -18,8 +18,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -74,7 +72,7 @@ public class AdvancedStartProcessCommandTest {
         parameters = new HashMap<String, Serializable>(2);
         parameters.put(AdvancedStartProcessCommand.PROCESS_DEFINITION_ID, PROCESS_DEFINITION_ID);
         parameters.put(AdvancedStartProcessCommand.STARTED_BY, 123L);
-        parameters.put(AdvancedStartProcessCommand.ACTIVITY_NAME, new ArrayList<String>(Collections.singletonList("")));
+        parameters.put(AdvancedStartProcessCommand.ACTIVITY_NAME, "");
         
         Set<SFlowNodeDefinition> flowNodes = new HashSet<SFlowNodeDefinition>();
         flowNodes.add(userTask);
