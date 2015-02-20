@@ -20,7 +20,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -67,11 +67,11 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     }
 
     @Override
-    public FormMapping getProcessStartForm(final long processDefinitionId) throws NotFoundException {
+    public FormMapping getProcessStartForm(final long processDefinitionId) throws FormMappingNotFoundException {
         return getFormMapping(processDefinitionId, FormMappingType.PROCESS_START.name(), null);
     }
 
-    FormMapping getFormMapping(long processDefinitionId, String name, String taskName) throws NotFoundException {
+    FormMapping getFormMapping(long processDefinitionId, String name, String taskName) throws FormMappingNotFoundException {
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {
             SFormMapping sFormMapping;
@@ -84,22 +84,22 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (SObjectNotFoundException e) {
-            throw new NotFoundException("Form mapping not found for " + name + " on process " + processDefinitionId);
+            throw new FormMappingNotFoundException("Form mapping not found for " + name + " on process " + processDefinitionId);
         }
     }
 
     @Override
-    public FormMapping getProcessOverviewForm(final long processDefinitionId) throws NotFoundException {
+    public FormMapping getProcessOverviewForm(final long processDefinitionId) throws FormMappingNotFoundException {
         return getFormMapping(processDefinitionId, FormMappingType.PROCESS_OVERVIEW.name(), null);
     }
 
     @Override
-    public FormMapping getTaskForm(final long processDefinitionId, final String taskName) throws NotFoundException {
+    public FormMapping getTaskForm(final long processDefinitionId, final String taskName) throws FormMappingNotFoundException {
         return getFormMapping(processDefinitionId, FormMappingType.TASK.name(), taskName);
     }
 
     @Override
-    public void updateFormMapping(final long formMappingId, final String form, final boolean external) throws NotFoundException, UpdateException {
+    public void updateFormMapping(final long formMappingId, final String form, final boolean external) throws FormMappingNotFoundException, UpdateException {
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {
             SFormMapping sFormMapping = formMappingService.get(formMappingId);
@@ -107,7 +107,7 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (SObjectNotFoundException e) {
-            throw new NotFoundException("Unable to find the form mapping with id " + formMappingId);
+            throw new FormMappingNotFoundException("Unable to find the form mapping with id " + formMappingId);
         } catch (SObjectModificationException e) {
             throw new UpdateException("Unable to update the form mapping " + formMappingId, e);
         }
