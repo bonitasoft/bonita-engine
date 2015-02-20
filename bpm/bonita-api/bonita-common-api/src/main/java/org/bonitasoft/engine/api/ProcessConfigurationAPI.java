@@ -16,6 +16,7 @@
 package org.bonitasoft.engine.api;
 
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.mapping.FormMapping;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -37,7 +38,7 @@ public interface ProcessConfigurationAPI {
      * @return the result of the search
      * @since 7.0.0
      */
-    SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions);
+    SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions) throws SearchException;
 
     /**
      * Get the form mapping that contains the link to the process start form

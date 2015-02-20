@@ -20,6 +20,7 @@ import java.util.List;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
@@ -42,4 +43,8 @@ public interface FormMappingService {
     List<SFormMapping> list(long processDefinitionId, int fromIndex, int numberOfResults) throws SBonitaReadException;
 
     List<SFormMapping> list(int fromIndex, int numberOfResults) throws SBonitaReadException;
+
+    List<SFormMapping> searchFormMappings(QueryOptions queryOptions) throws SBonitaReadException;
+
+    long getNumberOfFormMappings(QueryOptions queryOptions) throws SBonitaReadException;
 }

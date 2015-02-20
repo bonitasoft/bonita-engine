@@ -15,6 +15,7 @@
 
 package org.bonitasoft.engine.core.form.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,8 +120,9 @@ public class FormMappingServiceImpl implements FormMappingService {
 
     @Override
     public SFormMapping get(long formMappingId) throws SBonitaReadException, SObjectNotFoundException {
-        SFormMapping getFormMappingById = persistenceService.selectById(new SelectByIdDescriptor<SFormMapping>("getFormMappingById", SFormMapping.class, formMappingId));
-        if(getFormMappingById == null){
+        SFormMapping getFormMappingById = persistenceService.selectById(new SelectByIdDescriptor<SFormMapping>("getFormMappingById", SFormMapping.class,
+                formMappingId));
+        if (getFormMappingById == null) {
             throw new SObjectNotFoundException(formMappingId);
         }
         return getFormMappingById;
@@ -134,6 +136,7 @@ public class FormMappingServiceImpl implements FormMappingService {
         parameters.put("task", task);
         return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingOfProcessDefinitionOnTask", parameters, SFormMapping.class));
     }
+
     @Override
     public SFormMapping get(long processDefinitionId, String type) throws SBonitaReadException {
         Map<String, Object> parameters = new HashMap<String, Object>(3);
@@ -146,8 +149,9 @@ public class FormMappingServiceImpl implements FormMappingService {
     public List<SFormMapping> list(long processDefinitionId, int fromIndex, int numberOfResults) throws SBonitaReadException {
         Map<String, Object> parameters = new HashMap<String, Object>(3);
         parameters.put("processDefinitionId", processDefinitionId);
-        return persistenceService.selectList(new SelectListDescriptor<SFormMapping>("getFormMappingsOfProcessDefinition", parameters, SFormMapping.class, new QueryOptions(
-                fromIndex, numberOfResults)));
+        return persistenceService.selectList(new SelectListDescriptor<SFormMapping>("getFormMappingsOfProcessDefinition", parameters, SFormMapping.class,
+                new QueryOptions(
+                        fromIndex, numberOfResults)));
     }
 
     @Override
@@ -156,4 +160,15 @@ public class FormMappingServiceImpl implements FormMappingService {
         return persistenceService.selectList(new SelectListDescriptor<SFormMapping>("getFormMappings", parameters, SFormMapping.class, new QueryOptions(
                 fromIndex, numberOfResults)));
     }
+
+    @Override
+    public long getNumberOfFormMappings(QueryOptions queryOptions) throws SBonitaReadException {
+        return persistenceService.getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
+    }
+
+    @Override
+    public List<SFormMapping> searchFormMappings(QueryOptions queryOptions) throws SBonitaReadException {
+        return persistenceService.searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
+    }
+
 }

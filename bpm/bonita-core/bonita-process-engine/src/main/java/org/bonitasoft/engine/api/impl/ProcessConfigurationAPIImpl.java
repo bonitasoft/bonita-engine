@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
@@ -21,12 +22,15 @@ import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.mapping.FormMapping;
 import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.search.form.mapping.SearchFormMappings;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
@@ -49,8 +53,17 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     }
 
     @Override
-    public SearchResult<FormMapping> searchFormMappings(final SearchOptions searchOptions) {
-        return null;
+    public SearchResult<FormMapping> searchFormMappings(final SearchOptions searchOptions) throws SearchException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        FormMappingService formMappingService = tenantAccessor.getFormMappingService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final SearchFormMappings searchFormMappings = new SearchFormMappings(formMappingService, searchEntitiesDescriptor.getSearchProfileDescriptor(), searchOptions);
+        try {
+            searchFormMappings.execute();
+            return searchFormMappings.getResult();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
     }
 
     @Override

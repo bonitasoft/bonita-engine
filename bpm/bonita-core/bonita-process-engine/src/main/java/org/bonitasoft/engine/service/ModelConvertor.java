@@ -2107,4 +2107,12 @@ public class ModelConvertor {
         formMapping.setProcessDefinitionId(sFormMapping.getProcessDefinitionId());
         return formMapping;
     }
+
+    public static List<FormMapping> toFormMappings(List<SFormMapping> serverObjects) {
+        final List<FormMapping> clientObjects = new ArrayList<FormMapping>(serverObjects.size());
+        for (final SFormMapping serverObject : serverObjects) {;
+            clientObjects.add(toFormMapping(serverObject));
+        }
+        return clientObjects;
+    }
 }

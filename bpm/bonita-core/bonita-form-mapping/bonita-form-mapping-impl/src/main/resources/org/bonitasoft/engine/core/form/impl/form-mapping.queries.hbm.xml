@@ -44,4 +44,16 @@
         AND formmap.type = :type
     </query>
 
+
+
+    <query name="getNumberOfSFormMapping">
+        SELECT COUNT(formmap)
+        FROM org.bonitasoft.engine.core.form.impl.SFormMappingImpl AS formmap
+    </query>
+
+    <query name="searchSFormMapping">
+        SELECT formmap
+        FROM org.bonitasoft.engine.core.form.impl.SFormMappingImpl AS formmap
+    </query>
+
 </hibernate-mapping>

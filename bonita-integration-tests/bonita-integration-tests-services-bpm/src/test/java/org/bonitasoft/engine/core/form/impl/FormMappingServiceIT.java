@@ -16,12 +16,14 @@
 package org.bonitasoft.engine.core.form.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -127,10 +129,14 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         transactionService.complete();
 
         transactionService.begin();
-        SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
+        try{
+            SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
+            fail("should have thrown a not found");
+        }catch(SObjectNotFoundException e){
+            //ok
+        }
         transactionService.complete();
 
-        assertThat(sFormMapping).isNull();
     }
 
     @Test
