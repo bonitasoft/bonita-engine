@@ -15,6 +15,8 @@
 
 package org.bonitasoft.engine.api;
 
+import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.mapping.FormMapping;
 import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -46,7 +48,7 @@ public interface ProcessConfigurationAPI {
      * @return
      *         the form mapping of the process start form
      */
-    FormMapping getProcessStartForm(long processDefinitionId);
+    FormMapping getProcessStartForm(long processDefinitionId) throws NotFoundException;
 
     /**
      * Get the form mapping that contains the link to the process overview form
@@ -72,15 +74,11 @@ public interface ProcessConfigurationAPI {
 
     /**
      * Update a form mapping with the given values
-     * 
      * @param formMappingId
      *        the form mapping to update
-     * @param page
+     * @param form
      *        the name of the form or the url to the form
-     * @param type
-     *        the form mapping type
      * @param external
-     *        true if the page attribute is an url to an external page, false if it's a internal form
      */
-    void updateFormMapping(long formMappingId, String page, FormMappingType type, boolean external);
+    void updateFormMapping(final long formMappingId, final String form, final boolean external) throws NotFoundException, UpdateException;
 }

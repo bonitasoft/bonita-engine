@@ -27,26 +27,26 @@ public class FormMapping implements BaseElement {
     private long id;
     private long processDefinitionId;
     private String task;
-    private String page;
+    private String form;
     private boolean external;
     private FormMappingType type;
 
     public FormMapping() {
     }
 
-    public FormMapping(long processDefinitionId, boolean external, FormMappingType type, String page, String task) {
+    public FormMapping(long processDefinitionId, boolean external, FormMappingType type, String form, String task) {
         this.processDefinitionId = processDefinitionId;
         this.task = task;
-        this.page = page;
+        this.form = form;
         this.external = external;
         this.type = type;
     }
 
-    public FormMapping(long processDefinitionId, FormMappingType type, boolean external, String page) {
+    public FormMapping(long processDefinitionId, FormMappingType type, boolean external, String form) {
         this.type = type;
         this.external = external;
         this.processDefinitionId = processDefinitionId;
-        this.page = page;
+        this.form = form;
     }
 
     public FormMapping(FormMappingType type, boolean external, long processDefinitionId) {
@@ -80,12 +80,12 @@ public class FormMapping implements BaseElement {
         this.task = task;
     }
 
-    public String getPage() {
-        return page;
+    public String getForm() {
+        return form;
     }
 
-    public void setPage(String page) {
-        this.page = page;
+    public void setForm(String form) {
+        this.form = form;
     }
 
     public boolean isExternal() {
@@ -114,7 +114,7 @@ public class FormMapping implements BaseElement {
         if (external != that.external) return false;
         if (id != that.id) return false;
         if (processDefinitionId != that.processDefinitionId) return false;
-        if (page != null ? !page.equals(that.page) : that.page != null) return false;
+        if (form != null ? !form.equals(that.form) : that.form != null) return false;
         if (task != null ? !task.equals(that.task) : that.task != null) return false;
         if (type != that.type) return false;
 
@@ -126,7 +126,7 @@ public class FormMapping implements BaseElement {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (int) (processDefinitionId ^ (processDefinitionId >>> 32));
         result = 31 * result + (task != null ? task.hashCode() : 0);
-        result = 31 * result + (page != null ? page.hashCode() : 0);
+        result = 31 * result + (form != null ? form.hashCode() : 0);
         result = 31 * result + (external ? 1 : 0);
         result = 31 * result + type.hashCode();
         return result;
@@ -138,7 +138,7 @@ public class FormMapping implements BaseElement {
                 "id=" + id +
                 ", processDefinitionId=" + processDefinitionId +
                 ", task='" + task + '\'' +
-                ", page='" + page + '\'' +
+                ", form='" + form + '\'' +
                 ", external=" + external +
                 ", type=" + type +
                 '}';

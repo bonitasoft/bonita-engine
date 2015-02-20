@@ -21,6 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.core.form.FormMappingService;
+import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
 import org.bonitasoft.engine.form.mapping.FormMapping;
 import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -36,6 +37,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ProcessConfigurationAPIImplTest {
 
     private static final long PROCESS_DEF_ID = 158l;
+    private static final long FORM_MAPPING_ID = 458l;
     @Mock
     public FormMappingService formMappingService;
     @Mock
@@ -58,20 +60,28 @@ public class ProcessConfigurationAPIImplTest {
 
     @Test
     public void testGetProcessStartForm() throws Exception {
-//        //given
-//        long theId;
-//        FormMapping myForm = new FormMapping(PROCESS_DEF_ID, FormMappingType.PROCESS_START, false, "myForm");
-//        SFormMappingImpl sFormMapping = new SFormMappingImpl();
-//        doReturn(sFormMapping).when(formMappingService).get(PROCESS_DEF_ID,FormMappingType.PROCESS_START.name());
-//        //when
-//        FormMapping processStartForm = processConfigurationAPI.getProcessStartForm(PROCESS_DEF_ID);
-//        //then
-//        verify(formMappingService, times(1)).get(PROCESS_DEF_ID, FormMappingType.PROCESS_START.name());
-//        assertThat(processStartForm.getProcessDefinitionId()).isEqualTo(PROCESS_DEF_ID);
-//        assertThat(processStartForm.getType()).isEqualTo(FormMappingType.PROCESS_START);
-//        assertThat(processStartForm.isExternal()).isFalse();
-//        assertThat(processStartForm.getPage()).isEqualTo("myForm");
-//        assertThat(processStartForm.getId()).isEqualTo(theId);
+        //given
+        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, false, "myForm", PROCESS_DEF_ID);
+        doReturn(sFormMapping).when(formMappingService).get(PROCESS_DEF_ID, FormMappingType.PROCESS_START.name());
+        //when
+        FormMapping processStartForm = processConfigurationAPI.getProcessStartForm(PROCESS_DEF_ID);
+        //then
+        verify(formMappingService, times(1)).get(PROCESS_DEF_ID, FormMappingType.PROCESS_START.name());
+        assertThat(processStartForm.getProcessDefinitionId()).isEqualTo(PROCESS_DEF_ID);
+        assertThat(processStartForm.getType()).isEqualTo(FormMappingType.PROCESS_START);
+        assertThat(processStartForm.isExternal()).isFalse();
+        assertThat(processStartForm.getForm()).isEqualTo("myForm");
+        assertThat(processStartForm.getId()).isEqualTo(FORM_MAPPING_ID);
+    }
+
+    SFormMappingImpl createSFormMapping(String name, long formMappingId, boolean isExternal, String myForm1, long processDefinitionId) {
+        SFormMappingImpl sFormMapping = new SFormMappingImpl();
+        sFormMapping.setId(formMappingId);
+        sFormMapping.setProcessDefinitionId(processDefinitionId);
+        sFormMapping.setType(name);
+        sFormMapping.setIsExternal(isExternal);
+        sFormMapping.setForm(myForm1);
+        return sFormMapping;
     }
 
     @Ignore

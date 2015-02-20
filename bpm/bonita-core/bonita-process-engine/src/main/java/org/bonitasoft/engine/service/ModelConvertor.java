@@ -149,6 +149,7 @@ import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescr
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
+import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
@@ -212,6 +213,8 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
+import org.bonitasoft.engine.form.mapping.FormMapping;
+import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
 import org.bonitasoft.engine.identity.ExportedUser;
@@ -2091,4 +2094,17 @@ public class ModelConvertor {
         return value;
     }
 
+    public static FormMapping toFormMapping(SFormMapping sFormMapping) {
+        if(sFormMapping == null){
+            return null;
+        }
+        FormMapping formMapping = new FormMapping();
+        formMapping.setId(sFormMapping.getId());
+        formMapping.setTask(sFormMapping.getTask());
+        formMapping.setExternal(sFormMapping.isExternal());
+        formMapping.setForm(sFormMapping.getForm());
+        formMapping.setType(FormMappingType.valueOf(sFormMapping.getType()));
+        formMapping.setProcessDefinitionId(sFormMapping.getProcessDefinitionId());
+        return formMapping;
+    }
 }

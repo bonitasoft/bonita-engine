@@ -35,6 +35,7 @@ import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
@@ -53,6 +54,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STim
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.form.mapping.FormMapping;
+import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
@@ -350,5 +353,43 @@ public class ModelConvertorTest {
         assertEquals(saProcessInstance.getStringIndex4(), archivedProcessInstance.getStringIndexValue(4));
         assertEquals(sProcessDefinition.getStringIndexLabel(5), archivedProcessInstance.getStringIndexLabel(5));
         assertEquals(saProcessInstance.getStringIndex5(), archivedProcessInstance.getStringIndexValue(5));
+    }
+
+
+    @Test
+    public void toFormMapping_can_convert() {
+        // Given
+        SFormMappingImpl sFormMapping = new SFormMappingImpl();
+        sFormMapping.setId(555l);
+        sFormMapping.setIsExternal(true);
+        sFormMapping.setForm("myForm1");
+        sFormMapping.setType(FormMappingType.TASK.name());
+        sFormMapping.setTask("myTask");
+        sFormMapping.setProcessDefinitionId(666l);
+
+        // Then
+        FormMapping formMapping = ModelConvertor.toFormMapping(sFormMapping);
+
+        // When
+        assertThat(formMapping).isNotNull();
+        assertThat(formMapping.getId()).isEqualTo(555l);
+        assertThat(formMapping.getType()).isEqualTo(FormMappingType.TASK);
+        assertThat(formMapping.isExternal()).isTrue();
+        assertThat(formMapping.getForm()).isEqualTo("myForm1");
+        assertThat(formMapping.getTask()).isEqualTo("myTask");
+        assertThat(formMapping.getProcessDefinitionId()).isEqualTo(666l);
+
+    }
+
+    @Test
+    public void toFormMapping_can_convert_null() {
+        // Given
+
+        // Then
+        FormMapping formMapping = ModelConvertor.toFormMapping(null);
+
+        // When
+        assertThat(formMapping).isNull();
+
     }
 }

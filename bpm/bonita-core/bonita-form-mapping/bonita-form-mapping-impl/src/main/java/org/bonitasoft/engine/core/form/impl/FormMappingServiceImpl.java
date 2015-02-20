@@ -23,6 +23,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -117,8 +118,12 @@ public class FormMappingServiceImpl implements FormMappingService {
     }
 
     @Override
-    public SFormMapping get(long formMappingId) throws SBonitaReadException {
-        return persistenceService.selectById(new SelectByIdDescriptor<SFormMapping>("getFormMappingById", SFormMapping.class, formMappingId));
+    public SFormMapping get(long formMappingId) throws SBonitaReadException, SObjectNotFoundException {
+        SFormMapping getFormMappingById = persistenceService.selectById(new SelectByIdDescriptor<SFormMapping>("getFormMappingById", SFormMapping.class, formMappingId));
+        if(getFormMappingById == null){
+            throw new SObjectNotFoundException(formMappingId);
+        }
+        return getFormMappingById;
     }
 
     @Override

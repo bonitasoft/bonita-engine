@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
@@ -32,11 +33,11 @@ public interface FormMappingService {
 
     void delete(SFormMapping formMapping) throws SObjectModificationException;
 
-    SFormMapping get(long formMappingId) throws SBonitaReadException;
+    SFormMapping get(long formMappingId) throws SBonitaReadException, SObjectNotFoundException;
 
-    SFormMapping get(long processDefinitionId, String type, String task) throws SBonitaReadException;
+    SFormMapping get(long processDefinitionId, String type, String task) throws SBonitaReadException, SObjectNotFoundException;
 
-    SFormMapping get(long processDefinitionId, String type) throws SBonitaReadException;
+    SFormMapping get(long processDefinitionId, String type) throws SBonitaReadException, SObjectNotFoundException;
 
     List<SFormMapping> list(long processDefinitionId, int fromIndex, int numberOfResults) throws SBonitaReadException;
 
