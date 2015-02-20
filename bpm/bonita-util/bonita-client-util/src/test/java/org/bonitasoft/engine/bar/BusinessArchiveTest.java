@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bar;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -38,6 +39,9 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
+import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition;
+import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition.FormMappingType;
+import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
@@ -309,6 +313,23 @@ public class BusinessArchiveTest {
     }
 
     @Test
+    public void formMappingInBarShouldBeWrittenAndReadProperly() throws Exception {
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("MethCookingPlanning", "Season 5").done();
+
+        final FormMappingModel formMappingModel = new FormMappingModel();
+        formMappingModel.addFormMapping(new FormMappingDefinition("/?myPageTokenID", FormMappingType.PROCESS_INSTANCIATION, false));
+        formMappingModel.addFormMapping(new FormMappingDefinition("someExternalPage", FormMappingType.HUMAN_TASK, true, "requestTask"));
+
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
+                .setFormMappings(formMappingModel).done();
+
+        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
+
+        final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(barFile);
+        assertThat(readBusinessArchive.getFormMappingModel().getFormMappings()).as("Form Mapping should be found in BusinessArchive").hasSize(2);
+    }
+
+    @Test
     public void putActorMappingInBar() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProductionPlanning", "3.1");
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
@@ -378,6 +399,7 @@ public class BusinessArchiveTest {
                         trueExpression);
         processDefinitionBuilder.addData("myData", "java.lang.Boolean", trueExpression).addDescription("My boolean data");
         final DesignProcessDefinition process = processDefinitionBuilder.done();
+
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process)
                 .addDocumentResource(new BarResource("testFile.txt", new byte[] { 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })).done();
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);

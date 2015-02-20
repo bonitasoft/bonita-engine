@@ -233,7 +233,7 @@ public class IOUtil {
             public void run() {
                 try {
                     final boolean deleted = deleteDir(tmpDir);
-                    if(!deleted) {
+                    if (!deleted) {
                         System.err.println("Unable to delete the directory: " + tmpDir);
                     }
                 } catch (final IOException e) {
@@ -393,7 +393,7 @@ public class IOUtil {
     }
 
     private static int copyFileToZip(final ZipOutputStream zos, final byte[] readBuffer, final File file, final int bytesInOfZip) throws FileNotFoundException,
-    IOException {
+            IOException {
         final FileInputStream fis = new FileInputStream(file);
         int bytesIn = bytesInOfZip;
         try {
@@ -478,7 +478,7 @@ public class IOUtil {
     }
 
     private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder) throws FileNotFoundException,
-    IOException {
+            IOException {
         ZipEntry zipEntry = null;
         while ((zipEntry = zipInputstream.getNextEntry()) != null) {
             try {
@@ -533,13 +533,13 @@ public class IOUtil {
         }
     }
 
-    public static void write(final File file, final Entry<String, byte[]> entry) throws FileNotFoundException, IOException {
+    public static void write(final File file, final byte[] content) throws FileNotFoundException, IOException {
         FileOutputStream fos = null;
         BufferedOutputStream bos = null;
         try {
             fos = new FileOutputStream(file);
             bos = new BufferedOutputStream(fos);
-            bos.write(entry.getValue());
+            bos.write(content);
             bos.flush();
         } finally {
             if (bos != null) {
