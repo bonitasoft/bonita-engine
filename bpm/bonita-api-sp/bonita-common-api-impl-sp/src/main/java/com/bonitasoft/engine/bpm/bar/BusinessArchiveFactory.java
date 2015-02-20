@@ -25,10 +25,10 @@ import org.bonitasoft.engine.bpm.bar.ClasspathContribution;
 import org.bonitasoft.engine.bpm.bar.ConnectorContribution;
 import org.bonitasoft.engine.bpm.bar.DocumentsResourcesContribution;
 import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
+import org.bonitasoft.engine.bpm.bar.FormMappingContribution;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.bar.ParameterContribution;
 import org.bonitasoft.engine.bpm.bar.UserFilterContribution;
-import org.bonitasoft.engine.bpm.bar.formmapping.FormMappingContribution;
 import org.bonitasoft.engine.io.IOUtil;
 
 /**
