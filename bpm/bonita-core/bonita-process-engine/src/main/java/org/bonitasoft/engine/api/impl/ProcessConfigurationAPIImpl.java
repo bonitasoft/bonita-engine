@@ -1,21 +1,17 @@
-/*
+/**
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.api.impl;
-
-import java.util.List;
 
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.core.form.FormMappingService;
@@ -43,30 +39,31 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
             throw new BonitaRuntimeException(e);
         }
     }
+
     @Override
-    public SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions) {
+    public SearchResult<FormMapping> searchFormMappings(final SearchOptions searchOptions) {
         return null;
     }
 
     @Override
-    public FormMapping getProcessStartForm(long processDefinitionId) {
-        FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
-        
+    public FormMapping getProcessStartForm(final long processDefinitionId) {
+        final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
+
         return null;
     }
 
     @Override
-    public FormMapping getProcessOverviewForm(long processDefinitionId) {
+    public FormMapping getProcessOverviewForm(final long processDefinitionId) {
         return null;
     }
 
     @Override
-    public FormMapping getTaskForm(long processDefinitionId, String taskName) {
+    public FormMapping getTaskForm(final long processDefinitionId, final String taskName) {
         return null;
     }
 
     @Override
-    public void updateFormMapping(long formMappingId, String page, FormMappingType type, boolean external) {
+    public void updateFormMapping(final long formMappingId, final String page, final FormMappingType type, final boolean external) {
 
     }
 }

@@ -40,7 +40,6 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
 import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition;
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition.FormMappingType;
 import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -72,6 +71,7 @@ import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
@@ -317,8 +317,8 @@ public class BusinessArchiveTest {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("MethCookingPlanning", "Season 5").done();
 
         final FormMappingModel formMappingModel = new FormMappingModel();
-        formMappingModel.addFormMapping(new FormMappingDefinition("/?myPageTokenID", FormMappingType.PROCESS_INSTANCIATION, false));
-        formMappingModel.addFormMapping(new FormMappingDefinition("someExternalPage", FormMappingType.HUMAN_TASK, true, "requestTask"));
+        formMappingModel.addFormMapping(new FormMappingDefinition("/?myPageTokenID", FormMappingType.PROCESS_START, false));
+        formMappingModel.addFormMapping(new FormMappingDefinition("someExternalPage", FormMappingType.TASK, true, "requestTask"));
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
                 .setFormMappings(formMappingModel).done();

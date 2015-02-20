@@ -20,33 +20,13 @@ import javax.xml.bind.annotation.XmlAttribute;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.bonitasoft.engine.form.mapping.FormMappingType;
 
 /**
  * @author Emmanuel Duchastenier
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FormMappingDefinition {
-
-    /**
-     * Type of a {@link FormMappingDefinition}
-     */
-    public enum FormMappingType {
-
-        /**
-         * Type for Process Instanciation form mapping.
-         */
-        PROCESS_INSTANCIATION,
-
-        /**
-         * Type for Process Overview form mapping.
-         */
-        PROCESS_OVERVIEW,
-
-        /**
-         * Type for Human Task form mapping.
-         */
-        HUMAN_TASK
-    }
 
     @XmlAttribute(required = true)
     private String page;

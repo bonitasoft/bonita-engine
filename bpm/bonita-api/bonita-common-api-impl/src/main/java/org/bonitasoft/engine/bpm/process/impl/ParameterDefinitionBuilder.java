@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.parameter.impl.ParameterDefinitionImpl;
-import org.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 
 /**

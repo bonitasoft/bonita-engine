@@ -123,6 +123,8 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
+import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition;
+import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.category.CategoryNotFoundException;
@@ -201,6 +203,7 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.StringUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
+import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -225,6 +228,7 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException;
+import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.comment.api.SCommentNotFoundException;
@@ -730,6 +734,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
             processDefinitionService.store(sProcessDefinition, designProcessDefinition.getDisplayName(), designProcessDefinition.getDisplayDescription());
             unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
+            deployFormMappings(businessArchive, sProcessDefinition.getId());
             final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(businessArchive, tenantAccessor, sProcessDefinition);
             if (isResolved) {
                 tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
@@ -750,6 +755,22 @@ public class ProcessAPIImpl implements ProcessAPI {
                     + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + "> with id <" + sProcessDefinition.getId() + ">");
         }
         return processDefinition;
+    }
+
+    private void deployFormMappings(final BusinessArchive businessArchive, final long processDefinitionId) throws ProcessDeployException {
+        final FormMappingModel formMappingModel = businessArchive.getFormMappingModel();
+        if (formMappingModel != null) {
+            final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
+            try {
+                for (final FormMappingDefinition formMapping : formMappingModel.getFormMappings()) {
+                    formMappingService.create(processDefinitionId, formMapping.getTaskname(), formMapping.getPage(), formMapping.isExternal(), formMapping
+                            .getType().name());
+                }
+                // TODO: add empty mappings for all tasks, including the ones that are not declared in the form-mapping.
+            } catch (final SObjectCreationException e) {
+                throw new ProcessDeployException(e);
+            }
+        }
     }
 
     @Override
@@ -2502,7 +2523,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long processDefinitionId = processInstanceService.getProcessInstance(processInstanceId).getProcessDefinitionId();
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(), parentContainerResolver,
+            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(),
+                    parentContainerResolver,
                     startIndex, maxResults);
             return convertModelToDataInstances(dataInstances);
         } catch (final SBonitaException e) {
@@ -2633,7 +2655,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = activityInstanceService.getFlowNodeInstance(activityInstanceId).getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver,
+            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                    parentContainerResolver,
                     startIndex, maxResults);
             return convertModelToDataInstances(dataInstances);
         } catch (final SBonitaException e) {
@@ -2659,7 +2682,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            data = dataInstanceService.getDataInstance(dataName, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
+            data = dataInstanceService.getDataInstance(dataName, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
+                    parentContainerResolver);
             return convertModeltoDataInstance(data);
         } catch (final SBonitaException e) {
             throw new DataNotFoundException(e);
@@ -2993,13 +3017,13 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = activityInstanceService.getFlowNodeInstance(activityInstanceId).getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(variables.keySet()), activityInstanceId,
+            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(variables.keySet()), activityInstanceId,
                     DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
-            if(dataInstances.size()<variables.size()){
-                throw new UpdateException("Some data does not exists, wanted to update "+variables.keySet()+" but there is only "+dataInstances);
+            if (dataInstances.size() < variables.size()) {
+                throw new UpdateException("Some data does not exists, wanted to update " + variables.keySet() + " but there is only " + dataInstances);
             }
-            for (SDataInstance dataInstance : dataInstances) {
-                Serializable newValue = variables.get(dataInstance.getName());
+            for (final SDataInstance dataInstance : dataInstances) {
+                final Serializable newValue = variables.get(dataInstance.getName());
                 final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(newValue);
                 dataInstanceService.updateDataInstance(dataInstance, entityUpdateDescriptor);
             }
@@ -3017,7 +3041,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final OperationService operationService = tenantAccessor.getOperationService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
@@ -3030,7 +3054,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     activityInstance.getProcessDefinitionId());
             sExpressionContext.setSerializableInputValues(expressionContexts);
 
-            operationService.execute(sOperations,sExpressionContext);
+            operationService.execute(sOperations, sExpressionContext);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         } finally {
@@ -3041,6 +3065,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     protected SOperation convertOperation(final Operation operation) {
         return ModelConvertor.convertOperation(operation);
     }
+
     protected List<SOperation> convertOperations(final List<Operation> operations) {
         return ModelConvertor.convertOperations(operations);
     }
@@ -3437,10 +3462,10 @@ public class ProcessAPIImpl implements ProcessAPI {
             inputValues.putAll(connectorResult.getResult());
             expressionContext.setInputValues(inputValues);
             // execute
-            Long containerId = expressionContext.getContainerId();
+            final Long containerId = expressionContext.getContainerId();
             operationService.execute(sOperations, containerId == null ? -1 : containerId, expressionContext.getContainerType(), expressionContext);
             // return the value of the data if it's an external data
-            for (Operation operation : operations) {
+            for (final Operation operation : operations) {
                 final LeftOperand leftOperand = operation.getLeftOperand();
                 if (LeftOperand.TYPE_EXTERNAL_DATA.equals(leftOperand.getType())) {
                     externalDataValue.put(leftOperand.getName(), (Serializable) expressionContext.getInputValues().get(leftOperand.getName()));
@@ -4094,35 +4119,35 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Map<String, Map<String, Long>> getFlownodeStateCounters(long processInstanceId) {
+    public Map<String, Map<String, Long>> getFlownodeStateCounters(final long processInstanceId) {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final HashMap<String, Map<String, Long>> countersForProcessInstance = new HashMap<String, Map<String, Long>>();
         try {
             // Active flownodes:
             final List<SFlowNodeInstanceStateCounter> flownodes = serviceAccessor.getActivityInstanceService().getNumberOfFlownodesInAllStates(
                     processInstanceId);
-            for (SFlowNodeInstanceStateCounter nodeCounter : flownodes) {
-                String flownodeName = nodeCounter.getFlownodeName();
-                Map<String, Long> flownodeCounters = getFlownodeCounters(countersForProcessInstance, flownodeName);
+            for (final SFlowNodeInstanceStateCounter nodeCounter : flownodes) {
+                final String flownodeName = nodeCounter.getFlownodeName();
+                final Map<String, Long> flownodeCounters = getFlownodeCounters(countersForProcessInstance, flownodeName);
                 flownodeCounters.put(nodeCounter.getStateName(), nodeCounter.getNumberOf());
                 countersForProcessInstance.put(flownodeName, flownodeCounters);
             }
             // Archived flownodes:
             final List<SFlowNodeInstanceStateCounter> archivedFlownodes = serviceAccessor.getActivityInstanceService().getNumberOfArchivedFlownodesInAllStates(
                     processInstanceId);
-            for (SFlowNodeInstanceStateCounter nodeCounter : archivedFlownodes) {
-                String flownodeName = nodeCounter.getFlownodeName();
-                Map<String, Long> flownodeCounters = getFlownodeCounters(countersForProcessInstance, flownodeName);
+            for (final SFlowNodeInstanceStateCounter nodeCounter : archivedFlownodes) {
+                final String flownodeName = nodeCounter.getFlownodeName();
+                final Map<String, Long> flownodeCounters = getFlownodeCounters(countersForProcessInstance, flownodeName);
                 flownodeCounters.put(nodeCounter.getStateName(), nodeCounter.getNumberOf());
                 countersForProcessInstance.put(flownodeName, flownodeCounters);
             }
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         }
         return countersForProcessInstance;
     }
 
-    private Map<String, Long> getFlownodeCounters(HashMap<String, Map<String, Long>> counters, String flownodeName) {
+    private Map<String, Long> getFlownodeCounters(final HashMap<String, Map<String, Long>> counters, final String flownodeName) {
         Map<String, Long> flownodeCounters = counters.get(flownodeName);
         if (flownodeCounters == null) {
             flownodeCounters = new HashMap<String, Long>();
@@ -6030,18 +6055,19 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public int getNumberOfParameterInstances(long processDefinitionId) {
+    public int getNumberOfParameterInstances(final long processDefinitionId) {
         return processManagementAPIImplDelegate.getNumberOfParameterInstances(processDefinitionId);
     }
 
     @Override
-    public ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws NotFoundException {
+    public ParameterInstance getParameterInstance(final long processDefinitionId, final String parameterName) throws NotFoundException {
         return processManagementAPIImplDelegate.getParameterInstance(processDefinitionId, parameterName);
     }
 
     @Override
-    public List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort) {
-        return processManagementAPIImplDelegate.getParameterInstances(processDefinitionId,startIndex,maxResults,sort);
+    public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults,
+            final ParameterCriterion sort) {
+        return processManagementAPIImplDelegate.getParameterInstances(processDefinitionId, startIndex, maxResults, sort);
     }
 
 }

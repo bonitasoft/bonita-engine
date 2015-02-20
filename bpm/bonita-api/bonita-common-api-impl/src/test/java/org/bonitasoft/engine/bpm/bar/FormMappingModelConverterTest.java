@@ -14,13 +14,14 @@
 package org.bonitasoft.engine.bpm.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.bpm.bar.formmapping.builder.FormMappingBuilder.aFormMapping;
-import static org.bonitasoft.engine.bpm.bar.formmapping.builder.FormMappingModelBuilder.aFormMappingModel;
+import static org.bonitasoft.engine.bpm.formmapping.FormMappingModelBuilder.buildFormMappingModel;
 
 import javax.xml.bind.JAXBException;
 
-import org.bonitasoft.engine.bpm.bar.formmapping.builder.FormMappingModelBuilder;
+import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingModel;
+import org.bonitasoft.engine.bpm.formmapping.FormMappingDefinitionBuilder;
+import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.junit.Test;
 
 public class FormMappingModelConverterTest {
@@ -28,7 +29,7 @@ public class FormMappingModelConverterTest {
     @Test
     public void serializeThenDeserializeModelShouldReturnTheOriginalModel() throws Exception {
         final FormMappingModelConverter convertor = new FormMappingModelConverter();
-        final FormMappingModel model = new FormMappingModelBuilder().buildDefaultModelWithOneFormMapping();
+        final FormMappingModel model = buildDefaultModelWithOneFormMapping();
         final byte[] serialize = convertor.serializeToXML(model);
         final FormMappingModel actual = convertor.deserializeFromXML(serialize);
 
@@ -38,7 +39,7 @@ public class FormMappingModelConverterTest {
     @Test
     public void serializeThenDeserializeEmptyModelShouldReturnTheOriginalEmptyModel() throws Exception {
         final FormMappingModelConverter convertor = new FormMappingModelConverter();
-        final FormMappingModel model = new FormMappingModelBuilder().buildEmptyDefaultModel();
+        final FormMappingModel model = buildEmptyDefaultModel();
         final byte[] serialize = convertor.serializeToXML(model);
         final FormMappingModel actual = convertor.deserializeFromXML(serialize);
 
@@ -48,7 +49,7 @@ public class FormMappingModelConverterTest {
     @Test
     public void serializeThenDeserializeModelWithoutTaskNameShouldReturnTheOriginalModel() throws Exception {
         final FormMappingModelConverter convertor = new FormMappingModelConverter();
-        final FormMappingModel model = aFormMappingModel().withFormMapping(aFormMapping("page", null, true).build()).build();
+        final FormMappingModel model = buildFormMappingModel().withFormMapping(buildFormMapping()).build();
         final byte[] serialize = convertor.serializeToXML(model);
         final FormMappingModel actual = convertor.deserializeFromXML(serialize);
 
@@ -60,6 +61,24 @@ public class FormMappingModelConverterTest {
         final byte[] serialize = "<someXML />".getBytes();
         final FormMappingModelConverter convertor = new FormMappingModelConverter();
         convertor.deserializeFromXML(serialize);
+    }
+
+    private FormMappingDefinition buildFormMapping() {
+        return new FormMappingDefinitionBuilder("/FormMapping.html", FormMappingType.TASK, false).withTaskname("aTask").build();
+    }
+
+    private FormMappingDefinition buildMyFormMappingWithTaskName() {
+        return new FormMappingDefinitionBuilder("/FormMapping.html", FormMappingType.TASK, false).withTaskname("aTask").build();
+    }
+
+    public FormMappingModel buildDefaultModelWithOneFormMapping() {
+        final FormMappingModel model = buildEmptyDefaultModel();
+        model.addFormMapping(buildMyFormMappingWithTaskName());
+        return model;
+    }
+
+    public FormMappingModel buildEmptyDefaultModel() {
+        return new FormMappingModel();
     }
 
     //    @Test
