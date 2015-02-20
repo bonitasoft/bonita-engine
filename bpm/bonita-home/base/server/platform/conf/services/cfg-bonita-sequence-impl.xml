@@ -153,6 +153,7 @@
                 <entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" value="10200" />
                 <entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" value="10201" />
                 <entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" value="10202" />
+				<entry key="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" value="10300" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />

@@ -119,6 +119,7 @@
                 <entry key="org.bonitasoft.engine.core.document.model.SDocument" value="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" />
                 <entry key="org.bonitasoft.engine.core.document.model.SMappedDocument" value="org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl" />
                 <entry key="org.bonitasoft.engine.core.document.model.SLightDocument" value="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" />
+				<entry key="org.bonitasoft.engine.core.form.SFormMapping" value="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" />
 
 				<!-- bpm -->
 				<entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" />
