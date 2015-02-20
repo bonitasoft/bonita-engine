@@ -29,21 +29,58 @@ import org.bonitasoft.engine.search.SearchResult;
 public interface ProcessConfigurationAPI {
 
     /**
-     *
-     *
+     * Search for form mapping
      *
      * @param searchOptions
-     * @return
-     *
+     *        search options to search for form mapping
+     * @return the result of the search
      * @since 7.0.0
      */
     SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions);
 
+    /**
+     * Get the form mapping that contains the link to the process instantiation form
+     * 
+     * @param processDefinitionId
+     *        the process
+     * @return
+     *         the form mapping of the process instantiation form
+     */
     FormMapping getProcessStartForm(long processDefinitionId);
 
+    /**
+     * Get the form mapping that contains the link to the process overview form
+     * 
+     * @param processDefinitionId
+     *        the process
+     * @return
+     *         the form mapping of the process overview form
+     */
     FormMapping getProcessOverviewForm(long processDefinitionId);
 
+    /**
+     * Get the form mapping that contains the link to the task form
+     * 
+     * @param processDefinitionId
+     *        the process
+     * @param taskName
+     *        the name of the task
+     * @return
+     *         the form mapping of the task form
+     */
     FormMapping getHumanTaskForm(long processDefinitionId, String taskName);
 
+    /**
+     * Update a form mapping with the given values
+     * 
+     * @param formMappingId
+     *        the form mapping to update
+     * @param page
+     *        the name of the form or the url to the form
+     * @param type
+     *        the form mapping type
+     * @param external
+     *        true if the page attribute is an url to an external page, false if it's a internal form
+     */
     void updateFormMapping(long formMappingId, String page, FormMappingType type, boolean external);
 }
