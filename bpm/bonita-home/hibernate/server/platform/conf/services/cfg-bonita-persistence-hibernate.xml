@@ -311,6 +311,7 @@
 				<ref bean="hbm-bos-reporting-model" />
 				<ref bean="hbm-bos-page-model" />
 				<ref bean="hbm-bos-application-model" />
+				<ref bean="hbm-bos-form-mapping-model" />
 			</list>
 		</property>
 		<!-- L2 cache -->

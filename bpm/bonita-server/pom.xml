@@ -227,6 +227,20 @@
       <version>${project.version}</version>
     </dependency>
 
+
+
+    <dependency>
+      <groupId>org.bonitasoft.engine.core</groupId>
+      <artifactId>bonita-form-mapping-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bonitasoft.engine.core</groupId>
+      <artifactId>bonita-form-mapping-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Home Server -->
     <dependency>
       <groupId>org.bonitasoft.engine.core</groupId>
@@ -234,8 +248,8 @@
       <version>${project.version}</version>
       <exclusions>
         <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api</artifactId>
+          <groupId>org.bonitasoft.engine.api</groupId>
+          <artifactId>bonita-common-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
