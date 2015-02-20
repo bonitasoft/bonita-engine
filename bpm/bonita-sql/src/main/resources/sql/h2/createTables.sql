@@ -171,8 +171,8 @@ CREATE TABLE arch_flownode_instance (
   archiveDate BIGINT NOT NULL,
   rootContainerId BIGINT NOT NULL,
   parentContainerId BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  displayName VARCHAR(75),
+  name VARCHAR(255) NOT NULL,
+  displayName VARCHAR(255),
   displayDescription VARCHAR(255),
   stateId INT NOT NULL,
   stateName VARCHAR(50),
@@ -282,6 +282,8 @@ CREATE TABLE process_instance (
   PRIMARY KEY (tenantid, id)
 );
 
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, processdefinitionid, stateid);
+
 CREATE TABLE flownode_instance (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -289,8 +291,8 @@ CREATE TABLE flownode_instance (
   kind VARCHAR(25) NOT NULL,
   rootContainerId BIGINT NOT NULL,
   parentContainerId BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  displayName VARCHAR(75),
+  name VARCHAR(255) NOT NULL,
+  displayName VARCHAR(255),
   displayDescription VARCHAR(255),
   stateId INT NOT NULL,
   stateName VARCHAR(50),
@@ -668,9 +670,9 @@ CREATE TABLE external_identity_mapping (
 CREATE TABLE group_ (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  name VARCHAR(125) NOT NULL,
   parentPath VARCHAR(255),
-  displayName VARCHAR(75),
+  displayName VARCHAR(255),
   description LONGVARCHAR,
   iconName VARCHAR(50),
   iconPath VARCHAR(50),
@@ -684,8 +686,8 @@ CREATE TABLE group_ (
 CREATE TABLE role (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  displayName VARCHAR(75),
+  name VARCHAR(255) NOT NULL,
+  displayName VARCHAR(255),
   description LONGVARCHAR,
   iconName VARCHAR(50),
   iconPath VARCHAR(50),
@@ -709,7 +711,6 @@ CREATE TABLE user_ (
   title VARCHAR(50),
   jobTitle VARCHAR(255),
   managerUserId BIGINT,
-  delegeeUserName VARCHAR(50),
   iconName VARCHAR(50),
   iconPath VARCHAR(50),
   createdBy BIGINT,
@@ -740,10 +741,10 @@ CREATE TABLE user_contactinfo (
   room VARCHAR(50),
   address VARCHAR(255),
   zipCode VARCHAR(50),
-  city VARCHAR(50),
-  state VARCHAR(50),
-  country VARCHAR(50),
-  website VARCHAR(50),
+  city VARCHAR(255),
+  state VARCHAR(255),
+  country VARCHAR(255),
+  website VARCHAR(255),
   personal BOOLEAN NOT NULL,
   UNIQUE (tenantid, userId, personal),
   PRIMARY KEY (tenantid, id)

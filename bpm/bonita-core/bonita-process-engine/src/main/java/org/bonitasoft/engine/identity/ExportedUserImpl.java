@@ -113,7 +113,6 @@ public class ExportedUserImpl implements ExportedUser {
         password = user.getPassword();
         userName = user.getUserName();
         jobTitle = user.getJobTitle();
-        // delegeeUserName = user.getDelegeeUserName();
         managerUserId = user.getManagerUserId();
         iconName = user.getIconName();
         iconPath = user.getIconPath();

@@ -54,7 +54,7 @@ public class ProfilesImporterTest {
     private IdentityService identityService;
 
     @Mock
-    private ProfileImportStategy importStrategy;
+    private ProfileImportStrategy importStrategy;
 
     @Mock
     private ProfileService profileService;
@@ -281,7 +281,7 @@ public class ProfilesImporterTest {
         return expected;
     }
 
-    private void createImporter(final ProfileImportStategy importStrategy, final ExportedProfile... exportedProfile) throws SProfileUpdateException,
+    private void createImporter(final ProfileImportStrategy importStrategy, final ExportedProfile... exportedProfile) throws SProfileUpdateException,
             SProfileCreationException, SProfileEntryCreationException {
         profilesImporter = spy(new ProfilesImporter(profileService, identityService, Arrays.asList(exportedProfile), importStrategy));
         doReturn(mock(SProfile.class)).when(profilesImporter).createSProfile(any(ExportedProfile.class), anyLong());

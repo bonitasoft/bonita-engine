@@ -32,6 +32,8 @@ public class FlowNodeTransitionsWrapper {
 
     private List<STransitionDefinition> validOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
 
+    private STransitionDefinition defaultTransition;
+
     public int getInputTransitionsSize() {
         return inputTransitionsSize;
     }
@@ -118,4 +120,11 @@ public class FlowNodeTransitionsWrapper {
         return hasMultipleIncomingTransitions() && hasOneElement();
     }
 
+    public void setDefaultTransition(final STransitionDefinition defaultTransition) {
+        this.defaultTransition = defaultTransition;
+    }
+
+    public STransitionDefinition getDefaultTransition() {
+        return defaultTransition;
+    }
 }

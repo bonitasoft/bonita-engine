@@ -27,4 +27,6 @@ public interface STransitionDefinition extends SNamedElement {
 
     SExpression getCondition();
 
+    boolean hasCondition();
+
 }
