@@ -79,4 +79,6 @@ public interface APIAccessor extends Serializable {
      * @return an <code>ApplicationAPI</code>
      */
     ApplicationAPI getLivingApplicationAPI();
+
+    ProcessConfigurationAPI getProcessConfigurationAPIi();
 }

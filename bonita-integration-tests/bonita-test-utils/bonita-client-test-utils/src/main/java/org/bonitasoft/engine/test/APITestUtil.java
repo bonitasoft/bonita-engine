@@ -38,6 +38,7 @@ import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.api.ThemeAPI;
@@ -181,6 +182,8 @@ public class APITestUtil extends PlatformTestUtil {
 
     private ApplicationAPI applicationAPI;
 
+    private ProcessConfigurationAPI processConfigurationAPI;
+
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
         if (strTimeout != null) {
@@ -189,6 +192,7 @@ public class APITestUtil extends PlatformTestUtil {
             DEFAULT_TIMEOUT = 2* 60  * 1000;
         }
     }
+
 
     @After
     public void clearSynchroRepository() {
@@ -215,6 +219,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
+        setProcessConfigurationAPI(TenantAPIAccessor.getProcessConfigurationAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
@@ -229,6 +234,7 @@ public class APITestUtil extends PlatformTestUtil {
         loginAPI.logout(session);
         setSession(null);
         setIdentityAPI(null);
+        setProcessConfigurationAPI(null);
         setProcessAPI(null);
         setCommandAPI(null);
         setProfileAPI(null);
@@ -571,7 +577,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder,
             final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies) throws BonitaException {
         final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
+                connectorImplementations, generateConnectorDependencies, Collections.<BarResource>emptyList());
         return deployAndEnableProcess(businessArchiveBuilder.done());
     }
 
@@ -618,7 +624,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
             throws BonitaException {
-        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
+        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource>emptyList(),
                 generateFilterDependencies, userFilters);
     }
 
@@ -1465,6 +1471,14 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ApplicationAPI getApplicationAPI() {
         return applicationAPI;
+    }
+
+    public ProcessConfigurationAPI getProcessConfigurationAPI() {
+        return processConfigurationAPI;
+    }
+
+    public void setProcessConfigurationAPI(ProcessConfigurationAPI processConfigurationAPI) {
+        this.processConfigurationAPI = processConfigurationAPI;
     }
 
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
