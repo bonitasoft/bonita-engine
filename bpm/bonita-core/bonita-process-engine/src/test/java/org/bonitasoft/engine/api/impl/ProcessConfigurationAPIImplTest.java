@@ -109,9 +109,15 @@ public class ProcessConfigurationAPIImplTest {
         assertThat(processStartForm.getId()).isEqualTo(FORM_MAPPING_ID);
     }
 
-    @Ignore
     @Test
     public void testUpdateFormMapping() throws Exception {
+        //given
+        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, false, "myForm", PROCESS_DEF_ID);
+        doReturn(sFormMapping).when(formMappingService).get(FORM_MAPPING_ID);
+        //when
+        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", true);
+        //then
+        verify(formMappingService, times(1)).update(sFormMapping,"theNewForm",true);
 
     }
 }
