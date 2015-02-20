@@ -24,8 +24,8 @@ public class FormMappingDefinitionBuilder {
         formMapping = new FormMappingDefinition(page, type, external);
     }
 
-    public static FormMappingDefinitionBuilder buildFormMapping(final String page, final FormMappingType type, final boolean external) {
-        return new FormMappingDefinitionBuilder(page, type, external);
+    public static FormMappingDefinitionBuilder buildFormMapping(final String form, final FormMappingType type, final boolean external) {
+        return new FormMappingDefinitionBuilder(form, type, external);
     }
 
     public FormMappingDefinitionBuilder withTaskname(final String taskname) {

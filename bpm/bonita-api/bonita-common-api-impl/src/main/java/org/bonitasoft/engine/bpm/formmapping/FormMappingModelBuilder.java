@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.formmapping;
 
 import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingModel;
+import org.bonitasoft.engine.form.mapping.FormMappingType;
 
 /**
  * @author Emmanuel Duchastenier
@@ -36,4 +37,15 @@ public class FormMappingModelBuilder {
         return formMappingModel;
     }
 
+    public FormMappingModelBuilder addProcessStartForm(String form, boolean external) {
+        return withFormMapping(FormMappingDefinitionBuilder.buildFormMapping(form, FormMappingType.PROCESS_START,external).build());
+    }
+
+    public FormMappingModelBuilder addProcessOverviewForm(String form, boolean external) {
+        return withFormMapping(FormMappingDefinitionBuilder.buildFormMapping(form, FormMappingType.PROCESS_OVERVIEW,external).build());
+    }
+
+    public FormMappingModelBuilder addTaskForm(String form, boolean external, String task) {
+        return withFormMapping(FormMappingDefinitionBuilder.buildFormMapping(form, FormMappingType.TASK,external).withTaskname(task).build());
+    }
 }

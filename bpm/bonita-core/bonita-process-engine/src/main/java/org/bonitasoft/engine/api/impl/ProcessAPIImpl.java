@@ -763,7 +763,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
             try {
                 for (final FormMappingDefinition formMapping : formMappingModel.getFormMappings()) {
-                    formMappingService.create(processDefinitionId, formMapping.getTaskname(), formMapping.getPage(), formMapping.isExternal(), formMapping
+                    formMappingService.create(processDefinitionId, formMapping.getTaskname(), formMapping.getForm(), formMapping.isExternal(), formMapping
                             .getType().name());
                 }
                 // TODO: add empty mappings for all tasks, including the ones that are not declared in the form-mapping.

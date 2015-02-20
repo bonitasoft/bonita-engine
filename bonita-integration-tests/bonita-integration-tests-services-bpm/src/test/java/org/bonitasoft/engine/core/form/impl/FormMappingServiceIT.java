@@ -130,7 +130,7 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
         transactionService.begin();
         try{
-            SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
+            formMappingService.get(taskForm.getId());
             fail("should have thrown a not found");
         }catch(SObjectNotFoundException e){
             //ok

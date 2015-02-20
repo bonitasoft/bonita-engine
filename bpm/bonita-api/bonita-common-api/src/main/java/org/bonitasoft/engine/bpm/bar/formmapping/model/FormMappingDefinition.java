@@ -29,7 +29,7 @@ import org.bonitasoft.engine.form.mapping.FormMappingType;
 public class FormMappingDefinition {
 
     @XmlAttribute(required = true)
-    private String page;
+    private String form;
 
     @XmlAttribute(required = true)
     private boolean external;
@@ -46,14 +46,14 @@ public class FormMappingDefinition {
     protected FormMappingDefinition() {
     }
 
-    public FormMappingDefinition(final String page, final FormMappingType type, final boolean external) {
-        this.page = page;
+    public FormMappingDefinition(final String form, final FormMappingType type, final boolean external) {
+        this.form = form;
         this.type = type;
         this.external = external;
     }
 
-    public FormMappingDefinition(final String page, final FormMappingType type, final boolean external, final String taskname) {
-        this(page, type, external);
+    public FormMappingDefinition(final String form, final FormMappingType type, final boolean external, final String taskname) {
+        this(form, type, external);
         setTaskname(taskname);
     }
 
@@ -65,8 +65,8 @@ public class FormMappingDefinition {
         this.taskname = taskname;
     }
 
-    public String getPage() {
-        return page;
+    public String getForm() {
+        return form;
     }
 
     public boolean isExternal() {
@@ -79,14 +79,14 @@ public class FormMappingDefinition {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(11, 43).append(page).append(external).append(type).toHashCode();
+        return new HashCodeBuilder(11, 43).append(form).append(external).append(type).toHashCode();
     }
 
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof FormMappingDefinition) {
             final FormMappingDefinition other = (FormMappingDefinition) obj;
-            return new EqualsBuilder().append(page, other.page).append(external, other.external).append(type, other.type).isEquals();
+            return new EqualsBuilder().append(form, other.form).append(external, other.external).append(type, other.type).isEquals();
         }
         return false;
     }
@@ -94,7 +94,7 @@ public class FormMappingDefinition {
     @Override
     public String toString() {
         final ToStringBuilder builder = new ToStringBuilder(this);
-        builder.append("page", page).append("external", external).append("type", type).append("taskname", taskname);
+        builder.append("page", form).append("external", external).append("type", type).append("taskname", taskname);
         return builder.toString();
     }
 
