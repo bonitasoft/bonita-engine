@@ -18,7 +18,6 @@ package org.bonitasoft.engine.api;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.mapping.FormMapping;
-import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -47,6 +46,9 @@ public interface ProcessConfigurationAPI {
      *        the process
      * @return
      *         the form mapping of the process start form
+     * @throws org.bonitasoft.engine.exception.NotFoundException
+     *         when the form mapping with these properties is not found
+     * @since 7.0.0
      */
     FormMapping getProcessStartForm(long processDefinitionId) throws NotFoundException;
 
@@ -57,6 +59,9 @@ public interface ProcessConfigurationAPI {
      *        the process
      * @return
      *         the form mapping of the process overview form
+     * @throws org.bonitasoft.engine.exception.NotFoundException
+     *         when the form mapping with these properties is not found
+     * @since 7.0.0
      */
     FormMapping getProcessOverviewForm(long processDefinitionId) throws NotFoundException;
 
@@ -69,16 +74,26 @@ public interface ProcessConfigurationAPI {
      *        the name of the task
      * @return
      *         the form mapping of the task form
+     * @throws org.bonitasoft.engine.exception.NotFoundException
+     *         when the form mapping with these properties is not found
+     * @since 7.0.0
      */
     FormMapping getTaskForm(long processDefinitionId, String taskName) throws NotFoundException;
 
     /**
      * Update a form mapping with the given values
+     * 
      * @param formMappingId
      *        the form mapping to update
      * @param form
      *        the name of the form or the url to the form
      * @param external
+     *        true if the form is an external url
+     * @throws org.bonitasoft.engine.exception.NotFoundException
+     *         when the formMappingId is not an existing form mapping
+     * @throws org.bonitasoft.engine.exception.UpdateException
+     *         when there is an issue when updating the form mapping
+     * @since 7.0.0
      */
     void updateFormMapping(final long formMappingId, final String form, final boolean external) throws NotFoundException, UpdateException;
 }
