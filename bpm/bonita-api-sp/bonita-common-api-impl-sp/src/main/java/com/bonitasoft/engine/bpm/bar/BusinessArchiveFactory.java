@@ -28,6 +28,7 @@ import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.bar.ParameterContribution;
 import org.bonitasoft.engine.bpm.bar.UserFilterContribution;
+import org.bonitasoft.engine.bpm.bar.formmapping.FormMappingContribution;
 import org.bonitasoft.engine.io.IOUtil;
 
 /**
@@ -47,6 +48,7 @@ public class BusinessArchiveFactory {
         contributions.add(new UserFilterContribution());
         contributions.add(new DocumentsResourcesContribution());
         contributions.add(new ClasspathContribution());
+        contributions.add(new FormMappingContribution());
     }
 
     public static BusinessArchive readBusinessArchive(final InputStream inputStream) throws IOException, InvalidBusinessArchiveFormatException {
@@ -61,9 +63,9 @@ public class BusinessArchiveFactory {
                 }
             }
             return businessArchive;
-        } catch (InvalidBusinessArchiveFormatException e) {
+        } catch (final InvalidBusinessArchiveFormatException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new InvalidBusinessArchiveFormatException("Invalid format, can't read the BAR file", e);
         } finally {
             IOUtil.deleteDir(barFolder);
