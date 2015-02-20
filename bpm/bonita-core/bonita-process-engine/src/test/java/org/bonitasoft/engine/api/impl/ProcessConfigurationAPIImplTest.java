@@ -15,12 +15,17 @@
 
 package org.bonitasoft.engine.api.impl;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.core.form.FormMappingService;
+import org.bonitasoft.engine.form.mapping.FormMapping;
+import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -30,6 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessConfigurationAPIImplTest {
 
+    private static final long PROCESS_DEF_ID = 158l;
     @Mock
     public FormMappingService formMappingService;
     @Mock
@@ -44,14 +50,22 @@ public class ProcessConfigurationAPIImplTest {
 
     }
 
+    @Ignore
     @Test
     public void testSearchFormMappings() throws Exception {
-
     }
 
+    @Ignore
     @Test
     public void testGetProcessStartForm() throws Exception {
-
+        //given
+        FormMapping myForm = new FormMapping(PROCESS_DEF_ID, FormMappingType.PROCESS_START, false, "myForm");
+        doReturn(myForm);
+        //when
+        FormMapping processStartForm = processConfigurationAPI.getProcessStartForm(PROCESS_DEF_ID);
+        //then
+        verify(formMappingService, times(1)).get(PROCESS_DEF_ID, FormMappingType.PROCESS_START.name());
+        assertThat(processStartForm).isEqualTo(myForm);
     }
 
     @Test

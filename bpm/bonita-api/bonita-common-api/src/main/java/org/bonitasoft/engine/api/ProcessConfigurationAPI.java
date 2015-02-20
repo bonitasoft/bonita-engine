@@ -39,12 +39,12 @@ public interface ProcessConfigurationAPI {
     SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions);
 
     /**
-     * Get the form mapping that contains the link to the process instantiation form
+     * Get the form mapping that contains the link to the process start form
      * 
      * @param processDefinitionId
      *        the process
      * @return
-     *         the form mapping of the process instantiation form
+     *         the form mapping of the process start form
      */
     FormMapping getProcessStartForm(long processDefinitionId);
 

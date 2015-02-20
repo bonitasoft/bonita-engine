@@ -21,9 +21,9 @@ package org.bonitasoft.engine.form.mapping;
 public enum FormMappingType {
 
     /**
-     * form used as process instantiation form
+     * form used as process start form
      */
-    PROCESS_INSTANTIATION,
+    PROCESS_START,
 
     /**
      * form used as process overview form
@@ -31,7 +31,7 @@ public enum FormMappingType {
     PROCESS_OVERVIEW,
 
     /**
-     * form of a human task
+     * form of a task
      */
-    HUMAN_TASK
+    TASK
 }
