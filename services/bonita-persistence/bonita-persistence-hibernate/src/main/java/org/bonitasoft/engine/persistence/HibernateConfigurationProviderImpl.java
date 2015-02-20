@@ -65,11 +65,11 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
 
             PersistentClass persistentClass = configuration.getClassMapping(mappedClassName);
             if (persistentClass == null) {
-                // try to keep only the simpleName f the class which is sometimes used as "entity-name" in th emapping file
+                // try to keep only the simpleName if the class which is sometimes used as "entity-name" in the mapping file
                 final String classSimpleName = mappedClassName.substring(mappedClassName.lastIndexOf('.') + 1);
                 persistentClass = configuration.getClassMapping(classSimpleName);
                 if (persistentClass == null) {
-                    throw new SPersistenceException("Unable to locate a class mapping for class: " + mappedClassName + ", found mappings are: " + sb.toString());
+                    throw new SPersistenceException("Unable to locate an hibernate mapping file for class: " + mappedClassName + ", found mappings are: " + sb.toString());
                 }
             }
             final Class<? extends PersistentObject> mappedClass = persistentClass.getMappedClass();

@@ -15,20 +15,24 @@
 
 package org.bonitasoft.engine.form.mapping;
 
-import java.io.Serializable;
+import org.bonitasoft.engine.bpm.BaseElement;
 
 /**
  * @author Baptiste Mesta
  */
-public class FormMapping implements Serializable {
+public class FormMapping implements BaseElement {
 
     private static final long serialVersionUID = 1L;
 
+    private long id;
     private long processDefinitionId;
     private String task;
     private String page;
     private boolean external;
     private FormMappingType type;
+
+    public FormMapping() {
+    }
 
     public FormMapping(long processDefinitionId, boolean external, FormMappingType type, String page, String task) {
         this.processDefinitionId = processDefinitionId;
@@ -57,6 +61,15 @@ public class FormMapping implements Serializable {
 
     public void setProcessDefinitionId(long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+    }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getTask() {
@@ -92,17 +105,6 @@ public class FormMapping implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return "FormMapping{" +
-                "processDefinitionId=" + processDefinitionId +
-                ", task='" + task + '\'' +
-                ", page='" + page + '\'' +
-                ", external=" + external +
-                ", type=" + type +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FormMapping)) return false;
@@ -110,6 +112,7 @@ public class FormMapping implements Serializable {
         FormMapping that = (FormMapping) o;
 
         if (external != that.external) return false;
+        if (id != that.id) return false;
         if (processDefinitionId != that.processDefinitionId) return false;
         if (page != null ? !page.equals(that.page) : that.page != null) return false;
         if (task != null ? !task.equals(that.task) : that.task != null) return false;
@@ -120,11 +123,24 @@ public class FormMapping implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = (int) (processDefinitionId ^ (processDefinitionId >>> 32));
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (int) (processDefinitionId ^ (processDefinitionId >>> 32));
         result = 31 * result + (task != null ? task.hashCode() : 0);
         result = 31 * result + (page != null ? page.hashCode() : 0);
         result = 31 * result + (external ? 1 : 0);
         result = 31 * result + type.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "FormMapping{" +
+                "id=" + id +
+                ", processDefinitionId=" + processDefinitionId +
+                ", task='" + task + '\'' +
+                ", page='" + page + '\'' +
+                ", external=" + external +
+                ", type=" + type +
+                '}';
     }
 }

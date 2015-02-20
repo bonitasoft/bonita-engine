@@ -98,6 +98,7 @@
 				<entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
 				<entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
 				<entry key="org.bonitasoft.engine.theme.model.STheme" value="org.bonitasoft.engine.theme.model.impl.SThemeImpl" />
+				<entry key="org.bonitasoft.engine.core.form.SFormMapping" value="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" />
 
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" />
@@ -166,7 +167,6 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.SSystemComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
-				<entry key="org.bonitasoft.engine.core.form.SFormMapping" value="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" />
 
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
