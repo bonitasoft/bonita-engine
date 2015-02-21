@@ -1,7 +1,7 @@
 package org.bonitasoft.engine.api.impl.form;
 
-import static org.bonitasoft.engine.bpm.formmapping.FormMappingDefinitionBuilder.buildFormMapping;
-import static org.bonitasoft.engine.bpm.formmapping.FormMappingModelBuilder.buildFormMappingModel;
+import static org.bonitasoft.engine.bpm.form.FormMappingDefinitionBuilder.buildFormMapping;
+import static org.bonitasoft.engine.bpm.form.FormMappingModelBuilder.buildFormMappingModel;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;

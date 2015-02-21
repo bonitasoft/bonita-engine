@@ -12,12 +12,14 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-package org.bonitasoft.engine.bpm.formmapping;
+package org.bonitasoft.engine.bpm.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition;
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingModel;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
+import org.bonitasoft.engine.bpm.form.FormMappingDefinitionBuilder;
+import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
 import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.junit.Test;
 

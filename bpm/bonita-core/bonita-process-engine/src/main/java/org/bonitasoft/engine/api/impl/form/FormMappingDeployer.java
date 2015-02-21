@@ -19,7 +19,7 @@ import static org.bonitasoft.engine.form.mapping.FormMappingType.PROCESS_START;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;

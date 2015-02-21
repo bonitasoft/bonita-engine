@@ -14,13 +14,13 @@
 package org.bonitasoft.engine.bpm.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.bpm.formmapping.FormMappingModelBuilder.buildFormMappingModel;
+import static org.bonitasoft.engine.bpm.form.FormMappingModelBuilder.buildFormMappingModel;
 
 import javax.xml.bind.JAXBException;
 
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition;
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingModel;
-import org.bonitasoft.engine.bpm.formmapping.FormMappingDefinitionBuilder;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
+import org.bonitasoft.engine.bpm.form.FormMappingDefinitionBuilder;
 import org.bonitasoft.engine.form.mapping.FormMappingType;
 import org.junit.Test;
 

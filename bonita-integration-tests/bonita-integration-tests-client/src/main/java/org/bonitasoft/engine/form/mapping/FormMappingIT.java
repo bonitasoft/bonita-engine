@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.formmapping.FormMappingModelBuilder;
+import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.search.Order;

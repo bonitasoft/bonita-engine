@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingModel;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 
 /**

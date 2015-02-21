@@ -11,9 +11,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.formmapping;
+package org.bonitasoft.engine.bpm.form;
 
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.form.mapping.FormMappingType;
 
 public class FormMappingDefinitionBuilder {

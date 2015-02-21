@@ -2,7 +2,7 @@ package org.bonitasoft.engine.bpm.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingModel;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.junit.Test;
 

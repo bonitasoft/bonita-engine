@@ -18,7 +18,7 @@ import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
 
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingModel;
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.io.IOUtil;
 import org.xml.sax.SAXException;
 
