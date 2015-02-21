@@ -16,6 +16,8 @@ package org.bonitasoft.engine.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Date;
+
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -51,6 +53,7 @@ public class FormMappingIT extends TestWithUser {
         ProcessDefinition p1 = deployAndEnableProcessWithActor(bar1.done(), "actor", user);
         ProcessDefinition p2 = deployAndEnableProcessWithActor(bar2.done(), "actor", user);
 
+        long afterDeploy = System.currentTimeMillis();
         ProcessConfigurationAPI processConfigurationAPI = getProcessConfigurationAPI();
 
         //get
@@ -90,11 +93,14 @@ public class FormMappingIT extends TestWithUser {
         //update
         processConfigurationAPI.updateFormMapping(step2Form1.getId(),"newFormUrlForStep2",true);
         FormMapping updatedStep2Form1 = processConfigurationAPI.getTaskForm(p1.getId(), "step2");
-        assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1,"form", "external");
+        assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1,"form", "external", "lastUpdateDate", "lastUpdatedBy");
         assertThat(updatedStep2Form1.getForm()).isEqualTo("newFormUrlForStep2");
         assertThat(updatedStep2Form1.isExternal()).isTrue();
+        assertThat(updatedStep2Form1.getLastUpdateDate()).isAfter(new Date(afterDeploy));
+        assertThat(updatedStep2Form1.getLastUpdatedBy()).isEqualTo(user.getId());
+        assertThat(step2Form1.getLastUpdateDate()).isNull();
 
-        disableAndDeleteProcess(p1,p2);
+        disableAndDeleteProcess(p1, p2);
         assertThat(processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).done()).getResult()).isEmpty();
     }
 }

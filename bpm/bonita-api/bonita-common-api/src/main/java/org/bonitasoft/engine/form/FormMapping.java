@@ -15,6 +15,8 @@
 
 package org.bonitasoft.engine.form;
 
+import java.util.Date;
+
 import org.bonitasoft.engine.bpm.BaseElement;
 
 /**
@@ -30,6 +32,8 @@ public class FormMapping implements BaseElement {
     private String form;
     private boolean external;
     private FormMappingType type;
+    private long lastUpdatedBy;
+    private Date lastUpdateDate;
 
     public FormMapping() {
     }
@@ -104,17 +108,36 @@ public class FormMapping implements BaseElement {
         this.type = type;
     }
 
+    public long getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(long lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof FormMapping)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         FormMapping that = (FormMapping) o;
 
         if (external != that.external) return false;
         if (id != that.id) return false;
+        if (lastUpdatedBy != that.lastUpdatedBy) return false;
         if (processDefinitionId != that.processDefinitionId) return false;
         if (form != null ? !form.equals(that.form) : that.form != null) return false;
+        if (lastUpdateDate != null ? !lastUpdateDate.equals(that.lastUpdateDate) : that.lastUpdateDate != null)
+            return false;
         if (task != null ? !task.equals(that.task) : that.task != null) return false;
         if (type != that.type) return false;
 
@@ -128,7 +151,9 @@ public class FormMapping implements BaseElement {
         result = 31 * result + (task != null ? task.hashCode() : 0);
         result = 31 * result + (form != null ? form.hashCode() : 0);
         result = 31 * result + (external ? 1 : 0);
-        result = 31 * result + type.hashCode();
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
+        result = 31 * result + (lastUpdateDate != null ? lastUpdateDate.hashCode() : 0);
         return result;
     }
 
@@ -141,6 +166,8 @@ public class FormMapping implements BaseElement {
                 ", form='" + form + '\'' +
                 ", external=" + external +
                 ", type=" + type +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                ", lastUpdateDate=" + lastUpdateDate +
                 '}';
     }
 }

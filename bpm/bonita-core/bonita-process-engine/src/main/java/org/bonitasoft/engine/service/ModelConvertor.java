@@ -423,7 +423,7 @@ public class ModelConvertor {
     }
 
     public static ActivityInstance toMultiInstanceActivityInstance(final SMultiInstanceActivityInstance sActivity,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                   final FlowNodeStateManager flowNodeStateManager) {
         final MultiInstanceActivityInstanceImpl loopActivityInstance = new MultiInstanceActivityInstanceImpl(sActivity.getName(),
                 sActivity.getFlowNodeDefinitionId(), sActivity.isSequential(), sActivity.getLoopDataInputRef(), sActivity.getLoopDataOutputRef(),
                 sActivity.getDataInputItemRef(), sActivity.getDataOutputItemRef(), sActivity.getNumberOfActiveInstances(),
@@ -448,7 +448,7 @@ public class ModelConvertor {
     }
 
     private static void updateActivityInstance(final SActivityInstance sActivity, final FlowNodeStateManager flowNodeStateManager,
-            final ActivityInstanceImpl activity) {
+                                               final ActivityInstanceImpl activity) {
         final String state = flowNodeStateManager.getState(sActivity.getStateId()).getName();
         updateFlowNode(activity, sActivity, state);
         activity.setReachedSateDate(new Date(sActivity.getReachedStateDate()));
@@ -483,7 +483,7 @@ public class ModelConvertor {
     }
 
     private static void updateHumanTaskInstance(final SHumanTaskInstance sHumanTask, final FlowNodeStateManager flowNodeStateManager,
-            final HumanTaskInstanceImpl humanTaskInstance) {
+                                                final HumanTaskInstanceImpl humanTaskInstance) {
         updateActivityInstance(sHumanTask, flowNodeStateManager, humanTaskInstance);
         humanTaskInstance.setAssigneeId(sHumanTask.getAssigneeId());
         final long claimedDate = sHumanTask.getClaimedDate();
@@ -498,7 +498,7 @@ public class ModelConvertor {
     }
 
     public static List<HumanTaskInstance> toHumanTaskInstances(final List<? extends SHumanTaskInstance> sHumanTasks,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                               final FlowNodeStateManager flowNodeStateManager) {
         final List<HumanTaskInstance> humanTaskInstances = new ArrayList<HumanTaskInstance>(sHumanTasks.size());
         for (final SHumanTaskInstance sUserTask : sHumanTasks) {
             final HumanTaskInstance userTask = toHumanTaskInstance(sUserTask, flowNodeStateManager);
@@ -533,7 +533,7 @@ public class ModelConvertor {
     }
 
     public static List<ProcessInstance> toProcessInstances(final List<SProcessInstance> sProcessInstances,
-            final ProcessDefinitionService processDefinitionService) {
+                                                           final ProcessDefinitionService processDefinitionService) {
         final List<ProcessInstance> clientProcessInstances = new ArrayList<ProcessInstance>();
         if (sProcessInstances != null) {
             final Map<Long, SProcessDefinition> processDefinitions = new HashMap<Long, SProcessDefinition>();
@@ -548,7 +548,7 @@ public class ModelConvertor {
     }
 
     private static SProcessDefinition getProcessDefinition(final ProcessDefinitionService processDefinitionService,
-            final Map<Long, SProcessDefinition> processDefinitions, final long processDefinitionId) {
+                                                           final Map<Long, SProcessDefinition> processDefinitions, final long processDefinitionId) {
         SProcessDefinition sProcessDefinition = processDefinitions.get(processDefinitionId);
         if (sProcessDefinition == null) {
             try {
@@ -609,7 +609,7 @@ public class ModelConvertor {
                 processDefinitionDI.getVersion(), processDefinitionDI.getDescription(), new Date(processDefinitionDI.getDeploymentDate()),
                 processDefinitionDI.getDeployedBy(), ActivationState.valueOf(processDefinitionDI.getActivationState()),
                 ConfigurationState.valueOf(processDefinitionDI.getConfigurationState()), processDefinitionDI.getDisplayName(), new Date(
-                        processDefinitionDI.getLastUpdateDate()), processDefinitionDI.getIconPath(), processDefinitionDI.getDisplayDescription());
+                processDefinitionDI.getLastUpdateDate()), processDefinitionDI.getIconPath(), processDefinitionDI.getDisplayDescription());
     }
 
     public static Map<Long, ProcessDeploymentInfo> toProcessDeploymentInfos(final Map<Long, SProcessDefinitionDeployInfo> sProcessDeploymentInfos) {
@@ -631,7 +631,7 @@ public class ModelConvertor {
     }
 
     public static ArchivedReceiveTaskInstance toArchivedReceiveTaskInstance(final SAReceiveTaskInstance sInstance,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                            final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedReceiveTaskInstanceImpl archivedReceiveTaskInstanceImpl = new ArchivedReceiveTaskInstanceImpl(sInstance.getName());
         updateArchivedReceiveTaskInstance(archivedReceiveTaskInstanceImpl, flowNodeStateManager, sInstance);
         return archivedReceiveTaskInstanceImpl;
@@ -647,7 +647,7 @@ public class ModelConvertor {
      * Update the fields of ArchivedHumanTaskInstance from a SAHumanTaskInstance
      */
     private static void updateArchivedHumanTaskInstance(final ArchivedHumanTaskInstanceImpl activity, final FlowNodeStateManager flowNodeStateManager,
-            final SAHumanTaskInstance saHumanTask) {
+                                                        final SAHumanTaskInstance saHumanTask) {
         updateArchivedActivityInstance(activity, flowNodeStateManager, saHumanTask);
         activity.setAssigneeId(saHumanTask.getAssigneeId());
         activity.setPriority(TaskPriority.valueOf(saHumanTask.getPriority().name()));
@@ -661,7 +661,7 @@ public class ModelConvertor {
      * Update the fields of ArchivednTaskInstance from a SAActivityInstance
      */
     private static void updateArchivedReceiveTaskInstance(final ArchivedHumanTaskInstanceImpl activity, final FlowNodeStateManager flowNodeStateManager,
-            final SAReceiveTaskInstance sActivity) {
+                                                          final SAReceiveTaskInstance sActivity) {
         final String state = flowNodeStateManager.getState(sActivity.getStateId()).getName();
         updateArchivedFlowNodeInstance(activity, sActivity, state);
         activity.setReachedStateDate(new Date(sActivity.getReachedStateDate()));
@@ -672,7 +672,7 @@ public class ModelConvertor {
      * Update the fields of ArchivednTaskInstance from a SAActivityInstance
      */
     private static void updateArchivedSendTaskInstance(final ArchivedHumanTaskInstanceImpl activity, final FlowNodeStateManager flowNodeStateManager,
-            final SASendTaskInstance sActivity) {
+                                                       final SASendTaskInstance sActivity) {
         final String state = flowNodeStateManager.getState(sActivity.getStateId()).getName();
         updateArchivedFlowNodeInstance(activity, sActivity, state);
         activity.setReachedStateDate(new Date(sActivity.getReachedStateDate()));
@@ -683,7 +683,7 @@ public class ModelConvertor {
      * Update the fields of ArchivedActivityInstance from a SAActivityInstance
      */
     private static void updateArchivedActivityInstance(final ArchivedActivityInstanceImpl activity, final FlowNodeStateManager flowNodeStateManager,
-            final SAActivityInstance sActivity) {
+                                                       final SAActivityInstance sActivity) {
         final String state = flowNodeStateManager.getState(sActivity.getStateId()).getName();
         updateArchivedFlowNodeInstance(activity, sActivity, state);
         activity.setReachedStateDate(new Date(sActivity.getReachedStateDate()));
@@ -712,7 +712,7 @@ public class ModelConvertor {
     }
 
     public static List<ArchivedUserTaskInstance> toArchivedUserTaskInstances(final List<SAUserTaskInstance> sInstances,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                             final FlowNodeStateManager flowNodeStateManager) {
         final List<ArchivedUserTaskInstance> archivedUserTaskInstances = new ArrayList<ArchivedUserTaskInstance>();
         for (final SAUserTaskInstance sAUserTaskInstance : sInstances) {
             final ArchivedUserTaskInstance archivedUserTaskInstance = toArchivedUserTaskInstance(sAUserTaskInstance, flowNodeStateManager);
@@ -722,7 +722,7 @@ public class ModelConvertor {
     }
 
     public static List<ArchivedReceiveTaskInstance> toArchivedReceiveTaskInstances(final List<SAReceiveTaskInstance> sInstances,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                                   final FlowNodeStateManager flowNodeStateManager) {
         final List<ArchivedReceiveTaskInstance> archivedReceiveTaskInstances = new ArrayList<ArchivedReceiveTaskInstance>();
         for (final SAReceiveTaskInstance sAReceiveTaskInstance : sInstances) {
             final ArchivedReceiveTaskInstance archivedReceiveTaskInstance = toArchivedReceiveTaskInstance(sAReceiveTaskInstance, flowNodeStateManager);
@@ -732,7 +732,7 @@ public class ModelConvertor {
     }
 
     public static List<ArchivedHumanTaskInstance> toArchivedHumanTaskInstances(final List<? extends SAHumanTaskInstance> sInstances,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                               final FlowNodeStateManager flowNodeStateManager) {
         final List<ArchivedHumanTaskInstance> archivedUserTaskInstances = new ArrayList<ArchivedHumanTaskInstance>();
         for (final SAHumanTaskInstance sInstance : sInstances) {
             final ArchivedHumanTaskInstance archivedUserTaskInstance = toArchivedHumanTaskInstance(sInstance, flowNodeStateManager);
@@ -785,7 +785,7 @@ public class ModelConvertor {
     }
 
     private static ArchivedLoopActivityInstance toArchivedLoopActivityInstance(final SALoopActivityInstance sInstance,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                               final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedLoopActivityInstanceImpl archivedloopActivityInstanceImpl = new ArchivedLoopActivityInstanceImpl(sInstance.getName());
         archivedloopActivityInstanceImpl.setLoopCounter(sInstance.getLoopCounter());
         archivedloopActivityInstanceImpl.setLoopMax(sInstance.getLoopMax());
@@ -794,7 +794,7 @@ public class ModelConvertor {
     }
 
     private static ArchivedMultiInstanceActivityInstanceImpl toArchivedMultiInstanceActivityInstance(final SAMultiInstanceActivityInstance sInstance,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                                                     final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedMultiInstanceActivityInstanceImpl archivedMultiInstanceActivityInstanceImpl = new ArchivedMultiInstanceActivityInstanceImpl(
                 sInstance.getName(), sInstance.getFlowNodeDefinitionId(), sInstance.isSequential(), sInstance.getLoopDataInputRef(),
                 sInstance.getLoopDataOutputRef(), sInstance.getDataInputItemRef(), sInstance.getDataOutputItemRef(), sInstance.getNumberOfActiveInstances(),
@@ -810,14 +810,14 @@ public class ModelConvertor {
     }
 
     public static ArchivedCallActivityInstance toArchivedCallActivityInstance(final SACallActivityInstance sInstance,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                              final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedCallActivityInstanceImpl archivedCallActivityInstanceImpl = new ArchivedCallActivityInstanceImpl(sInstance.getName());
         updateArchivedActivityInstance(archivedCallActivityInstanceImpl, flowNodeStateManager, sInstance);
         return archivedCallActivityInstanceImpl;
     }
 
     public static ArchivedSubProcessActivityInstance toArchivedSubProcessActivityInstance(final SASubProcessActivityInstance sInstance,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                                          final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedSubProcessActivityInstanceImpl archivedSubProcActivityInstanceImpl = new ArchivedSubProcessActivityInstanceImpl(sInstance.getName(),
                 sInstance.isTriggeredByEvent());
         updateArchivedActivityInstance(archivedSubProcActivityInstanceImpl, flowNodeStateManager, sInstance);
@@ -825,14 +825,14 @@ public class ModelConvertor {
     }
 
     public static ArchivedAutomaticTaskInstance toArchivedAutomaticTaskInstance(final SAActivityInstance sInstance,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                                final FlowNodeStateManager flowNodeStateManager) {
         final ArchivedAutomaticTaskInstanceImpl archivedUserTaskInstanceImpl = new ArchivedAutomaticTaskInstanceImpl(sInstance.getName());
         updateArchivedActivityInstance(archivedUserTaskInstanceImpl, flowNodeStateManager, sInstance);
         return archivedUserTaskInstanceImpl;
     }
 
     public static List<ArchivedActivityInstance> toArchivedActivityInstances(final List<SAActivityInstance> saActivityInstances,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                             final FlowNodeStateManager flowNodeStateManager) {
         final List<ArchivedActivityInstance> archivedActivityInstances = new ArrayList<ArchivedActivityInstance>();
         for (final SAActivityInstance saActivityInstance : saActivityInstances) {
             final ArchivedActivityInstance archivedActivityInstance = toArchivedActivityInstance(saActivityInstance, flowNodeStateManager);
@@ -842,7 +842,7 @@ public class ModelConvertor {
     }
 
     public static List<ArchivedProcessInstance> toArchivedProcessInstances(final List<SAProcessInstance> saProcessInstances,
-            final ProcessDefinitionService processDefinitionService) {
+                                                                           final ProcessDefinitionService processDefinitionService) {
         if (saProcessInstances != null) {
             final List<ArchivedProcessInstance> clientProcessInstances = new ArrayList<ArchivedProcessInstance>(saProcessInstances.size());
             final Map<Long, SProcessDefinition> processDefinitions = new HashMap<Long, SProcessDefinition>(saProcessInstances.size());
@@ -858,7 +858,7 @@ public class ModelConvertor {
     }
 
     public static List<ArchivedProcessInstance> toArchivedProcessInstances(final List<SAProcessInstance> sProcessInstances,
-            final SProcessDefinition sProcessDefinition) {
+                                                                           final SProcessDefinition sProcessDefinition) {
         final List<ArchivedProcessInstance> clientProcessInstances = new ArrayList<ArchivedProcessInstance>(sProcessInstances.size());
         for (final SAProcessInstance sProcessInstance : sProcessInstances) {
             clientProcessInstances.add(toArchivedProcessInstance(sProcessInstance, sProcessDefinition));
@@ -1035,7 +1035,7 @@ public class ModelConvertor {
     }
 
     public static List<UserMembership> toUserMembership(final List<SUserMembership> sUserMemberships, final Map<Long, String> userNames,
-            final Map<Long, String> groupIdToGroup) {
+                                                        final Map<Long, String> groupIdToGroup) {
         final List<UserMembership> userMemberships = new ArrayList<UserMembership>();
         if (sUserMemberships != null) {
             for (final SUserMembership sMembership : sUserMemberships) {
@@ -1047,7 +1047,7 @@ public class ModelConvertor {
     }
 
     private static UserMembership toUserMembership(final SUserMembership sUserMembership, final Map<Long, String> userNames,
-            final Map<Long, String> groupIdToGroup) {
+                                                   final Map<Long, String> groupIdToGroup) {
         final UserMembershipImpl userMembership = new UserMembershipImpl(sUserMembership.getId(), sUserMembership.getUserId(), sUserMembership.getGroupId(),
                 sUserMembership.getRoleId());
         userMembership.setGroupName(sUserMembership.getGroupName());
@@ -1860,7 +1860,7 @@ public class ModelConvertor {
     }
 
     public static List<ArchivedFlowNodeInstance> toArchivedFlowNodeInstances(final List<SAFlowNodeInstance> saFlowNodes,
-            final FlowNodeStateManager flowNodeStateManager) {
+                                                                             final FlowNodeStateManager flowNodeStateManager) {
         final List<ArchivedFlowNodeInstance> flowNodeInstances = new ArrayList<ArchivedFlowNodeInstance>();
         for (final SAFlowNodeInstance saFlowNode : saFlowNodes) {
             final ArchivedFlowNodeInstance flowNodeInstance = toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager);
@@ -2095,7 +2095,7 @@ public class ModelConvertor {
     }
 
     public static FormMapping toFormMapping(SFormMapping sFormMapping) {
-        if(sFormMapping == null){
+        if (sFormMapping == null) {
             return null;
         }
         FormMapping formMapping = new FormMapping();
@@ -2105,12 +2105,16 @@ public class ModelConvertor {
         formMapping.setForm(sFormMapping.getForm());
         formMapping.setType(FormMappingType.valueOf(sFormMapping.getType()));
         formMapping.setProcessDefinitionId(sFormMapping.getProcessDefinitionId());
+        long lastUpdateDate = sFormMapping.getLastUpdateDate();
+        formMapping.setLastUpdateDate(lastUpdateDate > 0 ? new Date(lastUpdateDate): null);
+        formMapping.setLastUpdatedBy(sFormMapping.getLastUpdatedBy());
         return formMapping;
     }
 
     public static List<FormMapping> toFormMappings(List<SFormMapping> serverObjects) {
         final List<FormMapping> clientObjects = new ArrayList<FormMapping>(serverObjects.size());
-        for (final SFormMapping serverObject : serverObjects) {;
+        for (final SFormMapping serverObject : serverObjects) {
+            ;
             clientObjects.add(toFormMapping(serverObject));
         }
         return clientObjects;
