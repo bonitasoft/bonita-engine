@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl.form;
 
-import static org.bonitasoft.engine.form.mapping.FormMappingType.PROCESS_OVERVIEW;
-import static org.bonitasoft.engine.form.mapping.FormMappingType.PROCESS_START;
+import static org.bonitasoft.engine.form.FormMappingType.PROCESS_OVERVIEW;
+import static org.bonitasoft.engine.form.FormMappingType.PROCESS_START;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.core.form.FormMappingService;
-import org.bonitasoft.engine.form.mapping.FormMappingType;
+import org.bonitasoft.engine.form.FormMappingType;
 
 /**
  * @author Emmanuel Duchastenier

@@ -21,7 +21,7 @@ import javax.xml.bind.JAXBException;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.form.FormMappingDefinitionBuilder;
-import org.bonitasoft.engine.form.mapping.FormMappingType;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.junit.Test;
 
 public class FormMappingModelConverterTest {

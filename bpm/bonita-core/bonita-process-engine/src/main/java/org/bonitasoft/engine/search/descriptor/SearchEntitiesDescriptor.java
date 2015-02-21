@@ -65,6 +65,8 @@ public class SearchEntitiesDescriptor {
 
     private final SearchProfileDescriptor searchProfileDescriptor;
 
+    private final SearchFormMappingDescriptor searchFormMappingDescriptor;
+
     private final SearchProfileEntryDescriptor searchProfileEntryDescriptor;
 
     private final SearchProfileMemberUserDescriptor searchProfileMemberUserDescriptor;
@@ -121,6 +123,7 @@ public class SearchEntitiesDescriptor {
         searchApplicationDescriptor = new SearchApplicationDescriptor();
         searchApplicationMenuDescriptor = new SearchApplicationMenuDescriptor();
         searchApplicationPageDescriptor = new SearchApplicationPageDescriptor();
+        searchFormMappingDescriptor = new SearchFormMappingDescriptor();
     }
 
     public SearchUserDescriptor getSearchUserDescriptor() {
@@ -209,6 +212,10 @@ public class SearchEntitiesDescriptor {
 
     public SearchProfileDescriptor getSearchProfileDescriptor() {
         return searchProfileDescriptor;
+    }
+
+    public SearchFormMappingDescriptor getSearchFormMappingDescriptor() {
+        return searchFormMappingDescriptor;
     }
 
     public SearchProfileEntryDescriptor getSearchProfileEntryDescriptor() {

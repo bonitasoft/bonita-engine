@@ -42,7 +42,7 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.form.mapping.FormMappingType;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.User;
 import org.junit.After;
 import org.junit.Before;

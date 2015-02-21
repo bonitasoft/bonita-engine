@@ -18,9 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
-import org.bonitasoft.engine.bpm.form.FormMappingDefinitionBuilder;
-import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
-import org.bonitasoft.engine.form.mapping.FormMappingType;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.junit.Test;
 
 

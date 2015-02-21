@@ -54,8 +54,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STim
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.form.mapping.FormMapping;
-import org.bonitasoft.engine.form.mapping.FormMappingType;
+import org.bonitasoft.engine.form.FormMapping;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;

@@ -12,17 +12,18 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-package org.bonitasoft.engine.search.form.mapping;
+package org.bonitasoft.engine.search.form;
 
 import java.util.List;
 
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
-import org.bonitasoft.engine.form.mapping.FormMapping;
+import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.descriptor.SearchFormMappingDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchProfileDescriptor;
 import org.bonitasoft.engine.service.ModelConvertor;
 
@@ -33,7 +34,7 @@ public class SearchFormMappings extends AbstractSearchEntity<FormMapping, SFormM
 
     private final FormMappingService formMappingService;
 
-    public SearchFormMappings(final FormMappingService formMappingService, final SearchProfileDescriptor searchProfileDescriptor, final SearchOptions options) {
+    public SearchFormMappings(final FormMappingService formMappingService, final SearchFormMappingDescriptor searchProfileDescriptor, final SearchOptions options) {
         super(searchProfileDescriptor, options);
         this.formMappingService = formMappingService;
     }

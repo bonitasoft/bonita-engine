@@ -22,8 +22,8 @@ import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
-import org.bonitasoft.engine.form.mapping.FormMapping;
-import org.bonitasoft.engine.form.mapping.FormMappingType;
+import org.bonitasoft.engine.form.FormMapping;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Ignore;

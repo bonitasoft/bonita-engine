@@ -12,7 +12,7 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-package org.bonitasoft.engine.form.mapping;
+package org.bonitasoft.engine.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,7 +25,6 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -33,7 +32,6 @@ import org.junit.Test;
  */
 public class FormMappingIT extends TestWithUser {
 
-    @Ignore("wait for deploy to be implemented")
     @Test
     public void deployProcessesWithFormMappingAndUpdateThem() throws Exception {
 

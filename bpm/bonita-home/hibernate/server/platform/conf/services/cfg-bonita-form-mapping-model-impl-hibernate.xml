@@ -10,7 +10,7 @@
 		</property>
 		<property name="classAliasMappings">
 			<map>
-				<entry key="org.bonitasoft.engine.core.form.impl.SFormMapping" value="formmap" />
+				<entry key="org.bonitasoft.engine.core.form.SFormMapping" value="formmap" />
 			</map>
 		</property>
 	</bean>

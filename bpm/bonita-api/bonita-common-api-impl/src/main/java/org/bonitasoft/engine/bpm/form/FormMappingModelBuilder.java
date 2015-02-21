@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.form;
 
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
-import org.bonitasoft.engine.form.mapping.FormMappingType;
+import org.bonitasoft.engine.form.FormMappingType;
 
 /**
  * @author Emmanuel Duchastenier

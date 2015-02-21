@@ -69,8 +69,8 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <includes>
-                                <include>org/bonitasoft/engine/bpm/bar/formmapping/model/*.java</include>
-                                <include>org/bonitasoft/engine/form/mapping/*.java</include>
+                                <include>org/bonitasoft/engine/bpm/bar/form/model/*.java</include>
+                                <include>org/bonitasoft/engine/form/*.java</include>
                             </includes>
                             <outputDirectory>${project.build.directory}/schemas</outputDirectory>
                         </configuration>

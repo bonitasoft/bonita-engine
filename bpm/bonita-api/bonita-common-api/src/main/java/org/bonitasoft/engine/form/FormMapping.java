@@ -13,7 +13,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.bonitasoft.engine.form.mapping;
+package org.bonitasoft.engine.form;
 
 import org.bonitasoft.engine.bpm.BaseElement;
 

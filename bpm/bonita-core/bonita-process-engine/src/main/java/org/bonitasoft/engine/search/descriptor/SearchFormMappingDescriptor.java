@@ -20,9 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.core.form.SFormMapping;
-import org.bonitasoft.engine.form.mapping.FormMappingSearchDescriptor;
+import org.bonitasoft.engine.form.FormMappingSearchDescriptor;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.model.SProfile;
 
 /**

@@ -12,7 +12,7 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-package org.bonitasoft.engine.form.mapping;
+package org.bonitasoft.engine.form;
 
 /**
  * @author Baptiste Mesta
