@@ -56,14 +56,12 @@ public class FormMappingContribution implements BusinessArchiveContribution {
     @Override
     public void saveToBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {
         final FormMappingModel formMappingModel = businessArchive.getFormMappingModel();
-        if (formMappingModel != null) {
-            try {
-                final byte[] fileContent = new FormMappingModelConverter().serializeToXML(formMappingModel);
-                final File file = new File(barFolder, FORM_MAPPING_FILE);
-                IOUtil.write(file, fileContent);
-            } catch (JAXBException | SAXException e) {
-                throw new IOException("Cannot write Form Mapping Model to Bar folder", e);
-            }
+        try {
+            final byte[] fileContent = new FormMappingModelConverter().serializeToXML(formMappingModel);
+            final File file = new File(barFolder, FORM_MAPPING_FILE);
+            IOUtil.write(file, fileContent);
+        } catch (JAXBException | SAXException e) {
+            throw new IOException("Cannot write Form Mapping Model to Bar folder", e);
         }
     }
 }

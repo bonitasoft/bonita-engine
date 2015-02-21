@@ -46,6 +46,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilder;
 import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilderFactory;
 import org.bonitasoft.engine.api.DocumentAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.impl.form.FormMappingDeployer;
 import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstance;
@@ -123,8 +124,6 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingDefinition;
-import org.bonitasoft.engine.bpm.bar.formmapping.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.category.CategoryNotFoundException;
@@ -203,7 +202,6 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.StringUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -228,7 +226,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException;
-import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.comment.api.SCommentNotFoundException;
@@ -734,7 +731,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
             processDefinitionService.store(sProcessDefinition, designProcessDefinition.getDisplayName(), designProcessDefinition.getDisplayDescription());
             unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
-            deployFormMappings(businessArchive, sProcessDefinition.getId());
+            new FormMappingDeployer(getTenantAccessor().getFormMappingService()).deployFormMappings(businessArchive, sProcessDefinition.getId());
             final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(businessArchive, tenantAccessor, sProcessDefinition);
             if (isResolved) {
                 tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
@@ -755,22 +752,6 @@ public class ProcessAPIImpl implements ProcessAPI {
                     + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + "> with id <" + sProcessDefinition.getId() + ">");
         }
         return processDefinition;
-    }
-
-    private void deployFormMappings(final BusinessArchive businessArchive, final long processDefinitionId) throws ProcessDeployException {
-        final FormMappingModel formMappingModel = businessArchive.getFormMappingModel();
-        if (formMappingModel != null) {
-            final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
-            try {
-                for (final FormMappingDefinition formMapping : formMappingModel.getFormMappings()) {
-                    formMappingService.create(processDefinitionId, formMapping.getTaskname(), formMapping.getForm(), formMapping.isExternal(), formMapping
-                            .getType().name());
-                }
-                // TODO: add empty mappings for all tasks, including the ones that are not declared in the form-mapping.
-            } catch (final SObjectCreationException e) {
-                throw new ProcessDeployException(e);
-            }
-        }
     }
 
     @Override

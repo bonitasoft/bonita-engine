@@ -41,7 +41,7 @@ public class BusinessArchive implements Serializable {
 
     private final Map<String, byte[]> resources = new HashMap<String, byte[]>();
 
-    private FormMappingModel formMappingModel;
+    private FormMappingModel formMappingModel = new FormMappingModel();
 
     /**
      * Default constructor. Creates an instance of {@code BusinessArchive}

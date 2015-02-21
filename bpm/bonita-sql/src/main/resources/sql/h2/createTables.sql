@@ -969,7 +969,7 @@ CREATE TABLE form_mapping (
   id BIGINT NOT NULL,
   process BIGINT NOT NULL,
   task VARCHAR(50) NULL,
-  form VARCHAR(50) NOT NULL,
+  form VARCHAR(50) NULL,
   isexternal BOOLEAN NOT NULL,
   type VARCHAR(16) NOT NULL,
   lastUpdateDate BIGINT NULL,
