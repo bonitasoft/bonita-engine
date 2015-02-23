@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.cache;
 
 import static org.junit.Assert.assertEquals;
@@ -74,7 +87,7 @@ public class CacheServiceTest {
         configurationsList.add(cacheConfigurationEternal);
 
         final CacheConfiguration cacheConfiguration1 = new CacheConfiguration();
-        cacheConfiguration1.setName("test1");
+        cacheConfiguration1.setName(TEST1);
         cacheConfiguration1.setTimeToLiveSeconds(1);
         cacheConfiguration1.setMaxElementsInMemory(10000);
         cacheConfiguration1.setInMemoryOnly(false);
@@ -84,7 +97,7 @@ public class CacheServiceTest {
         configurationsList.add(cacheConfiguration1);
 
         final CacheConfiguration cacheConfiguration2 = new CacheConfiguration();
-        cacheConfiguration2.setName("test2");
+        cacheConfiguration2.setName(TEST2);
         cacheConfiguration2.setTimeToLiveSeconds(1);
         cacheConfiguration2.setMaxElementsInMemory(100000);
         cacheConfiguration2.setInMemoryOnly(false);
