@@ -59,3 +59,4 @@ DROP TABLE sequence;
 DROP TABLE tenant;
 DROP TABLE platform;
 DROP TABLE platformCommand;
+DROP TABLE form_mapping;

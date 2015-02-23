@@ -120,3 +120,5 @@ DROP TABLE platform
 GO
 DROP TABLE platformCommand
 GO
+DROP TABLE form_mapping
+GO

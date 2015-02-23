@@ -108,3 +108,5 @@ DELETE FROM job_desc WHERE tenantid = ${tenantid}
 GO
 DELETE FROM theme WHERE tenantid = ${tenantid}
 GO
+DELETE FROM form_mapping WHERE tenantid = ${tenantid}
+GO

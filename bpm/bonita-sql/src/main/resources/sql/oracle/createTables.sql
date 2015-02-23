@@ -958,3 +958,15 @@ CREATE TABLE theme (
   CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
   PRIMARY KEY (tenantId, id)
 );
+CREATE TABLE form_mapping (
+  tenantId NUMBER(19, 0) NOT NULL,
+  id NUMBER(19, 0) NOT NULL,
+  process BIGINT NOT NULL,
+  task VARCHAR2(255) NULL,
+  form VARCHAR2(1024) NULL,
+  isexternal BOOLEAN NOT NULL,
+  type VARCHAR2(16) NOT NULL,
+  lastUpdateDate NUMBER(19, 0) NULL,
+  lastUpdatedBy NUMBER(19, 0) NULL,
+  PRIMARY KEY (tenantId, id)
+);
