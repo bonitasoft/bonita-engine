@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
 
 import java.util.Arrays;
 
@@ -20,6 +18,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import groovy.lang.GroovyShell;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GroovyScriptExpressionExecutorCacheStrategyTest {
@@ -75,10 +75,10 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     }
 
     @Test
-    public void should_getScriptFromCache_return_a_the_same_script_if_in_same_definition() throws Exception {
+    public void should_getScriptFromCache_return_a_the_same_script_class_if_in_same_definition() throws Exception {
         // when
-        Script script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
-        Script script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
+        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
+        final Class script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
 
         // then
         assertThat(script1).isNotNull();
@@ -89,8 +89,8 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     @Test
     public void should_getScriptFromCache_return_different_script_if_different_definition() throws Exception {
         // when
-        Script script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
-        Script script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 13l);
+        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
+        final Class script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 13l);
 
         // then
         assertThat(script1).isNotNull();
@@ -98,4 +98,15 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         assertThat(script1).isNotEqualTo(script2);
     }
 
+    @Test
+    public void should_getScriptFromCache_return_different_script_if_content_is_different_definition() throws Exception {
+        // when
+        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent1", 12l);
+        final Class script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent2", 12l);
+
+        // then
+        assertThat(script1).isNotNull();
+        assertThat(script2).isNotNull();
+        assertThat(script1).isNotEqualTo(script2);
+    }
 }

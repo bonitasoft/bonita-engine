@@ -13,14 +13,8 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyRuntimeException;
-import groovy.lang.GroovyShell;
-import groovy.lang.MissingPropertyException;
-import groovy.lang.Script;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Map;
 
 import org.bonitasoft.engine.cache.CacheService;
@@ -34,6 +28,14 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.codehaus.groovy.runtime.InvokerHelper;
+
+import groovy.lang.Binding;
+import groovy.lang.GroovyCodeSource;
+import groovy.lang.GroovyRuntimeException;
+import groovy.lang.GroovyShell;
+import groovy.lang.MissingPropertyException;
+import groovy.lang.Script;
 
 /**
  * @author Zhao na
@@ -57,6 +59,8 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
 
     private final boolean debugEnabled;
 
+    private static int counter;
+
     public GroovyScriptExpressionExecutorCacheStrategy(final CacheService cacheService, final ClassLoaderService classLoaderService,
             final TechnicalLoggerService logger) {
         this.cacheService = cacheService;
@@ -65,14 +69,17 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         debugEnabled = logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG);
     }
 
-    Script getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, SClassLoaderException {
+    protected synchronized String generateScriptName() {
+        return "BScript" + (++counter) + ".groovy";
+    }
+
+    Class getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, SClassLoaderException {
         final GroovyShell shell = getShell(definitionId);
         /*
          * We use the current thread id is the key because Scripts are not thread safe (because of binding)
          * This way we store one script for each thread, it is like a thread local cache.
          */
         final String key = Thread.currentThread().getId() + SCRIPT_KEY + definitionId + expressionContent.hashCode();
-        Script script = (Script) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
 
         // getClassLoader return the InnerClassLoader getParent return the shell classloader
         if (script != null && script.getClass().getClassLoader().getParent() != shell.getClassLoader()) {
@@ -85,11 +92,18 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
             }
         }
 
-        if (script == null) {
-            script = shell.parse(expressionContent);
-            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, script);
+        GroovyCodeSource gcs = (GroovyCodeSource) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
+
+        if (gcs == null) {
+            gcs = AccessController.doPrivileged(new PrivilegedAction<GroovyCodeSource>() {
+
+                public GroovyCodeSource run() {
+                    return new GroovyCodeSource(expressionContent, generateScriptName(), GroovyShell.DEFAULT_CODE_BASE);
+                }
+            });
+            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, gcs);
         }
-        return script;
+        return shell.getClassLoader().parseClass(gcs, true);
     }
 
     GroovyShell getShell(final Long definitionId) throws SClassLoaderException, SCacheException {
@@ -121,8 +135,8 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         final String expressionContent = expression.getContent();
         final String expressionName = expression.getName();
         try {
-            final Script script = getScriptFromCache(expressionContent, (Long) context.get(DEFINITION_ID));
             final Binding binding = new Binding(context);
+            final Script script = InvokerHelper.createScript(getScriptFromCache(expressionContent, (Long) context.get(DEFINITION_ID)), binding);
             script.setBinding(binding);
             return script.run();
         } catch (final MissingPropertyException e) {
