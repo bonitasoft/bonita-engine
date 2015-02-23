@@ -21,6 +21,12 @@
 			<groupId>org.bonitasoft.engine.api</groupId>
 			<artifactId>bonita-common-api-impl</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>bonita-commons</artifactId>
+			        <groupId>org.bonitasoft.engine</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.api</groupId>
