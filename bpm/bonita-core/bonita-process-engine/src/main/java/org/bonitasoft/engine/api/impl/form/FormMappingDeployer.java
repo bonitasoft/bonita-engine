@@ -58,11 +58,25 @@ public class FormMappingDeployer {
                 }
             }
             // Deals with the process start / process overview forms:
+            boolean processStartDeclared = false;
+            boolean processOverviewDeclared = false;
             for (final FormMappingDefinition formMappingForProcess : formMappings) {
-                if (formMappingForProcess.getType() == PROCESS_START || formMappingForProcess.getType() == PROCESS_OVERVIEW) {
+                if (!processStartDeclared && formMappingForProcess.getType() == PROCESS_START) {
                     formMappingService.create(processDefinitionId, null, formMappingForProcess.getForm(), formMappingForProcess.isExternal(),
-                            formMappingForProcess.getType().name());
+                            PROCESS_START.name());
+                    processStartDeclared = true;
                 }
+                else if (!processOverviewDeclared && formMappingForProcess.getType() == PROCESS_OVERVIEW) {
+                    formMappingService.create(processDefinitionId, null, formMappingForProcess.getForm(), formMappingForProcess.isExternal(),
+                            PROCESS_OVERVIEW.name());
+                    processOverviewDeclared = true;
+                }
+            }
+            if (!processStartDeclared) {
+                formMappingService.create(processDefinitionId, null, null, false, PROCESS_START.name());
+            }
+            if (!processOverviewDeclared) {
+                formMappingService.create(processDefinitionId, null, null, false, PROCESS_OVERVIEW.name());
             }
         } catch (final SObjectCreationException e) {
             throw new ProcessDeployException(e);
