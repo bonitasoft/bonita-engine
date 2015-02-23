@@ -14,6 +14,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Colin PUY
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.rule.UniqueNameValidationRule} instead.
  */
 @Deprecated
 public class UniqueNameValidationRule extends ValidationRule<BusinessObjectModel> {

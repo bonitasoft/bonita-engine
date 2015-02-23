@@ -12,6 +12,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.rule.ValidationRule} instead.
  */
 @Deprecated
 public abstract class ValidationRule<T> {

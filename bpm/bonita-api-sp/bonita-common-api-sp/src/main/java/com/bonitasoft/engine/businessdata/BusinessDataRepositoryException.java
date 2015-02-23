@@ -15,7 +15,9 @@ import org.bonitasoft.engine.exception.BonitaException;
  *
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.business.data.BusinessDataRepositoryException} instead.
  */
+@Deprecated
 public class BusinessDataRepositoryException extends BonitaException {
 
     private static final long serialVersionUID = -1056166500737611443L;

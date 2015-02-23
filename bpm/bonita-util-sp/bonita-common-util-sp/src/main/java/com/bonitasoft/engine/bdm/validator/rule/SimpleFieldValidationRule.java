@@ -13,6 +13,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Colin PUY
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.rule.SimpleFieldValidationRule}
  */
 @Deprecated
 public class SimpleFieldValidationRule extends ValidationRule<SimpleField> {

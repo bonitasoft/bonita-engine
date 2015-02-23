@@ -12,6 +12,7 @@ package com.bonitasoft.engine.bdm.validator.rule;
  * Tests the validity of Query parameters
  * 
  * @author Emmanuel Duchastenier
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.rule.QueryParameterValidationRule} instead.
  */
 import java.util.Arrays;
 import java.util.List;

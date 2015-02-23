@@ -15,6 +15,7 @@ import java.lang.annotation.Target;
 
 /**
  * @author Colin Puy
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.lazy.LazyLoaded} instead.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

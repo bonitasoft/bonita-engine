@@ -15,7 +15,9 @@ import org.bonitasoft.engine.exception.CreationException;
  *
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.BusinessObjectDaoCreationException} instead.
  */
+@Deprecated
 public class BusinessObjectDaoCreationException extends CreationException {
 
     private static final long serialVersionUID = 1L;

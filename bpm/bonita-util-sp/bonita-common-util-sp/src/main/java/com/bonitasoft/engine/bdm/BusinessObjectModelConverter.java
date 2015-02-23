@@ -21,6 +21,7 @@ import com.bonitasoft.engine.io.IOUtils;
 
 /**
  * @author Matthieu Chaffotte
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.BusinessObjectModelConverter} instead.
  */
 @Deprecated
 public class BusinessObjectModelConverter {

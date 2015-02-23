@@ -33,6 +33,7 @@ import com.bonitasoft.engine.bdm.model.field.SimpleField;
 
 /**
  * @author Matthieu Chaffotte
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.model.BusinessObject} instead.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = { "description", "fields", "uniqueConstraints", "queries", "indexes" })

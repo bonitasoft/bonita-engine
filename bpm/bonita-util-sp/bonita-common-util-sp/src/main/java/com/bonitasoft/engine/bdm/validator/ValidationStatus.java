@@ -10,6 +10,7 @@ package com.bonitasoft.engine.bdm.validator;
 
 /**
  * @author Romain Bioteau
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.ValidationStatus} instead.
  */
 @Deprecated
 public class ValidationStatus extends org.bonitasoft.engine.bdm.validator.ValidationStatus {

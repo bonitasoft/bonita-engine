@@ -20,6 +20,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.rule.BusinessObjectModelValidationRule} instead.
  */
 @Deprecated
 public class BusinessObjectModelValidationRule extends ValidationRule<BusinessObjectModel> {

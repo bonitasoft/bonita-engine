@@ -21,7 +21,7 @@ import com.bonitasoft.engine.bdm.model.BusinessObject;
  *
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
- * @deprecated since version 7.0.0. Use {@link org.bonitasoft.engine.bdm.BusinessObjectDAOFactory} instead.
+ * @deprecated since version 7.0.0, use {@link org.bonitasoft.engine.bdm.BusinessObjectDAOFactory} instead.
  */
 @Deprecated
 public class BusinessObjectDAOFactory {

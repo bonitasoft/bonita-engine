@@ -28,6 +28,7 @@ import com.bonitasoft.engine.bdm.model.field.SimpleField;
 /**
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.BDMQueryUtil} instead.
  */
 @Deprecated
 public class BDMQueryUtil {

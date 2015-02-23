@@ -27,6 +27,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * @author Matthieu Chaffotte
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.model.BusinessObjectModel} instead.
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
