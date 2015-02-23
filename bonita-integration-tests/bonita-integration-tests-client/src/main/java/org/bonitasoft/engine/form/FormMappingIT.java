@@ -41,7 +41,7 @@ public class FormMappingIT extends TestWithUser {
         p1Builder.addUserTask("step1", "actor").addUserTask("step2", "actor");
         p1Builder.addActor("actor");
         BusinessArchiveBuilder bar1 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(p1Builder.done())
-                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", false)
+                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", true)
                         .addTaskForm("task1Form", false, "step1").addProcessOverviewForm("process1OverviewForm", false).build());
         ProcessDefinitionBuilder p2Builder = new ProcessDefinitionBuilder().createNewInstance("P2", "1.0");
         p2Builder.addUserTask("step1", "actor").addUserTask("step2", "actor");
@@ -89,6 +89,21 @@ public class FormMappingIT extends TestWithUser {
         SearchResult<FormMapping> formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).done());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(8);
         assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(),p2.getId(),p2.getId(),p2.getId(),p1.getId(),p1.getId(),p1.getId(),p1.getId());
+        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID,p2.getId()).done());
+        assertThat(formMappingSearchResult.getCount()).isEqualTo(4);
+        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(),p2.getId(),p2.getId(),p2.getId());
+        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).filter(FormMappingSearchDescriptor.TASK,"step1").done());
+        assertThat(formMappingSearchResult.getCount()).isEqualTo(2);
+        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(),p1.getId());
+        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).filter(FormMappingSearchDescriptor.FORM,"process1OverviewForm").done());
+        assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
+        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p1.getId());
+        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).filter(FormMappingSearchDescriptor.TYPE,FormMappingType.PROCESS_START.name()).done());
+        assertThat(formMappingSearchResult.getCount()).isEqualTo(2);
+        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(),p1.getId());
+        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).filter(FormMappingSearchDescriptor.EXTERNAL,true).done());
+        assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
+        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p1.getId());
 
         //update
         processConfigurationAPI.updateFormMapping(step2Form1.getId(),"newFormUrlForStep2",true);
