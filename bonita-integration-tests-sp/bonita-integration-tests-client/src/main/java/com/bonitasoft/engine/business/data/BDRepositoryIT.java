@@ -225,6 +225,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         employee.addQuery(COUNT_EMPLOYEE, "SELECT COUNT(e) FROM Employee e", Long.class.getName());
 
         employee.addIndex("IDX_LSTNM", "lastName");
+        employee.addIndex("IDX_LSTNM", "address");
+
 
         final BusinessObject person = new BusinessObject();
         person.setQualifiedName(PERSON_QUALIFIED_NAME);
