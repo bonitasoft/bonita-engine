@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -184,7 +185,12 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final Parser parser = tenantAccessor.getProfileParser();
         final PageService pageService = tenantAccessor.getPageService();
-        final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
+        final List<ExportedProfile> profiles;
+        try {
+            profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
+        } catch (IOException e) {
+            throw new ExecutionException(e);
+        }
 
         // licence and feature check moved
         // at profile level in ProfilesImporterExt
