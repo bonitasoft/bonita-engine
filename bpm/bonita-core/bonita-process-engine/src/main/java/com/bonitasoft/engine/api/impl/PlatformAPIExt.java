@@ -112,7 +112,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
 
-    private static final String PROFILES_FILE_SP = "profiles-sp.xml";
+    public static final String PROFILES_FILE_SP = "profiles-sp.xml";
 
     private final LicenseChecker checker;
 
