@@ -8,14 +8,14 @@
  *******************************************************************************/
 package org.bonitasoft.engine.bdm.model;
 
-import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
-import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aBooleanField;
-import static org.bonitasoft.engine.bdm.builder.FieldBuilder.anAggregationField;
-import static org.bonitasoft.engine.bdm.model.assertion.BusinessObjectAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static org.bonitasoft.engine.bdm.builder.FieldBuilder.*;
+import static org.bonitasoft.engine.bdm.model.assertion.BusinessObjectAssert.assertThat;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.junit.Test;
 
 /**
@@ -89,6 +89,70 @@ public class BusinessObjectTest {
         final Query query = businessObject.addQuery("userByName", "SELECT u FROM User u WHERE u.name='romain'", List.class.getName());
 
         assertThat(businessObject.getQueries()).containsExactly(query);
+    }
+
+    @Test
+    public void isARelationField_should_be_false_with_an_emtpy_object() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+
+        assertThat(bo.isARelationField("any")).isFalse();
+    }
+
+    @Test
+    public void isARelationField_should_be_false_with_an_object_without_relation_field_but_with_the_right_name() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        bo.addField(aBooleanField("bool"));
+
+        assertThat(bo.isARelationField("bool")).isFalse();
+    }
+
+    @Test
+    public void isARelationField_should_be_false_with_an_object_without_relation_field() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        bo.addField(aBooleanField("bool"));
+
+        assertThat(bo.isARelationField("any")).isFalse();
+    }
+
+    @Test
+    public void isARelationField_should_be_true_with_an_object_with_relation_field() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        final RelationField aggregationMultiple = aRelationField().withName("address").aggregation().referencing(addressBO()).build();
+        bo.addField(aggregationMultiple);
+
+        assertThat(bo.isARelationField("address")).isTrue();
+    }
+
+    private BusinessObject addressBO() {
+        return aBO("Address").withField(aStringField("street").build()).withField(aStringField("city").build()).build();
+    }
+
+    @Test
+    public void should_return_simple_name() {
+        //given
+        final BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName("com.company.model.Employee");
+
+        //when then
+        assertThat(businessObject.getSimpleName()).as("should return simple name").isEqualTo("Employee");
+    }
+
+    @Test
+    public void should_to_string_return_return_all_field() {
+        //given
+        final BusinessObject businessObject = aBO("aBo").withField(aBooleanField("field1")).withField(aBooleanField("field2")).build();
+        businessObject.addUniqueConstraint("const", "field1");
+        businessObject.addUniqueConstraint("const2", "field2");
+        businessObject.setDescription("description");
+        businessObject.addQuery("queryName", "select * from Employee", String.class.getName());
+
+        businessObject.setQualifiedName("com.company.model.Employee");
+
+        //when then
+        assertThat(businessObject.toString())
+                .as("should return simple name")
+                .isEqualTo(
+                        "BusinessObject[description=description,fields=[SimpleField[name=field1,nullable=true,collection=false,length=<null>,type=BOOLEAN], SimpleField[name=field2,nullable=true,collection=false,length=<null>,type=BOOLEAN]],indexes=[],qualifiedName=com.company.model.Employee,queries=[Query [name=queryName, content=select * from Employee, returnType=java.lang.String, queryParameters=[]]],uniqueConstraints=[org.bonitasoft.engine.bdm.model.UniqueConstraint@d2518f4e, org.bonitasoft.engine.bdm.model.UniqueConstraint@7bea0d39]]");
     }
 
 }

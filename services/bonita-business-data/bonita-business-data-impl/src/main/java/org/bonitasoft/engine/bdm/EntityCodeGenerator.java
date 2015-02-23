@@ -40,6 +40,7 @@ import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
+
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -53,11 +54,13 @@ import com.sun.codemodel.JMethod;
 public class EntityCodeGenerator {
 
     private final CodeGenerator codeGenerator;
+    private final RelationFieldAnnotator relationFieldAnnotator;
     private final BusinessObjectModel bom;
 
     public EntityCodeGenerator(final CodeGenerator codeGenerator, BusinessObjectModel bom) {
         this.codeGenerator = codeGenerator;
         this.bom = bom;
+        this.relationFieldAnnotator = new RelationFieldAnnotator(codeGenerator);
     }
 
     public JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
@@ -124,9 +127,9 @@ public class EntityCodeGenerator {
         if (!uniqueConstraints.isEmpty()) {
             final JAnnotationArrayMember uniqueConstraintsArray = tableAnnotation.paramArray("uniqueConstraints");
             for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {
-                final JAnnotationUse uniqueConstraintAnnotatation = uniqueConstraintsArray.annotate(javax.persistence.UniqueConstraint.class);
-                uniqueConstraintAnnotatation.param("name", uniqueConstraint.getName().toUpperCase());
-                final JAnnotationArrayMember columnNamesParamArray = uniqueConstraintAnnotatation.paramArray("columnNames");
+                final JAnnotationUse uniqueConstraintAnnotation = uniqueConstraintsArray.annotate(javax.persistence.UniqueConstraint.class);
+                uniqueConstraintAnnotation.param("name", uniqueConstraint.getName().toUpperCase());
+                final JAnnotationArrayMember columnNamesParamArray = uniqueConstraintAnnotation.paramArray("columnNames");
                 for (final String fieldName : uniqueConstraint.getFieldNames()) {
                     columnNamesParamArray.param(fieldName.toUpperCase());
                 }
@@ -145,7 +148,13 @@ public class EntityCodeGenerator {
                 indexAnnotation.param("name", index.getName().toUpperCase());
                 final JAnnotationArrayMember columnParamArray = indexAnnotation.paramArray("columnNames");
                 for (final String fieldName : index.getFieldNames()) {
-                    columnParamArray.param(fieldName.toUpperCase());
+                    String columnName;
+                    if (bo.isARelationField(fieldName)) {
+                        columnName = relationFieldAnnotator.getJoinColumnName(fieldName);
+                    } else {
+                        columnName = fieldName;
+                    }
+                    columnParamArray.param(columnName.toUpperCase());
                 }
             }
         }
@@ -203,7 +212,7 @@ public class EntityCodeGenerator {
     }
 
     private void annotateRelationField(final JDefinedClass entityClass, final RelationField rfield, final JFieldVar fieldVar) {
-        new RelationFieldAnnotator(codeGenerator).annotateRelationField(entityClass, rfield, fieldVar);
+        relationFieldAnnotator.annotateRelationField(entityClass, rfield, fieldVar);
     }
 
     private void annotateSimpleField(final SimpleField sfield, final JFieldVar fieldVar) {
@@ -251,7 +260,7 @@ public class EntityCodeGenerator {
     }
 
     private boolean isCollectionField(Field field) {
-        if (field==null){
+        if (field == null) {
             return false;
         }
         final Boolean collection = field.isCollection();

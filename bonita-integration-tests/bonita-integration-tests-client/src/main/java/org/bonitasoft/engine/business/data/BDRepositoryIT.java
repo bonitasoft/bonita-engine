@@ -224,6 +224,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         employee.addQuery(COUNT_EMPLOYEE, "SELECT COUNT(e) FROM Employee e", Long.class.getName());
 
         employee.addIndex("IDX_LSTNM", "lastName");
+        employee.addIndex("IDX_LSTNM", "address");
 
         final BusinessObject person = new BusinessObject();
         person.setQualifiedName(PERSON_QUALIFIED_NAME);
@@ -353,7 +354,8 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test
     public void shouldBeAbleToUpdateBusinessDataUsingBizDataJavaSetterOperation() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'Jules'; e.lastName = 'UnNamed'; return e;").toString(), EMPLOYEE_QUALIFIED_NAME);
+                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'Jules'; e.lastName = 'UnNamed'; return e;").toString(),
+                EMPLOYEE_QUALIFIED_NAME);
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", "6.3-beta");
@@ -399,7 +401,8 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test
     public void deployABDRAndCreateADefaultBusinessDataAndReuseReference() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;").toString(), EMPLOYEE_QUALIFIED_NAME);
+                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;").toString(),
+                EMPLOYEE_QUALIFIED_NAME);
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIFIED_NAME, employeeExpression);
@@ -431,7 +434,8 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test
     public void deployABDRAndCreateABOAndUdpateThroughAGroovyScript() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;").toString(), EMPLOYEE_QUALIFIED_NAME);
+                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;").toString(),
+                EMPLOYEE_QUALIFIED_NAME);
 
         final Expression getEmployeeExpression = new ExpressionBuilder().createBusinessDataExpression("myEmployee", EMPLOYEE_QUALIFIED_NAME);
         // try to modify the business data
@@ -581,7 +585,8 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String lastName = "Boudin";
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
                 .append(EMPLOYEE_QUALIFIED_NAME).append("; import ").append(ADDRESS_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = '")
-                .append(firstName).append("'; e.lastName = '").append(lastName).append("'; e.addToAddresses(myAddress); return e;").toString(), EMPLOYEE_QUALIFIED_NAME,
+                .append(firstName).append("'; e.lastName = '").append(lastName).append("'; e.addToAddresses(myAddress); return e;").toString(),
+                EMPLOYEE_QUALIFIED_NAME,
                 new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIFIED_NAME));
         final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
                 "import " +
@@ -851,7 +856,8 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test
     public void shouldBeAbleToDeleteABusinessDataUsingOperation() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;").toString(), EMPLOYEE_QUALIFIED_NAME);
+                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;").toString(),
+                EMPLOYEE_QUALIFIED_NAME);
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", "6.3-beta");
@@ -929,7 +935,8 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "createNewEmployees",
                 new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
                         .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';")
-                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; return [jane, john];").toString(), List.class.getName());
+                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; return [jane, john];").toString(),
+                List.class.getName());
 
         final Expression jackExpression = new ExpressionBuilder().createGroovyScriptExpression("createJack", "import " + EMPLOYEE_QUALIFIED_NAME
                 + "; Employee jack = new Employee(); jack.firstName = 'Jack'; jack.lastName = 'Doe'; return jack;", EMPLOYEE_QUALIFIED_NAME);
@@ -979,7 +986,8 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "createNewEmployees",
                 new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
                         .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';")
-                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john]").toString(), List.class.getName());
+                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john]").toString(),
+                List.class.getName());
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MBIMI", "1.2-beta");
         builder.addBusinessData("myEmployees", EMPLOYEE_QUALIFIED_NAME, employeeExpression).setMultiple(true);
@@ -1032,7 +1040,8 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "createNewEmployees",
                 new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
                         .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';")
-                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; return [jane, john];").toString(), List.class.getName());
+                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; return [jane, john];").toString(),
+                List.class.getName());
 
         builder = new ProcessDefinitionBuilder().createNewInstance("MBIMI", "1.2-beta");
         builder.addBusinessData("myEmployees", EMPLOYEE_QUALIFIED_NAME, employeeExpression).setMultiple(true);
@@ -1076,7 +1085,8 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "createNewEmployees",
                 new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
                         .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';")
-                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john];").toString(), List.class.getName());
+                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john];").toString(),
+                List.class.getName());
 
         builder = new ProcessDefinitionBuilder().createNewInstance("MBIMI", "1.2-beta");
         builder.addBusinessData("myEmployees", EMPLOYEE_QUALIFIED_NAME, employeeExpression).setMultiple(true);
@@ -1159,7 +1169,8 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "createNewEmployees",
                 new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
                         .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';")
-                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john]").toString(), List.class.getName());
+                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john]").toString(),
+                List.class.getName());
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MBIMI", "1.2-beta");
         builder.addBusinessData("myEmployees", EMPLOYEE_QUALIFIED_NAME, employeeExpression).setMultiple(true);
@@ -1390,7 +1401,8 @@ public class BDRepositoryIT extends CommonAPIIT {
                 "createNewEmployees",
                 new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
                         .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';")
-                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; return [jane, john];").toString(), List.class.getName());
+                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; return [jane, john];").toString(),
+                List.class.getName());
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addBusinessData("myEmployees", EMPLOYEE_QUALIFIED_NAME, null).setMultiple(true);

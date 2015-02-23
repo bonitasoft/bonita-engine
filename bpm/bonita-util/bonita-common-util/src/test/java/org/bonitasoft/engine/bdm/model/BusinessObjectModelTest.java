@@ -8,12 +8,12 @@
  *******************************************************************************/
 package org.bonitasoft.engine.bdm.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.anAggregationField;
 import static org.bonitasoft.engine.bdm.model.assertion.BusinessObjectModelAssert.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 
@@ -21,6 +21,7 @@ import org.junit.Test;
 
 /**
  * @author Colin PUY
+ * @author Laurent Leseigneur
  */
 public class BusinessObjectModelTest {
 

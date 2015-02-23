@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bdm.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -30,7 +31,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.RelationField.Type;
@@ -176,6 +176,22 @@ public class BusinessObject {
 
     private boolean isACompositionField(Field field) {
         return field instanceof RelationField && Type.COMPOSITION == ((RelationField) field).getType();
+    }
+
+    public boolean isARelationField(final String name) {
+        boolean relationField = false;
+        boolean found = false;
+        final Iterator<Field> iter = fields.iterator();
+        while (!found && iter.hasNext()) {
+            final Field field = iter.next();
+            if (field.getName().equals(name)) {
+                found = true;
+                if (field instanceof RelationField) {
+                    relationField = true;
+                }
+            }
+        }
+        return relationField;
     }
 
     public String getSimpleName() {
