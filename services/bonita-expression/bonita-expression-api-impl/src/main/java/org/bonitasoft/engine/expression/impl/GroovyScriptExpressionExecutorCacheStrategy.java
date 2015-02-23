@@ -81,7 +81,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
          * We use the current thread id is the key because Scripts are not thread safe (because of binding)
          * This way we store one script for each thread, it is like a thread local cache.
          */
-        final String key = Thread.currentThread().getId() + SCRIPT_KEY + definitionId + expressionContent.hashCode();
+        final String key = SCRIPT_KEY + definitionId + expressionContent.hashCode();
 
         Script script = (Script) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
 
@@ -107,6 +107,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
             });
             cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, gcs);
         }
+        // parse the groovy source code with cache set to true
         return shell.getClassLoader().parseClass(gcs, true);
     }
 

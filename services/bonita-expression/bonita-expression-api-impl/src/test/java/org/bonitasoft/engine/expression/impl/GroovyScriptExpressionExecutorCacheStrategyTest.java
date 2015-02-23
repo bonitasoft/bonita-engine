@@ -37,6 +37,9 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
 
     private GroovyScriptExpressionExecutorCacheStrategy groovyScriptExpressionExecutorCacheStrategy;
 
+    private final static String diskStorePath = IOUtil.TMP_DIRECTORY + File.separator + GroovyScriptExpressionExecutorCacheStrategyTest.class.getSimpleName();
+    private Class script2;
+
     @Before
     public void setup() throws Exception {
         CacheConfiguration cacheConfiguration = new CacheConfiguration();
@@ -82,6 +85,34 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
 
         // then
         assertThat(script1).isNotNull();
+        assertThat(script1).isEqualTo(script2);
+
+    }
+
+    @Test
+    public void should_getScriptFromCache_should_cache_only_once_when_on_different_threads() throws Exception {
+        // when
+        final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
+
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    script2 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
+                } catch (SCacheException e) {
+                    e.printStackTrace();
+                } catch (SClassLoaderException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+        thread.join();
+
+        // then
+        assertThat(script1).isNotNull();
+        assertThat(script2).isNotNull();
         assertThat(script1).isEqualTo(script2);
 
     }
