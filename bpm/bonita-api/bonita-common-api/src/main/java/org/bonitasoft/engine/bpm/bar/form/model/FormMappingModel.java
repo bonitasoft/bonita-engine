@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.bar.form.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class FormMappingModel {
+public class FormMappingModel implements Serializable {
+
+
+    private static final long serialVersionUID = 1L;
 
     @XmlElementWrapper(name = "form-mappings", required = true)
     @XmlElement(name = "form-mapping", required = false)

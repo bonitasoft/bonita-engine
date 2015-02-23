@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.bar.form.model;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -26,7 +27,9 @@ import org.bonitasoft.engine.form.FormMappingType;
  * @author Emmanuel Duchastenier
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class FormMappingDefinition {
+public class FormMappingDefinition implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @XmlAttribute(required = true)
     private String form;
