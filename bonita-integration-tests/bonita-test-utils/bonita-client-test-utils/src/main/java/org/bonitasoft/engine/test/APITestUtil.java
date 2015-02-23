@@ -176,7 +176,7 @@ public class APITestUtil extends PlatformTestUtil {
         if (strTimeout != null) {
             DEFAULT_TIMEOUT = Integer.valueOf(strTimeout);
         } else {
-            DEFAULT_TIMEOUT = 2* 60  * 1000;
+            DEFAULT_TIMEOUT = 2 * 60 * 1000;
         }
     }
 
@@ -1378,6 +1378,9 @@ public class APITestUtil extends PlatformTestUtil {
         final List<String> messages = new ArrayList<String>();
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1000);
         searchOptionsBuilder.filter(CommandSearchDescriptor.SYSTEM, false);
+        searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.EXECUTE_EVENTS_COMMAND);
+        searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.ADD_HANDLER_COMMAND);
+        searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.WAIT_SERVER_COMMAND);
         final SearchResult<CommandDescriptor> searchCommands = getCommandAPI().searchCommands(searchOptionsBuilder.done());
         final List<CommandDescriptor> commands = searchCommands.getResult();
         if (searchCommands.getCount() > 0) {
