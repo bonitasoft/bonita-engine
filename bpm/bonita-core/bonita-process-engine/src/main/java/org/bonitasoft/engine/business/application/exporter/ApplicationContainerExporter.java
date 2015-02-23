@@ -16,8 +16,8 @@ package org.bonitasoft.engine.business.application.exporter;
 import java.net.URL;
 
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.ExportException;
+import org.bonitasoft.engine.io.IOUtils;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -27,7 +27,7 @@ public class ApplicationContainerExporter {
     public byte[] export(final ApplicationNodeContainer applicationNodeContainer) throws ExportException {
         final URL resource = ApplicationNodeContainer.class.getResource("/applications.xsd");
         try {
-            return IOUtil.marshallObjectToXML(applicationNodeContainer, resource);
+            return IOUtils.marshallObjectToXML(applicationNodeContainer, resource);
         } catch (final Exception e) {
             throw new ExportException(e);
         }
