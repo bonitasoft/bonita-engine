@@ -245,9 +245,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         sessionAccessor.deleteSessionId();
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-                        // Create default commands
-                        createDefaultCommands(tenantServiceAccessor);
-
                         // Create default profiles
                         createDefaultProfiles(tenantServiceAccessor);
 
