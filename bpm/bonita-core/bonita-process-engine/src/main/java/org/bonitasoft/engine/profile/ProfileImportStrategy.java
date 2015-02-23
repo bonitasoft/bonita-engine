@@ -24,11 +24,11 @@ import org.bonitasoft.engine.profile.model.SProfile;
  * @author Baptiste Mesta
  * 
  */
-public abstract class ProfileImportStategy {
+public abstract class ProfileImportStrategy {
 
     private final ProfileService profileService;
 
-    public ProfileImportStategy(final ProfileService profileService) {
+    public ProfileImportStrategy(final ProfileService profileService) {
         this.profileService = profileService;
     }
 
@@ -52,14 +52,13 @@ public abstract class ProfileImportStategy {
 
     /**
      * convert {@link ExportedProfile} to {@link SProfile}
-     * 
-     * @param exportedProfile
-     * @param importerId
-     * @return
+     *
+     * @return the profile service
      */
 
     protected ProfileService getProfileService() {
         return profileService;
     }
 
+    public abstract boolean shouldUpdateProfileEntries(ExportedProfile exportedProfile, SProfile existingProfile);
 }

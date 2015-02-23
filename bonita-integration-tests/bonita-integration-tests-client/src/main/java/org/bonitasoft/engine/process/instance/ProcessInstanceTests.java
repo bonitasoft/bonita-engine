@@ -8,7 +8,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         CancelProcessInstanceIT.class,
         AbortProcessInstanceIT.class,
-        ProcessInstanceIT.class
+        ProcessInstanceIT.class,
+        InvolvedInProcessInstanceIT.class
 })
 public class ProcessInstanceTests {
 

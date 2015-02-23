@@ -10,10 +10,15 @@ import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_ENTER;
 import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_FINISH;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,19 +32,38 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
+import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.filter.FilterResult;
+import org.bonitasoft.engine.core.filter.UserFilterService;
+import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConnectorDefinitionImpl;
+import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.expression.model.SExpression;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -52,25 +76,31 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class StateBehaviorsTest {
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
     @Mock
     private SFlowNodeInstance flowNodeInstance;
-
     @Mock
     private SProcessDefinition processDefinition;
-
     @Mock
     private SFlowElementContainerDefinition containerDefinition;
-
     @Mock
-    private SFlowNodeDefinition flowNodeDefinition;
-
+    private SUserTaskDefinition flowNodeDefinition;
     @Mock
     private ConnectorInstanceService connectorInstanceService;
-
+    @Mock
+    private ActivityInstanceService activityInstanceService;
+    @Mock
+    private UserFilterService userFilterService;
+    @Mock
+    private SUserFilterDefinition userFilterDefinition;
+    @Mock
+    private ClassLoaderService classLoaderService;
     @InjectMocks
     private StateBehaviors behaviors;
 
     final long flownodeInstanceId = 3541L;
+    final long processDefinitionId = 4567L;
 
     private final static Map<Integer, String> phaseNames = new HashMap<Integer, String>(5);
     static {
@@ -92,6 +122,7 @@ public class StateBehaviorsTest {
         when(processDefinition.getProcessContainer()).thenReturn(containerDefinition);
         when(containerDefinition.getFlowNode(anyLong())).thenReturn(flowNodeDefinition);
         when(flowNodeInstance.getId()).thenReturn(flownodeInstanceId);
+        when(processDefinition.getId()).thenReturn(processDefinitionId);
     }
 
     protected void checkConnectorsPhases(final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag,
@@ -400,5 +431,135 @@ public class StateBehaviorsTest {
         }
         when(connectorInstanceService.getNextExecutableConnectorInstance(eq(flownodeInstanceId), anyString(), eq(connectorEventPhase))).thenReturn(
                 connectorInstance);
+    }
+
+
+    @Test
+    public void should_mapUsingUserFilters_map_user_id_only_once() throws Exception {
+        //given
+        final FilterResult result = new FilterResult() {
+            @Override
+            public List<Long> getResult() {
+                return Arrays.asList(1L,2L,3L,2L);
+            }
+
+            @Override
+            public boolean shouldAutoAssignTaskIfSingleResult() {
+                return true;
+            }
+        };
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
+                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        //when
+        behaviors.mapUsingUserFilters(flowNodeInstance,flowNodeDefinition,"actor",processDefinitionId,userFilterDefinition);
+        //then
+        ArgumentCaptor<SPendingActivityMapping> argumentCaptor = ArgumentCaptor.forClass(SPendingActivityMapping.class);
+        verify(activityInstanceService, times(3)).addPendingActivityMappings(argumentCaptor.capture());
+        verify(activityInstanceService,never()).assignHumanTask(anyLong(), anyLong());
+        List<SPendingActivityMapping> allValues = argumentCaptor.getAllValues();
+        assertThat(allValues).hasSize(3);
+        assertThat(allValues).extracting("userId").containsOnly(1L,2L,3L);
+    }
+
+    @Test
+    public void should_mapUsingUserFilters_assign_if_only_one_and_auto_assign() throws Exception {
+        //given
+        final FilterResult result = new FilterResult() {
+            @Override
+            public List<Long> getResult() {
+                return Arrays.asList(1L);
+            }
+
+            @Override
+            public boolean shouldAutoAssignTaskIfSingleResult() {
+                return true;
+            }
+        };
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
+                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        //when
+        behaviors.mapUsingUserFilters(flowNodeInstance,flowNodeDefinition,"actor",processDefinitionId,userFilterDefinition);
+        //then
+        ArgumentCaptor<SPendingActivityMapping> argumentCaptor = ArgumentCaptor.forClass(SPendingActivityMapping.class);
+        verify(activityInstanceService, times(1)).addPendingActivityMappings(argumentCaptor.capture());
+        verify(activityInstanceService,times(1)).assignHumanTask(anyLong(), eq(1l));
+        List<SPendingActivityMapping> allValues = argumentCaptor.getAllValues();
+        assertThat(allValues).extracting("userId").containsOnly(1L);
+    }
+
+    @Test
+    public void should_mapUsingUserFilters_do_not_assign_if_only_one_and_auto_assign_is_false() throws Exception {
+        //given
+        final FilterResult result = getFilterResult(Arrays.asList(1L));
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
+                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        //when
+        behaviors.mapUsingUserFilters(flowNodeInstance,flowNodeDefinition,"actor",processDefinitionId,userFilterDefinition);
+        //then
+        ArgumentCaptor<SPendingActivityMapping> argumentCaptor = ArgumentCaptor.forClass(SPendingActivityMapping.class);
+        verify(activityInstanceService, times(1)).addPendingActivityMappings(argumentCaptor.capture());
+        verify(activityInstanceService,never()).assignHumanTask(anyLong(), anyLong());
+        List<SPendingActivityMapping> allValues = argumentCaptor.getAllValues();
+        assertThat(allValues).extracting("userId").containsOnly(1L);
+    }
+    @Test
+    public void should_mapUsingUserFilters_throw_exception_when_empty_return() throws Exception {
+        //given
+        final FilterResult result = getFilterResult(Collections.<Long>emptyList());
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
+                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        expectedException.expect(SActivityStateExecutionException.class);
+        expectedException.expectMessage("no user id returned by the user filter");
+        //when
+        behaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
+    }
+    @Test
+    public void should_mapUsingUserFilters_throw_exception_when_null_return() throws Exception {
+        //given
+        final FilterResult result = getFilterResult(null);
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
+                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        expectedException.expect(SActivityStateExecutionException.class);
+        expectedException.expectMessage("no user id returned by the user filter");
+        //when
+        behaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
+    }
+
+    @Test
+    public void should_mapUsingUserFilters_throw_exception_when_return_contains_minus_1() throws Exception {
+        //given
+        final FilterResult result = getFilterResult(Arrays.asList(-1L));
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
+                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        expectedException.expect(SActivityStateExecutionException.class);
+        expectedException.expectMessage("no user id returned by the user filter");
+        //when
+        behaviors.mapUsingUserFilters(flowNodeInstance,flowNodeDefinition,"actor",processDefinitionId,userFilterDefinition);
+    }
+
+    @Test
+    public void should_mapUsingUserFilters_throw_exception_when_return_contains_0() throws Exception {
+        //given
+        final FilterResult result = getFilterResult(Arrays.asList(0L));
+        doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
+                any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
+        expectedException.expect(SActivityStateExecutionException.class);
+        expectedException.expectMessage("no user id returned by the user filter");
+        //when
+        behaviors.mapUsingUserFilters(flowNodeInstance,flowNodeDefinition,"actor",processDefinitionId,userFilterDefinition);
+    }
+
+    FilterResult getFilterResult(final List<Long> theResult) {
+        return new FilterResult() {
+                @Override
+                public List<Long> getResult() {
+                    return theResult;
+                }
+
+                @Override
+                public boolean shouldAutoAssignTaskIfSingleResult() {
+                    return false;
+                }
+            };
     }
 }
