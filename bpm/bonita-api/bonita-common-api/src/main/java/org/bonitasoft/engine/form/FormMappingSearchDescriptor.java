@@ -23,6 +23,9 @@ public final class FormMappingSearchDescriptor {
 
     public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
 
+    /**
+     * @see org.bonitasoft.engine.form.FormMappingType
+     */
     public static final String TYPE = "type";
 
     public static final String FORM = "form";

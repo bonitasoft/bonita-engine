@@ -36,6 +36,8 @@ public interface ProcessConfigurationAPI {
      * @param searchOptions
      *        search options to search for form mapping
      * @return the result of the search
+     * @see org.bonitasoft.engine.form.FormMappingSearchDescriptor
+     * @see org.bonitasoft.engine.form.FormMappingType
      * @since 7.0.0
      */
     SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions) throws SearchException;
