@@ -18,11 +18,18 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * Component of a process definition. It connects 2 {@link FlowNodeDefinition} between them.
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
 public interface TransitionDefinition extends NamedElement {
+
+    /**
+     * @deprecated from 6.5.0 on, name is not used anymore on TransitionDefinition. It is kept for retro-compatibility.
+     */
+    @Override
+    @Deprecated
+    public String getName();
 
     /**
      * @return The source of the transition
