@@ -176,7 +176,6 @@
 		</composite-id>
 		<property name="rootContainerId" column="rootContainerId" />
 		<property name="parentContainerId" column="parentContainerId" />
-		<property name="name" column="name" />
 		<property name="source" column="source" type="long" />
 		<property name="target" column="target" type="long" />
 		<property name="state" column="state">
