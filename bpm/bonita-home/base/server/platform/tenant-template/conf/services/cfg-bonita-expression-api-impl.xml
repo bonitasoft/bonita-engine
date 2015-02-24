@@ -52,8 +52,6 @@
 
 	<bean id="listExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ListExpressionExecutorStrategy" />
 
-	<bean id="conditionExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConditionExpressionExecutorStrategy" />
-
 	<bean id="equalityComparator" class="org.bonitasoft.engine.expression.impl.condition.EqualityComparator" />
 	<bean id="inequalityComparator" class="org.bonitasoft.engine.expression.impl.condition.InequalityComparator" />
 	<bean id="binaryComparatorMapper" class="org.bonitasoft.engine.expression.impl.condition.BinaryComparatorMapper">
