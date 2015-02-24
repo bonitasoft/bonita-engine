@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.external.web.profile.command;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class ImportProfilesCommand extends TenantCommand {
         final ProfileService profileService = serviceAccessor.getProfileService();
         final IdentityService identityService = serviceAccessor.getIdentityService();
 
-        byte[] xmlContent = null;
+        byte[] xmlContent;
         try {
             xmlContent = (byte[]) parameters.get("xmlContent");
             if (xmlContent == null) {
@@ -66,6 +67,8 @@ public class ImportProfilesCommand extends TenantCommand {
             return (Serializable) ProfilesImporter.toWarnings(new ProfilesImporter(profileService, identityService, profiles, ImportPolicy.DELETE_EXISTING)
                     .importProfiles(SessionInfos.getUserIdFromSession()));
         } catch (ExecutionException e) {
+            throw new SCommandExecutionException(e);
+        } catch (IOException e) {
             throw new SCommandExecutionException(e);
         }
     }

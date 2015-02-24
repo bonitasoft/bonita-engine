@@ -231,6 +231,16 @@ public class BonitaHomeServer extends BonitaHome {
     }
 
     /**
+     * @param tenantId
+     * @return the path of the work dir for a tenant
+     * @throws BonitaHomeNotSetException
+     * @since 6.5
+     */
+    public String getTenantWorkFolder(final long tenantId) throws BonitaHomeNotSetException {
+        return getTenantFolder(tenantId) + File.separatorChar + BONITA_HOME_WORK;
+    }
+
+    /**
      * get the absolute path to the folder containing configuration files of a tenant
      *
      * @param tenantId

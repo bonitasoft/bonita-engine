@@ -20,7 +20,7 @@ import org.bonitasoft.engine.profile.model.SProfile;
 /**
  * @author Baptiste Mesta
  */
-public class FailOnDuplicateImportStrategy extends ProfileImportStategy {
+public class FailOnDuplicateImportStrategy extends ProfileImportStrategy {
 
     public FailOnDuplicateImportStrategy(final ProfileService profileService) {
         super(profileService);
@@ -40,6 +40,11 @@ public class FailOnDuplicateImportStrategy extends ProfileImportStategy {
     @Override
     public boolean canCreateProfileIfNotExists(final ExportedProfile exportedProfile) {
         return true;
+    }
+
+    @Override
+    public boolean shouldUpdateProfileEntries(ExportedProfile exportedProfile, SProfile existingProfile) {
+        return false;
     }
 
 }
