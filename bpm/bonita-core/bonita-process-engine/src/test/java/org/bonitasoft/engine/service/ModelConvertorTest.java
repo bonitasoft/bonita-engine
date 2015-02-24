@@ -25,6 +25,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoDefinition;
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoValue;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -35,6 +38,7 @@ import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
@@ -378,6 +382,31 @@ public class ModelConvertorTest {
         assertThat(formMapping.getForm()).isEqualTo("myForm1");
         assertThat(formMapping.getTask()).isEqualTo("myTask");
         assertThat(formMapping.getProcessDefinitionId()).isEqualTo(666l);
+
+    }
+
+    @Test
+    public void toFormMappings_can_convert() {
+        // Given
+        SFormMappingImpl sFormMapping = new SFormMappingImpl();
+        sFormMapping.setId(555l);
+        sFormMapping.setIsExternal(true);
+        sFormMapping.setForm("myForm1");
+        sFormMapping.setType(FormMappingType.TASK.name());
+        sFormMapping.setTask("myTask");
+        sFormMapping.setProcessDefinitionId(666l);
+
+        // Then
+        List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping>asList(sFormMapping));
+
+        // When
+        assertThat(formMapping).hasSize(1);
+        assertThat(formMapping.get(0).getId()).isEqualTo(555l);
+        assertThat(formMapping.get(0).getType()).isEqualTo(FormMappingType.TASK);
+        assertThat(formMapping.get(0).isExternal()).isTrue();
+        assertThat(formMapping.get(0).getForm()).isEqualTo("myForm1");
+        assertThat(formMapping.get(0).getTask()).isEqualTo("myTask");
+        assertThat(formMapping.get(0).getProcessDefinitionId()).isEqualTo(666l);
 
     }
 
