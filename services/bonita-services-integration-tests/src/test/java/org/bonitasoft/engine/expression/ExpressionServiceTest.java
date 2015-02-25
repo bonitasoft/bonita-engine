@@ -1,9 +1,6 @@
 package org.bonitasoft.engine.expression;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -141,7 +138,7 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
         Object exprInCache = cacheService.get("GROOVY_SCRIPT_CACHE_NAME" + "SCRIPT_", strContent.hashCode());
         assertNull(exprInCache);
         evaluate(strExpr, EMPTY_RESOLVED_EXPRESSIONS);
-        exprInCache = cacheService.get("GROOVY_SCRIPT_CACHE_NAME", Thread.currentThread().getId() + "SCRIPT_" + null + strContent.hashCode());
+        exprInCache = cacheService.get("GROOVY_SCRIPT_CACHE_NAME", "SCRIPT_" + null + strContent.hashCode());
         assertNotNull(exprInCache);
     }
 
