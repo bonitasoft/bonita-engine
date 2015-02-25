@@ -14,7 +14,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         CommandIT.class,
         ExternalCommandsTests.class,
-        AdvancedStartProcessCommandIT.class
+        AdvancedStartProcessCommandIT.class,
+        MultipleStartPointsProcessCommandIT.class
 })
 @Initializer(TestsInitializer.class)
 public class CommandsTests {

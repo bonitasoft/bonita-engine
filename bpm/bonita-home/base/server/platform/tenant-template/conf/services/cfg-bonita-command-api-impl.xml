@@ -1,46 +1,48 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="commandService" class="org.bonitasoft.engine.command.api.impl.CommandServiceImpl">
-		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="recorder" ref="tenantRecorderSync" />
-		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-		<constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
-	</bean>
+    <bean id="commandService" class="org.bonitasoft.engine.command.api.impl.CommandServiceImpl">
+        <constructor-arg name="eventService" ref="eventService"/>
+        <constructor-arg name="persistenceService" ref="persistenceService"/>
+        <constructor-arg name="recorder" ref="tenantRecorderSync"/>
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService"/>
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService"/>
+        <constructor-arg name="defaultCommandProvider" ref="defaultCommandProvider"/>
+    </bean>
 
-	<bean id="defaultCommandProvider" class="org.bonitasoft.engine.command.DefaultCommandProvider">
-		<property name="defaultCommands">
-			<list>
-				<ref bean="canStartProcessDefinition" />
-                <ref bean="isInvolvedInHumanTask" />
-				<ref bean="importProfiles" />
-				<ref bean="isUserProcessSupervisor" />
-				<ref bean="createSupervisor" />
-				<ref bean="getSupervisor" />
-				<ref bean="deleteSupervisor" />
-				<ref bean="searchProcessSupervisors" />
-				<ref bean="executeActionsAndTerminate" />
-				<ref bean="isAllowedToStartProcess" />
-				<ref bean="isAllowedToSeeOverviewForm" />
-				<ref bean="isAllowedToSeeInstanciationForm" />
-				<ref bean="searchAssignedTasksSupervisedBy" />
-				<ref bean="searchArchivedTasksSupervisedBy" />
-				<ref bean="searchProcessDefinitionsSupervisedBy" />
-				<ref bean="searchSCommentSupervisedBy" />
-				<ref bean="isAllowedToStartProcesses" />
-				<ref bean="addEntityMemberCommand" />
-				<ref bean="removeEntityMemberCommand" />
-				<ref bean="searchEntityMembersCommand" />
-				<ref bean="searchEntityMembersForUserCommand" />
-				<ref bean="deleteEntityMembersCommand" />
-				<ref bean="searchWaitingEventsCommand" />
-                <ref bean="advancedStartProcessCommand" />
-			</list>
-		</property>
-	</bean>
+    <bean id="defaultCommandProvider" class="org.bonitasoft.engine.command.api.impl.CommandProvider">
+        <property name="defaultCommands">
+            <list>
+                <ref bean="canStartProcessDefinition"/>
+                <ref bean="isInvolvedInHumanTask"/>
+                <ref bean="importProfiles"/>
+                <ref bean="isUserProcessSupervisor"/>
+                <ref bean="createSupervisor"/>
+                <ref bean="getSupervisor"/>
+                <ref bean="deleteSupervisor"/>
+                <ref bean="searchProcessSupervisors"/>
+                <ref bean="executeActionsAndTerminate"/>
+                <ref bean="isAllowedToStartProcess"/>
+                <ref bean="isAllowedToSeeOverviewForm"/>
+                <ref bean="isAllowedToSeeInstanciationForm"/>
+                <ref bean="searchAssignedTasksSupervisedBy"/>
+                <ref bean="searchArchivedTasksSupervisedBy"/>
+                <ref bean="searchProcessDefinitionsSupervisedBy"/>
+                <ref bean="searchSCommentSupervisedBy"/>
+                <ref bean="isAllowedToStartProcesses"/>
+                <ref bean="addEntityMemberCommand"/>
+                <ref bean="removeEntityMemberCommand"/>
+                <ref bean="searchEntityMembersCommand"/>
+                <ref bean="searchEntityMembersForUserCommand"/>
+                <ref bean="deleteEntityMembersCommand"/>
+                <ref bean="searchWaitingEventsCommand"/>
+                <ref bean="advancedStartProcessCommand"/>
+                <ref bean="multipleStartPointsProcessCommand"/>
+            </list>
+        </property>
+    </bean>
 
-    <bean id="canStartProcessDefinition" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="canStartProcessDefinition" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>canStartProcessDefinition</value>
         </constructor-arg>
@@ -51,8 +53,8 @@
             <value>org.bonitasoft.engine.external.permission.CanStartProcessDefinition</value>
         </constructor-arg>
     </bean>
-    
-    <bean id="isInvolvedInHumanTask" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+
+    <bean id="isInvolvedInHumanTask" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>isInvolvedInHumanTask</value>
         </constructor-arg>
@@ -63,20 +65,20 @@
             <value>org.bonitasoft.engine.external.permission.IsInvolvedInHumanTask</value>
         </constructor-arg>
     </bean>
-    
-	<bean id="isUserProcessSupervisor" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
-		<constructor-arg name="name">
-			<value>isUserProcessSupervisor</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Get if the user a supervisor of processDefinition. Use parameter keys USER_ID_KEY, PROCESS_DEFINITION_ID_KEY</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.process.IsUserProcessSupervisor</value>
-		</constructor-arg>
-	</bean>
 
-	<bean id="createSupervisor" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="isUserProcessSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>isUserProcessSupervisor</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+			<value>Get if the user a supervisor of processDefinition. Use parameter keys USER_ID_KEY, PROCESS_DEFINITION_ID_KEY</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.process.IsUserProcessSupervisor</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="createSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>createSupervisor</value>
 		</constructor-arg>
@@ -88,7 +90,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="getSupervisor" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="getSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>getSupervisor</value>
 		</constructor-arg>
@@ -100,7 +102,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="deleteSupervisor" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="deleteSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>deleteSupervisor</value>
 		</constructor-arg>
@@ -112,7 +114,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="searchProcessSupervisors" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="searchProcessSupervisors" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>searchProcessSupervisors</value>
 		</constructor-arg>
@@ -124,7 +126,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="importProfiles" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="importProfiles" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>importProfilesCommand</value>
 		</constructor-arg>
@@ -136,7 +138,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="executeActionsAndTerminate" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="executeActionsAndTerminate" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>executeActionsAndTerminate</value>
 		</constructor-arg>
@@ -148,7 +150,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="isAllowedToStartProcess" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="isAllowedToStartProcess" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>isAllowedToStartProcess</value>
 		</constructor-arg>
@@ -160,7 +162,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="isAllowedToSeeOverviewForm" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="isAllowedToSeeOverviewForm" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>isAllowedToSeeOverviewForm</value>
 		</constructor-arg>
@@ -172,7 +174,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="isAllowedToSeeInstanciationForm" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="isAllowedToSeeInstanciationForm" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>isAllowedToSeeInstanciationForm</value>
 		</constructor-arg>
@@ -184,7 +186,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="searchAssignedTasksSupervisedBy" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="searchAssignedTasksSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>searchAssignedTasksSupervisedBy</value>
 		</constructor-arg>
@@ -196,7 +198,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="searchArchivedTasksSupervisedBy" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="searchArchivedTasksSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>searchArchivedTasksSupervisedBy</value>
 		</constructor-arg>
@@ -209,7 +211,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="searchProcessDefinitionsSupervisedBy" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="searchProcessDefinitionsSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>searchProcessDefinitionsSupervisedBy</value>
 		</constructor-arg>
@@ -221,7 +223,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="searchSCommentSupervisedBy" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="searchSCommentSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>searchSCommentSupervisedBy</value>
 		</constructor-arg>
@@ -234,7 +236,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="isAllowedToStartProcesses" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="isAllowedToStartProcesses" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>isAllowedToStartProcesses</value>
 		</constructor-arg>
@@ -246,7 +248,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="addEntityMemberCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="addEntityMemberCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>addEntityMemberCommand</value>
 		</constructor-arg>
@@ -259,7 +261,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="removeEntityMemberCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="removeEntityMemberCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>removeEntityMemberCommand</value>
 		</constructor-arg>
@@ -271,7 +273,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="searchEntityMembersCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="searchEntityMembersCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>searchEntityMembersCommand</value>
 		</constructor-arg>
@@ -285,7 +287,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="searchEntityMembersForUserCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="searchEntityMembersForUserCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>searchEntityMembersForUserCommand</value>
 		</constructor-arg>
@@ -299,7 +301,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="deleteEntityMembersCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="deleteEntityMembersCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>deleteEntityMembersCommand</value>
 		</constructor-arg>
@@ -312,7 +314,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="searchWaitingEventsCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="searchWaitingEventsCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
 		<constructor-arg name="name">
 			<value>searchWaitingEventsCommand</value>
 		</constructor-arg>
@@ -324,7 +326,7 @@
 		</constructor-arg>
 	</bean>
 
-    <bean id="advancedStartProcessCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="advancedStartProcessCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>advancedStartProcessCommand</value>
         </constructor-arg>
@@ -333,6 +335,18 @@
         </constructor-arg>
         <constructor-arg name="implementation">
             <value>org.bonitasoft.engine.command.AdvancedStartProcessCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="multipleStartPointsProcessCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>multipleStartPointsProcessCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Advanced start process using multiple start points.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.command.MultipleStartPointsProcessCommand</value>
         </constructor-arg>
     </bean>
 

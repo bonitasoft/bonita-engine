@@ -38,7 +38,7 @@ public class SCommandLogBuilderImpl extends CRUDELogBuilder implements SCommandL
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
             if (log.getNumericIndex(SCommandLogIndexesMapper.COMMAND_INDEX) == 0L) {
-                throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Category Id");
+                throw new MissingMandatoryFieldsException("Some mandatory fields are missing: command id ");
             }
         }
     }
