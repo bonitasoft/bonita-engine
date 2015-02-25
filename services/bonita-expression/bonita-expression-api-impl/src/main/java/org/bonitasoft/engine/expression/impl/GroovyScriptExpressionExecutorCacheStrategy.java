@@ -15,6 +15,8 @@ package org.bonitasoft.engine.expression.impl;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.cache.CacheService;
@@ -80,6 +82,8 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
          * This way we store one script for each thread, it is like a thread local cache.
          */
         final String key = Thread.currentThread().getId() + SCRIPT_KEY + definitionId + expressionContent.hashCode();
+
+        Script script = (Script) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
 
         // getClassLoader return the InnerClassLoader getParent return the shell classloader
         if (script != null && script.getClass().getClassLoader().getParent() != shell.getClassLoader()) {
