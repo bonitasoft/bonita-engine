@@ -41,8 +41,6 @@ public interface SUser extends PersistentObject {
      */
     long getManagerUserId();
 
-    String getDelegeeUserName();
-
     String getIconName();
 
     String getIconPath();

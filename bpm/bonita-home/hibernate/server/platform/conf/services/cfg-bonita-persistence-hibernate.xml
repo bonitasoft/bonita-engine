@@ -4,6 +4,7 @@
 	<bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformHibernatePersistenceService" depends-on="dbProperties" destroy-method="destroy">
 		<constructor-arg name="name" value="platform" />
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
+        <constructor-arg name="extraHibernateProperties"><null /></constructor-arg>
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
@@ -22,6 +23,7 @@
 		<constructor-arg name="name" value="journal" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
+        <constructor-arg name="extraHibernateProperties"><null /></constructor-arg>
 		<constructor-arg name="tenantConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
@@ -175,8 +177,6 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.SSystemComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.SToken" value="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" />
 				<entry key="org.bonitasoft.engine.page.SPage" value="org.bonitasoft.engine.page.impl.SPageImpl" />
 				<entry key="org.bonitasoft.engine.page.SPageContent" value="org.bonitasoft.engine.page.impl.SPageContentImpl" />
 				<entry key="org.bonitasoft.engine.page.SPageWithContent" value="org.bonitasoft.engine.page.impl.SPageWithContentImpl" />

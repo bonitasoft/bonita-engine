@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilityException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
@@ -56,8 +55,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     String ARCHIVED_ACTIVITYINSTANCE = "ARCHIVED_ACTIVITYINSTANCE";
 
     String PENDINGACTIVITYMAPPING = "PENDINGACTIVITYMAPPING";
-
-    String HIDDEN_TASK = "HIDDENTASK";
 
     /**
      * Create activityInstance in DB according to the given activityInstance object
@@ -268,64 +265,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SActivityModificationException
      */
     void assignHumanTask(long userTaskId, long userId) throws SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException;
-
-    /**
-     * Hides a task from a user's view.
-     *
-     * @param userId
-     *        the ID of the user to hide the task from
-     * @param activityInstanceId
-     *        the list of IDs of the tasks to hide for the user
-     * @throws SActivityInstanceNotFoundException
-     *         if the activity does not exist
-     * @throws STaskVisibilityException
-     *         if a task visibility creation error occurs
-     * @throws SUnhideableTaskException
-     * @since 6.0
-     */
-    void hideTasks(long userId, Long... activityInstanceId) throws SActivityInstanceNotFoundException, STaskVisibilityException, SBonitaReadException;
-
-    /**
-     * Un-hides a task from a user's view.
-     *
-     * @param userId
-     *        the ID of the user to un-hide the task from
-     * @param activityInstanceId
-     *        the list of IDs of the tasks to un-hide for the user
-     * @throws SActivityInstanceNotFoundException
-     *         if the activity does not exist
-     * @throws STaskVisibilityException
-     *         if a task visibility deletion error occurs
-     * @since 6.0
-     */
-    void unhideTasks(long userId, Long... activityInstanceId) throws STaskVisibilityException;
-
-    /**
-     * Delete a hidden task-user association
-     *
-     * @param id
-     *        the ID of the hidden task-user association object <code>SHiddenTask</code>
-     * @throws STaskVisibilityException
-     *         in case a deletion problem occurs
-     * @since 6.0
-     */
-    void unhideTask(long userId, long activityInstanceId) throws STaskVisibilityException;
-
-    /**
-     * Retrieve the Hidden tasks for a specific activity instance
-     *
-     * @param activityInstanceId
-     *        the ID of the activity instance
-     * @param fromIndex
-     * @param maxResults
-     * @return the list of found hidden tasks for the specified activity instance, ordered by id
-     * @throws SBonitaReadException
-     *         in case a search problem occurs
-     * @throws STaskVisibilityException
-     * @since 6.0
-     */
-
-    List<SHiddenTaskInstance> searchHiddenTasksForActivity(long activityInstanceId, int fromIndex, int maxResults) throws STaskVisibilityException;
 
     /**
      * Get the number of UserTask instances assigned to a specific user
@@ -695,71 +634,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     void setTokenCount(final SActivityInstance activityInstance, int tokenCount) throws SFlowNodeModificationException;
 
     /**
-     * Get a <code>SHiddenTaskInstance</code> from its ID
-     *
-     * @param id
-     *        the ID of the <code>SHiddenTaskInstance</code> to retrieve
-     * @return the found element
-     * @throws STaskVisibilityException
-     *         in case no <code>SHiddenTaskInstance</code> can be found with the provided ID
-     * @throws SBonitaReadException
-     *         in case a Read exception occurs
-     * @since 6.0
-     */
-    SHiddenTaskInstance getHiddenTask(long id) throws STaskVisibilityException, SBonitaReadException;
-
-    /**
-     * Get a hidden task for a specific user & task
-     *
-     * @param userId
-     *        the ID of the user to search for
-     * @param activityInstanceId
-     *        the ID of the task to search for
-     * @return the found <code>SHiddenTaskInstance</code> (hidden task <=> user association)
-     * @throws STaskVisibilityException
-     *         id no <code>SHiddenTaskInstance</code> was found, or if a read error occurs
-     * @since 6.0
-     */
-    SHiddenTaskInstance getHiddenTask(long userId, long activityInstanceId) throws STaskVisibilityException;
-
-    /**
-     * Delete all hidden tasks for a given activity
-     *
-     * @param activityInstanceId
-     *        the ID of the activity to delete
-     * @throws STaskVisibilityException
-     *         in case task hiding deletion error occurs
-     * @since 6.0
-     */
-    void deleteHiddenTasksForActivity(long activityInstanceId) throws STaskVisibilityException;
-
-    /**
-     * Delete all hidden tasks for the connected tenant
-     *
-     * @throws STaskVisibilityException
-     * @since 6.1
-     */
-    void deleteAllHiddenTasks() throws STaskVisibilityException;
-
-    /**
-     * @param userId
-     * @param queryOptions
-     * @return
-     * @throws SBonitaReadException
-     * @since 6.0
-     */
-    long getNumberOfPendingHiddenTasks(long userId, QueryOptions queryOptions) throws SBonitaReadException;
-
-    /**
-     * @param userId
-     * @param queryOptions
-     * @return
-     * @throws SBonitaReadException
-     * @since 6.0
-     */
-    List<SHumanTaskInstance> searchPendingHiddenTasks(long userId, QueryOptions queryOptions) throws SBonitaReadException;
-
-    /**
      * @param userId
      * @param searchOptions
      * @return
@@ -774,14 +648,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @since 6.0
      */
     List<SHumanTaskInstance> searchPendingTasksForUser(long userId, QueryOptions searchOptions) throws SBonitaReadException;
-
-    /**
-     * @param userId
-     * @param activityInstanceId
-     * @return
-     * @throws SBonitaReadException
-     */
-    boolean isTaskHidden(long userId, long activityInstanceId) throws SBonitaReadException;
 
     /**
      * @param humanTaskInstanceId
@@ -825,7 +691,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     /**
      * @param processInstanceId
      * @return
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      * @since 6.0
      */
     int getNumberOfActivityInstances(long processInstanceId) throws SBonitaReadException;

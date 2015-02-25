@@ -280,114 +280,91 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (callerId ^ callerId >>> 32);
-        result = prime * result + (int) (containerId ^ containerId >>> 32);
-        result = prime * result + (int) (endDate ^ endDate >>> 32);
-        result = prime * result + (int) (lastUpdate ^ lastUpdate >>> 32);
-        result = prime * result + (int) (processDefinitionId ^ processDefinitionId >>> 32);
-        result = prime * result + (stateCategory == null ? 0 : stateCategory.hashCode());
-        result = prime * result + (int) (rootProcessInstanceId ^ rootProcessInstanceId >>> 32);
-        result = prime * result + (int) (startDate ^ startDate >>> 32);
-        result = prime * result + (int) (startedBy ^ startedBy >>> 32);
-        result = prime * result + (int) (startedBySubstitute ^ startedBySubstitute >>> 32);
-        result = prime * result + stateId;
-        result = prime * result + (stringIndex1 == null ? 0 : stringIndex1.hashCode());
-        result = prime * result + (stringIndex2 == null ? 0 : stringIndex2.hashCode());
-        result = prime * result + (stringIndex3 == null ? 0 : stringIndex3.hashCode());
-        result = prime * result + (stringIndex4 == null ? 0 : stringIndex4.hashCode());
-        result = prime * result + (stringIndex5 == null ? 0 : stringIndex5.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SProcessInstanceImpl other = (SProcessInstanceImpl) obj;
-        if (callerId != other.callerId) {
-            return false;
-        }
-        if (containerId != other.containerId) {
-            return false;
-        }
-        if (endDate != other.endDate) {
-            return false;
-        }
-        if (lastUpdate != other.lastUpdate) {
-            return false;
-        }
-        if (processDefinitionId != other.processDefinitionId) {
-            return false;
-        }
-        if (stateCategory != other.stateCategory) {
-            return false;
-        }
-        if (rootProcessInstanceId != other.rootProcessInstanceId) {
-            return false;
-        }
-        if (startDate != other.startDate) {
-            return false;
-        }
-        if (startedBy != other.startedBy) {
-            return false;
-        }
-        if (startedBySubstitute != other.startedBySubstitute) {
-            return false;
-        }
-        if (stateId != other.stateId) {
-            return false;
-        }
-        if (stringIndex1 == null) {
-            if (other.stringIndex1 != null) {
-                return false;
-            }
-        } else if (!stringIndex1.equals(other.stringIndex1)) {
-            return false;
-        }
-        if (stringIndex2 == null) {
-            if (other.stringIndex2 != null) {
-                return false;
-            }
-        } else if (!stringIndex2.equals(other.stringIndex2)) {
-            return false;
-        }
-        if (stringIndex3 == null) {
-            if (other.stringIndex3 != null) {
-                return false;
-            }
-        } else if (!stringIndex3.equals(other.stringIndex3)) {
-            return false;
-        }
-        if (stringIndex4 == null) {
-            if (other.stringIndex4 != null) {
-                return false;
-            }
-        } else if (!stringIndex4.equals(other.stringIndex4)) {
-            return false;
-        }
-        if (stringIndex5 == null) {
-            if (other.stringIndex5 != null) {
-                return false;
-            }
-        } else if (!stringIndex5.equals(other.stringIndex5)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public boolean hasBeenInterruptedByEvent() {
         return getInterruptingEventId() != -1;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SProcessInstanceImpl)) return false;
+        if (!super.equals(o)) return false;
+
+        SProcessInstanceImpl that = (SProcessInstanceImpl) o;
+
+        if (callerId != that.callerId) return false;
+        if (containerId != that.containerId) return false;
+        if (endDate != that.endDate) return false;
+        if (interruptingEventId != that.interruptingEventId) return false;
+        if (lastUpdate != that.lastUpdate) return false;
+        if (migrationPlanId != that.migrationPlanId) return false;
+        if (processDefinitionId != that.processDefinitionId) return false;
+        if (rootProcessInstanceId != that.rootProcessInstanceId) return false;
+        if (startDate != that.startDate) return false;
+        if (startedBy != that.startedBy) return false;
+        if (startedBySubstitute != that.startedBySubstitute) return false;
+        if (stateId != that.stateId) return false;
+        if (callerType != that.callerType) return false;
+        if (description != null ? !description.equals(that.description) : that.description != null) return false;
+        if (stateCategory != that.stateCategory) return false;
+        if (stringIndex1 != null ? !stringIndex1.equals(that.stringIndex1) : that.stringIndex1 != null) return false;
+        if (stringIndex2 != null ? !stringIndex2.equals(that.stringIndex2) : that.stringIndex2 != null) return false;
+        if (stringIndex3 != null ? !stringIndex3.equals(that.stringIndex3) : that.stringIndex3 != null) return false;
+        if (stringIndex4 != null ? !stringIndex4.equals(that.stringIndex4) : that.stringIndex4 != null) return false;
+        if (stringIndex5 != null ? !stringIndex5.equals(that.stringIndex5) : that.stringIndex5 != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (int) (processDefinitionId ^ (processDefinitionId >>> 32));
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + stateId;
+        result = 31 * result + (int) (startDate ^ (startDate >>> 32));
+        result = 31 * result + (int) (startedBy ^ (startedBy >>> 32));
+        result = 31 * result + (int) (startedBySubstitute ^ (startedBySubstitute >>> 32));
+        result = 31 * result + (int) (endDate ^ (endDate >>> 32));
+        result = 31 * result + (int) (lastUpdate ^ (lastUpdate >>> 32));
+        result = 31 * result + (int) (containerId ^ (containerId >>> 32));
+        result = 31 * result + (int) (rootProcessInstanceId ^ (rootProcessInstanceId >>> 32));
+        result = 31 * result + (int) (callerId ^ (callerId >>> 32));
+        result = 31 * result + (callerType != null ? callerType.hashCode() : 0);
+        result = 31 * result + (int) (interruptingEventId ^ (interruptingEventId >>> 32));
+        result = 31 * result + (stateCategory != null ? stateCategory.hashCode() : 0);
+        result = 31 * result + (stringIndex1 != null ? stringIndex1.hashCode() : 0);
+        result = 31 * result + (stringIndex2 != null ? stringIndex2.hashCode() : 0);
+        result = 31 * result + (stringIndex3 != null ? stringIndex3.hashCode() : 0);
+        result = 31 * result + (stringIndex4 != null ? stringIndex4.hashCode() : 0);
+        result = 31 * result + (stringIndex5 != null ? stringIndex5.hashCode() : 0);
+        result = 31 * result + (int) (migrationPlanId ^ (migrationPlanId >>> 32));
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "SProcessInstanceImpl{" +
+                "processDefinitionId=" + processDefinitionId +
+                ", description='" + description + '\'' +
+                ", stateId=" + stateId +
+                ", startDate=" + startDate +
+                ", startedBy=" + startedBy +
+                ", startedBySubstitute=" + startedBySubstitute +
+                ", endDate=" + endDate +
+                ", lastUpdate=" + lastUpdate +
+                ", containerId=" + containerId +
+                ", rootProcessInstanceId=" + rootProcessInstanceId +
+                ", callerId=" + callerId +
+                ", callerType=" + callerType +
+                ", interruptingEventId=" + interruptingEventId +
+                ", stateCategory=" + stateCategory +
+                ", stringIndex1='" + stringIndex1 + '\'' +
+                ", stringIndex2='" + stringIndex2 + '\'' +
+                ", stringIndex3='" + stringIndex3 + '\'' +
+                ", stringIndex4='" + stringIndex4 + '\'' +
+                ", stringIndex5='" + stringIndex5 + '\'' +
+                ", migrationPlanId=" + migrationPlanId +
+                '}';
+    }
 }

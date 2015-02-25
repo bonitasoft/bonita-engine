@@ -125,7 +125,7 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
                 final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex());
                 final SFlowNodeInstance child = bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(), flowNodeInstance.getRootContainerId(),
                         flowNodeInstance.getId(), SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId, parentProcessInstanceId, true,
-                        loopCounter + 1, SStateCategory.NORMAL, -1, null);
+                        loopCounter + 1, SStateCategory.NORMAL, -1);
                 activityInstanceService.incrementLoopCounter(loopActivity);
                 activityInstanceService.setTokenCount(loopActivity, loopActivity.getTokenCount() + 1);
                 containerRegistry.executeFlowNode(processDefinition.getId(), parentProcessInstanceId, child.getId(), null, null);

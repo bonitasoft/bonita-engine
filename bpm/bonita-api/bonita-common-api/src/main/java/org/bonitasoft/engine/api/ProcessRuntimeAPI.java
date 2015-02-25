@@ -56,6 +56,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.business.data.BusinessDataReference;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
@@ -88,22 +89,6 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * @author Emmanuel Duchastenier
  */
 public interface ProcessRuntimeAPI {
-
-    /**
-     * Search for pending hidden tasks that are available to the specified user.
-     * Only searches for pending tasks for the current user: if a hidden task has been assigned
-     * or executed, it will not be retrieved.
-     *
-     * @param userId
-     *        The identifier of the user for whom to list the hidden tasks.
-     * @param searchOptions
-     *        The search criterion. See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
-     * @return The list of hidden tasks for the specified user.
-     * @throws SearchException
-     *         If an exception occurs when getting the list of tasks.
-     * @since 6.0
-     */
-    SearchResult<HumanTaskInstance> searchPendingHiddenTasks(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
      * List all open root process instances.
@@ -631,8 +616,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Get the list of pending human task instances available to the specified user.
      * A human task is pending for a given user if it is not yet assigned and if the
-     * user is a candidate either through an {@link org.bonitasoft.engine.bpm.actor.ActorMember} or through a {@link org.bonitasoft.engine.filter.UserFilter}. Hidden tasks for this user are not retrieved (see
-     * {@link #hideTasks(long, Long...)}).
+     * user is a candidate either through an {@link org.bonitasoft.engine.bpm.actor.ActorMember} or through a {@link org.bonitasoft.engine.filter.UserFilter}.
      *
      * @param userId
      *        The identifier of the user.
@@ -1374,40 +1358,6 @@ public interface ProcessRuntimeAPI {
     void retryTask(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
     /**
-     * Hides a list of tasks from a specified user. A task that is "hidden" for a user is not pending for that user,
-     * so is not retrieved by #searchPendingTasksForUser.
-     * As soon as a task is claimed by or assigned to a user, it is no longer hidden from any users.
-     *
-     * @param userId
-     *        The identifier of the user.
-     * @param activityInstanceId
-     *        The list of identifiers of the tasks to be hidden.
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If there is no current valid session.
-     * @throws UpdateException
-     *         If a problem occurs when hiding one of the tasks.
-     * @see #unhideTasks(long, Long...)
-     * @since 6.0
-     */
-    void hideTasks(long userId, Long... activityInstanceId) throws UpdateException;
-
-    /**
-     * Un-hides a list of tasks for a specified user. Un-hiding a task makes it available for a user if the task is pending for that user.
-     *
-     * @param userId
-     *        The identifier of the user.
-     * @param activityInstanceId
-     *        The list of identifiers of the tasks to be hidden.
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If there is no current valid session.
-     * @throws UpdateException
-     *         If a problem occurs when un-hiding one of the tasks.
-     * @see #hideTasks(long, Long...)
-     * @since 6.0
-     */
-    void unhideTasks(long userId, Long... activityInstanceId) throws UpdateException;
-
-    /**
      * Evaluate an expression in the context of the specified process.
      * Some context values can also be provided
      *
@@ -1426,22 +1376,6 @@ public interface ProcessRuntimeAPI {
      */
     Serializable evaluateExpressionOnProcessDefinition(Expression expression, Map<String, Serializable> context, long processDefinitionId)
             throws ExpressionEvaluationException;
-
-    /**
-     * Checks whether a specified task is hidden from a given user.
-     *
-     * @param userTaskId
-     *        The identifier of the task to check.
-     * @param userId
-     *        The identifier of the user.
-     * @return True if the task is hidden from the user.
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If there is no current valid session
-     * @throws org.bonitasoft.engine.exception.RetrieveException
-     *         If an error occurs while retreiving the task.
-     * @since 6.0
-     */
-    boolean isTaskHidden(long userTaskId, long userId);
 
     /**
      * Get the number of comments matching the search conditions.
@@ -1699,7 +1633,6 @@ public interface ProcessRuntimeAPI {
     /**
      * Search for all tasks available to a specified user.
      * A task is available to a user if is assigned to the user or it is pending for that user.
-     * Hidden tasks are not retrieved.
      *
      * @param userId
      *        The identifier of the user for whom the tasks are available.
@@ -1834,16 +1767,15 @@ public interface ProcessRuntimeAPI {
     List<Long> getChildrenInstanceIdsOfProcessInstance(long processInstanceId, int startIndex, int maxResults, ProcessInstanceCriterion criterion);
 
     /**
-     * Check whether a specified user is involved in a process instance.<br>
+     * Check whether a specific user is involved in a given process instance.<br/>
      * User A is involved with a process instance if any of the following is true:
      * <ul>
      * <li>user A has started the process instance</li>
      * <li>a task in the process instance is assigned to user A</li>
      * <li>a task in the process instance is pending for user A</li>
-     * <li>the process instance has been started by a user managed by user A</li>
-     * <li>a task in the process instance is assigned to a user managed by user A</li>
-     * <li>a task in the process instance is pending for a user managed by user A</li>
+     * <li>a task in the process instance has been performed by user A</li>
      * </ul>
+     * This method also applies to completed instances of process.
      *
      * @param userId
      *        The identifier of the user.
@@ -1857,8 +1789,30 @@ public interface ProcessRuntimeAPI {
      * @throws UserNotFoundException
      *         If there is no user with the specified identifier.
      * @since 6.0
+     * @see #isManagerOfUserInvolvedInProcessInstance(long, long)
      */
     boolean isInvolvedInProcessInstance(long userId, long processInstanceId) throws ProcessInstanceNotFoundException, UserNotFoundException;
+
+    /**
+     * Check whether a specific user has at least one subordinate (person he / she is the manager of) involved in a given process instance.<br/>
+     * User A is involved with a process instance if any of the following is true:
+     * <ul>
+     * <li>user A has started the process instance</li>
+     * <li>a task in the process instance is assigned to user A</li>
+     * <li>a task in the process instance is pending for user A</li>
+     * <li>a task in the process instance has been performed by user A</li>
+     * </ul>
+     * This method also applies to completed instances of process.
+     *
+     * @param managerUserId the ID of the manager of the user involved.
+     * @param processInstanceId the ID of the process instance we are interested in.
+     * @return true if the specified manager has subordinates involved in the given process instance.
+     * @throws ProcessInstanceNotFoundException if the process instance does not exist.
+     * @throws BonitaException if an error occured while searching for users involved.
+     * @since 6.4.2
+     * @see #isInvolvedInProcessInstance(long, long)
+     */
+    boolean isManagerOfUserInvolvedInProcessInstance(long managerUserId, long processInstanceId) throws ProcessInstanceNotFoundException, BonitaException;
 
     /**
      * Get the process instance id from an activity instance id.

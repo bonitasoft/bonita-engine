@@ -191,23 +191,23 @@ public class BPMInstancesCreator {
     }
 
     public List<SFlowNodeInstance> createFlowNodeInstances(final Long processDefinitionId, final long rootContainerId, final long parentContainerId,
-            final List<SFlowNodeDefinition> flowNodeDefinitions, final long rootProcessInstanceId, final long parentProcessInstanceId,
-            final SStateCategory stateCategory, final Long tokenRefId) throws SBonitaException {
+                                                           final List<SFlowNodeDefinition> flowNodeDefinitions, final long rootProcessInstanceId, final long parentProcessInstanceId,
+                                                           final SStateCategory stateCategory) throws SBonitaException {
         final List<SFlowNodeInstance> flownNodeInstances = new ArrayList<SFlowNodeInstance>(flowNodeDefinitions.size());
         for (final SFlowNodeDefinition sFlowNodeDefinition : flowNodeDefinitions) {
             flownNodeInstances.add(createFlowNodeInstance(processDefinitionId, rootContainerId, parentContainerId, SFlowElementsContainerType.PROCESS,
-                    sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, -1, stateCategory, -1, tokenRefId));
+                    sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, -1, stateCategory, -1));
         }
         return flownNodeInstances;
     }
 
     public SFlowNodeInstance createFlowNodeInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
-            final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
-            final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
-            final long relatedActivityInstanceId, final Long tokenRefId) throws SBonitaException {
+                                                    final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
+                                                    final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
+                                                    final long relatedActivityInstanceId) throws SBonitaException {
         final SFlowNodeInstance flownNodeInstance = toFlowNodeInstance(processDefinitionId, rootContainerId, parentContainerId, parentContainerType,
                 sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, createInnerActivity, loopCounter, stateCategory,
-                relatedActivityInstanceId, tokenRefId);
+                relatedActivityInstanceId);
         if (SFlowNodeType.GATEWAY.equals(flownNodeInstance.getType())) {
             new CreateGatewayInstance((SGatewayInstance) flownNodeInstance, gatewayInstanceService).call();
         } else if (flownNodeInstance instanceof SActivityInstance) {
@@ -220,9 +220,9 @@ public class BPMInstancesCreator {
     }
 
     public SFlowNodeInstance toFlowNodeInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
-            final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
-            final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
-            final long relatedActivityInstanceId, final Long tokenRefId) throws SActorNotFoundException, SActivityReadException {
+                                                final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
+                                                final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
+                                                final long relatedActivityInstanceId) throws SActorNotFoundException, SActivityReadException {
         if (!createInnerActivity && sFlowNodeDefinition instanceof SActivityDefinition) {
             final SActivityDefinition activityDefinition = (SActivityDefinition) sFlowNodeDefinition;
             final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
@@ -237,7 +237,6 @@ public class BPMInstancesCreator {
                 }
                 builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
                 builder.setStateCategory(stateCategory);
-                builder.setTokenRefId(tokenRefId);
                 return builder.done();
             }
         }
@@ -302,7 +301,6 @@ public class BPMInstancesCreator {
         builder.setLoopCounter(loopCounter);
         builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
         builder.setStateCategory(stateCategory);
-        builder.setTokenRefId(tokenRefId);
         return builder.done();
     }
 

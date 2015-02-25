@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-integration-tests</artifactId>
 		<groupId>org.bonitasoft.engine.test</groupId>
-		<version>6.5.0-SNAPSHOT</version>
+		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-tests-services-bpm</artifactId>
@@ -130,14 +130,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
-		<!-- Delete -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-delete-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
         <!-- Dependency -->
         <dependency>

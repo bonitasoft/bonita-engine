@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>services</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.5.0-SNAPSHOT</version>
+		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.bonitasoft.engine.persistence</groupId>
@@ -19,8 +19,6 @@
 		<module>bonita-persistence-api</module>
 		<module>bonita-persistence-hibernate</module>
 		<module>bonita-persistence-db</module>
-		<module>bonita-delete-api</module>
-		<module>bonita-delete-impl</module>
 		<module>bonita-sequence-api</module>
 		<module>bonita-sequence-impl</module>
 	</modules>

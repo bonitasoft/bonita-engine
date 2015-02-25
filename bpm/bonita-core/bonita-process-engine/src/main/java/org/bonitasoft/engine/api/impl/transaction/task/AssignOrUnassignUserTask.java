@@ -50,7 +50,6 @@ public final class AssignOrUnassignUserTask implements TransactionContent {
         }
         activityInstanceService.assignHumanTask(userTaskId, userId);
         if (userId > 0) {
-            activityInstanceService.deleteHiddenTasksForActivity(activityInstance.getId());
             stateBehaviors.addAssignmentSystemComment(activityInstance, userId);
         }
 

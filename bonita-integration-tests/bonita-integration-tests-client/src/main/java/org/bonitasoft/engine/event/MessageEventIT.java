@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProcessRuntimeAPI;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
@@ -81,7 +82,8 @@ public class MessageEventIT extends AbstractEventIT {
     @Test
     public void messageStartEventMessageSentAfterEnable() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(Collections.<String, String> emptyMap(),
+                Collections.<Operation> emptyList());
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         waitForProcessToFinish(sendMessageProcessInstance);
@@ -101,7 +103,8 @@ public class MessageEventIT extends AbstractEventIT {
     @Test
     public void messageStartEventMessageSentAfterEnableWithNoTargetFlowNode() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, null);
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(Collections.<String, String> emptyMap(),
+                Collections.<Operation> emptyList());
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         waitForProcessToFinish(sendMessageProcessInstance);
@@ -124,7 +127,8 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         waitForProcessToFinish(sendMessageProcessInstance);
 
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(Collections.<String, String> emptyMap(),
+                Collections.<Operation> emptyList());
         forceMatchingOfEvents();
         waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
@@ -377,7 +381,8 @@ public class MessageEventIT extends AbstractEventIT {
     @Test
     public void messageIntermediateThrowEventMessageSentAfterEnable() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(Collections.<String, String> emptyMap(),
+                Collections.<Operation> emptyList());
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         waitForProcessToFinish(sendMessageProcessInstance);
@@ -596,7 +601,8 @@ public class MessageEventIT extends AbstractEventIT {
     @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "throw event", "send message", "start event" }, jira = "ENGINE-447")
     @Test
     public void sendMessageViaAPIToStartMessageEvent() throws Exception {
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(Collections.<String, String> emptyMap(),
+                Collections.<Operation> emptyList());
 
         // send message
         sendMessage(MESSAGE_NAME, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", null);
@@ -667,7 +673,8 @@ public class MessageEventIT extends AbstractEventIT {
 
     @Test
     public void sendMessageTwiceTriggersTwoStartMessageEvents() throws Exception {
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(Collections.<String, String> emptyMap(),
+                Collections.<Operation> emptyList());
         sendMessage(MESSAGE_NAME, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.<Expression, Expression> emptyMap());
         forceMatchingOfEvents();
         final ActivityInstance taskFirstProcInst = waitForUserTaskAndGetIt(START_WITH_MESSAGE_STEP1_NAME);
@@ -845,5 +852,25 @@ public class MessageEventIT extends AbstractEventIT {
             // Clean up
             disableAndDeleteProcess(processToKillDefinition, killerProcessDefinition);
         }
+    }
+
+    @Cover(classes = { EventInstance.class }, concept = Cover.BPMNConcept.EVENTS, jira = "BS-12124", keywords = { "Message", "Target defined by a variable" })
+    @Test
+    public void can_use_a_variable_to_define_target_process() throws Exception {
+        //given
+        ProcessDefinition receiveMsgProcess = deployAndEnableProcessWithStartMessageEvent("receiveMsgProcess", "go");
+        ProcessDefinition sendMessageProcess = deployAndEnableProcessSendingMessageUsingVariableAsTarget("receiveMsgProcess", "startEvent", "go");
+
+        //when
+        ProcessInstance processInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
+
+        //then
+        waitForProcessToFinish(processInstance);
+        long taskId = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
+        HumanTaskInstance taskInstance = getProcessAPI().getHumanTaskInstance(taskId);
+        Assertions.assertThat(taskInstance.getProcessDefinitionId()).isEqualTo(receiveMsgProcess.getId());
+
+        //clean up
+        disableAndDeleteProcess(receiveMsgProcess, sendMessageProcess);
     }
 }

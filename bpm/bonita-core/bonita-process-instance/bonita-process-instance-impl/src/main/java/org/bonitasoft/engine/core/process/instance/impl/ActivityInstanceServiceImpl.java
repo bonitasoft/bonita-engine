@@ -41,7 +41,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilit
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
@@ -50,9 +49,6 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceLogBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceLogBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingLogBuilder;
@@ -114,8 +110,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     private static final String PENDING_MANAGED_BY = "PendingManagedBy";
 
     private static final String PENDING_SUPERVISED_BY = "PendingSupervisedBy";
-
-    private static final String PENDING_HIDDEN_FOR_USER = "PendingHiddenForUser";
 
     private static final String PENDING_FOR_USER = "PendingForUser";
 
@@ -672,129 +666,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     }
 
     @Override
-    public void hideTasks(final long userId, final Long... activityInstanceId) throws SActivityInstanceNotFoundException, STaskVisibilityException,
-            SBonitaReadException {
-        for (final long id : activityInstanceId) {
-            hideTask(userId, id);
-        }
-    }
-
-    private void hideTask(final long userId, final long activityInstanceId) throws SActivityInstanceNotFoundException, STaskVisibilityException,
-            SBonitaReadException {
-        getHumanTaskInstance(activityInstanceId);
-
-        final SHiddenTaskInstance hiddenTask = BuilderFactory.get(SHiddenTaskInstanceBuilderFactory.class).createNewInstance(activityInstanceId, userId).done();
-        final InsertRecord insertRecord = new InsertRecord(hiddenTask);
-        final EventService eventService = getEventService();
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(HIDDEN_TASK, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(HIDDEN_TASK).setObject(hiddenTask).done();
-        }
-
-        try {
-            getRecorder().recordInsert(insertRecord, insertEvent);
-        } catch (final SRecorderException e) {
-            throw new STaskVisibilityException("Can't hide the task.", activityInstanceId, userId);
-        }
-    }
-
-    @Override
-    public void unhideTasks(final long userId, final Long... activityInstanceId) throws STaskVisibilityException {
-        for (final Long actId : activityInstanceId) {
-            unhideTask(userId, actId);
-        }
-    }
-
-    @Override
-    public void unhideTask(final long userId, final long activityInstanceId) throws STaskVisibilityException {
-        final SHiddenTaskInstance hiddenTask = getHiddenTask(userId, activityInstanceId);
-        try {
-            final DeleteRecord deleteRecord = new DeleteRecord(hiddenTask);
-            SDeleteEvent deleteEvent = null;
-            if (getEventService().hasHandlers(HIDDEN_TASK, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(HIDDEN_TASK).setObject(hiddenTask).done();
-            }
-            getRecorder().recordDelete(deleteRecord, deleteEvent);
-        } catch (final SRecorderException e) {
-            throw new STaskVisibilityException("Can't unhide the task.", hiddenTask.getActivityId(), hiddenTask.getUserId(), e);
-        }
-    }
-
-    @Override
-    public SHiddenTaskInstance getHiddenTask(final long userId, final long activityInstanceId) throws STaskVisibilityException {
-        try {
-            final SHiddenTaskInstance hiddenTask = getPersistenceService().selectOne(SelectDescriptorBuilder.getSHiddenTask(userId, activityInstanceId));
-            if (hiddenTask == null) {
-                throw new STaskVisibilityException("SHiddenTaskInstance not found.", activityInstanceId, userId);
-            }
-            return hiddenTask;
-        } catch (final SBonitaReadException e) {
-            throw new STaskVisibilityException("SHiddenTaskInstance not found.", activityInstanceId, userId, e);
-        }
-    }
-
-    @Override
-    public SHiddenTaskInstance getHiddenTask(final long id) throws STaskVisibilityException, SBonitaReadException {
-        final SHiddenTaskInstance hiddenTask = getPersistenceService().selectById(
-                SelectDescriptorBuilder.getElementById(SHiddenTaskInstance.class, "SHiddenTaskInstance", id));
-        if (hiddenTask == null) {
-            throw new STaskVisibilityException("SHiddenTaskInstance not found.", id);
-        }
-        return hiddenTask;
-    }
-
-    @Override
-    public List<SHiddenTaskInstance> searchHiddenTasksForActivity(final long activityInstanceId, final int fromIndex, final int maxResults)
-            throws STaskVisibilityException {
-        try {
-            return getPersistenceService().selectList(SelectDescriptorBuilder.getSHiddenTasksForActivity(activityInstanceId, fromIndex, maxResults));
-        } catch (final SBonitaReadException e) {
-            throw new STaskVisibilityException("Error searching for hidden tasks for the activity.", activityInstanceId, e);
-        }
-    }
-
-    @Override
-    public void deleteHiddenTasksForActivity(final long activityInstanceId) throws STaskVisibilityException {
-        List<SHiddenTaskInstance> hiddenTasks;
-        while (!(hiddenTasks = searchHiddenTasksForActivity(activityInstanceId, 0, 100)).isEmpty()) {
-            for (final SHiddenTaskInstance sHiddenTask : hiddenTasks) {
-                unhideTasks(sHiddenTask.getUserId(), activityInstanceId);
-            }
-        }
-    }
-
-    @Override
-    public void deleteAllHiddenTasks() throws STaskVisibilityException {
-        try {
-            final DeleteAllRecord record = new DeleteAllRecord(SHiddenTaskInstance.class, null);
-            getRecorder().recordDeleteAll(record);
-        } catch (final SRecorderException e) {
-            throw new STaskVisibilityException("Can't delete all hidden tasks.", e);
-        }
-    }
-
-    @Override
-    public long getNumberOfPendingHiddenTasks(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
-        return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, PENDING_HIDDEN_FOR_USER, queryOptions, parameters);
-    }
-
-    @Override
-    public List<SHumanTaskInstance> searchPendingHiddenTasks(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
-        return getPersistenceService().searchEntity(SHumanTaskInstance.class, PENDING_HIDDEN_FOR_USER, queryOptions, parameters);
-    }
-
-    protected SHiddenTaskInstanceLogBuilder getHiddenTaskQueriableLog(final ActionType actionType, final String message, final SHiddenTaskInstance hiddenTask) {
-        final SHiddenTaskInstanceLogBuilder logBuilder = BuilderFactory.get(SHiddenTaskInstanceLogBuilderFactory.class).createNewInstance();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        logBuilder.activityInstanceId(hiddenTask.getActivityId());
-        logBuilder.userId(hiddenTask.getUserId());
-        return logBuilder;
-    }
-
-    @Override
     public long getNumberOfPendingTasksForUser(final long userId, final QueryOptions searchOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
         return getPersistenceService().getNumberOfEntities(SHumanTaskInstance.class, PENDING_FOR_USER, searchOptions, parameters);
@@ -816,17 +687,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
     public List<SHumanTaskInstance> searchPendingOrAssignedTasks(final long userId, final QueryOptions searchOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
         return getPersistenceService().searchEntity(SHumanTaskInstance.class, PENDING_OR_ASSIGNED, searchOptions, parameters);
-    }
-
-    @Override
-    public boolean isTaskHidden(final long userId, final long activityInstanceId) throws SBonitaReadException {
-        final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
-        parameters.put("activityId", activityInstanceId);
-        parameters.put("userId", userId);
-
-        final Long selectOne = getPersistenceService().selectOne(
-                new SelectOneDescriptor<Long>("isTaskHidden", parameters, SHiddenTaskInstance.class, Long.class));
-        return selectOne == 1l;
     }
 
     @Override

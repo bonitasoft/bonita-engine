@@ -116,7 +116,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         final BPMInstancesCreator bpmInstancesCreator = getTenantAccessor(context).getBPMInstancesCreator();
         final SFlowNodeInstance createFlowNodeInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, rootProcessInstanceId,
                 processInstanceId, SFlowElementsContainerType.PROCESS, eventDefinition, rootProcessInstanceId, processInstanceId, false, -1,
-                SStateCategory.NORMAL, -1, null);
+                SStateCategory.NORMAL, -1);
         return (SThrowEventInstance) createFlowNodeInstance;
     }
 
@@ -140,7 +140,9 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
-                throwEventInstance, errorEventTriggerDefinition, null);
+                throwEventInstance, errorEventTriggerDefinition, throwEventInstance);
+
+        tenantAccessor.getFlowNodeExecutor().archiveFlowNodeInstance(throwEventInstance, true, sProcessDefinition.getId());
         if (!hasActionToExecute) {
             setConnectorAndContainerToFailed(context, exception);
         }

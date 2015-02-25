@@ -38,9 +38,6 @@ GO
 DELETE FROM ref_biz_data_inst
 GO
 
-DELETE FROM hidden_activity
-GO
-
 DELETE FROM pending_mapping
 GO
 
@@ -57,9 +54,6 @@ DELETE FROM connector_instance
 GO
 
 DELETE FROM flownode_instance
-GO
-
-DELETE FROM token
 GO
 
 DELETE FROM process_instance

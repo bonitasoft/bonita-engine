@@ -486,7 +486,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     @Cover(classes = { ActorMember.class, Group.class, Role.class, User.class }, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-808, ENGINE-1635", keywords = {
-            "Delete", "Organization", "Actor member", "User", "Group", "Role", "User membership", "Profile member", "Hidden activity", "Supervisor",
+            "Delete", "Organization", "Actor member", "User", "Group", "Role", "User membership", "Profile member", "Supervisor",
             "External identity mapping", "Pending mapping " })
     @Test
     public void deleteOrganization() throws Exception {
@@ -544,7 +544,7 @@ public class OrganizationIT extends TestWithTechnicalUser {
     }
 
     @Cover(classes = { ActorMember.class, Group.class, Role.class, User.class }, concept = BPMNConcept.ORGANIZATION, jira = "ENGINE-1635", keywords = {
-            "Delete", "Organization", "Actor member", "User", "Group", "Role", "User membership", "Profile member", "Hidden activity", "Supervisor",
+            "Delete", "Organization", "Actor member", "User", "Group", "Role", "User membership", "Profile member", "Supervisor",
             "External identity mapping", "Pending mapping " })
     @Test(expected = DeletionException.class)
     public void cantDeleteOrganizationWhenProcessInstanceIsActive() throws Exception {

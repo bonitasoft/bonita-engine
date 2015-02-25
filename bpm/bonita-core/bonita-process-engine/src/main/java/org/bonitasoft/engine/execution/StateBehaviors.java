@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
@@ -67,6 +68,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.SThrowEventDefi
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
@@ -111,7 +113,6 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFac
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.event.OperationsWithContext;
-import org.bonitasoft.engine.execution.flowmerger.TokenInfo;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -190,20 +191,20 @@ public class StateBehaviors {
 
     private final IdentityService identityService;
 
-    private final TokenService tokenService;
-
     protected final ParentContainerResolver parentContainerResolver;
 
     private RefBusinessDataService refBusinessDataService;
 
+    private final ProcessInstanceService processInstanceService;
+
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
-                          final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
-                          final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
-                          final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
-                          final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
-                          final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SchedulerService schedulerService,
-                          final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService,
-                          final ParentContainerResolver parentContainerResolver, RefBusinessDataService refBusinessDataService) {
+            final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
+            final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
+            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
+            final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
+            final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SchedulerService schedulerService,
+            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final ProcessInstanceService processInstanceService,
+            final ParentContainerResolver parentContainerResolver) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -223,7 +224,7 @@ public class StateBehaviors {
         this.commentService = commentService;
         this.identityService = identityService;
         this.logger = logger;
-        this.tokenService = tokenService;
+        this.processInstanceService = processInstanceService;
         this.parentContainerResolver = parentContainerResolver;
         this.refBusinessDataService = refBusinessDataService;
     }
@@ -341,7 +342,7 @@ public class StateBehaviors {
         activityInstanceService.addPendingActivityMappings(mapping);
     }
 
-    private void mapUsingUserFilters(final SFlowNodeInstance flowNodeInstance, final SHumanTaskDefinition humanTaskDefinition, final String actorName,
+    void mapUsingUserFilters(final SFlowNodeInstance flowNodeInstance, final SHumanTaskDefinition humanTaskDefinition, final String actorName,
             final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition) throws SClassLoaderException, SUserFilterExecutionException,
             SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException {
         final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
@@ -354,7 +355,7 @@ public class StateBehaviors {
             throw new SActivityStateExecutionException("no user id returned by the user filter " + sUserFilterDefinition + " on activity "
                     + humanTaskDefinition.getName());
         }
-        for (final Long userId : userIds) {
+        for (final Long userId : new TreeSet<Long>(userIds)) {
             final SPendingActivityMapping mapping = BuilderFactory.get(SPendingActivityMappingBuilderFactory.class)
                     .createNewInstanceForUser(flowNodeInstance.getId(), userId).done();
             activityInstanceService.addPendingActivityMappings(mapping);
@@ -769,14 +770,11 @@ public class StateBehaviors {
     private void createBoundaryEvent(final SProcessDefinition processDefinition, final SActivityInstance activityInstance, final long rootProcessInstanceId,
             final long parentProcessInstanceId, final SFlowElementsContainerType containerType, final SBoundaryEventDefinition boundaryEventDefinition)
             throws SBonitaException {
-        final TokenInfo tokenInfo = new BoundaryCreationTokenProvider(activityInstance, boundaryEventDefinition, tokenService).getOutputTokenInfo();
         final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(),
                 rootProcessInstanceId, activityInstance.getParentContainerId(), containerType, boundaryEventDefinition,
-                rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId(),
-                tokenInfo.outputTokenRefId);
+                rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId()
+        );
 
-        // we create token here to be sure the token is put synchronously
-        tokenService.createTokens(activityInstance.getParentProcessInstanceId(), tokenInfo.outputTokenRefId, tokenInfo.outputParentTokenRefId, 1);
         // no need to handle failed state, creation is in the same tx
         containerRegistry.executeFlowNodeInSameThread(parentProcessInstanceId, boundaryEventInstance.getId(), null, null, containerType.name());
     }
@@ -936,7 +934,7 @@ public class StateBehaviors {
         for (int i = nbOfInstances; i < nbOfInstances + numberOfInstanceToCreate; i++) {
             createdInstances.add(bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, flowNodeInstance.getRootContainerId(),
                     flowNodeInstance.getId(), SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId, parentProcessInstanceId, true, i,
-                    SStateCategory.NORMAL, -1, null));
+                    SStateCategory.NORMAL, -1));
             nbOfcreatedInstances++;
         }
         activityInstanceService.addMultiInstanceNumberOfActiveActivities(flowNodeInstance, nbOfcreatedInstances);

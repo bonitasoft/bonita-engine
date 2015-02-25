@@ -62,13 +62,13 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
         final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) instance;
         if (boundaryEventInstance.isInterrupting()) {
-            aborteRelatedActivity(boundaryEventInstance);
+            abortRelatedActivity(boundaryEventInstance);
         }
 
         return StateCode.DONE;
     }
 
-    private void aborteRelatedActivity(final SBoundaryEventInstance boundaryEventInstance) throws SActivityStateExecutionException {
+    private void abortRelatedActivity(final SBoundaryEventInstance boundaryEventInstance) throws SActivityStateExecutionException {
         final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         if (SStateCategory.NORMAL.equals(boundaryEventInstance.getStateCategory())) {
             try {

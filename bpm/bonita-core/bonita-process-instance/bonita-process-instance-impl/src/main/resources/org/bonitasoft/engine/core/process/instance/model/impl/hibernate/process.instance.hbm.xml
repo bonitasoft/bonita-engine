@@ -5,9 +5,6 @@
 	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
 		<filter-param name="tenantId" type="long" />
 	</filter-def>
-	<filter-def name="deletedFilter" condition=":tenantId = tenantid">
-		<filter-param name="tenantId" type="long" />
-	</filter-def>
 
 	<class name="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" table="process_instance">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
@@ -49,18 +46,6 @@
 		<property name="stringIndex5" column="stringIndex5" />
 		<filter name="tenantFilter" />
 	</class>
-	
-	<class name="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" table="token">
-		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-			<key-property name="tenantId" column="tenantid" type="long" />
-			<key-property name="id" column="id" type="long" />
-		</composite-id>
-		<property name="processInstanceId" column="processInstanceId" />
-		<property name="refId" column="ref_id" />
-		<property name="parentRefId" column="parent_ref_id" />
-		<filter name="tenantFilter" />
-	</class>
-
 
 	<class name="SFlowNodeInstanceImpl" abstract="true" table="flownode_instance">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
@@ -79,7 +64,6 @@
 		<property name="previousStateId" column="prev_state_id" />
 		<property name="stable" column="stable" type="boolean" />
 		<property name="terminal" column="terminal" type="boolean" />
-		<property name="tokenRefId" column="token_ref_id" type="long" />
 		<property name="stateCategory" column="stateCategory">
 			<type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
 				<param name="enumClass">
@@ -96,7 +80,6 @@
 		<property name="loopCounter" column="loop_counter" />
 		<property name="executedBy" column="executedBy" />
 		<property name="executedBySubstitute" column="executedBySubstitute" />
-		<property name="deleted" column="deleted" />
 		<property name="stateExecuting" column="state_executing" />
 		<filter name="tenantFilter" />
 	</class>
@@ -340,16 +323,6 @@
 		<property name="activityId" column="activityId" />
 		<property name="userId" column="userId" />
 		<property name="actorId" column="actorId" />
-		<filter name="tenantFilter" />
-	</class>
-
-	<class name="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" table="hidden_activity">
-		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-			<key-property name="tenantId" column="tenantid" type="long" />
-			<key-property name="id" column="id" type="long" />
-		</composite-id>
-		<property name="activityId" column="activityId" />
-		<property name="userId" column="userId" />
 		<filter name="tenantFilter" />
 	</class>
 

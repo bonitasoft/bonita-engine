@@ -129,24 +129,6 @@ public interface PersistenceService extends ReadPersistenceService {
     void delete(final PersistentObject entity) throws SPersistenceException;
 
     /**
-     * Delete elements that are marked to be deleted
-     *
-     * @throws SPersistenceException
-     * @throws SRetryableException
-     */
-    void purge() throws SPersistenceException;
-
-    /**
-     * Delete elements that are marked to be deleted
-     *
-     * @param classToPurge
-     *        the class to purge
-     * @throws SPersistenceException
-     * @throws SRetryableException
-     */
-    void purge(String classToPurge) throws SPersistenceException;
-
-    /**
      * Delete all records belong to the given entity class from the table.
      *
      * @param entityClass

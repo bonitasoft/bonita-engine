@@ -29,9 +29,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +59,9 @@ import org.bonitasoft.engine.commons.ClassDataUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.Pair;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+import sun.misc.IOUtils;
+import sun.security.util.ManifestDigester;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -733,4 +740,38 @@ public class IOUtil {
         return out.toByteArray();
     }
 
+    public static String readResource(String fileName) throws IOException {
+        final String xmlContent;
+        final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
+        if (inputStream == null) {
+            return null;
+        }
+        try {
+            xmlContent = read(inputStream);
+        } finally {
+            inputStream.close();
+        }
+        return xmlContent;
+    }
+
+    public static String md5(byte[] content) throws NoSuchAlgorithmException {
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        return new BigInteger(1, md5.digest(content)).toString(16);
+    }
+
+    public static void writeMD5(File file, byte[] bytes) throws NoSuchAlgorithmException, IOException {
+        write(file, md5(bytes).getBytes());
+
+    }
+
+    public static boolean checkMD5(File md5File, byte[] contentToCheck) throws NoSuchAlgorithmException {
+        if(!md5File.exists()){
+            return false;
+        }
+        try {
+            return read(md5File).equals(md5(contentToCheck));
+        } catch (IOException e) {
+            return false;
+        }
+    }
 }

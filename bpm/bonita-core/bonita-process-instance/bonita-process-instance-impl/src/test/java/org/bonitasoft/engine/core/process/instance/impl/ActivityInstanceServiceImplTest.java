@@ -17,7 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,6 +55,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ActivityInstanceServiceImplTest {
+
+    final static String DISPLAY_NAME_255 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345000000000000000000000000000000";
 
     @Mock
     private PersistenceService persistenceService;
@@ -119,8 +126,7 @@ public class ActivityInstanceServiceImplTest {
     @Test
     public void updateDisplayName_should_truncate_when_display_name_is_bigger_than_75_characters() throws Exception {
         // given
-        final String displayName75 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345";
-        final String displayName = displayName75 + displayName75;
+        final String displayName = DISPLAY_NAME_255 + "__";
         final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
 
         // when
@@ -128,7 +134,7 @@ public class ActivityInstanceServiceImplTest {
 
         // then
         // the value must be truncated to 75 characters
-        checkFlowNodeUpdate(keyProvider.getDisplayNameKey(), displayName75);
+        checkFlowNodeUpdate(keyProvider.getDisplayNameKey(), DISPLAY_NAME_255);
     }
 
     private void checkFlowNodeUpdate(final String attributeKey, final String expectedValue) throws SRecorderException {
@@ -139,7 +145,7 @@ public class ActivityInstanceServiceImplTest {
     }
 
     @Test
-    public void updateDisplayName_should_not_change_value_when_display_name_is_lower_than_75_characters() throws Exception {
+    public void updateDisplayName_should_not_change_value_when_display_name_is_lower_than_255_characters() throws Exception {
         // given
         final String displayName = "simple task";
         final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
@@ -153,17 +159,16 @@ public class ActivityInstanceServiceImplTest {
     }
 
     @Test
-    public void updateDisplayName_should_not_change_value_when_display_name_is_75_characters_long() throws Exception {
+    public void updateDisplayName_should_not_change_value_when_display_name_is_255_characters_long() throws Exception {
         // given
-        final String displayName75 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345";
         final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
 
         // when
-        activityInstanceServiceImpl.updateDisplayName(flowNode, displayName75);
+        activityInstanceServiceImpl.updateDisplayName(flowNode, DISPLAY_NAME_255);
 
         // then
         // keep original value
-        checkFlowNodeUpdate(keyProvider.getDisplayNameKey(), displayName75);
+        checkFlowNodeUpdate(keyProvider.getDisplayNameKey(), DISPLAY_NAME_255);
     }
 
     @Test
@@ -336,7 +341,7 @@ public class ActivityInstanceServiceImplTest {
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<Map<String, Object>>> any())).thenReturn(
                 Collections.<Map<String, Object>> emptyList());
 
-        List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfFlownodesInAllStates(2L);
+        final List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfFlownodesInAllStates(2L);
         assertThat(numberOfFlownodesInState).isEmpty();
     }
 
@@ -345,7 +350,7 @@ public class ActivityInstanceServiceImplTest {
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<Map<String, Object>>> any())).thenReturn(
                 Collections.<Map<String, Object>> emptyList());
 
-        List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfArchivedFlownodesInAllStates(2L);
+        final List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfArchivedFlownodesInAllStates(2L);
         assertThat(numberOfFlownodesInState).isEmpty();
     }
 

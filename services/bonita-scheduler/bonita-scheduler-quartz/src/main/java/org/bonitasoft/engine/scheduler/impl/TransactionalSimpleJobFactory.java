@@ -86,7 +86,7 @@ public final class TransactionalSimpleJobFactory extends SimpleJobFactory {
     }
 
     private boolean isInternalCronJob(final String jobName) {
-        final List<String> internalCronJobs = Arrays.asList("BPMEventHandling", "CleanInvalidSessions", "InsertBatchLogsJob", "DeleteBatchJob");
+        final List<String> internalCronJobs = Arrays.asList("BPMEventHandling", "CleanInvalidSessions", "InsertBatchLogsJob");
         return internalCronJobs.contains(jobName);
     }
 

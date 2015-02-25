@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -86,8 +87,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     int stat_display_count;
 
-    List<String> classesToPurge;
-
     // ----
 
     /**
@@ -132,15 +131,18 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      * @throws ClassNotFoundException
      */
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
-            final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
-            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
+            final Properties extraHibernateProperties, final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter,
+            final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
         super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
         orderByCheckingMode = getOrderByCheckingMode();
         Configuration configuration;
         try {
             configuration = hbmConfigurationProvider.getConfiguration();
+            if (extraHibernateProperties != null) {
+                configuration.addProperties(extraHibernateProperties);
+            }
         } catch (final ConfigurationException e) {
             throw new SPersistenceException(e);
         }
@@ -188,14 +190,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     private OrderByCheckingMode getOrderByCheckingMode() {
         final String property = System.getProperty("sysprop.bonita.orderby.checking.mode");
         return property != null && !property.isEmpty() ? OrderByCheckingMode.valueOf(property) : OrderByCheckingMode.NONE;
-    }
-
-    /**
-     * @param classesToPurge
-     *        the classesToPurge to set
-     */
-    public void setClassesToPurge(final List<String> classesToPurge) {
-        this.classesToPurge = classesToPurge;
     }
 
     /**
@@ -342,36 +336,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 setId(entity);
                 session.save(entity);
             }
-        }
-    }
-
-    @Override
-    public void purge() throws SPersistenceException {
-        if (classesToPurge != null) {
-            for (final String classToPurge : classesToPurge) {
-                purge(classToPurge);
-            }
-        }
-    }
-
-    @Override
-    public void purge(final String classToPurge) throws SPersistenceException {
-        final int index = classToPurge.lastIndexOf('.');
-        String suffix = classToPurge;
-        if (index != -1) {
-            suffix = classToPurge.substring(index + 1, classToPurge.length());
-        }
-        final Query query = getSession(true).getNamedQuery("purge" + suffix);
-        try {
-            query.executeUpdate();
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException he) {
-            throw new SPersistenceException(he);
         }
     }
 

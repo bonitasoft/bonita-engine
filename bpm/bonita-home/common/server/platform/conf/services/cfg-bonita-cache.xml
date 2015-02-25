@@ -5,6 +5,15 @@
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
-	</bean>
+        <constructor-arg name="defaultCacheConfiguration" ref="defaultPlatformCacheConfiguration" />
+        <constructor-arg name="diskStorePath" value="java.io.tmpdir/platform.cache" />
+    </bean>
+    
+    <bean id="defaultPlatformCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="DEFAULT_PLATFORM" />
+        <property name="maxElementsInMemory" value="1000" />
+        <property name="inMemoryOnly" value="true" />
+        <property name="eternal" value="true" />
+    </bean>
 
 </beans>

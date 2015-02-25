@@ -24,19 +24,13 @@ public class STokenImpl extends SPersistenceObjectImpl implements SToken {
 
     private long processInstanceId;
 
-    private Long refId;
-
-    private Long parentRefId;
-
     public STokenImpl() {
         super();
     }
 
-    public STokenImpl(final long processInstanceId, final Long refId, final Long parentRefId) {
+    public STokenImpl(final long processInstanceId) {
         super();
         this.processInstanceId = processInstanceId;
-        this.refId = refId;
-        this.parentRefId = parentRefId;
     }
 
     @Override
@@ -49,23 +43,12 @@ public class STokenImpl extends SPersistenceObjectImpl implements SToken {
         return processInstanceId;
     }
 
-    @Override
-    public Long getRefId() {
-        return refId;
-    }
-
-    @Override
-    public Long getParentRefId() {
-        return parentRefId;
-    }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (parentRefId == null ? 0 : parentRefId.hashCode());
         result = prime * result + (int) (processInstanceId ^ processInstanceId >>> 32);
-        result = prime * result + (refId == null ? 0 : refId.hashCode());
         return result;
     }
 
@@ -81,21 +64,7 @@ public class STokenImpl extends SPersistenceObjectImpl implements SToken {
             return false;
         }
         final STokenImpl other = (STokenImpl) obj;
-        if (parentRefId == null) {
-            if (other.parentRefId != null) {
-                return false;
-            }
-        } else if (!parentRefId.equals(other.parentRefId)) {
-            return false;
-        }
         if (processInstanceId != other.processInstanceId) {
-            return false;
-        }
-        if (refId == null) {
-            if (other.refId != null) {
-                return false;
-            }
-        } else if (!refId.equals(other.refId)) {
             return false;
         }
         return true;
@@ -103,7 +72,7 @@ public class STokenImpl extends SPersistenceObjectImpl implements SToken {
 
     @Override
     public String toString() {
-        return "STokenImpl [processInstanceId=" + processInstanceId + ", refId=" + refId + ", parentRefId=" + parentRefId + "]";
+        return "STokenImpl [processInstanceId=" + processInstanceId + "]";
     }
 
 }

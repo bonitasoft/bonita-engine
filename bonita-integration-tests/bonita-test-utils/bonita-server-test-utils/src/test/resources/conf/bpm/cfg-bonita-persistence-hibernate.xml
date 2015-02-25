@@ -5,6 +5,7 @@
 		<constructor-arg name="name" value="platform" />
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
+        <constructor-arg name="extraHibernateProperties"><null /></constructor-arg>
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
@@ -24,6 +25,7 @@
 		<constructor-arg name="name" value="journal" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
+        <constructor-arg name="extraHibernateProperties"><null /></constructor-arg>
 		<constructor-arg name="tenantConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
@@ -166,8 +168,6 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.SSystemComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.SToken" value="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" />
 
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
