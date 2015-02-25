@@ -5,12 +5,16 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
+import java.io.File;
 import java.util.Arrays;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheConfigurations;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Before;

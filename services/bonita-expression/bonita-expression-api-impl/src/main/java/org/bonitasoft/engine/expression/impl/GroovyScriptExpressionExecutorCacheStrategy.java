@@ -83,19 +83,6 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
          */
         final String key = SCRIPT_KEY + definitionId + expressionContent.hashCode();
 
-        Script script = (Script) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
-
-        // getClassLoader return the InnerClassLoader getParent return the shell classloader
-        if (script != null && script.getClass().getClassLoader().getParent() != shell.getClassLoader()) {
-            ClassLoader classLoader = script.getClass().getClassLoader();
-            script = null;
-            cacheService.remove(GROOVY_SCRIPT_CACHE_NAME, key);
-            if (debugEnabled) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Invalidating script because expected classloader <" + classLoader + "> but was <"
-                        + shell.getClassLoader() + ">");
-            }
-        }
-
         GroovyCodeSource gcs = (GroovyCodeSource) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
 
         if (gcs == null) {
