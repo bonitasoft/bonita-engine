@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2012 BonitaSoft S.A.
+/*******************************************************************************
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -10,22 +10,28 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.command.model;
+ ******************************************************************************/
+package org.bonitasoft.engine.command.api.impl;
 
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface SCommandUpdateBuilder {
+public class CommandProvider {
 
-    SCommandUpdateBuilder updateName(String name);
+    private List<CommandDeployment> defaultCommands;
 
-    SCommandUpdateBuilder updateDescription(String description);
+    public void setDefaultCommands(final List<CommandDeployment> defaultCommands) {
+        this.defaultCommands = defaultCommands;
+    }
 
-    SCommandUpdateBuilder updateImplementation(String implementation);
-
-    EntityUpdateDescriptor done();
+    public List<CommandDeployment> getDefaultCommands() {
+        if (defaultCommands == null) {
+            return Collections.emptyList();
+        }
+        return defaultCommands;
+    }
 
 }

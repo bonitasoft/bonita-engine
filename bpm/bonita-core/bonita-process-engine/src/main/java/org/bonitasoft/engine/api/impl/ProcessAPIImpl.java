@@ -3791,18 +3791,24 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final LockService lockService = tenantAccessor.getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
+        BonitaLock lock = null;
         try {
-            final BonitaLock lock = lockService.lock(processInstanceId, objectType, tenantAccessor.getTenantId());
+            lock = lockService.lock(processInstanceId, objectType, tenantAccessor.getTenantId());
             deleteProcessInstanceInTransaction(tenantAccessor, processInstanceId);
-            lockService.unlock(lock, tenantAccessor.getTenantId());
-        } catch (final SLockException e) {
-            throw new DeletionException("Lock was not released. Object type: " + objectType + ", id: " + processInstanceId);
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
         } catch (final SProcessInstanceNotFoundException e) {
             throw new DeletionException(e);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
+        } finally {
+            if(lock != null) {
+                try {
+                    lockService.unlock(lock, tenantAccessor.getTenantId());
+                } catch (SLockException e) {
+                    throw new DeletionException("Lock was not released. Object type: " + objectType + ", id: " + processInstanceId, e);
+                }
+            }
         }
     }
 

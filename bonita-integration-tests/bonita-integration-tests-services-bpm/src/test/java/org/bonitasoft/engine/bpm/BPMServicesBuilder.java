@@ -33,13 +33,13 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.command.DefaultCommandProvider;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.login.LoginService;
@@ -47,7 +47,6 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
@@ -282,7 +281,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(ProcessInstanceService.class);
     }
 
-
     @Override
     public ActivityInstanceService getActivityInstanceService() {
         return getInstanceOf(ActivityInstanceService.class);
@@ -337,7 +335,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     public CommandService getCommandService() {
         return getInstanceOf(CommandService.class);
     }
-
 
     @Override
     public DocumentService getDocumentService() {
@@ -507,11 +504,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     protected <T> T getInstanceOf(final String name, final Class<T> class1) {
         return accessor.getInstanceOf(name, class1);
-    }
-
-    @Override
-    public DefaultCommandProvider getDefaultCommandProvider() {
-        return getInstanceOf(DefaultCommandProvider.class);
     }
 
     @Override
