@@ -55,8 +55,8 @@ public class TransitionDefinitionBuilder extends FlowElementContainerBuilder {
         }
 
         // Create transition
-        final StringBuilder nameBuilder = new StringBuilder(source);
-        nameBuilder.append("_->_").append(target);
+        final StringBuilder nameBuilder = new StringBuilder();
+        nameBuilder.append(from.getId()).append("_->_").append(to.getId());
         transition = new TransitionDefinitionImpl(nameBuilder.toString(), from.getId(), to.getId());
         transition.setCondition(condition);
 

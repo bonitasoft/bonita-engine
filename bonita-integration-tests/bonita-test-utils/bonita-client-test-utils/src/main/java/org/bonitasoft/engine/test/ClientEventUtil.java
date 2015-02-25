@@ -39,9 +39,9 @@ public class ClientEventUtil {
 
     public static final String EXECUTE_EVENTS_COMMAND = "executeEventsCommand";
 
-    private static final String ADD_HANDLER_COMMAND = "addHandlerCommand";
+    public static final String ADD_HANDLER_COMMAND = "addHandlerCommand";
 
-    private static final String WAIT_SERVER_COMMAND = "waitServerCommand";
+    public static final String WAIT_SERVER_COMMAND = "waitServerCommand";
 
     private static final String FLOW_NODE = "flowNode";
 

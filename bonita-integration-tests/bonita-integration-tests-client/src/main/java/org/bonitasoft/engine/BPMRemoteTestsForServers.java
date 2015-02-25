@@ -4,6 +4,7 @@ import org.bonitasoft.engine.accessors.TenantAccessorTest;
 import org.bonitasoft.engine.activity.PendingTasksIT;
 import org.bonitasoft.engine.command.AdvancedStartProcessCommandIT;
 import org.bonitasoft.engine.command.CommandIT;
+import org.bonitasoft.engine.command.MultipleStartPointsProcessCommandIT;
 import org.bonitasoft.engine.command.web.ExternalCommandsTests;
 import org.bonitasoft.engine.event.SignalEventIT;
 import org.bonitasoft.engine.identity.UserIT;
@@ -39,7 +40,9 @@ import org.junit.runners.Suite.SuiteClasses;
         OperationIT.class,
         TenantAccessorTest.class,
         MultiThreadCallsIT.class,
-        AdvancedStartProcessCommandIT.class })
+        AdvancedStartProcessCommandIT.class,
+        MultipleStartPointsProcessCommandIT.class
+})
 @Initializer(BPMRemoteTestsForServers.class)
 public class BPMRemoteTestsForServers {
 
