@@ -65,7 +65,7 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
                 dataInstanceService, operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentService, commentService,
                 new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
                         connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
-                        containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, tokenService,
+                        containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, processInstanceService,
                         parentContainerResolver, refBusinessDataService));
         this.breakpointService = breakpointService;
     }

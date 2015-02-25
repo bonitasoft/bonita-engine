@@ -78,8 +78,6 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                 transitionService, eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
                 expressionResolverService, eventService, handlers, documentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
                 eventsHandler, flowNodeStateManager, businessDataRepository, refBusinessDataService, transitionEvaluator);
-        this.businessDataRepository = businessDataRepository;
-        this.refBusinessDataService = refBusinessDataService;
     }
 
     protected void initializeData(final SProcessDefinition sDefinition, final SProcessInstance sInstance) throws SProcessInstanceCreationException {
