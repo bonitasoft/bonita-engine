@@ -2823,7 +2823,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public boolean isInvolvedInProcessInstance(final long userId, final long processInstanceId) throws ProcessInstanceNotFoundException {
         return new ProcessInvolvementAPIImpl(this).isInvolvedInProcessInstance(userId, processInstanceId);
-            }
+    }
 
     @Override
     public boolean isManagerOfUserInvolvedInProcessInstance(final long managerUserId, final long processInstanceId) throws ProcessInstanceNotFoundException,
@@ -2939,10 +2939,10 @@ public class ProcessAPIImpl implements ProcessAPI {
                     activityInstance.getProcessDefinitionId());
             Thread.currentThread().setContextClassLoader(processClassLoader);
             final List<SOperation> sOperations = convertOperations(operations);
-                    final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
-                            DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
+            final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
                     activityInstance.getProcessDefinitionId());
-                    sExpressionContext.setSerializableInputValues(expressionContexts);
+            sExpressionContext.setSerializableInputValues(expressionContexts);
 
             operationService.execute(sOperations, sExpressionContext);
         } catch (final SBonitaException e) {
@@ -3345,16 +3345,16 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
             final Map<String, Serializable> externalDataValue = new HashMap<String, Serializable>(operations.size());
-                // convert the client operation to server operation
+            // convert the client operation to server operation
             final List<SOperation> sOperations = convertOperations(operations);
-                // set input values of expression with connector result + provided input for this operation
-                final HashMap<String, Object> inputValues = new HashMap<String, Object>(operationInputValues);
-                inputValues.putAll(connectorResult.getResult());
-                expressionContext.setInputValues(inputValues);
-                // execute
+            // set input values of expression with connector result + provided input for this operation
+            final HashMap<String, Object> inputValues = new HashMap<String, Object>(operationInputValues);
+            inputValues.putAll(connectorResult.getResult());
+            expressionContext.setInputValues(inputValues);
+            // execute
             Long containerId = expressionContext.getContainerId();
             operationService.execute(sOperations, containerId == null ? -1 : containerId, expressionContext.getContainerType(), expressionContext);
-                // return the value of the data if it's an external data
+            // return the value of the data if it's an external data
             for (Operation operation : operations) {
                 final LeftOperand leftOperand = operation.getLeftOperand();
                 if (LeftOperand.TYPE_EXTERNAL_DATA.equals(leftOperand.getType())) {
@@ -3468,8 +3468,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 tenantAccessor.getProcessDefinitionService(), tenantAccessor.getDataInstanceService(), tenantAccessor.getOperationService(),
                 tenantAccessor.getWorkService(), tenantAccessor.getContainerRegistry(), tenantAccessor.getEventInstanceService(),
                 tenantAccessor.getSchedulerService(), tenantAccessor.getCommentService(), tenantAccessor.getIdentityService(),
-                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getProcessInstanceService(), tenantAccessor.getParentContainerResolver());
-                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getTokenService(), tenantAccessor.getParentContainerResolver(),
+                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getProcessInstanceService(), tenantAccessor.getParentContainerResolver(),
                 tenantAccessor.getRefBusinessDataService());
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);

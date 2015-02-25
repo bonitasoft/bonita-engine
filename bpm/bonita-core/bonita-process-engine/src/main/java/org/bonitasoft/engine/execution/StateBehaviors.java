@@ -66,9 +66,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefi
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SThrowEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
@@ -203,8 +202,9 @@ public class StateBehaviors {
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final ProcessInstanceService processInstanceService,
-            final ParentContainerResolver parentContainerResolver) {
+            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger,
+            final ProcessInstanceService processInstanceService,
+            final ParentContainerResolver parentContainerResolver, final RefBusinessDataService refBusinessDataService) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -272,7 +272,8 @@ public class StateBehaviors {
         }
     }
 
-    private void MapMultiInstanceBusinessDataOutput(final SFlowNodeInstance flowNodeInstance, final SMultiInstanceLoopCharacteristics miLoop) throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException, SRefBusinessDataInstanceModificationException {
+    private void MapMultiInstanceBusinessDataOutput(final SFlowNodeInstance flowNodeInstance, final SMultiInstanceLoopCharacteristics miLoop)
+            throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException, SRefBusinessDataInstanceModificationException {
         final SRefBusinessDataInstance outputMIRef = refBusinessDataService.getFlowNodeRefBusinessDataInstance(
                 miLoop.getDataOutputItemRef(), flowNodeInstance.getId());
         final SRefBusinessDataInstance outputMILoopRef = refBusinessDataService.getRefBusinessDataInstance(
@@ -413,13 +414,13 @@ public class StateBehaviors {
      * Return the phases and connectors to execute, as a couple of (phase, couple of (connector instance, connector definition))
      * 
      * @param processDefinition
-     *            the process where the connectors are defined.
+     *        the process where the connectors are defined.
      * @param flowNodeInstance
-     *            the instance of the flow node to execute possible connectors on.
+     *        the instance of the flow node to execute possible connectors on.
      * @param executeConnectorsOnEnter
-     *            do we want to consider the connectors ON_ENTER or ignore them?
+     *        do we want to consider the connectors ON_ENTER or ignore them?
      * @param executeConnectorsOnFinish
-     *            do we want to consider the connectors ON_FINISH or ignore them?
+     *        do we want to consider the connectors ON_FINISH or ignore them?
      * @return the phases and connectors to execute
      * @throws SActivityStateExecutionException
      */
@@ -773,7 +774,7 @@ public class StateBehaviors {
         final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(),
                 rootProcessInstanceId, activityInstance.getParentContainerId(), containerType, boundaryEventDefinition,
                 rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId()
-        );
+                );
 
         // no need to handle failed state, creation is in the same tx
         containerRegistry.executeFlowNodeInSameThread(parentProcessInstanceId, boundaryEventInstance.getId(), null, null, containerType.name());
@@ -1016,7 +1017,7 @@ public class StateBehaviors {
         }
     }
 
-    boolean isBusinessData(final SProcessDefinition processDefinition,  final SMultiInstanceLoopCharacteristics miLoop) {
+    boolean isBusinessData(final SProcessDefinition processDefinition, final SMultiInstanceLoopCharacteristics miLoop) {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SBusinessDataDefinition businessData = processContainer.getBusinessDataDefinition(miLoop.getLoopDataOutputRef());
         return businessData != null;
@@ -1030,7 +1031,8 @@ public class StateBehaviors {
         updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
     }
 
-    private void updateLoopDataOutputWithListContent(final List<?> outValue, final SDataInstance loopDataOutput, final int numberOfInstanceMax) throws SDataInstanceException {
+    private void updateLoopDataOutputWithListContent(final List<?> outValue, final SDataInstance loopDataOutput, final int numberOfInstanceMax)
+            throws SDataInstanceException {
         if (outValue.size() < numberOfInstanceMax) {
             // output data is too small
             final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
