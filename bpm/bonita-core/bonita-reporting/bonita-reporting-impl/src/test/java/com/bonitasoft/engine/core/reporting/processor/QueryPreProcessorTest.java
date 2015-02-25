@@ -24,29 +24,29 @@ public class QueryPreProcessorTest {
 
     @Test
     public void should_replace_boolean_value_for_oracle() {
-        String queryString = "SELECT * FROM TASK WHERE DELETED = FALSE";
-        String expectedQueryString = "SELECT * FROM TASK WHERE DELETED = 0";
+        final String queryString = "SELECT * FROM TASK WHERE MYBOOLEAN = FALSE";
+        final String expectedQueryString = "SELECT * FROM TASK WHERE MYBOOLEAN = 0";
 
-        String processedQuery = queryPreProcessor.preProcessFor(Vendor.ORACLE, queryString);
+        final String processedQuery = queryPreProcessor.preProcessFor(Vendor.ORACLE, queryString);
 
         assertThat(processedQuery).isEqualTo(expectedQueryString);
     }
 
     @Test
     public void should_replace_boolean_value_for_sqlserver() {
-        String queryString = "SELECT * FROM TASK WHERE DELETED =  false";
-        String expectedQueryString = "SELECT * FROM TASK WHERE DELETED = 0";
+        final String queryString = "SELECT * FROM TASK WHERE MYBOOLEAN =  false";
+        final String expectedQueryString = "SELECT * FROM TASK WHERE MYBOOLEAN = 0";
 
-        String processedQuery = queryPreProcessor.preProcessFor(Vendor.SQLSERVER, queryString);
+        final String processedQuery = queryPreProcessor.preProcessFor(Vendor.SQLSERVER, queryString);
 
         assertThat(processedQuery).isEqualTo(expectedQueryString);
     }
 
     @Test
     public void should_do_nothing_for_other_databases_vendors() {
-        String expectedQueryString = "SELECT * FROM TASK WHERE DELETED = FALSE";
+        final String expectedQueryString = "SELECT * FROM TASK WHERE MYBOOLEAN = FALSE";
 
-        String processedQuery = queryPreProcessor.preProcessFor(Vendor.OTHER, expectedQueryString);
+        final String processedQuery = queryPreProcessor.preProcessFor(Vendor.OTHER, expectedQueryString);
 
         assertThat(processedQuery).isEqualTo(expectedQueryString);
     }

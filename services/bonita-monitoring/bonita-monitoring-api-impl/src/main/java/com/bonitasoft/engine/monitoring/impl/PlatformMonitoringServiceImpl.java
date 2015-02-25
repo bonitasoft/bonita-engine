@@ -188,7 +188,8 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
 
     @Override
     public boolean isOptionalMonitoringInformationAvailable() {
-        return jvmMBean.getJvmVendor().indexOf("Sun") >= 0;
+        final String jvmVendor = jvmMBean.getJvmVendor();
+        return jvmVendor.contains("Sun") || jvmVendor.contains("Oracle");
     }
 
     @Override

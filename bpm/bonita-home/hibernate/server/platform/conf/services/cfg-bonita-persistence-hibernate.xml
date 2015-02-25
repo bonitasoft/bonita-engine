@@ -1,9 +1,24 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformHibernatePersistenceService" depends-on="dbProperties" destroy-method="destroy">
+    <bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformHibernatePersistenceService" depends-on="dbProperties"
+        destroy-method="destroy">
 		<constructor-arg name="name" value="platform" />
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
+        <constructor-arg name="extraHibernateProperties">
+            <bean class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+                <property name="map">
+                    <map>
+                        <entry key="net.sf.ehcache.configurationResourceName">
+                            <bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
+                                <property name="filePath" value="/server/platform/conf/hibernate-cache-platform.xml" />
+                                <property name="baseFolder" value="${bonita.home}" />
+                            </bean>
+                        </entry>
+                    </map>
+                </property>
+            </bean>
+        </constructor-arg>
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
@@ -18,21 +33,30 @@
         </constructor-arg>
 	</bean>
 
-	<bean id="persistenceService" class="com.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties" destroy-method="destroy">
+	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties" destroy-method="destroy">
 		<constructor-arg name="name" value="journal" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
+        <constructor-arg name="extraHibernateProperties">
+            <bean class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+                <property name="map">
+                    <map>
+                        <entry key="net.sf.ehcache.configurationResourceName">
+                            <bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
+                                <property name="filePath" value="/server/platform/conf/hibernate-cache-tenant.xml" />
+                                <property name="baseFolder" value="${bonita.home}" />
+                            </bean>
+                        </entry>
+                    </map>
+                </property>
+            </bean>
+        </constructor-arg>
 		<constructor-arg name="tenantConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
-		<property name="classesToPurge">
-			<list>
-				<value>org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl</value>
-			</list>
-		</property>
         <constructor-arg name="enableWordSearch" value="false" />
         <constructor-arg name="wordSearchExclusionMappings">
             <set>
@@ -186,8 +210,6 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.SSystemComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.SToken" value="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" />
@@ -351,7 +373,7 @@
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.theme.model.impl.SThemeImpl" value="read-write"/>
+                <entry key="org.bonitasoft.engine.theme.model.impl.SThemeImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" value="read-write" />

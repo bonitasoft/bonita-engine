@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.test</groupId>
 		<artifactId>bonita-integration-tests-sp</artifactId>
-		<version>6.5.0-SNAPSHOT</version>
+		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-tests-services-bpm-sp</artifactId>
@@ -173,14 +173,6 @@
             <artifactId>bonita-data-definition-model-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-		<!-- Delete -->
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-delete-batch</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
         <!-- Dependency -->
         <dependency>
