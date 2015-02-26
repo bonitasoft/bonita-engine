@@ -46,7 +46,7 @@ public class EntityMerger {
                 
                 ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(bdrService));
                 for (final Object item : collection) {
-                    newCollection.add(proxyfier.proxifyIfNeeded((Entity) item));
+                    newCollection.add(proxyfier.proxify((Entity) item));
                 }
                 return (Serializable) newCollection;
             } catch (final InstantiationException e) {
@@ -56,7 +56,7 @@ public class EntityMerger {
             }
         } else if (isAnEntity(value)) {
             ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(bdrService));
-            return proxyfier.proxifyIfNeeded((Entity) value);
+            return proxyfier.proxify((Entity) value);
         } else {
             return value;
         }

@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data;
 
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
 import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
@@ -33,6 +36,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -43,9 +47,11 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
@@ -81,6 +87,7 @@ import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.businessdata.BusinessDataReference;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 
@@ -218,6 +225,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         employee.addQuery(COUNT_EMPLOYEE, "SELECT COUNT(e) FROM Employee e", Long.class.getName());
 
         employee.addIndex("IDX_LSTNM", "lastName");
+        employee.addIndex("IDX_LSTNM", "address");
 
         final BusinessObject person = new BusinessObject();
         person.setQualifiedName("org.bonitasoft.pojo.Person");
@@ -263,11 +271,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         matti = createUser("matti", "bpm");
 
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(buildBOM());
-        getTenantManagementAPI().pause();
-        getTenantManagementAPI().installBusinessDataModel(zip);
-        getTenantManagementAPI().resume();
+        installBusinessDataModel(buildBOM());
 
         tenantId = getSession().getTenantId();
     }
@@ -279,27 +283,30 @@ public class BDRepositoryIT extends CommonAPISPIT {
         } catch (final Exception e) {
             clientFolder.deleteOnExit();
         }
-        if (!getTenantManagementAPI().isPaused()) {
-            getTenantManagementAPI().pause();
-            getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
-            getTenantManagementAPI().resume();
-        }
+        uninstallBusinessObjectModel();
 
         deleteUser(matti);
         logoutOnTenant();
     }
 
+    private void uninstallBusinessObjectModel() throws UpdateException, BusinessDataRepositoryDeploymentException {
+        if (!getTenantManagementAPI().isPaused()) {
+            getTenantManagementAPI().pause();
+            getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
+            getTenantManagementAPI().resume();
+        }
+    }
+
     @Test
     public void deploying_bdm_after_process_should_put_process_in_resolved_state() throws Exception {
         final String aQualifiedName = "org.bonitasoft.test.Bo";
-        final byte[] bom = buildSimpleBom(aQualifiedName);
 
         final ProcessDefinition processDefinition = deploySimpleProcessWithBusinessData(aQualifiedName);
 
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.UNRESOLVED);
 
-        installBusinessDataModel(bom);
+        installBusinessDataModel(buildSimpleBom(aQualifiedName));
 
         processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
@@ -307,10 +314,12 @@ public class BDRepositoryIT extends CommonAPISPIT {
         deleteProcess(processDefinition);
     }
 
-    private void installBusinessDataModel(final byte[] bdm) throws Exception {
+    private void installBusinessDataModel(final BusinessObjectModel bdm) throws Exception {
+        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
+        final byte[] zip = converter.zip(bdm);
         getTenantManagementAPI().pause();
         getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
-        getTenantManagementAPI().installBusinessDataModel(bdm);
+        getTenantManagementAPI().installBusinessDataModel(zip);
         getTenantManagementAPI().resume();
     }
 
@@ -326,7 +335,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         return processDefinition;
     }
 
-    private byte[] buildSimpleBom(final String boQualifiedName) throws IOException, JAXBException, SAXException {
+    private BusinessObjectModel buildSimpleBom(final String boQualifiedName) throws IOException, JAXBException, SAXException {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName(boQualifiedName);
         final SimpleField field = new SimpleField();
@@ -335,8 +344,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         bo.addField(field);
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(bo);
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        return converter.zip(model);
+        return model;
     }
 
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "business data java setter operation" }, jira = "BS-7217", story = "update a business data using a java setter operation")
@@ -1229,7 +1237,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    private void verifyCommandGetBusinessDataById(SimpleBusinessDataReference businessDataReference) throws Exception {
+    private void verifyCommandGetBusinessDataById(final SimpleBusinessDataReference businessDataReference) throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("businessDataId", businessDataReference.getStorageId());
         parameters.put("entityClassName", EMPLOYEE_QUALIF_CLASSNAME);
@@ -1255,7 +1263,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private void verifyCommandGetQuery_findByFirstNameAndLastNameNewOrder() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
 
         queryParameters.put("firstName", "Alphonse");
         queryParameters.put("lastName", "Dupond");
@@ -1277,7 +1285,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private void verifyCommandGetQuery_getEmployeeByPhoneNumber() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
 
         queryParameters.put("phoneNumber", "123456789");
 
@@ -1298,7 +1306,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private void verifyCommandGetQuery_findByFirstNameFetchAddresses() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
 
         queryParameters.put("firstName", "Alphonse");
 
@@ -1336,7 +1344,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private void verifyCommandGetQuery_findByHireDate() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
         queryParameters.put("date1","1930-01-15");
         queryParameters.put("date2","2050-12-31" );
 
@@ -1355,7 +1363,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     }
 
-    private String getJsonContent(String jsonFileName) throws IOException {
+    private String getJsonContent(final String jsonFileName) throws IOException {
         final String json;
         json = new String(IOUtils.toByteArray(this.getClass().getResourceAsStream(jsonFileName)));
         return json;
@@ -1428,10 +1436,41 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    private String getClientBdmJarClassPath(String bonitaHomePath) {
+    private String getClientBdmJarClassPath(final String bonitaHomePath) {
         String clientBdmJarPath;
         clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("server").append(File.separator).append("tenants")
                 .append(File.separator).append(tenantId).append(File.separator).append("data-management").append(File.separator).append("client").toString();
         return clientBdmJarPath;
     }
+
+    @Test
+    public void should_execute_a_connector_with_tenant_dependency() throws Exception {
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+
+        uninstallBusinessObjectModel();
+
+        BusinessObjectModel businessObjectModel = aBOM().
+                withBO(aBO("org.test.Restaurant").withField(aStringField("name").ofType(FieldType.STRING).build())
+                        .build())
+                .build();
+        installBusinessDataModel(businessObjectModel);
+
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
+        final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
+        final UserTaskDefinitionBuilder addUserTask = pBuilder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME);
+        addUserTask
+                .addConnector("myConnector1", "connectorInJar", "1.0.0", ConnectorEvent.ON_ENTER);
+        final DesignProcessDefinition done = pBuilder.done();
+        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(done);
+        builder.addConnectorImplementation(getResource("/com/bonitasoft/engine/business/data/TestConnectorInJar.impl", "TestConnectorInJar.impl"));
+        builder.addClasspathResource(getResource("/com/bonitasoft/engine/business/data/test-connector-with-bdm-0.0.1-SNAPSHOT.jar.bak",
+                "test-connector-with-bdm-0.0.1-SNAPSHOT.jar"));
+        final BusinessArchive businessArchive = builder.done();
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask(processInstance, "step1");
+        disableAndDeleteProcess(processDefinition);
+    }
+
 }
