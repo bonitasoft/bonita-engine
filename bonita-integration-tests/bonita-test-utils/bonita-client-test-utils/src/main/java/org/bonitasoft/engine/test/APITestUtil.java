@@ -952,10 +952,13 @@ public class APITestUtil extends PlatformTestUtil {
         return getFlowNodeInstance(activityId);
     }
 
-    public FlowNodeInstance waitForFlowNodeInCompletedState(final ProcessInstance processInstance, final String flowNodeName,
+    public ArchivedActivityInstance waitForActivityInCompletedState(final ProcessInstance processInstance, final String flowNodeName,
             final boolean useRootProcessInstance) throws Exception {
         final Long activityId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.NORMAL_FINAL, useRootProcessInstance);
-        return getFlowNodeInstance(activityId);
+        // we must wait for the activity to be completely archived:
+        final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(30, 8000, activityId, TestStates.NORMAL_FINAL, getProcessAPI());
+        assertTrue(waitForArchivedActivity.waitUntil());
+        return waitForArchivedActivity.getArchivedActivityInstance();
     }
 
     public FlowNodeInstance waitForFlowNodeInWaitingState(final ProcessInstance processInstance, final String flowNodeName,

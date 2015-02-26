@@ -730,4 +730,26 @@ public class ProfileServiceImpl implements ProfileService {
         return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
+    @Override
+    public void start() throws SBonitaException {
+        /*
+            Check that the default profiles are up to date
+         */
+
+    }
+
+    @Override
+    public void stop() throws SBonitaException {
+
+    }
+
+    @Override
+    public void pause() throws SBonitaException {
+
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+
+    }
 }

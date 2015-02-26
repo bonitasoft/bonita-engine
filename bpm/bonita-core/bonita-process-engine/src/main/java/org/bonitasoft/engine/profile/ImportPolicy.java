@@ -20,6 +20,6 @@ package org.bonitasoft.engine.profile;
  */
 public enum ImportPolicy {
 
-    DELETE_EXISTING, REPLACE_DUPLICATES, FAIL_ON_DUPLICATES, IGNORE_DUPLICATES; // , MERGE_DUPLICATES (Merge should retain existing IDs)
+    DELETE_EXISTING, REPLACE_DUPLICATES, FAIL_ON_DUPLICATES, IGNORE_DUPLICATES, UPDATE_DEFAULTS; // , MERGE_DUPLICATES (Merge should retain existing IDs)
 
 }

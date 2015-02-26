@@ -71,21 +71,39 @@ public class CacheServiceTest {
 
     protected CacheService getCacheService() {
         final List<CacheConfiguration> configurationsList = new ArrayList<CacheConfiguration>(2);
-        CacheConfiguration cacheConfiguration = new CacheConfiguration();
+        final CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName(SOME_DEFAULT_CACHE_NAME);
         cacheConfiguration.setTimeToLiveSeconds(1);
-        cacheConfiguration.setMaxElementsInMemory(100);
         cacheConfiguration.setMaxElementsInMemory(200);
         cacheConfiguration.setInMemoryOnly(true);
         configurationsList.add(cacheConfiguration);
-        cacheConfiguration = new CacheConfiguration();
-        cacheConfiguration.setName(ETERNAL_CACHE);
-        cacheConfiguration.setTimeToLiveSeconds(1);
-        cacheConfiguration.setMaxElementsInMemory(100);
-        cacheConfiguration.setMaxElementsInMemory(200);
-        cacheConfiguration.setInMemoryOnly(true);
-        cacheConfiguration.setEternal(true);
-        configurationsList.add(cacheConfiguration);
+
+        final CacheConfiguration cacheConfigurationEternal = new CacheConfiguration();
+        cacheConfigurationEternal.setName(ETERNAL_CACHE);
+        cacheConfigurationEternal.setTimeToLiveSeconds(1);
+        cacheConfigurationEternal.setMaxElementsInMemory(200);
+        cacheConfigurationEternal.setInMemoryOnly(true);
+        cacheConfigurationEternal.setEternal(true);
+        configurationsList.add(cacheConfigurationEternal);
+
+        final CacheConfiguration cacheConfiguration1 = new CacheConfiguration();
+        cacheConfiguration1.setName("test1");
+        cacheConfiguration1.setTimeToLiveSeconds(1);
+        cacheConfiguration1.setMaxElementsInMemory(10000);
+        cacheConfiguration1.setInMemoryOnly(false);
+        cacheConfiguration1.setEternal(false);
+        cacheConfiguration1.setCopyOnRead(true);
+        cacheConfiguration1.setCopyOnWrite(true);
+        configurationsList.add(cacheConfiguration1);
+
+        final CacheConfiguration cacheConfiguration2 = new CacheConfiguration();
+        cacheConfiguration2.setName("test2");
+        cacheConfiguration2.setTimeToLiveSeconds(1);
+        cacheConfiguration2.setMaxElementsInMemory(100000);
+        cacheConfiguration2.setInMemoryOnly(false);
+        cacheConfiguration2.setEternal(false);
+        configurationsList.add(cacheConfiguration2);
+
         final CacheConfigurations cacheConfigurations = new CacheConfigurations();
         cacheConfigurations.setConfigurations(configurationsList);
         return new EhCacheCacheService(new TechnicalLoggerService() {
@@ -117,7 +135,7 @@ public class CacheServiceTest {
             public long getSessionId() {
                 return 1;
             }
-        }, cacheConfigurations, this.getClass().getResource("/ehcache.xml"));
+        }, cacheConfigurations, new CacheConfiguration(), "target");
     }
 
     @Test

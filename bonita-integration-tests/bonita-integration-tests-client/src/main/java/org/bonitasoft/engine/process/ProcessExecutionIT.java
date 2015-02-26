@@ -32,7 +32,6 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
@@ -338,7 +337,7 @@ public class ProcessExecutionIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
 
-        final FlowNodeInstance auto1 = waitForFlowNodeInCompletedState(pi, "auto1", true);
+        final ArchivedActivityInstance auto1 = waitForActivityInCompletedState(pi, "auto1", true);
         assertEquals(null, auto1.getDisplayDescription());
 
         final ActivityInstance activityInstance = waitForTaskInState(pi, "task1", TestStates.READY);

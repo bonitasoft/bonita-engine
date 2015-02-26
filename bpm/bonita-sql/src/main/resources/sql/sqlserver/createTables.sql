@@ -243,7 +243,6 @@ CREATE TABLE arch_transition_instance (
   id NUMERIC(19, 0) NOT NULL,
   rootContainerId NUMERIC(19, 0) NOT NULL,
   parentContainerId NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(255) NOT NULL,
   source NUMERIC(19, 0),
   target NUMERIC(19, 0),
   state NVARCHAR(50),
@@ -308,6 +307,9 @@ CREATE TABLE process_instance (
   stringIndex5 NVARCHAR(255),
   PRIMARY KEY (tenantid, id)
 )
+GO
+
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, processdefinitionid, stateid)
 GO
 
 CREATE TABLE flownode_instance (

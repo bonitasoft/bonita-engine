@@ -24,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProfileImportStategyTest {
+public class ProfileImportStrategyTest {
 
     @Mock
     private ProfileService profileService;

@@ -20,6 +20,7 @@ import java.util.List;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 
+import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -34,6 +35,9 @@ public class CommonEhCacheCacheServiceTest {
 
     @Mock
     private CacheConfigurations cacheConfigurations;
+
+    @Mock
+    private CacheConfiguration defaultCacheConfiguration;
 
     @Mock
     private CacheManager cacheManager;
@@ -51,7 +55,7 @@ public class CommonEhCacheCacheServiceTest {
 
     @Before
     public void setup() {
-        cacheService = new EhCacheCacheService(logger, sessionAccessor, cacheConfigurations) {
+        cacheService = new EhCacheCacheService(logger, sessionAccessor, cacheConfigurations, defaultCacheConfiguration, null) {
 
             @Override
             public synchronized void start() {

@@ -220,7 +220,6 @@ CREATE TABLE arch_transition_instance (
   id BIGINT NOT NULL,
   rootContainerId BIGINT NOT NULL,
   parentContainerId BIGINT NOT NULL,
-  name VARCHAR(255) NOT NULL,
   source BIGINT,
   target BIGINT,
   state VARCHAR(50),
@@ -281,6 +280,8 @@ CREATE TABLE process_instance (
   stringIndex5 VARCHAR(255),
   PRIMARY KEY (tenantid, id)
 );
+
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, processdefinitionid, stateid);
 
 CREATE TABLE flownode_instance (
   tenantid BIGINT NOT NULL,
