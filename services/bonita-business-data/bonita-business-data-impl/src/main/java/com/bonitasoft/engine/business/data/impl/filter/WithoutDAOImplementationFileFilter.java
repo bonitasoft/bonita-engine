@@ -28,7 +28,7 @@ public class WithoutDAOImplementationFileFilter extends AbstractFileFilter {
     }
 
     private boolean notClientResource(final File file) {
-        return !file.getAbsolutePath().contains("com" + File.separatorChar + "bonitasoft");
+        return !file.getAbsolutePath().contains("com" + File.separatorChar + "bonitasoft"+ File.separatorChar);
     }
 
     private boolean acceptSourceFile(final File file, final String name) {

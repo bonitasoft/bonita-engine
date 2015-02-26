@@ -10,6 +10,7 @@ package com.bonitasoft.engine.monitoring.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -50,10 +51,34 @@ public class PlatformMonitoringServiceImplTest {
         doReturn(11L).when(transactionService).getNumberOfActiveTransactions();
 
         //when
-        long activeTransactions = platformMonitoringService.getNumberOfActiveTransactions();
+        final long activeTransactions = platformMonitoringService.getNumberOfActiveTransactions();
 
         //then
         assertThat(activeTransactions).isEqualTo(11);
+    }
+
+    @Test
+    public void isOptionalMonitoringInformationAvailableShouldBeTrueForSunJVM() throws Exception {
+        // given:
+        when(jvmMBean.getJvmVendor()).thenReturn("JVM Sun something");
+
+        // when:
+        final boolean optional = platformMonitoringService.isOptionalMonitoringInformationAvailable();
+
+        // then:
+        assertThat(optional).isTrue();
+    }
+
+    @Test
+    public void isOptionalMonitoringInformationAvailableShouldBeTrueForOracleJVM() throws Exception {
+        // given:
+        when(jvmMBean.getJvmVendor()).thenReturn("JVM Oracle something");
+
+        // when:
+        final boolean optional = platformMonitoringService.isOptionalMonitoringInformationAvailable();
+
+        // then:
+        assertThat(optional).isTrue();
     }
 
 }
