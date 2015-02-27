@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
- * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -36,6 +36,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
@@ -51,7 +52,6 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -103,6 +103,8 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
                     return getFromContextOrEngineExecutionContext(expressionConstant, context, containerState);
                 case LOGGED_USER_ID:
                     return getLoggedUserFromSession();
+                case LOOP_COUNTER:
+                    return getLoopCounter(context);
                 default:
                     final Object object = context.get(expressionConstant.getEngineConstantName());
                     if (object == null) {
@@ -135,6 +137,20 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         } catch (final SBonitaException e) {
             throw new SExpressionEvaluationException(e, expressionName);
         }
+    }
+
+    private Serializable getLoopCounter(Map<String, Object> context) throws SExpressionEvaluationException, SFlowNodeReadException, SFlowNodeNotFoundException {
+        final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
+            final long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
+        if( DataInstanceContainer.ACTIVITY_INSTANCE.toString().equals(containerType)){
+            SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(containerId);
+            if(flowNodeInstance instanceof SLoopActivityInstance){
+                return flowNodeInstance.getLoopCounter();
+            }
+            SLoopActivityInstance loopActivityInstance = (SLoopActivityInstance) activityInstanceService.getFlowNodeInstance(flowNodeInstance.getParentActivityInstanceId());
+            return loopActivityInstance.getLoopCounter();
+        }
+        throw new SExpressionEvaluationException("loopCounter is not available in this context","loopCounter");
     }
 
     protected APIAccessor getApiAccessor() {

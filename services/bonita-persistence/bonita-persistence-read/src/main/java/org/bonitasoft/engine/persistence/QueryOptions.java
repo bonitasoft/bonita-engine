@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -157,7 +157,7 @@ public class QueryOptions implements Serializable {
 
     public static QueryOptions getNextPage(final QueryOptions queryOptions) {
         return new QueryOptions(queryOptions.getFromIndex() + queryOptions.getNumberOfResults(), queryOptions.getNumberOfResults(),
-                queryOptions.getOrderByOptions());
+                queryOptions.getOrderByOptions(), queryOptions.getFilters(), queryOptions.getMultipleFilter());
     }
 
     @Override
@@ -170,19 +170,31 @@ public class QueryOptions implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof QueryOptions)) return false;
-
-        QueryOptions that = (QueryOptions) o;
-
-        if (fromIndex != that.fromIndex) return false;
-        if (numberOfResults != that.numberOfResults) return false;
-        if (filters != null ? !filters.equals(that.filters) : that.filters != null) return false;
-        if (multipleFilter != null ? !multipleFilter.equals(that.multipleFilter) : that.multipleFilter != null)
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof QueryOptions)) {
             return false;
-        if (orderByOptions != null ? !orderByOptions.equals(that.orderByOptions) : that.orderByOptions != null)
+        }
+
+        final QueryOptions that = (QueryOptions) o;
+
+        if (fromIndex != that.fromIndex) {
             return false;
+        }
+        if (numberOfResults != that.numberOfResults) {
+            return false;
+        }
+        if (filters != null ? !filters.equals(that.filters) : that.filters != null) {
+            return false;
+        }
+        if (multipleFilter != null ? !multipleFilter.equals(that.multipleFilter) : that.multipleFilter != null) {
+            return false;
+        }
+        if (orderByOptions != null ? !orderByOptions.equals(that.orderByOptions) : that.orderByOptions != null) {
+            return false;
+        }
 
         return true;
     }

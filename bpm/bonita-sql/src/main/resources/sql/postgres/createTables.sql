@@ -195,8 +195,8 @@ CREATE TABLE arch_flownode_instance (
   archiveDate INT8 NOT NULL,
   rootContainerId INT8 NOT NULL,
   parentContainerId INT8 NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  displayName VARCHAR(75),
+  name VARCHAR(255) NOT NULL,
+  displayName VARCHAR(255),
   displayDescription VARCHAR(255),
   stateId INT NOT NULL,
   stateName VARCHAR(50),
@@ -244,7 +244,6 @@ CREATE TABLE arch_transition_instance (
   id INT8 NOT NULL,
   rootContainerId INT8 NOT NULL,
   parentContainerId INT8 NOT NULL,
-  name VARCHAR(255) NOT NULL,
   source INT8,
   target INT8,
   state VARCHAR(50),
@@ -306,6 +305,8 @@ CREATE TABLE process_instance (
   PRIMARY KEY (tenantid, id)
 );
 
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, processdefinitionid, stateid);
+
 CREATE TABLE flownode_instance (
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
@@ -313,8 +314,8 @@ CREATE TABLE flownode_instance (
   kind VARCHAR(25) NOT NULL,
   rootContainerId INT8 NOT NULL,
   parentContainerId INT8 NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  displayName VARCHAR(75),
+  name VARCHAR(255) NOT NULL,
+  displayName VARCHAR(255),
   displayDescription VARCHAR(255),
   stateId INT NOT NULL,
   stateName VARCHAR(50),
@@ -692,9 +693,9 @@ CREATE TABLE external_identity_mapping (
 CREATE TABLE group_ (
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  name VARCHAR(125) NOT NULL,
   parentPath VARCHAR(255),
-  displayName VARCHAR(75),
+  displayName VARCHAR(255),
   description TEXT,
   iconName VARCHAR(50),
   iconPath VARCHAR(50),
@@ -708,8 +709,8 @@ CREATE TABLE group_ (
 CREATE TABLE role (
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  displayName VARCHAR(75),
+  name VARCHAR(255) NOT NULL,
+  displayName VARCHAR(255),
   description TEXT,
   iconName VARCHAR(50),
   iconPath VARCHAR(50),
@@ -733,7 +734,6 @@ CREATE TABLE user_ (
   title VARCHAR(50),
   jobTitle VARCHAR(255),
   managerUserId INT8,
-  delegeeUserName VARCHAR(50),
   iconName VARCHAR(50),
   iconPath VARCHAR(50),
   createdBy INT8,
@@ -764,10 +764,10 @@ CREATE TABLE user_contactinfo (
   room VARCHAR(50),
   address VARCHAR(255),
   zipCode VARCHAR(50),
-  city VARCHAR(50),
-  state VARCHAR(50),
-  country VARCHAR(50),
-  website VARCHAR(50),
+  city VARCHAR(255),
+  state VARCHAR(255),
+  country VARCHAR(255),
+  website VARCHAR(255),
   personal BOOLEAN NOT NULL,
   UNIQUE (tenantid, userId, personal),
   PRIMARY KEY (tenantid, id)

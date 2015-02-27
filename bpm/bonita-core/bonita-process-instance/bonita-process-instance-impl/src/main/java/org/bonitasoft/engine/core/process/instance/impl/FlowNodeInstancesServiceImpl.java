@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -31,6 +31,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
@@ -38,7 +39,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManua
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.events.EventActionType;
@@ -177,7 +177,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         if (displayName != null && !displayName.equals(flowNodeInstance.getDisplayName())) {
             final String key = activityInstanceKeyProvider.getDisplayNameKey();
             final String event = ACTIVITYINSTANCE_DISPLAY_NAME;
-            updateOneField(flowNodeInstance, displayName, event, key, 75);
+            updateOneField(flowNodeInstance, displayName, event, key, 255);
         }
     }
 
@@ -216,9 +216,9 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         }
     }
 
-    private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeValue, final String event, final String attributeKey,
-            final int maxLengh) throws SFlowNodeModificationException {
-        final String truncatedValue = getTruncated(attributeValue, maxLengh, flowNodeInstance, attributeKey);
+    protected void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeValue, final String event, final String attributeKey,
+            final int maxLength) throws SFlowNodeModificationException {
+        final String truncatedValue = getTruncated(attributeValue, maxLength, flowNodeInstance, attributeKey);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(attributeKey, truncatedValue);
 
@@ -271,10 +271,12 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public List<SFlowNodeInstance> getFlowNodeInstances(final long parentProcessInstanceId, final int fromIndex, final int maxResults) throws SFlowNodeReadException {
+    public List<SFlowNodeInstance> getFlowNodeInstances(final long parentProcessInstanceId, final int fromIndex, final int maxResults)
+            throws SFlowNodeReadException {
         List<SFlowNodeInstance> selectList;
         try {
-            selectList = getPersistenceService().selectList(SelectDescriptorBuilder.getFlowNodesFromProcessInstance(parentProcessInstanceId, fromIndex, maxResults));
+            selectList = getPersistenceService().selectList(
+                    SelectDescriptorBuilder.getFlowNodesFromProcessInstance(parentProcessInstanceId, fromIndex, maxResults));
         } catch (final SBonitaReadException e) {
             throw new SFlowNodeReadException(e);
         }
@@ -522,7 +524,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public int getNumberOfFlowNodes(long parentProcessInstanceId) throws SBonitaReadException {
+    public int getNumberOfFlowNodes(final long parentProcessInstanceId) throws SBonitaReadException {
         return getPersistenceService().selectOne(SelectDescriptorBuilder.getNumberOfFlowNode(parentProcessInstanceId)).intValue();
     }
 }

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.business.application.model.impl">
+
+	<filter-def name="tenantFilter" condition=":tenantId = tenantId">
+		<filter-param name="tenantId" type="long" />
+	</filter-def>
+
+	<class name="SApplicationImpl" table="business_app">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="token" column="token" />
+		<property name="displayName" column="displayName" />
+		<property name="version" column="version" />
+		<property name="description" column="description" />
+		<property name="iconPath" column="iconPath" />
+		<property name="creationDate" column="creationDate" />
+		<property name="createdBy" column="createdBy" />
+		<property name="lastUpdateDate" column="lastUpdateDate" />
+		<property name="updatedBy" column="updatedBy" />
+		<property name="state" column="state" />
+		<property name="homePageId" column="homePageId" />
+		<property name="profileId" column="profileId" />
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="SApplicationPageImpl" table="business_app_page">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="applicationId" column="applicationId" />
+		<property name="pageId" column="pageId" />
+		<property name="token" column="token" />
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="SApplicationMenuImpl" table="business_app_menu">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="displayName" column="displayName" />
+		<property name="applicationId" column="applicationId" />
+		<property name="applicationPageId" column="applicationPageId" />
+		<property name="parentId" column="parentId" />
+		<property name="index" column="index_" />
+		<filter name="tenantFilter" />
+	</class>
+
+</hibernate-mapping>

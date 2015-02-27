@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -738,4 +738,26 @@ public class ProfileServiceImpl implements ProfileService {
         return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
+    @Override
+    public void start() throws SBonitaException {
+        /*
+            Check that the default profiles are up to date
+         */
+
+    }
+
+    @Override
+    public void stop() throws SBonitaException {
+
+    }
+
+    @Override
+    public void pause() throws SBonitaException {
+
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+
+    }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -30,9 +31,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
+import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
@@ -126,9 +129,12 @@ import org.bonitasoft.engine.test.wait.WaitForDataValue;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
 import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 /**
  * @author Emmanuel Duchastenier
@@ -171,6 +177,10 @@ public class APITestUtil extends PlatformTestUtil {
 
     private PermissionAPI permissionAPI;
 
+    private PageAPI pageAPI;
+
+    private ApplicationAPI applicationAPI;
+
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
         if (strTimeout != null) {
@@ -210,6 +220,8 @@ public class APITestUtil extends PlatformTestUtil {
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
+        setPageAPI(TenantAPIAccessor.getCustomPageAPI(getSession()));
+        applicationAPI = TenantAPIAccessor.getLivingApplicationAPI(getSession());
     }
 
     public void logoutOnTenant() throws BonitaException {
@@ -934,10 +946,13 @@ public class APITestUtil extends PlatformTestUtil {
         return getFlowNodeInstance(activityId);
     }
 
-    public FlowNodeInstance waitForFlowNodeInCompletedState(final ProcessInstance processInstance, final String flowNodeName,
+    public ArchivedActivityInstance waitForActivityInCompletedState(final ProcessInstance processInstance, final String flowNodeName,
             final boolean useRootProcessInstance) throws Exception {
         final Long activityId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.NORMAL_FINAL, useRootProcessInstance);
-        return getFlowNodeInstance(activityId);
+        // we must wait for the activity to be completely archived:
+        final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(30, 8000, activityId, TestStates.NORMAL_FINAL, getProcessAPI());
+        assertTrue(waitForArchivedActivity.waitUntil());
+        return waitForArchivedActivity.getArchivedActivityInstance();
     }
 
     public FlowNodeInstance waitForFlowNodeInWaitingState(final ProcessInstance processInstance, final String flowNodeName,
@@ -1443,6 +1458,18 @@ public class APITestUtil extends PlatformTestUtil {
         this.session = session;
     }
 
+    protected void setPageAPI(final PageAPI pageAPI) {
+        this.pageAPI = pageAPI;
+    }
+
+    public PageAPI getPageAPI() {
+        return pageAPI;
+    }
+
+    public ApplicationAPI getApplicationAPI() {
+        return applicationAPI;
+    }
+
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
         if (processSupervisors != null) {
             for (final ProcessSupervisor processSupervisor : processSupervisors) {
@@ -1514,6 +1541,14 @@ public class APITestUtil extends PlatformTestUtil {
             processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
         }
         return processDefinitions;
+    }
+
+    protected void assertThatXmlHaveNoDifferences(final String xmlPrettyFormatExpected, final String xmlPrettyFormatExported) throws SAXException, IOException {
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+        final DetailedDiff diff = new DetailedDiff(XMLUnit.compareXML(xmlPrettyFormatExported, xmlPrettyFormatExpected));
+        final List<?> allDifferences = diff.getAllDifferences();
+        assertThat(allDifferences).as("should have no differences between:\n%s\n and:\n%s\n", xmlPrettyFormatExpected, xmlPrettyFormatExported).isEmpty();
     }
 
 }

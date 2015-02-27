@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -29,7 +29,7 @@ import org.bonitasoft.engine.profile.model.SProfile;
 /**
  * @author Baptiste Mesta
  */
-public class DeleteExistingImportStrategy extends ProfileImportStategy {
+public class DeleteExistingImportStrategy extends ProfileImportStrategy {
 
     public DeleteExistingImportStrategy(final ProfileService profileService) {
         super(profileService);
@@ -63,6 +63,11 @@ public class DeleteExistingImportStrategy extends ProfileImportStategy {
     @Override
     public boolean canCreateProfileIfNotExists(final ExportedProfile exportedProfile) {
         return true;
+    }
+
+    @Override
+    public boolean shouldUpdateProfileEntries(ExportedProfile exportedProfile, SProfile existingProfile) {
+        return false;
     }
 
 }

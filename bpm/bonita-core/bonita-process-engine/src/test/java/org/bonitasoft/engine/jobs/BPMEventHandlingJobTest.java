@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,6 +16,7 @@ package org.bonitasoft.engine.jobs;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -35,6 +36,7 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageEventCoupleImpl;
 import org.bonitasoft.engine.scheduler.JobParameter;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -68,7 +70,7 @@ public class BPMEventHandlingJobTest {
     private BPMEventHandlingJob bPMEventHandlingJob;
 
     /**
-     * Test method for {@link org.bonitasoft.engine.jobs.BPMEventHandlingJob#getMessageUniqueCouples()}.
+     * Test method for {@link BPMEventHandlingJob#getMessageUniqueCouples(java.util.List)}.
      */
     @Test
     public void getMessageUniqueCouplesWithDuplicateMessage() throws SEventTriggerInstanceReadException {
@@ -87,10 +89,9 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).getMessageEventCouples();
 
         // When
-        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
+        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples(messageCouples);
 
         // Then
         assertEquals(2, uniqueCouples.size());
@@ -119,10 +120,9 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).getMessageEventCouples();
 
         // When
-        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
+        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples(messageCouples);
 
         // Then
         assertEquals(2, uniqueCouples.size());
@@ -149,10 +149,9 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).getMessageEventCouples();
 
         // When
-        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
+        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples(messageCouples);
 
         // Then
         assertEquals(2, uniqueCouples.size());
@@ -179,10 +178,9 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(3);
         messageCouples.addAll(Arrays.asList(couple1, couple2));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).getMessageEventCouples();
 
         // When
-        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
+        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples(messageCouples);
 
         // Then
         assertEquals(1, uniqueCouples.size());
@@ -212,10 +210,9 @@ public class BPMEventHandlingJobTest {
 
         final List<SMessageEventCouple> messageCouples = new ArrayList<SMessageEventCouple>(4);
         messageCouples.addAll(Arrays.asList(couple1, couple2, couple3, couple4));
-        doReturn(messageCouples).doReturn(Collections.EMPTY_LIST).when(bPMEventHandlingJob).getMessageEventCouples();
 
         // When
-        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples();
+        final List<SMessageEventCouple> uniqueCouples = bPMEventHandlingJob.getMessageUniqueCouples(messageCouples);
 
         // Then
         assertEquals(2, uniqueCouples.size());
@@ -248,10 +245,12 @@ public class BPMEventHandlingJobTest {
     @Test
     public void executeShouldRegisterASynchroWhenMessageCouplesAreEqualToTheBatchSize() throws Exception {
         final List<SMessageEventCouple> messageCouples = mock(List.class);
+        final List<SMessageEventCouple> uniqueCouples = mock(List.class);
         final Iterator<SMessageEventCouple> iterator = mock(Iterator.class);
-        doReturn(messageCouples).when(bPMEventHandlingJob).getMessageUniqueCouples();
+        doReturn(messageCouples).when(bPMEventHandlingJob).getMessageEventCouples();
+        doReturn(uniqueCouples).when(bPMEventHandlingJob).getMessageUniqueCouples(messageCouples);
         when(messageCouples.size()).thenReturn(1000);
-        when(messageCouples.iterator()).thenReturn(iterator);
+        when(uniqueCouples.iterator()).thenReturn(iterator);
 
         bPMEventHandlingJob.execute();
 
@@ -262,7 +261,7 @@ public class BPMEventHandlingJobTest {
     public void executeShouldOnlyRegisterWorks() throws Exception {
         final List<SMessageEventCouple> messageCouples = mock(List.class);
         final Iterator<SMessageEventCouple> iterator = mock(Iterator.class);
-        doReturn(messageCouples).when(bPMEventHandlingJob).getMessageUniqueCouples();
+        doReturn(messageCouples).when(bPMEventHandlingJob).getMessageUniqueCouples(anyListOf(SMessageEventCouple.class));
         when(messageCouples.size()).thenReturn(450);
         when(messageCouples.iterator()).thenReturn(iterator);
 
@@ -273,7 +272,7 @@ public class BPMEventHandlingJobTest {
 
     @Test(expected = SJobExecutionException.class)
     public void executeShouldThrowAJobExceptionIfAnExceptionOccurs() throws Exception {
-        doThrow(new SEventTriggerInstanceReadException("ouch", null)).when(bPMEventHandlingJob).getMessageUniqueCouples();
+        doThrow(new SEventTriggerInstanceReadException("ouch", null)).when(bPMEventHandlingJob).getMessageUniqueCouples(anyListOf(SMessageEventCouple.class));
 
         bPMEventHandlingJob.execute();
 

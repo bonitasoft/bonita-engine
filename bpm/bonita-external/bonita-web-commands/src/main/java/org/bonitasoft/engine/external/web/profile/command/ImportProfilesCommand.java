@@ -1,19 +1,19 @@
 /**
- * Copyright (C) 2012-2014 Bonitasoft S.A.
- * Bonitasoft, 31 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.external.web.profile.command;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class ImportProfilesCommand extends TenantCommand {
         final ProfileService profileService = serviceAccessor.getProfileService();
         final IdentityService identityService = serviceAccessor.getIdentityService();
 
-        byte[] xmlContent = null;
+        byte[] xmlContent;
         try {
             xmlContent = (byte[]) parameters.get("xmlContent");
             if (xmlContent == null) {
@@ -67,6 +67,8 @@ public class ImportProfilesCommand extends TenantCommand {
             return (Serializable) ProfilesImporter.toWarnings(new ProfilesImporter(profileService, identityService, profiles, ImportPolicy.DELETE_EXISTING)
                     .importProfiles(SessionInfos.getUserIdFromSession()));
         } catch (ExecutionException e) {
+            throw new SCommandExecutionException(e);
+        } catch (IOException e) {
             throw new SCommandExecutionException(e);
         }
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,6 +16,7 @@ package org.bonitasoft.engine.userfilter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
@@ -24,6 +25,7 @@ import org.bonitasoft.engine.core.filter.exception.SUserFilterLoadingException;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.expression.EngineConstantExpressionBuilder;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 
 /**
  * This {@link UserFilterService} implementation injects, in method {@link #executeFilter(long, SUserFilterDefinition, Map, ClassLoader)} a new expression to

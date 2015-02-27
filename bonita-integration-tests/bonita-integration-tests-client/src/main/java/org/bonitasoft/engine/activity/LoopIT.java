@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.activity;
 
 import static org.junit.Assert.assertEquals;
@@ -30,6 +43,7 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
+import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -153,36 +167,31 @@ public class LoopIT extends TestWithUser {
     }
 
     @Test
-    @Ignore("BS-11655")
-    public void executeAStandardLoopWithDataUsingLoopCounter() throws Exception {
-        final Expression condition = new ExpressionBuilder().createGroovyScriptExpression("executeAStandardLoopWithDataUsingLoopCounter",
-                "loopCounter < 3", Boolean.class.getName(), Arrays.asList(new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
+    public void executeAStandardLoopWithConditionUsingDataUsingLoopCounter() throws Exception {
+        final Expression condition = new ExpressionBuilder().createGroovyScriptExpression("executeAStandardLoopWithConditionUsingLoopCounter",
+                "pData + loopCounter < 6", Boolean.class.getName(), Arrays.asList(new ExpressionBuilder().createDataExpression("pData",Integer.class.getName()),new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAStandardLoopUserTask", "1.0");
         builder.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
-
-        final Expression defaultValueExpression = new ExpressionBuilder().createGroovyScriptExpression("useLoopCounter",
-                "loopCounter", Integer.class.getName(), Arrays.asList(new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
-
-        final UserTaskDefinitionBuilder userTask = builder.addUserTask("step1", ACTOR_NAME);
-        userTask.addData("loopCounterData", Integer.class.getName(), defaultValueExpression);
-        userTask.addLoop(false, condition);
-
+        builder.addData("pData", Integer.class.getName(), null);
+        UserTaskDefinitionBuilder step1 = builder.addUserTask("step1", ACTOR_NAME);
+        step1.addLoop(false, condition);
+        step1.addData("theData", Integer.class.getName(), new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER));
+        step1.addOperation(new OperationBuilder().createSetDataOperation("pData",new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
         builder.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        for (int i = 1; i <= 3; i++) {
-            final long stepId;
-            stepId = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
-            assignAndExecuteStep(stepId, user);
-            final DataInstance loopCounterData = getProcessAPI().getActivityDataInstance("loopCounterData", stepId);
-            assertEquals(loopCounterData.getValue(), i);
+        for (int i = 0; i < 3; i++) {
+            final long step1Id = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
+            assignAndExecuteStep(step1Id, user);
         }
         waitForUserTaskAndcheckPendingHumanTaskInstances("step2", processInstance);
+
         disableAndDeleteProcess(processDefinition);
     }
+
 
     private long waitForUserTaskAndcheckPendingHumanTaskInstances(final String userTaskName, final ProcessInstance processInstance)
             throws Exception {

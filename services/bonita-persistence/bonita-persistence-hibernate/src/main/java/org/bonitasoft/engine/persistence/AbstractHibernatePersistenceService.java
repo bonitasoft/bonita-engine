@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -130,15 +131,18 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      * @throws ClassNotFoundException
      */
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
-            final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
-            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
+            final Properties extraHibernateProperties, final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter,
+            final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
+            final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
         super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
         orderByCheckingMode = getOrderByCheckingMode();
         Configuration configuration;
         try {
             configuration = hbmConfigurationProvider.getConfiguration();
+            if (extraHibernateProperties != null) {
+                configuration.addProperties(extraHibernateProperties);
+            }
         } catch (final ConfigurationException e) {
             throw new SPersistenceException(e);
         }

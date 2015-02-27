@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,9 +13,10 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,16 +27,26 @@ import java.util.Map;
 
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
+import org.bonitasoft.engine.expression.impl.condition.BinaryComparatorExecutor;
+import org.bonitasoft.engine.expression.impl.condition.LogicalComplementExecutor;
+import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ConditionExpressionExecutorStrategyTest {
 
+    @InjectMocks
     private ConditionExpressionExecutorStrategy strategy;
 
     private ArrayList<SExpression> dependFirstLtSecond;
@@ -46,10 +57,11 @@ public class ConditionExpressionExecutorStrategyTest {
 
     private HashMap<Integer, Object> resolvedDependencies;
 
-    @Before
-    public void setup() {
-        strategy = new ConditionExpressionExecutorStrategy();
-    }
+    @Mock
+    private LogicalComplementExecutor logicalComplementExecutor;
+
+    @Mock
+    private BinaryComparatorExecutor binaryComparatorExecutor;
 
     @Before
     public void initialiseDependencies() {
@@ -76,14 +88,6 @@ public class ConditionExpressionExecutorStrategyTest {
         resolvedDependencies.put(constExpr3.getDiscriminant(), 2);
     }
 
-    /**
-     * @param string
-     * @param typeConstant
-     * @param name
-     * @param object
-     * @param object2
-     * @return
-     */
     private SExpression buildExpression(final String content, final String expressionType, final String returnType, final String interpreter,
             final List<SExpression> dependencies) {
         final SExpressionImpl eb = new SExpressionImpl();
@@ -96,296 +100,118 @@ public class ConditionExpressionExecutorStrategyTest {
         return eb;
     }
 
-    @Test
-    public void evaluateConditionExpressionGraterThan() throws Exception {
-        final SExpression expr1 = buildExpression(">", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, true, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr2 = buildExpression(">", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, false, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr3 = buildExpression(">", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, false, resolvedDependencies, ContainerState.ACTIVE);
-    }
-
-    protected void evaluateAndCheckResult(final SExpression expression, final Object expectedValue, final Map<Integer, Object> resolvedExpression,
-            final ContainerState containerState)
-            throws Exception {
-        final Object expressionResult = evaluate(expression, resolvedExpression, containerState);
-        assertEquals(expectedValue, expressionResult);
-    }
-
-    protected Object evaluate(final SExpression expression, final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
-            throws SExpressionEvaluationException {
-        return strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions, containerState);
-    }
-
     protected List<Object> evaluate(final List<SExpression> expression, final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
             throws SExpressionEvaluationException {
         return strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions, containerState);
     }
 
     @Test
-    public void evaluateConditionExpressionGraterThanOrEquals() throws Exception {
-        final SExpression expr1 = buildExpression(">=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, true, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr2 = buildExpression(">=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, false, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr3 = buildExpression(">=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, true, resolvedDependencies, ContainerState.ACTIVE);
-    }
-
-    @Test
-    public void evaluateConditionExpressionLowerThan() throws Exception {
-        final SExpression expr1 = buildExpression("<", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, false, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr2 = buildExpression("<", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, true, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr3 = buildExpression("<", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, false, resolvedDependencies, ContainerState.ACTIVE);
-    }
-
-    @Test
-    public void evaluateConditionExpressionLowerThanOrEquals() throws Exception {
-        final SExpression expr1 = buildExpression("<=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, false, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr2 = buildExpression("<=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, true, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr3 = buildExpression("<=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, true, resolvedDependencies, ContainerState.ACTIVE);
-    }
-
-    @Test
-    public void evaluateConditionExpressionEquals() throws Exception {
-        final SExpression expr1 = buildExpression("==", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, false, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr2 = buildExpression("==", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, false, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr3 = buildExpression("==", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, true, resolvedDependencies, ContainerState.ACTIVE);
-    }
-
-    @Test
-    public void evaluateConditionExpressionDifferent() throws Exception {
-        final SExpression expr1 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        evaluateAndCheckResult(expr1, true, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr2 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
-        evaluateAndCheckResult(expr2, true, resolvedDependencies, ContainerState.ACTIVE);
-
-        final SExpression expr3 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        evaluateAndCheckResult(expr3, false, resolvedDependencies, ContainerState.ACTIVE);
-    }
-
-    @Test
-    public void evaluateConditionExpressionBooleanOperator() throws Exception {
-
-        final SExpression booleanDependTrueExpr = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
-        final SExpression boleanOperatorExpr1 = buildExpression("!", SExpression.TYPE_CONDITION, Boolean.class.getName(), null,
-                Collections.singletonList(booleanDependTrueExpr));
-        evaluateAndCheckResult(boleanOperatorExpr1, false, Collections.<Integer, Object> singletonMap(booleanDependTrueExpr.getDiscriminant(), true),
-                ContainerState.ACTIVE);
-
-        final SExpression booleanDependFalseExpr = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        final SExpression boleanOperatorExpr2 = buildExpression("!", SExpression.TYPE_CONDITION, Boolean.class.getName(), null,
-                Collections.singletonList(booleanDependFalseExpr));
-        evaluateAndCheckResult(boleanOperatorExpr2, true, Collections.<Integer, Object> singletonMap(booleanDependFalseExpr.getDiscriminant(), false),
-                ContainerState.ACTIVE);
-    }
-
-    @Test
-    public void evaluateConditionListOfExpressions() throws Exception {
+    public void evaluate_lstOfExpressions_should_return_list_of_results() throws Exception {
+        //given
         final SExpression expr1 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstGtSecond);
         final SExpression expr2 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependFirstLtSecond);
         final SExpression expr3 = buildExpression("!=", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, dependEquals);
-        final List<SExpression> expressions = new ArrayList<SExpression>(3);
-        expressions.add(expr1);
-        expressions.add(expr2);
-        expressions.add(expr3);
 
-        final List<Object> resolvedExpressions = evaluate(expressions, resolvedDependencies, ContainerState.ACTIVE);
-        assertEquals(3, resolvedExpressions.size());
-        assertTrue((Boolean) resolvedExpressions.get(0));
-        assertTrue((Boolean) resolvedExpressions.get(1));
-        assertFalse((Boolean) resolvedExpressions.get(2));
+        Map<String, Object> context = Collections.emptyMap();
+        ConditionExpressionExecutorStrategy mockedStrategy = spy(strategy);
+        given(mockedStrategy.evaluate(expr1, context, resolvedDependencies, ContainerState.ACTIVE)).willReturn(true);
+        given(mockedStrategy.evaluate(expr2, context, resolvedDependencies, ContainerState.ACTIVE)).willReturn(false);
+        given(mockedStrategy.evaluate(expr3, context, resolvedDependencies, ContainerState.ACTIVE)).willReturn(null);
+
+        //when
+        List<Object> resolvedExpressions = mockedStrategy.evaluate(Arrays.asList(expr1, expr2, expr3), context, resolvedDependencies, ContainerState.ACTIVE);
+
+        //then
+        assertThat(resolvedExpressions).containsExactly(true, false, null);
     }
 
     @Test
-    public void compareNumericEqualsLongInteger() throws Exception {
-        final SExpression unLong = buildExpression("1l", SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
-        final SExpression unInteger = buildExpression("1", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
-        compare(true, "==", unLong, unInteger, Long.valueOf(1l), Integer.valueOf(1));
+    public void evaluate_should_return_result_of_LogicalComplementExecutor_when_content_is_logical_complement_operator() throws Exception {
+        //given
+        Map<Integer, Object> resolvedExpressions = Collections.emptyMap();
+        SExpression expression = mock(SExpression.class);
+        given(expression.getContent()).willReturn(ConditionExpressionExecutorStrategy.LOGICAL_COMPLEMENT_OPERATOR);
+
+        given(logicalComplementExecutor.evaluate(resolvedExpressions, expression)).willReturn(true);
+
+        //when
+        Object value = strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions, ContainerState.ACTIVE);
+
+        //then
+        assertThat(value).isEqualTo(true);
     }
 
     @Test
-    public void compareNumericEqualsIntegerLong() throws Exception {
-        final SExpression unLong = buildExpression("1l", SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
-        final SExpression unInteger = buildExpression("1", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
-        compare(true, "==", unInteger, unLong, Integer.valueOf(1), Long.valueOf(1l));
+    public void evaluate_should_return_result_of_BinaryComparatorExecutor_when_content_is_a_binary_operator() throws Exception {
+        //given
+        Map<Integer, Object> resolvedExpressions = Collections.emptyMap();
+        SExpression expression = mock(SExpression.class);
+        given(expression.getContent()).willReturn(ConditionExpressionExecutorStrategy.GREATER_THAN_COMPARATOR);
+
+        given(binaryComparatorExecutor.evaluate(resolvedExpressions, expression)).willReturn(true);
+
+        //when
+        Object value = strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions, ContainerState.ACTIVE);
+
+        //then
+        assertThat(value).isEqualTo(true);
     }
 
     @Test
-    public void compareNumericGreaterLongInteger() throws Exception {
-        final SExpression unLong = buildExpression("2l", SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
-        final SExpression unInteger = buildExpression("1", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
-        compare(true, ">=", unLong, unInteger, Long.valueOf(2l), Integer.valueOf(1));
+    public void mustPutEvaluatedExpressionInContext_should_return_false() throws Exception {
+        //given
+
+        //when
+        boolean value = strategy.mustPutEvaluatedExpressionInContext();
+
+        //then
+        assertThat(value).isFalse();
     }
 
     @Test
-    public void compareNumericGreaterDoubleLong() throws Exception {
-        final SExpression aDouble = buildExpression("2.00d", SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
-        final SExpression aLong = buildExpression("1l", SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
-        compare(true, ">=", aDouble, aLong, Double.valueOf(2.00d), Long.valueOf(1l));
-        compare(true, ">=", aDouble, aLong, 2.00d, 1l);
+    public void getExpressionKind_should_return() throws Exception {
+        //given
+
+        //when
+        ExpressionKind kind = strategy.getExpressionKind();
+
+        //then
+        assertThat(kind.getInterpreter()).isEqualTo(ExpressionKind.NONE);
+        assertThat(kind.getType()).isEqualTo(SExpression.TYPE_CONDITION);
     }
 
-    @Test
-    public void compareNumericGreaterDoubleInteger() throws Exception {
-        final SExpression aDouble = buildExpression("2.00d", SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
-        final SExpression anInteger = buildExpression("1", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
-        compare(true, ">=", aDouble, anInteger, Double.valueOf(2.00d), Integer.valueOf(1));
-        compare(true, ">=", aDouble, anInteger, 2.00d, 1);
-        compare(false, "<", aDouble, anInteger, Double.valueOf(2.00d), Integer.valueOf(1));
-        compare(false, "<", aDouble, anInteger, 2.00d, 1);
+    @Test(expected = SInvalidExpressionException.class)
+    public void validate_should_throw_exception_if_expression_is_null() throws Exception {
+        //given
+
+        //when
+        strategy.validate(null);
+
+        //then exception
     }
 
-    @Test
-    public void compareNumericGreaterFloatByte() throws Exception {
-        final SExpression aFloat = buildExpression("2.00d", SExpression.TYPE_CONSTANT, Float.class.getName(), null, null);
-        final SExpression aByte = buildExpression("1", SExpression.TYPE_CONSTANT, Byte.class.getName(), null, null);
-        compare(true, ">=", aFloat, aByte, Float.valueOf(2.00f), (byte) 1);
-        compare(true, ">=", aFloat, aByte, 2.00f, Byte.valueOf((byte) 1));
+    @Test(expected = SInvalidExpressionException.class)
+    public void validate_should_throw_exception_if_expression_content_is_null() throws Exception {
+        //given
+        SExpression expression = mock(SExpression.class);
+        given(expression.getContent()).willReturn(null);
+
+        //when
+        strategy.validate(expression);
+
+        //then exception
     }
 
-    @Test
-    public void compareNumericGreaterIntegerLong() throws Exception {
-        final SExpression unLong = buildExpression("1l", SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
-        final SExpression unInteger = buildExpression("2", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
-        compare(true, ">=", unInteger, unLong, Integer.valueOf(2), Long.valueOf(1l));
+    @Test(expected = SInvalidExpressionException.class)
+    public void validate_should_throw_exception_if_expression_content_is_an_invalid_operator() throws Exception {
+        //given
+        SExpression expression = mock(SExpression.class);
+        given(expression.getContent()).willReturn("^");
+
+        //when
+        strategy.validate(expression);
+
+        //then exception
     }
 
-    @Test
-    public void compareNumericNotEqualsLongInteger() throws Exception {
-        final SExpression unLong = buildExpression("2l", SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
-        final SExpression unInteger = buildExpression("1", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
-        compare(true, "!=", unLong, unInteger, Long.valueOf(2l), Integer.valueOf(1));
-    }
-
-    @Test
-    public void compareNumericNotEqualsIntegerLong() throws Exception {
-        final SExpression unLong = buildExpression("2l", SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
-        final SExpression unInteger = buildExpression("2", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
-        compare(false, "!=", unInteger, unLong, Integer.valueOf(2), Long.valueOf(2l));
-    }
-
-    @Test
-    public void compareNumericEqualsDoubleFloat() throws Exception {
-        final SExpression aDouble = buildExpression("1.1d", SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
-        final SExpression aFloat = buildExpression("1.1f", SExpression.TYPE_CONSTANT, Float.class.getName(), null, null);
-        compare(true, "==", aDouble, aFloat, Double.valueOf(1.1d), Float.valueOf(1.1f));
-    }
-
-    @Test
-    public void compareNumericEqualsFloatDouble() throws Exception {
-        final SExpression unFloat = buildExpression("1.1d", SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
-        final SExpression unInteger = buildExpression("1.1f", SExpression.TYPE_CONSTANT, Float.class.getName(), null, null);
-        compare(true, "==", unInteger, unFloat, Float.valueOf(1.1f), Double.valueOf(1.1d));
-    }
-
-    @Test
-    public void compareNumericGreaterDoubleFloat() throws Exception {
-        final SExpression unDouble = buildExpression("2.1d", SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
-        final SExpression unFloat = buildExpression("1.1f", SExpression.TYPE_CONSTANT, Float.class.getName(), null, null);
-        compare(true, ">=", unDouble, unFloat, Double.valueOf(2.1d), Float.valueOf(1.1f));
-    }
-
-    @Test
-    public void compareNumericGreaterFloatDouble() throws Exception {
-        final SExpression unDouble = buildExpression("1.1d", SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
-        final SExpression unFloat = buildExpression("2.1f", SExpression.TYPE_CONSTANT, Float.class.getName(), null, null);
-        compare(true, ">=", unFloat, unDouble, Float.valueOf(2.1f), Double.valueOf(1.1d));
-    }
-
-    @Test
-    public void compareNumericNotEqualsDoubleFloat() throws Exception {
-        final SExpression unFloat = buildExpression("1.1d", SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
-        final SExpression unInteger = buildExpression("1.1f", SExpression.TYPE_CONSTANT, Float.class.getName(), null, null);
-        compare(true, "!=", unFloat, unInteger, Double.valueOf(1.2d), Float.valueOf(1.1f));
-    }
-
-    @Test
-    public void compareNumericNotEqualsFloatDouble() throws Exception {
-        final SExpression unFloat = buildExpression("1.1d", SExpression.TYPE_CONSTANT, Double.class.getName(), null, null);
-        final SExpression unInteger = buildExpression("1.1f", SExpression.TYPE_CONSTANT, Float.class.getName(), null, null);
-        compare(false, "!=", unInteger, unFloat, Float.valueOf(1.1f), Double.valueOf(1.1d));
-    }
-
-    @Test
-    public void compareNumericFloatFloat() throws Exception {
-        final SExpression unLong = buildExpression("1.1f", SExpression.TYPE_CONSTANT, Float.class.getName(), null, null);
-        final SExpression unInteger = buildExpression("1.1f", SExpression.TYPE_CONSTANT, Float.class.getName(), null, null);
-        compare(true, "==", unLong, unInteger, Float.valueOf(1.1f), Float.valueOf(1.1f));
-    }
-
-    @Test
-    public void compareNumericIntegerInteger() throws Exception {
-        final SExpression unLong = buildExpression("1", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
-        final SExpression unInteger = buildExpression("1", SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
-        compare(true, "==", unLong, unInteger, Integer.valueOf(1), Integer.valueOf(1));
-    }
-
-    private void compare(final boolean result, final String operator, final SExpression exp1, final SExpression exp2, final Object exp1Value,
-            final Object exp2Value) throws Exception {
-        final Map<Integer, Object> evaluatedDependencies = new HashMap<Integer, Object>(2);
-        evaluatedDependencies.put(exp1.hashCode(), exp1Value);
-        evaluatedDependencies.put(exp2.hashCode(), exp2Value);
-        evaluateAndCheckResult(buildExpression(operator, SExpression.TYPE_CONDITION, Boolean.class.getName(), null, Arrays.asList(exp1, exp2)), result,
-                evaluatedDependencies, ContainerState.ACTIVE);
-    }
-
-    @Test(expected = SExpressionEvaluationException.class)
-    public void compareWithWrongNumberOfDependencies() throws Exception {
-        final SExpression exp1 = buildExpression("1", SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
-        final SExpression exp2 = buildExpression("1", SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
-        final SExpression exp3 = buildExpression("1", SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
-        final Map<Integer, Object> evaluatedDependencies = new HashMap<Integer, Object>(3);
-        evaluatedDependencies.put(exp1.hashCode(), 1l);
-        evaluatedDependencies.put(exp2.hashCode(), 1l);
-        evaluatedDependencies.put(exp3.hashCode(), 1l);
-        evaluateAndCheckResult(buildExpression("==", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, Arrays.asList(exp1, exp2, exp3)), true,
-                evaluatedDependencies, ContainerState.ACTIVE);
-    }
-
-    @Test
-    public void compareWithStringWithLong() throws Exception {
-        final SExpression unLong = buildExpression("1", SExpression.TYPE_CONSTANT, Long.class.getName(), null, null);
-        final SExpression aString = buildExpression("tada", SExpression.TYPE_CONSTANT, String.class.getName(), null, null);
-        compare(false, "==", unLong, aString, Integer.valueOf(1), "tada");
-    }
-
-    @Test
-    public void evaluateNotOnBoolean() throws Exception {
-        final SExpression trueBoolean = buildExpression("false", SExpression.TYPE_CONSTANT, Boolean.class.getName(), null, null);
-        final Map<Integer, Object> evaluatedDependencies = new HashMap<Integer, Object>(1);
-        evaluatedDependencies.put(trueBoolean.hashCode(), Boolean.FALSE);
-        evaluateAndCheckResult(buildExpression("!", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, Arrays.asList(trueBoolean)), true,
-                evaluatedDependencies, ContainerState.ACTIVE);
-    }
-
-    @Test(expected = SExpressionEvaluationException.class)
-    public void evaluateNotOnString() throws Exception {
-        final SExpression stringExpression = buildExpression("false", SExpression.TYPE_CONSTANT, String.class.getName(), null, null);
-        final Map<Integer, Object> evaluatedDependencies = new HashMap<Integer, Object>(1);
-        evaluatedDependencies.put(stringExpression.hashCode(), "false");
-        evaluateAndCheckResult(buildExpression("!", SExpression.TYPE_CONDITION, Boolean.class.getName(), null, Arrays.asList(stringExpression)), true,
-                evaluatedDependencies, ContainerState.ACTIVE);
-    }
 }

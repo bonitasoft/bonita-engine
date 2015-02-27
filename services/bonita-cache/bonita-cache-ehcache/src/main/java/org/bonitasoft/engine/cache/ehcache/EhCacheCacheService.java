@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2015 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,13 +13,11 @@
  **/
 package org.bonitasoft.engine.cache.ehcache;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.ehcache.CacheManager;
-
+import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
@@ -35,16 +33,9 @@ import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
  */
 public class EhCacheCacheService extends CommonEhCacheCacheService implements CacheService {
 
-    private final URL configFile;
-
     public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final CacheConfigurations cacheConfigurations,
-            final URL configFile) {
-        super(logger, sessionAccessor, cacheConfigurations);
-        this.configFile = configFile;
-    }
-
-    public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final CacheConfigurations cacheConfigurations) {
-        this(logger, sessionAccessor, cacheConfigurations, null);
+            final CacheConfiguration defaultCacheConfiguration, final String diskStorePath) {
+        super(logger, sessionAccessor, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
     }
 
     @Override
@@ -83,15 +74,12 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
 
     @Override
     public synchronized void start() {
-        cacheManager = configFile != null ? new CacheManager(configFile) : new CacheManager();
+        buildCacheManagerWithDefaultConfiguration();
     }
 
     @Override
     public synchronized void stop() {
-        if (cacheManager != null) {
-            cacheManager.shutdown();
-            cacheManager = null;
-        }
+        shutdownCacheManager();
     }
 
     @Override

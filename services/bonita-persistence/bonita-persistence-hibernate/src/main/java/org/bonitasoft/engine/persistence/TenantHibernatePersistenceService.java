@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.persistence;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -49,11 +50,11 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     private final ReadSessionAccessor sessionAccessor;
 
     public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor,
-            final HibernateConfigurationProvider hbmConfigurationProvider, final DBConfigurationsProvider tenantConfigurationsProvider,
-            final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
-            final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException,
-            ClassNotFoundException {
-        super(name, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger,
+            final HibernateConfigurationProvider hbmConfigurationProvider, final Properties extraHibernateProperties,
+            final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
+            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
+            final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
+        super(name, hbmConfigurationProvider, extraHibernateProperties, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger,
                 sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
         this.sessionAccessor = sessionAccessor;
     }

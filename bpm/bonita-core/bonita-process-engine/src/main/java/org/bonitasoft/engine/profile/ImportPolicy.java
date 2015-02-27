@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,6 +20,6 @@ package org.bonitasoft.engine.profile;
  */
 public enum ImportPolicy {
 
-    DELETE_EXISTING, REPLACE_DUPLICATES, FAIL_ON_DUPLICATES, IGNORE_DUPLICATES; // , MERGE_DUPLICATES (Merge should retain existing IDs)
+    DELETE_EXISTING, REPLACE_DUPLICATES, FAIL_ON_DUPLICATES, IGNORE_DUPLICATES, UPDATE_DEFAULTS; // , MERGE_DUPLICATES (Merge should retain existing IDs)
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,6 +15,7 @@ package org.bonitasoft.engine.profile;
 
 import java.util.List;
 
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -39,7 +40,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public interface ProfileService {
+public interface ProfileService extends TenantLifecycleService{
 
     String PROFILE = "PROFILE";
 

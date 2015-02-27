@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
@@ -50,12 +52,6 @@ import org.bonitasoft.engine.work.WorkService;
  */
 public class BPMEventHandlingJob extends InternalJob {
 
-    /**
-     * List of BPMN Event types that can be triggered multiple times for a single instance.
-     */
-    //TODO EVENT_SUB_PROCESS of type non-interrupted should be considered as well, as soon as we support them
-    private static final List<SBPMEventType> START_WAITING_MESSAGE_LIST = Arrays.asList(SBPMEventType.START_EVENT); // , SBPMEventType.EVENT_SUB_PROCESS);
-
     private static final long serialVersionUID = 8929044925208984537L;
 
     private int maxCouples = 1000;
@@ -71,6 +67,7 @@ public class BPMEventHandlingJob extends InternalJob {
     private transient SchedulerService schedulerService;
 
     private transient TechnicalLoggerService loggerService;
+    private ProcessDefinitionService processDefinitionService;
 
     @Override
     public String getName() {
@@ -85,9 +82,10 @@ public class BPMEventHandlingJob extends InternalJob {
     @Override
     public void execute() throws SJobExecutionException {
         try {
-            final List<SMessageEventCouple> uniqueCouples = getMessageUniqueCouples();
+            final List<SMessageEventCouple> potentialMessageCouples = getMessageEventCouples();
+            final List<SMessageEventCouple> uniqueCouples = getMessageUniqueCouples(potentialMessageCouples);
             executeUniqueMessageCouplesWork(uniqueCouples);
-            if (uniqueCouples.size() == maxCouples) {
+            if (potentialMessageCouples.size() == maxCouples) {
                 rescheduleJob();
             }
         } catch (final Exception e) {
@@ -105,9 +103,13 @@ public class BPMEventHandlingJob extends InternalJob {
             final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
             final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
             markMessageAsInProgress(messageInstance);
-            if (!START_WAITING_MESSAGE_LIST.contains(waitingMessageEventType)) {
+
+            //EVENT_SUB_PROCESS of type non-interrupted should be considered as well, as soon as we support them
+            if (!SBPMEventType.START_EVENT.equals(waitingMessageEventType)) {
                 markWaitingMessageAsInProgress(waitingMsg);
             }
+            long processDefinitionId = waitingMsg.getProcessDefinitionId();
+            SProcessDefinitionDeployInfo processDeploymentInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
             workService.registerWork(WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMsg));
         }
     }
@@ -118,24 +120,24 @@ public class BPMEventHandlingJob extends InternalJob {
      * In the case of <code>SWaitingMessageEvent</code> of types {@link SBPMEventType#START_EVENT} or {@link SBPMEventType#EVENT_SUB_PROCESS}, it can be
      * selected several times to trigger multiple instances.
      *
-     * @param messageCouples
+     * @param potentialMessageCouples
      *        all the possible couples that match the potential correlation.
      * @return the reduced list of couple, where we insure that a unique message instance is associated with a unique waiting message.
      */
-    protected List<SMessageEventCouple> getMessageUniqueCouples() throws SEventTriggerInstanceReadException {
+    protected List<SMessageEventCouple> getMessageUniqueCouples(List<SMessageEventCouple> potentialMessageCouples) throws SEventTriggerInstanceReadException {
         final List<Long> takenMessages = new ArrayList<Long>();
         final List<Long> takenWaitings = new ArrayList<Long>();
         final List<SMessageEventCouple> uniqueMessageCouples = new ArrayList<SMessageEventCouple>();
 
-        final List<SMessageEventCouple> potentialMessageCouples = getMessageEventCouples();
         for (final SMessageEventCouple couple : potentialMessageCouples) {
             final long messageInstanceId = couple.getMessageInstanceId();
             final long waitingMessageId = couple.getWaitingMessageId();
             final SBPMEventType waitingMessageEventType = couple.getWaitingMessageEventType();
             if (!takenMessages.contains(messageInstanceId) && !takenWaitings.contains(waitingMessageId)) {
                 takenMessages.add(messageInstanceId);
-                // Starting events and Starting event sub-processes must not be considered as taken if they appear several times:
-                if (!START_WAITING_MESSAGE_LIST.contains(waitingMessageEventType)) {
+                // Starting events and Starting event sub-processes must not be considered as taken if they appear several times
+                //EVENT_SUB_PROCESS of type non-interrupted should be considered as well, as soon as we support them
+                if (!SBPMEventType.START_EVENT.equals(waitingMessageEventType)) {
                     takenWaitings.add(waitingMessageId);
                 }
                 uniqueMessageCouples.add(couple);
@@ -156,6 +158,7 @@ public class BPMEventHandlingJob extends InternalJob {
 
     void setAttributes(final TenantServiceAccessor tenantServiceAccessor, final Map<String, Serializable> attributes) {
         eventInstanceService = tenantServiceAccessor.getEventInstanceService();
+        processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
         workService = tenantServiceAccessor.getWorkService();
         transactionService = tenantServiceAccessor.getUserTransactionService();
         jobService = tenantServiceAccessor.getJobService();

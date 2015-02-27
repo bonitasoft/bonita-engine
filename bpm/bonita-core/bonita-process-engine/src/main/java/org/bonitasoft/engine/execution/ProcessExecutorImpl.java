@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2015 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -173,7 +173,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
-            final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager) {
+            final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager, final TransitionEvaluator transitionEvaluator) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
@@ -193,7 +193,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.sessionAccessor = sessionAccessor;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
-        transitionEvaluator = new TransitionEvaluator(expressionResolverService);
+        this.transitionEvaluator = transitionEvaluator;
         // dependency injection because of circular references...
         flowNodeStateManager.setProcessExecutor(this);
         eventsHandler.setProcessExecutor(this);
@@ -337,7 +337,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                     for (SGatewayInstance otherMergedGateway : otherMergedGateways) {
                         workService.registerWork(WorkFactory
                                 .createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, otherMergedGateway.getId(), null, null));
-                    }
+            }
                 }
             }
         } catch (final SBonitaException e) {
@@ -362,8 +362,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             // no gateway found we create one
             return createGateway(sProcessDefinition.getId(), flowNodeDefinition, stateCategory, parentProcessInstanceId, rootProcessInstanceId);
         }
-        return gatewayInstance;
-    }
+            return gatewayInstance;
+        }
 
     private SGatewayInstance createGateway(final Long processDefinitionId, final SFlowNodeDefinition flowNodeDefinition, final SStateCategory stateCategory,
             final long parentProcessInstanceId, final long rootProcessInstanceId) throws SBonitaException {
@@ -582,7 +582,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 break;
         }
         processInstanceService.setState(sProcessInstance, processInstanceState);
-        flowNodeExecutor.childReachedState(sProcessInstance, processInstanceState, hasActionsToExecute);
+            flowNodeExecutor.childReachedState(sProcessInstance, processInstanceState, hasActionsToExecute);
 
     }
 
@@ -607,7 +607,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      *         number of token of the process
      */
     private boolean executeValidOutgoingTransitionsAndUpdateTokens(final SProcessDefinition processDefinition, final SFlowNodeInstance child,
-                                                                   final SProcessInstance sProcessInstance) throws SBonitaException {
+            final SProcessInstance sProcessInstance) throws SBonitaException {
         // token we merged
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
         final FlowNodeTransitionsWrapper transitionsDescriptor = transitionEvaluator.buildTransitionsWrapper(sFlowNodeDefinition, processDefinition, child);
@@ -653,7 +653,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                                 .createExecuteFlowNodeWork(processDefinition.getId(), processInstanceId, otherMergedGateway.getId(), null, null));
                     }
                 }
-            }
+        }
 
         }
         return transitionsDescriptor.isLastFlowNode();
@@ -679,7 +679,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             In conclusion if all declared transition are not taken it means that a 'branch died' and that some inclusive gateways might be triggered so the reevaluation is needed
          */
         return takenTransition < allOutgoingTransitions;
-    }
+        }
 
     private void archiveInvalidTransitions(final SFlowNodeInstance child, final FlowNodeTransitionsWrapper transitionsDescriptor)
             throws STransitionCreationException {

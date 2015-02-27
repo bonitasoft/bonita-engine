@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013, 2015 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -23,6 +23,8 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.config.DiskStoreConfiguration;
 
 import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.CommonCacheService;
@@ -45,10 +47,17 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     protected final Map<String, CacheConfiguration> cacheConfigurations;
 
+    private final CacheConfiguration defaultCacheConfiguration;
+
+    private final String diskStorePath;
+
     public CommonEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-            final CacheConfigurations cacheConfigurations) {
+            final CacheConfigurations cacheConfigurations, final org.bonitasoft.engine.cache.CacheConfiguration defaultCacheConfiguration,
+            final String diskStorePath) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
+        this.diskStorePath = diskStorePath;
+        this.defaultCacheConfiguration = getEhCacheConfiguration(defaultCacheConfiguration);
         final List<org.bonitasoft.engine.cache.CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
         this.cacheConfigurations = new HashMap<String, CacheConfiguration>(configurations.size());
         for (final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig : configurations) {
@@ -62,10 +71,19 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         ehCacheConfig.setMaxElementsOnDisk(cacheConfig.getMaxElementsOnDisk());
         ehCacheConfig.setOverflowToDisk(!cacheConfig.isInMemoryOnly());
         ehCacheConfig.setEternal(cacheConfig.isEternal());
+        ehCacheConfig.setCopyOnRead(cacheConfig.isCopyOnRead());
+        ehCacheConfig.setCopyOnWrite(cacheConfig.isCopyOnWrite());
         if (!cacheConfig.isEternal()) {
             ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
         }
         return ehCacheConfig;
+    }
+
+    protected void buildCacheManagerWithDefaultConfiguration() {
+        final Configuration configuration = new Configuration();
+        configuration.setDefaultCacheConfiguration(defaultCacheConfiguration);
+        configuration.diskStore(new DiskStoreConfiguration().path(diskStorePath));
+        cacheManager = new CacheManager(configuration);
     }
 
     protected synchronized Cache createCache(final String cacheName, final String internalCacheName) throws SCacheException {
@@ -298,4 +316,10 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         }
     }
 
+    protected void shutdownCacheManager() {
+        if (cacheManager != null) {
+            cacheManager.shutdown();
+            cacheManager = null;
+        }
+    }
 }

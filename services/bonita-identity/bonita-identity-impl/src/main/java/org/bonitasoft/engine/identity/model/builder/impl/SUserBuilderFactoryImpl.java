@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -28,8 +28,6 @@ import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 public class SUserBuilderFactoryImpl implements SUserBuilderFactory {
 
     static final String ID = "id";
-
-    static final String DELEGEE_USER_NAME = "delegeeUserName";
 
     static final String MANAGER_USER_ID = "managerUserId";
 
@@ -109,11 +107,6 @@ public class SUserBuilderFactoryImpl implements SUserBuilderFactory {
     @Override
     public String getManagerUserIdKey() {
         return MANAGER_USER_ID;
-    }
-
-    @Override
-    public String getDelegeeUserNameKey() {
-        return DELEGEE_USER_NAME;
     }
 
     @Override

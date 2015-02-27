@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.cache;
 
 import static org.junit.Assert.assertEquals;
@@ -58,21 +71,39 @@ public class CacheServiceTest {
 
     protected CacheService getCacheService() {
         final List<CacheConfiguration> configurationsList = new ArrayList<CacheConfiguration>(2);
-        CacheConfiguration cacheConfiguration = new CacheConfiguration();
+        final CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName(SOME_DEFAULT_CACHE_NAME);
         cacheConfiguration.setTimeToLiveSeconds(1);
-        cacheConfiguration.setMaxElementsInMemory(100);
         cacheConfiguration.setMaxElementsInMemory(200);
         cacheConfiguration.setInMemoryOnly(true);
         configurationsList.add(cacheConfiguration);
-        cacheConfiguration = new CacheConfiguration();
-        cacheConfiguration.setName(ETERNAL_CACHE);
-        cacheConfiguration.setTimeToLiveSeconds(1);
-        cacheConfiguration.setMaxElementsInMemory(100);
-        cacheConfiguration.setMaxElementsInMemory(200);
-        cacheConfiguration.setInMemoryOnly(true);
-        cacheConfiguration.setEternal(true);
-        configurationsList.add(cacheConfiguration);
+
+        final CacheConfiguration cacheConfigurationEternal = new CacheConfiguration();
+        cacheConfigurationEternal.setName(ETERNAL_CACHE);
+        cacheConfigurationEternal.setTimeToLiveSeconds(1);
+        cacheConfigurationEternal.setMaxElementsInMemory(200);
+        cacheConfigurationEternal.setInMemoryOnly(true);
+        cacheConfigurationEternal.setEternal(true);
+        configurationsList.add(cacheConfigurationEternal);
+
+        final CacheConfiguration cacheConfiguration1 = new CacheConfiguration();
+        cacheConfiguration1.setName("test1");
+        cacheConfiguration1.setTimeToLiveSeconds(1);
+        cacheConfiguration1.setMaxElementsInMemory(10000);
+        cacheConfiguration1.setInMemoryOnly(false);
+        cacheConfiguration1.setEternal(false);
+        cacheConfiguration1.setCopyOnRead(true);
+        cacheConfiguration1.setCopyOnWrite(true);
+        configurationsList.add(cacheConfiguration1);
+
+        final CacheConfiguration cacheConfiguration2 = new CacheConfiguration();
+        cacheConfiguration2.setName("test2");
+        cacheConfiguration2.setTimeToLiveSeconds(1);
+        cacheConfiguration2.setMaxElementsInMemory(100000);
+        cacheConfiguration2.setInMemoryOnly(false);
+        cacheConfiguration2.setEternal(false);
+        configurationsList.add(cacheConfiguration2);
+
         final CacheConfigurations cacheConfigurations = new CacheConfigurations();
         cacheConfigurations.setConfigurations(configurationsList);
         return new EhCacheCacheService(new TechnicalLoggerService() {
@@ -104,7 +135,7 @@ public class CacheServiceTest {
             public long getSessionId() {
                 return 1;
             }
-        }, cacheConfigurations, this.getClass().getResource("/ehcache.xml"));
+        }, cacheConfigurations, new CacheConfiguration(), "target");
     }
 
     @Test

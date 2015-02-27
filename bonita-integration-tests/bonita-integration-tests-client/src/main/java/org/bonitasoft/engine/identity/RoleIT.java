@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.identity;
 
 import static org.junit.Assert.assertEquals;
@@ -97,6 +110,28 @@ public class RoleIT extends TestWithTechnicalUser {
         assertEquals(manager, role.getName());
 
         getIdentityAPI().deleteRole(role.getId());
+    }
+
+    @Test
+    public void roleNameAndDisplayNameShouldAccept255Chars() throws BonitaException {
+        final String stringIndex_255_chars = "abcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxy12345";
+        final Role role = getIdentityAPI().createRole(new RoleCreator(stringIndex_255_chars).setDisplayName(stringIndex_255_chars));
+
+        // Should be no exception:
+
+        getIdentityAPI().deleteRole(role.getId());
+    }
+
+    @Test(expected = Exception.class)
+    public void roleNameShouldNotAccept256Chars() throws BonitaException {
+        final String stringIndex_256_chars = "_abcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxy12345";
+        getIdentityAPI().createRole(stringIndex_256_chars);
+    }
+
+    @Test(expected = Exception.class)
+    public void roleDisplayNameShouldNotAccept256Chars() throws BonitaException {
+        final String stringIndex_256_chars = "_abcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxy12345";
+        getIdentityAPI().createRole(new RoleCreator("someName").setDisplayName(stringIndex_256_chars));
     }
 
     @Test

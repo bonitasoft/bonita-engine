@@ -193,8 +193,8 @@ CREATE TABLE arch_flownode_instance (
   archiveDate NUMBER(19, 0) NOT NULL,
   rootContainerId NUMBER(19, 0) NOT NULL,
   parentContainerId NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(50 CHAR) NOT NULL,
-  displayName VARCHAR2(75 CHAR),
+  name VARCHAR2(255 CHAR) NOT NULL,
+  displayName VARCHAR2(255 CHAR),
   displayDescription VARCHAR2(255 CHAR),
   stateId INT NOT NULL,
   stateName VARCHAR2(50 CHAR),
@@ -242,7 +242,6 @@ CREATE TABLE arch_transition_instance (
   id NUMBER(19, 0) NOT NULL,
   rootContainerId NUMBER(19, 0) NOT NULL,
   parentContainerId NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(255 CHAR) NOT NULL,
   source NUMBER(19, 0),
   target NUMBER(19, 0),
   state VARCHAR2(50 CHAR),
@@ -304,6 +303,8 @@ CREATE TABLE process_instance (
   PRIMARY KEY (tenantid, id)
 );
 
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, processdefinitionid, stateid);
+
 CREATE TABLE flownode_instance (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
@@ -311,8 +312,8 @@ CREATE TABLE flownode_instance (
   kind VARCHAR2(25 CHAR) NOT NULL,
   rootContainerId NUMBER(19, 0) NOT NULL,
   parentContainerId NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(50 CHAR) NOT NULL,
-  displayName VARCHAR2(75 CHAR),
+  name VARCHAR2(255 CHAR) NOT NULL,
+  displayName VARCHAR2(255 CHAR),
   displayDescription VARCHAR2(255 CHAR),
   stateId INT NOT NULL,
   stateName VARCHAR2(50 CHAR),
@@ -688,9 +689,9 @@ CREATE TABLE external_identity_mapping (
 CREATE TABLE group_ (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(50 CHAR) NOT NULL,
+  name VARCHAR2(125 CHAR) NOT NULL,
   parentPath VARCHAR2(255 CHAR),
-  displayName VARCHAR2(75 CHAR),
+  displayName VARCHAR2(255 CHAR),
   description VARCHAR2(1024 CHAR),
   iconName VARCHAR2(50 CHAR),
   iconPath VARCHAR2(50 CHAR),
@@ -704,8 +705,8 @@ CREATE TABLE group_ (
 CREATE TABLE role (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(50 CHAR) NOT NULL,
-  displayName VARCHAR2(75 CHAR),
+  name VARCHAR2(255 CHAR) NOT NULL,
+  displayName VARCHAR2(255 CHAR),
   description VARCHAR2(1024 CHAR),
   iconName VARCHAR2(50 CHAR),
   iconPath VARCHAR2(50 CHAR),
@@ -728,7 +729,6 @@ CREATE TABLE user_ (
   title VARCHAR2(50 CHAR),
   jobTitle VARCHAR2(255 CHAR),
   managerUserId NUMBER(19, 0),
-  delegeeUserName VARCHAR2(50 CHAR),
   iconName VARCHAR2(50 CHAR),
   iconPath VARCHAR2(50 CHAR),
   createdBy NUMBER(19, 0),
@@ -758,10 +758,10 @@ CREATE TABLE user_contactinfo (
   room VARCHAR2(50 CHAR),
   address VARCHAR2(255 CHAR),
   zipCode VARCHAR2(50 CHAR),
-  city VARCHAR2(50 CHAR),
-  state VARCHAR2(50 CHAR),
-  country VARCHAR2(50 CHAR),
-  website VARCHAR2(50 CHAR),
+  city VARCHAR2(255 CHAR),
+  state VARCHAR2(255 CHAR),
+  country VARCHAR2(255 CHAR),
+  website VARCHAR2(255 CHAR),
   personal NUMBER(1) NOT NULL,
   UNIQUE (tenantid, userId, personal),
   PRIMARY KEY (tenantid, id)

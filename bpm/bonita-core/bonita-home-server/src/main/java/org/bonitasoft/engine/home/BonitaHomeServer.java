@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -228,6 +228,16 @@ public class BonitaHomeServer extends BonitaHome {
      */
     public String getTenantFolder(final long tenantId) throws BonitaHomeNotSetException {
         return getTenantsFolder() + File.separatorChar + tenantId;
+    }
+
+    /**
+     * @param tenantId
+     * @return the path of the work dir for a tenant
+     * @throws BonitaHomeNotSetException
+     * @since 6.5
+     */
+    public String getTenantWorkFolder(final long tenantId) throws BonitaHomeNotSetException {
+        return getTenantFolder(tenantId) + File.separatorChar + BONITA_HOME_WORK;
     }
 
     /**

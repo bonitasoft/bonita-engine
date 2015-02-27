@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
- * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -68,6 +68,19 @@ public class ProcessBuilder extends FlowElementContainerBuilder {
      */
     public DocumentDefinitionBuilder addDocumentDefinition(final String name, final String fileName) {
         return new DocumentDefinitionBuilder(getProcessBuilder(), (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, fileName);
+    }
+
+    /**
+     * Add a parameter on this process.
+     *
+     * @param parameterName
+     *        The name of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
+     * @param type
+     *        The type of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition} (complete class name)
+     * @return The {@link ParameterDefinitionBuilder} containing the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
+     */
+    public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
+        return new ParameterDefinitionBuilder(getProcessBuilder(), process, parameterName, type);
     }
 
     DesignProcessDefinitionImpl getProcessDefinition() {

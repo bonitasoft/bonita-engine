@@ -1,17 +1,16 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * accessor program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * accessor program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with accessor program. If not, see <http://www.gnu.org/licenses/>.
- */
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.bpm;
 
 import java.io.IOException;
@@ -29,6 +28,7 @@ import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -72,6 +72,8 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.parameter.ParameterService;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
@@ -339,7 +341,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(CommandService.class);
     }
 
-
     @Override
     public DocumentService getDocumentService() {
         return getInstanceOf(DocumentService.class);
@@ -561,6 +562,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
+    public ParameterService getParameterService() {
+        return getInstanceOf(ParameterService.class);
+    }
+
+    @Override
     public <T> T lookup(final String serviceName) {
         throw new UnsupportedOperationException();
     }
@@ -568,6 +574,16 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public ContractDataService getContractDataService() {
         return getInstanceOf(ContractDataService.class);
+    }
+
+    @Override
+    public PageService getPageService() {
+        return getInstanceOf(PageService.class);
+    }
+
+    @Override
+    public ApplicationService getApplicationService() {
+        return getInstanceOf(ApplicationService.class);
     }
 
 }

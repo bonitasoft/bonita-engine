@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,11 +18,18 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * Component of a process definition. It connects 2 {@link FlowNodeDefinition} between them.
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
 public interface TransitionDefinition extends NamedElement {
+
+    /**
+     * @deprecated from 6.5.0 on, name is not used anymore on TransitionDefinition. It is kept for retro-compatibility.
+     */
+    @Override
+    @Deprecated
+    public String getName();
 
     /**
      * @return The source of the transition

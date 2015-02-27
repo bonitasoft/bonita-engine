@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -159,26 +159,19 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
     @Override
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        final long eventInstanceId = eventInstance.getId();
-        final String eventInstanceName = eventInstance.getName();
-        final long parentContainerId = eventInstance.getParentContainerId();
         final Long processDefinitionId = processDefinition.getId();
-        final SExpressionContext expressionContext = new SExpressionContext(parentContainerId, getParentContainerType(eventInstance).name(),
+        final SExpressionContext expressionContext = new SExpressionContext(eventInstance.getParentContainerId(), getParentContainerType(eventInstance).name(),
                 processDefinitionId);
 
-        handleThrowMessage(sEventTriggerDefinition, eventInstanceId, eventInstanceName, processDefinitionId, expressionContext);
+        handleThrowMessage(sEventTriggerDefinition, eventInstance.getId(), eventInstance.getName(), processDefinitionId, expressionContext);
     }
 
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SSendTaskInstance sendTaskInstance,
             final SThrowMessageEventTriggerDefinition messageTrigger) throws SEventTriggerInstanceCreationException, SMessageInstanceCreationException,
             SDataInstanceException, SExpressionException {
-        final long eventInstanceId = sendTaskInstance.getId();
-        final String eventInstanceName = sendTaskInstance.getName();
-        final long parentContainerId = sendTaskInstance.getParentContainerId();
-        final Long processDefinitionId = processDefinition.getId();
-        final SExpressionContext expressionContext = new SExpressionContext(parentContainerId, getParentContainerType(sendTaskInstance).name(),
-                processDefinitionId);
-        handleThrowMessage(messageTrigger, eventInstanceId, eventInstanceName, processDefinitionId, expressionContext);
+        final SExpressionContext expressionContext = new SExpressionContext(sendTaskInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                processDefinition.getId());
+        handleThrowMessage(messageTrigger, sendTaskInstance.getId(), sendTaskInstance.getName(), processDefinition.getId(), expressionContext);
     }
 
     private void handleThrowMessage(final SEventTriggerDefinition sEventTriggerDefinition, final long eventInstanceId, final String eventInstanceName,
@@ -189,10 +182,10 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SExpression targetProcess = messageTrigger.getTargetProcess();
         final SExpression targetFlowNode = messageTrigger.getTargetFlowNode();
         // evaluate expression
-        final String stringTargetProcess = (String) expressionResolverService.evaluate(targetProcess);
+        final String stringTargetProcess = (String) expressionResolverService.evaluate(targetProcess, expressionContext);
         String stringTargetFlowNode = null;
         if (targetFlowNode != null) {
-            stringTargetFlowNode = (String) expressionResolverService.evaluate(targetFlowNode);
+            stringTargetFlowNode = (String) expressionResolverService.evaluate(targetFlowNode, expressionContext);
         }
 
         final SThrowMessageEventTriggerInstance messageEventTriggerInstance = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class)

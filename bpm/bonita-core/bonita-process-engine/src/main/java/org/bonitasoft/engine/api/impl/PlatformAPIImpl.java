@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.scheduler.PlatformJobListenerManager;
 import org.bonitasoft.engine.api.impl.scheduler.TenantJobListenerManager;
@@ -96,14 +94,11 @@ import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.xml.Parser;
 
 /**
  * @author Matthieu Chaffotte
@@ -118,7 +113,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
 
-    private static final String PROFILES_FILE = "profiles.xml";
+    public static final String PROFILES_FILE = "profiles.xml";
 
     private static boolean isNodeStarted = false;
 
@@ -319,8 +314,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     void beforeServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
-            final List<STenant> tenants) throws SessionIdNotSetException, SBonitaException, BonitaHomeNotSetException, InstantiationException,
-            IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException, IOException, Exception, SSessionNotFoundException {
+            final List<STenant> tenants) throws Exception {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
         final SessionService sessionService = platformAccessor.getSessionService();
 
@@ -725,28 +719,18 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     protected void createDefaultProfiles(final TenantServiceAccessor tenantServiceAccessor) throws Exception {
-        final Parser parser = tenantServiceAccessor.getProfileParser();
-        final ProfileService profileService = tenantServiceAccessor.getProfileService();
-        final IdentityService identityService = tenantServiceAccessor.getIdentityService();
-
-        final String xmlContent;
-        final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(getProfileFileName());
-        if (inputStream == null) {
-            // no default profiles
-            return;
-        }
-        try {
-            xmlContent = IOUtils.toString(inputStream, org.bonitasoft.engine.io.IOUtil.FILE_ENCODING);
-        } finally {
-            inputStream.close();
-        }
-        final List<ExportedProfile> profilesFromXML = ProfilesImporter.getProfilesFromXML(xmlContent, parser);
-        importProfiles(profileService, identityService, profilesFromXML, tenantServiceAccessor);
+        File file = ProfilesImporter.getFileContainingMD5(tenantServiceAccessor);
+        String fileContent = IOUtil.readResource(getProfileFileName());
+        List<ExportedProfile> profilesFromXML = ProfilesImporter.getProfilesFromXML(fileContent, tenantServiceAccessor.getProfileParser());
+        importProfiles(tenantServiceAccessor.getProfileService(), tenantServiceAccessor.getIdentityService(), profilesFromXML, tenantServiceAccessor);
+        IOUtil.writeMD5(file, fileContent.getBytes());
     }
 
     protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
             final TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
-        new ProfilesImporter(profileService, identityService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
+        ProfilesImporter profilesImporter = new ProfilesImporter(tenantServiceAccessor.getProfileService(), tenantServiceAccessor.getIdentityService(),
+                profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES);
+        profilesImporter.importProfiles(-1);
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {

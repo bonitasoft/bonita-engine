@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -55,8 +55,8 @@ public class TransitionDefinitionBuilder extends FlowElementContainerBuilder {
         }
 
         // Create transition
-        final StringBuilder nameBuilder = new StringBuilder(source);
-        nameBuilder.append("_->_").append(target);
+        final StringBuilder nameBuilder = new StringBuilder();
+        nameBuilder.append(from.getId()).append("_->_").append(to.getId());
         transition = new TransitionDefinitionImpl(nameBuilder.toString(), from.getId(), to.getId());
         transition.setCondition(condition);
 

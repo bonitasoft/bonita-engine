@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -30,6 +30,7 @@ import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -70,6 +71,8 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.parameter.ParameterService;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.xml.ChildrenEntriesBinding;
 import org.bonitasoft.engine.profile.xml.MembershipBinding;
@@ -227,11 +230,18 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private TransientDataService transientDataService;
 
     private TimeTracker timeTracker;
+
     private PermissionService permissionService;
 
     private ParentContainerResolver parentContainerResolver;
 
     private ContractDataService contractDataService;
+
+    private ParameterService parameterService;
+
+    private PageService pageService;
+
+    private ApplicationService applicationService;
 
     @Override
     public ParentContainerResolver getParentContainerResolver() {
@@ -808,6 +818,32 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             contractDataService = beanAccessor.getService(ContractDataService.class);
         }
         return contractDataService;
+    }
+
+    @Override
+    public ParameterService getParameterService() {
+        if (parameterService == null) {
+            parameterService = beanAccessor.getService(ParameterService.class);
+        }
+        return parameterService;
+    }
+    /**
+     * might not be an available service
+     */
+    @Override
+    public PageService getPageService() {
+        if (pageService == null) {
+            pageService = beanAccessor.getService(PageService.class);
+        }
+        return pageService;
+    }
+
+    @Override
+    public ApplicationService getApplicationService() {
+        if (applicationService == null) {
+            applicationService = beanAccessor.getService(ApplicationService.class);
+        }
+        return applicationService;
     }
 
 }

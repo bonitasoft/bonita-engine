@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -42,8 +42,6 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
 
     private long managerUserId;
 
-    private String delegeeUserName;
-
     private String title;
 
     private String jobTitle;
@@ -58,7 +56,6 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
 
     private SUserLogin sUserLogin;
 
-
     public SUserImpl() {
         super();
     }
@@ -69,7 +66,6 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         password = user.getPassword();
         userName = user.getUserName();
         jobTitle = user.getJobTitle();
-        delegeeUserName = user.getDelegeeUserName();
         managerUserId = user.getManagerUserId();
         iconName = user.getIconName();
         iconPath = user.getIconPath();
@@ -108,11 +104,6 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
     @Override
     public String getJobTitle() {
         return jobTitle;
-    }
-
-    @Override
-    public String getDelegeeUserName() {
-        return delegeeUserName;
     }
 
     @Override
@@ -188,10 +179,6 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         this.managerUserId = managerUserId;
     }
 
-    public void setDelegeeUserName(final String delegeeUserName) {
-        this.delegeeUserName = delegeeUserName;
-    }
-
     public void setIconName(final String iconName) {
         this.iconName = iconName;
     }
@@ -216,41 +203,73 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         this.enabled = enabled;
     }
 
-    public void setsUserLogin(SUserLogin sUserLogin) {
+    public void setsUserLogin(final SUserLogin sUserLogin) {
         this.sUserLogin = sUserLogin;
     }
 
-    public void setLastConnection(Long lastConnection){
+    public void setLastConnection(final Long lastConnection) {
         sUserLogin.setLastConnection(lastConnection);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SUserImpl)) return false;
-        if (!super.equals(o)) return false;
-
-        SUserImpl sUser = (SUserImpl) o;
-
-        if (createdBy != sUser.createdBy) return false;
-        if (creationDate != sUser.creationDate) return false;
-        if (enabled != sUser.enabled) return false;
-        if (lastUpdate != sUser.lastUpdate) return false;
-        if (managerUserId != sUser.managerUserId) return false;
-        if (delegeeUserName != null ? !delegeeUserName.equals(sUser.delegeeUserName) : sUser.delegeeUserName != null)
-            return false;
-        if (firstName != null ? !firstName.equals(sUser.firstName) : sUser.firstName != null) return false;
-        if (iconName != null ? !iconName.equals(sUser.iconName) : sUser.iconName != null) return false;
-        if (iconPath != null ? !iconPath.equals(sUser.iconPath) : sUser.iconPath != null) return false;
-        if (jobTitle != null ? !jobTitle.equals(sUser.jobTitle) : sUser.jobTitle != null) return false;
-        if (lastName != null ? !lastName.equals(sUser.lastName) : sUser.lastName != null) return false;
-        if (password != null ? !password.equals(sUser.password) : sUser.password != null) return false;
-        if (sUserLogin != null ? !sUserLogin.equals(sUser.sUserLogin) : sUser.sUserLogin != null) return false;
-        if (title != null ? !title.equals(sUser.title) : sUser.title != null) return false;
-        if (userName != null ? !userName.equals(sUser.userName) : sUser.userName != null) return false;
-
+    public boolean equals(final Object o) {
+        if (this == o) {
             return true;
         }
+        if (!(o instanceof SUserImpl)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        final SUserImpl sUser = (SUserImpl) o;
+
+        if (createdBy != sUser.createdBy) {
+            return false;
+        }
+        if (creationDate != sUser.creationDate) {
+            return false;
+        }
+        if (enabled != sUser.enabled) {
+            return false;
+        }
+        if (lastUpdate != sUser.lastUpdate) {
+            return false;
+        }
+        if (managerUserId != sUser.managerUserId) {
+            return false;
+        }
+        if (firstName != null ? !firstName.equals(sUser.firstName) : sUser.firstName != null) {
+            return false;
+        }
+        if (iconName != null ? !iconName.equals(sUser.iconName) : sUser.iconName != null) {
+            return false;
+        }
+        if (iconPath != null ? !iconPath.equals(sUser.iconPath) : sUser.iconPath != null) {
+            return false;
+        }
+        if (jobTitle != null ? !jobTitle.equals(sUser.jobTitle) : sUser.jobTitle != null) {
+            return false;
+        }
+        if (lastName != null ? !lastName.equals(sUser.lastName) : sUser.lastName != null) {
+            return false;
+        }
+        if (password != null ? !password.equals(sUser.password) : sUser.password != null) {
+            return false;
+        }
+        if (sUserLogin != null ? !sUserLogin.equals(sUser.sUserLogin) : sUser.sUserLogin != null) {
+            return false;
+        }
+        if (title != null ? !title.equals(sUser.title) : sUser.title != null) {
+            return false;
+        }
+        if (userName != null ? !userName.equals(sUser.userName) : sUser.userName != null) {
+            return false;
+        }
+
+        return true;
+    }
 
     @Override
     public int hashCode() {
@@ -261,17 +280,16 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         result = 31 * result + (userName != null ? userName.hashCode() : 0);
         result = 31 * result + (iconName != null ? iconName.hashCode() : 0);
         result = 31 * result + (iconPath != null ? iconPath.hashCode() : 0);
-        result = 31 * result + (int) (managerUserId ^ (managerUserId >>> 32));
-        result = 31 * result + (delegeeUserName != null ? delegeeUserName.hashCode() : 0);
+        result = 31 * result + (int) (managerUserId ^ managerUserId >>> 32);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (jobTitle != null ? jobTitle.hashCode() : 0);
-        result = 31 * result + (int) (creationDate ^ (creationDate >>> 32));
-        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
-        result = 31 * result + (int) (lastUpdate ^ (lastUpdate >>> 32));
+        result = 31 * result + (int) (creationDate ^ creationDate >>> 32);
+        result = 31 * result + (int) (createdBy ^ createdBy >>> 32);
+        result = 31 * result + (int) (lastUpdate ^ lastUpdate >>> 32);
         result = 31 * result + (enabled ? 1 : 0);
         result = 31 * result + (sUserLogin != null ? sUserLogin.hashCode() : 0);
         return result;
-        }
+    }
 
     @Override
     public String toString() {
@@ -282,7 +300,6 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
                 ", iconName='" + iconName + '\'' +
                 ", iconPath='" + iconPath + '\'' +
                 ", managerUserId=" + managerUserId +
-                ", delegeeUserName='" + delegeeUserName + '\'' +
                 ", title='" + title + '\'' +
                 ", jobTitle='" + jobTitle + '\'' +
                 ", creationDate=" + creationDate +

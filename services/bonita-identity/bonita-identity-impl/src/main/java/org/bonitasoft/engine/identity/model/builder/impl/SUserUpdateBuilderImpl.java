@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -79,12 +79,6 @@ public class SUserUpdateBuilderImpl implements SUserUpdateBuilder {
     }
 
     @Override
-    public SUserUpdateBuilder updateDelegeeUserName(final String delegeeUserName) {
-        descriptor.addField(SUserBuilderFactoryImpl.DELEGEE_USER_NAME, delegeeUserName);
-        return this;
-    }
-
-    @Override
     public SUserUpdateBuilder updateIconName(final String iconName) {
         descriptor.addField(SUserBuilderFactoryImpl.ICON_NAME, iconName);
         return this;
@@ -109,7 +103,7 @@ public class SUserUpdateBuilderImpl implements SUserUpdateBuilder {
     }
 
     @Override
-    public SUserUpdateBuilder updateEnabled(boolean enabled) {
+    public SUserUpdateBuilder updateEnabled(final boolean enabled) {
         descriptor.addField(SUserBuilderFactoryImpl.ENABLED, enabled);
         return this;
     }
