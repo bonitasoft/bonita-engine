@@ -52,13 +52,7 @@
 
     <build>
         <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>jaxb2-maven-plugin</artifactId>
-                    <version>1.6</version>
-                </plugin>
-            </plugins>
+
         </pluginManagement>
     </build>
 
