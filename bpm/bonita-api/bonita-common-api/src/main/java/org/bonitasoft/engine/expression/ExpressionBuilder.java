@@ -420,6 +420,10 @@ public class ExpressionBuilder {
         return done();
     }
 
+    public Expression createContractInputExpression(final String inputName, final String returnType) throws InvalidExpressionException {
+        return createNewInstance(inputName).setContent(inputName).setExpressionType(ExpressionType.TYPE_CONTRACT_INPUT).setReturnType(returnType).done();
+    }
+
     public Expression createComparisonExpression(final String name, final Expression leftOperand, final ComparisonOperator operator,
             final Expression rightOperand) throws InvalidExpressionException {
         String strOperator = null;

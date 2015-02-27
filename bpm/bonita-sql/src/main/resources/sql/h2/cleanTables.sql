@@ -1,3 +1,6 @@
+DELETE FROM arch_contract_data;
+DELETE FROM contract_data;
+
 DELETE FROM actormember;
 DELETE FROM actor;
 DELETE FROM processcategorymapping;

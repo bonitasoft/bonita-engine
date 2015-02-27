@@ -19,6 +19,7 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Matthieu Chaffotte
  */
 public abstract class SFlowElementInstanceImpl extends SNamedElementImpl implements SFlowElementInstance {
 

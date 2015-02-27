@@ -1,3 +1,8 @@
+DELETE FROM arch_contract_data
+GO
+DELETE FROM contract_data
+GO
+
 DELETE FROM actormember
 GO
 DELETE FROM actor

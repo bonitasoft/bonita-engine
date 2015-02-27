@@ -109,6 +109,8 @@ SBusinessApplication -> 10200
 SBusinessApplicationPage -> 10201
 SBusinessApplicationMenu -> 10202
 
+SContractData -> 10210
+
 =Archived objects==
 
 ProcessInstance -> 20010
@@ -128,6 +130,7 @@ SALongTextDataInstance --> 20050
 SAXMLDataInstance --> 20050
 SABlobDataInstance --> 20050
 
+SContractData -> 20210
 
 =TESTS=
 HUMAN -> 1000

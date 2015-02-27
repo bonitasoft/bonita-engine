@@ -13,35 +13,46 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
-import static org.junit.Assert.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.junit.Test;
 
 /**
  * @author Celine Souchet
- * 
+ *
  */
 public class SUserTaskDefinitionImplTest {
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.process.definition.model.impl.SFlowNodeDefinitionImpl#isExclusive()}.
-     */
     @Test
     public void not_exclusive_if_not_gateway() {
-        final SUserTaskDefinitionImpl sUserTaskDefinitionImpl = new SUserTaskDefinitionImpl(5, "name", "actorName");
+        final SUserTaskDefinitionImpl userTask = new SUserTaskDefinitionImpl(5, "name", "actorName");
 
-        assertFalse(sUserTaskDefinitionImpl.isExclusive());
+        assertThat(userTask.isExclusive()).isFalse();
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.process.definition.model.impl.SFlowNodeDefinitionImpl#isParalleleOrInclusive()}.
-     */
     @Test
     public void not_parallelOrInclusive_if_not_gateway() {
-        final SUserTaskDefinitionImpl sUserTaskDefinitionImpl = new SUserTaskDefinitionImpl(5, "name", "actorName");
+        final SUserTaskDefinitionImpl userTask = new SUserTaskDefinitionImpl(5, "name", "actorName");
 
-        assertFalse(sUserTaskDefinitionImpl.isParalleleOrInclusive());
+        assertThat(userTask.isParalleleOrInclusive()).isFalse();
+    }
 
+    @Test
+    public void aUserTaskWithANullContractReturnsAnEmptyOne() throws Exception {
+        final SUserTaskDefinitionImpl userTask = new SUserTaskDefinitionImpl(5, "name", "actorName");
+
+        assertThat(userTask.getContract()).isNotNull().isEqualTo(new SContractDefinitionImpl());
+    }
+
+    @Test
+    public void aUserTaskWithAContractReturnsThatOne() throws Exception {
+        final SContractDefinitionImpl contract = new SContractDefinitionImpl();
+        contract.addSimpleInput(new SSimpleInputDefinitionImpl("valid", SType.TEXT, "descripti"));
+        final SUserTaskDefinitionImpl userTask = new SUserTaskDefinitionImpl(5, "name", "actorName");
+        userTask.setContract(contract);
+
+        assertThat(userTask.getContract()).isNotNull().isEqualTo(contract);
     }
 
 }

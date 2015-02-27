@@ -536,7 +536,6 @@ public class BusinessArchiveTest {
             final Iterator<ConnectorDefinition> itResultCon = resultAct.getConnectors().iterator();
             for (final ConnectorDefinition connectorDefinition : processActivityConnectors) {
                 final ConnectorDefinition nextResultConnector = itResultCon.next();
-                System.out.println(connectorDefinition.getFailAction());
                 assertEquals(connectorDefinition.getFailAction(), nextResultConnector.getFailAction());
             }
         }
