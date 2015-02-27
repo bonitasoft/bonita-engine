@@ -25,8 +25,8 @@ import java.net.URL;
 import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.ImportException;
+import org.bonitasoft.engine.io.IOUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -15,6 +15,7 @@ package org.bonitasoft.engine.io;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,7 +40,18 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.xml.sax.SAXException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -569,6 +581,51 @@ public class IOUtil {
             if (fin != null) {
                 fin.close();
             }
+        }
+    }
+
+    public static byte[] marshallObjectToXML(final Object jaxbModel, final URL schemaURL) throws JAXBException, IOException, SAXException {
+        if (jaxbModel == null) {
+            return null;
+        }
+        if (schemaURL == null) {
+            throw new IllegalArgumentException("schemaURL is null");
+        }
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        final Schema schema = sf.newSchema(schemaURL);
+        try {
+            final JAXBContext contextObj = JAXBContext.newInstance(jaxbModel.getClass());
+            final Marshaller m = contextObj.createMarshaller();
+            m.setSchema(schema);
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.marshal(jaxbModel, baos);
+        } finally {
+            baos.close();
+        }
+        return baos.toByteArray();
+    }
+
+    public static <T> T unmarshallXMLtoObject(final byte[] xmlObject, final Class<T> objectClass, final URL schemaURL) throws JAXBException, IOException,
+            SAXException {
+        if (xmlObject == null) {
+            return null;
+        }
+        if (schemaURL == null) {
+            throw new IllegalArgumentException("schemaURL is null");
+        }
+        final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        final Schema schema = sf.newSchema(schemaURL);
+        final JAXBContext contextObj = JAXBContext.newInstance(objectClass);
+        final Unmarshaller um = contextObj.createUnmarshaller();
+        um.setSchema(schema);
+        final ByteArrayInputStream bais = new ByteArrayInputStream(xmlObject);
+        final StreamSource ss = new StreamSource(bais);
+        try {
+            final JAXBElement<T> jaxbElement = um.unmarshal(ss, objectClass);
+            return jaxbElement.getValue();
+        } finally {
+            bais.close();
         }
     }
 

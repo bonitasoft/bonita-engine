@@ -16,8 +16,8 @@ package org.bonitasoft.engine.business.application.exporter;
 import java.net.URL;
 
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.ExportException;
+import org.bonitasoft.engine.io.IOUtil;
 
 /**
  * @author Elias Ricken de Medeiros
