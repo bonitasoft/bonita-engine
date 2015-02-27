@@ -20,7 +20,9 @@ import com.bonitasoft.engine.bdm.validator.rule.ValidationRule;
  * Check that a composite bo is referenced in only one composition
  * 
  * @author Colin PUY
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.rule.composition.UniquenessCompositionValidationRule} instead.
  */
+@Deprecated
 public class UniquenessCompositionValidationRule extends ValidationRule<BusinessObjectModel> {
 
     public UniquenessCompositionValidationRule() {

@@ -92,7 +92,7 @@
 			<value>Execute a named query in the BDM. Use parameter keys : "queryName" the name of the query in the bdm, "returnType" the query expected return type, "returnsList" if result is a List or a single value, "queryParameters" a Map to value query parameters</value>
 		</constructor-arg>
 		<constructor-arg name="implementation">
-			<value>com.bonitasoft.engine.command.ExecuteBDMQueryCommand</value>
+			<value>org.bonitasoft.engine.command.ExecuteBDMQueryCommand</value>
 		</constructor-arg>
 	</bean>
 
@@ -424,7 +424,7 @@
             <value>Get the business data via its identifier and class name, and returns its Json representation.</value>
         </constructor-arg>
         <constructor-arg name="implementation">
-            <value>com.bonitasoft.engine.command.GetBusinessDataByIdCommand</value>
+            <value>org.bonitasoft.engine.command.GetBusinessDataByIdCommand</value>
         </constructor-arg>
     </bean>
 
@@ -436,7 +436,7 @@
 			<value>Execute a named query in the BDM, and returns its Json representation. Use parameter keys : "queryName" the name of the query in the bdm, "returnType" the query expected return type, "returnsList" if result is a List or a single value, "queryParameters" a Map to value query parameters</value>
 		</constructor-arg>
 		<constructor-arg name="implementation">
-			<value>com.bonitasoft.engine.command.GetBusinessDataByQueryCommand</value>
+			<value>org.bonitasoft.engine.command.GetBusinessDataByQueryCommand</value>
 		</constructor-arg>
 	</bean>
 

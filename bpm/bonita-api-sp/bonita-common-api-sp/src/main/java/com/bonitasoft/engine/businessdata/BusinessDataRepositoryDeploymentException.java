@@ -14,7 +14,9 @@ package com.bonitasoft.engine.businessdata;
  * @author Colin Puy
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.business.data.BusinessDataRepositoryDeploymentException} instead.
  */
+@Deprecated
 public class BusinessDataRepositoryDeploymentException extends BusinessDataRepositoryException {
 
     private static final long serialVersionUID = 1L;

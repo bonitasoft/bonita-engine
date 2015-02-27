@@ -16,7 +16,9 @@ import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
  * A <code>MultipleBusinessDataReference</code> is a reference of a {@link BusinessDataDefinition} which is multiple.
  * 
  * @author Matthieu Chaffotte
+ * @deprecated since version 7.0.0, use {@link org.bonitasoft.engine.business.data.MultipleBusinessDataReference}
  */
+@Deprecated
 public interface MultipleBusinessDataReference extends BusinessDataReference {
 
     /**
@@ -25,4 +27,5 @@ public interface MultipleBusinessDataReference extends BusinessDataReference {
      * @return the business data identifiers.
      */
     List<Long> getStorageIds();
+
 }

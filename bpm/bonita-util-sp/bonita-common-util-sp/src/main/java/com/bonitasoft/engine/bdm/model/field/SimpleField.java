@@ -19,8 +19,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * @author Matthieu Chaffotte
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.model.field.SimpleField} instead.
  */
 @XmlType
+@Deprecated
 public class SimpleField extends Field {
 
     @XmlAttribute(required = true)

@@ -17,27 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
-import org.bonitasoft.engine.profile.builder.SProfileBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
-import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.service.ModelConvertor;
-
 import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.impl.BreakpointImpl;
-import com.bonitasoft.engine.businessdata.MultipleBusinessDataReference;
-import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
-import com.bonitasoft.engine.businessdata.impl.MultipleBusinessDataReferenceImpl;
-import com.bonitasoft.engine.businessdata.impl.SimpleBusinessDataReferenceImpl;
-import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
-import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.core.reporting.SReport;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
@@ -63,6 +44,18 @@ import com.bonitasoft.engine.reporting.Report;
 import com.bonitasoft.engine.reporting.ReportCreator;
 import com.bonitasoft.engine.reporting.ReportCreator.ReportField;
 import com.bonitasoft.engine.reporting.impl.ReportImpl;
+import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
+import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.model.SProfileEntry;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
  * @author Matthieu Chaffotte
@@ -256,14 +249,6 @@ public final class SPModelConvertor extends ModelConvertor {
             newSReportBuilder.setScreenshot(screenshot);
         }
         return newSReportBuilder.done();
-    }
-
-    public static SimpleBusinessDataReference toSimpleBusinessDataReference(final SSimpleRefBusinessDataInstance sReference) {
-        return new SimpleBusinessDataReferenceImpl(sReference.getName(), sReference.getDataClassName(), sReference.getDataId());
-    }
-
-    public static MultipleBusinessDataReference toMultipleBusinessDataReference(final SMultiRefBusinessDataInstance sReference) {
-        return new MultipleBusinessDataReferenceImpl(sReference.getName(), sReference.getDataClassName(), sReference.getDataIds());
     }
 
 }

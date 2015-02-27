@@ -15,8 +15,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 /**
  * @author Matthieu Chaffotte
  * @author Romain Bioteau
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.model.QueryParameter} instead.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@Deprecated
 public class QueryParameter {
 
     @XmlAttribute(required = true)

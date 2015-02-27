@@ -14,7 +14,9 @@ import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
  * A <code>SimpleBusinessDataReference</code> is a reference of a {@link BusinessDataDefinition} which is not multiple.
  *
  * @author Matthieu Chaffotte
+ * @deprecated since version 7.0.0, use {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference}
  */
+@Deprecated
 public interface SimpleBusinessDataReference extends BusinessDataReference {
 
     /**

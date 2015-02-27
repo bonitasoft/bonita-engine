@@ -24,10 +24,12 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.rule.BusinessObjectValidationRule} instead.
  */
+@Deprecated
 public class BusinessObjectValidationRule extends ValidationRule<BusinessObject> {
 
-    private static final String RESERVED_PACKAGE_PREFIX = "com.bonitasoft.";
+    private static final String[] RESERVED_PACKAGE_PREFIX = { "com.bonitasoft.", "org.bonitasoft." };
 
     private static final int MAX_TABLENAME_LENGTH = 30;
 
@@ -47,8 +49,11 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
             return status;
         }
 
-        if (qualifiedName.startsWith(RESERVED_PACKAGE_PREFIX)) {
-            status.addError("Package com.bonitasoft is reserved. Please choose another package name");
+        for (String reservedPrefix : RESERVED_PACKAGE_PREFIX) {
+            if (qualifiedName.startsWith(reservedPrefix)) {
+                status.addError(new StringBuilder().append("Package ").append(reservedPrefix).append(" is reserved. Please choose another package name")
+                        .toString());
+            }
         }
 
         final String simpleName = bo.getSimpleName();

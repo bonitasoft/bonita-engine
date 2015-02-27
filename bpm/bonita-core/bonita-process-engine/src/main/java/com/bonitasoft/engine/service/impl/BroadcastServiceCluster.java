@@ -18,15 +18,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.bonitasoft.engine.service.BroadcastService;
+import org.bonitasoft.engine.service.TaskResult;
+
 import com.bonitasoft.engine.service.BroadCastedTask;
-import com.bonitasoft.engine.service.BroadcastService;
-import com.bonitasoft.engine.service.TaskResult;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
 
 /**
  * @author Baptiste Mesta
- * 
  */
 public class BroadcastServiceCluster implements BroadcastService {
 

@@ -16,7 +16,9 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.rule.FieldValidationRule} instead.
  */
+@Deprecated
 public class FieldValidationRule extends ValidationRule<Field> {
 
     private static final int MAX_COLUMNAME_LENGTH = 50;

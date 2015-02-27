@@ -20,7 +20,9 @@ import com.bonitasoft.engine.bdm.validator.rule.ValidationRule;
  * Check that there are no circular references on referenced business objects by composition.
  * 
  * @author Colin PUY
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.rule.composition.CyclicCompositionValidationRule} instead.
  */
+@Deprecated
 public class CyclicCompositionValidationRule extends ValidationRule<BusinessObjectModel> {
 
     public CyclicCompositionValidationRule() {

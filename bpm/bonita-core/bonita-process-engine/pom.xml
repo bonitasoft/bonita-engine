@@ -33,6 +33,7 @@
             <groupId>com.bonitasoft.engine</groupId>
             <artifactId>bonita-common-sp</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.bonitasoft.engine.core.process.instance</groupId>
@@ -65,7 +66,7 @@
             <version>3.18.1-GA</version>
         </dependency>
         <dependency>
-            <groupId>com.bonitasoft.engine.data</groupId>
+            <groupId>org.bonitasoft.engine.data</groupId>
             <artifactId>bonita-business-data-api</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -141,11 +142,16 @@
             <groupId>com.bonitasoft.engine.core.process.instance</groupId>
             <artifactId>bonita-process-instance-impl-sp</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.application</groupId>
             <artifactId>bonita-business-application-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.util</groupId>
+            <artifactId>bonita-common-util</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

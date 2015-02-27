@@ -18,9 +18,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * @author Colin PUY
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.model.field.Field} instead.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType
+@Deprecated
 public abstract class Field {
 
     public static final String PERSISTENCE_ID = "persistenceId";
