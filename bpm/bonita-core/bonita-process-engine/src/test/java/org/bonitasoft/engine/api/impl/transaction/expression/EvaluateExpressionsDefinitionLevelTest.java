@@ -51,7 +51,7 @@ public class EvaluateExpressionsDefinitionLevelTest {
 
         try {
             // when:
-            new EvaluateExpressionsDefinitionLevel(null, processDefId, expressionResolverService, processDefinitionService).evaluateExpression(null, null,
+            new EvaluateExpressionsDefinitionLevel(null, processDefId, expressionResolverService, processDefinitionService, null).evaluateExpression(null, null,
                     processDef);
             fail("There should be a exception raised");
         } catch (SExpressionEvaluationException e) {
@@ -71,7 +71,7 @@ public class EvaluateExpressionsDefinitionLevelTest {
 
         try {
             // when:
-            new EvaluateExpressionsDefinitionLevel(null, 196584L, expressionResolverService, processDefinitionService).evaluateExpression(null, null,
+            new EvaluateExpressionsDefinitionLevel(null, 196584L, expressionResolverService, processDefinitionService, null).evaluateExpression(null, null,
                     processDef);
             fail("There should be a exception raised");
         } catch (SExpressionEvaluationException e) {
@@ -91,7 +91,7 @@ public class EvaluateExpressionsDefinitionLevelTest {
 
         try {
             // when:
-            new EvaluateExpressionsDefinitionLevel(null, 6453241L, expressionResolverService, processDefinitionService).evaluateExpression(null, null,
+            new EvaluateExpressionsDefinitionLevel(null, 6453241L, expressionResolverService, processDefinitionService, null).evaluateExpression(null, null,
                     processDef);
             fail("There should be a exception raised");
         } catch (SExpressionEvaluationException e) {

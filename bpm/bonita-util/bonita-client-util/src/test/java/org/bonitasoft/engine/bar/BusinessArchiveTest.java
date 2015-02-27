@@ -59,6 +59,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacterist
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.MultiInstanceLoopCharacteristicsBuilder;
@@ -661,7 +662,10 @@ public class BusinessArchiveTest {
     @Test
     public void readProcessWithMultiInstanceFromBusinessArchive() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithMultiInstances", "1.0");
-        final MultiInstanceLoopCharacteristicsBuilder multiInstance1 = builder.addAutomaticTask("auto1").addMultiInstance(false, "inputList");
+        builder.addData("inputList", List.class.getName(), null).addData("outputList", List.class.getName(), null);
+        final AutomaticTaskDefinitionBuilder automaticTaskBuilder = builder.addAutomaticTask("auto1");
+        automaticTaskBuilder.addShortTextData("input", null).addShortTextData("output", null);
+        final MultiInstanceLoopCharacteristicsBuilder multiInstance1 = automaticTaskBuilder.addMultiInstance(false, "inputList");
         multiInstance1.addDataInputItemRef("input");
         multiInstance1.addDataOutputItemRef("output");
         multiInstance1.addLoopDataOutputRef("outputList");

@@ -48,6 +48,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -66,6 +67,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCa
 import org.bonitasoft.engine.core.process.definition.model.event.SThrowEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
@@ -74,6 +76,8 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityState
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
@@ -91,6 +95,9 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceA
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventKeyProviderBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
@@ -185,6 +192,8 @@ public class StateBehaviors {
 
     protected final ParentContainerResolver parentContainerResolver;
 
+    private RefBusinessDataService refBusinessDataService;
+
     private final ProcessInstanceService processInstanceService;
 
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
@@ -193,8 +202,9 @@ public class StateBehaviors {
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final ProcessInstanceService processInstanceService,
-            final ParentContainerResolver parentContainerResolver) {
+            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger,
+            final ProcessInstanceService processInstanceService,
+            final ParentContainerResolver parentContainerResolver, final RefBusinessDataService refBusinessDataService) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -216,6 +226,7 @@ public class StateBehaviors {
         this.logger = logger;
         this.processInstanceService = processInstanceService;
         this.parentContainerResolver = parentContainerResolver;
+        this.refBusinessDataService = refBusinessDataService;
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -246,13 +257,35 @@ public class StateBehaviors {
                     final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
                     if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics
                             && ((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataOutputItemRef() != null) {
-                        mapDataOutputOfMultiInstance(flowNodeInstance, (SMultiInstanceLoopCharacteristics) loopCharacteristics);
+                        final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
+                        final SBusinessDataDefinition businessData = processContainer.getBusinessDataDefinition(miLoop.getLoopDataOutputRef());
+                        if (businessData == null) {
+                            mapDataOutputOfMultiInstance(flowNodeInstance, miLoop);
+                        } else {
+                            MapMultiInstanceBusinessDataOutput(flowNodeInstance, miLoop);
+                        }
                     }
-                } catch (final SBonitaException e) {
-                    throw new SActivityStateExecutionException(e);
+                } catch (final SBonitaException sbe) {
+                    throw new SActivityStateExecutionException(sbe);
                 }
             }
         }
+    }
+
+    private void MapMultiInstanceBusinessDataOutput(final SFlowNodeInstance flowNodeInstance, final SMultiInstanceLoopCharacteristics miLoop)
+            throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException, SRefBusinessDataInstanceModificationException {
+        final SRefBusinessDataInstance outputMIRef = refBusinessDataService.getFlowNodeRefBusinessDataInstance(
+                miLoop.getDataOutputItemRef(), flowNodeInstance.getId());
+        final SRefBusinessDataInstance outputMILoopRef = refBusinessDataService.getRefBusinessDataInstance(
+                miLoop.getLoopDataOutputRef(), flowNodeInstance.getParentProcessInstanceId());
+        final SMultiRefBusinessDataInstance multiRefBusinessDataInstance = (SMultiRefBusinessDataInstance) outputMILoopRef;
+        List<Long> dataIds = multiRefBusinessDataInstance.getDataIds();
+        if (dataIds == null) {
+            dataIds = new ArrayList<Long>();
+        }
+        final Long dataId = ((SFlowNodeSimpleRefBusinessDataInstance) outputMIRef).getDataId();
+        dataIds.add(dataId);
+        refBusinessDataService.updateRefBusinessDataInstance(multiRefBusinessDataInstance, dataIds);
     }
 
     @SuppressWarnings("unchecked")
@@ -381,13 +414,13 @@ public class StateBehaviors {
      * Return the phases and connectors to execute, as a couple of (phase, couple of (connector instance, connector definition))
      * 
      * @param processDefinition
-     *            the process where the connectors are defined.
+     *        the process where the connectors are defined.
      * @param flowNodeInstance
-     *            the instance of the flow node to execute possible connectors on.
+     *        the instance of the flow node to execute possible connectors on.
      * @param executeConnectorsOnEnter
-     *            do we want to consider the connectors ON_ENTER or ignore them?
+     *        do we want to consider the connectors ON_ENTER or ignore them?
      * @param executeConnectorsOnFinish
-     *            do we want to consider the connectors ON_FINISH or ignore them?
+     *        do we want to consider the connectors ON_FINISH or ignore them?
      * @return the phases and connectors to execute
      * @throws SActivityStateExecutionException
      */
@@ -741,7 +774,7 @@ public class StateBehaviors {
         final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(),
                 rootProcessInstanceId, activityInstance.getParentContainerId(), containerType, boundaryEventDefinition,
                 rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId()
-        );
+                );
 
         // no need to handle failed state, creation is in the same tx
         containerRegistry.executeFlowNodeInSameThread(parentProcessInstanceId, boundaryEventInstance.getId(), null, null, containerType.name());
@@ -913,6 +946,21 @@ public class StateBehaviors {
 
     public int getNumberOfInstancesToCreateFromInputRef(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SMultiInstanceLoopCharacteristics miLoop, final int numberOfInstanceMax) throws SDataInstanceException, SActivityStateExecutionException {
+        final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+        final SBusinessDataDefinition businessData = processContainer.getBusinessDataDefinition(miLoop.getLoopDataInputRef());
+        if (businessData == null) {
+            return getNumberOfInstanceToCreateFromSimpleData(processDefinition, flowNodeInstance, miLoop, numberOfInstanceMax);
+        }
+        try {
+            return refBusinessDataService.getNumberOfDataOfMultiRefBusinessData(businessData.getName(), flowNodeInstance.getParentProcessInstanceId());
+        } catch (final SBonitaReadException sbre) {
+            throw new SActivityStateExecutionException(sbre);
+        }
+
+    }
+
+    private int getNumberOfInstanceToCreateFromSimpleData(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance,
+            SMultiInstanceLoopCharacteristics miLoop, int numberOfInstanceMax) throws SDataInstanceException, SActivityStateExecutionException {
         final SDataInstance loopDataInput = dataInstanceService.getDataInstance(miLoop.getLoopDataInputRef(), flowNodeInstance.getId(),
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         if (loopDataInput != null) {
@@ -932,46 +980,67 @@ public class StateBehaviors {
         if (loopCharacteristics.getLoopCardinality() != null) {
             return miActivityInstance.getLoopCardinality() > numberOfInstances;
         }
-        final SDataInstance dataInstance = dataInstanceService.getDataInstance(loopCharacteristics.getLoopDataInputRef(), miActivityInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
-        if (dataInstance != null) {
-            final List<?> loopDataInputCollection = (List<?>) dataInstance.getValue();
-            return numberOfInstances < loopDataInputCollection.size();
+        List<?> possibleValues = null;
+        try {
+            //FIXME find if a business data is used if instead of try catch
+            final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) refBusinessDataService.getRefBusinessDataInstance(
+                    loopCharacteristics.getLoopDataInputRef(), miActivityInstance.getParentProcessInstanceId());
+            possibleValues = multiRef.getDataIds();
+        } catch (final SBonitaException sbe) {
+            final SDataInstance dataInstance = getDataInstanceService().getDataInstance(loopCharacteristics.getLoopDataInputRef(),
+                    miActivityInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
+            possibleValues = (List<?>) dataInstance.getValue();
         }
-        return false;
+        return possibleValues != null && numberOfInstances < possibleValues.size();
     }
 
     public void updateOutputData(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SMultiInstanceLoopCharacteristics miLoop, final int numberOfInstanceMax) throws SDataInstanceException, SActivityStateExecutionException {
-        final String loopDataOutputRef = miLoop.getLoopDataOutputRef();
-        if (loopDataOutputRef != null) {
-            final SDataInstance loopDataOutput = dataInstanceService.getDataInstance(loopDataOutputRef, flowNodeInstance.getId(),
-                    DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
-            if (loopDataOutput != null) {
-                final Serializable outValue = loopDataOutput.getValue();
-                if (outValue instanceof List) {
-                    final List<?> loopDataOutputCollection = (List<?>) outValue;
-                    if (loopDataOutputCollection.size() < numberOfInstanceMax) {
-                        // output data is too small
-                        final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
-                        newOutputList.addAll(loopDataOutputCollection);
-                        for (int i = loopDataOutputCollection.size(); i < numberOfInstanceMax; i++) {
-                            newOutputList.add(null);
-                        }
-                        updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
+        if (!isBusinessData(processDefinition, miLoop)) {
+            final String loopDataOutputRef = miLoop.getLoopDataOutputRef();
+            if (loopDataOutputRef != null) {
+                final SDataInstance loopDataOutput = dataInstanceService.getDataInstance(loopDataOutputRef, flowNodeInstance.getId(),
+                        DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
+                if (loopDataOutput != null) {
+                    final Serializable outValue = loopDataOutput.getValue();
+                    if (outValue instanceof List) {
+                        updateLoopDataOutputWithListContent((List<?>) outValue, loopDataOutput, numberOfInstanceMax);
+                    } else if (outValue == null) {
+                        updateLoopDataOutputWithNull(loopDataOutput, numberOfInstanceMax);
+                    } else {
+                        throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName()
+                                + " of process " + processDefinition.getName() + " " + processDefinition.getVersion()
+                                + " have a loop data output which is not a java.util.List");
                     }
-                } else if (outValue == null) {
-                    final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
-                    for (int i = 0; i < numberOfInstanceMax; i++) {
-                        newOutputList.add(null);
-                    }
-                    updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
-                } else {
-                    throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName()
-                            + " of process " + processDefinition.getName() + " " + processDefinition.getVersion()
-                            + " have a loop data output which is not a java.util.List");
                 }
             }
+        }
+    }
+
+    boolean isBusinessData(final SProcessDefinition processDefinition, final SMultiInstanceLoopCharacteristics miLoop) {
+        final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+        final SBusinessDataDefinition businessData = processContainer.getBusinessDataDefinition(miLoop.getLoopDataOutputRef());
+        return businessData != null;
+    }
+
+    private void updateLoopDataOutputWithNull(final SDataInstance loopDataOutput, final int numberOfInstanceMax) throws SDataInstanceException {
+        final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
+        for (int i = 0; i < numberOfInstanceMax; i++) {
+            newOutputList.add(null);
+        }
+        updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
+    }
+
+    private void updateLoopDataOutputWithListContent(final List<?> outValue, final SDataInstance loopDataOutput, final int numberOfInstanceMax)
+            throws SDataInstanceException {
+        if (outValue.size() < numberOfInstanceMax) {
+            // output data is too small
+            final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
+            newOutputList.addAll(outValue);
+            for (int i = outValue.size(); i < numberOfInstanceMax; i++) {
+                newOutputList.add(null);
+            }
+            updateLoopDataOutputDataInstance(loopDataOutput, newOutputList);
         }
     }
 

@@ -25,9 +25,26 @@
 				<ref bean="javaMethodCallExpressionExecutorStrategy" />
 				<ref bean="parameterExpressionExecutorStrategy" />
 				<ref bean="xPathReadExpressionExecutorStrategy" />
+                <ref bean="businessDataExpressionExecutorStrategy" />
+                <ref bean="queryBusinessDataExpressionExecutorStrategy" />
+                <ref bean="businessObjectDAOExpressionStrategy" />
 			</list>
 		</property>
 	</bean>
+
+    <bean id="businessDataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.BusinessDataExpressionExecutorStrategy" >
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+    </bean>
+
+    <bean id="businessObjectDAOExpressionStrategy" class="org.bonitasoft.engine.expression.BusinessObjectDAOExpressionStrategy" >
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+    </bean>
+
+    <bean id="queryBusinessDataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.QueryBusinessDataExpressionExecutorStrategy" >
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+    </bean>
 
 	<bean id="constantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy" />
 

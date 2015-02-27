@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.api.ApplicationAPI;
+import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PageAPI;
@@ -69,5 +70,10 @@ public class APIAccessorImpl implements APIAccessor {
     @Override
     public ApplicationAPI getLivingApplicationAPI() {
         return new ApplicationAPIImpl();
+    }
+
+    @Override
+    public BusinessDataAPI getBusinessDataAPI() {
+        return new BusinessDataAPIImpl();
     }
 }

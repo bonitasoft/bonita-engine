@@ -38,10 +38,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
             <artifactId>bonita-log-technical-api</artifactId>
             <version>${project.version}</version>

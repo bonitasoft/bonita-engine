@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -49,7 +50,9 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
     private final Map<String, Serializable> results = new HashMap<String, Serializable>(0);
 
     public EvaluateExpressionsDefinitionLevel(final Map<Expression, Map<String, Serializable>> expressions, final long processDefinitionId,
-            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService) {
+            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
+            final BusinessDataRepository bdrService) {
+        super(bdrService);
         expressionsAndTheirPartialContext = expressions;
         this.processDefinitionId = processDefinitionId;
         expressionResolver = expressionResolverService;

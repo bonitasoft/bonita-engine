@@ -22,6 +22,8 @@
 	<util:map id="jndiMapping">
 		<entry key="java:comp/env/bonitaDS" value-ref="bonitaDataSource" />
 		<entry key="java:comp/env/bonitaSequenceManagerDS" value-ref="bonitaSequenceManagerDataSource" />
+        <entry key="java:comp/env/BusinessDataDS" value-ref="businessDataDataSource" />
+        <entry key="java:comp/env/NotManagedBizDataDS" value-ref="notManagedBizDataSource" />
 		<entry key="java:comp/UserTransaction" value-ref="BitronixTransactionManager" />
 	</util:map>
 

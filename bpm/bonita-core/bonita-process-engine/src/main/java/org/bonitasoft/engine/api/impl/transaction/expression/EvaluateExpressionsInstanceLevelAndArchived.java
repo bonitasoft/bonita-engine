@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -48,7 +49,9 @@ TransactionContentWithResult<Map<String, Serializable>> {
     private final Map<String, Serializable> results = new HashMap<String, Serializable>(0);
 
     public EvaluateExpressionsInstanceLevelAndArchived(final Map<Expression, Map<String, Serializable>> expressions, final long containerId,
-            final String containerType, final long processDefinitionId, final long time, final ExpressionResolverService expressionService) {
+            final String containerType, final long processDefinitionId, final long time, final ExpressionResolverService expressionService,
+            final BusinessDataRepository bdrService) {
+        super(bdrService);
         this.expressions = expressions;
         this.containerId = containerId;
         expressionResolver = expressionService;
