@@ -14,12 +14,10 @@
 package org.bonitasoft.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +29,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.ApplicationAPI;
+import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
@@ -40,6 +40,7 @@ import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
@@ -91,6 +92,7 @@ import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.connector.AbstractConnector;
+import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -181,6 +183,10 @@ public class APITestUtil extends PlatformTestUtil {
 
     private ApplicationAPI applicationAPI;
 
+    private TenantAdministrationAPI tenantManagementCommunityAPI;
+
+    private BusinessDataAPI businessDataAPI;
+
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
         if (strTimeout != null) {
@@ -221,7 +227,17 @@ public class APITestUtil extends PlatformTestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
         setPageAPI(TenantAPIAccessor.getCustomPageAPI(getSession()));
-        applicationAPI = TenantAPIAccessor.getLivingApplicationAPI(getSession());
+        setApplicationAPI(TenantAPIAccessor.getLivingApplicationAPI(getSession()));
+        setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantAdministrationAPI(getSession()));
+        setBusinessDataAPI(TenantAPIAccessor.getBusinessDataAPI(getSession()));
+    }
+
+    public BusinessDataAPI getBusinessDataAPI() {
+        return businessDataAPI;
+    }
+
+    public void setBusinessDataAPI(final BusinessDataAPI businessDataAPI) {
+        this.businessDataAPI = businessDataAPI;
     }
 
     public void logoutOnTenant() throws BonitaException {
@@ -234,6 +250,10 @@ public class APITestUtil extends PlatformTestUtil {
         setProfileAPI(null);
         setThemeAPI(null);
         setPermissionAPI(null);
+        setApplicationAPI(null);
+        setTenantManagementCommunityAPI(null);
+        setPageAPI(null);
+        setBusinessDataAPI(null);
     }
 
     public void logoutThenlogin() throws BonitaException {
@@ -586,6 +606,12 @@ public class APITestUtil extends PlatformTestUtil {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
                 Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
                 Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)), null);
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user) throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, actorName, user, "TestConnectorEngineExecutionContext.impl",
+                TestConnectorEngineExecutionContext.class, "TestConnectorEngineExecutionContext.jar");
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
@@ -1470,6 +1496,18 @@ public class APITestUtil extends PlatformTestUtil {
         return applicationAPI;
     }
 
+    public void setApplicationAPI(final ApplicationAPI applicationAPI) {
+        this.applicationAPI = applicationAPI;
+    }
+
+    public TenantAdministrationAPI getTenantAdministrationAPI() {
+        return tenantManagementCommunityAPI;
+    }
+
+    public void setTenantManagementCommunityAPI(final TenantAdministrationAPI tenantManagementCommunityAPI) {
+        this.tenantManagementCommunityAPI = tenantManagementCommunityAPI;
+    }
+
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
         if (processSupervisors != null) {
             for (final ProcessSupervisor processSupervisor : processSupervisors) {
@@ -1551,4 +1589,14 @@ public class APITestUtil extends PlatformTestUtil {
         assertThat(allDifferences).as("should have no differences between:\n%s\n and:\n%s\n", xmlPrettyFormatExpected, xmlPrettyFormatExported).isEmpty();
     }
 
+    public BarResource getBarResource(final String path, final String name, Class<?> clazz) throws IOException {
+        final InputStream stream = clazz.getResourceAsStream(path);
+        assertThat(stream).isNotNull();
+        try {
+            final byte[] byteArray = IOUtils.toByteArray(stream);
+            return new BarResource(name, byteArray);
+        } finally {
+            stream.close();
+        }
+    }
 }

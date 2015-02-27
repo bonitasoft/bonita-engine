@@ -156,7 +156,15 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping" value="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" />
 
-				<entry key="org.bonitasoft.engine.core.category.model.SCategory" value="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" />
+                <!--business data-->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SMultiRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl" />
+
+                <entry key="org.bonitasoft.engine.core.category.model.SCategory" value="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" />
 				<entry key="org.bonitasoft.engine.core.category.model.SProcessCategoryMapping" value="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" />
 				<entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" />
                 <entry key="org.bonitasoft.engine.core.document.model.SDocument" value="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" />

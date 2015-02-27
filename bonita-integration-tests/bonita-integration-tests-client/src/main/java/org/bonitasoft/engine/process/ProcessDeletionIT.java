@@ -402,8 +402,10 @@ public class ProcessDeletionIT extends TestWithUser {
 
         // start P2, the call activities will start an instance of P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
-        final ActivityInstance simpleTask = waitForUserTaskAndExecuteAndGetIt(rootProcessInstance, simpleStepName, user);
+        final ActivityInstance simpleTask = waitForUserTaskAndAssigneIt(rootProcessInstance, simpleStepName, user);
         final ProcessInstance simpleProcessInstance = getProcessAPI().getProcessInstance(simpleTask.getParentProcessInstanceId());
+        getProcessAPI().executeFlowNode(simpleTask.getId());
+
         waitForUserTask(rootProcessInstance, rootStepName);
         waitForProcessToFinish(simpleProcessInstance);
 

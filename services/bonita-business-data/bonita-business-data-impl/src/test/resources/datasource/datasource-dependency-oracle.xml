@@ -1,0 +1,32 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="properties">
+			<props>
+				<prop key="db.hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
+				<prop key="db.datasource.classname">oracle.jdbc.xa.client.OracleXADataSource</prop>
+				<prop key="db.server.name">192.168.4.61</prop>
+				<prop key="db.server.port">1521</prop>
+				<prop key="db.instance.name">orcl</prop>
+				<prop key="db.user">bonita_engine</prop>
+                <prop key="db.password">bonita_engine</prop>
+                <prop key="db.url">jdbc:oracle:thin:@${db.server.name}:${db.server.port}:${db.instance.name}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="driverProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="user">${db.user}</prop>
+				<prop key="password">${db.password}</prop>
+				<prop key="URL">jdbc:oracle:thin:@${db.server.name}:${db.server.port}:${db.instance.name}</prop>
+			</props>
+		</property>
+	</bean>
+
+</beans>

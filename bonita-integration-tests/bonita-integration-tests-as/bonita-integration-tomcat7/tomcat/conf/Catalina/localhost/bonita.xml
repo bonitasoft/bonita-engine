@@ -44,4 +44,32 @@
 		driverClassName="#db.driver.class#" 
 		url="#db.url#" />
 
+	<Resource name="BusinessDataDS"
+	    auth="Container"
+	    type="javax.sql.DataSource"
+		factory="bitronix.tm.resource.ResourceObjectFactory"
+		uniqueName="jdbc/BusinessDataDS" />
+
+	<Resource name="NotManagedBizDataDS"
+		auth="Container"
+		type="javax.sql.DataSource"
+		maxActive="100"
+		minIdle="10"
+		maxWait="10000"
+		initialSize="1"
+		maxPoolSize="5"
+		minPoolSize="1"
+		maxConnectionAge="0"
+		maxIdleTime="1800"
+		maxIdleTimeExcessConnections="120"
+		idleConnectionTestPeriod="30"
+		acquireIncrement="3"
+		testConnectionOnCheckout="true"
+		removeAbandoned="true"
+		logAbandoned="true"
+		username="#db.user#"
+		password="#db.password#"
+		driverClassName="#db.driver.class#"
+		url="#db.url#" />
+
 </Context>

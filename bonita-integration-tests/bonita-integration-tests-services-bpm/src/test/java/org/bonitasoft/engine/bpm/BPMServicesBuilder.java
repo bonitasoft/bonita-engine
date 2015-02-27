@@ -29,6 +29,9 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.BusinessDataRepository;
+import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -53,6 +56,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -72,8 +76,8 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
@@ -92,6 +96,7 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.PermissionService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -586,4 +591,28 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(ApplicationService.class);
     }
 
+    @Override
+    public BroadcastService getBroadcastService() {
+        return getInstanceOf(BroadcastService.class);
+    }
+
+    @Override
+    public BusinessDataRepository getBusinessDataRepository() {
+        return getInstanceOf(BusinessDataRepository.class);
+    }
+
+    @Override
+    public RefBusinessDataService getRefBusinessDataService() {
+        return getInstanceOf(RefBusinessDataService.class);
+    }
+
+    @Override
+    public BusinessDataModelRepository getBusinessDataModelRepository() {
+        return getInstanceOf(BusinessDataModelRepository.class);
+    }
+
+    @Override
+    public BusinessDataService getBusinessDataService() {
+        return getInstanceOf(BusinessDataService.class);
+    }
 }

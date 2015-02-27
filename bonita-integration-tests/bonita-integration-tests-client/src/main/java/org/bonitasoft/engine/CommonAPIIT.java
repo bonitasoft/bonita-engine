@@ -124,11 +124,7 @@ public abstract class CommonAPIIT extends APITestUtil {
     }
 
     public BarResource getResource(final String path, final String name) throws IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream(path);
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
-        return new BarResource(name, byteArray);
+        return getBarResource(path, name, BPMRemoteTests.class);
     }
 
     public void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
