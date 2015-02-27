@@ -332,6 +332,13 @@
 					<artifactId>cargo-maven2-plugin</artifactId>
 					<version>1.4.11</version>
 				</plugin>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>jaxb2-maven-plugin</artifactId>
+                        <version>1.6</version>
+                    </plugin>
+                </plugins>
                 <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
