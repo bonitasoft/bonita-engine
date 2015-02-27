@@ -154,6 +154,7 @@
                 <entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" value="10201" />
                 <entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" value="10202" />
 				<entry key="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" value="10300" />
+                <entry key="org.bonitasoft.engine.core.contract.data.SContractData" value="10210" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />
@@ -186,6 +187,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" value="20040" />
+                <entry key="org.bonitasoft.engine.core.contract.data.SAContractData" value="20210" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />

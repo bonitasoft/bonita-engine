@@ -38,7 +38,7 @@ public class LazyLoader {
 
     public Object load(final Method method, final long persistenceId) {
         try {
-            EntityGetter getter = new EntityGetter(method);
+            final EntityGetter getter = new EntityGetter(method);
             final Map<String, Serializable> commandParameters = BDMQueryCommandParameters.createCommandParameters(getter, persistenceId);
             final byte[] serializedResult = (byte[]) getCommandAPI().execute("executeBDMQuery", commandParameters);
             if (getter.returnsList()) {

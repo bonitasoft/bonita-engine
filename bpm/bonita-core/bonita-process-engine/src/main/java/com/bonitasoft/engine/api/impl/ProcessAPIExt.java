@@ -44,6 +44,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
@@ -171,7 +172,6 @@ import com.bonitasoft.manager.Features;
  */
 public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
-    @Override
     protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -316,13 +316,16 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
 
             final SManualTaskInstance createManualUserTask = createManualUserTask(tenantAccessor, fields, parentHumanTaskId);
-            executeFlowNode(loggedUserId, createManualUserTask.getId(), false /* wrapInTransaction */);// put it in ready
+            executeFlowNode(loggedUserId, createManualUserTask.getId(), false /* wrapInTransaction */, new HashMap<String, Object>());// put it in ready
             addActivityInstanceTokenCount(activityInstanceService, parentActivityInstance);
 
             return ModelConvertor.toManualTask(createManualUserTask, flowNodeStateManager);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new CreationException(e.getMessage());
+        } catch (final ContractViolationException cve) {
+            log(tenantAccessor, cve);
+            throw new CreationException("The manual task cannot be created due to a contract violation");
         }
     }
 

@@ -54,7 +54,9 @@ import com.bonitasoft.engine.core.process.instance.model.SFlowNodeSimpleRefBusin
 import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
-
+/**
+ * @author Matthieu Chaffotte
+ */
 public class StateBehaviorsExt extends StateBehaviors {
 
     private final RefBusinessDataService refBusinessDataService;
