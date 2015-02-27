@@ -51,7 +51,11 @@ import com.bonitasoft.engine.profile.ProfileEntryCreator;
 import com.bonitasoft.engine.profile.ProfileEntryType;
 
 @SuppressWarnings("javadoc")
-@Deprecated
+@Deprecated // when cleaning deprecated APIs, please do not delete this class. The tests below are related to custom profiles and must be kept
+//- deletePage_should_delete_profile_entry
+//- deletePage_should_delete_parent_profile_entry
+//- deletePage_with_no_parent_profile_entry
+//- updatePage_should_update_profile_entry
 public class PageAPIIT extends CommonAPISPIT {
 
     @Rule

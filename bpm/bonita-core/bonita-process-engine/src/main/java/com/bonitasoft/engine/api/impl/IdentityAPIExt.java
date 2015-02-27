@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import org.bonitasoft.engine.api.impl.AvailableWhenTenantIsPaused;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;

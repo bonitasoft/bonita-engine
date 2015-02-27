@@ -40,7 +40,7 @@
     </bean>
 
 
-    <bean id="bpmInstancesCreator" class="com.bonitasoft.engine.bpm.model.impl.BPMInstancesCreatorExt">
+    <bean id="bpmInstancesCreator" class="org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator">
         <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
         <constructor-arg name="actorMappingService" ref="actorMappingService"/>
         <constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService"/>
@@ -199,7 +199,7 @@
                 <bean class="org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyResolver"/>
                 <bean class="org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver"/>
                 <bean class="org.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver"/>
-                <bean class="com.bonitasoft.engine.api.impl.resolver.BusinessDataProcessDependencyResolver"/>
+                <bean class="org.bonitasoft.engine.api.impl.resolver.BusinessDataProcessDependencyResolver"/>
             </list>
         </constructor-arg>
     </bean>

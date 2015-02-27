@@ -188,12 +188,12 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping" value="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" />
 				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
-                <entry key="com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataInstanceImpl" />
-				<entry key="com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SSimpleRefBusinessDataInstanceImpl" />
-                <entry key="com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SMultiRefBusinessDataInstanceImpl" />
-                <entry key="com.bonitasoft.engine.core.process.instance.model.SProcessSimpleRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SProcessSimpleRefBusinessDataInstanceImpl" />
-                <entry key="com.bonitasoft.engine.core.process.instance.model.SFlowNodeSimpleRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeSimpleRefBusinessDataInstanceImpl" />
-                <entry key="com.bonitasoft.engine.core.process.instance.model.SProcessMultiRefBusinessDataInstance" value="com.bonitasoft.engine.core.process.instance.model.impl.SProcessMultiRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SMultiRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SReport" value="com.bonitasoft.engine.core.reporting.SReportImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="com.bonitasoft.engine.core.reporting.SReportContentImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContent" value="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" />

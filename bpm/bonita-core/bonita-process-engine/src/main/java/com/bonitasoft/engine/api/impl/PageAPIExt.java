@@ -11,6 +11,7 @@ package com.bonitasoft.engine.api.impl;
 import java.util.List;
 import java.util.Properties;
 
+import org.bonitasoft.engine.api.impl.AvailableWhenTenantIsPaused;
 import org.bonitasoft.engine.api.impl.PageAPIImpl;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.api.impl.page.PageAPIDelegate;

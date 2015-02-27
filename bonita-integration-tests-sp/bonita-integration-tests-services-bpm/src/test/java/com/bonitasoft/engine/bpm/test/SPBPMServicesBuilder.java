@@ -9,22 +9,17 @@
 package com.bonitasoft.engine.bpm.test;
 
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
+import org.bonitasoft.engine.parameter.ParameterService;
 
-import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import com.bonitasoft.engine.business.data.BusinessDataRepository;
-import com.bonitasoft.engine.business.data.BusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
-import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
 import com.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
 import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
-import org.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
-import com.bonitasoft.engine.service.BroadcastService;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -96,31 +91,6 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
             return getInstanceOf("monitoringServiceWithCache", TenantMonitoringService.class);
         }
         return getInstanceOf("monitoringService", TenantMonitoringService.class);
-    }
-
-    @Override
-    public BusinessDataRepository getBusinessDataRepository() {
-        return getInstanceOf(BusinessDataRepository.class);
-    }
-
-    @Override
-    public BroadcastService getBroadcastService() {
-        return getInstanceOf(BroadcastService.class);
-    }
-
-    @Override
-    public RefBusinessDataService getRefBusinessDataService() {
-        return getInstanceOf(RefBusinessDataService.class);
-    }
-
-    @Override
-    public BusinessDataModelRepository getBusinessDataModelRepository() {
-        return getInstanceOf(BusinessDataModelRepository.class);
-    }
-
-    @Override
-    public BusinessDataService getBusinessDataService() {
-        return getInstanceOf(BusinessDataService.class);
     }
 
 }

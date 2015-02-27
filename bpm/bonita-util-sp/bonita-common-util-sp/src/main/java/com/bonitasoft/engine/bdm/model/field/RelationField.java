@@ -21,8 +21,10 @@ import com.bonitasoft.engine.bdm.model.BusinessObject;
 
 /**
  * @author Colin PUY
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.model.field.RelationField} instead.
  */
 @XmlType
+@Deprecated
 public class RelationField extends Field {
 
     public enum Type {

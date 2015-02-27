@@ -19,7 +19,9 @@ import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
  * 
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.api.TenantAdministrationAPI} instead.
  */
+@Deprecated
 public interface TenantManagementAPI {
 
     /**
