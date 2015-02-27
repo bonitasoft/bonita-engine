@@ -1,15 +1,16 @@
 /*******************************************************************************
- * Copyright (C) 2014 Bonitasoft S.A.
- * Bonitasoft is a trademark of Bonitasoft SA.
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
- * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
- * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
 package com.bonitasoft.engine.monitoring.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -50,10 +51,34 @@ public class PlatformMonitoringServiceImplTest {
         doReturn(11L).when(transactionService).getNumberOfActiveTransactions();
 
         //when
-        long activeTransactions = platformMonitoringService.getNumberOfActiveTransactions();
+        final long activeTransactions = platformMonitoringService.getNumberOfActiveTransactions();
 
         //then
         assertThat(activeTransactions).isEqualTo(11);
+    }
+
+    @Test
+    public void isOptionalMonitoringInformationAvailableShouldBeTrueForSunJVM() throws Exception {
+        // given:
+        when(jvmMBean.getJvmVendor()).thenReturn("JVM Sun something");
+
+        // when:
+        final boolean optional = platformMonitoringService.isOptionalMonitoringInformationAvailable();
+
+        // then:
+        assertThat(optional).isTrue();
+    }
+
+    @Test
+    public void isOptionalMonitoringInformationAvailableShouldBeTrueForOracleJVM() throws Exception {
+        // given:
+        when(jvmMBean.getJvmVendor()).thenReturn("JVM Oracle something");
+
+        // when:
+        final boolean optional = platformMonitoringService.isOptionalMonitoringInformationAvailable();
+
+        // then:
+        assertThat(optional).isTrue();
     }
 
 }

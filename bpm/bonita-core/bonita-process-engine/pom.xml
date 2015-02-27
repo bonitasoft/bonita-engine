@@ -4,7 +4,7 @@
     <parent>
         <artifactId>bonita-core</artifactId>
         <groupId>com.bonitasoft.engine.core</groupId>
-        <version>6.5.0-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-process-engine</artifactId>
@@ -35,11 +35,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.bonitasoft.engine.core.parameter</groupId>
-            <artifactId>bonita-parameter-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.bonitasoft.engine.core.process.instance</groupId>
             <artifactId>bonita-process-instance-api-sp</artifactId>
             <version>${project.version}</version>
@@ -60,7 +55,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.bonitasoft.engine.page</groupId>
+            <groupId>org.bonitasoft.engine.page</groupId>
             <artifactId>bonita-page-api</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -75,7 +70,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.bonitasoft.engine.application</groupId>
+            <groupId>org.bonitasoft.engine.application</groupId>
             <artifactId>bonita-business-application-api</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -149,7 +144,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.bonitasoft.engine.application</groupId>
+            <groupId>org.bonitasoft.engine.application</groupId>
             <artifactId>bonita-business-application-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -28,7 +28,7 @@ public class WithoutDAOImplementationFileFilter extends AbstractFileFilter {
     }
 
     private boolean notClientResource(final File file) {
-        return !file.getAbsolutePath().contains("com" + File.separatorChar + "bonitasoft");
+        return !file.getAbsolutePath().contains("com" + File.separatorChar + "bonitasoft"+ File.separatorChar);
     }
 
     private boolean acceptSourceFile(final File file, final String name) {

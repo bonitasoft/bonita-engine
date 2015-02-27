@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -10,13 +10,14 @@ package com.bonitasoft.engine.business.application;
 
 import org.bonitasoft.engine.profile.Profile;
 
-
 /**
  * Contains fields that can be used by {@link ApplicationCreator} and {@link ApplicationUpdater}
  *
  * @author Elias Ricken de Medeiros
  * @see ApplicationCreator
  * @see ApplicationUpdater
+ * @see org.bonitasoft.engine.business.application.ApplicationField
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationField} instead.
  */
 public enum ApplicationField {
 
@@ -72,6 +73,7 @@ public enum ApplicationField {
 
     /**
      * References the identifier of the {@link ApplicationPage} defined as the {@link Application} home page
+     *
      * @see com.bonitasoft.engine.business.application.ApplicationPage
      * @see com.bonitasoft.engine.business.application.Application
      */

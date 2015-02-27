@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.test</groupId>
 		<artifactId>bonita-integration-tests-sp</artifactId>
-		<version>6.5.0-SNAPSHOT</version>
+		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-tests-services-bpm-sp</artifactId>
@@ -50,7 +50,7 @@
 
 		<!-- Parameter -->
 		<dependency>
-			<groupId>com.bonitasoft.engine.core.parameter</groupId>
+			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-parameter-propertyfile</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -85,15 +85,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
-        <!-- Business application -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.application</groupId>
-            <artifactId>bonita-business-application</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
 
 		<!-- Business Data -->
 		<dependency>
@@ -307,22 +298,13 @@
 		</dependency>
 
 		<!-- Custom Pages -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.page</groupId>
-			<artifactId>bonita-page-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.bonitasoft.engine.page</groupId> -->
+<!-- 			<artifactId>bonita-page-impl</artifactId> -->
+<!-- 			<version>${project.version}</version> -->
+<!-- 			<scope>test</scope> -->
+<!-- 		</dependency> -->
         
-        
-        <!-- Page -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.page</groupId>
-            <artifactId>bonita-page</artifactId>
-            <version>${project.version}</version>
-			<scope>test</scope>
-        </dependency>
-
 		<!-- Platform -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
@@ -570,12 +552,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.bonitasoft.engine.page</groupId>
-			<artifactId>bonita-page-api</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.transaction</groupId>
 			<artifactId>bonita-transaction-api</artifactId>
 			<version>${project.version}</version>
@@ -594,7 +570,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.bonitasoft.engine.core.parameter</groupId>
+			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-parameter-api</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -656,12 +632,12 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>com.bonitasoft.engine.application</groupId>
-            <artifactId>bonita-business-application-impl</artifactId>
-            <version>${project.version}</version>
-			<scope>test</scope>
-        </dependency>
+<!--         <dependency> -->
+<!--             <groupId>com.bonitasoft.engine.application</groupId> -->
+<!--             <artifactId>bonita-business-application-impl</artifactId> -->
+<!--             <version>${project.version}</version> -->
+<!-- 			<scope>test</scope> -->
+<!--         </dependency> -->
 
 	</dependencies>
 

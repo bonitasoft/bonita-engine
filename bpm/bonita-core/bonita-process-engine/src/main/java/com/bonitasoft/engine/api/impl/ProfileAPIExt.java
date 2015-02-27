@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
@@ -48,7 +50,6 @@ import com.bonitasoft.engine.api.impl.transaction.profile.ExportProfilesSpecifie
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfile;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntry;
 import com.bonitasoft.engine.api.impl.transaction.profile.UpdateProfileEntryIndexOnInsert;
-import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.profile.ImportPolicy;
 import com.bonitasoft.engine.profile.ProfileCreator;
 import com.bonitasoft.engine.profile.ProfileCreator.ProfileField;
@@ -184,7 +185,12 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final Parser parser = tenantAccessor.getProfileParser();
         final PageService pageService = tenantAccessor.getPageService();
-        final List<ExportedProfile> profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
+        final List<ExportedProfile> profiles;
+        try {
+            profiles = ProfilesImporter.getProfilesFromXML(new String(xmlContent), parser);
+        } catch (IOException e) {
+            throw new ExecutionException(e);
+        }
 
         // licence and feature check moved
         // at profile level in ProfilesImporterExt

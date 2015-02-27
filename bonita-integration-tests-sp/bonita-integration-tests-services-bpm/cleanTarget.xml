@@ -29,7 +29,7 @@
 		<!-- sql files -->
     	<delete dir="${target.dir}/server/sql" />
     	<copy todir="${target.dir}/server/sql">
-    		<fileset dir="${basedir}/../../../bonita-engine/bpm/bonita-sql/sql" />
+    		<fileset dir="${basedir}/../../../bonita-engine/bpm/bonita-sql/src/main/resources/sql" />
     	</copy>
 
 		<loadfile srcFile="${basedir}/pom.xml" property="project.version">

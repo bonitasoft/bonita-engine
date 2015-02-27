@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -51,15 +51,6 @@ import com.bonitasoft.engine.monitoring.SGcInfo;
 import com.bonitasoft.engine.monitoring.SMemoryUsage;
 import com.bonitasoft.engine.monitoring.impl.GcInfoImpl;
 import com.bonitasoft.engine.monitoring.impl.MemoryUsageImpl;
-import com.bonitasoft.engine.page.Page;
-import com.bonitasoft.engine.page.PageCreator;
-import com.bonitasoft.engine.page.PageCreator.PageField;
-import com.bonitasoft.engine.page.PageUpdater;
-import com.bonitasoft.engine.page.PageUpdater.PageUpdateField;
-import com.bonitasoft.engine.page.SPage;
-import com.bonitasoft.engine.page.SPageBuilder;
-import com.bonitasoft.engine.page.SPageBuilderFactory;
-import com.bonitasoft.engine.page.impl.PageImpl;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantCreator.TenantField;
@@ -243,21 +234,6 @@ public final class SPModelConvertor extends ModelConvertor {
         return report;
     }
 
-    public static Page toPage(final SPage sPage) {
-        final PageImpl page = new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(), sPage.getDescription(),
-                sPage.getInstallationDate(),
-                sPage.getInstalledBy(), sPage.getLastModificationDate(), sPage.getLastUpdatedBy(), sPage.getContentName());
-        return page;
-    }
-
-    public static List<Page> toPages(final List<SPage> sPages) {
-        final List<Page> pages = new ArrayList<Page>(sPages.size());
-        for (final SPage sPage : sPages) {
-            pages.add(toPage(sPage));
-        }
-        return pages;
-    }
-
     public static List<Report> toReports(final List<SReport> sReports) {
         final List<Report> reports = new ArrayList<Report>(sReports.size());
         for (final SReport sReport : sReports) {
@@ -280,28 +256,6 @@ public final class SPModelConvertor extends ModelConvertor {
             newSReportBuilder.setScreenshot(screenshot);
         }
         return newSReportBuilder.done();
-    }
-
-    public static SPage constructSPage(final PageCreator pageCreator, final long creatorUserId) {
-        final Map<PageField, Serializable> fields = pageCreator.getFields();
-        final String name = (String) fields.get(PageField.NAME);
-        final String description = (String) fields.get(PageField.DESCRIPTION);
-        final String displayName = (String) fields.get(PageField.DISPLAY_NAME);
-        final String contentName = (String) fields.get(PageField.CONTENT_NAME);
-        final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId, false, contentName);
-        return newSPageBuilder.done();
-    }
-
-    public static SPage constructSPage(final PageUpdater pageUpdater, final long creatorUserId) {
-        final Map<PageUpdateField, Serializable> fields = pageUpdater.getFields();
-        final String name = (String) fields.get(PageField.NAME);
-        final String description = (String) fields.get(PageField.DESCRIPTION);
-        final String displayName = (String) fields.get(PageField.DISPLAY_NAME);
-        final String contentName = (String) fields.get(PageField.CONTENT_NAME);
-        final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId, false, contentName);
-        return newSPageBuilder.done();
     }
 
     public static SimpleBusinessDataReference toSimpleBusinessDataReference(final SSimpleRefBusinessDataInstance sReference) {

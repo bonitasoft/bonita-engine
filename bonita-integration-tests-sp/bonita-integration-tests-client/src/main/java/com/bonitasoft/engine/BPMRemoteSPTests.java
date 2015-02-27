@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -35,8 +35,10 @@ import com.bonitasoft.engine.tenant.TenantIT;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
+        // When removing this 2 test suites, maybe include BOS version instead:
         PageAPIIT.class,
         ApplicationAPIITs.class,
+
         TenantIT.class,
         NodeAPITest.class,
         LogTest.class,

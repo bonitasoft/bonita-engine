@@ -4,7 +4,7 @@
     <parent>
         <artifactId>bpm</artifactId>
         <groupId>com.bonitasoft.engine</groupId>
-        <version>6.5.0-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-server-sp</artifactId>
@@ -83,11 +83,6 @@
         <!-- Business Application -->
         <dependency>
             <groupId>org.bonitasoft.engine.application</groupId>
-            <artifactId>bonita-business-application</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.bonitasoft.engine.application</groupId>
             <artifactId>bonita-business-application-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -343,11 +338,6 @@
         <!-- Page -->
         <dependency>
             <groupId>org.bonitasoft.engine.page</groupId>
-            <artifactId>bonita-page</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.bonitasoft.engine.page</groupId>
             <artifactId>bonita-page-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -355,7 +345,7 @@
 
         <!-- Parameter -->
         <dependency>
-            <groupId>com.bonitasoft.engine.core.parameter</groupId>
+      <groupId>org.bonitasoft.engine.core</groupId>
             <artifactId>bonita-parameter-propertyfile</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -748,9 +738,8 @@
                                     <include>com.bonitasoft.engine.authentication:bonita-authentication-jaas</include>
                                     <include>com.bonitasoft.engine.authentication:bonita-authentication-impl</include>
                                     <!-- Business application -->
-                                    <inlude>org.bonitasoft.engine.application:bonita-business-application</inlude>
-                                    <inlude>com.bonitasoft.engine.application:bonita-business-application-api</inlude>
-                                    <inlude>com.bonitasoft.engine.application:bonita-business-application-impl</inlude>
+                                    <inlude>org.bonitasoft.engine.application:bonita-business-application-api</inlude>
+                                    <inlude>org.bonitasoft.engine.application:bonita-business-application-impl</inlude>
                                     <!-- Business Data -->
                                     <inlude>com.bonitasoft.engine.data:bonita-business-data-api</inlude>
                                     <inlude>com.bonitasoft.engine.data:bonita-business-data-impl</inlude>
@@ -835,12 +824,11 @@
                                     <include>org.bonitasoft.engine.core.operation:bonita-operation-api</include>
                                     <include>org.bonitasoft.engine.core.operation:bonita-operation-api-impl</include>
                                     <!-- Parameter -->
-                                    <include>org.bonitasoft.engine.page:bonita-page</include>
-                                    <include>com.bonitasoft.engine.page:bonita-page-api</include>
-                                    <include>com.bonitasoft.engine.page:bonita-page-impl</include>
+                                    <include>org.bonitasoft.engine.page:bonita-page-api</include>
+                                    <include>org.bonitasoft.engine.page:bonita-page-impl</include>
                                     <!-- Parameter -->
-                                    <include>com.bonitasoft.engine.core.parameter:bonita-parameter-api</include>
-                                    <include>com.bonitasoft.engine.core.parameter:bonita-parameter-propertyfile</include>
+                  <include>org.bonitasoft.engine.core:bonita-parameter-api</include>
+                  <include>org.bonitasoft.engine.core:bonita-parameter-propertyfile</include>
                                     <!-- Persistence -->
                                     <include>org.bonitasoft.engine.persistence:bonita-persistence-api</include>
                                     <include>org.bonitasoft.engine.persistence:bonita-persistence-db</include>

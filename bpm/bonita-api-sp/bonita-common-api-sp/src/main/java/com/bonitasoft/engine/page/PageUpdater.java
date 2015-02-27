@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -9,12 +9,16 @@
 package com.bonitasoft.engine.page;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
+
+import com.bonitasoft.engine.converter.EnumConverter;
 
 /**
  * @author Laurent Leseigneur
+ * @author Emmanuel Duchastenier
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.page.PageUpdater} instead.
  */
+@Deprecated
 public class PageUpdater implements Serializable {
 
     private static final long serialVersionUID = 4295108162470507415L;
@@ -23,34 +27,38 @@ public class PageUpdater implements Serializable {
         NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME;
     }
 
-    private final Map<PageUpdateField, Serializable> fields;
+    private final org.bonitasoft.engine.page.PageUpdater delegate;
 
     public PageUpdater() {
-        fields = new HashMap<PageUpdateField, Serializable>(3);
+        delegate = new org.bonitasoft.engine.page.PageUpdater();
     }
 
     public PageUpdater setName(final String name) {
-        fields.put(PageUpdateField.NAME, name);
+        delegate.setName(name);
         return this;
     }
 
     public PageUpdater setDescription(final String description) {
-        fields.put(PageUpdateField.DESCRIPTION, description);
+        delegate.setDescription(description);
         return this;
     }
 
     public PageUpdater setDisplayName(final String displayName) {
-        fields.put(PageUpdateField.DISPLAY_NAME, displayName);
+        delegate.setDisplayName(displayName);
         return this;
     }
 
     public PageUpdater setContentName(final String contentName) {
-        fields.put(PageUpdateField.CONTENT_NAME, contentName);
+        delegate.setContentName(contentName);
         return this;
     }
 
     public Map<PageUpdateField, Serializable> getFields() {
-        return fields;
+        return new EnumConverter().convert(delegate.getFields(), PageUpdateField.class);
+    }
+
+    public org.bonitasoft.engine.page.PageUpdater getDelegate() {
+        return delegate;
     }
 
 }

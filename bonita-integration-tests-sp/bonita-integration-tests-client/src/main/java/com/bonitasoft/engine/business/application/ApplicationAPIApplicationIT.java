@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -48,7 +48,7 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         creator.setProfileId(profile.getId());
 
         //when
-        final Application application = getApplicationAPI().createApplication(creator);
+        final Application application = getSubscriptionApplicationAPI().createApplication(creator);
 
         //then
         assertThat(application).isNotNull();
@@ -63,7 +63,7 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         assertThat(application.getHomePageId()).isNull();
         assertThat(application.getProfileId()).isEqualTo(profile.getId());
 
-        getApplicationAPI().deleteApplication(application.getId());
+        getSubscriptionApplicationAPI().deleteApplication(application.getId());
         getProfileAPI().deleteProfile(profile.getId());
     }
 
@@ -74,7 +74,7 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
 
         //when
-        final Application application = getApplicationAPI().createApplication(creator);
+        final Application application = getSubscriptionApplicationAPI().createApplication(creator);
 
         //then
         assertThat(application).isNotNull();
@@ -87,7 +87,7 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         //given
         final Profile profile = getProfileAPI().createProfile("ProfileForApp", "Profile used by the application");
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
-        final Application application = getApplicationAPI().createApplication(creator);
+        final Application application = getSubscriptionApplicationAPI().createApplication(creator);
 
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("My-updated-app");
@@ -99,7 +99,7 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         updater.setState(ApplicationState.ACTIVATED.name());
 
         //when
-        final Application updatedApplication = getApplicationAPI().updateApplication(application.getId(), updater);
+        final Application updatedApplication = getSubscriptionApplicationAPI().updateApplication(application.getId(), updater);
 
         //then
         assertThat(updatedApplication).isNotNull();
@@ -110,9 +110,9 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         assertThat(updatedApplication.getIconPath()).isEqualTo("/newIcon.jpg");
         assertThat(updatedApplication.getProfileId()).isEqualTo(profile.getId());
         assertThat(updatedApplication.getState()).isEqualTo(ApplicationState.ACTIVATED.name());
-        assertThat(updatedApplication).isEqualTo(getApplicationAPI().getApplication(application.getId()));
+        assertThat(updatedApplication).isEqualTo(getSubscriptionApplicationAPI().getApplication(application.getId()));
 
-        getApplicationAPI().deleteApplication(application.getId());
+        getSubscriptionApplicationAPI().deleteApplication(application.getId());
         getProfileAPI().deleteProfile(profile.getId());
     }
 
@@ -121,11 +121,11 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
     public void getApplication_returns_application_with_the_given_id() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
-        final Application createdApp = getApplicationAPI().createApplication(creator);
+        final Application createdApp = getSubscriptionApplicationAPI().createApplication(creator);
         assertThat(createdApp).isNotNull();
 
         //when
-        final Application retrievedApp = getApplicationAPI().getApplication(createdApp.getId());
+        final Application retrievedApp = getSubscriptionApplicationAPI().getApplication(createdApp.getId());
 
         //then
         assertThat(retrievedApp).isEqualTo(createdApp);
@@ -136,15 +136,15 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
     public void deleteApplication_should_delete_application_with_the_given_id() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
-        final Application createdApp = getApplicationAPI().createApplication(creator);
+        final Application createdApp = getSubscriptionApplicationAPI().createApplication(creator);
         assertThat(createdApp).isNotNull();
 
         //when
-        getApplicationAPI().deleteApplication(createdApp.getId());
+        getSubscriptionApplicationAPI().deleteApplication(createdApp.getId());
 
         //then
         try {
-            getApplicationAPI().getApplication(createdApp.getId());
+            getSubscriptionApplicationAPI().getApplication(createdApp.getId());
             fail("Not found exception");
         } catch (final NotFoundException e) {
             //ok
@@ -160,12 +160,12 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
-        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
+        final Application hr = getSubscriptionApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getSubscriptionApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getSubscriptionApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchResult<Application> firstPage = getApplicationAPI().searchApplications(buildSearchOptions(0, 2));
+        final SearchResult<Application> firstPage = getSubscriptionApplicationAPI().searchApplications(buildSearchOptions(0, 2));
 
         //then
         assertThat(firstPage).isNotNull();
@@ -173,7 +173,7 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         assertThat(firstPage.getResult()).containsExactly(engineering, hr);
 
         //when
-        final SearchResult<Application> secondPage = getApplicationAPI().searchApplications(buildSearchOptions(2, 2));
+        final SearchResult<Application> secondPage = getSubscriptionApplicationAPI().searchApplications(buildSearchOptions(2, 2));
 
         //then
         assertThat(secondPage).isNotNull();
@@ -190,15 +190,15 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        getApplicationAPI().createApplication(hrCreator);
-        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
-        getApplicationAPI().createApplication(marketingCreator);
+        getSubscriptionApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getSubscriptionApplicationAPI().createApplication(engineeringCreator);
+        getSubscriptionApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationSearchDescriptor.TOKEN, "Engineering-dashboard");
 
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        final SearchResult<Application> applications = getSubscriptionApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(1);
         assertThat(applications.getResult()).containsExactly(engineering);
@@ -214,15 +214,15 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        getApplicationAPI().createApplication(engineeringCreator);
-        getApplicationAPI().createApplication(marketingCreator);
+        final Application hr = getSubscriptionApplicationAPI().createApplication(hrCreator);
+        getSubscriptionApplicationAPI().createApplication(engineeringCreator);
+        getSubscriptionApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationSearchDescriptor.DISPLAY_NAME, "HR dashboard");
 
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        final SearchResult<Application> applications = getSubscriptionApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(1);
         assertThat(applications.getResult()).containsExactly(hr);
@@ -237,15 +237,15 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "2.0");
 
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        getApplicationAPI().createApplication(engineeringCreator);
-        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
+        final Application hr = getSubscriptionApplicationAPI().createApplication(hrCreator);
+        getSubscriptionApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getSubscriptionApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationSearchDescriptor.VERSION, "2.0");
 
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        final SearchResult<Application> applications = getSubscriptionApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(2);
         assertThat(applications.getResult()).containsExactly(hr, marketing);
@@ -263,22 +263,22 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         engineeringCreator.setProfileId(profile.getId());
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
-        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
+        final Application hr = getSubscriptionApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getSubscriptionApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getSubscriptionApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationSearchDescriptor.PROFILE_ID, profile.getId());
 
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        final SearchResult<Application> applications = getSubscriptionApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(1);
         assertThat(applications.getResult()).containsExactly(engineering);
 
-        getApplicationAPI().deleteApplication(hr.getId());
-        getApplicationAPI().deleteApplication(engineering.getId());
-        getApplicationAPI().deleteApplication(marketing.getId());
+        getSubscriptionApplicationAPI().deleteApplication(hr.getId());
+        getSubscriptionApplicationAPI().deleteApplication(engineering.getId());
+        getSubscriptionApplicationAPI().deleteApplication(marketing.getId());
         getProfileAPI().deleteProfile(profile.getId());
     }
 
@@ -291,15 +291,15 @@ public class ApplicationAPIApplicationIT extends TestWithApplication {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("My", "Marketing", "2.0");
 
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        getApplicationAPI().createApplication(engineeringCreator);
-        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
+        final Application hr = getSubscriptionApplicationAPI().createApplication(hrCreator);
+        getSubscriptionApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getSubscriptionApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.searchTerm("My");
 
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        final SearchResult<Application> applications = getSubscriptionApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(2);
         assertThat(applications.getResult()).containsExactly(hr, marketing);

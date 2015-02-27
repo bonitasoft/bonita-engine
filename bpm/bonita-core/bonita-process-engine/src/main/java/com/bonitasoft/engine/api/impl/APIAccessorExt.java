@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -11,8 +11,6 @@ package com.bonitasoft.engine.api.impl;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.ApplicationAPI;
@@ -85,11 +83,19 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
         return new ThemeAPIExt();
     }
 
+    /**
+     * @deprecated from version 7.0 on, use {@link #getCustomPageAPI()} instead.
+     */
+    @Deprecated
     @Override
     public PageAPI getPageAPI() {
         return new PageAPIExt();
     }
 
+    /**
+     * @deprecated from version 7.0 on, use {@link #getLivingApplicationAPI()} instead.
+     */
+    @Deprecated
     @Override
     public ApplicationAPI getApplicationAPI() {
         return new ApplicationAPIImpl();

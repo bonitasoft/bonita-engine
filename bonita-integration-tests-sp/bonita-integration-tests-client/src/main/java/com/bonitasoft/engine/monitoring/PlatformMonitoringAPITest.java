@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -34,7 +34,7 @@ public class PlatformMonitoringAPITest extends CommonAPISPIT {
 
     @After
     public void afterTest() throws Exception {
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
@@ -242,7 +242,7 @@ public class PlatformMonitoringAPITest extends CommonAPISPIT {
     @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Monitoring information", "Optional" }, story = "Test if optional monitoring information are available.", jira = "")
     @Test
     public void isOptionalMonitoringInformationAvailable() throws Exception {
-        if (getPlatformMonitoringAPI().getJvmVendor().indexOf("Sun") >= 0) {
+        if (getPlatformMonitoringAPI().getJvmVendor().indexOf("Sun") >= 0 || getPlatformMonitoringAPI().getJvmVendor().indexOf("Oracle") >= 0) {
             assertTrue(getPlatformMonitoringAPI().isOptionalMonitoringInformationAvailable());
         } else {
             assertFalse(getPlatformMonitoringAPI().isOptionalMonitoringInformationAvailable());

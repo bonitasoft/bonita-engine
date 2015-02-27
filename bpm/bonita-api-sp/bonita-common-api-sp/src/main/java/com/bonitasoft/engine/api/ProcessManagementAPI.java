@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 - 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -36,18 +36,6 @@ import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessManagementAPI {
 
     /**
-     * Gets how many parameters the process definition contains.
-     * 
-     * @param processDefinitionId
-     *            The identifier of the processDefinition
-     * @return The number of parameters of a process definition
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since 6.0
-     */
-    int getNumberOfParameterInstances(long processDefinitionId);
-
-    /**
      * Get a parameter instance by process definition UUID
      * 
      * @param processDefinitionId
@@ -60,7 +48,9 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
+     * @deprecated use {@link org.bonitasoft.engine.api.ProcessManagementAPI#getParameterInstance(long, String)}
      */
+    @Deprecated
     ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws ParameterNotFoundException;
 
     /**
@@ -78,7 +68,9 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
+     * @deprecated use {@link org.bonitasoft.engine.api.ProcessManagementAPI#getParameterInstances(long, int, int, org.bonitasoft.engine.bpm.parameter.ParameterCriterion)}
      */
+    @Deprecated
     List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort);
 
     /**
@@ -254,7 +246,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
 
     /**
      * Get the number of processes supervisors mapped to a group on a specific process definition.
-     *
+     * 
      * @param processDefinitionId
      *            the id of the process definition
      * @return The number of processes supervisors mapped to a group for the process definition
@@ -264,7 +256,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
 
     /**
      * Get the number of processes supervisors mapped to a role on a specific process definition.
-     *
+     * 
      * @param processDefinitionId
      *            the id of the process definition
      * @return The number of processes supervisors mapped to a role for the process definition
@@ -274,7 +266,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
 
     /**
      * Get the number of processes supervisors mapped to a membership on a specific process definition.
-     *
+     * 
      * @param processDefinitionId
      *            the id of the process definition
      * @return The number of processes supervisors mapped to a membership for the process definition

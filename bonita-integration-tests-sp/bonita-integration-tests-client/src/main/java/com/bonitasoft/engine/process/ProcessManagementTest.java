@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 - 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -194,10 +194,10 @@ public class ProcessManagementTest extends CommonAPISPIT {
         // archive sub task:
         // archive first children tasks:
         getProcessAPI().executeFlowNode(manualUserTask1.getId());
-        waitForFlowNodeInCompletedState(processInstance, "newManualTask1", true);
+        waitForActivityInCompletedState(processInstance, "newManualTask1", true);
 
         getProcessAPI().executeFlowNode(manualUserTask2.getId());
-        waitForFlowNodeInCompletedState(processInstance, "newManualTask2", true);
+        waitForActivityInCompletedState(processInstance, "newManualTask2", true);
 
         getProcessAPI().executeFlowNode(parentTask.getId());
 
