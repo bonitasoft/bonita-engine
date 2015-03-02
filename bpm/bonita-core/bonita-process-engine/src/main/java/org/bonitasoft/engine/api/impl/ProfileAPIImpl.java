@@ -65,6 +65,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
+@AvailableWhenTenantIsPaused
 public class ProfileAPIImpl implements ProfileAPI {
 
     protected TenantServiceAccessor getTenantAccessor() {
