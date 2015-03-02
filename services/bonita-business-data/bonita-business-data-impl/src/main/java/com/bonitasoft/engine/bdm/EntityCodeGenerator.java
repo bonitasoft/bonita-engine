@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 Bonitasoft S.A.
+ * Copyright (C) 2014, 2015 Bonitasoft S.A.
  * Bonitasoft is a trademark of Bonitasoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -43,16 +43,21 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 
 /**
- * @author Colin PUY
+ * @author Colin PUY,
+ * @author Matthieu Chaffotte
  */
 public class EntityCodeGenerator {
 
     private final CodeGenerator codeGenerator;
+
+    private final RelationFieldAnnotator relationFieldAnnotator;
+
     private final BusinessObjectModel bom;
 
-    public EntityCodeGenerator(final CodeGenerator codeGenerator, BusinessObjectModel bom) {
+    public EntityCodeGenerator(final CodeGenerator codeGenerator, final BusinessObjectModel bom) {
         this.codeGenerator = codeGenerator;
         this.bom = bom;
+        relationFieldAnnotator = new RelationFieldAnnotator(codeGenerator);
     }
 
     public JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
@@ -140,7 +145,13 @@ public class EntityCodeGenerator {
                 indexAnnotation.param("name", index.getName().toUpperCase());
                 final JAnnotationArrayMember columnParamArray = indexAnnotation.paramArray("columnNames");
                 for (final String fieldName : index.getFieldNames()) {
-                    columnParamArray.param(fieldName.toUpperCase());
+                    String columnName;
+                    if (bo.isARelationField(fieldName)) {
+                        columnName = relationFieldAnnotator.getJoinColumnName(fieldName);
+                    } else {
+                        columnName = fieldName;
+                    }
+                    columnParamArray.param(columnName.toUpperCase());
                 }
             }
         }
@@ -198,7 +209,7 @@ public class EntityCodeGenerator {
     }
 
     private void annotateRelationField(final JDefinedClass entityClass, final RelationField rfield, final JFieldVar fieldVar) {
-        new RelationFieldAnnotator(codeGenerator).annotateRelationField(entityClass, rfield, fieldVar);
+        relationFieldAnnotator.annotateRelationField(entityClass, rfield, fieldVar);
     }
 
     private void annotateSimpleField(final SimpleField sfield, final JFieldVar fieldVar) {
@@ -245,7 +256,7 @@ public class EntityCodeGenerator {
         }
     }
 
-    private boolean isCollectionField(Field field) {
+    private boolean isCollectionField(final Field field) {
         if (field==null){
             return false;
         }
