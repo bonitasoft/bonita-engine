@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,9 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.TenantStatusException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
@@ -113,16 +117,15 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
                 .get(AuthenticationConstants.BASIC_USERNAME)) : null;
         final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         final STenant sTenant = getTenant(tenantId, platformServiceAccessor);
-        final long localTenantId = sTenant.getId();
-        checkThatWeCanLogin(userName, sTenant);
+        checkThatWeCanLogin(userName, sTenant, getBonitaHomeServerInstance());
 
-        final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(localTenantId);
+        final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(sTenant.getId());
         final LoginService loginService = serviceAccessor.getLoginService();
         final IdentityService identityService = serviceAccessor.getIdentityService();
         final TransactionService transactionService = platformServiceAccessor.getTransactionService();
 
         final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<String, Serializable>(credentials);
-        credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, localTenantId);
+        credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, sTenant.getId());
         final SSession sSession = transactionService.executeInTransaction(new LoginAndRetrieveUser(loginService, identityService,
                 credentialsWithResolvedTenantId));
         return ModelConvertor.toAPISession(sSession, sTenant.getName());
@@ -157,10 +160,28 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         }
     }
 
-    protected void checkThatWeCanLogin(final String userName, final STenant sTenant) throws LoginException {
+    protected void checkThatWeCanLogin(final String userName, final STenant sTenant, BonitaHomeServer bonitaHomeServer) throws LoginException {
         if (!sTenant.isActivated()) {
             throw new LoginException("Tenant " + sTenant.getName() + " is not activated !!");
         }
+        try {
+            if (sTenant.isPaused()) {
+                final String technicalUserName = bonitaHomeServer.getTenantProperties(sTenant.getId()).getProperty("userName");
+
+                if (!technicalUserName.equals(userName)) {
+                    throw new TenantStatusException("Tenant with ID " + sTenant.getId()
+                            + " is in pause, unable to login with other user than the technical user.");
+                }
+            }
+        } catch (BonitaHomeNotSetException e) {
+            throw new LoginException(e);
+        } catch (IOException e) {
+            throw new LoginException(e);
+        }
+    }
+
+    protected BonitaHomeServer getBonitaHomeServerInstance() {
+        return BonitaHomeServer.getInstance();
     }
 
     private class LoginAndRetrieveUser implements Callable<SSession> {
