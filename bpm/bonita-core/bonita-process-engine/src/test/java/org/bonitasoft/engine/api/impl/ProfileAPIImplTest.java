@@ -16,10 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.impl.transaction.profile.CreateProfileMember;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -162,4 +159,9 @@ public class ProfileAPIImplTest {
 
     }
 
+    @Test
+    public void should_profile_api_be_available_when_tenant_is_paused() throws Exception {
+        assertThat(ProfileAPIImpl.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as("should profile api be available when tenant is paused")
+                .isTrue();
+    }
 }
