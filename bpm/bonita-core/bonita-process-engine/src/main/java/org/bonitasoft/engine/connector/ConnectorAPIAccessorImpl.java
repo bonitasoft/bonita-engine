@@ -17,6 +17,7 @@ import java.lang.reflect.Proxy;
 
 import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.api.ApplicationAPI;
+import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PageAPI;
@@ -115,6 +116,11 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     @Override
     public ProcessConfigurationAPI getProcessConfigurationAPIi() {
         return getAPI(ProcessConfigurationAPI.class, getAPISession());
+    }
+
+    @Override
+    public BusinessDataAPI getBusinessDataAPI() {
+        return getAPI(BusinessDataAPI.class, getAPISession());
     }
 
     private static ServerAPI getServerAPI() {

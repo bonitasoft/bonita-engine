@@ -69,4 +69,5 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
     PlatformCacheService getPlatformCacheService();
 
     void destroy();
+    BroadcastService getBroadcastService();
 }

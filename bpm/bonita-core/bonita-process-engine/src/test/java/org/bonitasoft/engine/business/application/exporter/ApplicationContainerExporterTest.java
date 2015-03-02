@@ -21,27 +21,26 @@ import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.net.URL;
-
 import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.exception.ExportException;
-import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(IOUtil.class)
+@PrepareForTest(IOUtils.class)
 public class ApplicationContainerExporterTest {
 
     @Test
     public void exportApplications_should_call_marshall() throws Exception {
         final ApplicationContainerExporter exporter = new ApplicationContainerExporter();
-        mockStatic(IOUtil.class);
+        mockStatic(IOUtils.class);
         final ApplicationNodeContainer container = mock(ApplicationNodeContainer.class);
-        given(IOUtil.marshallObjectToXML(same(container), any(URL.class))).willReturn("<applications/>".getBytes());
+        given(IOUtils.marshallObjectToXML(same(container), any(URL.class))).willReturn("<applications/>".getBytes());
 
         //when
         final byte[] bytes = exporter.export(container);
@@ -53,9 +52,9 @@ public class ApplicationContainerExporterTest {
     @Test(expected = ExportException.class)
     public void exportApplications_should_throw_SBonitaExportException_if_marshalling_throws_exception() throws Exception {
         final ApplicationContainerExporter exporter = new ApplicationContainerExporter();
-        mockStatic(IOUtil.class);
+        mockStatic(IOUtils.class);
         final ApplicationNodeContainer container = mock(ApplicationNodeContainer.class);
-        given(IOUtil.marshallObjectToXML(same(container), any(URL.class))).willThrow(new JAXBException(""));
+        given(IOUtils.marshallObjectToXML(same(container), any(URL.class))).willThrow(new JAXBException(""));
 
         //when
         exporter.export(container);

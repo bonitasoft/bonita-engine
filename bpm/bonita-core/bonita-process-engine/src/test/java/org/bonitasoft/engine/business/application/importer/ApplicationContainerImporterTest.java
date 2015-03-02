@@ -21,12 +21,11 @@ import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.net.URL;
-
 import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.exception.ImportException;
-import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +33,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(IOUtil.class)
+@PrepareForTest(IOUtils.class)
 public class ApplicationContainerImporterTest {
 
     private ApplicationContainerImporter importer;
@@ -48,9 +47,9 @@ public class ApplicationContainerImporterTest {
     @Test
     public void importXML_should_return_result_of_unmarshall() throws Exception {
         //given
-        mockStatic(IOUtil.class);
+        mockStatic(IOUtils.class);
         final ApplicationNodeContainer container = mock(ApplicationNodeContainer.class);
-        given(IOUtil.unmarshallXMLtoObject(any(byte[].class), eq(ApplicationNodeContainer.class), any(URL.class))).willReturn(container);
+        given(IOUtils.unmarshallXMLtoObject(any(byte[].class), eq(ApplicationNodeContainer.class), any(URL.class))).willReturn(container);
 
         //when
         final ApplicationNodeContainer importedContainer = importer.importXML("<applications/>".getBytes());
@@ -62,8 +61,8 @@ public class ApplicationContainerImporterTest {
     @Test(expected = ImportException.class)
     public void importXML_should_throw_ExecutionException_when_unmarshall_throws_exception() throws Exception {
         //given
-        mockStatic(IOUtil.class);
-        given(IOUtil.unmarshallXMLtoObject(any(byte[].class), eq(ApplicationNodeContainer.class), any(URL.class))).willThrow(new JAXBException(""));
+        mockStatic(IOUtils.class);
+        given(IOUtils.unmarshallXMLtoObject(any(byte[].class), eq(ApplicationNodeContainer.class), any(URL.class))).willThrow(new JAXBException(""));
 
         //when
         importer.importXML("<applications/>".getBytes());

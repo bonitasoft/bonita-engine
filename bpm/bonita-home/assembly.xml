@@ -29,5 +29,9 @@
 			</includes>
 			<filtered>true</filtered>
 		</fileSet>
+        <fileSet>
+            <outputDirectory>home</outputDirectory>
+            <directory>${project.build.directory}/common/home</directory>
+		</fileSet>
 	</fileSets>
 </assembly>

@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ====================================================================== -->
+<!-- -->
+<!-- JBoss Server Configuration -->
+<!-- -->
+<!-- ====================================================================== -->
+
 <datasources>
+    <!-- PostgreSQL Example -->
     <datasource jta="false" jndi-name="java:jboss/datasources/bonitaSequenceManagerDS" pool-name="bonitaSequenceManagerDS" enabled="true" use-ccm="false">
+        <connection-url>jdbc:postgresql://#database.ip#:#database.port#/#database.name#</connection-url>
+        <driver>postgresql</driver>
+        <security>
+            <user-name>#database.user#</user-name>
+            <password>#database.password#</password>
+        </security>
+    </datasource>
+    <datasource jta="false" jndi-name="java:jboss/datasources/NotManagedBizDataDS" pool-name="NotManagedBizDataDS" enabled="true" use-ccm="false">
         <connection-url>jdbc:postgresql://#database.ip#:#database.port#/#database.name#</connection-url>
         <driver>postgresql</driver>
         <security>
@@ -22,11 +38,32 @@
             <user-name>#database.user#</user-name>
             <password>#database.password#</password>
         </security>
-        <validation>  
-          <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>  
-          <validate-on-match>false</validate-on-match>  
-          <background-validation>false</background-validation>  
-          <useFastFail>false</useFastFail>  
-       </validation> 
+        <validation>
+            <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
+            <validate-on-match>false</validate-on-match>
+            <background-validation>false</background-validation>
+            <useFastFail>false</useFastFail>
+        </validation>
+    </xa-datasource>
+    <xa-datasource jndi-name="java:jboss/datasources/BusinessDataDS" pool-name="BusinessDataDS" enabled="true" use-ccm="false">
+        <xa-datasource-property name="ServerName">#database.ip#</xa-datasource-property>
+        <xa-datasource-property name="PortNumber">#database.port#</xa-datasource-property>
+        <xa-datasource-property name="DatabaseName">#database.name#</xa-datasource-property>
+        <driver>postgresql</driver>
+        <xa-pool>
+            <min-pool-size>1</min-pool-size>
+            <max-pool-size>50</max-pool-size>
+            <prefill>true</prefill>
+        </xa-pool>
+        <security>
+            <user-name>#database.user#</user-name>
+            <password>#database.password#</password>
+        </security>
+        <validation>
+            <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
+            <validate-on-match>false</validate-on-match>
+            <background-validation>false</background-validation>
+            <useFastFail>false</useFastFail>
+        </validation>
     </xa-datasource>
 </datasources>

@@ -19,8 +19,15 @@
                 <ref bean="externalDataLeftOperandHandler"/>
                 <ref bean="documentLeftOperandHandler"/>
                 <ref bean="documentListLeftOperandHandler"/>
+                <ref bean="businessDataLeftOperandHandler" />
             </list>
         </property>
+    </bean>
+
+    <bean id="businessDataLeftOperandHandler" class="org.bonitasoft.engine.operation.BusinessDataLeftOperandHandler">
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository"/>
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService"/>
     </bean>
 
     <bean id="assignmentOperationExecutorStrategy"
@@ -43,7 +50,9 @@
           class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>
 
     <bean id="javaMethodOperationExecutorStrategy"
-          class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy"/>
+          class="org.bonitasoft.engine.operation.BusinessDataJavaMethodOperationExecutorStrategy">
+        <constructor-arg name="businessDataService" ref="businessDataService"/>
+    </bean>
 
     <bean id="xpathUpdateQueryOperationExecutorStrategy"
           class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy"/>

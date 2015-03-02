@@ -17,7 +17,7 @@ import java.net.URL;
 
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.exception.ImportException;
-import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.io.IOUtils;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -27,7 +27,7 @@ public class ApplicationContainerImporter {
     public ApplicationNodeContainer importXML(final byte[] xmlContent) throws ImportException {
         final URL resource = ApplicationNodeContainer.class.getResource("/applications.xsd");
         try {
-            return IOUtil.unmarshallXMLtoObject(xmlContent, ApplicationNodeContainer.class, resource);
+            return IOUtils.unmarshallXMLtoObject(xmlContent, ApplicationNodeContainer.class, resource);
         } catch (final Exception e) {
             throw new ImportException(e);
         }

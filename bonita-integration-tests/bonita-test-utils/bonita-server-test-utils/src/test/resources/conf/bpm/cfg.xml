@@ -111,6 +111,7 @@
         <constructor-arg name="transientDataService" ref="transientDataService"/>
         <constructor-arg name="archiveService" ref="archiveService"/>
         <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
     </bean>
 
     <bean id="flowNodeStateManager" class="org.bonitasoft.engine.execution.FlowNodeStateManagerImpl">
@@ -136,6 +137,7 @@
         <constructor-arg name="workService" ref="workService"/>
         <constructor-arg name="identityService" ref="identityService"/>
         <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
     </bean>
 
     <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
@@ -218,6 +220,8 @@
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
         <constructor-arg name="transitionEvaluator" ref="transitionEvaluator" />
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository"/>
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
 	</bean>
 	
 	<bean id="transactionalProcessInstanceInterruptor" class="org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor">
