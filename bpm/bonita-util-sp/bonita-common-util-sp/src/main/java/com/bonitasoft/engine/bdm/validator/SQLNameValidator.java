@@ -16,7 +16,9 @@ import java.util.Set;
 
 /**
  * @author Romain Bioteau
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.SQLNameValidator} instead.
  */
+@Deprecated
 public class SQLNameValidator {
 
     private final int maxLength;

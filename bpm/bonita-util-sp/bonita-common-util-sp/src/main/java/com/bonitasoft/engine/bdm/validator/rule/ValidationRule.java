@@ -12,7 +12,9 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.rule.ValidationRule} instead.
  */
+@Deprecated
 public abstract class ValidationRule<T> {
 
     private Class<T> classToApply;
@@ -20,13 +22,13 @@ public abstract class ValidationRule<T> {
     public ValidationRule(Class<T> classToApply) {
         this.classToApply = classToApply;
     }
-    
+
     public boolean appliesTo(Object modelElement) {
         return modelElement != null && classToApply.isAssignableFrom(modelElement.getClass());
     }
 
     protected abstract ValidationStatus validate(T modelElement);
-    
+
     @SuppressWarnings("unchecked")
     public ValidationStatus checkRule(Object modelElement) {
         if (!appliesTo(modelElement)) {

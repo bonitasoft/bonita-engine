@@ -12,7 +12,9 @@ import java.util.Date;
 
 /**
  * @author Matthieu Chaffotte
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.model.field.FieldType} instead.
  */
+@Deprecated
 public enum FieldType {
 
     STRING(String.class),

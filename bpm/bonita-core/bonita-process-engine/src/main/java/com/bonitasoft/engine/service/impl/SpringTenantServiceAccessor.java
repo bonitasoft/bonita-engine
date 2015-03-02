@@ -8,14 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service.impl;
 
-import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import com.bonitasoft.engine.business.data.BusinessDataRepository;
-import com.bonitasoft.engine.business.data.BusinessDataService;
+import org.bonitasoft.engine.parameter.ParameterService;
+
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
-import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
-import org.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -30,14 +27,6 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     private TenantMonitoringService tenantMonitoringServie;
 
     private SearchEntitiesDescriptor searchEntitiesDescriptor;
-
-    private BusinessDataRepository businessDataRespository;
-
-    private RefBusinessDataService refBusinessDataService;
-
-    private BusinessDataModelRepository businessDataModelRespository;
-
-    private BusinessDataService businessDataService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         super(tenantId);
@@ -77,38 +66,6 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
             tenantMonitoringServie = lookupService(TenantMonitoringService.class);
         }
         return tenantMonitoringServie;
-    }
-
-    @Override
-    public BusinessDataRepository getBusinessDataRepository() {
-        if (businessDataRespository == null) {
-            businessDataRespository = lookupService(BusinessDataRepository.class);
-        }
-        return businessDataRespository;
-    }
-
-    @Override
-    public BusinessDataModelRepository getBusinessDataModelRepository() {
-        if (businessDataModelRespository == null) {
-            businessDataModelRespository = lookupService(BusinessDataModelRepository.class);
-        }
-        return businessDataModelRespository;
-    }
-
-    @Override
-    public RefBusinessDataService getRefBusinessDataService() {
-        if (refBusinessDataService == null) {
-            refBusinessDataService = lookupService(RefBusinessDataService.class);
-        }
-        return refBusinessDataService;
-    }
-
-    @Override
-    public BusinessDataService getBusinessDataService() {
-        if (businessDataService == null) {
-            businessDataService = lookupService(BusinessDataService.class);
-        }
-        return businessDataService;
     }
 
 }

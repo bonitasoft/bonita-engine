@@ -26,5 +26,4 @@ public interface PlatformServiceAccessor extends org.bonitasoft.engine.service.P
 
     PlatformMonitoringService getPlatformMonitoringService();
 
-    BroadcastService getBroadcastService();
 }

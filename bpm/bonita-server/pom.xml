@@ -89,7 +89,7 @@
 
 		<!-- Business Data -->
 		<dependency>
-			<groupId>com.bonitasoft.engine.data</groupId>
+			<groupId>org.bonitasoft.engine.data</groupId>
 			<artifactId>bonita-business-data-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -139,17 +139,17 @@
             <version>${project.version}</version>
         </dependency>
 
-    <!-- Connector Executor -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.connector</groupId>
-      <artifactId>bonita-connector-executor-api-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.bonitasoft.engine</groupId>
-      <artifactId>bonita-connector-executor-timedout</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+        <!-- Connector Executor -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.connector</groupId>
+            <artifactId>bonita-connector-executor-api-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine</groupId>
+            <artifactId>bonita-connector-executor-timedout</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
     <!-- Connector -->
     <dependency>
@@ -750,8 +750,8 @@
                                     <inlude>org.bonitasoft.engine.application:bonita-business-application-api</inlude>
                                     <inlude>org.bonitasoft.engine.application:bonita-business-application-impl</inlude>
 									<!-- Business Data -->
-									<inlude>com.bonitasoft.engine.data:bonita-business-data-api</inlude>
-									<inlude>com.bonitasoft.engine.data:bonita-business-data-impl</inlude>
+                  <inlude>org.bonitasoft.engine.data:bonita-business-data-api</inlude>
+                  <inlude>org.bonitasoft.engine.data:bonita-business-data-impl</inlude>
                   <!-- Cache -->
                   <include>org.bonitasoft.engine.cache:bonita-cache-api</include>
                   <include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
@@ -785,6 +785,10 @@
                   <!-- Data Instance -->
                   <include>org.bonitasoft.engine.data.instance:bonita-data-instance-api</include>
                   <include>org.bonitasoft.engine.data.instance:bonita-data-instance-impl</include>
+                  <!-- Delete -->
+                  <include>org.bonitasoft.engine.persistence:bonita-delete-api</include>
+                  <include>org.bonitasoft.engine.persistence:bonita-delete-impl</include>
+                  <include>com.bonitasoft.engine:bonita-delete-batch</include>
                   <!-- Dependency -->
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-api</include>
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-impl</include>
