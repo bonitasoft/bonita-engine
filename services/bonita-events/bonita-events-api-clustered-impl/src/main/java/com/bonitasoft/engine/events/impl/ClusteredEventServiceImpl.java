@@ -36,7 +36,7 @@ import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.InMemoryFormat;
+import com.hazelcast.config.MapConfig.InMemoryFormat;
 import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
@@ -87,7 +87,7 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
         final Config config = hazelcastInstance.getConfig();
 
         final NearCacheConfig nearCacheConfig = new NearCacheConfig();
-        nearCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
+        nearCacheConfig.setInMemoryFormat(InMemoryFormat.CACHED);
 
         config.addMapConfig(new MapConfig(mapName));
         // ---
