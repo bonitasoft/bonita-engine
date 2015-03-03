@@ -41,11 +41,11 @@ public class AbstractDBPersistenceServiceTest {
      */
     class DummyDBPersistenceService extends AbstractDBPersistenceService {
 
-        public DummyDBPersistenceService(final String name, final String statementDelimiter,
+        public DummyDBPersistenceService(final String name,
                 final String likeEscapeCharacter, final SequenceManager sequenceManager,
                 final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger)
                         throws ClassNotFoundException {
-            super(name, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
+            super(name, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                     wordSearchExclusionMappings, logger);
         }
 
@@ -112,12 +112,6 @@ public class AbstractDBPersistenceServiceTest {
         @Override
         protected long getTenantId() throws STenantIdNotSetException {
             return 0;
-        }
-
-        @Override
-        protected void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,
-                final boolean useDataSourceConnection) throws SPersistenceException, IOException {
-
         }
 
         @Override
@@ -281,7 +275,7 @@ public class AbstractDBPersistenceServiceTest {
         final SequenceManager sequenceManager = mock(SequenceManager.class);
         final DataSource datasource = mock(DataSource.class);
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        final AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", ";", "#", sequenceManager,
+        final AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", "#", sequenceManager,
                 datasource, enableWordSearch, wordSearchExclusionMappings, logger);
 
         assertThat(persistenceService.isWordSearchEnabled(entityClass)).isEqualTo(expectedResult);

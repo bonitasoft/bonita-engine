@@ -101,7 +101,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping,
             final Map<String, String> classAliasMappings, final boolean enableWordSearch,
             final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
-        super("TEST", ";", "#", enableWordSearch, wordSearchExclusionMappings, logger);
+        super("TEST", "#", enableWordSearch, wordSearchExclusionMappings, logger);
         this.sessionFactory = sessionFactory;
         this.classAliasMappings = classAliasMappings;
         this.classMapping = classMapping;
@@ -119,8 +119,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     /**
      * @param name
      * @param hbmConfigurationProvider
-     * @param tenantConfigurationsProvider
-     * @param statementDelimiter
      * @param likeEscapeCharacter
      * @param logger
      * @param sequenceManager
@@ -131,10 +129,10 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      * @throws ClassNotFoundException
      */
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
-            final Properties extraHibernateProperties, final String statementDelimiter,
+            final Properties extraHibernateProperties,
             final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
             final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
-        super(name, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
+        super(name, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
         orderByCheckingMode = getOrderByCheckingMode();
         Configuration configuration;
@@ -784,46 +782,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             } else {
                 query.setParameter(entry.getKey(), value);
             }
-        }
-    }
-
-    @Override
-    protected void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,
-            final boolean useDataSourceConnection) throws SPersistenceException, IOException {
-        final URL url = this.getClass().getResource(sqlResource);
-        if (url == null) {
-            throw new IOException("SQL file not found, path=" + sqlResource);
-        }
-        final String fileContent = new String(IOUtil.getAllContentFrom(url));
-
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Processing SQL resource : " + sqlResource);
-        }
-        final String regex = statementDelimiter.concat("\r?\n");
-        final List<String> commands = new ArrayList<String>();
-        final String[] tmp = fileContent.split(regex);
-        for (final String command : tmp) {
-            final String filledCommand = fillTemplate(replacements, command);
-            if (!filledCommand.isEmpty()) {
-                commands.add(filledCommand);
-            }
-        }
-        if (commands.isEmpty()) {
-            return;
-        }
-        final int lastIndex = commands.size() - 1;
-        String lastCommand = commands.get(lastIndex);
-        final int index = lastCommand.lastIndexOf(statementDelimiter);
-        if (index > 0) {
-            lastCommand = lastCommand.substring(0, index);
-            commands.remove(lastIndex);
-            commands.add(lastCommand);
-        }
-
-        if (useDataSourceConnection) {
-            doExecuteSQLThroughJDBC(commands);
-        } else {
-            doExecuteSQLThroughHibernate(sqlResource, commands);
         }
     }
 

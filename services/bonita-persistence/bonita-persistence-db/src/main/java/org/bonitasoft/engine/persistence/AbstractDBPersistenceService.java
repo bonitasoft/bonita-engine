@@ -45,8 +45,6 @@ import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
  */
 public abstract class AbstractDBPersistenceService implements TenantPersistenceService {
 
-    private final String statementDelimiter;
-
     private final String likeEscapeCharacter;
 
     private final String name;
@@ -61,12 +59,11 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     protected final TechnicalLoggerService logger;
 
-    public AbstractDBPersistenceService(final String name, final String statementDelimiter, final String likeEscapeCharacter,
+    public AbstractDBPersistenceService(final String name, final String likeEscapeCharacter,
             final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
         this.name = name;
         sequenceManager = null;
         datasource = null;
-        this.statementDelimiter = statementDelimiter;
         this.likeEscapeCharacter = likeEscapeCharacter;
         this.enableWordSearch = enableWordSearch;
         if (wordSearchExclusionMappings != null) {
@@ -82,13 +79,12 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         this.logger = logger;
     }
 
-    public AbstractDBPersistenceService(final String name, final String statementDelimiter,
+    public AbstractDBPersistenceService(final String name,
             final String likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource,
             final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
         this.name = name;
         this.sequenceManager = sequenceManager;
         this.datasource = datasource;
-        this.statementDelimiter = statementDelimiter;
         this.likeEscapeCharacter = likeEscapeCharacter;
         this.enableWordSearch = enableWordSearch;
         this.logger = logger;
@@ -128,26 +124,6 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         }
         return true;
     }
-
-    private void executeSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,
-            final boolean useDataSourceConnection) throws SPersistenceException, IOException {
-        if (replacements != null) {
-            final Map<String, String> replacementsWithVarDelimiters = new HashMap<String, String>();
-            for (final Entry<String, String> entry : replacements.entrySet()) {
-                if (entry.getKey().charAt(0) == '$') {
-                    replacementsWithVarDelimiters.put(entry.getKey(), entry.getValue());
-                } else {
-                    replacementsWithVarDelimiters.put(new StringBuilder("\\$\\{").append(entry.getKey()).append("\\}").toString(), entry.getValue());
-                }
-            }
-            doExecuteSQL(sqlResource, statementDelimiter, replacementsWithVarDelimiters, useDataSourceConnection);
-        } else {
-            doExecuteSQL(sqlResource, statementDelimiter, null, useDataSourceConnection);
-        }
-    }
-
-    protected abstract void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,
-            final boolean useDataSourceConnection) throws SPersistenceException, IOException;
 
     @Override
     public <T extends PersistentObject> long getNumberOfEntities(final Class<T> entityClass, final QueryOptions options, final Map<String, Object> parameters)
