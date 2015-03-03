@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.cache;
 
 import static org.junit.Assert.assertEquals;
@@ -29,12 +42,13 @@ public class CacheServiceTest {
     protected static final String SOME_DEFAULT_CACHE_NAME = "SOME_DEFAULT_CACHE_NAME";
 
     protected static final String ETERNAL_CACHE = "ETERNAL_CACHE";
-
     private static final String TEST1 = "test1";// with copy
-
     private static final String TEST2 = "test2";// without copy
+	private static final String ONE_ELEMENT_IN_MEMORY = "ONE_ELEMENT_IN_MEMORY";
+	private static final String ONE_ELEMENT_IN_MEMORY_ONLY = "ONE_ELEMENT_IN_MEMORY_ONLY";
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CacheServiceTest.class);
+
 
     private CacheService cacheService;
 
@@ -74,7 +88,7 @@ public class CacheServiceTest {
         configurationsList.add(cacheConfigurationEternal);
 
         final CacheConfiguration cacheConfiguration1 = new CacheConfiguration();
-        cacheConfiguration1.setName("test1");
+        cacheConfiguration1.setName(TEST1);
         cacheConfiguration1.setTimeToLiveSeconds(1);
         cacheConfiguration1.setMaxElementsInMemory(10000);
         cacheConfiguration1.setInMemoryOnly(false);
@@ -84,12 +98,18 @@ public class CacheServiceTest {
         configurationsList.add(cacheConfiguration1);
 
         final CacheConfiguration cacheConfiguration2 = new CacheConfiguration();
-        cacheConfiguration2.setName("test2");
+        cacheConfiguration2.setName(TEST2);
         cacheConfiguration2.setTimeToLiveSeconds(1);
         cacheConfiguration2.setMaxElementsInMemory(100000);
         cacheConfiguration2.setInMemoryOnly(false);
         cacheConfiguration2.setEternal(false);
         configurationsList.add(cacheConfiguration2);
+
+        final CacheConfiguration cacheWithOneElementInMemory = createOneElementInMemoryCacheConfiguration();
+        configurationsList.add(cacheWithOneElementInMemory);
+        
+        final CacheConfiguration cacheWithOneElementInMemoryOnly = createOneElementInMemoryOnlyCacheConfiguration();
+        configurationsList.add(cacheWithOneElementInMemoryOnly);
 
         final CacheConfigurations cacheConfigurations = new CacheConfigurations();
         cacheConfigurations.setConfigurations(configurationsList);
@@ -124,6 +144,30 @@ public class CacheServiceTest {
             }
         }, cacheConfigurations, new CacheConfiguration(), "target");
     }
+
+	private CacheConfiguration createOneElementInMemoryCacheConfiguration() {
+		final CacheConfiguration cacheWithOneElementInMemory = new CacheConfiguration();
+        cacheWithOneElementInMemory.setName(ONE_ELEMENT_IN_MEMORY);
+        cacheWithOneElementInMemory.setTimeToLiveSeconds(1);
+        cacheWithOneElementInMemory.setMaxElementsInMemory(1);
+        cacheWithOneElementInMemory.setInMemoryOnly(false);
+        cacheWithOneElementInMemory.setEternal(false);
+        cacheWithOneElementInMemory.setCopyOnRead(true);
+        cacheWithOneElementInMemory.setCopyOnWrite(true);
+		return cacheWithOneElementInMemory;
+	}
+
+	private CacheConfiguration createOneElementInMemoryOnlyCacheConfiguration() {
+		final CacheConfiguration cacheWithOneElementInMemoryOnly = new CacheConfiguration();
+        cacheWithOneElementInMemoryOnly.setName(ONE_ELEMENT_IN_MEMORY_ONLY);
+        cacheWithOneElementInMemoryOnly.setTimeToLiveSeconds(1);
+        cacheWithOneElementInMemoryOnly.setMaxElementsInMemory(1);
+        cacheWithOneElementInMemoryOnly.setInMemoryOnly(true);
+        cacheWithOneElementInMemoryOnly.setEternal(false);
+        cacheWithOneElementInMemoryOnly.setCopyOnRead(true);
+        cacheWithOneElementInMemoryOnly.setCopyOnWrite(true);
+		return cacheWithOneElementInMemoryOnly;
+	}
 
     @Test
     public void shortTimeoutConfig() throws Exception {
@@ -262,13 +306,24 @@ public class CacheServiceTest {
     }
 
     @Test
-    public void testPutLotOfItemsWithOverflow() throws SCacheException {
-        final int cacheSize = cacheService.getCacheSize(TEST1);
-        final int j = 20000;
+    public void testPutLotOfItemsWithOverflow() throws SCacheException, InterruptedException {
+        final int cacheSize = cacheService.getCacheSize(ONE_ELEMENT_IN_MEMORY);
+        final int j = 2;
         for (int i = 0; i < j; i++) {
-            cacheService.store(TEST1, "testLotOfItems" + i, "value" + i);
+            cacheService.store(ONE_ELEMENT_IN_MEMORY, "testLotOfItems" + i, "value" + i);
         }
-        assertEquals("Not all elements were added with the overflow", cacheSize + j, cacheService.getCacheSize(TEST1));
+       
+        assertEquals("Not all elements were added with the overflow", cacheSize + j, cacheService.getCacheSize(ONE_ELEMENT_IN_MEMORY));
+    }
+    
+    @Test
+    public void testPutLotOfItemsWithOverflowInMemoryOnly() throws SCacheException, InterruptedException {
+        final int j = 2;
+        for (int i = 0; i < j; i++) {
+            cacheService.store(ONE_ELEMENT_IN_MEMORY_ONLY, "testLotOfItems" + i, "value" + i);
+        }
+       
+        assertEquals("Too many elements added although limited memory.", 1, cacheService.getCacheSize(ONE_ELEMENT_IN_MEMORY_ONLY));
     }
 
     @SuppressWarnings("unchecked")
