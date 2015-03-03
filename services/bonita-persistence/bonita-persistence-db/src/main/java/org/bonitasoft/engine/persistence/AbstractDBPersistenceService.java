@@ -45,22 +45,6 @@ import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
  */
 public abstract class AbstractDBPersistenceService implements TenantPersistenceService {
 
-    private final List<String> createTablesFiles = new ArrayList<String>();
-
-    private final List<String> postCreateStructureFiles = new ArrayList<String>();
-
-    private final List<String> preDropStructureFiles = new ArrayList<String>();
-
-    private final List<String> dropTablesFiles = new ArrayList<String>();
-
-    private final List<String> initTablesFiles = new ArrayList<String>();
-
-    private final List<String> cleanTablesFiles = new ArrayList<String>();
-
-    private final List<String> deleteObjectsFiles = new ArrayList<String>();
-
-    private final Map<String, SQLTransformer> sqlTransformers = new HashMap<String, SQLTransformer>();
-
     private final String statementDelimiter;
 
     private final String likeEscapeCharacter;
@@ -98,13 +82,12 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         this.logger = logger;
     }
 
-    public AbstractDBPersistenceService(final String name, final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter,
+    public AbstractDBPersistenceService(final String name, final String statementDelimiter,
             final String likeEscapeCharacter, final SequenceManager sequenceManager, final DataSource datasource,
             final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
         this.name = name;
         this.sequenceManager = sequenceManager;
         this.datasource = datasource;
-        initTablesFiles(dbConfigurationsProvider, name);
         this.statementDelimiter = statementDelimiter;
         this.likeEscapeCharacter = likeEscapeCharacter;
         this.enableWordSearch = enableWordSearch;
@@ -146,95 +129,6 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         return true;
     }
 
-    protected void initTablesFiles(final DBConfigurationsProvider dbConfigurationsProvider, final String persistenceDBConfigFilter) {
-        if (dbConfigurationsProvider != null) {
-//            for (final DBConfiguration dbConfiguration : dbConfigurationsProvider.getMatchingTenantConfigurations(persistenceDBConfigFilter)) {
-//                if (dbConfiguration.hasCreateTablesFile()) {
-//                    createTablesFiles.add(dbConfiguration.getCreateTablesFile());
-//                }
-//                if (dbConfiguration.hasInitTablesFile()) {
-//                    initTablesFiles.add(dbConfiguration.getInitTablesFile());
-//                }
-//                if (dbConfiguration.hasCleanTablesFile()) {
-//                    cleanTablesFiles.add(dbConfiguration.getCleanTablesFile());
-//                }
-//                if (dbConfiguration.hasDropTablesFile()) {
-//                    dropTablesFiles.add(dbConfiguration.getDropTablesFile());
-//                }
-//                if (dbConfiguration.hasDeleteTenantObjectsFile()) {
-//                    deleteObjectsFiles.add(dbConfiguration.getDeleteTenantObjectsFile());
-//                }
-//                if (dbConfiguration.hasPostCreateStructureFile()) {
-//                    postCreateStructureFiles.add(dbConfiguration.getPostCreateStructureFile());
-//                }
-//                if (dbConfiguration.hasPreDropStructureFile()) {
-//                    preDropStructureFiles.add(dbConfiguration.getPreDropStructureFile());
-//                }
-//                if (dbConfiguration.hasSqlTransformers()) {
-//                    sqlTransformers.putAll(dbConfiguration.getSqlTransformers());
-//                }
-//            }
-        }
-    }
-
-    @Override
-    public void createStructure() throws SPersistenceException, IOException {
-        for (final String sqlResource : createTablesFiles) {
-            executeSQL(sqlResource, statementDelimiter, null, true);
-        }
-    }
-
-    @Override
-    public void postCreateStructure() throws SPersistenceException, IOException {
-        for (final String sqlResource : postCreateStructureFiles) {
-            executeSQL(sqlResource, statementDelimiter, null, true);
-        }
-    }
-
-    @Override
-    public void preDropStructure() throws SPersistenceException, IOException {
-        for (final String sqlResource : preDropStructureFiles) {
-            executeSQL(sqlResource, statementDelimiter, null, true);
-        }
-    }
-
-    @Override
-    public void cleanStructure() throws SPersistenceException, IOException {
-        for (final String sqlResource : cleanTablesFiles) {
-            executeSQL(sqlResource, statementDelimiter, null, true);
-        }
-    }
-
-    @Override
-    public void deleteStructure() throws SPersistenceException, IOException {
-        sequenceManager.clear();
-        for (final String sqlResource : dropTablesFiles) {
-            executeSQL(sqlResource, statementDelimiter, null, true);
-        }
-    }
-
-    @Override
-    public void initializeStructure() throws SPersistenceException, IOException {
-        initializeStructure(Collections.<String, String> emptyMap());
-    }
-
-    @Override
-    public void initializeStructure(final Map<String, String> replacements) throws SPersistenceException, IOException {
-        for (final String sqlResource : initTablesFiles) {
-            // FIXME Are we obliged to use the Hibernate connection ?
-            executeSQL(sqlResource, statementDelimiter, replacements, false);
-        }
-    }
-
-    @Override
-    public void deleteTenant(final long tenantId) throws SPersistenceException, IOException {
-        sequenceManager.clear(tenantId);
-        final Map<String, String> replacements = Collections.singletonMap("tenantid", String.valueOf(tenantId));
-        for (final String sqlResource : deleteObjectsFiles) {
-            executeSQL(sqlResource, statementDelimiter, replacements, true);
-        }
-    }
-
     private void executeSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,
             final boolean useDataSourceConnection) throws SPersistenceException, IOException {
         if (replacements != null) {
@@ -250,14 +144,6 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
         } else {
             doExecuteSQL(sqlResource, statementDelimiter, null, useDataSourceConnection);
         }
-    }
-
-    protected SQLTransformer getSqlTransformer(final String className) {
-        return sqlTransformers.get(className);
-    }
-
-    protected List<SQLTransformer> getSqlTransformers() {
-        return new ArrayList<SQLTransformer>(sqlTransformers.values());
     }
 
     protected abstract void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,

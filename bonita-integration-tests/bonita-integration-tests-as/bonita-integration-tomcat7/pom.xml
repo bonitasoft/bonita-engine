@@ -262,7 +262,7 @@
 										<!-- Change Dialect of BDR -->
                                         <property file="tomcat/${db.vendor}/bdm.properties"/>
                                         <replaceregexp
-                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties"
+                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-tenant.properties"
                                                 match="businessdata.hibernate.dialect=.*"
                                                 replace="businessdata.hibernate.dialect=${bdm.dialect}" byline="true"/>
 

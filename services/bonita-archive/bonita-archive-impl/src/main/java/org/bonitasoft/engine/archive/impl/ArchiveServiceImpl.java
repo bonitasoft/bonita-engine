@@ -16,7 +16,6 @@ package org.bonitasoft.engine.archive.impl;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.ArchivingStrategy;
-import org.bonitasoft.engine.archive.SArchiveDescriptor;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -38,8 +37,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class ArchiveServiceImpl implements ArchiveService {
 
-    private final SArchiveDescriptor definitiveArchiveDescriptor;
-
     private final TransactionService transactionService;
 
     private final PersistenceService definitiveArchivePersistenceService;
@@ -48,10 +45,9 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     private final ArchivingStrategy archivingStrategy;
 
-    public ArchiveServiceImpl(final SArchiveDescriptor definitiveArchiveDescriptor, final PersistenceService definitiveArchivePersistenceService,
+    public ArchiveServiceImpl(final PersistenceService definitiveArchivePersistenceService,
             final TechnicalLoggerService logger, final ArchivingStrategy archivingStrategy, final TransactionService transactionService) {
         super();
-        this.definitiveArchiveDescriptor = definitiveArchiveDescriptor;
         this.definitiveArchivePersistenceService = definitiveArchivePersistenceService;
         this.archivingStrategy = archivingStrategy;
         this.logger = logger;
@@ -139,11 +135,6 @@ public class ArchiveServiceImpl implements ArchiveService {
         if (logger.isLoggable(this.getClass(), technicalLogSeverity)) {
             logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
         }
-    }
-
-    @Override
-    public SArchiveDescriptor getDefinitiveArchiveDescriptor() {
-        return definitiveArchiveDescriptor;
     }
 
     @Override

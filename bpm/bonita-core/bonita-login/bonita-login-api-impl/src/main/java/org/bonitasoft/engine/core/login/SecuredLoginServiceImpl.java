@@ -221,7 +221,7 @@ public class SecuredLoginServiceImpl implements LoginService {
     protected TechnicalUser getTechnicalUser(final long tenantId) throws SLoginException {
         try {
             final String technicalUserPropertiesPath = BonitaHomeServer.getInstance().getTenantConfFolder(tenantId) + File.separator
-                    + "bonita-server.properties";
+                    + "bonita-tenant.properties";
             final Properties properties = PropertiesManager.getProperties(new File(technicalUserPropertiesPath));
             final String userName = (String) properties.get("userName");
             final String password = (String) properties.get("userPassword");

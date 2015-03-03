@@ -218,12 +218,6 @@ public class ArchiveServiceTest extends CommonServiceTest {
     }
 
     @Test
-    public void testGetDefinitiveArchiveDescriptor() {
-        final SArchiveDescriptor archiveDescriptor = archiveService.getDefinitiveArchiveDescriptor();
-        assertNotNull(archiveDescriptor);
-    }
-
-    @Test
     @Cover(classes = { ReadPersistenceService.class }, concept = BPMNConcept.OTHERS, keywords = { "archived objects" }, jira = "")
     public void testGetDefinitiveArchiveReadPersistenceService() {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();

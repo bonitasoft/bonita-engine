@@ -259,7 +259,7 @@
                                          <if>
                                             <not><equals arg1="${db.vendor}" arg2="h2" /></not>
                                             <then><replaceregexp
-                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties"
+                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-tenant.properties"
                                                 match="businessdata.hibernate.dialect=.*"
                                                 replace="businessdata.hibernate.dialect=org.hibernate.dialect.PostgreSQL82Dialect"
                                                 byline="true"/>

@@ -16,12 +16,4 @@
 		</property>
 	</bean>
 
-	<bean id="db-bonita-platform-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
-		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/platform/db/${db.vendor}-createTables.sql" />
-		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/platform/db/${db.vendor}-initTables.sql" />
-		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/platform/db/${db.vendor}-cleanTables.sql" />
-		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/platform/db/${db.vendor}-dropTables.sql" />
-		<constructor-arg name="filter" value="platform" />
-	</bean>
-
 </beans>

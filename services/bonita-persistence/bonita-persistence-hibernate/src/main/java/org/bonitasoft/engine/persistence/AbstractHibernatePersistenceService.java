@@ -131,10 +131,10 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      * @throws ClassNotFoundException
      */
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
-            final Properties extraHibernateProperties, final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter,
+            final Properties extraHibernateProperties, final String statementDelimiter,
             final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource,
             final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
-        super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
+        super(name, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
         orderByCheckingMode = getOrderByCheckingMode();
         Configuration configuration;

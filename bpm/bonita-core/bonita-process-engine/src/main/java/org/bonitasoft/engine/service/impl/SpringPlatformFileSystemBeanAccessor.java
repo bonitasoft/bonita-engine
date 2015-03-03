@@ -38,8 +38,7 @@ public class SpringPlatformFileSystemBeanAccessor {
         try {
             final String platformFolder = homeServer.getPlatformConfFolder();
             final File serviceFolder = new File(platformFolder + File.separatorChar + "services");
-            final File modelFolder = new File(platformFolder + File.separatorChar + "model");
-            final String[] resources = ArrayUtils.addAll(getResourcesOfFolder(serviceFolder), getResourcesOfFolder(modelFolder));
+            final String[] resources = ArrayUtils.addAll(getResourcesOfFolder(serviceFolder));
             return resources;
         } catch (final BonitaHomeNotSetException e) {
             throw new RuntimeException("Bonita home not set");

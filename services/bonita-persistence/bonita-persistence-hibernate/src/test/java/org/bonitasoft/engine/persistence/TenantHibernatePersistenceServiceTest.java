@@ -75,9 +75,6 @@ public class TenantHibernatePersistenceServiceTest {
     private final String statementDelimiter = ";";
 
     @Mock
-    private DBConfigurationsProvider dbConfigurationsProvider;
-
-    @Mock
     private Session session;
 
     private Set<String> wordSearchExclusionMappings;
@@ -111,7 +108,7 @@ public class TenantHibernatePersistenceServiceTest {
         System.setProperty("sysprop.bonita.orderby.checking.mode", "");
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
+                statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings));
         final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
 
@@ -130,7 +127,7 @@ public class TenantHibernatePersistenceServiceTest {
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.STRICT.name());
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource,
+                statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource,
                 enableWordSearch, wordSearchExclusionMappings));
         final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
 
@@ -149,7 +146,7 @@ public class TenantHibernatePersistenceServiceTest {
         System.clearProperty("sysprop.bonita.orderby.checking.mode");
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
+                statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings));
         final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
 
@@ -168,7 +165,7 @@ public class TenantHibernatePersistenceServiceTest {
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.NONE.name());
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
+                statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings));
         final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
 
@@ -187,7 +184,7 @@ public class TenantHibernatePersistenceServiceTest {
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.WARNING.name());
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
+                statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings));
         final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
 
@@ -213,7 +210,7 @@ public class TenantHibernatePersistenceServiceTest {
         System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.STRICT.name());
 
         tenantHibernatePersistenceService = spy(new TenantHibernatePersistenceService(name, sessionAccessor, hbmConfigurationProvider, null,
-                dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource,
+                statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource,
                 enableWordSearch, wordSearchExclusionMappings));
         final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
 

@@ -60,7 +60,7 @@ public interface PlatformAPI {
      * <b>Initialize the platform.</b>
      * The running environment of Bonita Engine is initialized and marked as activated.<br>
      * Business elements linked to the execution are initialized, after this step the technical user will be able to connect to the engine and to import the
-     * organization. No user are created by default and the default username/password to connect to the Bonita Engine are stored in the file bonita-server.xml
+     * organization. No user are created by default and the default username/password to connect to the Bonita Engine are stored in the file bonita-platform.properties
      * that is in the Bonita home.
      *
      * @throws org.bonitasoft.engine.session.InvalidSessionException

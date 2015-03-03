@@ -15,14 +15,4 @@
 		</property>
 	</bean>
 
-	<bean id="db-bos-supervisor-mapping" name="DBConfiguration" class="org.bonitasoft.engine.persistence.DBConfiguration">
-		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/supervisor/mapping/db/${db.vendor}-createTables.sql" />
-		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/supervisor/mapping/db/${db.vendor}-initTables.sql" />
-		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/supervisor/mapping/db/${db.vendor}-cleanTables.sql" />
-		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/supervisor/mapping/db/${db.vendor}-dropTables.sql" />
-		<constructor-arg name="filter" value="journal" />
-		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/supervisor/mapping/db/${db.vendor}-deleteTenantObjects.sql" />
-		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="10" />
-	</bean>
-
 </beans>

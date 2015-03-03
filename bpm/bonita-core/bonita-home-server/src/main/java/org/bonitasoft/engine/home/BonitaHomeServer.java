@@ -36,7 +36,7 @@ public class BonitaHomeServer extends BonitaHome {
 
     private static final String VERSION_FILE_NAME = "VERSION";
 
-    private static final String TENANT_CONFIGURATION_FILE = "bonita-server.properties";
+    private static final String TENANT_CONFIGURATION_FILE = "bonita-tenant.properties";
 
     private static final String CONF = "conf";
 
