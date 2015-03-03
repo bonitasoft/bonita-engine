@@ -19,7 +19,6 @@
                 </property>
             </bean>
         </constructor-arg>
-		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
@@ -50,7 +49,6 @@
                 </property>
             </bean>
         </constructor-arg>
-		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
