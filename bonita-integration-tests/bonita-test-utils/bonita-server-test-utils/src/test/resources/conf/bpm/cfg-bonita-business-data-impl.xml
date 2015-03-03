@@ -21,10 +21,6 @@
     <bean id="businessDataModelRepository" class="org.bonitasoft.engine.business.data.impl.BusinessDataModelRepositoryImpl">
         <constructor-arg name="dependencyService" ref="dependencyService" />
         <constructor-arg name="schemaManager" ref="schemaManager" />
-        <constructor-arg name="compilationPath">
-            <value>${bonita.home}/server/platform/data-management/compilation-dependencies
-            </value>
-        </constructor-arg>
         <constructor-arg name="clientStoragePath">
             <value>${bonita.home}/server/platform/data-management/client
             </value>
