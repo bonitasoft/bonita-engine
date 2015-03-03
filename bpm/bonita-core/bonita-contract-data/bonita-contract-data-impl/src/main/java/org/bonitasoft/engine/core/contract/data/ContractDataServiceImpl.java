@@ -72,6 +72,9 @@ public class ContractDataServiceImpl implements ContractDataService {
 
     @Override
     public void addUserTaskData(final long userTaskId, final Map<String, Object> data) throws SContractDataCreationException {
+        if (data == null) {
+            return;
+        }
         for (final Entry<String, Object> datum : data.entrySet()) {
             addUserTaskData(new SContractData(datum.getKey(), (Serializable) datum.getValue(), userTaskId));
         }
