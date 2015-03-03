@@ -151,7 +151,7 @@
                                 <!-- Change Dialect of BDR -->
                                 <property file="${bonita.home}/server/platform/conf/bonita-platform.properties" />
                                 <property file="${basedir}/src/test/resources/jdbc-${sysprop.bonita.db.vendor}.properties" />
-                                <replaceregexp file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties" match="businessdata.hibernate.dialect=(.*)"
+                                <replaceregexp file="${bonita.home}/server/platform/tenant-template/conf/bonita-tenant.properties" match="businessdata.hibernate.dialect=(.*)"
                                     replace="businessdata.hibernate.dialect=${db.hibernate.dialect}" byline="true" />
                             </target>
                         </configuration>

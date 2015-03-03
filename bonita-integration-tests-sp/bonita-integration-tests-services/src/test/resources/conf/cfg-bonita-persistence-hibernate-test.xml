@@ -20,22 +20,4 @@
 		</property>
 	</bean>
 
-	<bean class="org.bonitasoft.engine.persistence.DBConfiguration" depends-on="dbProperties">
-		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-createTables.sql" />
-		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-initTables.sql" />
-		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-cleanTables.sql" />
-		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-dropTables.sql" />
-		<constructor-arg name="filter" value="journal" />
-		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-deleteTenantObjects.sql" />
-		<constructor-arg name="deleteTenantObjectsPriority" value="0" />
-	</bean>
-
-	<bean class="org.bonitasoft.engine.persistence.DBConfiguration" depends-on="dbProperties">
-		<constructor-arg name="postCreateStructureFile" value="/org/bonitasoft/engine/persistence/test/human/${db.vendor}-postCreateStructure.sql" />
-		<constructor-arg name="preDropStructureFile">
-			<null />
-		</constructor-arg>
-		<constructor-arg name="filter" value="journal" />
-	</bean>
-
 </beans>

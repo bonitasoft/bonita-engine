@@ -638,7 +638,7 @@ public class SPPlatformTest {
             path.append(tenantId1);
             path.append(File.separatorChar);
             path.append("conf");
-            final String tenantPath = path.toString() + File.separator + "bonita-server.properties";
+            final String tenantPath = path.toString() + File.separator + "bonita-tenant.properties";
             final File file = new File(tenantPath);
             final Properties properties = PropertiesManager.getProperties(file);
             assertEquals("@\\[||sfgf23465", properties.getProperty("userPassword"));
