@@ -38,14 +38,11 @@ public abstract class AbstractBDMJarBuilder {
 
     private final JDTCompiler compiler;
 
-    private final String dependencyPath;
-
     private AbstractBDMCodeGenerator bdmCodeGenerator;
 
-    public AbstractBDMJarBuilder(AbstractBDMCodeGenerator bdmCodeGenerator, final JDTCompiler compiler, final String dependencyPath) {
+    public AbstractBDMJarBuilder(AbstractBDMCodeGenerator bdmCodeGenerator, final JDTCompiler compiler) {
         this.bdmCodeGenerator = bdmCodeGenerator;
         this.compiler = compiler;
-        this.dependencyPath = dependencyPath == null ? "" : dependencyPath;
     }
 
     /**
@@ -60,7 +57,7 @@ public abstract class AbstractBDMJarBuilder {
             final File tmpBDMDirectory = createTempDirectory("bdm");
             try {
                 addSourceFilesToDirectory(bom, tmpBDMDirectory);
-                compiler.compile(tmpBDMDirectory, new File(dependencyPath));
+                compiler.compile(tmpBDMDirectory, Thread.currentThread().getContextClassLoader());
                 return generateJar(tmpBDMDirectory, fileFilter);
             } finally {
                 deleteDirectory(tmpBDMDirectory);

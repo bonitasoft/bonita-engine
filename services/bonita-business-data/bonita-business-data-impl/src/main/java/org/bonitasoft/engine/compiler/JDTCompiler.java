@@ -23,7 +23,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
+import org.eclipse.jdt.internal.compiler.batch.FileSystem;
+import org.eclipse.jdt.internal.compiler.batch.Main;
 
 /**
  * Compiler based on JDTCompiler
@@ -34,51 +35,35 @@ import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 public class JDTCompiler {
 
     private static final String COMPILER_COMPLIANCE_LEVEL = "-1.6";
+    private ClassLoader classLoader;
 
     /**
      * Compile files in output directory using provided classpath
      * Put null for classpath argument to take current classpath
      * 
      * @throws CompilationException
-     *             if compilation errors occurs
+     *         if compilation errors occurs
      */
-    public void compile(final Collection<File> filesToBeCompiled, final File outputdirectory, final Collection<File> classpathEntries)
+    public void compile(final Collection<File> filesToBeCompiled, final File outputdirectory, ClassLoader classLoader)
             throws CompilationException {
-        final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory, classpathEntries);
+        this.classLoader = classLoader;
+        final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory);
         launchCompiler(commandLine);
     }
 
-    public void compile(final File srcDirectory, final File compilationPath) throws CompilationException {
-        final Collection<File> files = FileUtils.listFiles(srcDirectory, new String[] { "java" }, true);
-        Collection<File> classpathEntries;
-        if (compilationPath.exists()) {
-            classpathEntries = FileUtils.listFiles(compilationPath, new String[] { "jar" }, false);
-        } else {
-            classpathEntries = Collections.emptyList();
-        }
-        compile(files, srcDirectory, classpathEntries);
+    public void compile(final File srcDirectory, ClassLoader classLoader) throws CompilationException {
+        final Collection<File> files = FileUtils.listFiles(srcDirectory, new String[]{"java"}, true);
+        compile(files, srcDirectory, classLoader);
     }
 
-    private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory, final Collection<File> classpathEntries) {
+    private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory) {
         final List<String> arguments = new ArrayList<String>();
         arguments.add(COMPILER_COMPLIANCE_LEVEL);
         arguments.addAll(outputDirectoryArguments(outputdirectory));
         arguments.addAll(filesToBeCompiledArguments(files));
-        arguments.addAll(classpathArguments(classpathEntries));
         return arguments.toArray(new String[arguments.size()]);
     }
 
-    private List<String> classpathArguments(final Collection<File> classpathEntries) {
-        if (classpathEntries == null || classpathEntries.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        final StringBuilder builder = new StringBuilder();
-        for (final File file : classpathEntries) {
-            builder.append(file.getAbsolutePath()).append(File.pathSeparator);
-        }
-        return Arrays.asList("-cp", builder.toString());
-    }
 
     private List<String> filesToBeCompiledArguments(final Collection<File> files) {
         final List<String> arguments = new ArrayList<String>(files.size());
@@ -112,7 +97,16 @@ public class JDTCompiler {
 
     private void doCompilation(final String[] commandLine, final PrintWriter outWriter, final ByteArrayOutputStream errorStream, final PrintWriter errorWriter)
             throws CompilationException {
-        final boolean succeeded = BatchCompiler.compile(commandLine, outWriter, errorWriter, new DummyCompilationProgress());
+
+        Main mainCompiler = new Main(outWriter, errorWriter, false /* systemExit */, null /* options */, new DummyCompilationProgress()) {
+
+            @Override
+            public FileSystem getLibraryAccess() {
+                ClassLoader contextClassLoader = classLoader;
+                return new ClassLoaderEnvironment(contextClassLoader, getCompilationUnits());
+            }
+        };
+        final boolean succeeded = mainCompiler.compile(commandLine);
         if (!succeeded) {
             throw new CompilationException(new String(errorStream.toByteArray()));
         }

@@ -52,7 +52,7 @@ public class ServerBDMJarBuilderTest {
     @Test
     public void should_addPersistenceUnittestGetPersistenceFileContentFor() throws Exception {
         final JDTCompiler compiler = mock(JDTCompiler.class);
-        final ServerBDMJarBuilder builder = spy(new ServerBDMJarBuilder(compiler, null));
+        final ServerBDMJarBuilder builder = spy(new ServerBDMJarBuilder(compiler));
 
         builder.addPersistenceFile(directory, bom);
 
