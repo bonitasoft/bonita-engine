@@ -215,7 +215,11 @@
 	
 	<bean id="externalDataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>
 
-	<bean id="javaMethodOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy" />
+
+	<bean id="javaMethodOperationExecutorStrategy"
+		  class="org.bonitasoft.engine.operation.BusinessDataJavaMethodOperationExecutorStrategy">
+		<constructor-arg name="businessDataService" ref="businessDataService"/>
+	</bean>
 
 	<bean id="xpathUpdateQueryOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy" />
 
