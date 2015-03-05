@@ -958,4 +958,12 @@
 
 	<bean id="sessionAccessor" class="org.bonitasoft.engine.sessionaccessor.ThreadLocalSessionAccessor" />
 
+	<bean id="parameterService" class="org.bonitasoft.engine.parameter.propertyfile.PropertyFileParameterService">
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="cacheService" ref="platformCacheService" />
+	</bean>
+
+	<bean id="parameterExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
+		<constructor-arg name="parameterService" ref="parameterService" />
+	</bean>
 </beans>

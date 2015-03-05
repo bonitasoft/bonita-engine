@@ -446,6 +446,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="la" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="a" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" value="ref" />
 			</map>
 		</property>
 	</bean>
