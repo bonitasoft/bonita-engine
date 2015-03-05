@@ -416,6 +416,13 @@
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}/test-classes/sql-test</outputDirectory>
                                 </artifactItem>
+								<artifactItem>
+									<groupId>org.bonitasoft.engine.test</groupId>
+									<artifactId>bonita-integration-tests-services</artifactId>
+									<version>${project.version}</version>
+									<type>test-jar</type>
+									<outputDirectory>${project.build.directory}/service-test-community</outputDirectory>
+								</artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.build.directory}/server</outputDirectory>
                         </configuration>
@@ -440,6 +447,9 @@
                                  <copy todir="${project.build.directory}/conf" overwrite="true">
                                     <fileset dir="${basedir}/src/test/resources/conf" />
                                 </copy>
+								<copy todir="${project.build.directory}/conf" overwrite="true">
+									<fileset dir="${project.build.directory}/service-test-community/conf" />
+								</copy>
                             </target>
                         </configuration>
                     </execution>
