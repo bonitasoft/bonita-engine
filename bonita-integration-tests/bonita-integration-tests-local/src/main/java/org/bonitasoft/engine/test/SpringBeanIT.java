@@ -73,7 +73,7 @@ public class SpringBeanIT {
                 for (final File subdir : subdirs) {
                     iterateOnDirectory(subdir);
                 }
-            } else if (file.isFile() && file.getName().startsWith("cfg") && file.getName().endsWith(".xml")) {
+            } else if (file.isFile() && (file.getName().startsWith("bonita") || file.getName().startsWith("cfg")) && file.getName().endsWith(".xml")) {
                 findAllBeansOfDocument(parse(file));
             }
         }

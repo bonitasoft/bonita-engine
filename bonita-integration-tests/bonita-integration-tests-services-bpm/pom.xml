@@ -579,7 +579,6 @@
                                 <copy todir="${project.build.directory}/test-classes/conf">
                                     <fileset dir="${project.build.directory}/server/conf/service" />
                                 </copy>
-                                <!-- Need this order to overwrite existing files -->
                                 <copy todir="${project.build.directory}/test-classes/conf" overwrite="true">
                                     <fileset dir="${project.build.directory}/server/conf/bpm" />
                                 </copy>

@@ -23,7 +23,7 @@ public class ServicesFileFilter implements FileFilter {
 
     @Override
     public boolean accept(final File pathname) {
-        return pathname.isFile() && pathname.getName().endsWith(".xml") && pathname.getName().startsWith("cfg");
+        return pathname.isFile() && pathname.getName().endsWith(".xml") && (pathname.getName().startsWith("bonita") || pathname.getName().startsWith("cfg"));
     }
 
 }
