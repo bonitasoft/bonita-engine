@@ -23,6 +23,7 @@ import org.bonitasoft.engine.events.model.SEvent;
 
 /**
  * @author Baptiste Mesta
+ * @author Guillaume Rosinosky
  */
 public class ProcessInstanceFinishedHandler extends AbstractJMSUpdateHandler {
 
@@ -30,8 +31,8 @@ public class ProcessInstanceFinishedHandler extends AbstractJMSUpdateHandler {
 
     private final String identifier;
 
-    public ProcessInstanceFinishedHandler(final long tenantId, final long messageTimeout) {
-        super(tenantId, messageTimeout);
+    public ProcessInstanceFinishedHandler(final long tenantId, final long messageTimeout, final String brokerURL) {
+        super(tenantId, messageTimeout, brokerURL);
         identifier = UUID.randomUUID().toString();
     }
 

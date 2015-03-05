@@ -33,8 +33,12 @@ public class JMSProducer {
 
     private static JMSProducer jmsProducer;
 
-    private JMSProducer(final long timeout) throws JMSException {
-        final String brokerURL = System.getProperty("broker.url");
+  
+    private JMSProducer(final long timeout, String brokerURL) throws JMSException {
+        
+        // if brokerURL not defined before, get property
+        if (brokerURL == null) 
+            brokerURL = System.getProperty("broker.url");
 
         // Create a ConnectionFactory
         topicConnectionFactory = new ActiveMQConnectionFactory(brokerURL);
@@ -62,12 +66,15 @@ public class JMSProducer {
                 }
             }
         });
+        
     }
-
-    public static JMSProducer getInstance(final long messageTimeout) {
+    
+   
+   public static JMSProducer getInstance(final long messageTimeout, final String brokerURL) {
+        // TODO : add map by tenant
         if (jmsProducer == null) {
             try {
-                jmsProducer = new JMSProducer(messageTimeout);
+                jmsProducer = new JMSProducer(messageTimeout, brokerURL);
             } catch (final Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
@@ -75,7 +82,9 @@ public class JMSProducer {
         }
         return jmsProducer;
     }
-
+    
+    
+    
     public void sendMessage(final Map<String, Serializable> properties, final String bodyId) throws JMSException {
         final MapMessage message = session.createMapMessage();
 
