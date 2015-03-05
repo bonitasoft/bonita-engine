@@ -73,11 +73,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
 
     Class getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, SClassLoaderException {
         final GroovyShell shell = getShell(definitionId);
-        /*
-         * We use the current thread id is the key because Scripts are not thread safe (because of binding)
-         * This way we store one script for each thread, it is like a thread local cache.
-         */
-        final String key = SCRIPT_KEY + expressionContent.hashCode();
+        final String key = getScriptKey(expressionContent, definitionId);
 
         GroovyCodeSource gcs = (GroovyCodeSource) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
 
@@ -94,30 +90,47 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
         return shell.getClassLoader().parseClass(gcs, true);
     }
 
+    private String getScriptKey(String expressionContent, Long definitionId) {
+        final StringBuilder builder = new StringBuilder().append(SCRIPT_KEY);
+        if (definitionId != null) {
+            builder.append(definitionId);
+        }
+        builder.append(expressionContent.hashCode());
+        return builder.toString();
+    }
+
     GroovyShell getShell(final Long definitionId) throws SClassLoaderException, SCacheException {
         String key = null;
         GroovyShell shell = null;
         if (definitionId != null) {
             key = SHELL_KEY + definitionId;
             shell = (GroovyShell) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
+        } else {
+            if (debugEnabled) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "no definitionId provided ");
+            }
         }
         if (shell == null) {
-            ClassLoader classLoader;
-            if (definitionId == null) {
-                if (debugEnabled) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "no definitionId provided ");
-                }
-                classLoader = Thread.currentThread().getContextClassLoader();
-            } else {
-                classLoader = classLoaderService.getLocalClassLoader(DEFINITION_TYPE, definitionId);
-                cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
-            }
+            ClassLoader classLoader = getClassLoaderForShell(definitionId);
             if (debugEnabled) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Create a new groovy classloader for " + definitionId + " " + classLoader);
             }
             shell = new GroovyShell(classLoader);
+            if (definitionId != null) {
+                cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
+            }
         }
         return shell;
+    }
+
+    private ClassLoader getClassLoaderForShell(Long definitionId) throws SClassLoaderException {
+        ClassLoader classLoader;
+        if (definitionId == null) {
+            classLoader = Thread.currentThread().getContextClassLoader();
+        } else {
+            classLoader = classLoaderService.getLocalClassLoader(DEFINITION_TYPE, definitionId);
+        }
+        return classLoader;
     }
 
     @Override
