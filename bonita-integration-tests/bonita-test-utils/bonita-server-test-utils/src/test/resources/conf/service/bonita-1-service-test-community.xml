@@ -226,7 +226,7 @@
 		<constructor-arg name="delay" value="10" />
 		<constructor-arg name="delayFactor" value="3" />
 	</bean>
-	<!-- -->
+
 	<bean id="archiveService" class="org.bonitasoft.engine.archive.impl.ArchiveServiceImpl">
 		<constructor-arg name="definitiveArchivePersistenceService" ref="persistenceService" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
