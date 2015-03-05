@@ -444,12 +444,17 @@
                                 <copy todir="${project.build.directory}/conf" overwrite="true">
                                     <fileset dir="${project.build.directory}/server/conf/service" />
                                 </copy>
-                                 <copy todir="${project.build.directory}/conf" overwrite="true">
-                                    <fileset dir="${basedir}/src/test/resources/conf" />
-                                </copy>
 								<copy todir="${project.build.directory}/conf" overwrite="true">
 									<fileset dir="${project.build.directory}/service-test-community/conf" />
 								</copy>
+								<copy todir="${project.build.directory}/test-classes" overwrite="true">
+									<fileset dir="${project.build.directory}/service-test-community" >
+										<include name="*.*"/>
+									</fileset>
+								</copy>
+                                <copy todir="${project.build.directory}/conf" overwrite="true">
+                                    <fileset dir="${basedir}/src/test/resources/conf" />
+                                </copy>
                             </target>
                         </configuration>
                     </execution>
