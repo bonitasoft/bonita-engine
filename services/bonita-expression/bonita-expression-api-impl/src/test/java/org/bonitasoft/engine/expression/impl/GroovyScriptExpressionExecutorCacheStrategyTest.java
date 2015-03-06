@@ -1,16 +1,14 @@
 package org.bonitasoft.engine.expression.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheConfigurations;
@@ -28,6 +26,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import groovy.lang.GroovyShell;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GroovyScriptExpressionExecutorCacheStrategyTest {
@@ -110,13 +110,13 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
 
     }
 
-
     @Test
     public void should_getScriptFromCache_should_cache_only_once_when_on_different_threads() throws Exception {
         // when
         final Class script1 = groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent", 12l);
 
         Thread thread = new Thread(new Runnable() {
+
             @Override
             public void run() {
                 try {
@@ -149,6 +149,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         assertThat(script2).isNotNull();
         assertThat(script1).isNotEqualTo(script2);
     }
+
     @Test
     public void should_getScriptFromCache_return_different_script_if_content_is_different_definition() throws Exception {
         // when
@@ -159,5 +160,23 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         assertThat(script1).isNotNull();
         assertThat(script2).isNotNull();
         assertThat(script1).isNotEqualTo(script2);
+    }
+
+    @Test
+    public void should_not_put_in_cache_script_without_definition_id() throws Exception {
+        //given
+        final List<Object> keys = cacheService.getKeys(GroovyScriptExpressionExecutorCacheStrategy.GROOVY_SCRIPT_CACHE_NAME);
+        assertThat(keys).as("cache should be empty").isEmpty();
+
+        // when
+        groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent1", null);
+
+        // then
+        final List<Object> cacheServiceKeys = cacheService.getKeys(GroovyScriptExpressionExecutorCacheStrategy.GROOVY_SCRIPT_CACHE_NAME);
+        for (Object key : cacheServiceKeys) {
+            assertThat(key.toString()).as("should store only script definitions").startsWith(GroovyScriptExpressionExecutorCacheStrategy.SCRIPT_KEY);
+        }
+        assertThat(cacheServiceKeys).as("should store one script definitions").hasSize(1);
+
     }
 }

@@ -33,6 +33,7 @@ import java.util.Map;
  * <p>Use this command carefully: note that no validation will be done concerning the start points coherence.</p>
  *
  * @author Elias Ricken de Medeiros
+ * @since 6.5.0
  */
 public class MultipleStartPointsProcessCommand extends AbstractStartProcessCommand {
 
