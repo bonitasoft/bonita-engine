@@ -321,7 +321,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             Thread.currentThread().setContextClassLoader(classLoader);
             final Connector connector = (Connector) Class.forName(implementationClassName, true, classLoader).newInstance();
             final SConnectorAdapter sConnectorAdapter = new SConnectorAdapter(connector);
-            return new ConnectorResult(connector, connectorExecutor.execute(sConnectorAdapter, inputParameters));
+            return new ConnectorResult(connector, connectorExecutor.execute(sConnectorAdapter, inputParameters, classLoader));
         } catch (final ClassNotFoundException e) {
             throw new SConnectorException(implementationClassName + " can not be found.", e);
         } catch (final InstantiationException e) {
