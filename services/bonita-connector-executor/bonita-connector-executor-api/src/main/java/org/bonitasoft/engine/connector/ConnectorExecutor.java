@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2014 BonitaSoft S.A.
+ * Copyright (C) 2011, 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,22 +27,24 @@ import org.bonitasoft.engine.connector.exception.SConnectorException;
 public interface ConnectorExecutor extends TenantLifecycleService {
 
     /**
-     * Execute a connector.
-     * 
+     * Executes a connector.
+     *
      * @param sConnector
-     *            The connector will be executed
+     *        The connector will be executed
      * @param inputParameters
-     *            The input parameters of connector
+     *        The input parameters of connector
+     * @param classLoader
+     *        The classLoader within the connector will be executed
      * @return
      *         The output after connector executing
      * @throws SConnectorException
-     *             Error thrown when error occurs in connector executing
+     *         Error thrown when error occurs in connector executing
      */
-    Map<String, Object> execute(SConnector sConnector, Map<String, Object> inputParameters) throws SConnectorException;
+    Map<String, Object> execute(SConnector sConnector, Map<String, Object> inputParameters, final ClassLoader classLoader) throws SConnectorException;
 
     /**
      * call disconnect method of the connector
-     * 
+     *
      * @param sConnector
      * @throws SConnectorException
      */
