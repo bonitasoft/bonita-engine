@@ -65,7 +65,7 @@ CREATE TABLE arch_process_comment(
   userId NUMERIC(19, 0),
   processInstanceId NUMERIC(19, 0) NOT NULL,
   postDate NUMERIC(19, 0) NOT NULL,
-  content NVARCHAR(255) NOT NULL,
+  content NVARCHAR(512) NOT NULL,
   archiveDate NUMERIC(19, 0) NOT NULL,
   sourceObjectId NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
@@ -83,7 +83,7 @@ CREATE TABLE process_comment (
   userId NUMERIC(19, 0),
   processInstanceId NUMERIC(19, 0) NOT NULL,
   postDate NUMERIC(19, 0) NOT NULL,
-  content NVARCHAR(255) NOT NULL,
+  content NVARCHAR(512) NOT NULL,
   PRIMARY KEY (tenantid, id)
 )
 GO
@@ -243,7 +243,6 @@ CREATE TABLE arch_transition_instance (
   id NUMERIC(19, 0) NOT NULL,
   rootContainerId NUMERIC(19, 0) NOT NULL,
   parentContainerId NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(255) NOT NULL,
   source NUMERIC(19, 0),
   target NUMERIC(19, 0),
   state NVARCHAR(50),

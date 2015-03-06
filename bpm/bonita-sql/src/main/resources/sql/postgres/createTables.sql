@@ -59,7 +59,7 @@ CREATE TABLE arch_process_comment(
   userId INT8,
   processInstanceId INT8 NOT NULL,
   postDate INT8 NOT NULL,
-  content VARCHAR(255) NOT NULL,
+  content VARCHAR(512) NOT NULL,
   archiveDate INT8 NOT NULL,
   sourceObjectId INT8 NOT NULL,
   PRIMARY KEY (tenantid, id)
@@ -74,7 +74,7 @@ CREATE TABLE process_comment (
   userId INT8,
   processInstanceId INT8 NOT NULL,
   postDate INT8 NOT NULL,
-  content VARCHAR(255) NOT NULL,
+  content VARCHAR(512) NOT NULL,
   PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE process_definition (
@@ -220,7 +220,6 @@ CREATE TABLE arch_transition_instance (
   id INT8 NOT NULL,
   rootContainerId INT8 NOT NULL,
   parentContainerId INT8 NOT NULL,
-  name VARCHAR(255) NOT NULL,
   source INT8,
   target INT8,
   state VARCHAR(50),

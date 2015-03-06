@@ -59,7 +59,7 @@ CREATE TABLE arch_process_comment(
   userId BIGINT,
   processInstanceId BIGINT NOT NULL,
   postDate BIGINT NOT NULL,
-  content VARCHAR(255) NOT NULL,
+  content VARCHAR(512) NOT NULL,
   archiveDate BIGINT NOT NULL,
   sourceObjectId BIGINT NOT NULL,
   PRIMARY KEY (tenantid, id)
@@ -74,7 +74,7 @@ CREATE TABLE process_comment (
   userId BIGINT,
   processInstanceId BIGINT NOT NULL,
   postDate BIGINT NOT NULL,
-  content VARCHAR(255) NOT NULL,
+  content VARCHAR(512) NOT NULL,
   PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE process_definition (
@@ -220,7 +220,6 @@ CREATE TABLE arch_transition_instance (
   id BIGINT NOT NULL,
   rootContainerId BIGINT NOT NULL,
   parentContainerId BIGINT NOT NULL,
-  name VARCHAR(255) NOT NULL,
   source BIGINT,
   target BIGINT,
   state VARCHAR(50),

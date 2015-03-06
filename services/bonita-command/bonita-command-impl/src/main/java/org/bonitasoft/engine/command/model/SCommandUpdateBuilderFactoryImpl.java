@@ -13,15 +13,12 @@
  **/
 package org.bonitasoft.engine.command.model;
 
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-
 /**
  * @author Matthieu Chaffotte
  */
 public class SCommandUpdateBuilderFactoryImpl implements SCommandUpdateBuilderFactory {
-    
+
     public SCommandUpdateBuilder createNewInstance() {
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        return new SCommandUpdateBuilderImpl(descriptor);
+        return new SCommandUpdateBuilderImpl();
     }
 }
