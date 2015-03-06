@@ -11,14 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.command.model;
+package org.bonitasoft.engine.command.api.impl;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class SCommandUpdateBuilderFactoryImpl implements SCommandUpdateBuilderFactory {
+public class CommandProvider {
 
-    public SCommandUpdateBuilder createNewInstance() {
-        return new SCommandUpdateBuilderImpl();
+    private List<CommandDeployment> defaultCommands;
+
+    public void setDefaultCommands(final List<CommandDeployment> defaultCommands) {
+        this.defaultCommands = defaultCommands;
     }
+
+    public List<CommandDeployment> getDefaultCommands() {
+        if (defaultCommands == null) {
+            return Collections.emptyList();
+        }
+        return defaultCommands;
+    }
+
 }

@@ -32,6 +32,7 @@ import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.tracking.TimeTracker;
@@ -106,7 +107,14 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         if (executorService == null) {
             throw new SConnectorException("Unable to execute a connector, if the node is not started. Start it first");
         }
-        final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector);
+
+        long tenantId;
+        try {
+            tenantId = sessionAccessor.getTenantId();
+        } catch (STenantIdNotSetException tenantIdNotSetException) {
+            throw new SConnectorException("Tenant id not set.", tenantIdNotSetException);
+        }
+        final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector, tenantId);
         final Future<Map<String, Object>> submit = executorService.submit(callable);
         try {
             return getValue(submit);
@@ -172,14 +180,21 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
         private final SConnector sConnector;
 
-        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector) {
+        private long tenantId;
+
+        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, long tenantId) {
             this.inputParameters = inputParameters;
             this.sConnector = sConnector;
+            this.tenantId = tenantId;
         }
 
         @Override
         public Map<String, Object> call() throws Exception {
             final long startTime = System.currentTimeMillis();
+
+            //Fix Classloading issue with ThreadLocal implementatoin of SessionAccessor
+            sessionAccessor.setTenantId(tenantId);
+
             sConnector.setInputParameters(inputParameters);
             try {
                 sConnector.validate();

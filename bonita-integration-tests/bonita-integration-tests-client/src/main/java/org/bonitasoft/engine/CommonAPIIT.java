@@ -13,13 +13,6 @@
  **/
 package org.bonitasoft.engine;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -44,6 +37,13 @@ import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializer.class)
@@ -177,4 +177,8 @@ public abstract class CommonAPIIT extends APITestUtil {
         }
     }
 
+    @Override
+    public BarResource getBarResource(String path, String name, Class<?> clazz) throws IOException {
+        return super.getBarResource(path, name, clazz);
+    }
 }

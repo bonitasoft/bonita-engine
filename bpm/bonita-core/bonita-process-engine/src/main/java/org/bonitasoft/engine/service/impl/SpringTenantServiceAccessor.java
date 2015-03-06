@@ -37,7 +37,6 @@ import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.command.DefaultCommandProvider;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
@@ -203,8 +202,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private CacheService cacheService;
 
     private DependencyResolver dependencyResolver;
-
-    private DefaultCommandProvider commandProvider;
 
     private WorkService workService;
 
@@ -722,14 +719,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             dependencyResolver = beanAccessor.getService(DependencyResolver.class);
         }
         return dependencyResolver;
-    }
-
-    @Override
-    public DefaultCommandProvider getDefaultCommandProvider() {
-        if (commandProvider == null) {
-            commandProvider = beanAccessor.getService(DefaultCommandProvider.class);
-        }
-        return commandProvider;
     }
 
     @Override

@@ -36,7 +36,6 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.command.DefaultCommandProvider;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
@@ -289,7 +288,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(ProcessInstanceService.class);
     }
 
-
     @Override
     public ActivityInstanceService getActivityInstanceService() {
         return getInstanceOf(ActivityInstanceService.class);
@@ -513,11 +511,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     protected <T> T getInstanceOf(final String name, final Class<T> class1) {
         return accessor.getInstanceOf(name, class1);
-    }
-
-    @Override
-    public DefaultCommandProvider getDefaultCommandProvider() {
-        return getInstanceOf(DefaultCommandProvider.class);
     }
 
     @Override

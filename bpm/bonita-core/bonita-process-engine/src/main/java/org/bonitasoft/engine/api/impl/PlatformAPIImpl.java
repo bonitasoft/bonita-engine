@@ -40,13 +40,6 @@ import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.IsPlatformCreated;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
-import org.bonitasoft.engine.command.CommandDescriptor;
-import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.command.DefaultCommandProvider;
-import org.bonitasoft.engine.command.SCommandAlreadyExistsException;
-import org.bonitasoft.engine.command.SCommandCreationException;
-import org.bonitasoft.engine.command.model.SCommand;
-import org.bonitasoft.engine.command.model.SCommandBuilderFactory;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -664,9 +657,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
 
-            // Create default commands
-            createDefaultCommands(tenantServiceAccessor);
-
             // Create default profiles
             createDefaultProfiles(tenantServiceAccessor);
 
@@ -739,16 +729,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             if (platformSessionId != -1) {
                 sessionAccessor.setSessionInfo(platformSessionId, -1);
             }
-        }
-    }
-
-    protected void createDefaultCommands(final TenantServiceAccessor tenantServiceAccessor) throws SCommandAlreadyExistsException, SCommandCreationException {
-        final CommandService commandService = tenantServiceAccessor.getCommandService();
-        final DefaultCommandProvider provider = tenantServiceAccessor.getDefaultCommandProvider();
-        final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
-        for (final CommandDescriptor command : provider.getDefaultCommands()) {
-            final SCommand sCommand = fact.createNewInstance(command.getName(), command.getDescription(), command.getImplementation()).setSystem(true).done();
-            commandService.create(sCommand);
         }
     }
 
