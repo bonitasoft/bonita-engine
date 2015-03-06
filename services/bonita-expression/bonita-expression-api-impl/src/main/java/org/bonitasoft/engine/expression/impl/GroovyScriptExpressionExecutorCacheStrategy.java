@@ -13,13 +13,6 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyCodeSource;
-import groovy.lang.GroovyRuntimeException;
-import groovy.lang.GroovyShell;
-import groovy.lang.MissingPropertyException;
-import groovy.lang.Script;
-
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Map;
@@ -35,6 +28,13 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyCodeSource;
+import groovy.lang.GroovyRuntimeException;
+import groovy.lang.GroovyShell;
+import groovy.lang.MissingPropertyException;
+import groovy.lang.Script;
+
 /**
  * @author Zhao na
  * @author Baptiste Mesta
@@ -43,11 +43,11 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  */
 public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyScriptExpressionExecutorStrategy {
 
-    private static final String GROOVY_SCRIPT_CACHE_NAME = "GROOVY_SCRIPT_CACHE_NAME";
+    public static final String GROOVY_SCRIPT_CACHE_NAME = "GROOVY_SCRIPT_CACHE_NAME";
 
-    private static final String SCRIPT_KEY = "SCRIPT_";
+    public static final String SCRIPT_KEY = "SCRIPT_";
 
-    private static final String SHELL_KEY = "SHELL_";
+    public static final String SHELL_KEY = "SHELL_";
 
     private final CacheService cacheService;
 
@@ -73,17 +73,13 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
 
     Class getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, SClassLoaderException {
         final GroovyShell shell = getShell(definitionId);
-        /*
-         * We use the current thread id is the key because Scripts are not thread safe (because of binding)
-         * This way we store one script for each thread, it is like a thread local cache.
-         */
-        final String key = SCRIPT_KEY + definitionId + expressionContent.hashCode();
-
+        final String key = getScriptKey(expressionContent, definitionId);
 
         GroovyCodeSource gcs = (GroovyCodeSource) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
 
         if (gcs == null) {
             gcs = AccessController.doPrivileged(new PrivilegedAction<GroovyCodeSource>() {
+
                 public GroovyCodeSource run() {
                     return new GroovyCodeSource(expressionContent, generateScriptName(), GroovyShell.DEFAULT_CODE_BASE);
                 }
@@ -94,27 +90,47 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
         return shell.getClassLoader().parseClass(gcs, true);
     }
 
+    private String getScriptKey(String expressionContent, Long definitionId) {
+        final StringBuilder builder = new StringBuilder().append(SCRIPT_KEY);
+        if (definitionId != null) {
+            builder.append(definitionId);
+        }
+        builder.append(expressionContent.hashCode());
+        return builder.toString();
+    }
+
     GroovyShell getShell(final Long definitionId) throws SClassLoaderException, SCacheException {
         String key = null;
         GroovyShell shell = null;
         if (definitionId != null) {
             key = SHELL_KEY + definitionId;
             shell = (GroovyShell) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
+        } else {
+            if (debugEnabled) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "no definitionId provided ");
+            }
         }
         if (shell == null) {
-            ClassLoader classLoader;
-            if (definitionId != null) {
-                classLoader = classLoaderService.getLocalClassLoader(DEFINITION_TYPE, definitionId);
-            } else {
-                classLoader = Thread.currentThread().getContextClassLoader();
-            }
+            ClassLoader classLoader = getClassLoaderForShell(definitionId);
             if (debugEnabled) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Create a new groovy classloader for " + definitionId + " " + classLoader);
             }
             shell = new GroovyShell(classLoader);
-            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
+            if (definitionId != null) {
+                cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
+            }
         }
         return shell;
+    }
+
+    private ClassLoader getClassLoaderForShell(Long definitionId) throws SClassLoaderException {
+        ClassLoader classLoader;
+        if (definitionId == null) {
+            classLoader = Thread.currentThread().getContextClassLoader();
+        } else {
+            classLoader = classLoaderService.getLocalClassLoader(DEFINITION_TYPE, definitionId);
+        }
+        return classLoader;
     }
 
     @Override
