@@ -204,7 +204,7 @@ public class PageServiceImpl implements PageService {
 
             final SPage pageByName = getPageByName(page.getName());
             if (null != pageByName) {
-                initiateLogBuilder(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_NAME_ADD_PAGE);
+                log(page.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_NAME_ADD_PAGE);
                 throwAlreadyExistsException(pageByName.getName());
             }
             recorder.recordInsert(insertContentRecord, insertContentEvent);
@@ -341,18 +341,18 @@ public class PageServiceImpl implements PageService {
             final DeleteRecord deleteRecord = new DeleteRecord(sPage);
             final SDeleteEvent deleteEvent = getDeleteEvent(sPage, PAGE);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
+            log(sPage.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
         } catch (final SRecorderException re) {
-            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
+            log(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(re);
         } catch (final SBonitaReadException e) {
-            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
+            log(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(e);
         } catch (final SProfileEntryNotFoundException e) {
-            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
+            log(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(e);
         } catch (final SProfileEntryDeletionException e) {
-            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
+            log(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(e);
         }
     }
@@ -422,7 +422,7 @@ public class PageServiceImpl implements PageService {
         return null;
     }
 
-    void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
+    void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
@@ -473,7 +473,7 @@ public class PageServiceImpl implements PageService {
                 final SPage pageByName = getPageByName(entityUpdateDescriptor.getFields().get(SPageFields.PAGE_NAME).toString());
                 if (null != pageByName && pageByName.getId() != pageId)
                 {
-                    initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
+                    log(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
                     throwAlreadyExistsException(pageByName.getName());
                 }
             }
@@ -492,16 +492,16 @@ public class PageServiceImpl implements PageService {
                 updateProfileEntry(oldPageName, newPageName);
             }
 
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, logMethodName);
+            log(pageId, SQueriableLog.STATUS_OK, logBuilder, logMethodName);
             return sPage;
         } catch (final SRecorderException re) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
+            log(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
             throw new SObjectModificationException(re);
         } catch (final SBonitaReadException e) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
+            log(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
             throw new SObjectModificationException(e);
         } catch (final SProfileEntryUpdateException e) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
+            log(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
             throw new SObjectModificationException(e);
         }
 
@@ -552,13 +552,13 @@ public class PageServiceImpl implements PageService {
 
             recorder.recordUpdate(updateRecord, updatePageEvent);
 
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, METHOD_UPDATE_PAGE);
+            log(pageId, SQueriableLog.STATUS_OK, logBuilder, METHOD_UPDATE_PAGE);
 
         } catch (final SRecorderException re) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
+            log(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
             throw new SObjectModificationException(re);
         } catch (final SBonitaReadException e) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
+            log(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
             throw new SObjectModificationException(e);
         }
         final SPageUpdateBuilder pageBuilder = BuilderFactory.get(SPageUpdateBuilderFactory.class)

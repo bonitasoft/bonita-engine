@@ -147,7 +147,7 @@ public class PageServiceImplTest {
         pageServiceImpl = spy(new PageServiceImpl(manager, readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService,
                 profileService));
         doReturn(pageLogBuilder).when(pageServiceImpl).getPageLog(any(ActionType.class), anyString());
-        doNothing().when(pageServiceImpl).initiateLogBuilder(anyLong(), anyInt(), any(SPersistenceLogBuilder.class), anyString());
+        doNothing().when(pageServiceImpl).log(anyLong(), anyInt(), any(SPersistenceLogBuilder.class), anyString());
 
     }
 
