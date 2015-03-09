@@ -2,6 +2,8 @@ package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
@@ -33,12 +35,12 @@ public class JMSProducer {
 
     private static JMSProducer jmsProducer;
 
-  
     private JMSProducer(final long timeout, String brokerURL) throws JMSException {
-        
+
         // if brokerURL not defined before, get property
-        if (brokerURL == null) 
+        if (brokerURL == null) {
             brokerURL = System.getProperty("broker.url");
+        }
 
         // Create a ConnectionFactory
         topicConnectionFactory = new ActiveMQConnectionFactory(brokerURL);
@@ -66,11 +68,10 @@ public class JMSProducer {
                 }
             }
         });
-        
+
     }
-    
-   
-   public synchronized static JMSProducer getInstance(final long messageTimeout, final String brokerURL) {
+
+    public synchronized static JMSProducer getInstance(final long messageTimeout, final String brokerURL) {
         // TODO : add map by tenant
         if (jmsProducer == null) {
             try {
@@ -82,12 +83,41 @@ public class JMSProducer {
         }
         return jmsProducer;
     }
-    
+
     public synchronized static void resetInstance() {
-        // TODO : gracefully stop jmsProducer
+        if (jmsProducer != null) {
+            if (jmsProducer.topicConnection != null) {
+                try {
+                    jmsProducer.topicConnection.stop();
+                } catch (JMSException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            if (jmsProducer.producer != null) {
+                try {
+                    jmsProducer.producer.close();
+                } catch (JMSException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            if (jmsProducer.session != null) {
+                try {
+                    jmsProducer.session.close();
+                } catch (JMSException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            if (jmsProducer.topicConnection != null) {
+                try {
+                    jmsProducer.topicConnection.close();
+                } catch (JMSException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
         jmsProducer = null;
     }
-    
+
     public void sendMessage(final Map<String, Serializable> properties, final String bodyId) throws JMSException {
         final MapMessage message = session.createMapMessage();
 
