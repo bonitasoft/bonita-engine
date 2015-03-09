@@ -70,7 +70,7 @@ public class JMSProducer {
     }
     
    
-   public static JMSProducer getInstance(final long messageTimeout, final String brokerURL) {
+   public synchronized static JMSProducer getInstance(final long messageTimeout, final String brokerURL) {
         // TODO : add map by tenant
         if (jmsProducer == null) {
             try {
@@ -83,7 +83,10 @@ public class JMSProducer {
         return jmsProducer;
     }
     
-    
+    public synchronized static void resetInstance() {
+        // TODO : gracefully stop jmsProducer
+        jmsProducer = null;
+    }
     
     public void sendMessage(final Map<String, Serializable> properties, final String bodyId) throws JMSException {
         final MapMessage message = session.createMapMessage();
