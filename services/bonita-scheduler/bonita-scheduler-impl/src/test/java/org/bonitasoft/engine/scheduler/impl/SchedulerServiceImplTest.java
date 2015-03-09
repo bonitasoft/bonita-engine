@@ -30,7 +30,6 @@ import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.InjectedService;
@@ -38,9 +37,6 @@ import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.ServicesResolver;
 import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilder;
-import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilder;
-import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
@@ -78,9 +74,6 @@ public class SchedulerServiceImplTest {
     @Mock
     private SessionAccessor sessionAccessor;
 
-    @Mock
-    private SSchedulerQueriableLogBuilderFactory schedulerLogBuilderFactory;
-
     ServicesResolver servicesResolver;
 
     @Before
@@ -98,23 +91,6 @@ public class SchedulerServiceImplTest {
         when(sEventBuilderFactory.createNewInstance(anyString())).thenReturn(sEventBuilder);
         when(sEventBuilderFactory.createInsertEvent(anyString())).thenReturn(sEventBuilder);
         when(sEventBuilder.setObject(any(Object.class))).thenReturn(sEventBuilder);
-
-        final SSchedulerQueriableLogBuilderFactory schedulerLogBuilderFactory = mock(SSchedulerQueriableLogBuilderFactory.class);
-        final ReturnLogBuilder builderAnswer = new ReturnLogBuilder();
-        final SSchedulerQueriableLogBuilder schedulerLogBuilder = mock(SSchedulerQueriableLogBuilder.class, builderAnswer);
-        builderAnswer.setObject(schedulerLogBuilder);
-        when(BuilderFactory.get(SSchedulerQueriableLogBuilderFactory.class)).thenReturn(schedulerLogBuilderFactory);
-        when(schedulerLogBuilderFactory.createNewInstance()).thenReturn(schedulerLogBuilder);
-
-        final SJobQueriableLogBuilder jobLogBuilder = mock(SJobQueriableLogBuilder.class);
-
-        final SSchedulerQueriableLogBuilderFactory schedulerLogBuilderFact = mock(SSchedulerQueriableLogBuilderFactory.class);
-
-        final SSchedulerQueriableLogBuilder sLogBuilder = mock(SSchedulerQueriableLogBuilder.class);
-        when(schedulerLogBuilderFact.createNewInstance()).thenReturn(sLogBuilder);
-
-        final SQueriableLog sQueriableLog = mock(SQueriableLog.class);
-        when(jobLogBuilder.done()).thenReturn(sQueriableLog);
 
         given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
 

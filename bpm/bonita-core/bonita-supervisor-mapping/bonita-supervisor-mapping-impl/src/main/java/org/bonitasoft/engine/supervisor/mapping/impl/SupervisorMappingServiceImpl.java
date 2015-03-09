@@ -79,10 +79,10 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_OK, logBuilder, "createSupervisor");
+            log(supervisor.getId(), SQueriableLog.STATUS_OK, logBuilder, "createSupervisor");
             return supervisor;
         } catch (final SRecorderException re) {
-            initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createSupervisor");
+            log(supervisor.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createSupervisor");
             throw new SSupervisorCreationException(re);
         }
     }
@@ -117,9 +117,9 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
         final SProcessSupervisorLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting supervisor");
         try {
             recorder.recordDelete(record, deleteEvent);
-            initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_OK, logBuilder, "createSupervisor");
+            log(supervisor.getId(), SQueriableLog.STATUS_OK, logBuilder, "createSupervisor");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createSupervisor");
+            log(supervisor.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createSupervisor");
             throw new SSupervisorDeletionException("Can't delete process supervisor " + supervisor, e);
         }
     }
@@ -166,7 +166,7 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
         return persistenceService.getNumberOfEntities(SProcessSupervisor.class, null, searchOptions, null);
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);

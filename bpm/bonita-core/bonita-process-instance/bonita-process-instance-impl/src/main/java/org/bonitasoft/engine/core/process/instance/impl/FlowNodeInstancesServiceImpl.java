@@ -36,8 +36,6 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManualTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -108,14 +106,6 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
 
     protected <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
         logBuilder.setActionType(actionType);
-    }
-
-    protected SFlowNodeInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final SFlowElementInstance flowElementInstance) {
-        final SFlowNodeInstanceLogBuilder logBuilder = BuilderFactory.get(SFlowNodeInstanceLogBuilderFactory.class).createNewInstance();
-        initializeLogBuilder(logBuilder, message);
-        updateLog(actionType, logBuilder);
-        logBuilder.processInstanceId(flowElementInstance.getRootContainerId());
-        return logBuilder;
     }
 
     @Override

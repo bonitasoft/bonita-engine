@@ -100,12 +100,12 @@ public class ThemeServiceImpl implements ThemeService {
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            log(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
             return theme;
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
-            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            log(theme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SThemeCreationException(re);
         }
     }
@@ -136,11 +136,11 @@ public class ThemeServiceImpl implements ThemeService {
         }
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            log(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
-            initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            log(theme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SThemeDeletionException(re);
         }
     }
@@ -221,11 +221,11 @@ public class ThemeServiceImpl implements ThemeService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(sTheme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            log(sTheme.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
-            initiateLogBuilder(sTheme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            log(sTheme.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SThemeUpdateException(re);
         }
         return sTheme;
@@ -278,7 +278,7 @@ public class ThemeServiceImpl implements ThemeService {
         return logBuilder;
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);

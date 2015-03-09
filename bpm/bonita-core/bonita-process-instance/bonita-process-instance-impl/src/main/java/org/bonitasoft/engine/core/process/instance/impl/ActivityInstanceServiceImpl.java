@@ -37,7 +37,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDelet
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilityException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -51,8 +50,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingLogBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingLogBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -78,7 +75,6 @@ import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
-import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
@@ -173,14 +169,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             stb.append(">");
             getLogger().log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
         }
-    }
-
-    protected SPendingActivityMappingLogBuilder getQueriableLog(final ActionType actionType, final String message, final SPendingActivityMapping mapping) {
-        final SPendingActivityMappingLogBuilder logBuilder = BuilderFactory.get(SPendingActivityMappingLogBuilderFactory.class).createNewInstance();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        logBuilder.activityInstanceId(mapping.getActivityId());
-        return logBuilder;
     }
 
     @Override
