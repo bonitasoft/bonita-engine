@@ -1,26 +1,24 @@
 /*******************************************************************************
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft is a trademark of BonitaSoft SA.
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
- * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
- * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
 package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
-
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Colin Puy
@@ -33,20 +31,15 @@ public class ServerProxyfier {
         this.lazyLoader = lazyLoader;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Entity> T proxifyIfNeeded(final T entity) {
-        if (isLazyMethodProxyfied(entity)) {
-            return entity;
-        }
-        return (T) proxifyEntity(entity);
-    }
-
     public static boolean isLazyMethodProxyfied(final Entity e) {
         return ProxyFactory.isProxyClass(e.getClass()) && ProxyFactory.getHandler((Proxy) e) instanceof LazyMethodHandler;
     }
 
     @SuppressWarnings("unchecked")
     public <T extends Entity> T proxify(final T entity) {
+        if (isLazyMethodProxyfied(entity)) {
+            return entity;
+        }
         return (T) proxifyEntity(entity);
     }
 
@@ -55,7 +48,14 @@ public class ServerProxyfier {
             return null;
         }
         final ProxyFactory factory = new ProxyFactory();
-        factory.setSuperclass(entity.getClass());
+        Class<?> classForProxy = entity.getClass();
+
+        //It's not possible to create a Proxy on a Proxy
+        //Here Entity can already be an Hibernate Proxy
+        if (ProxyFactory.isProxyClass(classForProxy)) {
+            classForProxy = classForProxy.getSuperclass();
+        }
+        factory.setSuperclass(classForProxy);
         factory.setFilter(new AllMethodFilter());
         try {
             return (Entity) factory.create(new Class<?>[0], new Object[0], new LazyMethodHandler(entity, lazyLoader));

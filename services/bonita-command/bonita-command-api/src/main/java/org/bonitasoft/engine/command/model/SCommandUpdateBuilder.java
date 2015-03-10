@@ -24,6 +24,8 @@ public interface SCommandUpdateBuilder {
 
     SCommandUpdateBuilder updateDescription(String description);
 
+    SCommandUpdateBuilder updateImplementation(String implementation);
+
     EntityUpdateDescriptor done();
 
 }
