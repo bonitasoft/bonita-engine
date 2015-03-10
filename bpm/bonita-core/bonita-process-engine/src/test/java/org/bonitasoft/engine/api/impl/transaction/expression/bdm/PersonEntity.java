@@ -9,10 +9,11 @@
 package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
 
 import org.bonitasoft.engine.bdm.Entity;
-
+import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
 
 /**
  * @author Romain Bioteau
+ * @author Laurent Leseigneur
  */
 public class PersonEntity implements Entity {
 
@@ -20,15 +21,17 @@ public class PersonEntity implements Entity {
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see com.bonitasoft.engine.bdm.Entity#getPersistenceId()
      */
     @Override
     public Long getPersistenceId() {
-        return null;
+        return 1L;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see com.bonitasoft.engine.bdm.Entity#getPersistenceVersion()
      */
     @Override
@@ -36,4 +39,12 @@ public class PersonEntity implements Entity {
         return null;
     }
 
+    @LazyLoaded
+    public String getWithLazyLoadedAnnotation() {
+        return "getWithLazyLoadedAnnotation";
+    }
+
+    public String getWithoutLazyLoadedAnnotation() {
+        return "getWithoutLazyLoadedAnnotation";
+    }
 }

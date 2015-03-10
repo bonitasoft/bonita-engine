@@ -8,9 +8,19 @@
  *******************************************************************************/
 package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
+import java.lang.reflect.Method;
+
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 import javassist.util.proxy.ProxyObject;
+
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bdm.Entity;
 import org.junit.Before;
@@ -19,12 +29,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.lang.reflect.Method;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * @author Romain Bioteau
+ * @author Laurent Leseigneur
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ServerProxyfierTest {
@@ -70,4 +77,35 @@ public class ServerProxyfierTest {
         assertThat(proxy).isNotSameAs(aProxy);
     }
 
+    @Test
+    public void should_call_on_lazy_loaded_getter_use_lazyLoader() throws Exception {
+        //given
+        PersonEntity personEntity = new PersonEntity();
+
+        final Method method = PersonEntity.class.getMethod("getWithLazyLoadedAnnotation");
+        doReturn("lazyResult").when(lazyLoader).load(any(Method.class), anyLong());
+
+        //when
+        PersonEntity proxy = serverProxyfier.proxify(personEntity);
+        final String withLazyLoadedAnnotation = proxy.getWithLazyLoadedAnnotation();
+
+        //
+        verify(lazyLoader).load(method, personEntity.getPersistenceId());
+        assertThat(withLazyLoadedAnnotation).isEqualTo("lazyResult");
+    }
+
+    @Test
+    public void should_not_call_lazyLoader() throws Exception {
+        //given
+        PersonEntity personEntity = new PersonEntity();
+        final Method method = PersonEntity.class.getMethod("getWithoutLazyLoadedAnnotation");
+
+        //when
+        PersonEntity proxy = serverProxyfier.proxify(personEntity);
+        final String withLazyLoadedAnnotation = proxy.getWithoutLazyLoadedAnnotation();
+
+        //
+        verify(lazyLoader, never()).load(method, personEntity.getPersistenceId());
+        assertThat(withLazyLoadedAnnotation).isEqualTo("getWithoutLazyLoadedAnnotation");
+    }
 }

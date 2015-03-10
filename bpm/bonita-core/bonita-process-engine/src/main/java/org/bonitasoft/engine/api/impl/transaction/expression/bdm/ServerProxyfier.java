@@ -8,20 +8,21 @@
  *******************************************************************************/
 package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
 
-import javassist.util.proxy.MethodFilter;
-import javassist.util.proxy.MethodHandler;
-import javassist.util.proxy.Proxy;
-import javassist.util.proxy.ProxyFactory;
-import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
-
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import javassist.util.proxy.MethodFilter;
+import javassist.util.proxy.MethodHandler;
+import javassist.util.proxy.Proxy;
+import javassist.util.proxy.ProxyFactory;
+
+import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
+
 /**
  * @author Colin Puy
+ * @author Laurent Leseigneur
  */
 public class ServerProxyfier {
 
@@ -85,13 +86,12 @@ public class ServerProxyfier {
      */
     public class LazyMethodHandler implements MethodHandler {
 
-        private final ServerLazyLoader lazyloader;
-        private final List<String> alreadyLoaded = new ArrayList<String>();
+        private final ServerLazyLoader lazyLoader;
         private final Entity entity;
 
-        public LazyMethodHandler(final Entity entity, final ServerLazyLoader lazyloader) {
+        public LazyMethodHandler(final Entity entity, final ServerLazyLoader lazyLoader) {
             this.entity = entity;
-            this.lazyloader = lazyloader;
+            this.lazyLoader = lazyLoader;
         }
 
         public Entity getEntity() {
@@ -100,29 +100,17 @@ public class ServerProxyfier {
 
         @Override
         public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args) throws Throwable {
-            Object invocationResult = thisMethod.invoke(entity, args);
-
-            if (isGetterOrSetter(thisMethod)) {
-                if (isGetter(thisMethod) && shouldBeLoaded(thisMethod, invocationResult)) {
-                    invocationResult = lazyloader.load(thisMethod, entity.getPersistenceId());
-                    callSetterOnEntity(invocationResult, thisMethod);
-                }
-                alreadyLoaded.add(toFieldName(thisMethod.getName()));
+            Object invocationResult;
+            if (isMethodGetterOnLazyLoadedField(thisMethod)) {
+                invocationResult = lazyLoader.load(thisMethod, entity.getPersistenceId());
+            } else {
+                invocationResult = thisMethod.invoke(entity, args);
             }
-
             return proxifyIfNeeded(invocationResult);
         }
 
-        private void callSetterOnEntity(final Object invocationResult, final Method getter) throws NoSuchMethodException, SecurityException,
-                IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-            if (invocationResult != null) {
-                final Method setter = getAssociatedSetter(invocationResult, getter);
-                setter.invoke(entity, invocationResult);
-            }
-        }
-
-        private Method getAssociatedSetter(final Object invocationResult, final Method getter) throws NoSuchMethodException, SecurityException {
-            return entity.getClass().getMethod(getter.getName().replaceFirst("^get", "set"), getter.getReturnType());
+        private boolean isMethodGetterOnLazyLoadedField(Method thisMethod) {
+            return isGetter(thisMethod) && thisMethod.isAnnotationPresent(LazyLoaded.class);
         }
 
         @SuppressWarnings("unchecked")
@@ -151,24 +139,10 @@ public class ServerProxyfier {
             return invocationResult instanceof Entity;
         }
 
-        private boolean shouldBeLoaded(final Method thisMethod, final Object notLazyLoaded) {
-            return thisMethod.isAnnotationPresent(LazyLoaded.class) && !alreadyLoaded.contains(toFieldName(thisMethod.getName()));
-        }
-
-        private boolean isGetterOrSetter(final Method method) {
-            return isGetter(method) || method.getName().startsWith("set") && method.getName().length() > 3;
-        }
-
         private boolean isGetter(final Method method) {
             return method.getName().startsWith("get");
         }
 
-        private String toFieldName(final String methodName) {
-            if (methodName.startsWith("get") || methodName.startsWith("set") && methodName.length() > 3) {
-                return methodName.substring(3).toLowerCase();
-            }
-            throw new IllegalArgumentException(methodName + " is not a valid getter or setter name.");
-        }
     }
 
     /**
