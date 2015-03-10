@@ -1,71 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <artifactId>bpm</artifactId>
-        <groupId>org.bonitasoft.engine</groupId>
-        <version>7.0.0-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<artifactId>bpm</artifactId>
+		<groupId>org.bonitasoft.engine</groupId>
+		<version>7.0.0-SNAPSHOT</version>
+	</parent>
 
-    <artifactId>bonita-home</artifactId>
-    <packaging>pom</packaging>
+	<artifactId>bonita-home</artifactId>
+	<packaging>pom</packaging>
 
-    <name>Bonita Home</name>
+	<name>Bonita Home</name>
 
-    <build>
-        <plugins>
+	<build>
+		<plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>distrib-assembly</id>
-                        <phase>package</phase>
+                        <id>copy-compilation-dependencies</id>
+                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <descriptors>
-                                <descriptor>assembly-common.xml</descriptor>
-                                <descriptor>assembly-base.xml</descriptor>
-                                <descriptor>assembly-base-hibernate.xml</descriptor>
-                                <descriptor>assembly.xml</descriptor>
-                            </descriptors>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.bonitasoft.engine.data</groupId>
+                                    <artifactId>bonita-business-data-api</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.bonitasoft.engine</groupId>
+                                    <artifactId>bonita-commons</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.bonitasoft.engine</groupId>
+                                    <artifactId>bonita-client</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.bonitasoft.engine</groupId>
+                                    <artifactId>bonita-common</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate.javax.persistence</groupId>
+                                    <artifactId>hibernate-jpa-2.0-api</artifactId>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-core</artifactId>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.fasterxml.jackson.core</groupId>
+                                    <artifactId>jackson-databind</artifactId>
+                                    <version>2.2.3</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.fasterxml.jackson.core</groupId>
+                                    <artifactId>jackson-core</artifactId>
+                                    <version>2.2.3</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.fasterxml.jackson.core</groupId>
+                                    <artifactId>jackson-annotations</artifactId>
+                                    <version>2.2.3</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.javassist</groupId>
+                                    <artifactId>javassist</artifactId>
+                                    <version>3.18.1-GA</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/common/home/server/platform/data-management/compilation-dependencies</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
-    </build>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>distrib-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>assembly-common.xml</descriptor>
+								<descriptor>assembly-base.xml</descriptor>
+								<descriptor>assembly-base-hibernate.xml</descriptor>
+								<descriptor>assembly.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
-    <profiles>
-        <profile>
-            <id>deploy</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>distrib-assembly</id>
+	<profiles>
+		<profile>
+			<id>deploy</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>distrib-assembly</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>single</goal>
                                 </goals>
-                                <configuration>
-                                    <descriptors>
-                                        <descriptor>assembly.xml</descriptor>
-                                    </descriptors>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+								<configuration>
+									<descriptors>
+										<descriptor>assembly.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

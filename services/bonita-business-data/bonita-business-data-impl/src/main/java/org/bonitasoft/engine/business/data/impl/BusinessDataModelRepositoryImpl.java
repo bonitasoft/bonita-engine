@@ -78,12 +78,15 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private final SchemaManager schemaManager;
 
+    private final String compilationPath;
+
     private final String clientStoragePath;
 
-    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaManager schemaManager,
+    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaManager schemaManager, final String compilationPath,
             final String clientStoragePath) {
         this.dependencyService = dependencyService;
         this.schemaManager = schemaManager;
+        this.compilationPath = compilationPath;
         this.clientStoragePath = clientStoragePath;
     }
 
@@ -209,14 +212,14 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     protected byte[] generateServerBDMJar(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
         final JDTCompiler compiler = new JDTCompiler();
-        final AbstractBDMJarBuilder builder = new ServerBDMJarBuilder(compiler);
+        final AbstractBDMJarBuilder builder = new ServerBDMJarBuilder(compiler, compilationPath);
         final IOFileFilter classFileAndXmlFilefilter = new SuffixFileFilter(Arrays.asList(".class", ".xml"));
         return builder.build(model, classFileAndXmlFilefilter);
     }
 
     protected byte[] generateClientBDMZip(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException, IOException {
         final JDTCompiler compiler = new JDTCompiler();
-        AbstractBDMJarBuilder builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader());
+        AbstractBDMJarBuilder builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader(), compilationPath);
 
         final Map<String, byte[]> resources = new HashMap<String, byte[]>();
         // Build jar with Model
@@ -224,7 +227,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         resources.put(MODEL_JAR_NAME, modelJarContent);
 
         // Build jar with DAO
-        builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader());
+        builder = new ClientBDMJarBuilder(compiler, new ResourcesLoader(), compilationPath);
         final byte[] daoJarContent = builder.build(model, new OnlyDAOImplementationFileFilter());
         resources.put(DAO_JAR_NAME, daoJarContent);
 

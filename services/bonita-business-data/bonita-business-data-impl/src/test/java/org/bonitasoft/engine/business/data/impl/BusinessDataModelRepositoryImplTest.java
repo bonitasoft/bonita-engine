@@ -52,7 +52,7 @@ public class BusinessDataModelRepositoryImplTest {
     @Before
     public void setUp() {
         dependencyService = mock(DependencyService.class);
-        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaManager.class), null));
+        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaManager.class), null, null));
     }
 
     @Test

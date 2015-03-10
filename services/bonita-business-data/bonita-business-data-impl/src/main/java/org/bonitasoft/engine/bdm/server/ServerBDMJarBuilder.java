@@ -34,8 +34,8 @@ import org.bonitasoft.engine.io.IOUtils;
  */
 public class ServerBDMJarBuilder extends AbstractBDMJarBuilder {
 
-    public ServerBDMJarBuilder(final JDTCompiler compiler) {
-        super(new ServerBDMCodeGenerator(), compiler);
+    public ServerBDMJarBuilder(final JDTCompiler compiler, final String dependencyPath) {
+        super(new ServerBDMCodeGenerator(), compiler, dependencyPath);
     }
 
     @Override

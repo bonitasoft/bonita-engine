@@ -27,14 +27,14 @@ public class ServerBDMJarBuilderITest {
     @Test
     public void jar_builder_should_go_well_without_errors() throws Exception {
         final JDTCompiler compiler = new JDTCompiler();
-        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler);
+        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
         bdmJarBuilder.build(BOMBuilder.aBOM().build(), TrueFileFilter.TRUE);
     }
 
     @Test
     public void jar_builder_should_go_well_without_errors_with_queries() throws Exception {
         final JDTCompiler compiler = new JDTCompiler();
-        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler);
+        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
         final BOMBuilder builder = new BOMBuilder();
         bdmJarBuilder.build(builder.buildComplex(), TrueFileFilter.TRUE);
     }
@@ -42,14 +42,14 @@ public class ServerBDMJarBuilderITest {
     @Test
     public void jar_builder_should_go_well_without_errors_with_queries2() throws Exception {
         final JDTCompiler compiler = new JDTCompiler();
-        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler);
+        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
         bdmJarBuilder.build(BOMBuilder.aBOM().buildPerson(), TrueFileFilter.TRUE);
     }
 
     @Test
     public void jar_builder_should_go_well_with_multipleBoolean() throws Exception {
         final JDTCompiler compiler = new JDTCompiler();
-        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler);
+        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
         final BOMBuilder builder = new BOMBuilder();
         bdmJarBuilder.build(builder.buildModelWithMultipleBoolean(), TrueFileFilter.TRUE);
     }

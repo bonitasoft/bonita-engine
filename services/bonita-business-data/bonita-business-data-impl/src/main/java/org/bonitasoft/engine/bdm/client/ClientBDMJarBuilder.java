@@ -27,8 +27,8 @@ public class ClientBDMJarBuilder extends AbstractBDMJarBuilder {
 
     private ResourcesLoader resourcesLoader;
 
-    public ClientBDMJarBuilder(final JDTCompiler compiler, ResourcesLoader resourcesLoader) {
-        super(new ClientBDMCodeGenerator(), compiler);
+    public ClientBDMJarBuilder(final JDTCompiler compiler, ResourcesLoader resourcesLoader, final String dependencyPath) {
+        super(new ClientBDMCodeGenerator(), compiler, dependencyPath);
         this.resourcesLoader = resourcesLoader;
     }
 
