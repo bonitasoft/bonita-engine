@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-instance-migration</artifactId>
 		<groupId>org.bonitasoft.engine.core</groupId>
-		<version>6.5.0</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-instance-migration-api</artifactId>
