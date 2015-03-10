@@ -55,7 +55,6 @@ import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
-import org.bonitasoft.engine.business.data.BusinessDataReference;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -125,6 +124,22 @@ public interface ProcessRuntimeAPI {
      * @since 6.4.0
      */
     SearchResult<ProcessInstance> searchFailedProcessInstances(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * List all process instances with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state that
+     * are supervised by the given user.
+     * If the specified userId does not correspond to a user, an empty SearchResult is returned.
+     *
+     * @param userId
+     *        The identifier of the user.
+     * @param searchOptions
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     * @return The list of failed process instances supervised by the specified user.
+     * @throws SearchException
+     *         If an exception occurs when getting the list of process instances.
+     * @since 7.0
+     */
+    SearchResult<ProcessInstance> searchFailedProcessInstancesSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
      * List all open process instances supervised by a user.
@@ -399,7 +414,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      */
     ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables) throws ProcessDefinitionNotFoundException,
-            ProcessActivationException, ProcessExecutionException;
+    ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations.
@@ -441,7 +456,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     ProcessInstance startProcess(long userId, long processDefinitionId) throws UserNotFoundException, ProcessDefinitionNotFoundException,
-            ProcessActivationException, ProcessExecutionException;
+    ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
@@ -1000,7 +1015,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     long getOneAssignedUserTaskInstanceOfProcessDefinition(long processDefinitionId, long userId) throws ProcessDefinitionNotFoundException,
-            UserNotFoundException;
+    UserNotFoundException;
 
     /**
      * Get the state of a specified activity instance.
@@ -1170,7 +1185,7 @@ public interface ProcessRuntimeAPI {
      */
     Map<String, Serializable> executeConnectorOnProcessDefinition(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processDefinitionId)
-            throws ConnectorExecutionException, ConnectorNotFoundException;
+                    throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute a connector in a specified processDefinition with operations.
@@ -2339,7 +2354,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Retrieve, for a given process instance, the current counters on flownodes. Please note: this method does not count the flownodes of sub-process instances
      * of the given process instance.
-     * 
+     *
      * @param processInstanceId ID of the process instance of which to retrieve the current indicators.
      * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the current counters for this flownode, that is,
      *         a map of &lt;state name, number of current flownode in that state&gt;

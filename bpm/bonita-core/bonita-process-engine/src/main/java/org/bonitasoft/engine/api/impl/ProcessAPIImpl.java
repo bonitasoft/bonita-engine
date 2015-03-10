@@ -386,6 +386,7 @@ import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesInvolv
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesWithoutSubProcess;
 import org.bonitasoft.engine.search.process.SearchFailedProcessInstances;
+import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUser;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUsersManagedBy;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesSupervisedBy;
@@ -3865,12 +3866,50 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.api.ProcessRuntimeAPI#searchFailedProcessInstancesSupervisedBy(long, org.bonitasoft.engine.search.SearchOptions)
+     */
+    @Override
+    public SearchResult<ProcessInstance> searchFailedProcessInstancesSupervisedBy(final long userId, final SearchOptions searchOptions) throws SearchException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        final GetSUser getUser = createTxUserGetter(userId, identityService);
+        try {
+            getUser.execute();
+        } catch (final SBonitaException e) {
+            return new SearchResultImpl<ProcessInstance>(0, Collections.<ProcessInstance> emptyList());
+        }
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final SearchFailedProcessInstancesSupervisedBy searchFailedProcessInstances = createSearchFailedProcessInstancesSupervisedBy(userId, searchOptions, processInstanceService, searchEntitiesDescriptor, processDefinitionService);
+        try {
+            searchFailedProcessInstances.execute();
+            return searchFailedProcessInstances.getResult();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
+    }
+
+    protected SearchFailedProcessInstancesSupervisedBy createSearchFailedProcessInstancesSupervisedBy(final long userId, final SearchOptions searchOptions,
+            final ProcessInstanceService processInstanceService, final SearchEntitiesDescriptor searchEntitiesDescriptor,
+            final ProcessDefinitionService processDefinitionService) {
+        return new SearchFailedProcessInstancesSupervisedBy(processInstanceService,
+                searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), userId, searchOptions, processDefinitionService);
+    }
+
+    protected GetSUser createTxUserGetter(final long userId, final IdentityService identityService) {
+        return new GetSUser(identityService, userId);
+    }
+
     @Override
     public SearchResult<ProcessInstance> searchOpenProcessInstancesSupervisedBy(final long userId, final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final GetSUser getUser = new GetSUser(identityService, userId);
+        final GetSUser getUser = createTxUserGetter(userId, identityService);
         try {
             getUser.execute();
         } catch (final SBonitaException e) {
@@ -5963,17 +6002,17 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public int getNumberOfParameterInstances(long processDefinitionId) {
+    public int getNumberOfParameterInstances(final long processDefinitionId) {
         return processManagementAPIImplDelegate.getNumberOfParameterInstances(processDefinitionId);
     }
 
     @Override
-    public ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws NotFoundException {
+    public ParameterInstance getParameterInstance(final long processDefinitionId, final String parameterName) throws NotFoundException {
         return processManagementAPIImplDelegate.getParameterInstance(processDefinitionId, parameterName);
     }
 
     @Override
-    public List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort) {
+    public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults, final ParameterCriterion sort) {
         return processManagementAPIImplDelegate.getParameterInstances(processDefinitionId, startIndex, maxResults, sort);
     }
 

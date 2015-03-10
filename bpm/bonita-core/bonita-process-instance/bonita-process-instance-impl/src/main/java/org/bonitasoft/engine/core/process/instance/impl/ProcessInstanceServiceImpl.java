@@ -28,8 +28,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceDeletionException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
@@ -104,6 +102,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     private static final String USER_ID = "userId";
 
     private static final String SUPERVISED_BY = "SupervisedBy";
+
+    private static final String FAILED_AND_SUPERVISED_BY = "FailedAndSupervisedBy";
 
     private static final String INVOLVING_USER = "InvolvingUser";
 
@@ -198,14 +198,14 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public void deleteProcessInstance(final long processInstanceId) throws SProcessInstanceModificationException, SProcessInstanceReadException,
-            SProcessInstanceNotFoundException {
+    SProcessInstanceNotFoundException {
         final SProcessInstance processInstance = getProcessInstance(processInstanceId);
         deleteProcessInstance(processInstance);
     }
 
     @Override
     public long deleteParentProcessInstanceAndElements(final List<SProcessInstance> sProcessInstances) throws SFlowNodeReadException,
-            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
+    SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         long nbDeleted = 0;
         for (final SProcessInstance sProcessInstance : sProcessInstances) {
             deleteParentProcessInstanceAndElements(sProcessInstance);
@@ -216,14 +216,14 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public void deleteParentProcessInstanceAndElements(final long processInstanceId) throws SProcessInstanceReadException, SProcessInstanceNotFoundException,
-            SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
+    SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         final SProcessInstance sProcessInstance = getProcessInstance(processInstanceId);
         deleteParentProcessInstanceAndElements(sProcessInstance);
     }
 
     @Override
     public void deleteParentProcessInstanceAndElements(final SProcessInstance sProcessInstance) throws SFlowNodeReadException,
-            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
+    SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         checkIfCallerIsNotActive(sProcessInstance.getCallerId());
 
         try {
@@ -261,7 +261,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public long deleteArchivedParentProcessInstancesAndElements(final List<SAProcessInstance> saProcessInstances) throws SFlowNodeReadException,
-            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
+    SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         long nbDeleted = 0;
         for (final SAProcessInstance saProcessInstance : saProcessInstances) {
             deleteArchivedParentProcessInstanceAndElements(saProcessInstance);
@@ -272,7 +272,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public void deleteArchivedParentProcessInstanceAndElements(final SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
-            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
+    SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         checkIfCallerIsNotActive(saProcessInstance.getCallerId());
         try {
             deleteArchivedProcessInstanceElements(saProcessInstance.getSourceObjectId(), saProcessInstance.getProcessDefinitionId());
@@ -459,7 +459,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private void deleteFlowNodeInstances(final long processInstanceId, final SProcessDefinition processDefinition) throws SFlowNodeReadException,
-            SProcessInstanceModificationException {
+    SProcessInstanceModificationException {
         List<SFlowNodeInstance> activityInstances;
         do {
             activityInstances = activityService.getFlowNodeInstances(processInstanceId, 0, BATCH_SIZE);
@@ -697,6 +697,16 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public long getNumberOfOpenProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
+            return persistenceRead.getNumberOfEntities(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaReadException(e);
+        }
+    }
+
+    @Override
+    public long getNumberOfFailedProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
             return persistenceRead.getNumberOfEntities(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);

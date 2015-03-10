@@ -17,8 +17,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
@@ -80,7 +78,7 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceHierarchicalDeletionException
      */
     void deleteProcessInstance(long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeReadException,
-            SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException;
+    SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException;
 
     /**
      * Delete the specified process instance
@@ -93,7 +91,7 @@ public interface ProcessInstanceService {
      * @since 6.0
      */
     void deleteProcessInstance(SProcessInstance processInstance) throws SFlowNodeReadException, SProcessInstanceModificationException,
-            SProcessInstanceHierarchicalDeletionException;
+    SProcessInstanceHierarchicalDeletionException;
 
     /**
      * Delete the specified process instances with id, and their elements archived and not, if are not a subProcess
@@ -104,7 +102,7 @@ public interface ProcessInstanceService {
      * @since 6.1
      */
     long deleteParentProcessInstanceAndElements(List<SProcessInstance> sProcessInstances) throws SFlowNodeReadException,
-            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+    SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Delete the specified process instance with id, and its elements archived and not, if are not a subProcess
@@ -119,7 +117,7 @@ public interface ProcessInstanceService {
      * @since 6.1
      */
     void deleteParentProcessInstanceAndElements(long processInstanceId) throws SProcessInstanceReadException, SProcessInstanceNotFoundException,
-            SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+    SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Delete the specified process instance, and its elements archived and not, if are not a subProcess
@@ -129,7 +127,7 @@ public interface ProcessInstanceService {
      * @since 6.4.0
      */
     void deleteParentProcessInstanceAndElements(SProcessInstance processInstance) throws SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException,
-            SProcessInstanceModificationException;
+    SProcessInstanceModificationException;
 
     /**
      * Get process instance by its id
@@ -166,7 +164,7 @@ public interface ProcessInstanceService {
      * @since 6.0
      */
     void setStateCategory(SProcessInstance processInstance, SStateCategory stateCatetory) throws SProcessInstanceNotFoundException,
-            SProcessInstanceModificationException;
+    SProcessInstanceModificationException;
 
     /**
      * Delete specified archived process instance
@@ -191,7 +189,7 @@ public interface ProcessInstanceService {
      * @since 6.1
      */
     long deleteArchivedParentProcessInstancesAndElements(List<SAProcessInstance> saProcessInstances) throws SFlowNodeReadException,
-            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+    SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Delete the specified archived process instance
@@ -204,7 +202,7 @@ public interface ProcessInstanceService {
      * @since 6.4.0
      */
     void deleteArchivedParentProcessInstanceAndElements(SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
-            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+    SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Delete all archived elements related to the specified process instance, even the archived process instances
@@ -216,7 +214,7 @@ public interface ProcessInstanceService {
      * @since 6.0
      */
     void deleteArchivedProcessInstanceElements(long processInstanceId, final long processDefinitionId) throws SFlowNodeReadException,
-            SProcessInstanceModificationException;
+    SProcessInstanceModificationException;
 
     /**
      * Get child instance identifiers for specific process instance, this can be used for pagination
@@ -331,6 +329,36 @@ public interface ProcessInstanceService {
      * @throws SBonitaReadException
      */
     long getNumberOfOpenProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
+
+    /**
+     * Get total number of {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
+     * state for the specific supervisor
+     *
+     * @param userId
+     *        identifier of supervisor user
+     * @param queryOptions
+     *        a map of specific parameters of a query
+     * @return The number of the {@link SProcessInstance} with at least one failed task or the
+     *         {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state for the specific supervisor
+     * @throws SBonitaReadException
+     * @since 7.0
+     */
+    long getNumberOfFailedProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
+
+    /**
+     * Search all {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state
+     * for the specific supervisor
+     *
+     * @param userId
+     *        identifier of supervisor user
+     * @param queryOptions
+     *        a map of specific parameters of a query
+     * @return The list of {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
+     *         state for the specific supervisor
+     * @throws SBonitaReadException
+     * @since 7.0
+     */
+    List<SProcessInstance> searchFailedProcessInstancesSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search all open process instances for the specific supervisor
@@ -500,7 +528,7 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceModificationException
      */
     void deleteFlowNodeInstance(SFlowNodeInstance flowNodeInstance, SProcessDefinition processDefinition) throws SFlowNodeReadException,
-            SProcessInstanceModificationException;
+    SProcessInstanceModificationException;
 
     /**
      * @param processDefinitionId

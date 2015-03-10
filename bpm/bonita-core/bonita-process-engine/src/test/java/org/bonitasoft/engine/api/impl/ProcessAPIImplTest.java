@@ -36,6 +36,7 @@ import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.DocumentAPI;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
+import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -49,6 +50,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.parser.JarDependencies;
@@ -97,6 +99,7 @@ import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.operation.LeftOperand;
@@ -118,6 +121,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
+import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -1099,5 +1103,43 @@ public class ProcessAPIImplTest {
 
         final ArchivedProcessInstance archivedProcessInstance = processAPI.getArchivedProcessInstance(processInstanceId);
         assertThat(archivedProcessInstance).isEqualTo(archivedProcessInstanceMocked);
+    }
+
+    @Test
+    public void searchFailedProcessInstancesSupervisedBy_should_Return_ProcessInstances_And_Call_ProcessInstanceService() throws Exception {
+        final long userId = 0;
+        final ProcessInstance mockedProcessInstance = mock(ProcessInstance.class);
+        final IdentityService identityService = mock(IdentityService.class);
+        when(tenantAccessor.getIdentityService()).thenReturn(identityService);
+        doReturn(mock(GetSUser.class)).when(processAPI).createTxUserGetter(userId, identityService);
+
+        final SearchOptions searchOptions = mock(SearchOptions.class);
+        final SearchFailedProcessInstancesSupervisedBy searchFailedProcessInstancesSupervisedBy = mock(SearchFailedProcessInstancesSupervisedBy.class);
+        doReturn(searchFailedProcessInstancesSupervisedBy).when(processAPI).createSearchFailedProcessInstancesSupervisedBy(userId, searchOptions,
+                processInstanceService, searchEntitiesDescriptor, processDefinitionService);
+
+        when(searchFailedProcessInstancesSupervisedBy.getResult()).thenReturn(mock(SearchResult.class));
+
+        final SearchResult<ProcessInstance> failedProcessInstancesSupervisedBy = processAPI.searchFailedProcessInstancesSupervisedBy(userId,
+                searchOptions);
+        assertThat(failedProcessInstancesSupervisedBy.getCount()).isEqualTo(1);
+        assertThat(failedProcessInstancesSupervisedBy.getResult()).hasSize(1).contains(mockedProcessInstance);
+    }
+
+    @Test
+    public void searchFailedProcessInstancesSupervisedBy_should_Return_Empty_Result_When_User_Does_Not_Exist() throws Exception {
+        final long userId = 0;
+        final ProcessInstance mockedProcessInstance = mock(ProcessInstance.class);
+        final IdentityService identityService = mock(IdentityService.class);
+        when(tenantAccessor.getIdentityService()).thenReturn(identityService);
+        final GetSUser getSUser = mock(GetSUser.class);
+        doReturn(getSUser).when(processAPI).createTxUserGetter(userId, identityService);
+        doThrow(new SBonitaException() {
+        }).when(getSUser).execute();
+
+        final SearchResult<ProcessInstance> failedProcessInstancesSupervisedBy = processAPI.searchFailedProcessInstancesSupervisedBy(userId,
+                mock(SearchOptions.class));
+        assertThat(failedProcessInstancesSupervisedBy.getCount()).isEqualTo(0);
+        assertThat(failedProcessInstancesSupervisedBy.getResult()).hasSize(0);
     }
 }
