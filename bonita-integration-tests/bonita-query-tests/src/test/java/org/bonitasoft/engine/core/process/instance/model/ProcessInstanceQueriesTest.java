@@ -13,18 +13,17 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
-import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
-import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.aCallActivityInstanceBuilder;
-import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
-import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
-import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
-import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
-import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.*;
+import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.*;
+import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.*;
+import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.*;
+import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.*;
+import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.*;
+import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.*;
+import static org.bonitasoft.engine.test.persistence.builder.SupervisorBuilder.*;
+import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.*;
+import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.*;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -613,6 +612,28 @@ public class ProcessInstanceQueriesTest {
         // Then
         assertEquals(1, failedSProcessInstance.size());
         assertEquals(processInstanceWithFailedFlowNode, failedSProcessInstance.get(0));
+    }
+
+    @Test
+    public void getNumberOfSProcessInstanceFailedAndSupervisedBy_should_return_number_of_distinct_process_instances() {
+        // Given
+        repository.add(buildFailedProcessInstance(1));
+        repository.add(aSupervisor().withProcessDefinitionId(9L).withGroupId(aGroupId).build());
+
+        final SProcessInstanceImpl processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 10L);
+        processInstanceWithFailedFlowNode.setId(2);
+        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        repository.add(processInstanceWithFailedFlowNode);
+        repository.add(buildFailedGateway(852, processInstanceWithFailedFlowNode.getId()));
+
+        final SProcessInstanceImpl failedProcessInstanceWithFailedFlowNode = repository.add(buildFailedProcessInstance(3));
+        repository.add(buildFailedGateway(56, failedProcessInstanceWithFailedFlowNode.getId()));
+
+        // When
+        final long numberOfSProcessInstanceFailed = repository.getNumberOfSProcessInstanceFailed();
+
+        // Then
+        assertEquals(1, numberOfSProcessInstanceFailed);
     }
 
     private SGatewayInstanceImpl buildFailedGateway(final long gatewayId, final long parentProcessInstanceId) {

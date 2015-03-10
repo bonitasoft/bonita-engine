@@ -1118,12 +1118,12 @@ public class ProcessAPIImplTest {
         doReturn(searchFailedProcessInstancesSupervisedBy).when(processAPI).createSearchFailedProcessInstancesSupervisedBy(userId, searchOptions,
                 processInstanceService, searchEntitiesDescriptor, processDefinitionService);
 
-        when(searchFailedProcessInstancesSupervisedBy.getResult()).thenReturn(mock(SearchResult.class));
+        final SearchResult<ProcessInstance> searchResult = mock(SearchResult.class);
+        when(searchFailedProcessInstancesSupervisedBy.getResult()).thenReturn(searchResult);
 
         final SearchResult<ProcessInstance> failedProcessInstancesSupervisedBy = processAPI.searchFailedProcessInstancesSupervisedBy(userId,
                 searchOptions);
-        assertThat(failedProcessInstancesSupervisedBy.getCount()).isEqualTo(1);
-        assertThat(failedProcessInstancesSupervisedBy.getResult()).hasSize(1).contains(mockedProcessInstance);
+        assertThat(failedProcessInstancesSupervisedBy).isEqualTo(searchResult);
     }
 
     @Test

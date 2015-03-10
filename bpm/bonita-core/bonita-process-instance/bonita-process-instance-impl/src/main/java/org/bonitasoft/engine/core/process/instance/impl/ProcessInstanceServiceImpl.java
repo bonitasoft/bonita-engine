@@ -706,20 +706,30 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public long getNumberOfFailedProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
+    public List<SProcessInstance> searchOpenProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
-            return persistenceRead.getNumberOfEntities(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
+            return persistenceRead.searchEntity(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
         } catch (final SBonitaReadException e) {
             throw new SBonitaReadException(e);
         }
     }
 
     @Override
-    public List<SProcessInstance> searchOpenProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
+    public long getNumberOfFailedProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
-            return persistenceRead.searchEntity(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
+            return persistenceRead.getNumberOfEntities(SProcessInstance.class, FAILED_AND_SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaReadException(e);
+        }
+    }
+
+    @Override
+    public List<SProcessInstance> searchFailedProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
+            return persistenceRead.searchEntity(SProcessInstance.class, FAILED_AND_SUPERVISED_BY, queryOptions, parameters);
         } catch (final SBonitaReadException e) {
             throw new SBonitaReadException(e);
         }
