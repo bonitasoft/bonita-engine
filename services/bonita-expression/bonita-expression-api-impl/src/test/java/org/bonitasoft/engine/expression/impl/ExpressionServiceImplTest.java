@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.bonitasoft.engine.expression.ContainerState;
@@ -64,7 +65,7 @@ public class ExpressionServiceImplTest {
         final SExpression expression = mock(SExpression.class);
         final TimeTracker timeTracker = mock(TimeTracker.class);
         expressionService = new ExpressionServiceImpl(expressionExecutorStrategyProvider, logger, true, timeTracker);
-        expressionService.evaluate(expression, new HashMap<Integer, Object>(0), ContainerState.ACTIVE);
+        expressionService.evaluate(expression, Collections.<String,Object>singletonMap("processDefinitionId", 546l), new HashMap<Integer, Object>(0), ContainerState.ACTIVE);
         verify(expressionExecutorStrategy, times(1)).validate(any(SExpression.class));
     }
 }
