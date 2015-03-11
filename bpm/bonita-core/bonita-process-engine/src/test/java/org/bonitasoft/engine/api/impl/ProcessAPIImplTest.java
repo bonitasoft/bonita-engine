@@ -1119,17 +1119,11 @@ public class ProcessAPIImplTest {
 
     @Test(expected = BonitaRuntimeException.class)
     public void getUserTaskContractVariableValue_should_throw_an_exception_if_an_exception_occurs_when_reading_data() throws Exception {
-        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = createConnectorList();
+        //given
         when(contractDataService.getArchivedUserTaskDataValue(1983L, "id")).thenThrow(new SBonitaReadException("exception"));
 
-        doReturn((long) sConnectorImplementationDescriptors.size()).when(connectorService)
-                .getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID, TENANT_ID);
-
-        //when
-        final long numberOfConnectorImplementations = processAPI.getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID);
-
-        //then
-        assertThat(numberOfConnectorImplementations).as("should return count").isEqualTo(sConnectorImplementationDescriptors.size());
+        //when then exception
+        processAPI.getUserTaskContractVariableValue(1983L, "id");
     }
 
     @Test(expected = UserTaskNotFoundException.class)
