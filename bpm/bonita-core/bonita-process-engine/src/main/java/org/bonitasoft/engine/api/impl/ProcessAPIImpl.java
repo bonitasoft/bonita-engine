@@ -894,11 +894,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Override
     public void executeFlowNode(final long flownodeInstanceId) throws FlowNodeExecutionException {
-        try {
-            executeFlowNode(0, flownodeInstanceId, true);
-        } catch (final SBonitaException e) {
-            throw new FlowNodeExecutionException(e);
-        }
+        executeFlowNode(0, flownodeInstanceId, true);
     }
 
     @CustomTransactions
@@ -906,32 +902,21 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
         try {
             executeFlowNode(userId, flownodeInstanceId, true, new HashMap<String, Object>());
-        } catch (final SBonitaException e) {
+        } catch (ContractViolationException e) {
             throw new FlowNodeExecutionException(e);
-        } catch (final ContractViolationException e) {
+        } catch (final SBonitaException e) {
             throw new FlowNodeExecutionException(e);
         }
     }
 
-    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final LockService lockService = tenantAccessor.getLockService();
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-
-        final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flownodeInstanceId);
-        executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
-        final BonitaLock lock = lockService.lock(getFlowNodeInstance.getResult().getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name(),
-                tenantAccessor.getTenantId());
+    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction) throws FlowNodeExecutionException {
         try {
-            final TransactionContent transactionContent = new ExecuteFlowNode(tenantAccessor, userId, getFlowNodeInstance.getResult(),
-                    new HashMap<String, Object>());
-            executeTransactionContent(tenantAccessor, transactionContent, wrapInTransaction);
-        } finally {
-            lockService.unlock(lock, tenantAccessor.getTenantId());
+            executeFlowNode(userId, flownodeInstanceId, wrapInTransaction, new HashMap<String, Object>());
+        } catch (ContractViolationException e) {
+            throw new FlowNodeExecutionException(e);
+        } catch (SBonitaException e) {
+            throw new FlowNodeExecutionException(e);
         }
-
     }
 
     private void executeTransactionContent(final TenantServiceAccessor tenantAccessor, final TransactionContent transactionContent,
