@@ -17,17 +17,14 @@ import java.io.Serializable;
 
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class SAContractData implements ArchivedPersistentObject {
+public class SAContractData extends PersistentObjectId implements ArchivedPersistentObject {
 
     private static final long serialVersionUID = 5105634271134688723L;
-
-    private long tenantId;
-
-    private long id;
 
     private String name;
 
@@ -48,25 +45,6 @@ public class SAContractData implements ArchivedPersistentObject {
         value = contractData.getValue();
         scopeId = contractData.getScopeId();
         sourceObjectId = contractData.getId();
-    }
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(final long id) {
-        this.id = id;
     }
 
     @Override
@@ -126,11 +104,11 @@ public class SAContractData implements ArchivedPersistentObject {
         final int prime = 31;
         int result = 1;
         result = prime * result + (int) (archiveDate ^ archiveDate >>> 32);
-        result = prime * result + (int) (id ^ id >>> 32);
+        result = prime * result + (int) (getId() ^ getId() >>> 32);
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (int) (scopeId ^ scopeId >>> 32);
         result = prime * result + (int) (sourceObjectId ^ sourceObjectId >>> 32);
-        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
+        result = prime * result + (int) (getTenantId() ^ getTenantId() >>> 32);
         result = prime * result + (value == null ? 0 : value.hashCode());
         return result;
     }
@@ -150,7 +128,7 @@ public class SAContractData implements ArchivedPersistentObject {
         if (archiveDate != other.archiveDate) {
             return false;
         }
-        if (id != other.id) {
+        if (getId() != other.getId()) {
             return false;
         }
         if (name == null) {
@@ -166,7 +144,7 @@ public class SAContractData implements ArchivedPersistentObject {
         if (sourceObjectId != other.sourceObjectId) {
             return false;
         }
-        if (tenantId != other.tenantId) {
+        if (getTenantId() != other.getTenantId()) {
             return false;
         }
         if (value == null) {

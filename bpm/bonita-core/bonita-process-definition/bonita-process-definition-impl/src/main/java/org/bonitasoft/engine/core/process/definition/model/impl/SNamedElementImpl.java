@@ -41,16 +41,27 @@ public class SNamedElementImpl extends SBaseElementImpl implements SNamedElement
         return result;
     }
 
+    protected EQUALS_STATE checkFurtherNaiveEquality(final Object obj) {
+        EQUALS_STATE state;
+        if ((state = super.checkNaiveEquality(obj)) != EQUALS_STATE.CONTINUE) {
+            return state;
+        } else if (!super.equals(obj)) {
+            return EQUALS_STATE.RETURN_FALSE;
+        } else {
+            return EQUALS_STATE.CONTINUE;
+        }
+    }
+
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
+        switch (checkFurtherNaiveEquality(obj)) {
+            case RETURN_FALSE:
+                return false;
+            case RETURN_TRUE:
+                return true;
+            case CONTINUE:
+            default:
+                break;
         }
         final SNamedElementImpl other = (SNamedElementImpl) obj;
         if (name == null) {
