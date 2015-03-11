@@ -30,6 +30,5 @@
 		<module>bonita-process-comment</module>
 		<module>bonita-user-filter</module>
 		<module>bonita-instance-migration</module>
-		<module>bonita-reporting</module>
 	</modules>
 </project>
