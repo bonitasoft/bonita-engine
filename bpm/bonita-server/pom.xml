@@ -71,13 +71,6 @@
 			<version>${project.version}</version>
 		</dependency>
         
-         <!-- Business Application -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.application</groupId>
-            <artifactId>bonita-business-application</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
 		<!-- Cache -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.cache</groupId>
@@ -364,13 +357,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Reporting -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.reporting</groupId>
-			<artifactId>bonita-reporting-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- Scheduler -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.scheduler</groupId>
@@ -558,8 +544,6 @@
 									<!-- Authentication -->
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api</include>
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
-                                    <!-- Business application -->
-                                    <inlude>org.bonitasoft.engine.application:bonita-business-application</inlude>
 									<!-- Cache -->
 									<include>org.bonitasoft.engine.cache:bonita-cache-api</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
@@ -658,8 +642,6 @@
 									<!-- Recorder -->
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
 									<include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
-									<!-- Reporting -->
-									<include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
 									<!-- Scheduler -->
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>
