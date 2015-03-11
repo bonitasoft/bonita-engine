@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -16,10 +15,7 @@ import org.bonitasoft.engine.api.impl.AvailableWhenTenantIsPaused;
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.LoginException;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.session.APISession;
 
 import com.bonitasoft.engine.api.LoginAPI;
@@ -97,24 +93,4 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {
         return TenantServiceSingleton.getInstance(tenantId);
     }
-
-    @Override
-    protected void checkThatWeCanLogin(final String userName, final STenant sTenant) throws LoginException {
-        super.checkThatWeCanLogin(userName, sTenant);
-        try {
-            if (sTenant.isPaused()) {
-                final String technicalUserName = BonitaHomeServer.getInstance().getTenantProperties(sTenant.getId()).getProperty("userName");
-
-                if (!technicalUserName.equals(userName)) {
-                    throw new TenantStatusException("Tenant with ID " + sTenant.getId()
-                            + " is in pause, unable to login with other user than the technical user.");
-                }
-            }
-        } catch (BonitaHomeNotSetException e) {
-            throw new LoginException(e);
-        } catch (IOException e) {
-            throw new LoginException(e);
-        }
-    }
-
 }
