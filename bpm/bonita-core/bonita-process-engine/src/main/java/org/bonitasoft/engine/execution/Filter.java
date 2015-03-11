@@ -14,11 +14,13 @@
 package org.bonitasoft.engine.execution;
 
 
+import java.io.Serializable;
+
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public interface Filter<E> {
+public interface Filter<E> extends Serializable {
 
     boolean mustSelect(E element);
     
