@@ -228,7 +228,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
     /**
      * Replay a task that was in failed state.
      * The task can be replayed if no connector is in state failed.
-     * If that is the case change state of failed connectors first to SKIPPED of TO_BE_EXECUTED
+     * If that is the case change state of failed connectors first to SKIPPED or TO_BE_EXECUTED
      * 
      * @param activityInstanceId
      *        The activity to replay
