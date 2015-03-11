@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -58,7 +57,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor tenantAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         this.tenantAccessor = tenantAccessor;
-        boolean isHas = false;
+        boolean isAllowed = false;
 
         final Long userId = (Long) parameters.get(USER_ID_KEY);
         if (userId == null || userId == 0) {
@@ -101,17 +100,14 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
         if (processDefinitionId != 0) {
             final ActorMappingService actorMappingService = this.tenantAccessor.getActorMappingService();
             try {
-                final List<SActor> ckRes = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId, 0, 2);
-                if (ckRes != null && ckRes.size() == 1) {
-                    isHas = true;
-                }
+                isAllowed = actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId);
             } catch (final SBonitaException e) {
                 e.setProcessDefinitionIdOnContext(processDefinitionId);
                 throw new SCommandExecutionException("No actorInitiator of user who can start the processDefinition.", e);
             }
         }
 
-        if (!isHas) {
+        if (!isAllowed) {
             final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
             searchOptions.addFilter("id", processInstanceId);
             final SearchOpenProcessInstancesInvolvingUser searchOpenProcessInstances = new SearchOpenProcessInstancesInvolvingUser(processInstanceService,
@@ -127,7 +123,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                         + " found durng executing method IsAllowedToSeeOverviewForm.", sbe);
             }
             if (processInstanceRes.getCount() > 0) {// ==1?
-                isHas = true;
+                isAllowed = true;
             } else {
                 final SearchArchivedProcessInstancesInvolvingUser archivedSearcher = new SearchArchivedProcessInstancesInvolvingUser(userId,
                         processInstanceService, tenantAccessor.getProcessDefinitionService(),
@@ -142,11 +138,11 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                 }
                 final SearchResult<ArchivedProcessInstance> archivedRes = archivedSearcher.getResult();
                 if (archivedRes.getCount() > 0) {
-                    isHas = true;
+                    isAllowed = true;
                 }
             }
         }
-        return isHas;
+        return isAllowed;
     }
 
 }

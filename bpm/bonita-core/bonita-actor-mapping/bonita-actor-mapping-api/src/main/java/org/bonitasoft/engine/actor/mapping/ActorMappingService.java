@@ -262,21 +262,15 @@ public interface ActorMappingService {
     List<SActorMember> getActorMembersOfRole(long roleId, int fromIndex, int numberOfActorMembers) throws SBonitaReadException;
 
     /**
-     * Get a list of actors for id specified user who can start the id specified process definition
+     * Is a specified user allowed to start a process?
      *
      * @param userId
      *        Id of user
-     * @param processDefinitionId
-     *        Id of processDefinition
-     * @param fromIndex
-     *        Index of the record to be retrieved from. First record has pageNumber 0.
-     * @param numberOfElements
-     *        Number of result we want to get. Maximum number of result returned.
+     * @param processDefinitionId Id of processDefinition
      * @return a list of SActor objects
      * @throws SBonitaReadException
      */
-    List<SActor> getActorsOfUserCanStartProcessDefinition(long userId, long processDefinitionId, int fromIndex, int numberOfElements)
-            throws SBonitaReadException;
+    boolean canUserStartProcessDefinition(long userId, long processDefinitionId) throws SBonitaReadException;
 
     /**
      * Get a list of actors by the given list of actor ids
@@ -294,14 +288,6 @@ public interface ActorMappingService {
      *
      * @param processDefinitionId
      *        identifier of process definition
-     * @param pageNumber
-     *        Index of the record to be retrieved from. First record has pageNumber 0.
-     * @param numberPerPage
-     *        Number of result we want to get. Maximum number of result returned.
-     * @param orderByField
-     *        Field to order
-     * @param order
-     *        ASC or DESC
      * @return the list of actors
      * @throws SBonitaReadException
      */

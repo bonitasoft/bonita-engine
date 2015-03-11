@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.actor.mapping.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -454,11 +455,25 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public List<SActor> getActorsOfUserCanStartProcessDefinition(final long userId, final long processDefinitionId, final int fromIndex,
-            final int numberOfElements) throws SBonitaReadException {
-        final SelectListDescriptor<SActor> descriptor = SelectDescriptorBuilder.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId,
-                fromIndex, numberOfElements);
-        return persistenceService.selectList(descriptor);
+    public boolean canUserStartProcessDefinition(final long userId, final long processDefinitionId) throws SBonitaReadException {
+        final SelectListDescriptor<Long> descriptor = SelectDescriptorBuilder.getActorMembersInitiatorForProcess(processDefinitionId, 0,
+                QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
+        final List<Long> actorMembersForProcess = persistenceService.selectList(descriptor);
+        final int BATCH_SIZE = 80;
+        boolean found = false;
+        while (!found && actorMembersForProcess.size() > 0) {
+            found = 0 < persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUserMembersForUserOrManagerForActorMembers(userId,
+                    retrieveFirstResultsAndRemoveFromOriginalList(BATCH_SIZE, actorMembersForProcess)));
+        }
+        return found;
+    }
+
+    private List<Long> retrieveFirstResultsAndRemoveFromOriginalList(int howMany, List<Long> ids) {
+        List<Long> subList = new ArrayList<Long>(howMany);
+        for (int i = 0; i < howMany && ids.size() > 0; i++) {
+            subList.add(ids.remove(0));
+        }
+        return subList;
     }
 
     @Override
