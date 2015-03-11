@@ -14,9 +14,22 @@
 package org.bonitasoft.engine.home;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
@@ -30,39 +43,14 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * @author Baptiste Mesta
  * @author Frederic Bouquet
  * @author Matthieu Chaffotte
+ * @author Charles Souillard
  * @since 6.0.0
  */
 public class BonitaHomeServer extends BonitaHome {
 
-    private static final String VERSION_FILE_NAME = "VERSION";
-
-    private static final String TENANT_CONFIGURATION_FILE = "bonita-tenant.properties";
-
-    private static final String CONF = "conf";
-
-    private static final String REPORTS = "reports";
-
-    private static final String BONITA_HOME_SERVER = "server";
-
-    private static final String BONITA_HOME_PLATFORM = "platform";
-
-    private static final String BONITA_HOME_TENANTS = "tenants";
-
-    private static final String BONITA_HOME_PROCESSES = "processes";
-
-    private static final String BONITA_HOME_WORK = "work";
-
-    private static final String BONITA_HOME_TENANT_TEMPLATE = "tenant-template";
-
     private static final String SERVER_API_IMPLEMENTATION = "serverApi";
 
-    private String tenantsPath;
-
-    private String platformPath;
-
-    private String serverPath;
-
-    private Properties platformProperties;
+    private Properties platformProperties = null;
 
     private String version;
 
@@ -76,16 +64,7 @@ public class BonitaHomeServer extends BonitaHome {
         return INSTANCE;
     }
 
-    /**
-     * get configuration properties of the bonita instance
-     * 
-     * @param propertyName
-     *        the name of the property
-     * @return the value of the property or null if it does not exists
-     * @throws IllegalStateException
-     *         if the property cannot be retrieved
-     */
-    public String getBonitaHomeProperty(final String propertyName) throws IllegalStateException {
+    private String getBonitaHomeProperty(final String propertyName) throws IllegalStateException {
         try {
             return getPlatformProperties().getProperty(propertyName);
         } catch (BonitaHomeNotSetException e) {
@@ -107,201 +86,87 @@ public class BonitaHomeServer extends BonitaHome {
         return getBonitaHomeProperty(SERVER_API_IMPLEMENTATION);
     }
 
-    /**
-     * @return the path to the server part of the bonita home
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public String getBonitaHomeServerFolder() throws BonitaHomeNotSetException {
-        if (serverPath == null) {
-            final StringBuilder path = new StringBuilder(getBonitaHomeFolder());
-            path.append(File.separatorChar);
-            path.append(BONITA_HOME_SERVER);
-            serverPath = path.toString();
+    private String[] getResourcesFromFiles(final List<File> files) {
+        final List<String> resources = new ArrayList<String>();
+        for (File file : files) {
+            resources.add(file.getAbsolutePath());
         }
-        return serverPath;
+        return (String[]) resources.toArray();
     }
 
-    /**
-     * get the part of the bonita home containing configuration files and working directories of the platform
-     * 
-     * @return the path to the platform part of the bonita home
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public String getPlatformFolder() throws BonitaHomeNotSetException {
-        if (platformPath == null) {
-            final StringBuilder path = new StringBuilder(getBonitaHomeServerFolder());
-            path.append(File.separatorChar);
-            path.append(BONITA_HOME_PLATFORM);
-            platformPath = path.toString();
-        }
-        return platformPath;
+    private static List<File> getXmlResourcesOfFolder(final Folder folder) throws IOException {
+        final FileFilter filter = new FileFilter() {
+
+            @Override
+            public boolean accept(final File pathname) {
+                return pathname.isFile() && pathname.getName().endsWith(".xml");
+            }
+        };
+        /*
+         * sort this to have always the same order
+         */
+        File[] listFiles = folder.listFiles(filter);
+        List<File> listFilesCollection = Arrays.asList(listFiles);
+        Collections.sort(listFilesCollection);
+        return listFilesCollection;
     }
 
-    /**
-     * get the absolute path to the folder of the bonita home containing configuration files of the platform
-     *
-     * @return the path to the platform configuration directory
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public String getPlatformConfFolder() throws BonitaHomeNotSetException {
-        final StringBuilder path = new StringBuilder(getPlatformFolder());
-        path.append(File.separatorChar);
-        path.append(CONF);
-        return path.toString();
+    public String[] getPrePlatformInitConfigurationFiles() throws BonitaHomeNotSetException, IOException {
+        final List<File> files = new ArrayList<File>();
+        final Folder folder = FolderMgr.getPlatformInitWorkFolder(getBonitaHomeFolder());
+        files.add(folder.getFile("bonita-platform-session-accessor.xml"));
+        return getResourcesFromFiles(files);
     }
 
-    /**
-     * get the file containing the configuration of the platform
-     *
-     * @return the file containing the configuration of the platform
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public File getPlatformFile() throws BonitaHomeNotSetException {
-        final String platformFolder = getPlatformConfFolder();
-        return new File(platformFolder + File.separatorChar + "bonita-platform.properties");
+    public String[] getPlatformConfigurationFiles() throws BonitaHomeNotSetException, IOException {
+        final List<File> files = new ArrayList<File>();
+        files.addAll(getXmlResourcesOfFolder(FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder())));
+        files.addAll(getXmlResourcesOfFolder(FolderMgr.getPlatformConfFolder(getBonitaHomeFolder())));
+        return getResourcesFromFiles(files);
     }
 
-    /**
-     * get the absolute path to the folder of the bonita home containing configuration files and working directories of the tenants
-     *
-     * @return the path to the tenants part of the bonita home
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public String getTenantsFolder() throws BonitaHomeNotSetException {
-        if (tenantsPath == null) {
-            tenantsPath = getBonitaHomeServerFolder() + File.separatorChar + BONITA_HOME_TENANTS;
-        }
-        return tenantsPath;
+    public String[] getTenantConfigurationFiles(final long tenantId) throws BonitaHomeNotSetException, IOException {
+        final List<File> files = new ArrayList<File>();
+        files.addAll(getXmlResourcesOfFolder(FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId)));
+        files.addAll(getXmlResourcesOfFolder(FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId)));
+        return getResourcesFromFiles(files);
     }
 
-    /**
-     * get the absolute path to the folder containing definitions and files related to processes
-     *
-     * @param tenantId
-     *        the id of the tenant
-     * @return the path to the folder containing definitions and files related to processes
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public String getProcessesFolder(final long tenantId) throws BonitaHomeNotSetException {
-        return getTenantFolder(tenantId) + File.separatorChar + BONITA_HOME_WORK + File.separatorChar + BONITA_HOME_PROCESSES;
+    public void createTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
+        FolderMgr.createTenant(getBonitaHomeFolder(), tenantId);
+
+        //put the right id in tenant properties file
+        final File file = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile("bonita-tenant-id.properties");
+        //maybe a replace is better?
+        final Properties tenantProperties = new Properties();
+        tenantProperties.put("tenantId", String.valueOf(tenantId));
+        PropertiesManager.saveProperties(tenantProperties, file);
     }
 
-    /**
-     * get the absolute path to the folder containing definition and files related to a processes
-     *
-     * @param tenantId
-     *        the id of the tenant
-     * @param processDefinitionId
-     *        the id of the process definition
-     * @return the path to the folder containing definitions and files related to processes
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public String getProcessFolder(final long tenantId, final long processDefinitionId) throws BonitaHomeNotSetException {
-        return getTenantFolder(tenantId) + File.separatorChar + BONITA_HOME_WORK + File.separatorChar + BONITA_HOME_PROCESSES + File.separatorChar
-                + processDefinitionId;
-    }
-
-    /**
-     * get the absolute path to the folder containing configuration files and working directories of a tenant
-     * 
-     * @param tenantId
-     *        the id of the tenant
-     * @return
-     *         the path to this folder
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public String getTenantFolder(final long tenantId) throws BonitaHomeNotSetException {
-        return getTenantsFolder() + File.separatorChar + tenantId;
-    }
-
-    /**
-     * @param tenantId
-     * @return the path of the work dir for a tenant
-     * @throws BonitaHomeNotSetException
-     * @since 6.5
-     */
-    public String getTenantWorkFolder(final long tenantId) throws BonitaHomeNotSetException {
-        return getTenantFolder(tenantId) + File.separatorChar + BONITA_HOME_WORK;
-    }
-
-    /**
-     * get the absolute path to the folder containing configuration files of a tenant
-     *
-     * @param tenantId
-     *        the id of the tenant
-     * @return
-     *         the path to this folder
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public String getTenantConfFolder(final long tenantId) throws BonitaHomeNotSetException {
-        return getTenantsFolder() + File.separatorChar + tenantId + File.separatorChar + CONF;
-    }
-
-    /**
-     * get the absolute path to the reports folder inside a specific tenant folder.
-     * 
-     * @param tenantId
-     *        the id of the tenant
-     * @return the absolute path to the reports folder for the tenant.
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public String getTenantReportFolder(final long tenantId) throws BonitaHomeNotSetException {
-        return getTenantsFolder() + File.separatorChar + tenantId + File.separatorChar + REPORTS;
-    }
-
-    /**
-     * get the absolute path to the folder containing the template to create a new tenant
-     *
-     * @return the absolute path to the folder
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @since 6.0.0
-     */
-    public String getTenantTemplateFolder() throws BonitaHomeNotSetException {
-        return getPlatformFolder() + File.separatorChar + BONITA_HOME_TENANT_TEMPLATE;
+    public void deleteTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
+        FolderMgr.deleteTenant(getBonitaHomeFolder(), tenantId);
     }
 
     @Override
     protected void refresh() {
-        platformPath = null;
-        serverPath = null;
-        tenantsPath = null;
         platformProperties = null;
     }
 
-    /**
-     * get the configuration of the platform
-     * 
-     * @return the configuration of the platform as <code>Properties</code>
-     * @throws BonitaHomeNotSetException
-     *         when bonita.home system property is not set
-     * @throws IOException
-     *         if the properties cannot be read from the file
-     * @since 6.0.0
-     */
+    private Properties getProperties(final File folder, final String fileName) throws IOException {
+        return getProperties(new File(folder, fileName));
+    }
+
+    private Properties getProperties(final File propertiesFile) throws IOException {
+        return PropertiesManager.getProperties(propertiesFile);
+    }
+
     public Properties getPlatformProperties() throws BonitaHomeNotSetException, IOException {
         if (platformProperties == null) {
-            platformProperties = PropertiesManager.getProperties(getPlatformFile());
+            final Properties defaultProperties = getProperties(FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder()).getFile("bonita-platform.properties"));
+            final Properties customProperties = getProperties(FolderMgr.getPlatformConfFolder(getBonitaHomeFolder()).getFile("bonita-platform-user-custom.properties"));
+            platformProperties = new Properties();
+            platformProperties.putAll(defaultProperties);
+            platformProperties.putAll(customProperties);
         }
         return platformProperties;
     }
@@ -313,24 +178,20 @@ public class BonitaHomeServer extends BonitaHome {
      */
     public String getVersion() {
         if (version == null) {
-            String platformConfFolder = null;
+            File versionFile = null;
             try {
-                platformConfFolder = getPlatformConfFolder();
-                File file = new File(new File(platformConfFolder), VERSION_FILE_NAME);
-                version = IOUtil.read(file);
+                versionFile = FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder()).getFile("VERSION");
+                version = IOUtil.read(versionFile);
             } catch (Exception e) {
-                buildUnreadableVersionException(platformConfFolder);
+                throw new IllegalStateException("Error while reading file" + versionFile, e);
             }
             if (version == null) {
-                buildUnreadableVersionException(platformConfFolder);
+                throw new IllegalStateException("Invalid version file: " + versionFile);
             }
         }
         return version;
     }
 
-    private void buildUnreadableVersionException(final String platformConfFolder) {
-        throw new IllegalStateException(VERSION_FILE_NAME + " file not present or invalid in folder: " + platformConfFolder);
-    }
 
     /**
      * get the configuration of a tenant
@@ -345,7 +206,148 @@ public class BonitaHomeServer extends BonitaHome {
      * @since 6.0.0
      */
     public Properties getTenantProperties(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        return PropertiesManager.getProperties(new File(getTenantConfFolder(tenantId) + File.separatorChar + TENANT_CONFIGURATION_FILE));
+        final Properties tenantIdProperties = getProperties(FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile("bonita-tenant-id.properties"));
+        final Properties defaultProperties = getProperties(FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile("bonita-tenant.properties"));
+        final Properties customProperties = getProperties(FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId).getFile("bonita-platform.properties"));
+        final Properties tenantProperties = new Properties();
+        tenantProperties.putAll(tenantIdProperties);
+        tenantProperties.putAll(defaultProperties);
+        tenantProperties.putAll(customProperties);
+        return tenantProperties;
     }
 
+    private Folder getProcessFolder(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
+        return FolderMgr.getTenantWorkProcessFolder(getBonitaHomeFolder(), tenantId, processId);
+    }
+
+    public File getProcessDefinitionFile(long tenantId, long processId, String fileName) throws BonitaHomeNotSetException, IOException {
+        return getProcessFolder(tenantId, processId).getFile(fileName);
+    }
+
+    public FileOutputStream getProcessDefinitionFileOutputstream(long tenantId, long processId, String fileName) throws BonitaHomeNotSetException, IOException {
+        final Folder processFolder = getProcessFolder(tenantId, processId);
+        final File file = processFolder.getFile(fileName);
+        return new FileOutputStream(file);
+    }
+
+    private Folder getProcessClasspathFolder(final long tenantId, final long processId) throws BonitaHomeNotSetException, IOException {
+        return FolderMgr.getTenantWorkProcessClasspathFolder(getBonitaHomeFolder(), tenantId, processId);
+    }
+    public Map<String, byte[]> getProcessClasspath(final long tenantId, final long processId) throws BonitaHomeNotSetException, IOException {
+        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
+        final Folder processClasspathFolder = getProcessClasspathFolder(tenantId, processId);
+        final File[] listFiles = processClasspathFolder.listFiles();
+        for (final File jarFile : listFiles) {
+            final String name = jarFile.getName();
+            final byte[] jarContent = FileUtils.readFileToByteArray(jarFile);
+            resources.put(name, jarContent);
+        }
+        return resources;
+    }
+
+    public void deleteProcess(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
+        FolderMgr.deleteTenantWorkProcessFolder(getBonitaHomeFolder(), tenantId, processId);
+        FolderMgr.deleteTenantTempProcessFolder(getBonitaHomeFolder(), tenantId, processId);
+    }
+
+    public Map<String, byte[]> getProcessResources(long tenantId, long processId, String filenamesPattern) throws BonitaHomeNotSetException, IOException {
+        final Folder processFolder = getProcessFolder(tenantId, processId);
+        return processFolder.getResources(filenamesPattern);
+    }
+
+    public byte[] getProcessDefinitionFolderAsZip(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
+        final Folder processFolder = getProcessFolder(tenantId, processId);
+        return processFolder.zip(processFolder);
+    }
+
+    public byte[] getProcessDocument(long tenantId, long processId, String documentName) throws BonitaHomeNotSetException, IOException {
+        final Folder documentsFolder = FolderMgr.getTenantWorkProcessDocumentFolder(getBonitaHomeFolder(), tenantId, processId);
+        return FileUtils.readFileToByteArray(documentsFolder.getFile(documentName));
+    }
+
+    public File getTenantWorkFile(long tenantId, String fileName) throws BonitaHomeNotSetException, IOException {
+        return FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile(fileName);
+    }
+
+    public void writeBusinessArchive(long tenantId, long processIdd, BusinessArchive businessArchive) throws BonitaHomeNotSetException, IOException {
+        final Folder processFolder = getProcessFolder(tenantId, processIdd);
+        processFolder.writeBusinessArchive(businessArchive);
+    }
+
+    public Map<String, byte[]> getConnectorFiles(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
+        return getConnectorsFolder(tenantId, processId).listFilesAsResources();
+    }
+
+    private Folder getConnectorsFolder(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
+        return FolderMgr.getTenantWorkProcessConnectorsFolder(getBonitaHomeFolder(), tenantId, processId);
+    }
+
+    public void deleteConnectorFile(long tenantId, long processId, String fileName) throws BonitaHomeNotSetException, IOException {
+        final Folder connectorsFolder = getConnectorsFolder(tenantId, processId);
+        connectorsFolder.deleteFile(fileName);
+    }
+
+    public void deleteClasspathFiles(long tenantId, long processId, String... resourceNames) throws BonitaHomeNotSetException, IOException {
+        if (resourceNames != null) {
+            final Folder classpathFolder = getProcessClasspathFolder(tenantId, processId);
+            for (String resourceName : resourceNames) {
+                classpathFolder.deleteFile(resourceName);
+            }
+        }
+    }
+
+    public void storeClasspathFile(long tenantId, final long processId, String resourceName, byte[] resourceContent) throws BonitaHomeNotSetException, IOException {
+        final File newFile = getProcessClasspathFolder(tenantId, processId).getFile(resourceName);
+        IOUtil.write(newFile, resourceContent);
+    }
+
+    public void storeConnectorFile(long tenantId, final long processId, String resourceName, byte[] resourceContent) throws BonitaHomeNotSetException, IOException {
+        final File newFile = getConnectorsFolder(tenantId, processId).getFile(resourceName);
+        IOUtil.write(newFile, resourceContent);
+    }
+
+    public void storeSecurityScript(long tenantId, String scriptFileContent, String fileName, String[] folders) throws IOException, BonitaHomeNotSetException {
+        final Folder secuFolder = FolderMgr.getTenantWorkSecurityFolder(getBonitaHomeFolder(), tenantId);
+        final Folder finalFolder = new Folder(secuFolder, folders);
+        finalFolder.create();
+        final File fileToWrite = finalFolder.newFile(fileName);
+        org.bonitasoft.engine.commons.io.IOUtil.writeFile(fileToWrite, scriptFileContent);
+    }
+
+    public void createProcess(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
+        FolderMgr.createTenantWorkProcessFolder(getBonitaHomeFolder(), tenantId, processId);
+    }
+
+    public File[] getProcessClasspathFiles(final long tenantId, final long processId, final FilenameFilter filter) throws BonitaHomeNotSetException, IOException {
+        return getProcessClasspathFolder(tenantId, processId).listFiles(filter);
+    }
+
+    private File getParameterFile(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
+        return getProcessFolder(tenantId, processId).getFile("current-parameters.properties");
+    }
+    public Properties getParameters(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
+        return PropertiesManager.getProperties(getParameterFile(tenantId, processId));
+    }
+
+    public void storeParameters(long tenantId, long processId, Properties properties) throws BonitaHomeNotSetException, IOException {
+        PropertiesManager.saveProperties(properties, getParameterFile(tenantId, processId));
+    }
+
+    public boolean hasParameters(long tenantId, long processId) throws IOException, BonitaHomeNotSetException {
+        final File file = getParameterFile(tenantId, processId);
+        return file.exists();
+    }
+
+    public boolean deleteParameters(long tenantId, long processId) throws IOException, BonitaHomeNotSetException {
+        final File file = getParameterFile(tenantId, processId);
+        return file.delete();
+    }
+
+    public File[] getUserFiltersFiles(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
+        return getUserFiltersFolder(tenantId, processId).listFiles();
+    }
+
+    private Folder getUserFiltersFolder(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
+        return FolderMgr.getTenantWorkProcessUserFiltersFolder(getBonitaHomeFolder(), tenantId, processId);
+    }
 }

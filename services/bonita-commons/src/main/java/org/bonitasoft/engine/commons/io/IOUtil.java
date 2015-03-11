@@ -643,25 +643,32 @@ public class IOUtil {
 
     public static byte[] getZipEntryContent(final String entryName, final InputStream inputStream) throws IOException {
         final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipEntry zipEntry = null;
         try {
             while ((zipEntry = zipInputstream.getNextEntry()) != null) {
                 if (!entryName.equals(zipEntry.getName())) {
                     continue;
                 }
-                int bytesRead;
-                final byte[] buffer = new byte[BUFFER_SIZE];
-                while ((bytesRead = zipInputstream.read(buffer)) > -1) {
-                    byteArrayOutputStream.write(buffer, 0, bytesRead);
-                }
-                return byteArrayOutputStream.toByteArray();
+                return getBytes(zipInputstream);
             }
         } finally {
             zipInputstream.close();
-            byteArrayOutputStream.close();
         }
         throw new IOException("Entry " + entryName + " does not exists in the zip file");
+    }
+
+    public static byte[] getBytes(ZipInputStream zipInputstream) throws IOException {
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try {
+            int bytesRead;
+            final byte[] buffer = new byte[BUFFER_SIZE];
+            while ((bytesRead = zipInputstream.read(buffer)) > -1) {
+                byteArrayOutputStream.write(buffer, 0, bytesRead);
+            }
+            return byteArrayOutputStream.toByteArray();
+        } finally {
+            byteArrayOutputStream.close();
+        }
     }
 
     public static byte[] getZipEntryContent(final String entryName, final byte[] zipFile) throws IOException {

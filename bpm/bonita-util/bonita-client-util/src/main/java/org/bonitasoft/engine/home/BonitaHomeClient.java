@@ -52,7 +52,7 @@ public final class BonitaHomeClient extends BonitaHome {
      */
     public String getBonitaHomeClientFolder() throws BonitaHomeNotSetException {
         if (clientPath == null) {
-            final StringBuilder path = new StringBuilder(getBonitaHomeFolder());
+            final StringBuilder path = new StringBuilder(getBonitaHomeFolderPath());
             path.append(File.separatorChar);
             path.append(BONITA_HOME_CLIENT);
             clientPath = path.toString();

@@ -15,6 +15,7 @@ package org.bonitasoft.engine.service.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -31,23 +32,16 @@ public class SpringSessionAccessorFileSystemBeanAcessor {
     private static String[] getResources() {
         final BonitaHomeServer homeServer = BonitaHomeServer.getInstance();
         try {
-            final String platformFolder = homeServer.getPlatformConfFolder();
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(platformFolder).append(File.separatorChar).append("sessionaccessor").append(File.separatorChar);
-            final String file = "cfg-bonita-sessionaccessor-threadlocal.xml";
-            stringBuilder.append(file);
-            final File sessionAccesorFile = new File(stringBuilder.toString());
-            if (!sessionAccesorFile.exists() || !sessionAccesorFile.isFile()) {
-                throw new SessionAccessorNotFoundException("File: " + file + " does not exist");
-            }
-            final String[] resources = new String[1];
-            resources[0] = sessionAccesorFile.getCanonicalPath();
-            return resources;
+            return homeServer.getPrePlatformInitConfigurationFiles();
         } catch (final BonitaHomeNotSetException e) {
-            throw new SessionAccessorNotFoundException(e);
-        } catch (final IOException e) {
-            throw new SessionAccessorNotFoundException(e);
+            throw new RuntimeException("Bonita home not set");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private static CustomPropertySource getCustomPropertySource() {
+       return new CustomPropertySource("pre-init", new Properties());
     }
 
     protected static SessionAccessor getSessionAccessor() {
@@ -61,15 +55,13 @@ public class SpringSessionAccessorFileSystemBeanAcessor {
         return context;
     }
 
-    /**
-     * @param object
-     */
     public static synchronized void initializeContext(final ClassLoader classLoader) {
         if (context == null) {// synchronized null check
             context = new AbsoluteFileSystemXmlApplicationContext(getResources(), false, null);
             if (classLoader != null) {
                 context.setClassLoader(classLoader);
             }
+            context.getEnvironment().getPropertySources().addLast(getCustomPropertySource());
             context.refresh();
         }
     }

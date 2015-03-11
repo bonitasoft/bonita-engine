@@ -78,7 +78,7 @@ public class ExternalResourceContribution implements BusinessArchiveContribution
         for (final Entry<String, byte[]> entry : resources.entrySet()) {
             final File fullPathFile = new File(externalResourceFolder, entry.getKey().substring(beginIndex));
             fullPathFile.getParentFile().mkdirs();
-            IOUtil.write(fullPathFile, entry);
+            IOUtil.write(fullPathFile, entry.getValue());
         }
     }
 

@@ -21,6 +21,7 @@ import java.io.IOException;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -37,7 +38,6 @@ import org.junit.rules.ExpectedException;
  */
 public class PermissionAPIIT extends CommonAPILocalIT {
 
-    private File securityScriptsFolder;
     @Rule
     public ExpectedException exception = ExpectedException.none();
     private APICallContext apiCallContext;
@@ -45,8 +45,6 @@ public class PermissionAPIIT extends CommonAPILocalIT {
     @Before
     public void before() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        securityScriptsFolder = new File(new File(BonitaHomeServer.getInstance().getTenantConfFolder(getSession().getTenantId())), "security-scripts");
-        securityScriptsFolder.mkdirs();
         apiCallContext = new APICallContext("GET", "identity", "user", "1", "query", "body");
     }
 
@@ -66,7 +64,7 @@ public class PermissionAPIIT extends CommonAPILocalIT {
     public void execute_security_script_with_dependencies() throws Exception {
 
         //given
-        writeScriptToBonitaHome(getContentOfResource("/MyRule"), "org", "test", "MyRule");
+        writeScriptToBonitaHome(getContentOfResource("/MyRule"), "MyRule", "org", "test");
         final User john = createUser("john", "bpm");
         final User jack = createUser("jack", "bpm");
 
@@ -101,15 +99,10 @@ public class PermissionAPIIT extends CommonAPILocalIT {
         //then: ExecutionException
     }
 
-    private void writeScriptToBonitaHome(final String script, final String... path) throws IOException, SBonitaException {
-        File file = securityScriptsFolder;
-        for (int i = 0; i < path.length; i++) {
-            file = new File(file, i == path.length - 1 ? path[i] + ".groovy" : path[i]);
-        }
-        file.getParentFile().mkdirs();
-        file.createNewFile();
-        IOUtil.writeFile(file, script);
-        System.out.println("write to file " + file.getPath());
+    private void writeScriptToBonitaHome(final String scriptFileContent, final String fileName, final String... folders) throws IOException, SBonitaException, BonitaHomeNotSetException {
+        BonitaHomeServer.getInstance().storeSecurityScript(getSession().getTenantId(), scriptFileContent, fileName + ".groovy", folders);
+
+        //System.out.println("write to file " + fileName + " in folders: " + folders);
         final PermissionService permissionService = TenantServiceSingleton.getInstance().getPermissionService();
         //restart the service to reload scripts
         permissionService.stop();

@@ -316,10 +316,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             SProcessDefinition sProcessDefinition = (SProcessDefinition) cacheService.get(PROCESS_CACHE_NAME, processId);
             if (sProcessDefinition == null) {
                 getProcessDeploymentInfo(processId);
-                final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
-                final File processFolder = new File(processesFolder, String.valueOf(processId));
-                // read it from the saved XML file server side
-                final File xmlFile = new File(processFolder, SERVER_PROCESS_DEFINITION_XML);
+                final File xmlFile = BonitaHomeServer.getInstance().getProcessDefinitionFile(tenantId, processId, SERVER_PROCESS_DEFINITION_XML);
                 parser.validate(xmlFile);
                 sProcessDefinition = (SProcessDefinition) parser.getObjectFromXML(xmlFile);
                 storeProcessDefinition(processId, sProcessDefinition);
@@ -388,17 +385,15 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             final long processId = setIdOnProcessDefinition(definition);
             // storeProcessDefinition(processId, tenantId, definition);// FIXME remove that to check the read of processes
 
-            final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
-            final File processFolder = new File(processesFolder, String.valueOf(processId));
-            if (!processFolder.exists()) {
-                processFolder.mkdirs();
-                processFolder.mkdir();
-            }
-            final FileOutputStream outputStream = new FileOutputStream(new File(processFolder, SERVER_PROCESS_DEFINITION_XML));
+            FileOutputStream outputStream = null;
+
             try {
+                outputStream = BonitaHomeServer.getInstance().getProcessDefinitionFileOutputstream(tenantId, processId, SERVER_PROCESS_DEFINITION_XML);
                 xmlWriter.write(BuilderFactory.get(SProcessDefinitionBuilderFactory.class).getXMLProcessDefinition(definition), outputStream);
             } finally {
-                outputStream.close();
+                if (outputStream != null) {
+                    outputStream.close();
+                }
             }
 
             if (displayName == null || displayName.isEmpty()) {

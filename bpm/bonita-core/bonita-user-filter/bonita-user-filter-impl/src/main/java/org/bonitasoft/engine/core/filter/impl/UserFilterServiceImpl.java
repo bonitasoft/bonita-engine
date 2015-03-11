@@ -168,9 +168,7 @@ public class UserFilterServiceImpl implements UserFilterService {
     public boolean loadUserFilters(final long processDefinitionId, final long tenantId) throws SUserFilterLoadingException {
         boolean resolved = true;// should return false if there is nothing loaded + something in the definition
         try {
-            final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
-            final File connectorsFolder = new File(new File(processesFolder, String.valueOf(processDefinitionId)), USER_FILTER_FOLDER);
-            final File[] listFiles = connectorsFolder.listFiles();
+            final File[] listFiles = BonitaHomeServer.getInstance().getUserFiltersFiles(tenantId, processDefinitionId);
             final Pattern pattern = Pattern.compile("^.*\\" + IMPLEMENTATION_EXT + "$");
             for (final File file : listFiles) {
                 final String name = file.getName();
@@ -198,6 +196,8 @@ public class UserFilterServiceImpl implements UserFilterService {
             }
         } catch (final BonitaHomeNotSetException e) {
             throw new BonitaRuntimeException("Bonita home is not set.", e);
+        } catch (IOException e) {
+            throw new BonitaRuntimeException(e);
         }
         return resolved;
     }

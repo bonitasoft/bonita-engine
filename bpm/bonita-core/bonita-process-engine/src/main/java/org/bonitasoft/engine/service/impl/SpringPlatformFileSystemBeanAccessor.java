@@ -13,14 +13,9 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
+import java.io.IOException;
+
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -36,46 +31,22 @@ public class SpringPlatformFileSystemBeanAccessor {
     private static String[] getResources() {
         final BonitaHomeServer homeServer = BonitaHomeServer.getInstance();
         try {
-            final String platformFolder = homeServer.getPlatformConfFolder();
-            final File serviceFolder = new File(platformFolder + File.separatorChar + "services");
-            final String[] resources = ArrayUtils.addAll(getResourcesOfFolder(serviceFolder));
-            return resources;
+            return homeServer.getPlatformConfigurationFiles();
         } catch (final BonitaHomeNotSetException e) {
             throw new RuntimeException("Bonita home not set");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private static String[] getResourcesOfFolder(final File serviceFolder) {
-        if (!serviceFolder.isDirectory()) {
-            throw new RuntimeException("Folder '" + serviceFolder.getName() + "' not found");
+    private static CustomPropertySource getCustomPropertySource() {
+        try {
+            return new CustomPropertySource("platform", BonitaHomeServer.getInstance().getPlatformProperties());
+        } catch (final BonitaHomeNotSetException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
-        final FileFilter filter = new FileFilter() {
-
-            @Override
-            public boolean accept(final File pathname) {
-                return pathname.isFile() && pathname.getName().endsWith(".xml");
-            }
-        };
-        /*
-         * sort this to have always the same order
-         */
-        File[] listFiles = serviceFolder.listFiles(filter);
-        List<File> listFilesCollection = Arrays.asList(listFiles);
-        Collections.sort(listFilesCollection);
-        listFiles = listFilesCollection.toArray(new File[listFilesCollection.size()]);
-        if (listFiles.length == 0) {
-            throw new RuntimeException("No file found");
-        }
-        final String[] resources = new String[listFiles.length];
-        for (int i = 0; i < listFiles.length; i++) {
-            try {
-                resources[i] = listFiles[i].getCanonicalPath();
-            } catch (final IOException e) {
-                // TODO Auto-generated catch block
-                throw new RuntimeException(e);
-            }
-        }
-        return resources;
     }
 
     public static <T> T getService(final Class<T> serviceClass) {
@@ -94,6 +65,9 @@ public class SpringPlatformFileSystemBeanAccessor {
             SpringSessionAccessorFileSystemBeanAcessor.initializeContext(classLoader);
             final FileSystemXmlApplicationContext sessionContext = SpringSessionAccessorFileSystemBeanAcessor.getContext();
             context = new AbsoluteFileSystemXmlApplicationContext(getResources(), true, sessionContext);
+            context.getEnvironment().getPropertySources().addLast(getCustomPropertySource());
+            context.refresh();
+
         }
     }
 

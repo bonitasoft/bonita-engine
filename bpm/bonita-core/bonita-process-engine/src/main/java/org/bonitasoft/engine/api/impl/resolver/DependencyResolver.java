@@ -139,9 +139,7 @@ public class DependencyResolver {
         final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
         if (resolved) {
             if (ConfigurationState.UNRESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
-                resolveAndCreateDependencies(
-                        new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId())), String.valueOf(processDefinitionId)),
-                        processDefinitionService, dependencyService, processDefinitionId);
+                resolveAndCreateDependencies(tenantAccessor.getTenantId(), processDefinitionService, dependencyService, processDefinitionId);
             }
         } else {
             if (ConfigurationState.RESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
@@ -153,31 +151,23 @@ public class DependencyResolver {
     }
 
     /**
-     * create dependencies based on the bonita home (the process folder)
+     * create dependencies based on the bonita home
      * 
-     * @param processFolder
      * @param processDefinitionService
      * @param dependencyService
      * @param dependencyBuilderAccessor
      * @param processDefinitionId
      * @throws SBonitaException
      */
-    public void resolveAndCreateDependencies(final File processFolder, final ProcessDefinitionService processDefinitionService,
+    public void resolveAndCreateDependencies(final long tenantId, final ProcessDefinitionService processDefinitionService,
             final DependencyService dependencyService, final long processDefinitionId) throws SBonitaException {
-        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
-
-        final File file = new File(processFolder, "classpath");
-        if (file.exists() && file.isDirectory()) {
-            final File[] listFiles = file.listFiles();
-            for (final File jarFile : listFiles) {
-                final String name = jarFile.getName();
-                try {
-                    final byte[] jarContent = FileUtils.readFileToByteArray(jarFile);
-                    resources.put(name, jarContent);
-                } catch (final IOException e) {
-                    throw new SDependencyCreationException(e);
-                }
-            }
+        Map<String, byte[]> resources = null;
+        try {
+        resources = BonitaHomeServer.getInstance().getProcessClasspath(tenantId, processDefinitionId);
+        } catch (final IOException e) {
+            throw new SDependencyCreationException(e);
+        } catch (BonitaHomeNotSetException e) {
+            throw new SDependencyCreationException(e);
         }
         addDependencies(resources, dependencyService, processDefinitionId);
         processDefinitionService.resolveProcess(processDefinitionId);

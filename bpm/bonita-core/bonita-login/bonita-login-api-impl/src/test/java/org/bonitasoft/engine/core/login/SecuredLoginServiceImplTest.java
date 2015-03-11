@@ -22,15 +22,20 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.AuthenticationService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.session.SessionService;
@@ -42,11 +47,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(BonitaHomeServer.class)
 public class SecuredLoginServiceImplTest {
 
     private SecuredLoginServiceImpl securedLoginServiceImpl;
+
+    @Mock
+    private BonitaHomeServer bonitaHomeServer;
 
     @Mock
     private AuthenticationService authenticationService;
@@ -63,21 +74,18 @@ public class SecuredLoginServiceImplTest {
     @Mock
     private IdentityService identityService;
 
-    private String formerBonitaHome = null;
-
     @Before
-    public void setUp() {
-        formerBonitaHome = System.getProperty("bonita.home");
-        System.setProperty("bonita.home", "src/test/resources/bonita");
-    }
+    public void setUp() throws IOException, BonitaHomeNotSetException {
+        mockStatic(BonitaHomeServer.class);
 
-    @After
-    public void tearDown() {
-        if (formerBonitaHome != null) {
-            System.setProperty("bonita.home", formerBonitaHome);
-        } else {
-            System.clearProperty("bonita.home");
-        }
+        when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
+
+        final Properties properties = new Properties();
+        properties.put("userName", "install");
+        properties.put("userPassword", "install");
+        doReturn(properties).when(bonitaHomeServer).getTenantProperties(1);
+
+
     }
 
     @Test

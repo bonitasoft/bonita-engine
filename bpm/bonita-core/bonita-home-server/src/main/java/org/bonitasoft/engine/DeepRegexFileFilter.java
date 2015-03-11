@@ -11,17 +11,16 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl;
+package org.bonitasoft.engine;
 
 import java.io.File;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.filefilter.AbstractFileFilter;
-import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.bonitasoft.engine.commons.StringUtils;
 
 /**
- * Identical to {@link RegexFileFilter}, but accept files based on the complete file path and name, not only its name.
+ * Identical to {@link org.apache.commons.io.filefilter.RegexFileFilter}, but accept files based on the complete file path and name, not only its name.
  *
  * @author Emmanuel Duchastenier
  */

@@ -482,12 +482,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
         final List<SDocumentDefinition> documentDefinitions = processContainer.getDocumentDefinitions();
         if (!documentDefinitions.isEmpty()) {
-            final String processesFolder = BonitaHomeServer.getInstance().getProcessFolder(sessionAccessor.getTenantId(), sDefinition.getId());
-            final File documentsFolder = new File(processesFolder, DocumentsResourcesContribution.DOCUMENTS_FOLDER);
             for (final SDocumentDefinition document : documentDefinitions) {
                 if (document.getFile() != null) {
                     final String file = document.getFile();// should always exists...validation on businessarchive
-                    final byte[] content = FileUtils.readFileToByteArray(new File(documentsFolder, file));
+                    final byte[] content = BonitaHomeServer.getInstance().getProcessDocument(sessionAccessor.getTenantId(), sDefinition.getId(), file);
                     attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), content, authorId,
                             document.getDescription(), -1);
                 } else if (document.getUrl() != null) {

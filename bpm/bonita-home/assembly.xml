@@ -7,31 +7,70 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
 		<fileSet>
-			<outputDirectory>home</outputDirectory>
-			<directory>base</directory>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>home</outputDirectory>
-			<directory>hibernate</directory>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>home</outputDirectory>
-			<directory>common</directory>
-			<excludes>
-				<exclude>server/platform/conf/VERSION</exclude>
-			</excludes>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>home/server/platform/conf/</outputDirectory>
-			<directory>common/server/platform/conf/</directory>
+			<outputDirectory>bonita-home/engine-client/work</outputDirectory>
+			<directory>src/main/resources</directory>
 			<includes>
+				<include>bonita-client.properties</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>bonita-home/engine-server/work/platform-init</outputDirectory>
+			<directory>src/main/resources</directory>
+			<includes>
+				<include>bonita-platform-session-accessor.xml</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>bonita-home/engine-server/work/platform</outputDirectory>
+			<directory>src/main/resources</directory>
+			<includes>
+				<include>bonita-platform.properties</include>
+				<include>bonita-platform-private.properties</include>
+				<include>bonita-platform-community.xml</include>
 				<include>VERSION</include>
 			</includes>
 			<filtered>true</filtered>
 		</fileSet>
-        <fileSet>
-            <outputDirectory>home</outputDirectory>
-            <directory>${project.build.directory}/common/home</directory>
+		<fileSet>
+			<outputDirectory>bonita-home/engine-server/work/tenants/template</outputDirectory>
+			<directory>src/main/resources</directory>
+			<includes>
+				<include>bonita-tenant.properties</include>
+				<include>bonita-tenant-community.xml</include>
+			</includes>
 		</fileSet>
+		<fileSet>
+			<outputDirectory>bonita-home/engine-server/work/platform/lib</outputDirectory>
+			<directory>${project.build.directory}/bdm-lib</directory>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>bonita-home/engine-server/conf/platform</outputDirectory>
+			<directory>src/main/resources</directory>
+			<includes>
+				<include>bonita-platform-community-user-custom.xml</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>bonita-home/engine-server/conf/tenants/template</outputDirectory>
+			<directory>src/main/resources</directory>
+			<includes>
+				<include>bonita-tenants-community-user-custom.xml</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>bonita-home/engine-server/conf/platform</outputDirectory>
+			<directory>${project.build.directory}</directory>
+			<includes>
+				<include>bonita-platform-user-custom.properties</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>bonita-home/engine-client/conf</outputDirectory>
+			<directory>${project.build.directory}</directory>
+			<includes>
+				<include>bonita-client-user-custom.properties</include>
+			</includes>
+		</fileSet>
+
 	</fileSets>
 </assembly>

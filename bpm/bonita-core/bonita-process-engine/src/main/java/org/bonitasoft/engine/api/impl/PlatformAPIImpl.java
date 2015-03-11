@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.scheduler.PlatformJobListenerManager;
 import org.bonitasoft.engine.api.impl.scheduler.TenantJobListenerManager;
@@ -64,7 +63,6 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -651,9 +649,9 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             transactionService.complete();
             transactionService.begin();
-            final String targetDir = createTenantFolderInBonitaHome(tenant);
+            createTenantFolderInBonitaHome(tenant);
             // Get user name
-            userName = getUserName(tenant, tenantId, targetDir);
+            userName = getUserName(tenant, tenantId);
 
             // Create session
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
@@ -683,39 +681,24 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private String getUserName(final STenant tenant, final Long tenantId, final String targetDir) throws IOException, STenantDeletionException,
+    private String getUserName(final STenant tenant, final Long tenantId) throws IOException, STenantDeletionException,
             STenantCreationException {
         try {
             return getUserName(tenantId);
         } catch (final Exception e) {
-            IOUtil.deleteDir(new File(targetDir));
             deleteTenant(tenant.getId());
             throw new STenantCreationException("Access File Exception !!");
         }
     }
 
-    private String createTenantFolderInBonitaHome(final STenant tenant) throws STenantDeletionException, STenantCreationException, IOException {
-        // add tenant folder
-        String targetDir;
-        String sourceDir;
+    private void createTenantFolderInBonitaHome(final STenant tenant) throws STenantDeletionException, STenantCreationException, IOException {
+        final BonitaHomeServer home = BonitaHomeServer.getInstance();
         try {
-            final BonitaHomeServer home = BonitaHomeServer.getInstance();
-            targetDir = home.getTenantsFolder() + File.separator + tenant.getId();
-            sourceDir = home.getTenantTemplateFolder();
-        } catch (final BonitaHomeNotSetException e) {
+            home.createTenant(tenant.getId());
+        } catch (Exception e) {
             deleteTenant(tenant.getId());
-            throw new STenantCreationException("Bonita home not set !!");
+            throw new STenantCreationException("Exception while creating tenant folder");
         }
-
-        // copy configuration file
-        try {
-            FileUtils.copyDirectory(new File(sourceDir), new File(targetDir));
-        } catch (final IOException e) {
-            IOUtil.deleteDir(new File(targetDir));
-            deleteTenant(tenant.getId());
-            throw new STenantCreationException("Copy File Exception !!");
-        }
-        return targetDir;
     }
 
     protected void createDefaultProfiles(final TenantServiceAccessor tenantServiceAccessor) throws Exception {
@@ -753,9 +736,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private String getUserName(final long tenantId) throws IOException, BonitaHomeNotSetException {
-        final String tenantPath = BonitaHomeServer.getInstance().getTenantConfFolder(tenantId) + File.separator + "bonita-tenant.properties";
-        final File file = new File(tenantPath);
-        final Properties properties = PropertiesManager.getProperties(file);
+        final Properties properties = BonitaHomeServer.getInstance().getTenantProperties(tenantId);
         return properties.getProperty("userName");
     }
 
@@ -787,8 +768,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             tenantServiceAccessor.destroy();
 
             // delete tenant folder
-            final String targetDir = BonitaHomeServer.getInstance().getTenantsFolder() + File.separator + tenantId;
-            IOUtil.deleteDir(new File(targetDir));
+            final BonitaHomeServer home = BonitaHomeServer.getInstance();
+            home.deleteTenant(tenantId);
         } catch (final STenantNotFoundException e) {
             log(platformAccessor, e);
             throw new STenantDeletionException(e);

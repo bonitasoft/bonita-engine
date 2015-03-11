@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 
+import org.bonitasoft.engine.DeepRegexFileFilter;
 import org.junit.Test;
 
 public class DeepRegexFileFilterTest {

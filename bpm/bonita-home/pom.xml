@@ -14,6 +14,7 @@
 
 	<name>Bonita Home</name>
 
+
 	<build>
 		<plugins>
             <plugin>
@@ -87,28 +88,70 @@
                                     <type>jar</type>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>${project.build.directory}/common/home/server/platform/data-management/compilation-dependencies</outputDirectory>
+                            <outputDirectory>${project.build.directory}/bdm-lib</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-			<plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant-nodeps</artifactId>
+                        <version>1.8.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant-junit</artifactId>
+                        <version>1.8.1</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>distrib-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy file="src/main/resources/bonita-platform.properties" tofile="${project.build.directory}/bonita-platform-user-custom.properties">
+                                    <filterchain>
+                                        <filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+                                            <param name="prefix" value="#"/>
+                                        </filterreader>
+
+                                    </filterchain>
+                                </copy>
+                                <copy file="src/main/resources/bonita-client.properties" tofile="${project.build.directory}/bonita-client-user-custom.properties">
+                                    <filterchain>
+                                        <filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+                                            <param name="prefix" value="#"/>
+                                        </filterreader>
+
+                                    </filterchain>
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>distrib-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>assembly-common.xml</descriptor>
-								<descriptor>assembly-base.xml</descriptor>
-								<descriptor>assembly-base-hibernate.xml</descriptor>
-								<descriptor>assembly.xml</descriptor>
-							</descriptors>
+                        <id>distrib-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
 						</configuration>
 					</execution>
 				</executions>
