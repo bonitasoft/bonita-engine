@@ -1,4 +1,4 @@
-/*******************************************************************************
+/**
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ******************************************************************************/
+ **/
 package org.bonitasoft.engine.bdm.client;
 
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
@@ -241,7 +241,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator();
         bdmCodeGenerator.generateBom(model, destDir);
 
-        assertFilesAreEqual("Employee.java", "Employee.java");
+        assertFilesAreEqual("Employee.java", "Employee.java.txt");
     }
 
     @Test
@@ -252,7 +252,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator();
         bdmCodeGenerator.generateBom(bom, destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeSimpleComposition.java");
+        assertFilesAreEqual("Employee.java", "EmployeeSimpleComposition.java.txt");
     }
 
     @Test
@@ -264,8 +264,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator();
         bdmCodeGenerator.generateBom(bom, destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeListComposition.java");
-        assertFilesAreEqual("Skill.java", "Skill.java");
+        assertFilesAreEqual("Employee.java", "EmployeeListComposition.java.txt");
+        assertFilesAreEqual("Skill.java", "Skill.java.txt");
     }
 
     @Test
@@ -276,7 +276,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator();
         bdmCodeGenerator.generateBom(businessObjectModel, destDir);
 
-        assertFilesAreEqual("com/test/model/PersonneDAOImpl.java", "PersonneDAOImpl.java");
+        assertFilesAreEqual("com/test/model/PersonneDAOImpl.java", "PersonneDAOImpl.java.txt");
     }
 
     @Test
@@ -287,7 +287,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator();
         bdmCodeGenerator.generateBom(bom, destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeSimpleAggregation.java");
+        assertFilesAreEqual("Employee.java", "EmployeeSimpleAggregation.java.txt");
     }
 
     @Test
@@ -298,7 +298,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator();
         bdmCodeGenerator.generateBom(bom, destDir);
 
-        assertFilesAreEqual("Employee.java", "EmployeeListAggregation.java");
+        assertFilesAreEqual("Employee.java", "EmployeeListAggregation.java.txt");
     }
 
     @Test
@@ -311,8 +311,8 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator();
         bdmCodeGenerator.generateBom(bom, destDir);
 
-        assertFilesAreEqual("AddressDAO.java", "AddressDAOWithLazyReferenceOnEmployee.java");
-        assertFilesAreEqual("AddressDAOImpl.java", "AddressDAOImplWithLazyReferenceOnEmployee.java");
+        assertFilesAreEqual("AddressDAO.java", "AddressDAOWithLazyReferenceOnEmployee.java.txt");
+        assertFilesAreEqual("AddressDAOImpl.java", "AddressDAOImplWithLazyReferenceOnEmployee.java.txt");
     }
 
     @Test
@@ -322,7 +322,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         bdmCodeGenerator = new ClientBDMCodeGenerator();
         bdmCodeGenerator.generateBom(model, destDir);
 
-        assertFilesAreEqual("Forecast.java", "ForecastList.java");
+        assertFilesAreEqual("Forecast.java", "ForecastList.java.txt");
     }
 
     private BusinessObject skillBO() {
