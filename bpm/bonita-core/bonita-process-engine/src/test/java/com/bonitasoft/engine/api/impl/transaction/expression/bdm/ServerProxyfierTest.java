@@ -9,6 +9,9 @@
 package com.bonitasoft.engine.api.impl.transaction.expression.bdm;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 
@@ -26,6 +29,7 @@ import com.bonitasoft.engine.bdm.Entity;
 
 /**
  * @author Romain Bioteau
+ * @author Laurent Leseigneur
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ServerProxyfierTest {
@@ -69,6 +73,38 @@ public class ServerProxyfierTest {
         PersonEntity proxy = (PersonEntity) serverProxyfier.proxify(aProxy);
 
         assertThat(proxy).isNotSameAs(aProxy);
+    }
+
+    @Test
+    public void should_call_on_lazy_loaded_getter_use_lazyLoader() throws Exception {
+        //given
+        PersonEntity personEntity = new PersonEntity();
+
+        final Method method = PersonEntity.class.getMethod("getWithLazyLoadedAnnotation");
+        doReturn("lazyResult").when(lazyLoader).load(any(Method.class), anyLong());
+
+        //when
+        PersonEntity proxy = serverProxyfier.proxify(personEntity);
+        final String withLazyLoadedAnnotation = proxy.getWithLazyLoadedAnnotation();
+
+        //
+        verify(lazyLoader).load(method, personEntity.getPersistenceId());
+        assertThat(withLazyLoadedAnnotation).isEqualTo("lazyResult");
+    }
+
+    @Test
+    public void should_not_call_lazyLoader() throws Exception {
+        //given
+        PersonEntity personEntity = new PersonEntity();
+        final Method method = PersonEntity.class.getMethod("getWithoutLazyLoadedAnnotation");
+
+        //when
+        PersonEntity proxy = serverProxyfier.proxify(personEntity);
+        final String withLazyLoadedAnnotation = proxy.getWithoutLazyLoadedAnnotation();
+
+        //
+        verify(lazyLoader, never()).load(method, personEntity.getPersistenceId());
+        assertThat(withLazyLoadedAnnotation).isEqualTo("getWithoutLazyLoadedAnnotation");
     }
 
 }
