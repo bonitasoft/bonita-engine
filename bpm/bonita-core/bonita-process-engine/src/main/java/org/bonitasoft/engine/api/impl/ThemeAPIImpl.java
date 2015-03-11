@@ -32,7 +32,9 @@ import org.bonitasoft.engine.theme.model.SThemeType;
 
 /**
  * @author Celine Souchet
+ * @author Laurent Leseigneur
  */
+@AvailableWhenTenantIsPaused
 public class ThemeAPIImpl implements ThemeAPI {
 
     public TenantServiceAccessor getTenantAccessor() {

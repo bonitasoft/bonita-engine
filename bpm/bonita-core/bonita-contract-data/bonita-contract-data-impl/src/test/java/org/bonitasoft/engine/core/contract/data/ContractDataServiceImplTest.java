@@ -109,6 +109,15 @@ public class ContractDataServiceImplTest {
         verify(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
     }
 
+    @Test
+    public void addUserTaskData_accept_null_inputs() throws Exception {
+        when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
+
+        contractDataService.addUserTaskData(54L,null);
+
+        verify(recorder,times(0)).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+    }
+
     @Test(expected=SContractDataCreationException.class)
     public void addUserTaskData_throws_an_exception_if_not_able_to_store_the_data() throws Exception {
         final SContractData contractData = new SContractData("id", 54L, 1983L);

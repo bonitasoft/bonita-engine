@@ -13,10 +13,12 @@
  **/
 package org.bonitasoft.engine.command.model;
 
+import org.bonitasoft.engine.command.api.impl.CommandDeployment;
+
 /**
  * @author Matthieu Chaffotte
  */
-public class SCommandImpl implements SCommand {
+public class SCommandImpl extends CommandDeployment implements SCommand {
 
     private static final long serialVersionUID = 4257969847115435401L;
 
@@ -24,35 +26,21 @@ public class SCommandImpl implements SCommand {
 
     private long id;
 
-    private String name;
-
-    private String description;
-
-    private String implementation;
-    
     private boolean system;
 
     public SCommandImpl() {
-        super();
     }
 
     public SCommandImpl(final String name, final String description, final String implementation) {
-        super();
-        this.name = name;
-        this.description = description;
-        this.implementation = implementation;
+        super(name, description, implementation);
     }
 
     public SCommandImpl(final SCommand command) {
-        super();
+        super(command.getName(), command.getDescription(), command.getImplementation());
         this.id = command.getId();
-        this.name = command.getName();
-        this.description = command.getDescription();
-        this.implementation = command.getImplementation();
         this.system = command.getSystem();
     }
 
-    
     public void setSystem(boolean system) {
         this.system = system;
     }
@@ -71,21 +59,6 @@ public class SCommandImpl implements SCommand {
         return id;
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String getImplementation() {
-        return implementation;
-    }
-
     public void setTenantId(final long tenantId) {
         this.tenantId = tenantId;
     }
@@ -94,70 +67,34 @@ public class SCommandImpl implements SCommand {
         this.id = id;
     }
 
-    public void setName(final String name) {
-        this.name = name;
-    }
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof SCommandImpl))
+            return false;
+        if (!super.equals(o))
+            return false;
 
-    public void setDescription(final String description) {
-        this.description = description;
+        final SCommandImpl sCommand = (SCommandImpl) o;
+
+        if (id != sCommand.id)
+            return false;
+        if (system != sCommand.system)
+            return false;
+        if (tenantId != sCommand.tenantId)
+            return false;
+
+        return true;
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((implementation == null) ? 0 : implementation.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + (int) (tenantId ^ (tenantId >>> 32));
-        result = prime * result + (system ? 1231 : 1237);
+        int result = super.hashCode();
+        result = 31 * result + (int) (tenantId ^ (tenantId >>> 32));
+        result = 31 * result + (int) (id ^ (id >>> 32));
+        result = 31 * result + (system ? 1 : 0);
         return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SCommandImpl other = (SCommandImpl) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (id != other.id) {
-            return false;
-        }
-        if (implementation == null) {
-            if (other.implementation != null) {
-                return false;
-            }
-        } else if (!implementation.equals(other.implementation)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (tenantId != other.tenantId) {
-            return false;
-        }
-        if (system != other.system) {
-            return false;
-        }
-        return true;
     }
 
     @Override

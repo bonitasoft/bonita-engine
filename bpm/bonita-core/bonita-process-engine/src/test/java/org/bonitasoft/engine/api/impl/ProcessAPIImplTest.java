@@ -17,7 +17,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -141,7 +140,6 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -371,7 +369,7 @@ public class ProcessAPIImplTest {
         processAPI.updateProcessDataInstance("foo", PROCESS_INSTANCE_ID, "go");
 
         // Then
-        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.<String, Serializable>singletonMap("foo", "go")));
+        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.<String, Serializable> singletonMap("foo", "go")));
     }
 
     @Test(expected = UpdateException.class)
@@ -396,7 +394,8 @@ public class ProcessAPIImplTest {
         sDataBar.setClassName(String.class.getName());
         sDataBar.setName("bar");
 
-        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(argument.capture(), anyLong(), anyString(), any(ParentContainerResolver.class));
+        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(argument.capture(), anyLong(), anyString(),
+                any(ParentContainerResolver.class));
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -409,7 +408,7 @@ public class ProcessAPIImplTest {
         // Then
         // Check that we called DataInstanceService for each pair data/value
         verify(dataInstanceService, times(2)).updateDataInstance(any(SDataInstance.class), any(EntityUpdateDescriptor.class));
-        assertThat(argument.getValue()).containsOnly("foo","bar");
+        assertThat(argument.getValue()).containsOnly("foo", "bar");
         verify(dataInstanceService).updateDataInstance(eq(sDataFoo), any(EntityUpdateDescriptor.class));
         verify(dataInstanceService).updateDataInstance(eq(sDataBar), any(EntityUpdateDescriptor.class));
     }
@@ -432,11 +431,12 @@ public class ProcessAPIImplTest {
             fail("An exception should have been thrown.");
         } catch (final UpdateException e) {
             // Then
-            assertEquals("DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
-                    + "] is not compatible with the type of the data.", e.getMessage());
+            assertThat(e.getMessage()).isEqualTo(
+                    "DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
+                            + "] is not compatible with the type of the data.");
             final Map<ExceptionContext, Serializable> exceptionContext = e.getContext();
-            assertEquals(List.class.getName(), exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
-            assertEquals(dataName, exceptionContext.get(ExceptionContext.DATA_NAME));
+            assertThat(List.class.getName()).isEqualTo(exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
+            assertThat(dataName).isEqualTo(exceptionContext.get(ExceptionContext.DATA_NAME));
         }
     }
 
@@ -444,7 +444,8 @@ public class ProcessAPIImplTest {
     public void should_updateProcessDataInstances_call_DataInstance_on_non_existing_data_throw_UpdateException() throws Exception {
         final long processInstanceId = 42l;
         doReturn(null).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
-        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(argument.capture(), anyLong(), anyString(), any(ParentContainerResolver.class));
+        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(argument.capture(), anyLong(), anyString(),
+                any(ParentContainerResolver.class));
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -459,7 +460,7 @@ public class ProcessAPIImplTest {
 
         // Check that we called DataInstanceService for each pair data/value
         verify(dataInstanceService, never()).updateDataInstance(any(SDataInstance.class), any(EntityUpdateDescriptor.class));
-        assertThat(argument.getValue()).containsOnly("foo","bar");
+        assertThat(argument.getValue()).containsOnly("foo", "bar");
     }
 
     @Test
@@ -589,7 +590,8 @@ public class ProcessAPIImplTest {
         final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
         dataInstance.setClassName(List.class.getName());
         dataInstance.setName(dataName);
-        doReturn(dataInstance).when(dataInstanceService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
+        doReturn(dataInstance).when(dataInstanceService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
+                parentContainerResolver);
 
         // When
         try {
@@ -598,11 +600,11 @@ public class ProcessAPIImplTest {
             fail("An exception should have been thrown.");
         } catch (final UpdateException e) {
             // Then
-            assertEquals("DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
-                    + "] is not compatible with the type of the data.", e.getMessage());
+            assertThat("DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
+                    + "] is not compatible with the type of the data.").isEqualTo(e.getMessage());
             final Map<ExceptionContext, Serializable> exceptionContext = e.getContext();
-            assertEquals(List.class.getName(), exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
-            assertEquals(dataName, exceptionContext.get(ExceptionContext.DATA_NAME));
+            assertThat(List.class.getName()).isEqualTo(exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
+            assertThat(dataName).isEqualTo(exceptionContext.get(ExceptionContext.DATA_NAME));
         }
     }
 
@@ -623,11 +625,11 @@ public class ProcessAPIImplTest {
             fail("An exception should have been thrown.");
         } catch (final UpdateException e) {
             // Then
-            assertEquals("DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
-                    + "] is not compatible with the type of the data.", e.getMessage());
+            assertThat("DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
+                    + "] is not compatible with the type of the data.").isEqualTo(e.getMessage());
             final Map<ExceptionContext, Serializable> exceptionContext = e.getContext();
-            assertEquals(List.class.getName(), exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
-            assertEquals(dataName, exceptionContext.get(ExceptionContext.DATA_NAME));
+            assertThat(List.class.getName()).isEqualTo(exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
+            assertThat(dataName).isEqualTo(exceptionContext.get(ExceptionContext.DATA_NAME));
         }
     }
 
@@ -772,8 +774,8 @@ public class ProcessAPIImplTest {
         final SearchResult<ProcessInstance> searchFailedProcessInstances = processAPI.searchFailedProcessInstances(searchOptions);
 
         // Then
-        assertEquals(numberOfFailedProcessInstances, searchFailedProcessInstances.getCount());
-        assertEquals(failedProcessInstances, searchFailedProcessInstances.getResult());
+        assertThat(numberOfFailedProcessInstances).isEqualTo(searchFailedProcessInstances.getCount());
+        assertThat(failedProcessInstances).isEqualTo(searchFailedProcessInstances.getResult());
     }
 
     @Test(expected = RetrieveException.class)
@@ -899,7 +901,7 @@ public class ProcessAPIImplTest {
         final long deleteArchivedProcessInstances = processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
 
         // Then
-        assertEquals("Must to return 0, when there are no archived process instance to delete.", 0, deleteArchivedProcessInstances);
+        assertThat(0L).isEqualTo(deleteArchivedProcessInstances).as("Must to return 0, when there are no archived process instance to delete.");
         verify(processInstanceService).getArchivedProcessInstancesInAllStates(archivedProcessInstanceIds);
     }
 
@@ -916,7 +918,7 @@ public class ProcessAPIImplTest {
         final long deleteArchivedProcessInstances = processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
 
         // Then
-        assertEquals("Must to return 1 deleted archived process instance.", 1L, deleteArchivedProcessInstances);
+        assertThat(1L).as("Must to return 1 deleted archived process instance.").isEqualTo(deleteArchivedProcessInstances);
         verify(processInstanceService).getArchivedProcessInstancesInAllStates(archivedProcessInstanceIds);
         verify(processInstanceService).deleteArchivedParentProcessInstancesAndElements(archivedProcessInstancesToDelete);
     }
@@ -1080,7 +1082,7 @@ public class ProcessAPIImplTest {
         doReturn(new SearchHumanTaskInstanceDescriptor()).when(searchEntitiesDescriptor).getSearchHumanTaskInstanceDescriptor();
 
         final SearchResult<HumanTaskInstance> humanTasksSearch = processAPI.searchHumanTaskInstances(searchOptionsBuilder.sort("tyefv", Order.ASC).done());
-        assertEquals(0, humanTasksSearch.getCount());
+        assertThat(0).isEqualTo(humanTasksSearch.getCount());
     }
 
     @Test
@@ -1117,8 +1119,10 @@ public class ProcessAPIImplTest {
 
     @Test(expected = BonitaRuntimeException.class)
     public void getUserTaskContractVariableValue_should_throw_an_exception_if_an_exception_occurs_when_reading_data() throws Exception {
+        //given
         when(contractDataService.getArchivedUserTaskDataValue(1983L, "id")).thenThrow(new SBonitaReadException("exception"));
 
+        //when then exception
         processAPI.getUserTaskContractVariableValue(1983L, "id");
     }
 
@@ -1129,4 +1133,21 @@ public class ProcessAPIImplTest {
         processAPI.getUserTaskContractVariableValue(1983L, "id");
     }
 
+    @Test
+    public void getArchivedProcessInstance_Should_Return_Instance_Of_Disabled_Process() throws Exception {
+        final long processInstanceId = PROCESS_INSTANCE_ID;
+        final long processDefinitionId = PROCESS_DEFINITION_ID;
+
+        final SAProcessInstance saProcessInstance = mock(SAProcessInstance.class);
+        when(processInstanceService.getArchivedProcessInstance(processInstanceId)).thenReturn(saProcessInstance);
+        when(saProcessInstance.getProcessDefinitionId()).thenReturn(PROCESS_DEFINITION_ID);
+        final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
+        when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenReturn(sProcessDefinition);
+
+        final ArchivedProcessInstance archivedProcessInstanceMocked = mock(ArchivedProcessInstance.class);
+        doReturn(archivedProcessInstanceMocked).when(processAPI).toArchivedProcessInstance(saProcessInstance, sProcessDefinition);
+
+        final ArchivedProcessInstance archivedProcessInstance = processAPI.getArchivedProcessInstance(processInstanceId);
+        assertThat(archivedProcessInstance).isEqualTo(archivedProcessInstanceMocked);
+    }
 }

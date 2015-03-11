@@ -466,7 +466,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI) {
-        processManagementAPIImplDelegate = processManagementAPIDelegate;
+        this.processManagementAPIImplDelegate = processManagementAPIDelegate;
         this.documentAPI = documentAPI;
     }
 
@@ -894,7 +894,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Override
     public void executeFlowNode(final long flownodeInstanceId) throws FlowNodeExecutionException {
-        executeFlowNode(0, flownodeInstanceId, true);
+        try {
+            executeFlowNode(0, flownodeInstanceId, true);
+        } catch (final SBonitaException e) {
+            throw new FlowNodeExecutionException(e);
+        }
     }
 
     @CustomTransactions
@@ -909,13 +913,23 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction) throws FlowNodeExecutionException {
+    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction) throws SBonitaException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final LockService lockService = tenantAccessor.getLockService();
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+
+        final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flownodeInstanceId);
+        executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
+        final BonitaLock lock = lockService.lock(getFlowNodeInstance.getResult().getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name(),
+                tenantAccessor.getTenantId());
         try {
-            executeFlowNode(userId, flownodeInstanceId, true, new HashMap<String, Object>());
-        } catch (final SBonitaException e) {
-            throw new FlowNodeExecutionException(e);
-        } catch (final ContractViolationException e) {
-            throw new FlowNodeExecutionException(e);
+            final TransactionContent transactionContent = new ExecuteFlowNode(tenantAccessor, userId, getFlowNodeInstance.getResult(),
+                    new HashMap<String, Object>());
+            executeTransactionContent(tenantAccessor, transactionContent, wrapInTransaction);
+        } finally {
+            lockService.unlock(lock, tenantAccessor.getTenantId());
         }
 
     }
@@ -1057,12 +1071,19 @@ public class ProcessAPIImpl implements ProcessAPI {
             if (archivedProcessInstance == null) {
                 throw new ArchivedProcessInstanceNotFoundException(id);
             }
-            final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinitionIfIsEnabled(archivedProcessInstance
+            final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(archivedProcessInstance
                     .getProcessDefinitionId());
-            return ModelConvertor.toArchivedProcessInstance(archivedProcessInstance, sProcessDefinition);
+            return toArchivedProcessInstance(archivedProcessInstance, sProcessDefinition);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
+    }
+
+    /**
+     * internal use for mocking purpose
+     */
+    protected ArchivedProcessInstance toArchivedProcessInstance(final SAProcessInstance archivedProcessInstance, final SProcessDefinition sProcessDefinition) {
+        return ModelConvertor.toArchivedProcessInstance(archivedProcessInstance, sProcessDefinition);
     }
 
     @Override
@@ -3778,18 +3799,24 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final LockService lockService = tenantAccessor.getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
+        BonitaLock lock = null;
         try {
-            final BonitaLock lock = lockService.lock(processInstanceId, objectType, tenantAccessor.getTenantId());
+            lock = lockService.lock(processInstanceId, objectType, tenantAccessor.getTenantId());
             deleteProcessInstanceInTransaction(tenantAccessor, processInstanceId);
-            lockService.unlock(lock, tenantAccessor.getTenantId());
-        } catch (final SLockException e) {
-            throw new DeletionException("Lock was not released. Object type: " + objectType + ", id: " + processInstanceId);
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
         } catch (final SProcessInstanceNotFoundException e) {
             throw new DeletionException(e);
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
+        } finally {
+            if (lock != null) {
+                try {
+                    lockService.unlock(lock, tenantAccessor.getTenantId());
+                } catch (final SLockException e) {
+                    throw new DeletionException("Lock was not released. Object type: " + objectType + ", id: " + processInstanceId, e);
+                }
+            }
         }
     }
 
@@ -5952,10 +5979,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             AlreadyExistsException {
         return documentAPI.updateDocument(documentId, documentValue);
     }
-
-
-
-
 
     @Override
     public void purgeClassLoader(final long processDefinitionId) throws ProcessDefinitionNotFoundException, UpdateException {
