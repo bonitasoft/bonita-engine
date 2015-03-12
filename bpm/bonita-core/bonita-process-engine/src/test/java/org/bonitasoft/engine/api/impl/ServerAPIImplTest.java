@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014 Bonitasoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,7 +13,11 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -42,15 +46,18 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.impl.APISessionImpl;
+import org.bonitasoft.engine.session.impl.PlatformSessionImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.UserTransactionService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -78,6 +85,17 @@ public class ServerAPIImplTest {
 
     @Mock
     private ServerWrappedException serverWrappedException;
+
+    @Mock
+    private AvailableWhenTenantIsPaused annotation;
+
+    private ServerAPIImpl serverAPIImpl;
+
+    @Before
+    public void createServerAPI() {
+        serverAPIImpl = new ServerAPIImpl(true, accessResolver);
+    }
+
 
     /**
      * Test method for
@@ -232,6 +250,177 @@ public class ServerAPIImplTest {
             verify(mockedServerAPIImpl).invokeAPIInTransaction(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName), session, apiInterfaceName);
             verify(mockedServerAPIImpl, never()).invokeAPI(any(Object[].class), anyString(), any(Method.class));
         }
+    }
+
+    @Test
+    public void checkMethodAccessibilityOnTenantAPIShouldBePossibleOnAnnotatedMethods() throws Exception {
+        // Given:
+        final long tenantId = 54L;
+        final APISessionImpl session = buildSession(tenantId);
+        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
+        doReturn(false).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
+
+        // When:
+        serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
+                FakeTenantLevelAPI.class.getMethod("canAlsoBeCalledOnPausedTenant", new Class[0]), session, false);
+
+        // no TenantModeException must be thrown. If so, test would fail.
+    }
+
+    @Test
+    public void checkMethodAccessibilityOnTenantAPIShouldBePossibleOnAnnotatedAPI() throws Exception {
+        // Given:
+        final long tenantId = 54L;
+        final APISessionImpl session = buildSession(tenantId);
+        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
+        doReturn(false).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
+
+        // When:
+        serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelFullyAccessibleAPI(), FakeTenantLevelFullyAccessibleAPI.class.getName(),
+                FakeTenantLevelFullyAccessibleAPI.class.getMethod("aMethod", new Class[0]), session, false);
+
+        // no TenantModeException must be thrown. If so, test would fail.
+    }
+
+    @Test
+    public void checkMethodAccessibilityOnTenantAPIShouldBePossibleOnNOTAnnotatedMethodsIfNotInPause() throws Exception {
+        // Given:
+        final long tenantId = 54L;
+        final APISessionImpl session = buildSession(tenantId);
+        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
+        doReturn(true).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
+
+        // When:
+        serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
+                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session, false);
+
+        // no TenantModeException must be thrown. If so, test would fail.
+    }
+
+    @Test
+    public void tenantStatusExceptionShouldHaveGoodMessageOnPausedTenant() throws Exception {
+        // Given:
+        final long tenantId = 98744L;
+        final APISessionImpl session = buildSession(tenantId);
+        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
+        doReturn(false).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
+
+        try {
+            // when:
+            serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
+                    FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session, false);
+            fail("Should have thrown TenantStatusException");
+        } catch (final TenantStatusException e) {
+            assertThat(e.getMessage()).isEqualTo("Tenant with ID " + tenantId + " is in pause, no API call on this tenant can be made for now.");
+        }
+    }
+
+    @Test
+    public void tenantStatusExceptionShouldHaveGoodMessageOnRunningTenant() throws Exception {
+        // Given:
+        final long tenantId = 98744L;
+        final APISessionImpl session = buildSession(tenantId);
+        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
+        doReturn(true).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
+        doReturn(false).when(serverAPIImplSpy).isMethodAvailableOnRunningTenant(anyBoolean(), any(AvailableWhenTenantIsPaused.class));
+
+        try {
+            // when:
+            serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
+                    FakeTenantLevelAPI.class.getMethod("canOnlyBeCalledOnPausedTenant", new Class[0]), session, false);
+            fail("Should have thrown TenantStatusException");
+        } catch (final TenantStatusException e) {
+            // then:
+            assertThat(e.getMessage()).isEqualTo(
+                    "Tenant with ID " + tenantId
+                            + " is running, method '" + FakeTenantLevelAPI.class.getName() + ".canOnlyBeCalledOnPausedTenant()' cannot be called.");
+        }
+    }
+
+    @Test(expected = TenantStatusException.class)
+    public void checkMethodAccessibilityOnTenantAPIShouldNotBePossibleOnNOTAnnotatedMethodsIfTenantInPause() throws Exception {
+        // Given:
+        final long tenantId = 54L;
+        final APISessionImpl session = buildSession(tenantId);
+        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
+        doReturn(false).when(serverAPIImplSpy).isTenantAvailable(tenantId, session, false);
+
+        // When:
+        serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
+                FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session, false);
+
+    }
+
+    @Test
+    public void checkMethodAccessibilityOnPlatformAPIShouldNotCheckTenantAvailability() throws Exception {
+        // Given:
+        final Session session = new PlatformSessionImpl(1L, new Date(), 120L, "userName", 5487L);
+        final ServerAPIImpl serverAPIImplSpy = spy(serverAPIImpl);
+
+        // When:
+        serverAPIImplSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
+                FakeTenantLevelAPI.class.getMethod("platformAPIMethod", new Class[0]), session, false);
+
+        // Then:
+        verify(serverAPIImplSpy, never()).isTenantAvailable(anyLong(), any(Session.class), eq(false));
+    }
+
+    @Test
+    public void isInAValidModeForAnActiveTenantWithAnnotationInOnlyIsInvalid() {
+        when(annotation.only()).thenReturn(true);
+
+        final boolean valid = serverAPIImpl.isMethodAvailableOnRunningTenant(true, annotation);
+
+        assertThat(valid).isFalse();
+    }
+
+    @Test
+    public void isInAValidModeForAnActiveTenantWithAnnotationInNotOnlyIsValid() {
+        when(annotation.only()).thenReturn(false);
+
+        final boolean valid = serverAPIImpl.isMethodAvailableOnRunningTenant(true, annotation);
+
+        assertThat(valid).isTrue();
+    }
+
+    @Test
+    public void isInAValidModeForAnActiveTenantWithoutAnnotationIsValid() {
+        final boolean valid = serverAPIImpl.isMethodAvailableOnRunningTenant(true, null);
+
+        assertThat(valid).isTrue();
+    }
+
+    @Test
+    public void isInAValidModeForAPausedTenantWithAnnotationInOnlyIsValid() {
+        when(annotation.only()).thenReturn(true);
+
+        final boolean valid = serverAPIImpl.isMethodAvailableOnPausedTenant(false, annotation);
+
+        assertThat(valid).isTrue();
+    }
+
+    @Test
+    public void isInAValidModeForAPausedTenantWithAnnotationInNotOnlyIsValid() {
+        when(annotation.only()).thenReturn(false);
+
+        final boolean valid = serverAPIImpl.isMethodAvailableOnPausedTenant(false, annotation);
+
+        assertThat(valid).isTrue();
+    }
+
+    @Test
+    public void isInAValidModeForAPausedTenantWithoutAnnotationIsInvalid() {
+        final boolean valid = serverAPIImpl.isMethodAvailableOnPausedTenant(false, null);
+
+        assertThat(valid).isFalse();
+    }
+
+    protected APISessionImpl buildSession(final long tenantId) {
+        return new APISessionImpl(415L, new Date(), 645646L, "userName", 7777L, "dummyTenant", tenantId);
+    }
+
+    protected APISessionImpl buildSession() {
+        return buildSession(14L);
     }
 
 }

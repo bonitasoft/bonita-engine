@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -23,6 +23,8 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.platform.PlatformState;
+import org.bonitasoft.engine.platform.StartNodeException;
+import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 
@@ -115,6 +117,14 @@ public class PlatformTestUtil {
         if (deployCommands) {
             deployCommandsOnDefaultTenant();
         }
+    }
+
+    public void stopAndStartPlatform() throws BonitaException {
+        final PlatformSession loginPlatform = loginOnPlatform();
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
+        platformAPI.stopNode();
+        platformAPI.startNode();
+        logoutOnPlatform(loginPlatform);
     }
 
     public void deployCommandsOnDefaultTenant() throws BonitaException {

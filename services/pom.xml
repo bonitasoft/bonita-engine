@@ -6,7 +6,7 @@
     <parent>
         <artifactId>bonita-engine</artifactId>
         <groupId>org.bonitasoft.engine</groupId>
-        <version>6.5.0-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>services</artifactId>
@@ -47,7 +47,10 @@
         <module>bonita-incident</module>
         <module>bonita-builder</module>
         <module>bonita-theme</module>
+        <module>bonita-page</module>
         <module>bonita-time-tracker</module>
+        <module>bonita-business-application</module>
+        <module>bonita-business-data</module>
     </modules>
 
 </project>

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2013-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -59,6 +59,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacterist
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.MultiInstanceLoopCharacteristicsBuilder;
@@ -661,7 +662,10 @@ public class BusinessArchiveTest {
     @Test
     public void readProcessWithMultiInstanceFromBusinessArchive() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithMultiInstances", "1.0");
-        final MultiInstanceLoopCharacteristicsBuilder multiInstance1 = builder.addAutomaticTask("auto1").addMultiInstance(false, "inputList");
+        builder.addData("inputList", List.class.getName(), null).addData("outputList", List.class.getName(), null);
+        final AutomaticTaskDefinitionBuilder automaticTaskBuilder = builder.addAutomaticTask("auto1");
+        automaticTaskBuilder.addShortTextData("input", null).addShortTextData("output", null);
+        final MultiInstanceLoopCharacteristicsBuilder multiInstance1 = automaticTaskBuilder.addMultiInstance(false, "inputList");
         multiInstance1.addDataInputItemRef("input");
         multiInstance1.addDataOutputItemRef("output");
         multiInstance1.addLoopDataOutputRef("outputList");

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.bonitasoft.engine.test</groupId>
 		<artifactId>bonita-integration-tests</artifactId>
-		<version>6.5.0-SNAPSHOT</version>
+		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-tests-client</artifactId>
@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>xmlunit</groupId>
 			<artifactId>xmlunit</artifactId>
-			<version>1.4</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -84,6 +84,19 @@
 			<artifactId>assertj-core</artifactId>
 			<scope>compile</scope>
 		</dependency>
+
+        <dependency>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-assertj</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bonitasoft.engine.util</groupId>
+            <artifactId>bonita-common-util</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+        </dependency>
 		
 		<!-- Just for the conf of the datasource -->
 		<dependency>

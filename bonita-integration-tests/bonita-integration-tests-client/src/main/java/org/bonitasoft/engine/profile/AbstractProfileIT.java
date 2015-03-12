@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -28,7 +28,9 @@ import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 
 /**
@@ -124,6 +126,19 @@ public abstract class AbstractProfileIT extends TestWithTechnicalUser {
         getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
 
         super.after();
+    }
+
+    @AfterClass
+    public static void restorDefaultProfiles() throws Exception {
+        final InputStream xmlStream = AbstractProfileIT.class.getResourceAsStream("/profiles.xml");
+        final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
+        xmlStream.close();
+        final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
+        importParameters.put("xmlContent", xmlContent);
+        final APITestUtil testUtil = new APITestUtil();
+        testUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
+        testUtil.getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
+        testUtil.logoutOnTenant();
     }
 
 }

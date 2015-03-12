@@ -1,9 +1,28 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.test.persistence.repository;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
+import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.SApplicationMenu;
+import org.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
+import org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
+import org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -34,6 +53,8 @@ import org.bonitasoft.engine.identity.model.impl.SGroupImpl;
 import org.bonitasoft.engine.identity.model.impl.SRoleImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
+import org.bonitasoft.engine.page.SPageWithContent;
+import org.bonitasoft.engine.page.impl.SPageWithContentImpl;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
@@ -190,6 +211,37 @@ public class TestRepository {
     public SADataInstance add(final SADataInstanceImpl dataInstance) {
         getSession().save(dataInstance);
         return (SADataInstance) getSession().get(dataInstance.getClass(), new PersistentObjectId(dataInstance.getId(), dataInstance.getTenantId()));
+    }
+
+    /**
+     * Need to replicate add method for each object because we don't have any superclass or interface providing getTenantId method
+     */
+    public SPageWithContent add(final SPageWithContentImpl sPageWithContentImpl) {
+        getSession().save(sPageWithContentImpl);
+        return (SPageWithContentImpl) getSession().get(sPageWithContentImpl.getClass(),
+                new PersistentObjectId(sPageWithContentImpl.getId(), sPageWithContentImpl.getTenantId()));
+    }
+
+    public SApplication add(final SApplicationImpl application) {
+        getSession().save(application);
+        return (SApplication) getSession().get(application.getClass(),
+                new PersistentObjectId(application.getId(), application.getTenantId()));
+    }
+
+    public SApplicationPage add(final SApplicationPageImpl applicationPage) {
+        getSession().save(applicationPage);
+        return (SApplicationPage) getSession().get(applicationPage.getClass(),
+                new PersistentObjectId(applicationPage.getId(), applicationPage.getTenantId()));
+    }
+
+    public SApplicationMenu add(final SApplicationMenuImpl applicationMenu) {
+        getSession().save(applicationMenu);
+        return (SApplicationMenu) getSession().get(applicationMenu.getClass(),
+                new PersistentObjectId(applicationMenu.getId(), applicationMenu.getTenantId()));
+    }
+
+    public void update(final SApplicationImpl application) {
+        getSession().update(application);
     }
 
 }
