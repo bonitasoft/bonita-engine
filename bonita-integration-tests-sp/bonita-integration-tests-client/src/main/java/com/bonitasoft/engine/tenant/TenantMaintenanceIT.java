@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -54,6 +54,9 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
  */
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
+@Deprecated // Please, do not delete this class when cleaning deprecated TenantMaintenanceAPI. The following tests must be kept:
+//- twoTenantPauseMode
+//- can_executeConnectorOnActivityInstance_after_resume_tenant
 public class TenantMaintenanceIT extends CommonAPISPIT {
 
     private static final String CRON_EXPRESSION_EACH_SECOND = "*/1 * * * * ?";

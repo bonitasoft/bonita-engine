@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,11 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bar;
 
+import org.bonitasoft.engine.bdm.BusinessObjectDAOFactoryTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-
-import com.bonitasoft.engine.bdm.BusinessObjectDAOFactoryTest;
 
 /**
  * @author Emmanuel Duchastenier

@@ -121,9 +121,9 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" value="10017" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" value="10018" />
 				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" value="10019" />
-                <entry key="com.bonitasoft.engine.core.process.instance.model.impl.SProcessMultiRefBusinessDataInstanceImpl" value="10096" />
-                <entry key="com.bonitasoft.engine.core.process.instance.model.impl.SProcessSimpleRefBusinessDataInstanceImpl" value="10096" />
-                <entry key="com.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeSimpleRefBusinessDataInstanceImpl" value="10096" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl" value="10096" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl" value="10096" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl" value="10096" />
                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl" value="10020" />
@@ -147,12 +147,12 @@
                 <entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" value="10090" />
                 <entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="10090" />
 				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" value="500" />
-				<entry key="com.bonitasoft.engine.page.impl.SPageWithContentImpl" value="10120" />
-				<entry key="com.bonitasoft.engine.page.impl.SPageImpl" value="10120" />
-				<entry key="com.bonitasoft.engine.page.impl.SPageContentImpl" value="10120" />
-                <entry key="com.bonitasoft.engine.business.application.model.impl.SApplicationImpl" value="10200" />
-                <entry key="com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" value="10201" />
-                <entry key="com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" value="10202" />
+				<entry key="org.bonitasoft.engine.page.impl.SPageWithContentImpl" value="10120" />
+				<entry key="org.bonitasoft.engine.page.impl.SPageImpl" value="10120" />
+				<entry key="org.bonitasoft.engine.page.impl.SPageContentImpl" value="10120" />
+                <entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" value="10200" />
+                <entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" value="10201" />
+                <entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" value="10202" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />

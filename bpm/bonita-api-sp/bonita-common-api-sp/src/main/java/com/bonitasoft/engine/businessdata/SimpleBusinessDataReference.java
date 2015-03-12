@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -14,7 +14,9 @@ import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
  * A <code>SimpleBusinessDataReference</code> is a reference of a {@link BusinessDataDefinition} which is not multiple.
  *
  * @author Matthieu Chaffotte
+ * @deprecated since version 7.0.0, use {@link org.bonitasoft.engine.business.data.SimpleBusinessDataReference}
  */
+@Deprecated
 public interface SimpleBusinessDataReference extends BusinessDataReference {
 
     /**

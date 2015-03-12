@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -104,16 +104,6 @@ public class LicenseTest {
     @Test
     public void traceability() {
         valideFeature(Features.TRACEABILITY);
-    }
-
-    @Test
-    public void customPages() {
-        valideFeature(Features.CUSTOM_PAGE);
-    }
-
-    @Test
-    public void applications() throws Exception {
-        valideFeature(Features.BUSINESS_APPLICATIONS);
     }
 
 }

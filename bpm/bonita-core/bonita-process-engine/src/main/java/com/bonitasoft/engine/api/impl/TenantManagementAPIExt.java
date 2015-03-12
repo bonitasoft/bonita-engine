@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (C) 2014 Bonitasoft S.A.
- * Bonitasoft is a trademark of Bonitasoft SA.
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
- * Bonitasoft, 32 rue Gustave Eiffel – 38000 Grenoble
- * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
@@ -13,12 +13,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.bonitasoft.engine.api.TenantManagementAPI;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
+import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
+import com.bonitasoft.engine.service.PlatformServiceAccessor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
+import org.bonitasoft.engine.api.impl.AvailableWhenTenantIsPaused;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.StarterThread;
+import org.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
+import org.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.ServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -32,24 +46,10 @@ import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.service.BroadcastService;
+import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-
-import com.bonitasoft.engine.api.TenantManagementAPI;
-import com.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
-import com.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
-import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
-import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
-import com.bonitasoft.engine.service.BroadcastService;
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
-import com.bonitasoft.engine.service.TaskResult;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
 /**
  * @author Matthieu Chaffotte

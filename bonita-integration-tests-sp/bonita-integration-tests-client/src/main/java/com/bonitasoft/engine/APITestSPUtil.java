@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -21,6 +21,26 @@ import java.util.List;
 import java.util.Map;
 
 import com.bonitasoft.engine.api.ApplicationAPI;
+import com.bonitasoft.engine.api.IdentityAPI;
+import com.bonitasoft.engine.api.LogAPI;
+import com.bonitasoft.engine.api.MonitoringAPI;
+import com.bonitasoft.engine.api.PageAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.api.PlatformMonitoringAPI;
+import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.ProfileAPI;
+import com.bonitasoft.engine.api.ReportingAPI;
+import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.api.TenantManagementAPI;
+import com.bonitasoft.engine.api.ThemeAPI;
+import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
+import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
+import com.bonitasoft.engine.connector.APIAccessorConnector;
+import com.bonitasoft.engine.log.Log;
+import com.bonitasoft.engine.monitoring.MonitoringException;
+import com.bonitasoft.engine.reporting.Report;
+import com.bonitasoft.engine.reporting.ReportSearchDescriptor;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
@@ -33,7 +53,6 @@ import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.TestConnector3;
-import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
 import org.bonitasoft.engine.connectors.TestConnectorLongToExecute;
 import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
@@ -55,27 +74,6 @@ import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.bonitasoft.engine.api.IdentityAPI;
-import com.bonitasoft.engine.api.LogAPI;
-import com.bonitasoft.engine.api.MonitoringAPI;
-import com.bonitasoft.engine.api.PageAPI;
-import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.api.PlatformMonitoringAPI;
-import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.ProfileAPI;
-import com.bonitasoft.engine.api.ReportingAPI;
-import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.api.TenantManagementAPI;
-import com.bonitasoft.engine.api.ThemeAPI;
-import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
-import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
-import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
-import com.bonitasoft.engine.connector.APIAccessorConnector;
-import com.bonitasoft.engine.log.Log;
-import com.bonitasoft.engine.monitoring.MonitoringException;
-import com.bonitasoft.engine.reporting.Report;
-import com.bonitasoft.engine.reporting.ReportSearchDescriptor;
 
 public class APITestSPUtil extends APITestUtil {
 
@@ -164,14 +162,24 @@ public class APITestSPUtil extends APITestUtil {
         return logAPI;
     }
 
+    /**
+     * @return
+     * @deprecated use {@link org.bonitasoft.engine.test.APITestUtil#getTenantAdministrationAPI()}
+     */
+    @Deprecated
     public TenantManagementAPI getTenantManagementAPI() {
         return tenantManagementAPI;
     }
 
-    public ApplicationAPI getApplicationAPI() {
+    public ApplicationAPI getSubscriptionApplicationAPI() {
         return applicationAPI;
     }
 
+    /**
+     * @param tenantManagementAPI
+     * @deprecated use {@link APITestUtil#setTenantManagementCommunityAPI(org.bonitasoft.engine.api.TenantAdministrationAPI)}
+     */
+    @Deprecated
     public void setTenantManagementAPI(final TenantManagementAPI tenantManagementAPI) {
         this.tenantManagementAPI = tenantManagementAPI;
     }
@@ -218,7 +226,7 @@ public class APITestSPUtil extends APITestUtil {
         this.pageAPI = pageAPI;
     }
 
-    public PageAPI getPageAPI() {
+    public PageAPI getSubscriptionPageAPI() {
         return pageAPI;
     }
 
@@ -250,15 +258,6 @@ public class APITestSPUtil extends APITestUtil {
             StartNodeException {
         final PlatformSession loginPlatform = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        platformAPI.startNode();
-        logoutOnPlatform(loginPlatform);
-    }
-
-    public void stopAndStartPlatform() throws BonitaException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, StopNodeException,
-            StartNodeException {
-        final PlatformSession loginPlatform = loginOnPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        platformAPI.stopNode();
         platformAPI.startNode();
         logoutOnPlatform(loginPlatform);
     }
@@ -382,12 +381,6 @@ public class APITestSPUtil extends APITestUtil {
                 BuildTestUtil.generateJarAndBuildBarResource(VariableStorage.class, "VariableStorage.jar"));
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user, connectorImplementations,
                 generateConnectorDependencies, null);
-    }
-
-    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(final ProcessDefinitionBuilder processDefinitionBuilder,
-            final String actorName, final User user) throws BonitaException, IOException {
-        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, actorName, user, "TestConnectorEngineExecutionContext.impl",
-                TestConnectorEngineExecutionContext.class, "TestConnectorEngineExecutionContext.jar");
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorWithCustomType(final ProcessDefinitionBuilder processDefinitionBuilder,

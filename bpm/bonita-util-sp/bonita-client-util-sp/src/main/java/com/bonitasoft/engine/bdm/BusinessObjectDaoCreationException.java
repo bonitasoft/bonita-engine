@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -15,7 +15,9 @@ import org.bonitasoft.engine.exception.CreationException;
  *
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.BusinessObjectDaoCreationException} instead.
  */
+@Deprecated
 public class BusinessObjectDaoCreationException extends CreationException {
 
     private static final long serialVersionUID = 1L;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -14,7 +14,9 @@ package com.bonitasoft.engine.businessdata;
  * @author Colin Puy
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.business.data.InvalidBusinessDataModelException} instead.
  */
+@Deprecated
 public class InvalidBusinessDataModelException extends BusinessDataRepositoryException {
 
     private static final long serialVersionUID = 1L;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,14 +8,13 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
-import org.bonitasoft.engine.exception.NotFoundException;
-
-
 /**
  * @author Elias Ricken de Medeiros
- *
+ * @see org.bonitasoft.engine.business.application.ApplicationPageNotFoundException
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.business.application.ApplicationPageNotFoundException} instead.
  */
-public class ApplicationPageNotFoundException extends NotFoundException {
+@Deprecated
+public class ApplicationPageNotFoundException extends org.bonitasoft.engine.business.application.ApplicationPageNotFoundException {
 
     private static final long serialVersionUID = -5011088434149162619L;
 

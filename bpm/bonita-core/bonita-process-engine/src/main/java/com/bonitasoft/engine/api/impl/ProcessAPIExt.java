@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -24,12 +23,30 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
+import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
+import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
+import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
+import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
+import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
+import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
+import com.bonitasoft.engine.bpm.process.Index;
+import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
+import com.bonitasoft.engine.businessdata.impl.MultipleBusinessDataReferenceImpl;
+import com.bonitasoft.engine.businessdata.impl.SimpleBusinessDataReferenceImpl;
+import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
+import com.bonitasoft.manager.Features;
 import org.bonitasoft.engine.api.impl.DocumentAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
+import org.bonitasoft.engine.api.impl.ProcessManagementAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.SessionInfos;
-import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
-import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevel;
-import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchived;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
@@ -61,9 +78,9 @@ import org.bonitasoft.engine.bpm.process.ProcessExportException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.business.data.converter.BusinessDataModelConverter;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -71,21 +88,20 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
-import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
@@ -97,6 +113,9 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -105,6 +124,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -119,6 +139,8 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.parameter.ParameterService;
+import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -135,38 +157,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
-
-import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
-import com.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevelExt;
-import com.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchivedExt;
-import com.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelExt;
-import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
-import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
-import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
-import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
-import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
-import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
-import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
-import com.bonitasoft.engine.bpm.process.Index;
-import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
-import com.bonitasoft.engine.businessdata.BusinessDataReference;
-import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
-import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
-import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
-import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
-import com.bonitasoft.engine.parameter.OrderBy;
-import com.bonitasoft.engine.parameter.ParameterService;
-import com.bonitasoft.engine.parameter.SParameter;
-import com.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
-import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import com.bonitasoft.engine.service.SPModelConvertor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.LicenseChecker;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
-import com.bonitasoft.manager.Features;
 
 /**
  * @author Matthieu Chaffotte
@@ -189,10 +179,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         super(new ProcessManagementAPIExtDelegate(), new DocumentAPIImpl());
     }
 
-    @Override
     public void importParameters(final long processDefinitionId, final byte[] parameters) throws ImportParameterException {
-        LicenseChecker.getInstance().checkLicenseAndFeature(Features.CREATE_PARAMETER);
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final org.bonitasoft.engine.service.TenantServiceAccessor tenantAccessor = getTenantAccessor();
         SProcessDefinition sDefinition = null;
         if (processDefinitionId > 0) {
             final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -219,7 +207,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 throw new ImportParameterException(e1);
             }
 
-            for (final Entry<Object, Object> entry : property.entrySet()) {
+            for (final Map.Entry<Object, Object> entry : property.entrySet()) {
                 defaultParameterValues.put(entry.getKey().toString(), entry.getValue().toString());
             }
         }
@@ -243,106 +231,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
     }
 
-    private void log(final TenantServiceAccessor tenantAccessor, final Exception e) {
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
-    }
-
-    private SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
-            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionId,
-                processDefinitionService);
-        try {
-            transactionContentWithResult.execute();
-            return transactionContentWithResult.getResult();
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw e;
-        } catch (final SProcessDefinitionReadException e) {
-            throw e;
-        } catch (final SBonitaException e) {
-            throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
-        }
-    }
-
-    @Override
-    public int getNumberOfParameterInstances(final long processDefinitionId) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
-            return sProcessDefinition.getParameters().size();
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
-        }
-    }
-
-    @Override
-    public ParameterInstance getParameterInstance(final long processDefinitionId, final String parameterName) throws ParameterNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ParameterService parameterService = tenantAccessor.getParameterService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
-            final SParameter parameter = parameterService.get(processDefinitionId, parameterName);
-            final String name = parameter.getName();
-            final String value = parameter.getValue();
-            final SParameterDefinition parameterDefinition = sProcessDefinition.getParameter(name);
-            final String description = parameterDefinition.getDescription();
-            final String type = parameterDefinition.getType();
-            return new ParameterImpl(name, description, value, type);
-        } catch (final SParameterProcessNotFoundException e) {
-            throw new ParameterNotFoundException(processDefinitionId, parameterName);
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
-        }
-    }
-
-    @Override
-    public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults,
-            final ParameterCriterion sort) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ParameterService parameterService = tenantAccessor.getParameterService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        try {
-            OrderBy order = null;
-            switch (sort) {
-                case NAME_DESC:
-                    order = OrderBy.NAME_DESC;
-                    break;
-                default:
-                    order = OrderBy.NAME_ASC;
-                    break;
-            }
-
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
-            if (sProcessDefinition.getParameters().isEmpty()) {
-                return Collections.emptyList();
-            }
-            final List<SParameter> parameters = parameterService.get(processDefinitionId, startIndex, maxResults, order);
-            final List<ParameterInstance> paramterInstances = new ArrayList<ParameterInstance>();
-            for (int i = 0; i < parameters.size(); i++) {
-                final SParameter parameter = parameters.get(i);
-                final String name = parameter.getName();
-                final String value = parameter.getValue();
-                final SParameterDefinition parameterDefinition = sProcessDefinition.getParameter(name);
-                final String description = parameterDefinition.getDescription();
-                final String type = parameterDefinition.getType();
-                paramterInstances.add(new ParameterImpl(name, description, value, type));
-            }
-            return paramterInstances;
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
-        }
-    }
-
-    @Override
     public void updateParameterInstanceValue(final long processDefinitionId, final String parameterName, final String parameterValue)
             throws ParameterNotFoundException, UpdateException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final org.bonitasoft.engine.service.TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
-            final SProcessDefinition sProcessDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
+            final SProcessDefinition sProcessDefinition = ProcessManagementAPIImplDelegate.getServerProcessDefinition(processDefinitionId,
+                    processDefinitionService);
             final SParameterDefinition parameter = sProcessDefinition.getParameter(parameterName);
             if (parameter == null) {
                 throw new ParameterNotFoundException(processDefinitionId, parameterName);
@@ -350,10 +246,44 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             parameterService.update(processDefinitionId, parameterName, parameterValue);
             tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
         } catch (final SParameterProcessNotFoundException e) {
-            throw new ParameterNotFoundException(e);
+            throw new ParameterNotFoundException(processDefinitionId, parameterName);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
+    }
+
+    private void log(final TenantServiceAccessor tenantAccessor, final Exception e) {
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+    }
+
+    @Override
+    public ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws ParameterNotFoundException {
+        try {
+            return convert(super.getParameterInstance(processDefinitionId, parameterName));
+        } catch (NotFoundException e) {
+            throw new ParameterNotFoundException(e.getMessage(), e.getCause());
+        }
+    }
+
+    @Override
+    public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults,
+            final ParameterCriterion sort) {
+        List<org.bonitasoft.engine.bpm.parameter.ParameterInstance> parameterInstances = super.getParameterInstances(processDefinitionId, startIndex,
+                maxResults, org.bonitasoft.engine.bpm.parameter.ParameterCriterion.valueOf(sort.name()));
+        return convert(parameterInstances);
+    }
+
+    private List<ParameterInstance> convert(List<org.bonitasoft.engine.bpm.parameter.ParameterInstance> parameterInstances) {
+        ArrayList<ParameterInstance> converted = new ArrayList<ParameterInstance>(parameterInstances.size());
+        for (org.bonitasoft.engine.bpm.parameter.ParameterInstance parameterInstance : parameterInstances) {
+            converted.add(convert(parameterInstance));
+        }
+        return converted;
+    }
+
+    private ParameterInstance convert(org.bonitasoft.engine.bpm.parameter.ParameterInstance parameterInstance) {
+        return new ParameterImpl(parameterInstance.getName(), parameterInstance.getDescription(), parameterInstance.getValue(), parameterInstance.getType());
     }
 
     @Override
@@ -699,6 +629,11 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final IOException e) {
             throw new ProcessExportException(e);
         }
+    }
+
+    @Override
+    public int getNumberOfParameterInstances(long processDefinitionId) {
+        return super.getNumberOfParameterInstances(processDefinitionId);
     }
 
     @Override
@@ -1192,33 +1127,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    protected EvaluateExpressionsInstanceLevel createInstanceLevelExpressionEvaluator(final Map<Expression, Map<String, Serializable>> expressions,
-            final long containerId,
-            final String containerType, final long processDefinitionId, final ExpressionResolverService expressionService) {
-        return new EvaluateExpressionsInstanceLevelExt(expressions, containerId, containerType, processDefinitionId, expressionService, getTenantAccessor()
-                .getBusinessDataRepository());
-    }
-
-    @Override
-    protected EvaluateExpressionsDefinitionLevel createDefinitionLevelExpressionEvaluator(
-            final Map<Expression, Map<String, Serializable>> expressionsAndTheirPartialContext, final long processDefinitionId,
-            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService) {
-        return new EvaluateExpressionsDefinitionLevelExt(expressionsAndTheirPartialContext, processDefinitionId, expressionResolverService,
-                processDefinitionService, getTenantAccessor()
-                        .getBusinessDataRepository());
-    }
-
-    @Override
-    protected EvaluateExpressionsInstanceLevelAndArchived createInstanceAndArchivedLevelExpressionEvaluator(
-            final Map<Expression, Map<String, Serializable>> expressions, final long containerId, final String containerType, final long processDefinitionId,
-            final long time,
-            final ExpressionResolverService expressionService) {
-        return new EvaluateExpressionsInstanceLevelAndArchivedExt(expressions, containerId, containerType, processDefinitionId, time, expressionService,
-                getTenantAccessor()
-                        .getBusinessDataRepository());
-    }
-
-    @Override
     public BusinessDataReference getProcessBusinessDataReference(final String businessDataName, final long processInstanceId) throws DataNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
@@ -1226,9 +1134,11 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SRefBusinessDataInstance sReference = refBusinessDataService.getRefBusinessDataInstance(businessDataName,
                     processInstanceId);
             if (sReference instanceof SSimpleRefBusinessDataInstance) {
-                return SPModelConvertor.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference);
+                return new SimpleBusinessDataReferenceImpl(
+                        BusinessDataModelConverter.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference));
             } else {
-                return SPModelConvertor.toMultipleBusinessDataReference((SMultiRefBusinessDataInstance) sReference);
+                return new MultipleBusinessDataReferenceImpl(
+                        BusinessDataModelConverter.toMultipleBusinessDataReference((SMultiRefBusinessDataInstance) sReference));
             }
         } catch (final SRefBusinessDataInstanceNotFoundException srbdnfe) {
             throw new DataNotFoundException(srbdnfe);
@@ -1246,9 +1156,11 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final List<BusinessDataReference> references = new ArrayList<BusinessDataReference>();
             for (final SRefBusinessDataInstance sReference : sReferences) {
                 if (sReference instanceof SSimpleRefBusinessDataInstance) {
-                    references.add(SPModelConvertor.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference));
+                    references.add(new SimpleBusinessDataReferenceImpl(BusinessDataModelConverter
+                            .toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference)));
                 } else {
-                    references.add(SPModelConvertor.toMultipleBusinessDataReference((SMultiRefBusinessDataInstance) sReference));
+                    references.add(new MultipleBusinessDataReferenceImpl(BusinessDataModelConverter
+                            .toMultipleBusinessDataReference((SMultiRefBusinessDataInstance) sReference)));
                 }
             }
             return references;
