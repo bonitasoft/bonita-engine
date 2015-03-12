@@ -13,20 +13,17 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.aMap;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.SComplexInputDefinitionBuilder.aComplexInput;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.SConstraintDefinitionBuilder.aRuleFor;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.aContract;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.aSimpleInput;
-import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.*;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.SComplexInputDefinitionBuilder.*;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.SConstraintDefinitionBuilder.*;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.*;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.*;
+import static org.bonitasoft.engine.core.process.definition.model.SType.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -72,7 +69,7 @@ public class ContractConstraintsValidatorTest {
     @Test
     public void should_log_all_rules_in_debug_mode() throws Exception {
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
-        final Map<String, Object> variables = aMap().put(IS_VALID, false).put(COMMENT, NICE_COMMENT).build();
+        final Map<String, Serializable> variables = aMap().put(IS_VALID, false).put(COMMENT, NICE_COMMENT).build();
 
         validator.validate(contract, variables);
 
@@ -86,7 +83,7 @@ public class ContractConstraintsValidatorTest {
     @Test
     public void should_not_log_all_rules_in_info_mode() throws Exception {
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
-        final Map<String, Object> variables = aMap().put(IS_VALID, false).put(COMMENT, NICE_COMMENT).build();
+        final Map<String, Serializable> variables = aMap().put(IS_VALID, false).put(COMMENT, NICE_COMMENT).build();
 
         //given
         when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(false);
@@ -105,7 +102,7 @@ public class ContractConstraintsValidatorTest {
 
     @Test
     public void isValid_should_log_invalid_constraints_in_warning_mode() throws Exception {
-        final Map<String, Object> variables = new HashMap<String, Object>();
+        final Map<String, Serializable> variables = new HashMap<>();
         variables.put(IS_VALID, false);
         variables.put(COMMENT, null);
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
@@ -122,7 +119,7 @@ public class ContractConstraintsValidatorTest {
     @Test
     public void isValid_should_be_false_when_rule_fails_to_evaluate() throws Exception {
         //given
-        final Map<String, Object> variables = new HashMap<String, Object>();
+        final Map<String, Serializable> variables = new HashMap<>();
         variables.put(IS_VALID, false);
         variables.put(COMMENT, NICE_COMMENT);
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
@@ -147,15 +144,15 @@ public class ContractConstraintsValidatorTest {
                 .withMandatoryConstraint(INTEGER_INPUT_NAME)
                 .withInput(
                         aComplexInput().withName(COMPLEX_INPUT_NAME).withInput(aSimpleInput(SType.TEXT).withName(TEXT_INPUT_NAME).build())
-                                .withInput(aSimpleInput(SType.INTEGER).withName(INTEGER_INPUT_NAME)).build())
-                .build();
+                        .withInput(aSimpleInput(SType.INTEGER).withName(INTEGER_INPUT_NAME)).build())
+                        .build();
 
         //when
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        final Map<String, Object> complex = new HashMap<String, Object>();
+        final Map<String, Serializable> variables = new HashMap<>();
+        final Map<String, Serializable> complex = new HashMap<>();
         variables.put(TEXT_INPUT_NAME, null);
         variables.put(INTEGER_INPUT_NAME, null);
-        complex.put(COMPLEX_INPUT_NAME, variables);
+        complex.put(COMPLEX_INPUT_NAME, (Serializable) variables);
 
         //then
         try {
@@ -164,7 +161,7 @@ public class ContractConstraintsValidatorTest {
         } catch (final ContractViolationException e) {
             final List<String> explanations = e.getExplanations();
             assertThat(explanations).hasSize(2).contains("input " + TEXT_INPUT_NAME + " is mandatory")
-                    .contains("input " + INTEGER_INPUT_NAME + " is mandatory");;
+            .contains("input " + INTEGER_INPUT_NAME + " is mandatory");;
         }
     }
 
@@ -176,8 +173,8 @@ public class ContractConstraintsValidatorTest {
                 .withInput(aSimpleInput(SType.TEXT).withName(TEXT_INPUT_NAME).withMultiple(true).build()).build();
 
         //when
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put(TEXT_INPUT_NAME, Arrays.asList("valid input", "", null));
+        final Map<String, Serializable> variables = new HashMap<>();
+        variables.put(TEXT_INPUT_NAME, (Serializable) Arrays.asList("valid input", "", null));
 
         //then
         try {
@@ -197,17 +194,17 @@ public class ContractConstraintsValidatorTest {
                 .withMandatoryConstraint(COMPLEX_INPUT_NAME)
                 .withInput(
                         aComplexInput().withName(COMPLEX_INPUT_NAME).withMultiple(true)
-                                .withInput(aSimpleInput(SType.INTEGER).withName(TEXT_INPUT_NAME).withMultiple(true).build()).build()).build();
+                        .withInput(aSimpleInput(SType.INTEGER).withName(TEXT_INPUT_NAME).withMultiple(true).build()).build()).build();
 
         //when
-        final Map<String, Object> goodComplex = new HashMap<String, Object>();
-        final List<Map<String, Object>> complexList = new ArrayList<Map<String, Object>>();
-        final Map<String, Object> variables = new HashMap<String, Object>();
+        final Map<String, Serializable> goodComplex = new HashMap<>();
+        final List<Map<String, Serializable>> complexList = new ArrayList<>();
+        final Map<String, Serializable> variables = new HashMap<>();
         goodComplex.put(TEXT_INPUT_NAME, "aa");
         complexList.add(goodComplex);
         complexList.add(goodComplex);
         complexList.add(null);
-        variables.put(COMPLEX_INPUT_NAME, complexList);
+        variables.put(COMPLEX_INPUT_NAME, (Serializable) complexList);
         //then
         try {
             validator.validate(contractDefinition, variables);
@@ -224,35 +221,37 @@ public class ContractConstraintsValidatorTest {
         final SContractDefinition contract = aContract()
                 .withInput(
                         aComplexInput().withName("user").withInput(aSimpleInput(SType.TEXT).withName("firstName").build())
-                                .withInput(aSimpleInput(SType.TEXT).withName("lastName").build()))
-                .withInput(
-                        aComplexInput()
+                        .withInput(aSimpleInput(SType.TEXT).withName("lastName").build()))
+                        .withInput(
+                                aComplexInput()
                                 .withName("expenseReport")
                                 .withInput(
                                         aComplexInput().withName("expenseLine").withMultiple(true)
-                                                .withInput(aSimpleInput(SType.TEXT).withName("nature").build())
-                                                .withInput(aSimpleInput(SType.DECIMAL).withName("amount").build())
-                                                .withInput(aSimpleInput(SType.DATE).withName("date").build())
-                                                .withInput(aSimpleInput(SType.TEXT).withName("comment").build()).build()).build())
-                .withInput(aSimpleInput(SType.TEXT).build())
-                .withMandatoryConstraint("firstName")
-                .withMandatoryConstraint("lastName")
-                .withMandatoryConstraint("nature")
-                .withMandatoryConstraint("amount")
-                .withMandatoryConstraint("date")
-                .withMandatoryConstraint("comment")
-                .build();
+                                        .withInput(aSimpleInput(SType.TEXT).withName("nature").build())
+                                        .withInput(aSimpleInput(SType.DECIMAL).withName("amount").build())
+                                        .withInput(aSimpleInput(SType.DATE).withName("date").build())
+                                        .withInput(aSimpleInput(SType.TEXT).withName("comment").build()).build()).build())
+                                        .withInput(aSimpleInput(SType.TEXT).build())
+                                        .withMandatoryConstraint("firstName")
+                                        .withMandatoryConstraint("lastName")
+                                        .withMandatoryConstraint("nature")
+                                        .withMandatoryConstraint("amount")
+                                        .withMandatoryConstraint("date")
+                                        .withMandatoryConstraint("comment")
+                                        .build();
 
         //given
-        final Map<String, Object> user = aMap().put("firstName", "john").put("lastName", "doe").build();
-        final Map<String, Object> taxiExpenseLine = aMap().put("nature", "taxi").put("amount", 30).put("date", "2014-10-16").put("comment", "slow").build();
-        final Map<String, Object> hotelExpenseLine = aMap().put("nature", "hotel").put("amount", 1000).put("date", "2014-10-16").put("comment", "expensive")
+        final Map<String, Serializable> user = aMap().put("firstName", "john").put("lastName", "doe").build();
+        final Map<String, Serializable> taxiExpenseLine = aMap().put("nature", "taxi").put("amount", 30).put("date", "2014-10-16").put("comment", "slow")
                 .build();
-        final List<Map<String, Object>> expenseLines = new ArrayList<Map<String, Object>>();
+        final Map<String, Serializable> hotelExpenseLine = aMap().put("nature", "hotel").put("amount", 1000).put("date", "2014-10-16")
+                .put("comment", "expensive")
+                .build();
+        final List<Map<String, Serializable>> expenseLines = new ArrayList<Map<String, Serializable>>();
         expenseLines.add(taxiExpenseLine);
         expenseLines.add(hotelExpenseLine);
-        final Map<String, Object> expenseReport = aMap().put("expenseReport", expenseLines).build();
-        final Map<String, Object> variables = aMap().put("user", user).put("expenseReport", expenseReport).build();
+        final Map<String, Serializable> expenseReport = aMap().put("expenseReport", (Serializable) expenseLines).build();
+        final Map<String, Serializable> variables = aMap().put("user", (Serializable) user).put("expenseReport", (Serializable) expenseReport).build();
 
         // when
         final ContractConstraintsValidator contractRulesValidator = new ContractConstraintsValidator(loggerService, new ConstraintsDefinitionHelper(),
@@ -280,7 +279,7 @@ public class ContractConstraintsValidatorTest {
                 .withConstraint(badConstraint).build();
 
         //given
-        final Map<String, Object> variables = aMap().put("input", "value").build();
+        final Map<String, Serializable> variables = aMap().put("input", "value").build();
 
         // when
         final ContractConstraintsValidator contractRulesValidator = new ContractConstraintsValidator(loggerService, new ConstraintsDefinitionHelper(),
@@ -302,6 +301,6 @@ public class ContractConstraintsValidatorTest {
                 .withConstraint(aRuleFor(IS_VALID).name("Mandatory").expression("isValid != null").explanation("isValid must be set").build())
                 .withConstraint(aRuleFor(IS_VALID, COMMENT).name("Comment_Needed_If_Not_Valid").expression("isValid || !isValid && comment != null")
                         .explanation("A comment is required when no validation").build())
-                .build();
+                        .build();
     }
 }

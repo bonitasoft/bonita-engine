@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.flownode;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.SessionInfos;
@@ -50,10 +51,10 @@ public class ExecuteFlowNode implements TransactionContent {
 
     private final long userId;
 
-    private final Map<String, Object> inputs;
+    private final Map<String, Serializable> inputs;
 
     public ExecuteFlowNode(final TenantServiceAccessor tenantAccessor, final long userId, final SFlowNodeInstance flowNodeInstance,
-            final Map<String, Object> inputs) {
+            final Map<String, Serializable> inputs) {
         processExecutor = tenantAccessor.getProcessExecutor();
         logger = tenantAccessor.getTechnicalLoggerService();
         commentService = tenantAccessor.getCommentService();
