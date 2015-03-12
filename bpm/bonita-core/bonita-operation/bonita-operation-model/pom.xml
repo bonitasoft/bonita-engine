@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-operation</artifactId>
 		<groupId>org.bonitasoft.engine.core.operation</groupId>
-		<version>6.5.0-SNAPSHOT</version>
+		<version>6.5.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-operation-model</artifactId>
