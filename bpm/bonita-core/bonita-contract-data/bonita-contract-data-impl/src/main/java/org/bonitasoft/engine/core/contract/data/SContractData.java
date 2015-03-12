@@ -16,17 +16,14 @@ package org.bonitasoft.engine.core.contract.data;
 import java.io.Serializable;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class SContractData implements PersistentObject {
+public class SContractData extends PersistentObjectId implements PersistentObject {
 
     private static final long serialVersionUID = 4666337073276985147L;
-
-    private long tenantId;
-
-    private long id;
 
     private String name;
 
@@ -43,25 +40,6 @@ public class SContractData implements PersistentObject {
         this.name = name;
         this.value = value;
         this.scopeId = scopeId;
-    }
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    @Override
-    public void setTenantId(final long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    @Override
-    public long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(final long id) {
-        this.id = id;
     }
 
     public String getName() {

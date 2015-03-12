@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class ContractValidator {
         comments = new ArrayList<String>();
     }
 
-    public boolean isValid(final SContractDefinition contract, final Map<String, Object> variables) {
+    public boolean isValid(final SContractDefinition contract, final Map<String, Serializable> variables) {
         try {
             structureValidator.validate(contract, variables);
             rulesValidator.validate(contract, variables);

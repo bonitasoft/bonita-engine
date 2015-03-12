@@ -1,8 +1,22 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.aMap;
+import static org.assertj.core.api.Assertions.*;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,11 +39,11 @@ public class ContractVariableHelperTest {
 
     @Test
     public void should_find_multiple_contract_variables() throws Exception {
-        final Map<String, Object> variables = buildMap();
+        final Map<String, Serializable> variables = buildMap();
 
         final SConstraintDefinition constraintDefinition = getConstraintDefinitionWithName("nature");
 
-        final List<Map<String, Object>> buildMandatoryMultipleInputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(
+        final List<Map<String, Serializable>> buildMandatoryMultipleInputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(
                 constraintDefinition, variables);
         assertThat(buildMandatoryMultipleInputVariables).as("should not find variable for constraint " + constraintDefinition.getName()).hasSize(2);
 
@@ -37,11 +51,11 @@ public class ContractVariableHelperTest {
 
     @Test
     public void should_not_find_multiple_contract_variables() throws Exception {
-        final Map<String, Object> variables = buildMap();
+        final Map<String, Serializable> variables = buildMap();
 
         final SConstraintDefinition constraintDefinition = getConstraintDefinitionWithName("not in payload");
 
-        final List<Map<String, Object>> buildMandatoryMultipleInputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(
+        final List<Map<String, Serializable>> buildMandatoryMultipleInputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(
                 constraintDefinition, variables);
         assertThat(buildMandatoryMultipleInputVariables).as("should not find variable for constraint " + constraintDefinition.getName()).isEmpty();
 
@@ -51,15 +65,15 @@ public class ContractVariableHelperTest {
     public void should_convert_multiple_variable() throws Exception {
         //given
         final List<String> values = Arrays.asList("item1", "item2", "item3");
-        final Map<String, Object> variable = aMap().put("key", values).build();
+        final Map<String, Serializable> variable = aMap().put("key", (Serializable) values).build();
 
         //when
-        final List<Map<String, Object>> convertMultipleToList = contractVariableHelper.convertMultipleToList(variable);
+        final List<Map<String, Serializable>> convertMultipleToList = contractVariableHelper.convertMultipleToList(variable);
 
         //then
         assertThat(convertMultipleToList).as("should split multiple item").hasSize(3);
         for (int i = 0; i < convertMultipleToList.size(); i++) {
-            final Map<String, Object> map = convertMultipleToList.get(i);
+            final Map<String, Serializable> map = convertMultipleToList.get(i);
             assertThat(map).as("should contain key").hasSize(1);
             assertThat(map.get("key").toString()).as("should contain item" + i).isEqualTo("item" + (i + 1));
         }
@@ -68,27 +82,29 @@ public class ContractVariableHelperTest {
     @Test
     public void should_not_convert_multiple_variable_and_return_empty_list() throws Exception {
         //given
-        final Map<String, Object> variable = aMap().put("key", "not a list").build();
+        final Map<String, Serializable> variable = aMap().put("key", "not a list").build();
 
         //when
-        final List<Map<String, Object>> convertMultipleToList = contractVariableHelper.convertMultipleToList(variable);
+        final List<Map<String, Serializable>> convertMultipleToList = contractVariableHelper.convertMultipleToList(variable);
 
         //then
         assertThat(convertMultipleToList).as("should not split multiple item").isNotNull().isEmpty();
     }
 
-    private Map<String, Object> buildMap() {
-        final Map<String, Object> variables;
-        final Map<String, Object> user = aMap().put("firstName", "john").put("lastName", "doe").build();
-        final Map<String, Object> taxiExpenseLine = aMap().put("nature", "taxi").put("amount", 30).put("date", "2014-10-16").put("comment", "slow").build();
-        final Map<String, Object> hotelExpenseLine = aMap().put("nature", "hotel").put("amount", 1000).put("date", "2014-10-16").put("comment", "expensive")
+    private Map<String, Serializable> buildMap() {
+        final Map<String, Serializable> variables;
+        final Map<String, Serializable> user = aMap().put("firstName", "john").put("lastName", "doe").build();
+        final Map<String, Serializable> taxiExpenseLine = aMap().put("nature", "taxi").put("amount", 30).put("date", "2014-10-16").put("comment", "slow")
                 .build();
-        final List<Map<String, Object>> expenseLines = new ArrayList<Map<String, Object>>();
+        final Map<String, Serializable> hotelExpenseLine = aMap().put("nature", "hotel").put("amount", 1000).put("date", "2014-10-16")
+                .put("comment", "expensive")
+                .build();
+        final List<Map<String, Serializable>> expenseLines = new ArrayList<Map<String, Serializable>>();
         expenseLines.add(taxiExpenseLine);
         expenseLines.add(hotelExpenseLine);
-        final Map<String, Object> expenseReport = aMap().put("expenseReport", expenseLines).build();
+        final Map<String, Serializable> expenseReport = aMap().put("expenseReport", (Serializable) expenseLines).build();
 
-        variables = aMap().put("user", user).put("expenseReport", expenseReport).build();
+        variables = aMap().put("user", (Serializable) user).put("expenseReport", (Serializable) expenseReport).build();
         return variables;
     }
 

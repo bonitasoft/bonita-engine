@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,13 +13,15 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation.builder;
 
+import java.io.Serializable;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 
 public class MapBuilder {
 
-    public static Builder<String, Object> aMap() {
-        return ImmutableMap.<String, Object> builder();
+    public static Builder<String, Serializable> aMap() {
+        return ImmutableMap.<String, Serializable> builder();
     }
 }

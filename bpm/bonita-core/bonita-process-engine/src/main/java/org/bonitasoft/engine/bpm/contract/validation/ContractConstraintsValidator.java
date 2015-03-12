@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class ContractConstraintsValidator {
         this.contractVariableHelper = contractVariableHelper;
     }
 
-    public void validate(final SContractDefinition contract, final Map<String, Object> variables) throws ContractViolationException {
+    public void validate(final SContractDefinition contract, final Map<String, Serializable> variables) throws ContractViolationException {
         final List<String> comments = new ArrayList<String>();
         for (final SConstraintDefinition constraint : contract.getConstraints()) {
             log(TechnicalLogSeverity.DEBUG, "Evaluating constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames());
@@ -62,12 +63,12 @@ public class ContractConstraintsValidator {
     }
 
     private void validateMandatoryContraint(final List<String> comments, final SInputDefinition sInputDefinition, final SConstraintDefinition constraint,
-            final Map<String, Object> variables) {
-        final List<Map<String, Object>> inputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(constraint, variables);
-        for (final Map<String, Object> inputVariable : inputVariables) {
+            final Map<String, Serializable> variables) {
+        final List<Map<String, Serializable>> inputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(constraint, variables);
+        for (final Map<String, Serializable> inputVariable : inputVariables) {
             if (sInputDefinition.isMultiple()) {
-                final List<Map<String, Object>> multipleVariables = contractVariableHelper.convertMultipleToList(inputVariable);
-                for (final Map<String, Object> multipleVariable : multipleVariables) {
+                final List<Map<String, Serializable>> multipleVariables = contractVariableHelper.convertMultipleToList(inputVariable);
+                for (final Map<String, Serializable> multipleVariable : multipleVariables) {
                     validateContraint(comments, constraint, multipleVariable);
                 }
             }
@@ -84,7 +85,7 @@ public class ContractConstraintsValidator {
         return constraint.getConstraintType().equals(SConstraintType.MANDATORY);
     }
 
-    private void validateContraint(final List<String> comments, final SConstraintDefinition constraint, final Map<String, Object> variables) {
+    private void validateContraint(final List<String> comments, final SConstraintDefinition constraint, final Map<String, Serializable> variables) {
         Boolean valid = Boolean.FALSE;
         try {
             valid = MVEL.evalToBoolean(constraint.getExpression(), variables);

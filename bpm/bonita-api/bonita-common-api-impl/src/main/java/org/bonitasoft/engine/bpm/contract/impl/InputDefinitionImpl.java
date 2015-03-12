@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -40,16 +40,17 @@ public class InputDefinitionImpl implements InputDefinition {
         return result;
     }
 
+
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
+        switch (NaiveEqualityResult.checkEquality(this, obj)) {
+            case RETURN_FALSE:
+                return false;
+            case RETURN_TRUE:
+                return true;
+            case CONTINUE:
+            default:
+                break;
         }
         final InputDefinitionImpl other = (InputDefinitionImpl) obj;
         if (description == null) {

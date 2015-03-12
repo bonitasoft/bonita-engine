@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.flownode;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.SessionInfos;
@@ -50,10 +51,10 @@ public class ExecuteFlowNode implements TransactionContent {
 
     private final long userId;
 
-    private final Map<String, Object> inputs;
+    private final Map<String, Serializable> inputs;
 
     public ExecuteFlowNode(final TenantServiceAccessor tenantAccessor, final long userId, final SFlowNodeInstance flowNodeInstance,
-            final Map<String, Object> inputs) {
+            final Map<String, Serializable> inputs) {
         processExecutor = tenantAccessor.getProcessExecutor();
         logger = tenantAccessor.getTechnicalLoggerService();
         commentService = tenantAccessor.getCommentService();
