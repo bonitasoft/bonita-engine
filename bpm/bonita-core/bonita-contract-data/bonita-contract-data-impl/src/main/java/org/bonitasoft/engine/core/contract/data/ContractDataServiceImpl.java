@@ -71,12 +71,12 @@ public class ContractDataServiceImpl implements ContractDataService {
     }
 
     @Override
-    public void addUserTaskData(final long userTaskId, final Map<String, Object> data) throws SContractDataCreationException {
+    public void addUserTaskData(final long userTaskId, final Map<String, Serializable> data) throws SContractDataCreationException {
         if (data == null) {
             return;
         }
-        for (final Entry<String, Object> datum : data.entrySet()) {
-            addUserTaskData(new SContractData(datum.getKey(), (Serializable) datum.getValue(), userTaskId));
+        for (final Entry<String, Serializable> datum : data.entrySet()) {
+            addUserTaskData(new SContractData(datum.getKey(), datum.getValue(), userTaskId));
         }
     }
 
@@ -141,7 +141,7 @@ public class ContractDataServiceImpl implements ContractDataService {
             final List<SContractData> contractData = getContractDataOfUserTask(userTaskId);
             if (!contractData.isEmpty()) {
                 final ArchiveInsertRecord[] records = buildArchiveRecords(contractData);
-            archiveService.recordInserts(archiveDate, records);
+                archiveService.recordInserts(archiveDate, records);
             }
         } catch (final SBonitaException sbe) {
             throw new SObjectModificationException(sbe);
