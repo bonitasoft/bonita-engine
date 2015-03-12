@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.contract.data;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -23,7 +24,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  */
 public interface ContractDataService {
 
-    void addUserTaskData(final long userTaskId, Map<String, Object> data) throws SContractDataCreationException;
+    void addUserTaskData(final long userTaskId, Map<String, Serializable> data) throws SContractDataCreationException;
 
     Object getUserTaskDataValue(final long userTaskId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
 

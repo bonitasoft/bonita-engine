@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class ContractValidator {
         comments = new ArrayList<String>();
     }
 
-    public boolean isValid(final SContractDefinition contract, final Map<String, Object> variables) {
+    public boolean isValid(final SContractDefinition contract, final Map<String, Serializable> variables) {
         try {
             structureValidator.validate(contract, variables);
             rulesValidator.validate(contract, variables);

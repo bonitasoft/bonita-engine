@@ -13,13 +13,15 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation.builder;
 
+import java.io.Serializable;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 
 public class MapBuilder {
 
-    public static Builder<String, Object> aMap() {
-        return ImmutableMap.<String, Object> builder();
+    public static Builder<String, Serializable> aMap() {
+        return ImmutableMap.<String, Serializable> builder();
     }
 }

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,8 +26,9 @@ import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition
 
 public class ContractVariableHelper {
 
-    public List<Map<String, Object>> buildMandatoryMultipleInputVariables(final SConstraintDefinition constraint, final Map<String, Object> contractVariables) {
-        final List<Map<String, Object>> constraintVariablesList = new ArrayList<Map<String, Object>>();
+    public List<Map<String, Serializable>> buildMandatoryMultipleInputVariables(final SConstraintDefinition constraint,
+            final Map<String, Serializable> contractVariables) {
+        final List<Map<String, Serializable>> constraintVariablesList = new ArrayList<Map<String, Serializable>>();
         for (final String inputName : constraint.getInputNames()) {
             buildRecursiveVariableList(contractVariables, constraintVariablesList, inputName);
         }
@@ -34,11 +36,11 @@ public class ContractVariableHelper {
 
     }
 
-    private List<Map<String, Object>> buildRecursiveVariableList(final Map<String, Object> currentVariables,
-            final List<Map<String, Object>> constraintVariablesList,
+    private List<Map<String, Serializable>> buildRecursiveVariableList(final Map<String, Serializable> currentVariables,
+            final List<Map<String, Serializable>> constraintVariablesList,
             final String inputName) {
         if (currentVariables.containsKey(inputName)) {
-            final Map<String, Object> value = new HashMap<String, Object>();
+            final Map<String, Serializable> value = new HashMap<String, Serializable>();
             value.put(inputName, currentVariables.get(inputName));
             constraintVariablesList.add(value);
         } else {
@@ -48,17 +50,17 @@ public class ContractVariableHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private Collection<? extends Map<String, Object>> buildRecursiveComplexVariableList(final Map<String, Object> currentVariables,
-            final List<Map<String, Object>> constraintVariablesList, final String inputName) {
-        for (final Entry<String, Object> variableEntry : currentVariables.entrySet()) {
+    private Collection<? extends Map<String, Serializable>> buildRecursiveComplexVariableList(final Map<String, Serializable> currentVariables,
+            final List<Map<String, Serializable>> constraintVariablesList, final String inputName) {
+        for (final Entry<String, Serializable> variableEntry : currentVariables.entrySet()) {
             final Object variableValue = variableEntry.getValue();
             if (variableValue instanceof Map<?, ?>) {
                 //complex case
-                buildRecursiveVariableList((Map<String, Object>) variableValue, constraintVariablesList, inputName);
+                buildRecursiveVariableList((Map<String, Serializable>) variableValue, constraintVariablesList, inputName);
             }
             if (variableValue instanceof List<?>) {
                 //multiple case
-                for (final Map<String, Object> variableValueItem : (List<Map<String, Object>>) variableValue) {
+                for (final Map<String, Serializable> variableValueItem : (List<Map<String, Serializable>>) variableValue) {
                     buildRecursiveVariableList(variableValueItem, constraintVariablesList, inputName);
                 }
             }
@@ -67,13 +69,13 @@ public class ContractVariableHelper {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> convertMultipleToList(final Map<String, Object> multipleVariable) {
-        final List<Map<String, Object>> multipleVariables = new ArrayList<Map<String, Object>>();
-        final Set<Entry<String, Object>> entrySet = multipleVariable.entrySet();
-        for (final Entry<String, Object> entry : entrySet) {
+    public List<Map<String, Serializable>> convertMultipleToList(final Map<String, Serializable> multipleVariable) {
+        final List<Map<String, Serializable>> multipleVariables = new ArrayList<Map<String, Serializable>>();
+        final Set<Entry<String, Serializable>> entrySet = multipleVariable.entrySet();
+        for (final Entry<String, Serializable> entry : entrySet) {
             if (entry.getValue() instanceof List<?>) {
-                for (final Object value : (List<Object>) entry.getValue()) {
-                    final Map<String, Object> item = new HashMap<String, Object>();
+                for (final Serializable value : (List<Serializable>) entry.getValue()) {
+                    final Map<String, Serializable> item = new HashMap<String, Serializable>();
                     item.put(entry.getKey(), value);
                     multipleVariables.add(item);
                 }
