@@ -425,14 +425,15 @@ public class CommonBPMServicesTest {
         transactionService.complete();
     }
 
-    protected void createSUserTaskInstance(final String name, final long flowNodeDefinitionId, final long parentId, final long processDefinitionId,
-            final long rootProcessInst, final long actorId) throws SBonitaException {
+    protected SUserTaskInstance createSUserTaskInstance(final String name, final long flowNodeDefinitionId, final long parentId, final long processDefinitionId,
+                                                        final long rootProcessInst, final long actorId) throws SBonitaException {
         final SUserTaskInstance taskInstance = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
                 .createNewUserTaskInstance(name, flowNodeDefinitionId, rootProcessInst, parentId, actorId, processDefinitionId, rootProcessInst, parentId)
                 .done();
         transactionService.begin();
         getServicesBuilder().getActivityInstanceService().createActivityInstance(taskInstance);
         transactionService.complete();
+        return taskInstance;
     }
 
     protected SActivityInstance createSAutomaticTaskInstance(final String name, final long flowNodeDefinitionId, final long parentId,

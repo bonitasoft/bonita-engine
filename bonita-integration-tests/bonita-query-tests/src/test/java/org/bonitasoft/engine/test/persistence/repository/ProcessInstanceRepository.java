@@ -38,6 +38,13 @@ public class ProcessInstanceRepository extends TestRepository {
         namedQuery.setParameter("humanTaskInstanceId", activityInstanceId);
         return ((Number) namedQuery.uniqueResult()).longValue();
     }
+    public boolean isTaskPendingForUser(final long activityInstanceId, final long userId) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        final Query namedQuery = getNamedQuery("isTaskPendingForUser");
+        namedQuery.setParameter("humanTaskInstanceId", activityInstanceId);
+        namedQuery.setParameter("userId", userId);
+        return ((Number) namedQuery.uniqueResult()).longValue() == 1;
+    }
 
     public long countChildrenInstanceIdsOfProcessInstance(final long processInstanceId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);

@@ -24,7 +24,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDelet
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.STaskVisibilityException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
@@ -676,7 +675,8 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     long getNumberOfPendingOrAssignedTasks(long userId, QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
-     * @param id
+     * @param flowNodeInstanceId
+     *     delete pending mapping of this flow node
      */
     void deleteArchivedPendingMappings(long flowNodeInstanceId);
 
@@ -697,6 +697,8 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     int getNumberOfActivityInstances(long processInstanceId) throws SBonitaReadException;
 
     List<Long> getPossibleUserIdsOfPendingTasks(long humanTaskInstanceId, int startIndex, int maxResults) throws SBonitaReadException;
+
+    boolean isTaskPendingForUser(long humanTaskInstanceId, long userId) throws SBonitaReadException;
 
     /**
      * Get total number of users according to specific query options, and who can start the task filtered with the search option
