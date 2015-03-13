@@ -21,7 +21,6 @@ import org.bonitasoft.engine.core.process.definition.model.SLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SMultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -34,18 +33,16 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.StateBehaviors;
+import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.model.SFlowNodeSimpleRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
-
 
 public class StateBehaviorsExt extends StateBehaviors {
 
@@ -56,12 +53,12 @@ public class StateBehaviorsExt extends StateBehaviors {
             final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
-            final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final ProcessInstanceService processInstanceService,
-            final RefBusinessDataService refBusinessDataService, final ParentContainerResolver parentContainerResolver) {
+            final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SCommentService commentService,
+            final IdentityService identityService, final RefBusinessDataService refBusinessDataService, final ParentContainerResolver parentContainerResolver,
+            WaitingEventsInterrupter waitingEventsInterrupter) {
         super(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
                 connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
-                containerRegistry, eventInstanceSevice, schedulerService, commentService, identityService, logger, processInstanceService, parentContainerResolver);
+                containerRegistry, eventInstanceService, commentService, identityService, parentContainerResolver, waitingEventsInterrupter);
         this.refBusinessDataService = refBusinessDataService;
     }
 
