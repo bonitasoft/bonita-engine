@@ -15,7 +15,6 @@ package org.bonitasoft.engine.execution;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -65,7 +64,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefi
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SThrowEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
@@ -74,7 +72,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityState
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
@@ -90,12 +87,10 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutom
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventKeyProviderBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
@@ -105,22 +100,13 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFac
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.event.OperationsWithContext;
-import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
-import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -171,10 +157,6 @@ public class StateBehaviors {
 
     private final EventInstanceService eventInstanceService;
 
-    private final SchedulerService schedulerService;
-
-    private final TechnicalLoggerService logger;
-
     private final ConnectorInstanceService connectorInstanceService;
 
     private ProcessExecutor processExecutor;
@@ -184,17 +166,16 @@ public class StateBehaviors {
     private final IdentityService identityService;
 
     protected final ParentContainerResolver parentContainerResolver;
-
-    private final ProcessInstanceService processInstanceService;
+    private final WaitingEventsInterrupter waitingEventsInterrupter;
 
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
             final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
-            final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final ProcessInstanceService processInstanceService,
-            final ParentContainerResolver parentContainerResolver) {
+            final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SCommentService commentService,
+            final IdentityService identityService,
+            final ParentContainerResolver parentContainerResolver, WaitingEventsInterrupter waitingEventsInterrupter) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -210,12 +191,10 @@ public class StateBehaviors {
         this.workService = workService;
         this.containerRegistry = containerRegistry;
         this.eventInstanceService = eventInstanceService;
-        this.schedulerService = schedulerService;
         this.commentService = commentService;
         this.identityService = identityService;
-        this.logger = logger;
-        this.processInstanceService = processInstanceService;
         this.parentContainerResolver = parentContainerResolver;
+        this.waitingEventsInterrupter = waitingEventsInterrupter;
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -381,13 +360,13 @@ public class StateBehaviors {
      * Return the phases and connectors to execute, as a couple of (phase, couple of (connector instance, connector definition))
      * 
      * @param processDefinition
-     *            the process where the connectors are defined.
+     *        the process where the connectors are defined.
      * @param flowNodeInstance
-     *            the instance of the flow node to execute possible connectors on.
+     *        the instance of the flow node to execute possible connectors on.
      * @param executeConnectorsOnEnter
-     *            do we want to consider the connectors ON_ENTER or ignore them?
+     *        do we want to consider the connectors ON_ENTER or ignore them?
      * @param executeConnectorsOnFinish
-     *            do we want to consider the connectors ON_FINISH or ignore them?
+     *        do we want to consider the connectors ON_FINISH or ignore them?
      * @return the phases and connectors to execute
      * @throws SActivityStateExecutionException
      */
@@ -741,7 +720,7 @@ public class StateBehaviors {
         final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(),
                 rootProcessInstanceId, activityInstance.getParentContainerId(), containerType, boundaryEventDefinition,
                 rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId()
-        );
+                );
 
         // no need to handle failed state, creation is in the same tx
         containerRegistry.executeFlowNodeInSameThread(parentProcessInstanceId, boundaryEventInstance.getId(), null, null, containerType.name());
@@ -779,7 +758,7 @@ public class StateBehaviors {
                 if (activityInstance.getAbortedByBoundary() != boundaryEventInstance.getId()) {
                     final boolean stable = boundaryEventInstance.isStable();
                     final SCatchEventDefinition catchEventDef = processDefinition.getProcessContainer().getBoundaryEvent(boundaryEventInstance.getName());
-                    interrupWaitinEvents(processDefinition, boundaryEventInstance, catchEventDef);
+                    waitingEventsInterrupter.interruptWaitingEvents(processDefinition, boundaryEventInstance, catchEventDef);
                     activityInstanceService.setStateCategory(boundaryEventInstance, categoryState);
                     if (stable) {
                         containerRegistry.executeFlowNode(processDefinition.getId(),
@@ -790,82 +769,6 @@ public class StateBehaviors {
             }
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException("Unable cancel boundary events attached to activity " + activityInstance.getName(), e);
-        }
-    }
-
-    public void interrupWaitinEvents(final SProcessDefinition processDefinition, final SCatchEventInstance catchEventInstance,
-            final SCatchEventDefinition catchEventDef) throws SBonitaException {
-        interruptTimerEvent(processDefinition, catchEventInstance, catchEventDef);
-        // message, signal and error
-        interruptWaitingEvents(catchEventInstance.getId(), catchEventDef);
-    }
-
-    private void interruptWaitingEvents(final long instanceId, final SCatchEventDefinition catchEventDef)
-            throws SBonitaReadException, SWaitingEventModificationException {
-        if (!catchEventDef.getEventTriggers().isEmpty()) {
-            interruptWaitingEvents(instanceId, SWaitingEvent.class);
-        }
-    }
-
-    public void interrupWaitinEvents(final SFlowNodeInstance receiveTaskInstance) throws SBonitaException {
-        if (receiveTaskInstance instanceof SReceiveTaskInstance || receiveTaskInstance instanceof SIntermediateCatchEventInstance
-                || receiveTaskInstance instanceof SBoundaryEventInstance) {
-            interruptWaitingEvents(receiveTaskInstance.getId(), SWaitingEvent.class);
-        }
-    }
-
-    private QueryOptions getWaitingEventsCountOptions(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
-        final List<FilterOption> filters = getFilterForWaitingEventsToInterrupt(instanceId, waitingEventClass);
-        return new QueryOptions(filters, null);
-    }
-
-    private QueryOptions getWaitingEventsQueryOptions(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
-        final OrderByOption orderByOption = new OrderByOption(waitingEventClass, BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class).getIdKey(),
-                OrderByType.ASC);
-        final List<FilterOption> filters = getFilterForWaitingEventsToInterrupt(instanceId, waitingEventClass);
-        return new QueryOptions(0, MAX_NUMBER_OF_RESULTS, Collections.singletonList(orderByOption), filters, null);
-    }
-
-    private List<FilterOption> getFilterForWaitingEventsToInterrupt(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
-        final SWaitingEventKeyProviderBuilderFactory waitingEventKeyProvider = BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class);
-        final List<FilterOption> filters = new ArrayList<FilterOption>(2);
-        filters.add(new FilterOption(waitingEventClass, waitingEventKeyProvider.getFlowNodeInstanceIdKey(), instanceId));
-        filters.add(new FilterOption(waitingEventClass, waitingEventKeyProvider.getActiveKey(), true));
-        return filters;
-    }
-
-    private <T extends SWaitingEvent> void interruptWaitingEvents(final long instanceId, final Class<T> waitingEventClass)
-            throws SBonitaReadException, SWaitingEventModificationException {
-        final QueryOptions queryOptions = getWaitingEventsQueryOptions(instanceId, waitingEventClass);
-        final QueryOptions countOptions = getWaitingEventsCountOptions(instanceId, waitingEventClass);
-        long count = 0;
-        List<T> waitingEvents;
-        do {
-            waitingEvents = eventInstanceService.searchWaitingEvents(waitingEventClass, queryOptions);
-            count = eventInstanceService.getNumberOfWaitingEvents(waitingEventClass, countOptions);
-            deleWaitingEvents(waitingEvents);
-        } while (count > waitingEvents.size());
-    }
-
-    private void deleWaitingEvents(final List<? extends SWaitingEvent> waitingEvents) throws SWaitingEventModificationException {
-        for (final SWaitingEvent sWaitingEvent : waitingEvents) {
-            eventInstanceService.deleteWaitingEvent(sWaitingEvent);
-        }
-    }
-
-    private void interruptTimerEvent(final SProcessDefinition processDefinition, final SCatchEventInstance catchEventInstance,
-            final SCatchEventDefinition catchEventDef) throws SSchedulerException {
-        // FIXME to support multiple events change this code
-        if (!catchEventDef.getTimerEventTriggerDefinitions().isEmpty()) {
-            final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), catchEventDef, catchEventInstance);
-            final boolean delete = schedulerService.delete(jobName);
-            if (!delete) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "No job found with name '" + jobName
-                            + "' when interrupting timer catch event named '" + catchEventDef.getName() + "' and id '" + catchEventInstance.getId()
-                            + "'. It was probably already triggered.");
-                }
-            }
         }
     }
 

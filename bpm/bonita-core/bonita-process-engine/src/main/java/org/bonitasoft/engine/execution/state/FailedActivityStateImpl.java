@@ -13,14 +13,12 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.execution.StateBehaviors;
 
 /**
  * Failed state is not terminal because activity can be retried, so it must be visible, so not archived immediately.
@@ -31,20 +29,9 @@ import org.bonitasoft.engine.execution.StateBehaviors;
  */
 public class FailedActivityStateImpl implements FlowNodeState {
 
-    private final StateBehaviors stateBehaviors;
-
-    public FailedActivityStateImpl(final StateBehaviors stateBehaviors) {
-        super();
-        this.stateBehaviors = stateBehaviors;
-    }
 
     @Override
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
-        try {
-            stateBehaviors.interrupWaitinEvents(instance);
-        } catch (final SBonitaException e) {
-            throw new SActivityStateExecutionException(e);
-        }
         return StateCode.DONE;
     }
 

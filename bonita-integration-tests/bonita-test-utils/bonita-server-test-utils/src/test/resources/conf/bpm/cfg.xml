@@ -112,16 +112,41 @@
         <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
     </bean>
 
+    <bean id="waitingEventsInterrupter" class="org.bonitasoft.engine.execution.WaitingEventsInterrupter">
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="schedulerService" ref="scheduler" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="stateBehaviors" class="org.bonitasoft.engine.execution.StateBehaviors">
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator"/>
+        <constructor-arg name="eventsHandler" ref="eventsHandler"/>
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="userFilterService" ref="userFilterService"/>
+        <constructor-arg name="classLoaderService" ref="classLoaderService"/>
+        <constructor-arg name="actorMappingService" ref="actorMappingService"/>
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="operationService" ref="operationService" />
+        <constructor-arg name="workService" ref="workService"/>
+        <constructor-arg name="containerRegistry" ref="containerRegistry" />
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="commentService" ref="commentService" />
+        <constructor-arg name="identityService" ref="identityService"/>
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
+        <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
+    </bean>
+
+
     <bean id="flowNodeStateManager" class="org.bonitasoft.engine.execution.FlowNodeStateManagerImpl">
         <constructor-arg name="processDefinitionService" ref="processDefinitionManager"/>
         <constructor-arg name="processInstanceService" ref="processInstanceService"/>
         <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService"/>
-        <constructor-arg name="classLoaderService" ref="classLoaderService"/>
         <constructor-arg name="expressionResolverService" ref="expressionResolverService"/>
-        <constructor-arg name="schedulerService" ref="scheduler"/>
         <constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
-        <constructor-arg name="eventInstanceService" ref="eventInstanceService"/>
         <constructor-arg name="operationService" ref="operationService"/>
         <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator"/>
         <constructor-arg name="containerRegistry" ref="containerRegistry"/>
@@ -129,12 +154,8 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService"/>
         <constructor-arg name="documentService" ref="documentService"/>
         <constructor-arg name="commentService" ref="commentService"/>
-        <constructor-arg name="eventsHandler" ref="eventsHandler"/>
-        <constructor-arg name="userFilterService" ref="userFilterService"/>
-        <constructor-arg name="actorMappingService" ref="actorMappingService"/>
-        <constructor-arg name="workService" ref="workService"/>
-        <constructor-arg name="identityService" ref="identityService"/>
-        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
+        <constructor-arg name="stateBehaviors" ref="stateBehaviors"/>
+        <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter"/>
     </bean>
 
     <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">

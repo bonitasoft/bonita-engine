@@ -18,9 +18,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.execution.FlowNodeExecutor;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
@@ -77,12 +75,12 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
     @Override
     public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
         TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-        final FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
-        FailedStateSetter failedStateSetter = new FailedStateSetter(flowNodeExecutor, activityInstanceService, flowNodeStateManager, loggerService);
+        WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(tenantAccessor.getEventInstanceService(),
+                tenantAccessor.getSchedulerService(), loggerService);
+        FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter, tenantAccessor.getActivityInstanceService(),
+                tenantAccessor.getFlowNodeStateManager(), loggerService);
         userTransactionService.executeInTransaction(new SetInFailCallable(failedStateSetter, flowNodeInstanceId));
     }
 

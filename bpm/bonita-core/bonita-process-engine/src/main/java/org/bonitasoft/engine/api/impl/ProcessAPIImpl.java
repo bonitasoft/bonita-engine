@@ -313,6 +313,7 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.SUnreleasableTaskException;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -3463,13 +3464,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void setActivityStateById(final long activityInstanceId, final int stateId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
+        EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
+        WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(eventInstanceService, tenantAccessor.getSchedulerService(), tenantAccessor.getTechnicalLoggerService());
         final StateBehaviors stateBehaviors = new StateBehaviors(tenantAccessor.getBPMInstancesCreator(), tenantAccessor.getEventsHandler(),
                 tenantAccessor.getActivityInstanceService(), tenantAccessor.getUserFilterService(), tenantAccessor.getClassLoaderService(),
                 tenantAccessor.getActorMappingService(), tenantAccessor.getConnectorInstanceService(), tenantAccessor.getExpressionResolverService(),
                 tenantAccessor.getProcessDefinitionService(), tenantAccessor.getDataInstanceService(), tenantAccessor.getOperationService(),
-                tenantAccessor.getWorkService(), tenantAccessor.getContainerRegistry(), tenantAccessor.getEventInstanceService(),
-                tenantAccessor.getSchedulerService(), tenantAccessor.getCommentService(), tenantAccessor.getIdentityService(),
-                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getProcessInstanceService(), tenantAccessor.getParentContainerResolver());
+                tenantAccessor.getWorkService(), tenantAccessor.getContainerRegistry(), eventInstanceService, tenantAccessor.getCommentService(), tenantAccessor.getIdentityService(), tenantAccessor.getParentContainerResolver(), waitingEventsInterrupter);
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
             if (sActivityInstance instanceof SHumanTaskInstance) {

@@ -563,9 +563,9 @@ public class APITestUtil extends PlatformTestUtil {
         return deployAndEnableProcess(businessArchiveBuilder.done());
     }
 
-    public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String name,
+    public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String connectorImplName,
             final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
-        return deployAndEnableProcessWithConnector(processDefinitionBuilder, Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
+        return deployAndEnableProcessWithConnector(processDefinitionBuilder, Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(connectorImplName, clazz)),
                 Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)));
     }
 
