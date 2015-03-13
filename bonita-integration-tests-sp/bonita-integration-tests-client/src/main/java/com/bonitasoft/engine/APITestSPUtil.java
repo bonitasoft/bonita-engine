@@ -209,6 +209,7 @@ public class APITestSPUtil extends APITestUtil {
     @Override
     protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
+        setProcessConfigurationAPI(TenantAPIAccessor.getProcessConfigurationAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
@@ -235,6 +236,7 @@ public class APITestSPUtil extends APITestUtil {
         BPMTestSPUtil.logoutOnTenant(getSession());
         setSession(null);
         setIdentityAPI(null);
+        setProcessConfigurationAPI(null);
         setProcessAPI(null);
         setProfileAPI(null);
         setThemeAPI(null);
