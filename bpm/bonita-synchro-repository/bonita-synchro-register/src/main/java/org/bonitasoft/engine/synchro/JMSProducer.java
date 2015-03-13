@@ -2,7 +2,6 @@ package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.MessageProducer;
@@ -33,8 +32,12 @@ public class JMSProducer {
 
     private static JMSProducer jmsProducer;
 
-    private JMSProducer(final long timeout) throws JMSException {
-        final String brokerURL = System.getProperty("broker.url");
+    private JMSProducer(final long timeout, String brokerURL) throws JMSException {
+
+        // if brokerURL not defined before, get property
+        if (brokerURL == null) {
+            brokerURL = System.getProperty("broker.url");
+        }
 
         // Create a ConnectionFactory
         topicConnectionFactory = new ActiveMQConnectionFactory(brokerURL);
@@ -62,18 +65,54 @@ public class JMSProducer {
                 }
             }
         });
+
     }
 
-    public static JMSProducer getInstance(final long messageTimeout) {
+    public synchronized static JMSProducer getInstance(final long messageTimeout, final String brokerURL) {
+        // TODO : add map by tenant
         if (jmsProducer == null) {
             try {
-                jmsProducer = new JMSProducer(messageTimeout);
+                jmsProducer = new JMSProducer(messageTimeout, brokerURL);
             } catch (final Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
         return jmsProducer;
+    }
+
+    public synchronized static void resetInstance() {
+        if (jmsProducer != null) {
+            if (jmsProducer.topicConnection != null) {
+                try {
+                    jmsProducer.topicConnection.stop();
+                } catch (JMSException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            if (jmsProducer.producer != null) {
+                try {
+                    jmsProducer.producer.close();
+                } catch (JMSException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            if (jmsProducer.session != null) {
+                try {
+                    jmsProducer.session.close();
+                } catch (JMSException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            if (jmsProducer.topicConnection != null) {
+                try {
+                    jmsProducer.topicConnection.close();
+                } catch (JMSException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        jmsProducer = null;
     }
 
     public void sendMessage(final Map<String, Serializable> properties, final String bodyId) throws JMSException {
