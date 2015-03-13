@@ -16,9 +16,9 @@ package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+
+import java.lang.reflect.Method;
 
 import java.lang.reflect.Method;
 
@@ -26,7 +26,6 @@ import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 import javassist.util.proxy.ProxyObject;
 
-import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bdm.Entity;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +54,7 @@ public class ServerProxyfierTest {
         PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
 
         assertThat(proxy).isInstanceOf(ProxyObject.class);
-        Assertions.assertThat(proxy.getClass().getSuperclass()).isEqualTo(PersonEntity.class);
+        assertThat(proxy.getClass().getSuperclass()).isEqualTo(PersonEntity.class);
     }
 
     @Test
