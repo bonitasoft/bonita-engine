@@ -599,7 +599,7 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void zipTest_Content_7_0_With_index_html_in_resources_folder() throws Exception {
+         public void zipTest_Content_7_0_With_index_html_in_resources_folder() throws Exception {
         // given
         Map<String, byte[]> zipContent = Collections.singletonMap("resources/index.html", "hello".getBytes());
 
@@ -607,7 +607,6 @@ public class PageServiceImplTest {
         pageServiceImpl.checkZipContainsRequiredEntries(zipContent);
 
         // then
-        // exception
     }
 
     @Test
