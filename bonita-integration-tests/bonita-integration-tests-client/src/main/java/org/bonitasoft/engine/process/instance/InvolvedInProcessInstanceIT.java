@@ -190,6 +190,39 @@ public class InvolvedInProcessInstanceIT extends AbstractProcessInstanceIT {
         disableAndDeleteProcess(processDefinition);
     }
 
+
+    @Test
+    public void isInvolvedInUserTask() throws Exception {
+        //given
+        // john is mapped as direct user:
+        final User john = createUser(new UserCreator("john", "bpm"));
+
+        final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder1.addActor(ACTOR_NAME);
+
+        // 1 instance of process def:
+        final DesignProcessDefinition designProcessDefinition = processBuilder1.addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME)
+                .addTransition("step1", "step2").getProcess();
+        final BusinessArchive businessArchive1 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive1);
+
+        // map user, group, role, and membership to that actor
+        final ActorInstance actor = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);
+        getProcessAPI().addUserToActor(actor.getId(), john.getId());
+        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final long processInstanceId = processInstance.getId();
+        long step1 = waitForUserTask(processInstanceId, "step1");
+
+        // then
+        assertThat(getProcessAPI().isInvolvedInHumanTaskInstance(john.getId(), step1)).as("directly mapped user should be involved").isTrue();
+
+        //clean
+        deleteUsers(john);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
     @Test(expected = ProcessInstanceNotFoundException.class)
     public void isInvolvedInProcessInstanceWithProcessInstanceNotFoundException() throws Exception {
         getProcessAPI().isInvolvedInProcessInstance(user.getId(), 0);

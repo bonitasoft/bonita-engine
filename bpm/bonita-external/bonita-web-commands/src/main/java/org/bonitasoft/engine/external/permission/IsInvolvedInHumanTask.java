@@ -14,12 +14,13 @@
 package org.bonitasoft.engine.external.permission;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
@@ -32,9 +33,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * Specific Command to know if a user is involved in a specific human task.
@@ -46,13 +44,11 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
 
     protected static final String USER_ID_KEY = "USER_ID_KEY";
 
-    protected static final String DO_FOR_KEY = "DO_FOR_KEY";
-
     protected static final String HUMAN_TASK_INSTANCE_ID_KEY = "HUMAN_TASK_INSTANCE_ID_KEY";
 
     /**
      * @return a Boolean :
-     *         - true, if the user is involved in t human task;
+     *         - true, if the user having USER_ID is involved in t human task;
      *         - false, otherwise.
      */
     @Override
@@ -72,11 +68,9 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
             throws SActivityInstanceNotFoundException, SActivityReadException, SActorNotFoundException, SBonitaReadException {
         final ActorMappingService actorMappingService = serviceAccessor.getActorMappingService();
         final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
-        SessionService sessionService = serviceAccessor.getSessionService();
-        SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
 
-        long actorId = -1;
-        long assigneeId = -1;
+        long actorId;
+        long assigneeId;
         long processDefinitionId;
         try {
             final SHumanTaskInstance humanTaskInstance = activityInstanceService.getHumanTaskInstance(humanTaskInstanceId);
@@ -94,19 +88,22 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
                 throw new SActivityInstanceNotFoundException(humanTaskInstanceId);
             }
         }
+        if (assigneeId >= 0) {
+            //check if the user is the assigned user
+            return userId == assigneeId;
+        } else {
+            //if the task is not assigned check if the user is mapped to the actor of the task
+            return isMappedToActor(userId, actorId, actorMappingService, processDefinitionId);
+        }
+    }
 
-        final long loggedUserId = sessionService.getLoggedUserFromSession(sessionAccessor);
-        //FIXME the command return true when: we give a user id != -1 and when the task is not assigned...
-        if (userId != -1) {
-            //in case we are performing a Do For (task assigned or not, we don't care
-            return true;
-        } else if (loggedUserId == assigneeId) {
-            //if user has the current task assigned
-            return true;
-        } else if (assigneeId == 0L) {
-            //in case we are not in do for, we check actor mapping
-            final SActor actor = actorMappingService.getActor(actorId);
-            return actor.getScopeId() == processDefinitionId;
+    private boolean isMappedToActor(long userId, long actorId, ActorMappingService actorMappingService, long processDefinitionId) throws SBonitaReadException,
+            SActorNotFoundException {
+        List<SActor> actors = actorMappingService.getActors(Collections.singleton(processDefinitionId), userId);
+        for (SActor actor : actors) {
+            if (actor.getId() == actorId) {
+                return true;
+            }
         }
         return false;
     }
