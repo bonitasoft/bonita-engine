@@ -48,7 +48,7 @@ public abstract class GenericFileContribution implements BusinessArchiveContribu
             final byte[] value = entry.getValue();
             if (value != null) {
                 final File file = new File(barFolder, entry.getKey());
-                IOUtil.write(file, entry);
+                IOUtil.write(file, entry.getValue());
             }
         }
     }

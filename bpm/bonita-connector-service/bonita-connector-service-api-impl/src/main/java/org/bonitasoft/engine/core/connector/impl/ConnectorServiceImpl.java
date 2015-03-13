@@ -206,7 +206,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             throws SConnectorException {
         final long startTime = System.currentTimeMillis();
         try {
-            expressionContext.setInputValues(new HashMap<String, Object>(result.getResult()));
+            expressionContext.putAllInputValues(result.getResult());
             operationService.execute(outputs, expressionContext.getContainerId(), expressionContext.getContainerType(), expressionContext);// data is in
             disconnect(result);
         } catch (final SOperationExecutionException e) {

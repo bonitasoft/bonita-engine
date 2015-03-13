@@ -118,6 +118,13 @@
 			<version>${project.version}</version>
 		</dependency>
 
+        <!-- Contract Data -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.contract.data</groupId>
+            <artifactId>bonita-contract-data-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
 		<!-- Connector Executor -->
 		<dependency>
 			<artifactId>bonita-connector-executor-api-impl</artifactId>
@@ -193,6 +200,17 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-form-mapping-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-form-mapping-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- Home Server -->
 
 		<!-- Incident -->
@@ -588,6 +606,9 @@
 									<!-- Command -->
 									<include>org.bonitasoft.engine.command:bonita-command-api</include>
 									<include>org.bonitasoft.engine.command:bonita-command-impl</include>
+                                    <!-- Contract Data -->
+                                    <include>org.bonitasoft.engine.core.contract.data:bonita-contract-data-api</include>
+                                    <include>org.bonitasoft.engine.core.contract.data:bonita-contract-data-impl</include>
 									<!-- Connector Executor -->
 									<include>org.bonitasoft.engine.connector:bonita-connector-executor-api</include>
 									<include>org.bonitasoft.engine.connector:bonita-connector-executor-api-impl</include>
@@ -618,6 +639,9 @@
 									<!-- External Identity Mapping -->
 									<include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-api</include>
 									<include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl</include>
+									<!-- Form mapping -->
+									<include>org.bonitasoft.engine.core:bonita-form-mapping-api</include>
+									<include>org.bonitasoft.engine.core:bonita-form-mapping-impl</include>
 									<!-- Home Server -->
 									<include>org.bonitasoft.engine.core:bonita-home-server</include>
 									<!-- Incident -->

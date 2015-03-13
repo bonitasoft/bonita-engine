@@ -1,40 +1,33 @@
-/*
+/**
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.process;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.form.FormMappingDefinitionBuilder;
+import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
 import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
 import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
@@ -48,14 +41,13 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ProcessParameterIT extends CommonAPIIT {
-
 
     @After
     public void afterTest() throws BonitaException {
@@ -203,7 +195,7 @@ public class ProcessParameterIT extends CommonAPIIT {
     }
 
     @Test
-    public void deployWithNullParam() throws BonitaException {
+    public void deployWithNullParamAndFormMappings() throws BonitaException {
         final String parameterName = "myParam1";
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("getParameter", "1.0");
         processBuilder.addParameter("myParam1", String.class.getCanonicalName()).addParameter("myParam2", String.class.getCanonicalName())
@@ -215,6 +207,8 @@ public class ProcessParameterIT extends CommonAPIIT {
         final Map<String, String> params = new HashMap<String, String>();
         params.put(parameterName, null);
         businessArchive.setParameters(params);
+        businessArchive.setFormMappings(FormMappingModelBuilder.buildFormMappingModel().withFormMapping(
+                FormMappingDefinitionBuilder.buildFormMapping("somePage", FormMappingType.TASK, false).withTaskname("someTask").build()).build());
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
 
@@ -250,7 +244,6 @@ public class ProcessParameterIT extends CommonAPIIT {
             deleteProcess(definition);
         }
     }
-
 
     @Test
     public void sortParametersByNameAsc() throws BonitaException {
@@ -418,7 +411,6 @@ public class ProcessParameterIT extends CommonAPIIT {
 
         deleteProcess(definition);
     }
-
 
     @Test
     public void showResolvedAndUnresolvedParameters() throws BonitaException {

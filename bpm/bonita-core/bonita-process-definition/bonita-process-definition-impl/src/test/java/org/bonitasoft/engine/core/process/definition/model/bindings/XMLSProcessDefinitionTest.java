@@ -20,8 +20,15 @@ import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefin
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class XMLSProcessDefinitionTest {
+
+    @Mock
+    private XMLSProcessDefinition xmlsProcessDefinition;
 
     @Test(expected = InvalidProcessDefinitionException.class)
     public void nullOperationShouldBeDeleted() throws Exception {
@@ -32,4 +39,6 @@ public class XMLSProcessDefinitionTest {
 
         BuilderFactory.get(SProcessDefinitionBuilderFactory.class).createNewInstance(processDefinitionBuilder.done()).done();
     }
+
+
 }

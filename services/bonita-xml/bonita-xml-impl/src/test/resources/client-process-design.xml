@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<processDefinition xmlns="http://www.bonitasoft.org/ns/process/client/6.3" bos_version="6.0-SNAPSHOT" name="demoStepContract" version="1.2">
+    <stringIndexes>
+        <stringIndex index="1" />
+        <stringIndex index="2" />
+        <stringIndex index="3" />
+        <stringIndex index="4" />
+        <stringIndex index="5" />
+    </stringIndexes>
+    <flowElements>
+        <transitions>
+            <transition id="4382862133218004722" name="Start_-&gt;_UserTask" source="-6268532758171441342" target="-8318522053555772185" />
+            <transition id="6502427928895440245" name="Start_-&gt;_End" source="-6268532758171441342" target="-7459376186294949002" />
+        </transitions>
+        <connectors />
+        <dataDefinitions />
+        <documentDefinitions />
+        <flowNodes>
+            <userTask actorName="Employees" id="-8318522053555772185" name="UserTask">
+                <incomingTransition idref="4382862133218004722" />
+                <dataDefinitions />
+                <operations />
+                <boundaryEvents />
+                <contract>
+                    <inputDefinitions>
+                        <inputDefinition description="user name" name="userName" type="TEXT" multiple="false" />
+                        <inputDefinition description="start date" name="startDate" type="DATE" multiple="false" />
+                        <inputDefinition description="end date" name="endDate" type="DATE" multiple="false" />
+                        <inputDefinition description="request is approved" name="isValid" type="BOOLEAN" multiple="false" />
+                        <inputDefinition description="comment" name="comment" type="TEXT" multiple="false" />
+                        <complexInputDefinition description="expense line" name="expense" multiple="false">
+                            <inputDefinition description="expense type" name="type" type="TEXT" multiple="false" />
+                            <inputDefinition description="expense comment" name="comment" type="TEXT" multiple="false" />
+                            <inputDefinition description="expense date" name="date" type="DATE" multiple="false" />
+                            <inputDefinition description="expense poof" name="proof" type="BYTE_ARRAY" multiple="false" />
+                            <complexInputDefinition description="expense line" name="expense" multiple="false">
+                                <inputDefinition description="complex in complex" name="comment" type="TEXT" multiple="false" />
+                            </complexInputDefinition>
+                            <inputDefinition description="expense comment" name="comment" type="DECIMAL" multiple="false" />
+                        </complexInputDefinition>
+                        <inputDefinition description="comment" name="comment" type="TEXT" multiple="false" />
+                    </inputDefinitions>
+                    <constraintDefinitions>
+                        <constraintDefinition name="username_constraint" type="CUSTOM">
+                            <conditionalExpression>userName != null</conditionalExpression>
+                            <explanation>user name is mandatory</explanation>
+                            <inputDefinitionNames>
+                                <inputDefinitionName>userName</inputDefinitionName>
+                            </inputDefinitionNames>
+                        </constraintDefinition>
+                        <constraintDefinition name="approval_constraint" type="CUSTOM">
+                            <conditionalExpression>isValid != null</conditionalExpression>
+                            <explanation>approval is mandatory</explanation>
+                            <inputDefinitionNames>
+                                <inputDefinitionName>isValid</inputDefinitionName>
+                            </inputDefinitionNames>
+                        </constraintDefinition>
+                        <constraintDefinition name="date_constraint" type="CUSTOM">
+                            <conditionalExpression>endDate.after(startDate)</conditionalExpression>
+                            <explanation>end date sould be after start date</explanation>
+                            <inputDefinitionNames>
+                                <inputDefinitionName>startDate</inputDefinitionName>
+                                <inputDefinitionName>endDate</inputDefinitionName>
+                            </inputDefinitionNames>
+                        </constraintDefinition>
+                        <constraintDefinition name="comment_constraint" type="CUSTOM">
+                            <conditionalExpression>isValid || (comment != null)</conditionalExpression>
+                            <explanation>comment is mandatory</explanation>
+                            <inputDefinitionNames>
+                                <inputDefinitionName>isValid</inputDefinitionName>
+                                <inputDefinitionName>comment</inputDefinitionName>
+                            </inputDefinitionNames>
+                        </constraintDefinition>
+                        <constraintDefinition name="special char constraint" type="CUSTOM">
+                            <conditionalExpression>comment.length 	> 5 </conditionalExpression>
+                            <explanation>comment should have at min 5 char </explanation>
+                            <inputDefinitionNames>
+                                <inputDefinitionName>comment</inputDefinitionName>
+                            </inputDefinitionNames>
+                        </constraintDefinition>
+                        <constraintDefinition name="special char constraint" type="CUSTOM">
+                            <conditionalExpression><![CDATA[comment.equals"<comment>"]]></conditionalExpression>
+                            <explanation>comment should have at min 5 char </explanation>
+                            <inputDefinitionNames>
+                                <inputDefinitionName>comment</inputDefinitionName>
+                            </inputDefinitionNames>
+                        </constraintDefinition>
+                    </constraintDefinitions>
+                </contract>
+            </userTask>
+            <startEvent id="-6268532758171441342" interrupting="true" name="Start">
+                <outgoingTransition idref="4382862133218004722" />
+                <outgoingTransition idref="6502427928895440245" />
+            </startEvent>
+            <endEvent id="-7459376186294949002" name="End">
+                <incomingTransition idref="6502427928895440245" />
+            </endEvent>
+        </flowNodes>
+    </flowElements>
+    <dependencies>
+        <parameters />
+        <actors>
+            <actor name="Employees">
+                <description>This a default process</description>
+            </actor>
+        </actors>
+    </dependencies>
+    <actorInitiator name="Employees" />
+</processDefinition>

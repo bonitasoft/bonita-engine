@@ -1,4 +1,4 @@
-/*******************************************************************************
+/**
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,28 +10,24 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ******************************************************************************/
-
+ **/
 package org.bonitasoft.engine.bdm;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
 import static org.bonitasoft.engine.bdm.builder.FieldBuilder.anIntegerField;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
-import org.bonitasoft.engine.bdm.CodeGenerator;
-import org.junit.Test;
-
-import org.bonitasoft.engine.bdm.model.BusinessObject;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
+import org.bonitasoft.engine.bdm.model.BusinessObject;
+import org.junit.Test;
 
 public class AbstractBDMCodeGeneratorTest {
 

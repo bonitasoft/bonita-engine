@@ -58,8 +58,9 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     private final long flowNodeDefinitionId;
 
-    ExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
-            final long connectorInstanceId, final String connectorDefinitionName) {
+
+    ExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId, final long connectorInstanceId,
+            final String connectorDefinitionName) {
         super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(flowNodeInstanceId,
                 DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinitionId));
         this.flowNodeDefinitionId = flowNodeDefinitionId;
