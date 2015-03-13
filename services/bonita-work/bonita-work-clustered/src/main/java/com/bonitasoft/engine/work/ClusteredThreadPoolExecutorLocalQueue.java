@@ -16,6 +16,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.hazelcast.core.MemberAttributeEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.BonitaExecutorService;
@@ -127,6 +128,11 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
 
     @Override
     public void memberAdded(final MembershipEvent membershipEvent) {
+    }
+
+    @Override
+    public void memberAttributeChanged(MemberAttributeEvent memberAttributeEvent) {
+
     }
 
     @Override
