@@ -41,10 +41,12 @@ import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
+import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
@@ -569,6 +571,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
+    public ContractDataService getContractDataService() {
+        return getInstanceOf(ContractDataService.class);
+    }
+
+    @Override
     public PageService getPageService() {
         return getInstanceOf(PageService.class);
     }
@@ -578,6 +585,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(ApplicationService.class);
     }
 
+    @Override
+    public FormMappingService getFormMappingService() {
+        return getInstanceOf(FormMappingService.class);
+    }
+    
     @Override
     public BroadcastService getBroadcastService() {
         return getInstanceOf(BroadcastService.class);

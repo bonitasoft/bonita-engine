@@ -27,7 +27,7 @@ public interface SessionProvider {
 
     void removeSession(final long sessionId) throws SSessionNotFoundException;
 
-    void addSession(final SSession session) throws SSessionAlreadyExistsException, SSessionAlreadyExistsException;
+    void addSession(final SSession session) throws SSessionAlreadyExistsException;
 
     void deleteSessionsOfTenant(long tenantId, boolean keepTechnicalSessions);
 

@@ -133,7 +133,7 @@ public interface JobService {
     /**
      * Create new job parameters for a specific tenant
      *
-     * @param sJobParameters
+     * @param parameters
      *        JobParameters to create
      * @param tenantId
      *        Identifier of tenant

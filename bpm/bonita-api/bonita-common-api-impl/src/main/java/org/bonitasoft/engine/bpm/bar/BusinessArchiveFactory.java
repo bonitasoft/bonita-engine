@@ -44,6 +44,7 @@ public class BusinessArchiveFactory {
         contributions.add(new UserFilterContribution());
         contributions.add(new DocumentsResourcesContribution());
         contributions.add(new ClasspathContribution());
+        contributions.add(new FormMappingContribution());
     }
 
     /**

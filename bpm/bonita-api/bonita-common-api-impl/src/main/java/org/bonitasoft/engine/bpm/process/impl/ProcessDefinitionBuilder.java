@@ -21,10 +21,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.lang.model.SourceVersion;
+
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.AutomaticTaskDefinition;
@@ -43,6 +49,7 @@ import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
+import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -80,9 +87,9 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * {@link #getProcess()} is called.
      *
      * @param name
-     *            the process name
+     *        the process name
      * @param version
-     *            the process version
+     *        the process version
      * @return
      */
     public ProcessDefinitionBuilder createNewInstance(final String name, final String version) {
@@ -100,7 +107,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      *
      * @return the process being build
      * @throws InvalidProcessDefinitionException
-     *             when the process definition is inconsistent. The exception contains causes
+     *         when the process definition is inconsistent. The exception contains causes
      */
     public DesignProcessDefinition done() throws InvalidProcessDefinitionException {
         validateProcess();
@@ -278,6 +285,9 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private void validateActivities(final FlowElementContainerDefinition processContainer) {
         for (final ActivityDefinition activity : processContainer.getActivities()) {
+            if (activity instanceof UserTaskDefinition) {
+                validateUserTask((UserTaskDefinition) activity);
+            }
             if (activity instanceof CallActivityDefinition && ((CallActivityDefinition) activity).getCallableElement() == null) {
                 addError("The call activity " + activity.getName() + " has a null callable element");
             }
@@ -298,6 +308,47 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                             + " through the same activty");
                 }
             }
+        }
+    }
+
+    private void validateUserTask(final UserTaskDefinition userTaskDefinition) {
+        final ContractDefinition contract = userTaskDefinition.getContract();
+        if (contract != null) {
+            validateUserTaskContractInputs(contract.getSimpleInputs(), contract.getComplexInputs());
+
+            for (final ConstraintDefinition constraint : contract.getConstraints()) {
+                if (constraint.getName() == null) {
+                    addError("A constraint name is missing");
+                }
+                if (constraint.getExpression() == null) {
+                    addError("The expression of constraint" + constraint.getName() + " is missing");
+                }
+            }
+        }
+    }
+
+    private void validateUserTaskContractInputs(final List<SimpleInputDefinition> simpleInputDefinitions,
+            final List<ComplexInputDefinition> complexInputDefinitions) {
+        for (final SimpleInputDefinition simpleInputDefinition : simpleInputDefinitions) {
+            validateContractInput(simpleInputDefinition);
+        }
+        for (final ComplexInputDefinition complexInputDefinition : complexInputDefinitions) {
+            validateContractInput(complexInputDefinition);
+        }
+    }
+
+    private void validateContractInput(final ComplexInputDefinition complexInputDefinition) {
+        validateContractInputName(complexInputDefinition.getName());
+        validateUserTaskContractInputs(complexInputDefinition.getSimpleInputs(), complexInputDefinition.getComplexInputs());
+    }
+
+    private void validateContractInput(final SimpleInputDefinition inputDefinition) {
+        validateContractInputName(inputDefinition.getName());
+    }
+
+    private void validateContractInputName(final String name) {
+        if (!SourceVersion.isIdentifier(name)) {
+            designErrors.add("contract input name " + name + " is invalid");
         }
     }
 
@@ -493,7 +544,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * Sets the process display name. When set, It is used to replace the name in the Bonita BPM Portal
      *
      * @param name
-     *            display name
+     *        display name
      * @return
      */
     public ProcessDefinitionBuilder addDisplayName(final String name) {
@@ -505,7 +556,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * Sets the process display description
      *
      * @param description
-     *            display description
+     *        display description
      * @return
      */
     public ProcessDefinitionBuilder addDisplayDescription(final String description) {
@@ -689,7 +740,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * Adds an actor on this process
      *
      * @param actorName
-     *            actor name
+     *        actor name
      * @see #addActor(String, boolean)
      */
     public ActorDefinitionBuilder addActor(final String actorName) {
@@ -700,9 +751,9 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * Adds an actor on this process
      *
      * @param name
-     *            actor name
+     *        actor name
      * @param initiator
-     *            defines whether it's the actor initiator (actor that's able to start the process)
+     *        defines whether it's the actor initiator (actor that's able to start the process)
      * @return
      */
     public ActorDefinitionBuilder addActor(final String name, final boolean initiator) {
@@ -730,7 +781,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * @return
      *         the process being build
      * @throws InvalidProcessDefinitionException
-     *             when the process definition is inconsistent. The exception contains causes
+     *         when the process definition is inconsistent. The exception contains causes
      */
     public DesignProcessDefinition getProcess() throws InvalidProcessDefinitionException {
         return done();

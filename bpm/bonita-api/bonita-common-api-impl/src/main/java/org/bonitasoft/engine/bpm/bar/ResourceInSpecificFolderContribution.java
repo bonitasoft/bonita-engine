@@ -51,7 +51,7 @@ public abstract class ResourceInSpecificFolderContribution implements BusinessAr
 
         for (final Entry<String, byte[]> entry : resources.entrySet()) {
             final File file = new File(folder, entry.getKey().substring(beginIndex));
-            IOUtil.write(file, entry);
+            IOUtil.write(file, entry.getValue());
         }
     }
 
