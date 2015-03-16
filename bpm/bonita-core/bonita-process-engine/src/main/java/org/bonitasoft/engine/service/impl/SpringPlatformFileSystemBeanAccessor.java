@@ -15,6 +15,7 @@ package org.bonitasoft.engine.service.impl;
 
 
 import java.io.IOException;
+import java.util.Properties;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -42,7 +43,8 @@ public class SpringPlatformFileSystemBeanAccessor {
 
     private static PropertiesPropertySource getPropertySource() {
         try {
-            return new PropertiesPropertySource("platform", BonitaHomeServer.getInstance().getPlatformProperties());
+            final Properties props = BonitaHomeServer.getInstance().getPlatformProperties();
+            return new PropertiesPropertySource("platform", props);
         } catch (final BonitaHomeNotSetException e) {
             throw new RuntimeException(e);
         } catch (final IOException e) {

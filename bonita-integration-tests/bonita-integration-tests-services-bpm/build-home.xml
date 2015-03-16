@@ -3,6 +3,7 @@
 	<property name="target.dir" value="${basedir}/target"/>
 	<property name="resources.dir" value="${basedir}/src/test/resources"/>
 	<property name="bh.source.dir" value="${basedir}/../../bpm/bonita-home/target/bonita-home"/>
+	<property name="local.test.resources.dir" value="${basedir}/../bonita-test-utils/bonita-server-test-utils/src/main/resources"/>
 	<property name="bh.target.dir" value="${target.dir}/bonita-home"/>
 	<property name="bh.target.conf.platform.dir" value="${bh.target.dir}/engine-server/conf/platform"/>
 	
@@ -14,6 +15,11 @@
 			</fileset>
 		</copy>
 		<copy file="${resources.dir}/bonita-platform-community-user-custom.xml" todir="${bh.target.conf.platform.dir}" overwrite="true"/>
+		<copy todir="${bh.target.conf.platform.dir}">
+			<fileset dir="${local.test.resources.dir}">
+				<include name="*"/>
+			</fileset>
+		</copy>
 	</target>
 
 </project>

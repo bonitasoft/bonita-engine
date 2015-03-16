@@ -173,24 +173,20 @@ public class BonitaHomeServer extends BonitaHome {
     }
 
     public Properties getPlatformProperties() throws BonitaHomeNotSetException, IOException {
-        //System.err.println("----- getPlatformProperties Thread: " + Thread.currentThread().getId() + "-----");
-        //Thread.dumpStack();
-        //System.err.println("before platformProperties = " + platformProperties);
         if (platformProperties == null) {
             final Properties defaultProperties = getProperties(FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder()).getFile("bonita-platform.properties"));
             final Properties privateProperties = getProperties(FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder()).getFile("bonita-platform-private.properties"));
-            final Properties customProperties = getProperties(FolderMgr.getPlatformConfFolder(getBonitaHomeFolder()).getFile("bonita-platform-user-custom.properties"));
-            //System.err.println("defaultProperties = " + defaultProperties);
-            //System.err.println("privateProperties = " + privateProperties);
-            //System.err.println("customProperties = " + customProperties);
-
             platformProperties = new Properties();
             platformProperties.putAll(defaultProperties);
             platformProperties.putAll(privateProperties);
-            platformProperties.putAll(customProperties);
+            final FilenameFilter filter = new FilenameFilter() {
+                public boolean accept(File dir, String filename) { return filename.endsWith(".properties"); }
+            };
+            final File[] files = FolderMgr.getPlatformConfFolder(getBonitaHomeFolder()).listFiles(filter);
+            for (File file : files) {
+                platformProperties.putAll(getProperties(file));
+            }
         }
-        //System.err.println("after platformProperties = " + platformProperties);
-        //System.err.println("----- end getPlatformProperties Thread: " + Thread.currentThread().getId() + "-----");
         return platformProperties;
     }
 
@@ -231,11 +227,17 @@ public class BonitaHomeServer extends BonitaHome {
     public Properties getTenantProperties(final long tenantId) throws BonitaHomeNotSetException, IOException {
         final Properties tenantIdProperties = getProperties(FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile("bonita-tenant-id.properties"));
         final Properties defaultProperties = getProperties(FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile("bonita-tenant.properties"));
-        final Properties customProperties = getProperties(FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId).getFile("bonita-platform.properties"));
         final Properties tenantProperties = new Properties();
         tenantProperties.putAll(tenantIdProperties);
         tenantProperties.putAll(defaultProperties);
-        tenantProperties.putAll(customProperties);
+        final FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String filename) { return filename.endsWith(".properties"); }
+        };
+        final File[] files = FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId).listFiles(filter);
+        for (File file : files) {
+            tenantProperties.putAll(getProperties(file));
+        }
+
         return tenantProperties;
     }
 

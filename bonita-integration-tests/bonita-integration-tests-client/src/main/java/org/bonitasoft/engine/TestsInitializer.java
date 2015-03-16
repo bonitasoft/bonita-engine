@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -22,6 +25,8 @@ import java.util.Set;
 import javax.naming.Context;
 
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -32,9 +37,8 @@ public class TestsInitializer {
 
     private static final String BONITA_HOME_PROPERTY = "bonita.home";
 
-    static ConfigurableApplicationContext springContext;
-
     private static TestsInitializer INSTANCE;
+    private Object h2Server;
 
     private static TestsInitializer getInstance() {
         if (INSTANCE == null) {
@@ -59,10 +63,34 @@ public class TestsInitializer {
 
         final long startTime = System.currentTimeMillis();
         setSystemPropertyIfNotSet(BONITA_HOME_PROPERTY, BONITA_HOME_DEFAULT_PATH);
-        setupSpringContext();
+        final String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
+
+        // Force these system properties
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
+        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");
+
+        if ("h2".equals(dbVendor)) {
+            this.h2Server = startH2Server();
+        }
+
         initPlatformAndTenant();
 
         System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
+    }
+
+    private Object startH2Server() throws ClassNotFoundException, NoSuchMethodException, IOException, BonitaHomeNotSetException, InvocationTargetException, IllegalAccessException {
+        final String h2Port = (String) BonitaHomeServer.getInstance().getPlatformProperties().get("h2.db.server.port");
+        final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
+
+        final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
+        final Method createTcpServer = h2ServerClass.getMethod("createTcpServer", new Class[] {String[].class});
+        return createTcpServer.invoke(createTcpServer, new Object[]{args});
+    }
+
+    private void stopH2Server(Object h2Server) throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
+        final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
+        final Method stop = h2ServerClass.getMethod("stop");
+        stop.invoke(stop);
     }
 
     protected void after() throws Exception {
@@ -71,8 +99,10 @@ public class TestsInitializer {
         System.out.println("=====================================================");
 
         deleteTenantAndPlatform();
-        closeSpringContext();
         checkThreadsAreStopped();
+        if (this.h2Server != null) {
+            stopH2Server(this.h2Server);
+        }
     }
 
     protected void deleteTenantAndPlatform() throws BonitaException {
@@ -129,39 +159,9 @@ public class TestsInitializer {
         new APITestUtil().initializeAndStartPlatformWithDefaultTenant(true);
     }
 
-    private void setupSpringContext() {
-        setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
-
-        // Force these system properties
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
-        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");
-
-        final List<String> springConfigLocations = getSpringConfigLocations();
-        springContext = new ClassPathXmlApplicationContext(springConfigLocations.toArray(new String[springConfigLocations.size()]));
-    }
-
-    protected List<String> getSpringConfigLocations() {
-        return Arrays.asList("datasource.xml", "jndi-setup.xml");
-    }
-
-    private void closeSpringContext() {
-        try {
-            // if in local we try to unload engine
-            final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-            final Class<?> initializerClass = contextClassLoader.loadClass(getInitializerListenerClassName());
-            initializerClass.getMethod("unload").invoke(null);
-        } catch (final Exception e) {
-            System.out.println("Unable to execute the unload handler, maybe test are not local: " + e.getMessage());
-            // not in local, do nothing
-        }
-        springContext.close();
-    }
-
-    protected String getInitializerListenerClassName() {
-        return "org.bonitasoft.engine.EngineInitializer";
-    }
-
-    private static void setSystemPropertyIfNotSet(final String property, final String value) {
-        System.setProperty(property, System.getProperty(property, value));
+    private static String setSystemPropertyIfNotSet(final String property, final String value) {
+        final String finalValue = System.getProperty(property, value);
+        System.setProperty(property, finalValue);
+        return finalValue;
     }
 }
