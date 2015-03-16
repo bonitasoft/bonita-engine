@@ -498,6 +498,51 @@ public interface ProcessRuntimeAPI {
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
 
     /**
+     * Start an instance of the process with the specified process definition id, and provides inputs to fullfill Process Contract.
+     * See {@link org.bonitasoft.engine.bpm.contract.ContractDefinition} for details on contracts.
+     *
+     * @param processDefinitionId
+     *        The identifier of the process definition for which an instance will be started.
+     * @param instantiationInputs
+     *        The couples of input name/value that allows to start a process with an instantiation contract.
+     * @return An instance of the process.
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid, e.g. the session has expired.
+     * @throws ProcessDefinitionNotFoundException
+     *         If no matching process definition is found.
+     * @throws ProcessActivationException
+     *         If an exception occurs during activation.
+     * @throws ProcessExecutionException
+     *         If a problem occurs when starting the process.
+     * @since 7.0.0
+     */
+    ProcessInstance startProcessWithInputs(final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
+
+    /**
+     * Start an instance of the process with the specified process definition id on behalf of a given user, and provides inputs to fullfill Process Contract.
+     * See {@link org.bonitasoft.engine.bpm.contract.ContractDefinition} for details on contracts.
+     *
+     * @param userId The identifier of the user in the name of whom the process is started.
+     * @param processDefinitionId
+     *        The identifier of the process definition for which an instance will be started.
+     * @param instantiationInputs
+     *        The couples of input name/value that allows to start a process with an instantiation contract.
+     * @return An instance of the process.
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid, e.g. the session has expired.
+     * @throws ProcessDefinitionNotFoundException
+     *         If no matching process definition is found.
+     * @throws ProcessActivationException
+     *         If an exception occurs during activation.
+     * @throws ProcessExecutionException
+     *         If a problem occurs when starting the process.
+     * @since 7.0.0
+     */
+    ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
+
+    /**
      * Executes a flow node that is in a stable state.
      * Will move the activity to the next stable state and then continue the execution of the process.
      *
