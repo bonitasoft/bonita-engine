@@ -819,10 +819,10 @@
                                     <!-- External Identity Mapping -->
                                     <include>
                                         org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-api
+                                    </include>
                                     <!-- Form Mapping -->
                                     <include>org.bonitasoft.engine.core:bonita-form-mapping-api</include>
                                     <include>org.bonitasoft.engine.core:bonita-form-mapping-impl</include>
-                                    </include>
                                     <include>
                                         org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl
                                     </include>
