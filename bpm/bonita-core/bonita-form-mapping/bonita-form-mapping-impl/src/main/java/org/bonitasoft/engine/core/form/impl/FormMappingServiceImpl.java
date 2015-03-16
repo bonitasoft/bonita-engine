@@ -66,8 +66,8 @@ public class FormMappingServiceImpl implements FormMappingService {
     }
 
     @Override
-    public SFormMapping create(long processDefinitionId, String task, String form, boolean isExternal, String type) throws SObjectCreationException {
-        SFormMappingImpl sFormMapping = new SFormMappingImpl(processDefinitionId, task, form, isExternal, type);
+    public SFormMapping create(long processDefinitionId, String task, String form, String target, String type) throws SObjectCreationException {
+        SFormMappingImpl sFormMapping = new SFormMappingImpl(processDefinitionId, task, form, target, type);
         InsertRecord record = new InsertRecord(sFormMapping);
 
         final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class)
@@ -82,14 +82,14 @@ public class FormMappingServiceImpl implements FormMappingService {
     }
 
     @Override
-    public void update(SFormMapping formMapping, String form, boolean isExternal) throws SObjectModificationException {
+    public void update(SFormMapping formMapping, String form, String target) throws SObjectModificationException {
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class)
                 .createUpdateEvent(FORM_MAPPING)
                 .setObject(formMapping).done();
         try {
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField("form", form);
-            entityUpdateDescriptor.addField("isExternal", isExternal);
+            entityUpdateDescriptor.addField("target", target);
             entityUpdateDescriptor.addField("lastUpdatedBy", getSessionUserId());
             entityUpdateDescriptor.addField("lastUpdateDate", System.currentTimeMillis());
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(formMapping,

@@ -72,6 +72,7 @@ import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperand;
@@ -318,8 +319,8 @@ public class BusinessArchiveTest {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("MethCookingPlanning", "Season 5").done();
 
         final FormMappingModel formMappingModel = new FormMappingModel();
-        formMappingModel.addFormMapping(new FormMappingDefinition("/?myPageTokenID", FormMappingType.PROCESS_START, false));
-        formMappingModel.addFormMapping(new FormMappingDefinition("someExternalPage", FormMappingType.TASK, true, "requestTask"));
+        formMappingModel.addFormMapping(new FormMappingDefinition("/?myPageTokenID", FormMappingType.PROCESS_START, FormMappingTarget.INTERNAL));
+        formMappingModel.addFormMapping(new FormMappingDefinition("someExternalPage", FormMappingType.TASK, FormMappingTarget.URL, "requestTask"));
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
                 .setFormMappings(formMappingModel).done();

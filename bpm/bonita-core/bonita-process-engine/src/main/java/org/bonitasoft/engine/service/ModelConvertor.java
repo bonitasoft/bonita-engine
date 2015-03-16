@@ -227,6 +227,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.form.FormMapping;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
@@ -2114,7 +2115,7 @@ public class ModelConvertor {
         FormMapping formMapping = new FormMapping();
         formMapping.setId(sFormMapping.getId());
         formMapping.setTask(sFormMapping.getTask());
-        formMapping.setExternal(sFormMapping.isExternal());
+        formMapping.setTarget(FormMappingTarget.valueOf(sFormMapping.getTarget()));
         formMapping.setForm(sFormMapping.getForm());
         formMapping.setType(FormMappingType.valueOf(sFormMapping.getType()));
         formMapping.setProcessDefinitionId(sFormMapping.getProcessDefinitionId());

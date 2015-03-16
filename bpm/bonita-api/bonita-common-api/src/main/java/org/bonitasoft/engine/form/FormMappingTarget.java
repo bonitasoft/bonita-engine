@@ -17,21 +17,20 @@ package org.bonitasoft.engine.form;
 /**
  * @author Baptiste Mesta
  */
-public final class FormMappingSearchDescriptor {
-
-    public static final String ID = "id";
-
-    public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
+public enum FormMappingTarget {
 
     /**
-     * @see org.bonitasoft.engine.form.FormMappingType
+     * the target form is a bonita form
      */
-    public static final String TYPE = "type";
+    INTERNAL,
 
-    public static final String FORM = "form";
+    /**
+     * the target form is an external url
+     */
+    URL,
 
-    public static final String TARGET  = "target";
-
-    public static final String TASK  = "task";
-
+    /**
+     * the target form is a legacy
+     */
+    LEGACY
 }

@@ -28,7 +28,7 @@ public class FormMapping implements BaseElement {
     private long processDefinitionId;
     private String task;
     private String form;
-    private boolean external;
+    private FormMappingTarget target;
     private FormMappingType type;
     private long lastUpdatedBy;
     private Date lastUpdateDate;
@@ -36,24 +36,24 @@ public class FormMapping implements BaseElement {
     public FormMapping() {
     }
 
-    public FormMapping(long processDefinitionId, boolean external, FormMappingType type, String form, String task) {
+    public FormMapping(long processDefinitionId, FormMappingTarget target, FormMappingType type, String form, String task) {
         this.processDefinitionId = processDefinitionId;
         this.task = task;
         this.form = form;
-        this.external = external;
+        this.target = target;
         this.type = type;
     }
 
-    public FormMapping(long processDefinitionId, FormMappingType type, boolean external, String form) {
+    public FormMapping(long processDefinitionId, FormMappingType type, FormMappingTarget target, String form) {
         this.type = type;
-        this.external = external;
+        this.target = target;
         this.processDefinitionId = processDefinitionId;
         this.form = form;
     }
 
-    public FormMapping(FormMappingType type, boolean external, long processDefinitionId) {
+    public FormMapping(FormMappingType type, FormMappingTarget target, long processDefinitionId) {
         this.type = type;
-        this.external = external;
+        this.target = target;
         this.processDefinitionId = processDefinitionId;
     }
 
@@ -90,12 +90,12 @@ public class FormMapping implements BaseElement {
         this.form = form;
     }
 
-    public boolean isExternal() {
-        return external;
+    public FormMappingTarget getTarget() {
+        return target;
     }
 
-    public void setExternal(boolean external) {
-        this.external = external;
+    public void setTarget(FormMappingTarget target) {
+        this.target = target;
     }
 
     public FormMappingType getType() {
@@ -129,7 +129,7 @@ public class FormMapping implements BaseElement {
 
         FormMapping that = (FormMapping) o;
 
-        if (external != that.external) return false;
+        if (target != that.target) return false;
         if (id != that.id) return false;
         if (lastUpdatedBy != that.lastUpdatedBy) return false;
         if (processDefinitionId != that.processDefinitionId) return false;
@@ -148,7 +148,7 @@ public class FormMapping implements BaseElement {
         result = 31 * result + (int) (processDefinitionId ^ (processDefinitionId >>> 32));
         result = 31 * result + (task != null ? task.hashCode() : 0);
         result = 31 * result + (form != null ? form.hashCode() : 0);
-        result = 31 * result + (external ? 1 : 0);
+        result = 31 * result + (target != null ? target.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
         result = 31 * result + (lastUpdateDate != null ? lastUpdateDate.hashCode() : 0);
@@ -162,7 +162,7 @@ public class FormMapping implements BaseElement {
                 ", processDefinitionId=" + processDefinitionId +
                 ", task='" + task + '\'' +
                 ", form='" + form + '\'' +
-                ", external=" + external +
+                ", target=" + target +
                 ", type=" + type +
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 ", lastUpdateDate=" + lastUpdateDate +
