@@ -19,6 +19,8 @@ import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 
+import java.lang.reflect.Method;
+
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 import javassist.util.proxy.ProxyObject;

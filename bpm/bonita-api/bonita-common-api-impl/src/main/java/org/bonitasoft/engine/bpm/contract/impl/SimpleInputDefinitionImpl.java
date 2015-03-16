@@ -53,13 +53,16 @@ public class SimpleInputDefinitionImpl extends InputDefinitionImpl implements Si
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
+        switch (NaiveEqualityResult.checkEquality(this, obj)) {
+            case RETURN_FALSE:
+                return false;
+            case RETURN_TRUE:
+                return true;
+            case CONTINUE:
+            default:
+                break;
         }
         if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
             return false;
         }
         final SimpleInputDefinitionImpl other = (SimpleInputDefinitionImpl) obj;

@@ -38,14 +38,14 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
+        switch (NaiveEqualityResult.checkEquality(this, obj)) {
+            case RETURN_FALSE:
+                return false;
+            case RETURN_TRUE:
+                return true;
+            case CONTINUE:
+            default:
+                break;
         }
         final ConstraintDefinitionImpl other = (ConstraintDefinitionImpl) obj;
         if (constraintType != other.constraintType) {
