@@ -538,7 +538,7 @@
     </bean>
 
     <bean id="transactionManager" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiName" value="trucmuch"/>
+        <property name="jndiName" value="${transaction.manager}"/>
     </bean>
 
     <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" scope="singleton">

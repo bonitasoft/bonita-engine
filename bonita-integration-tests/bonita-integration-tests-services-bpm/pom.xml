@@ -576,11 +576,7 @@
 						</goals>
 						<configuration>
 							<target name="copy-overriding-conf">
-                                <copy todir="${project.build.directory}/bonita-home/engine-server/conf/platform" overwrite="true">
-									<fileset dir="${basedir}/src/test/resources" >
-										<include name="bonita-platform-community-user-custom.xml"/>
-									</fileset>
-                                </copy>
+								<ant antfile="build-home.xml" target="build"/>
 							</target>
 						</configuration>
 					</execution>
@@ -604,13 +600,6 @@
 									<version>${project.version}</version>
 									<type>zip</type>
 									<outputDirectory>${project.build.directory}/test-classes/sql-test</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.bonitasoft.engine</groupId>
-									<artifactId>bonita-home</artifactId>
-									<version>${project.version}</version>
-									<type>zip</type>
-									<outputDirectory>${project.build.directory}</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 						</configuration>

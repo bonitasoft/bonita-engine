@@ -1,18 +1,18 @@
-<project name="bonita-integration-tests-servives-bpm" default="cleantarget">
+<project name="bonita-integration-tests-servives-bpm" default="build">
 
 	<property name="target.dir" value="${basedir}/target"/>
 	<property name="resources.dir" value="${basedir}/src/test/resources"/>
-	<property name="bh.source.dir" value="${basedir}/../../bpm/bonita-home/target"/>
+	<property name="bh.source.dir" value="${basedir}/../../bpm/bonita-home/target/bonita-home"/>
 	<property name="bh.target.dir" value="${target.dir}/bonita-home"/>
 	<property name="bh.target.conf.platform.dir" value="${bh.target.dir}/engine-server/conf/platform"/>
 	
-	<target name="cleantarget">
+	<target name="build">
 		<delete dir="${bh.target.dir}" />
-		<unzip dest="${target.dir}">
+		<copy todir="${bh.target.dir}">
 			<fileset dir="${bh.source.dir}">
-				<include name="bonita-home-*.zip"/>
+				<include name="**/*"/>
 			</fileset>
-		</unzip>
+		</copy>
 		<copy file="${resources.dir}/bonita-platform-community-user-custom.xml" todir="${bh.target.conf.platform.dir}" overwrite="true"/>
 	</target>
 
