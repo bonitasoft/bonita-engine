@@ -141,6 +141,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
+import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidator;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidatorFactory;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
@@ -5868,6 +5869,21 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    @Override
+    public ContractDefinition getProcessContract(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
+        return new ContractDefinitionImpl();
+        //        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        //        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        //        try {
+        //            final SProcessDefinition processDefinition = getTenantAccessor().getProcessDefinitionService().getProcessDefinition(processDefinitionId);
+        //            return ModelConvertor.toContract(processDefinition.getProcessContainer().getContract());
+        //        } catch (final SProcessDefinitionNotFoundException spdnfe) {
+        //            throw new ProcessDefinitionNotFoundException(spdnfe.getMessage());
+        //        } catch (final SProcessDefinitionReadException spdre) {
+        //            throw new ProcessDefinitionNotFoundException(spdre.getMessage());
+        //        }
+    }
+
     @CustomTransactions
     @Override
     public void executeUserTask(final long flownodeInstanceId, final Map<String, Serializable> inputs) throws FlowNodeExecutionException,
@@ -5981,6 +5997,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaReadException sbe) {
             throw new RetrieveException(sbe);
         }
+    }
+
+    @Override
+    public Serializable getProcessInstanciationInputValue(long processInstanceId, String name) throws ProcessInstanceNotFoundException {
+        return new String();
     }
 
     @Override

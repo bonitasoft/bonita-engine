@@ -401,7 +401,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      */
     ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables) throws ProcessDefinitionNotFoundException,
-    ProcessActivationException, ProcessExecutionException;
+            ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations.
@@ -443,7 +443,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     ProcessInstance startProcess(long userId, long processDefinitionId) throws UserNotFoundException, ProcessDefinitionNotFoundException,
-    ProcessActivationException, ProcessExecutionException;
+            ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
@@ -1002,7 +1002,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     long getOneAssignedUserTaskInstanceOfProcessDefinition(long processDefinitionId, long userId) throws ProcessDefinitionNotFoundException,
-    UserNotFoundException;
+            UserNotFoundException;
 
     /**
      * Get the state of a specified activity instance.
@@ -1172,7 +1172,7 @@ public interface ProcessRuntimeAPI {
      */
     Map<String, Serializable> executeConnectorOnProcessDefinition(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processDefinitionId)
-                    throws ConnectorExecutionException, ConnectorNotFoundException;
+            throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute a connector in a specified processDefinition with operations.
@@ -1208,7 +1208,8 @@ public interface ProcessRuntimeAPI {
      * Search the archived human tasks for tasks that match the search options.
      *
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
      *        fields
      *        for searching and sorting.
      * @return The archived human tasks that match the search conditions.
@@ -2390,6 +2391,16 @@ public interface ProcessRuntimeAPI {
     ContractDefinition getUserTaskContract(long userTaskId) throws UserTaskNotFoundException;
 
     /**
+     * Gets the process instantiation contract for a given process definition.
+     *
+     * @param processDefinitionId the identifier of the process definition.
+     * @return the contract of the given process
+     * @throws ProcessDefinitionNotFoundException
+     *         if identifier does not refer to an existing process definition.
+     */
+    ContractDefinition getProcessContract(long processDefinitionId) throws ProcessDefinitionNotFoundException;
+
+    /**
      * Executes a user task that is in a stable state.
      * Will move the activity to the next stable state and then continue the execution of the process.
      *
@@ -2443,5 +2454,15 @@ public interface ProcessRuntimeAPI {
      *         if identifier does not refer to a real user task.
      */
     Serializable getUserTaskContractVariableValue(long userTaskInstanceId, String name) throws UserTaskNotFoundException;
+
+    /**
+     * Gets the value of a process instanciation input.
+     *
+     * @param processInstanceId The identifier of the process instance
+     * @param name The name of the process input to retrieve
+     * @return The identifier of the user task
+     * @throws ProcessInstanceNotFoundException if identifier does not refer to an existing process instance.
+     */
+    Serializable getProcessInstanciationInputValue(long processInstanceId, String name) throws ProcessInstanceNotFoundException;
 
 }
