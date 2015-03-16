@@ -234,8 +234,7 @@
       <version>${project.version}</version>
     </dependency>
 
-
-
+	<!-- Form Mapping -->
     <dependency>
       <groupId>org.bonitasoft.engine.core</groupId>
       <artifactId>bonita-form-mapping-api</artifactId>
@@ -509,32 +508,7 @@
     <!-- Reporting -->
 
 
-    <!-- Scheduler -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.scheduler</groupId>
-      <artifactId>bonita-scheduler-quartz</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.bonitasoft.engine.scheduler</groupId>
-      <artifactId>bonita-scheduler-quartz-sp</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
     <!-- Service Commons -->
-
-    <!-- Sequence -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.persistence</groupId>
-      <artifactId>bonita-sequence-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.persistence</groupId>
-      <artifactId>bonita-sequence-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
     <!-- Session -->
     <dependency>
       <groupId>org.bonitasoft.engine.session</groupId>
@@ -814,12 +788,11 @@
                                     <include>org.bonitasoft.engine.core:bonita-expression-resolver-api</include>
                                     <include>org.bonitasoft.engine.core:bonita-expression-resolver-api-impl</include>
                                     <!-- External Identity Mapping -->
-                                    <include>
-                                        org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-api
-                                    </include>
-                                    <include>
-                                        org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl
-                                    </include>
+                                    <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-api</include>
+                                    <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl</include>
+                                    <!-- Form Mapping -->
+                                    <include>org.bonitasoft.engine.core:bonita-form-mapping-api</include>
+                                    <include>org.bonitasoft.engine.core:bonita-form-mapping-impl</include>
 		                    <!-- Form mapping -->
                   		    <include>org.bonitasoft.engine.core:bonita-form-mapping-api</include>
 		                    <include>org.bonitasoft.engine.core:bonita-form-mapping-impl</include>
@@ -854,8 +827,6 @@
                                     <include>org.bonitasoft.engine.page:bonita-page-api</include>
                                     <include>org.bonitasoft.engine.page:bonita-page-impl</include>
                   <!-- Parameter -->
-                                    <include>org.bonitasoft.engine.core:bonita-parameter-api</include>
-                                    <include>org.bonitasoft.engine.core:bonita-parameter-propertyfile</include>
                   <!-- Persistence -->
                   <include>org.bonitasoft.engine.persistence:bonita-persistence-api</include>
                   <include>org.bonitasoft.engine.persistence:bonita-persistence-db</include>
