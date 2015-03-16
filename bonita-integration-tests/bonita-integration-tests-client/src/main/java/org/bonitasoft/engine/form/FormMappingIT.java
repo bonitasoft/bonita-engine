@@ -41,14 +41,14 @@ public class FormMappingIT extends TestWithUser {
         p1Builder.addUserTask("step1", "actor").addUserTask("step2", "actor");
         p1Builder.addActor("actor");
         BusinessArchiveBuilder bar1 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(p1Builder.done())
-                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", true)
-                        .addTaskForm("task1Form", false, "step1").addProcessOverviewForm("process1OverviewForm", false).build());
+                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
+                        .addTaskForm("task1Form", FormMappingTarget.INTERNAL, "step1").addProcessOverviewForm("process1OverviewForm", FormMappingTarget.INTERNAL).build());
         ProcessDefinitionBuilder p2Builder = new ProcessDefinitionBuilder().createNewInstance("P2", "1.0");
         p2Builder.addUserTask("step1", "actor").addUserTask("step2", "actor");
         p2Builder.addActor("actor");
         BusinessArchiveBuilder bar2 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(p2Builder.done())
-                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", false)
-                        .addTaskForm("task2Form", false, "step1").addProcessOverviewForm("process2OverviewForm", false).build());
+                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.INTERNAL)
+                        .addTaskForm("task2Form", FormMappingTarget.INTERNAL, "step1").addProcessOverviewForm("process2OverviewForm", FormMappingTarget.INTERNAL).build());
 
         ProcessDefinition p1 = deployAndEnableProcessWithActor(bar1.done(), "actor", user);
         ProcessDefinition p2 = deployAndEnableProcessWithActor(bar2.done(), "actor", user);
@@ -101,16 +101,16 @@ public class FormMappingIT extends TestWithUser {
         formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).filter(FormMappingSearchDescriptor.TYPE,FormMappingType.PROCESS_START.name()).done());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(2);
         assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(),p1.getId());
-        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).filter(FormMappingSearchDescriptor.EXTERNAL,true).done());
+        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).filter(FormMappingSearchDescriptor.TARGET,"URL").done());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
         assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p1.getId());
 
         //update
-        processConfigurationAPI.updateFormMapping(step2Form1.getId(),"newFormUrlForStep2",true);
+        processConfigurationAPI.updateFormMapping(step2Form1.getId(),"newFormUrlForStep2",FormMappingTarget.URL.name());
         FormMapping updatedStep2Form1 = processConfigurationAPI.getTaskForm(p1.getId(), "step2");
-        assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1,"form", "external", "lastUpdateDate", "lastUpdatedBy");
+        assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1,"form", "target", "lastUpdateDate", "lastUpdatedBy");
         assertThat(updatedStep2Form1.getForm()).isEqualTo("newFormUrlForStep2");
-        assertThat(updatedStep2Form1.isExternal()).isTrue();
+        assertThat(updatedStep2Form1.getTarget()).isEqualTo(FormMappingTarget.URL.name());
         assertThat(updatedStep2Form1.getLastUpdateDate()).isAfter(new Date(afterDeploy));
         assertThat(updatedStep2Form1.getLastUpdatedBy()).isEqualTo(user.getId());
         assertThat(step2Form1.getLastUpdateDate()).isNull();

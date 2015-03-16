@@ -41,6 +41,7 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.User;
 import org.junit.After;
@@ -208,7 +209,7 @@ public class ProcessParameterIT extends CommonAPIIT {
         params.put(parameterName, null);
         businessArchive.setParameters(params);
         businessArchive.setFormMappings(FormMappingModelBuilder.buildFormMappingModel().withFormMapping(
-                FormMappingDefinitionBuilder.buildFormMapping("somePage", FormMappingType.TASK, false).withTaskname("someTask").build()).build());
+                FormMappingDefinitionBuilder.buildFormMapping("somePage", FormMappingType.TASK, FormMappingTarget.INTERNAL).withTaskname("someTask").build()).build());
 
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
 

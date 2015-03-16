@@ -28,7 +28,7 @@ public interface SFormMapping extends PersistentObject {
 
     public String getForm();
 
-    public boolean isExternal();
+    public String getTarget();
 
     public String getType();
 

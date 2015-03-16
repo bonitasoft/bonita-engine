@@ -40,7 +40,7 @@ public class SearchFormMappingDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(FormMappingSearchDescriptor.TYPE, new FieldDescriptor(SFormMapping.class, "type"));
         searchEntityKeys.put(FormMappingSearchDescriptor.FORM, new FieldDescriptor(SFormMapping.class, "form"));
         searchEntityKeys.put(FormMappingSearchDescriptor.TASK, new FieldDescriptor(SFormMapping.class, "task"));
-        searchEntityKeys.put(FormMappingSearchDescriptor.EXTERNAL, new FieldDescriptor(SFormMapping.class, "isExternal"));
+        searchEntityKeys.put(FormMappingSearchDescriptor.TARGET, new FieldDescriptor(SFormMapping.class, "target"));
 
         profileAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> fields = new HashSet<String>(0);
