@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (C) 2014 Bonitasoft S.A.
- * Bonitasoft is a trademark of Bonitasoft SA.
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
- * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
- * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
@@ -24,10 +24,12 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.bdm.validator.rule.BusinessObjectValidationRule} instead.
  */
+@Deprecated
 public class BusinessObjectValidationRule extends ValidationRule<BusinessObject> {
 
-    private static final String RESERVED_PACKAGE_PREFIX = "com.bonitasoft.";
+    private static final String[] RESERVED_PACKAGE_PREFIX = { "com.bonitasoft.", "org.bonitasoft." };
 
     private static final int MAX_TABLENAME_LENGTH = 30;
 
@@ -47,8 +49,11 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
             return status;
         }
 
-        if (qualifiedName.startsWith(RESERVED_PACKAGE_PREFIX)) {
-            status.addError("Package com.bonitasoft is reserved. Please choose another package name");
+        for (String reservedPrefix : RESERVED_PACKAGE_PREFIX) {
+            if (qualifiedName.startsWith(reservedPrefix)) {
+                status.addError(new StringBuilder().append("Package ").append(reservedPrefix).append(" is reserved. Please choose another package name")
+                        .toString());
+            }
         }
 
         final String simpleName = bo.getSimpleName();

@@ -85,6 +85,7 @@
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService"/>
         <constructor-arg name="classLoaderService" ref="classLoaderService"/>
         <constructor-arg name="workService" ref="workService"/>
+        <constructor-arg name="contractDataService" ref="contractDataService"/>
 	</bean>
 
 	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
@@ -103,6 +104,7 @@
         <constructor-arg name="transientDataService" ref="transientDataService"/>
         <constructor-arg name="archiveService" ref="archiveService"/>
         <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
 	</bean>
 
 	<bean id="flowNodeStateManager" class="com.bonitasoft.engine.execution.FlowNodeStateManagerExt">
@@ -265,8 +267,8 @@
                 <bean class="org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyResolver"/>
                 <bean class="org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyResolver"/>
                 <bean class="org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver"/>
-                <bean class="com.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver"/>
-                <bean class="com.bonitasoft.engine.api.impl.resolver.BusinessDataProcessDependencyResolver"/>
+                <bean class="org.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver"/>
+                <bean class="org.bonitasoft.engine.api.impl.resolver.BusinessDataProcessDependencyResolver"/>
 			</list>
 		</constructor-arg>
 	</bean>

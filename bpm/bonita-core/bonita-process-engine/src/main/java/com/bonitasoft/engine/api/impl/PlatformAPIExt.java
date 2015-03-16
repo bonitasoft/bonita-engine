@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2015 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -18,6 +18,28 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
+import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
+import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
+import com.bonitasoft.engine.api.impl.transaction.RegisterTenantJobListeners;
+import com.bonitasoft.engine.platform.Tenant;
+import com.bonitasoft.engine.platform.TenantActivationException;
+import com.bonitasoft.engine.platform.TenantCreator;
+import com.bonitasoft.engine.platform.TenantCriterion;
+import com.bonitasoft.engine.platform.TenantDeactivationException;
+import com.bonitasoft.engine.platform.TenantNotFoundException;
+import com.bonitasoft.engine.platform.TenantUpdater;
+import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
+import com.bonitasoft.engine.profile.ProfilesImporterExt;
+import com.bonitasoft.engine.search.SearchTenants;
+import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
+import com.bonitasoft.engine.service.PlatformServiceAccessor;
+import com.bonitasoft.engine.service.SPModelConvertor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import com.bonitasoft.manager.Features;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
@@ -54,6 +76,7 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.StartNodeException;
@@ -72,37 +95,13 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.service.BroadcastService;
+import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
-
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
-import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
-import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
-import com.bonitasoft.engine.api.impl.transaction.RegisterTenantJobListeners;
-import com.bonitasoft.engine.page.PageService;
-import com.bonitasoft.engine.platform.Tenant;
-import com.bonitasoft.engine.platform.TenantActivationException;
-import com.bonitasoft.engine.platform.TenantCreator;
-import com.bonitasoft.engine.platform.TenantCriterion;
-import com.bonitasoft.engine.platform.TenantDeactivationException;
-import com.bonitasoft.engine.platform.TenantNotFoundException;
-import com.bonitasoft.engine.platform.TenantUpdater;
-import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
-import com.bonitasoft.engine.profile.ProfilesImporterExt;
-import com.bonitasoft.engine.search.SearchTenants;
-import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
-import com.bonitasoft.engine.service.BroadcastService;
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
-import com.bonitasoft.engine.service.SPModelConvertor;
-import com.bonitasoft.engine.service.TaskResult;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.LicenseChecker;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.manager.Features;
 
 /**
  * @author Matthieu Chaffotte

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,31 +8,19 @@
  *******************************************************************************/
 package com.bonitasoft.engine.businessdata.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.bonitasoft.engine.businessdata.MultipleBusinessDataReference;
 
 /**
  * @author Matthieu Chaffotte
+ * @deprecated since version 7.0.0, use {@link org.bonitasoft.engine.business.data.impl.MultipleBusinessDataReferenceImpl}
  */
-public class MultipleBusinessDataReferenceImpl extends BusinessDataReferenceImpl implements MultipleBusinessDataReference {
+@Deprecated
+public class MultipleBusinessDataReferenceImpl extends org.bonitasoft.engine.business.data.impl.MultipleBusinessDataReferenceImpl implements MultipleBusinessDataReference {
 
     private static final long serialVersionUID = -8221290488745270659L;
 
-    private final List<Long> storageIds;
-
-    public MultipleBusinessDataReferenceImpl(final String name, final String type, final List<Long> storageIds) {
-        super(name, type);
-        this.storageIds = new ArrayList<Long>();
-        for (final Long storageId : storageIds) {
-            this.storageIds.add(storageId);
-        }
-    }
-
-    @Override
-    public List<Long> getStorageIds() {
-        return storageIds;
+    public MultipleBusinessDataReferenceImpl(org.bonitasoft.engine.business.data.MultipleBusinessDataReference dataReference) {
+        super(dataReference.getName(), dataReference.getType(), dataReference.getStorageIds());
     }
 
 }

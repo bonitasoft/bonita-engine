@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -51,6 +51,11 @@ import com.bonitasoft.engine.profile.ProfileEntryCreator;
 import com.bonitasoft.engine.profile.ProfileEntryType;
 
 @SuppressWarnings("javadoc")
+@Deprecated // when cleaning deprecated APIs, please do not delete this class. The tests below are related to custom profiles and must be kept
+//- deletePage_should_delete_profile_entry
+//- deletePage_should_delete_parent_profile_entry
+//- deletePage_with_no_parent_profile_entry
+//- updatePage_should_update_profile_entry
 public class PageAPIIT extends CommonAPISPIT {
 
     @Rule
@@ -83,10 +88,10 @@ public class PageAPIIT extends CommonAPISPIT {
     @Before
     public void before() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
+        final SearchResult<Page> searchPages = getSubscriptionPageAPI().searchPages(new SearchOptionsBuilder(0, Integer.MAX_VALUE).done());
         for (final Page page : searchPages.getResult()) {
             if (!page.isProvided()) {
-                getPageAPI().deletePage(page.getId());
+                getSubscriptionPageAPI().deletePage(page.getId());
             }
         }
     }
@@ -101,11 +106,11 @@ public class PageAPIIT extends CommonAPISPIT {
         // given
         final String name = generateUniquePageName(0);
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, name, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
-                pageContent);
+        final Page page = getSubscriptionPageAPI().createPage(
+                new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME), pageContent);
 
         // when
-        final Page returnedPage = getPageAPI().getPage(page.getId());
+        final Page returnedPage = getSubscriptionPageAPI().getPage(page.getId());
 
         // then
         assertThat(returnedPage).isEqualTo(page);
@@ -121,8 +126,8 @@ public class PageAPIIT extends CommonAPISPIT {
         loginOnDefaultTenantWith("john", "bpm");
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
-                pageContent);
+        final Page page = getSubscriptionPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME), pageContent);
         assertThat(page.getInstalledBy()).isEqualTo(john.getId());
         assertThat(page.getLastUpdatedBy()).isEqualTo(john.getId());
         logoutOnTenant();
@@ -136,7 +141,7 @@ public class PageAPIIT extends CommonAPISPIT {
         pageUpdater.setDisplayName(newDisplayName);
         pageUpdater.setContentName(newContentName);
 
-        final Page returnedPage = getPageAPI().updatePage(page.getId(), pageUpdater);
+        final Page returnedPage = getSubscriptionPageAPI().updatePage(page.getId(), pageUpdater);
 
         // then
         assertThat(returnedPage).as("page should be returned").isNotNull();
@@ -162,14 +167,15 @@ public class PageAPIIT extends CommonAPISPIT {
         final PageUpdater pageUpdater = new PageUpdater();
 
         // given
-        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getSubscriptionPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 createTestPageContent(INDEX_GROOVY, PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
-        final Page page2 = getPageAPI().createPage(new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        final Page page2 = getSubscriptionPageAPI().createPage(
+                new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 createTestPageContent(INDEX_GROOVY, PAGE_NAME2, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
         pageUpdater.setName(PAGE_NAME1);
-        getPageAPI().updatePage(page2.getId(), pageUpdater);
+        getSubscriptionPageAPI().updatePage(page2.getId(), pageUpdater);
 
         // then
         // exception
@@ -179,12 +185,12 @@ public class PageAPIIT extends CommonAPISPIT {
     @Test(expected = UpdatingWithInvalidPageZipContentException.class)
     public void updatePageContent_with_bad_content_should_fail() throws BonitaException, IOException {
         // given
-        final Page createPage = getPageAPI().createPage(
+        final Page createPage = getSubscriptionPageAPI().createPage(
                 new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 createTestPageContent(INDEX_GROOVY, PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
-        getPageAPI().updatePageContent(createPage.getId(), IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes())));
+        getSubscriptionPageAPI().updatePageContent(createPage.getId(), IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes())));
 
         // then
         // exception
@@ -196,13 +202,13 @@ public class PageAPIIT extends CommonAPISPIT {
         final PageUpdater pageUpdater = new PageUpdater();
 
         // given
-        final Page createPage = getPageAPI().createPage(
+        final Page createPage = getSubscriptionPageAPI().createPage(
                 new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 createTestPageContent(INDEX_GROOVY, PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
         pageUpdater.setName("invalid token");
-        getPageAPI().updatePage(createPage.getId(), pageUpdater);
+        getSubscriptionPageAPI().updatePage(createPage.getId(), pageUpdater);
 
         // then
         // exception
@@ -211,7 +217,7 @@ public class PageAPIIT extends CommonAPISPIT {
 
     public void updatePage_contents_should_updates_page() throws BonitaException {
         // given
-        final Page pageBefore = getPageAPI().createPage(
+        final Page pageBefore = getSubscriptionPageAPI().createPage(
                 new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 createTestPageContent(INDEX_GROOVY, PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
 
@@ -219,10 +225,10 @@ public class PageAPIIT extends CommonAPISPIT {
         final String newDescription = "new description";
         final String newDisplayName = "new display name";
         final byte[] updatedPageContent = createTestPageContent(INDEX_GROOVY, PAGE_NAME2, newDisplayName, newDescription);
-        getPageAPI().updatePageContent(pageBefore.getId(), updatedPageContent);
+        getSubscriptionPageAPI().updatePageContent(pageBefore.getId(), updatedPageContent);
 
         // then
-        final Page pageAfter = getPageAPI().getPage(pageBefore.getId());
+        final Page pageAfter = getSubscriptionPageAPI().getPage(pageBefore.getId());
         assertThat(pageAfter.getName()).as("should update page name").isEqualTo(PAGE_NAME2);
         assertThat(pageAfter.getDisplayName()).as("should update page display name").isEqualTo(newDisplayName);
         assertThat(pageAfter.getDescription()).as("should update page name").isEqualTo(newDescription);
@@ -235,7 +241,8 @@ public class PageAPIIT extends CommonAPISPIT {
         final Date createTimeMillis = new Date(System.currentTimeMillis());
         final String pageName = generateUniquePageName(0);
         final byte[] oldContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        final Page page = getSubscriptionPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 oldContent);
         final long pageId = page.getId();
 
@@ -248,9 +255,9 @@ public class PageAPIIT extends CommonAPISPIT {
         assertThat(updateTimeMillis).as("should wait 1 second").isAfter(createTimeMillis);
 
         final byte[] newContent = createTestPageContent(INDEX_HTML, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        getPageAPI().updatePageContent(pageId, newContent);
-        final byte[] returnedPageContent = getPageAPI().getPageContent(pageId);
-        final Page returnedPage = getPageAPI().getPage(pageId);
+        getSubscriptionPageAPI().updatePageContent(pageId, newContent);
+        final byte[] returnedPageContent = getSubscriptionPageAPI().getPageContent(pageId);
+        final Page returnedPage = getSubscriptionPageAPI().getPage(pageId);
 
         // then
         checkPageContentContainsProperties(returnedPageContent, DISPLAY_NAME, PAGE_DESCRIPTION);
@@ -263,11 +270,12 @@ public class PageAPIIT extends CommonAPISPIT {
         // given
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        final Page page = getSubscriptionPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // when
-        final Page returnedPage = getPageAPI().getPageByName(page.getName());
+        final Page returnedPage = getSubscriptionPageAPI().getPageByName(page.getName());
 
         // then
         assertThat(returnedPage).isEqualTo(page);
@@ -278,11 +286,11 @@ public class PageAPIIT extends CommonAPISPIT {
         // , "content.zip"given
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getSubscriptionPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // when
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getSubscriptionPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // then: expected exception
@@ -293,11 +301,11 @@ public class PageAPIIT extends CommonAPISPIT {
         // , "content.zip"given
         final String pageName = "plop";
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getSubscriptionPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // when
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getSubscriptionPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // then: expected exception
@@ -308,11 +316,11 @@ public class PageAPIIT extends CommonAPISPIT {
         // , "content.zip"given
         final String pageName = "";
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getSubscriptionPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // when
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getSubscriptionPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // then: expected exception
@@ -324,7 +332,7 @@ public class PageAPIIT extends CommonAPISPIT {
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent = IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes()));
         expectedException.expect(InvalidPageZipMissingIndexException.class);
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        getSubscriptionPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // when
@@ -339,7 +347,7 @@ public class PageAPIIT extends CommonAPISPIT {
 
         expectedException.expect(InvalidPageZipMissingIndexException.class);
         // when
-        getPageAPI().getPageProperties(pageContent, true);
+        getSubscriptionPageAPI().getPageProperties(pageContent, true);
 
         // then: expected exception
     }
@@ -355,12 +363,12 @@ public class PageAPIIT extends CommonAPISPIT {
                 + "esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in "
                 + "culpa qui officia deserunt mollit anim id est laborum.";
         final byte[] bytes = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, pageDescription);
-        final Page page = getPageAPI().createPage(
+        final Page page = getSubscriptionPageAPI().createPage(
                 new PageCreator(pageName, CONTENT_NAME).setDescription(pageDescription).setDisplayName(DISPLAY_NAME),
                 bytes);
 
         // when
-        final byte[] pageContent = getPageAPI().getPageContent(page.getId());
+        final byte[] pageContent = getSubscriptionPageAPI().getPageContent(page.getId());
         // then
         checkPageContentContainsProperties(pageContent, DISPLAY_NAME, pageDescription);
     }
@@ -407,15 +415,15 @@ public class PageAPIIT extends CommonAPISPIT {
         // given
         final String pageName = generateUniquePageName(0);
         final byte[] bytes = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(
+        final Page page = getSubscriptionPageAPI().createPage(
                 new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 bytes);
 
         // when
-        getPageAPI().deletePage(page.getId());
+        getSubscriptionPageAPI().deletePage(page.getId());
 
         // then
-        getPageAPI().getPage(page.getId());
+        getSubscriptionPageAPI().getPage(page.getId());
     }
 
     @Test
@@ -423,7 +431,7 @@ public class PageAPIIT extends CommonAPISPIT {
         // given
         // page
         final String pageName = generateUniquePageName(0);
-        final Page page = getPageAPI().createPage(
+        final Page page = getSubscriptionPageAPI().createPage(
                 new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION));
 
@@ -455,7 +463,7 @@ public class PageAPIIT extends CommonAPISPIT {
         final List<ProfileEntry> resultProfileEntriesBefore = getProfileAPI().searchProfileEntries(builder.done()).getResult();
 
         assertThat(resultProfileEntriesBefore).as("should contain 1 profileEntry with pageToSearch").hasSize(1).containsOnly(customPageProfileEntry);
-        getPageAPI().deletePage(page.getId());
+        getSubscriptionPageAPI().deletePage(page.getId());
 
         // then
 
@@ -480,7 +488,7 @@ public class PageAPIIT extends CommonAPISPIT {
     public void deletePage_should_delete_parent_profile_entry() throws BonitaException {
         // given
         final String pageName = generateUniquePageName(0);
-        final Page page = getPageAPI().createPage(
+        final Page page = getSubscriptionPageAPI().createPage(
                 new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION));
 
@@ -496,7 +504,7 @@ public class PageAPIIT extends CommonAPISPIT {
                         .setParentId(folderProfileEntry.getId()));
 
         // when
-        getPageAPI().deletePage(page.getId());
+        getSubscriptionPageAPI().deletePage(page.getId());
 
         // then
         getProfileAPI().getProfileEntry(folderProfileEntry.getId()); // ProfileEntryNotFoundException
@@ -507,7 +515,7 @@ public class PageAPIIT extends CommonAPISPIT {
     public void deletePage_with_no_parent_profile_entry() throws BonitaException {
         // given
         final String pageName = "custompage_myPageToDelete" + System.currentTimeMillis();
-        final Page page = getPageAPI().createPage(
+        final Page page = getSubscriptionPageAPI().createPage(
                 new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION));
 
@@ -520,7 +528,7 @@ public class PageAPIIT extends CommonAPISPIT {
                 .setDescription(DESCRIPTION_CUSTOM_PAGE));
 
         // when
-        getPageAPI().deletePage(page.getId());
+        getSubscriptionPageAPI().deletePage(page.getId());
 
         // then
         final SearchOptionsBuilder builderAfterDelete = new SearchOptionsBuilder(0, 20);
@@ -540,7 +548,7 @@ public class PageAPIIT extends CommonAPISPIT {
         // given
         // page
         final String name = generateUniquePageName(0);
-        final Page page = getPageAPI().createPage(
+        final Page page = getSubscriptionPageAPI().createPage(
                 new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 createTestPageContent(INDEX_GROOVY, name, DISPLAY_NAME, PAGE_DESCRIPTION));
 
@@ -578,7 +586,7 @@ public class PageAPIIT extends CommonAPISPIT {
         pageUpdater.setName("custompage_newName" + System.currentTimeMillis());
         pageUpdater.setDescription(page.getDescription());
         pageUpdater.setContentName(page.getContentName());
-        final Page updatePage = getPageAPI().updatePage(page.getId(), pageUpdater);
+        final Page updatePage = getSubscriptionPageAPI().updatePage(page.getId(), pageUpdater);
         // then
 
         final SearchOptionsBuilder builderAfterUpdate = new SearchOptionsBuilder(0, 20);
@@ -608,17 +616,17 @@ public class PageAPIIT extends CommonAPISPIT {
         final int noneMatchingCount = 8;
         for (int i = 0; i < noneMatchingCount; i++) {
             final String generateUniquePageName = generateUniquePageName(i) + i;
-            getPageAPI().createPage(
+            getSubscriptionPageAPI().createPage(
                     new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(noneMatchingdisplayName),
                     createTestPageContent(INDEX_GROOVY, generateUniquePageName, DISPLAY_NAME, PAGE_DESCRIPTION));
         }
         final String generateUniquePageName = generateUniquePageName(9);
-        final Page pageWithMatchingSearchTerm = getPageAPI().createPage(
+        final Page pageWithMatchingSearchTerm = getSubscriptionPageAPI().createPage(
                 new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(matchingDisplayName),
                 createTestPageContent(INDEX_GROOVY, generateUniquePageName, DISPLAY_NAME, PAGE_DESCRIPTION));
 
         // when
-        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 5).searchTerm(matchingValue).done());
+        final SearchResult<Page> searchPages = getSubscriptionPageAPI().searchPages(new SearchOptionsBuilder(0, 5).searchTerm(matchingValue).done());
 
         // then
         final List<Page> results = searchPages.getResult();
@@ -640,12 +648,13 @@ public class PageAPIIT extends CommonAPISPIT {
         for (int i = 0; i < expectedResultSize + 3; i++) {
             final String generateUniquePageName = generateUniquePageName(i) + 1;
             final byte[] pageContent = createTestPageContent(INDEX_GROOVY, generateUniquePageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-            getPageAPI().createPage(new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+            getSubscriptionPageAPI().createPage(
+                    new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                     pageContent);
         }
 
         // when
-        final SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 5).done());
+        final SearchResult<Page> searchPages = getSubscriptionPageAPI().searchPages(new SearchOptionsBuilder(0, 5).done());
 
         // then
         final List<Page> results = searchPages.getResult();
@@ -669,15 +678,17 @@ public class PageAPIIT extends CommonAPISPIT {
         for (int i = 0; i < expectedMatchingResults; i++) {
             final String generateUniquePageName = generateUniquePageName(i);
             final byte[] pageContent = createTestPageContent(INDEX_GROOVY, generateUniquePageName, matchingDisplayName, description);
-            getPageAPI().createPage(new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(matchingDisplayName),
+            getSubscriptionPageAPI().createPage(
+                    new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(matchingDisplayName),
                     pageContent);
         }
         final String anOtherName = generateUniquePageName(4);
-        getPageAPI().createPage(new PageCreator(anOtherName, CONTENT_NAME).setDescription("an awesome page!!!!!!!").setDisplayName(noneMatchingDisplayName),
+        getSubscriptionPageAPI().createPage(
+                new PageCreator(anOtherName, CONTENT_NAME).setDescription("an awesome page!!!!!!!").setDisplayName(noneMatchingDisplayName),
                 createTestPageContent(INDEX_GROOVY, anOtherName, noneMatchingDisplayName, "an awesome page!!!!!!!"));
 
         // when
-        final SearchResult<Page> searchPages = getPageAPI()
+        final SearchResult<Page> searchPages = getSubscriptionPageAPI()
                 .searchPages(new SearchOptionsBuilder(0, expectedMatchingResults + 2).filter(PageSearchDescriptor.DISPLAY_NAME, matchingDisplayName).done());
         // then
         final List<Page> results = searchPages.getResult();
@@ -697,15 +708,15 @@ public class PageAPIIT extends CommonAPISPIT {
         for (int i = 0; i < numberOfNonsMatchingPage; i++) {
             final String generateUniquePageName = generateUniquePageName(i) + i;
             final byte[] pageContent = createTestPageContent(INDEX_GROOVY, generateUniquePageName, displayName, description);
-            getPageAPI().createPage(new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(displayName),
+            getSubscriptionPageAPI().createPage(new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription(description).setDisplayName(displayName),
                     pageContent);
         }
-        final Page expectedMatchingPage = getPageAPI().createPage(
+        final Page expectedMatchingPage = getSubscriptionPageAPI().createPage(
                 new PageCreator(firstPageNameInDescOrder, CONTENT_NAME).setDescription(description).setDisplayName(displayName),
                 createTestPageContent(INDEX_GROOVY, firstPageNameInDescOrder, displayName, description));
 
         // when
-        final SearchResult<Page> searchPages = getPageAPI().searchPages(
+        final SearchResult<Page> searchPages = getSubscriptionPageAPI().searchPages(
                 new SearchOptionsBuilder(0, 1).sort(PageSearchDescriptor.NAME, Order.DESC).done());
 
         // then

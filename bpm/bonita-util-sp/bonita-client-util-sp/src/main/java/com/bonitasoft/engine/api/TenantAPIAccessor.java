@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -15,6 +15,8 @@ import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.EJB3ServerAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
+import org.bonitasoft.engine.api.ProcessConfigurationAPI;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
@@ -115,6 +117,10 @@ public final class TenantAPIAccessor {
         return getAPI(CommandAPI.class, session);
     }
 
+    public static ProcessConfigurationAPI getProcessConfigurationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getAPI(ProcessConfigurationAPI.class, session);
+    }
+
     public static ProfileAPI getProfileAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ProfileAPI.class, session);
     }
@@ -123,17 +129,43 @@ public final class TenantAPIAccessor {
         return getAPI(ReportingAPI.class, session);
     }
 
+    /**
+     * @deprecated from 7.0.0 on, use {@link #getTenantAdministrationAPI(org.bonitasoft.engine.session.APISession)} instead.
+     */
+    @Deprecated
     public static TenantManagementAPI getTenantManagementAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         return getAPI(TenantManagementAPI.class, session);
     }
 
+    public static TenantAdministrationAPI getTenantAdministrationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
+            UnknownAPITypeException {
+        return getAPI(TenantAdministrationAPI.class, session);
+    }
+
+    public static org.bonitasoft.engine.api.PageAPI getCustomPageAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
+            UnknownAPITypeException {
+        return getAPI(org.bonitasoft.engine.api.PageAPI.class, session);
+    }
+
+    /**
+     * @deprecated from version 7.0 on, use {@link #getCustomPageAPI(APISession)} instead.
+     */
+    @Deprecated
     public static PageAPI getPageAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(PageAPI.class, session);
     }
 
+    public static org.bonitasoft.engine.api.ApplicationAPI getLivingApplicationAPI(final APISession session) throws BonitaHomeNotSetException,
+            ServerAPIException, UnknownAPITypeException {
+        return getAPI(org.bonitasoft.engine.api.ApplicationAPI.class, session);
+    }
+
+    /**
+     * @deprecated from version 7.0 on, use {@link #getLivingApplicationAPI(APISession)} instead.
+     */
+    @Deprecated
     public static ApplicationAPI getApplicationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ApplicationAPI.class, session);
     }
-
 }

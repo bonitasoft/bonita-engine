@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -21,7 +21,9 @@ import com.bonitasoft.engine.bdm.model.BusinessObject;
  *
  * @author Romain Bioteau
  * @author Matthieu Chaffotte
+ * @deprecated since version 7.0.0, use {@link org.bonitasoft.engine.bdm.BusinessObjectDAOFactory} instead.
  */
+@Deprecated
 public class BusinessObjectDAOFactory {
 
     private static final String IMPL_SUFFIX = "Impl";

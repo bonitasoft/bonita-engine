@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -12,6 +12,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
+
 
 /**
  * @author Baptiste Mesta

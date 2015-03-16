@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -25,7 +25,9 @@ import org.bonitasoft.engine.bpm.bar.ClasspathContribution;
 import org.bonitasoft.engine.bpm.bar.ConnectorContribution;
 import org.bonitasoft.engine.bpm.bar.DocumentsResourcesContribution;
 import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
+import org.bonitasoft.engine.bpm.bar.FormMappingContribution;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
+import org.bonitasoft.engine.bpm.bar.ParameterContribution;
 import org.bonitasoft.engine.bpm.bar.UserFilterContribution;
 import org.bonitasoft.engine.io.IOUtil;
 
@@ -46,6 +48,7 @@ public class BusinessArchiveFactory {
         contributions.add(new UserFilterContribution());
         contributions.add(new DocumentsResourcesContribution());
         contributions.add(new ClasspathContribution());
+        contributions.add(new FormMappingContribution());
     }
 
     public static BusinessArchive readBusinessArchive(final InputStream inputStream) throws IOException, InvalidBusinessArchiveFormatException {
@@ -60,9 +63,9 @@ public class BusinessArchiveFactory {
                 }
             }
             return businessArchive;
-        } catch (InvalidBusinessArchiveFormatException e) {
+        } catch (final InvalidBusinessArchiveFormatException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new InvalidBusinessArchiveFormatException("Invalid format, can't read the BAR file", e);
         } finally {
             IOUtil.deleteDir(barFolder);

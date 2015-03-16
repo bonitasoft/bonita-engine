@@ -11,11 +11,10 @@
 		<property name="classAliasMappings">
 			<map>
 				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="breakpoint" />
-				<entry key="com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance" value="ref" />
 			</map>
 		</property>
 	</bean>
-	
+
 	<bean id="hbm-bonita-process-instance-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
 		<property name="resources">
 			<set>
@@ -59,6 +58,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="la" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="a" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" value="ref" />
 			</map>
 		</property>
 	</bean>

@@ -28,21 +28,22 @@
 				<ref bean="businessDataExpressionExecutorStrategy" />
 				<ref bean="queryBusinessDataExpressionExecutorStrategy" />
 				<ref bean="businessObjectDAOExpressionStrategy" />
+                <ref bean="contractInputExpressionExecutorStrategy" />
 			</list>
 		</property>
 	</bean>
 
-	<bean id="businessDataExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.BusinessDataExpressionExecutorStrategy" >
+	<bean id="businessDataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.BusinessDataExpressionExecutorStrategy" >
 		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
 		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
 		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
 	</bean>
 
-	<bean id="businessObjectDAOExpressionStrategy" class="com.bonitasoft.engine.expression.BusinessObjectDAOExpressionStrategy" >
+	<bean id="businessObjectDAOExpressionStrategy" class="org.bonitasoft.engine.expression.BusinessObjectDAOExpressionStrategy" >
 		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
 	</bean>
 
-	<bean id="queryBusinessDataExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.QueryBusinessDataExpressionExecutorStrategy" >
+	<bean id="queryBusinessDataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.QueryBusinessDataExpressionExecutorStrategy" >
 		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
 	</bean>
 
@@ -89,8 +90,12 @@
 
 	<bean id="javaMethodCallExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.JavaMethodCallExpressionExecutorStrategy" />
 
-	<bean id="parameterExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
+	<bean id="parameterExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
 		<constructor-arg name="parameterService" ref="parameterService" />
 	</bean>
+
+    <bean id="contractInputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ContractInputExpressionExecutorStrategy" >
+        <constructor-arg name="contractDataService" ref="contractDataService" />
+    </bean>
 
 </beans>

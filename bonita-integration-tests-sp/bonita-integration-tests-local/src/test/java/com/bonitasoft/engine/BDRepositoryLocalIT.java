@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -50,27 +50,46 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
     private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
 
     private static final String BIZ_GRENOBLE_ADDRESS = "bizGrenobleAddress";
+
     private static final String BIZ_SF_ADDRESS = "bizSfAddress";
+
     private static final String BIZ_ROME_ADDRESS = "bizRomeAddress";
+
     private static final String BIZ_EMPLOYEE = "bizEmployee";
 
     private static final String PROCESS_NAME = "lazy";
+
     private static final String VERSION = "1.0";
 
     private static final String TASK_AUTOMATIC_TASK_TO_INIT_BIZ_DATA = "automaticTaskToInitBizData";
+
     private static final String TASK_TO_CALL_JAVA_METHOD_OPERATION = "automaticTaskToCallJavaMethodOperation";
+
     private static final String TASK_HUMAN_TASK = "humanTask";
 
     private static final String CITY_SF = "S.F.";
+
     private static final String CITY_GRENOBLE = "Grenoble";
+
     private static final String CITY_ROME = "Rome";
 
     private static final String COUNTRY_ITALY = "Italy";
+
     private static final String COUNTRY_FRANCE = "France";
+
     private static final String COUNTRY_USA = "USA";
 
-    private static final String ADDRESS_QUALIF_CLASSNAME = "org.bonita.pojo.Address";
-    private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.Employee";
+    private static final String ADDRESS_QUALIFIED_NAME = "com.company.model.Address";
+
+    private static final String EMPLOYEE_QUALIFIED_NAME = "com.company.model.Employee";
+
+    public static final String PERSON_QUALIFIED_NAME = "com.company.model.Person";
+
+    public static final String COUNTRY_QUALIFIED_NAME = "com.company.model.Country";
+
+    public static final String PRODUCT_CATALOG_QUALIFIED_NAME = "com.company.model.ProductCatalog";
+
+    public static final String IMPORT_ = "import ";
 
     private User matti;
 
@@ -90,7 +109,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         getTenantManagementAPI().installBusinessDataModel(zip);
         getTenantManagementAPI().resume();
 
-        //needed for remote testing
+        // needed for remote testing
         addClientBDMZipToClassLoader();
     }
 
@@ -120,7 +139,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
 
     @Test
     public void should_get_lazy_object_outside_a_transaction() throws Exception {
-        //given
+        // given
         final Expression addressGrenobleExpression = createGrovyExpressionThatCreateAddressWithCityName(CITY_GRENOBLE, COUNTRY_FRANCE);
         final Expression addressSfExpression = createGrovyExpressionThatCreateAddressWithCityName(CITY_SF, COUNTRY_USA);
         final Expression addressRomeExpression = createGrovyExpressionThatCreateAddressWithCityName(CITY_ROME, COUNTRY_ITALY);
@@ -130,10 +149,10 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
                 PROCESS_NAME, VERSION);
 
-        processDefinitionBuilder.addBusinessData(BIZ_EMPLOYEE, EMPLOYEE_QUALIF_CLASSNAME, null);
-        processDefinitionBuilder.addBusinessData(BIZ_GRENOBLE_ADDRESS, ADDRESS_QUALIF_CLASSNAME, addressGrenobleExpression);
-        processDefinitionBuilder.addBusinessData(BIZ_SF_ADDRESS, ADDRESS_QUALIF_CLASSNAME, addressSfExpression);
-        processDefinitionBuilder.addBusinessData(BIZ_ROME_ADDRESS, ADDRESS_QUALIF_CLASSNAME, addressRomeExpression);
+        processDefinitionBuilder.addBusinessData(BIZ_EMPLOYEE, EMPLOYEE_QUALIFIED_NAME, null);
+        processDefinitionBuilder.addBusinessData(BIZ_GRENOBLE_ADDRESS, ADDRESS_QUALIFIED_NAME, addressGrenobleExpression);
+        processDefinitionBuilder.addBusinessData(BIZ_SF_ADDRESS, ADDRESS_QUALIFIED_NAME, addressSfExpression);
+        processDefinitionBuilder.addBusinessData(BIZ_ROME_ADDRESS, ADDRESS_QUALIFIED_NAME, addressRomeExpression);
 
         processDefinitionBuilder.addActor(ACTOR_NAME);
 
@@ -148,16 +167,16 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(BIZ_EMPLOYEE), OperatorType.ASSIGNMENT, null, null,
                         employeeExpression);
 
-        //call java operation to add address to employee
+        // call java operation to add address to employee
         processDefinitionBuilder.addAutomaticTask(TASK_TO_CALL_JAVA_METHOD_OPERATION)
                 .addOperation(
-                        new OperationBuilder().createBusinessDataSetAttributeOperation(BIZ_EMPLOYEE, "addToAddresses", ADDRESS_QUALIF_CLASSNAME,
-                                new ExpressionBuilder().createBusinessDataExpression(BIZ_ROME_ADDRESS, ADDRESS_QUALIF_CLASSNAME)));
+                        new OperationBuilder().createBusinessDataSetAttributeOperation(BIZ_EMPLOYEE, "addToAddresses", ADDRESS_QUALIFIED_NAME,
+                                new ExpressionBuilder().createBusinessDataExpression(BIZ_ROME_ADDRESS, ADDRESS_QUALIFIED_NAME)));
 
-        //waiting task
+        // waiting task
         processDefinitionBuilder.addUserTask(TASK_HUMAN_TASK, ACTOR_NAME);
 
-        //transitions
+        // transitions
         processDefinitionBuilder.addTransition(TASK_AUTOMATIC_TASK_TO_INIT_BIZ_DATA, TASK_TO_CALL_JAVA_METHOD_OPERATION);
         processDefinitionBuilder.addTransition(TASK_TO_CALL_JAVA_METHOD_OPERATION, TASK_HUMAN_TASK);
 
@@ -165,12 +184,12 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance, TASK_HUMAN_TASK);
 
-        //then
+        // then
         verifyLazyAddressesCount(humanTaskInstance, 2);
         verifySimpleFieldInAddresses(humanTaskInstance, CITY_GRENOBLE);
         verifyEagerCountryFieldInAddresses(humanTaskInstance, COUNTRY_FRANCE);
 
-        //cleanup
+        // cleanup
         disableAndDeleteProcess(definition.getId());
     }
 
@@ -179,7 +198,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         final byte[] clientBDMZip = getTenantManagementAPI().getClientBDMZip();
         final ClassLoader classLoaderWithBDM = new ClassloaderRefresher().loadClientModelInClassloader(clientBDMZip,
                 contextClassLoaderBeforeAddingBPMClientZip,
-                EMPLOYEE_QUALIF_CLASSNAME, clientFolder);
+                EMPLOYEE_QUALIFIED_NAME, clientFolder);
         Thread.currentThread().setContextClassLoader(classLoaderWithBDM);
     }
 
@@ -189,13 +208,13 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
 
         final Expression createQueryBusinessDataExpression = new ExpressionBuilder().createQueryBusinessDataExpression("expression Name",
-                "Employee." + FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER, EMPLOYEE_QUALIF_CLASSNAME,
+                "Employee." + FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER, EMPLOYEE_QUALIFIED_NAME,
                 new ExpressionBuilder().createConstantStringExpression("firstName", "Alphonse"),
                 new ExpressionBuilder().createConstantStringExpression("lastName", "Dupond"));
 
         final Expression countExpression = new ExpressionBuilder().createGroovyScriptExpression("countExpression", "myEmployee.getAddresses().size()"
                 , Integer.class.getName(),
-                new ExpressionBuilder().createInputExpression("myEmployee", EMPLOYEE_QUALIF_CLASSNAME));
+                new ExpressionBuilder().createInputExpression("myEmployee", EMPLOYEE_QUALIFIED_NAME));
         expressions.put(createQueryBusinessDataExpression, map);
 
         final Map<String, Serializable> evaluateExpressionsAtProcessInstanciation = getProcessAPI().evaluateExpressionsOnActivityInstance(
@@ -220,7 +239,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         final Map<Expression, Map<String, Serializable>> mapGetEmployee = new HashMap<Expression, Map<String, Serializable>>();
 
         final Expression getEmployeeExpression = new ExpressionBuilder().createQueryBusinessDataExpression("expression Name",
-                "Employee." + FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER, EMPLOYEE_QUALIF_CLASSNAME,
+                "Employee." + FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER, EMPLOYEE_QUALIFIED_NAME,
                 new ExpressionBuilder().createConstantStringExpression("firstName", "Alphonse"),
                 new ExpressionBuilder().createConstantStringExpression("lastName", "Dupond"));
         final String queryName = getEmployeeExpression.getName();
@@ -230,7 +249,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         final Expression getCountryExpression = new ExpressionBuilder().createGroovyScriptExpression(getCountryExpressionName,
                 script
                 , String.class.getName(),
-                new ExpressionBuilder().createInputExpression("myEmployee", EMPLOYEE_QUALIF_CLASSNAME));
+                new ExpressionBuilder().createInputExpression("myEmployee", EMPLOYEE_QUALIFIED_NAME));
         mapGetEmployee.put(getEmployeeExpression, map);
 
         final Map<String, Serializable> getEmployeeResultMap = getProcessAPI().evaluateExpressionsOnActivityInstance(
@@ -255,7 +274,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         final Map<Expression, Map<String, Serializable>> mapGetEmployee = new HashMap<Expression, Map<String, Serializable>>();
 
         final Expression getEmployeeExpression = new ExpressionBuilder().createQueryBusinessDataExpression("expression Name",
-                "Employee." + FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER, EMPLOYEE_QUALIF_CLASSNAME,
+                "Employee." + FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER, EMPLOYEE_QUALIFIED_NAME,
                 new ExpressionBuilder().createConstantStringExpression("firstName", "Alphonse"),
                 new ExpressionBuilder().createConstantStringExpression("lastName", "Dupond"));
         final String queryName = getEmployeeExpression.getName();
@@ -264,7 +283,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         final Expression getCountryExpression = new ExpressionBuilder().createGroovyScriptExpression(cityExpression,
                 "myEmployee.getAddresses().get(0).getCity()"
                 , String.class.getName(),
-                new ExpressionBuilder().createInputExpression("myEmployee", EMPLOYEE_QUALIF_CLASSNAME));
+                new ExpressionBuilder().createInputExpression("myEmployee", EMPLOYEE_QUALIFIED_NAME));
         mapGetEmployee.put(getEmployeeExpression, map);
 
         final Map<String, Serializable> getEmployeeResultMap = getProcessAPI().evaluateExpressionsOnActivityInstance(
@@ -286,30 +305,34 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
 
     private Expression createGrovyExpressionThatCreateEmployeWithOneAddress(final String businessDataAdressName) throws InvalidExpressionException {
         final StringBuilder script = new StringBuilder();
-        script.append("import ")
-                .append(EMPLOYEE_QUALIF_CLASSNAME)
+        script.append(IMPORT_)
+                .append(EMPLOYEE_QUALIFIED_NAME)
                 .append(";")
-                .append("import ")
-                .append(ADDRESS_QUALIF_CLASSNAME)
+                .append(IMPORT_)
+                .append(ADDRESS_QUALIFIED_NAME)
                 .append("; Employee e = new Employee(); e.firstName = 'Alphonse';")
                 .append(" e.lastName = 'Dupond'; e.addToAddresses(")
                 .append(businessDataAdressName)
                 .append("); return e;");
-        return new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", script.toString(), EMPLOYEE_QUALIF_CLASSNAME,
+        return new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", script.toString(), EMPLOYEE_QUALIFIED_NAME,
                 createBusinessDataExpressionWithName(businessDataAdressName));
     }
 
     private Expression createBusinessDataExpressionWithName(final String businessDataName) throws InvalidExpressionException {
         Expression createBusinessDataExpression;
-        createBusinessDataExpression = new ExpressionBuilder().createBusinessDataExpression(businessDataName, ADDRESS_QUALIF_CLASSNAME);
+        createBusinessDataExpression = new ExpressionBuilder().createBusinessDataExpression(businessDataName, ADDRESS_QUALIFIED_NAME);
         return createBusinessDataExpression;
     }
 
     private Expression createGrovyExpressionThatCreateAddressWithCityName(final String city, final String country) throws InvalidExpressionException {
         final Expression addressExpression;
         final StringBuilder builder = new StringBuilder();
-        builder.append("import org.bonita.pojo.Address; ")
-                .append("import org.bonita.pojo.Country; ")
+        builder.append(IMPORT_)
+                .append(ADDRESS_QUALIFIED_NAME)
+                .append("; ")
+                .append(IMPORT_)
+                .append(COUNTRY_QUALIFIED_NAME)
+                .append("; ")
                 .append("Country country = new Country(); ")
                 .append("country.name='")
                 .append(country)
@@ -324,7 +347,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
 
         addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
                 builder.toString(),
-                ADDRESS_QUALIF_CLASSNAME);
+                ADDRESS_QUALIFIED_NAME);
         return addressExpression;
     }
 
@@ -334,7 +357,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         name.setType(FieldType.STRING);
 
         final BusinessObject countryBO = new BusinessObject();
-        countryBO.setQualifiedName("org.bonita.pojo.Country");
+        countryBO.setQualifiedName(COUNTRY_QUALIFIED_NAME);
         countryBO.addField(name);
 
         final SimpleField street = new SimpleField();
@@ -354,7 +377,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         country.setReference(countryBO);
 
         final BusinessObject addressBO = new BusinessObject();
-        addressBO.setQualifiedName(ADDRESS_QUALIF_CLASSNAME);
+        addressBO.setQualifiedName(ADDRESS_QUALIFIED_NAME);
         addressBO.addField(street);
         addressBO.addField(city);
         addressBO.addField(country);
@@ -384,7 +407,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         phoneNumbers.setCollection(Boolean.TRUE);
 
         final BusinessObject employee = new BusinessObject();
-        employee.setQualifiedName(EMPLOYEE_QUALIF_CLASSNAME);
+        employee.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         employee.addField(firstName);
         employee.addField(lastName);
         employee.addField(phoneNumbers);
@@ -400,7 +423,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         employee.addIndex("IDX_LSTNM", "lastName");
 
         final BusinessObject person = new BusinessObject();
-        person.setQualifiedName("org.bonitasoft.pojo.Person");
+        person.setQualifiedName(PERSON_QUALIFIED_NAME);
         person.addField(firstName);
         person.addField(lastName);
         person.addField(phoneNumbers);
@@ -408,7 +431,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         person.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
         final BusinessObject productBO = new BusinessObject();
-        productBO.setQualifiedName("org.bonita.pojo.Product");
+        productBO.setQualifiedName("com.company.model.Product");
         productBO.addField(name);
 
         final RelationField products = new RelationField();
@@ -420,7 +443,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
         products.setReference(productBO);
 
         final BusinessObject catalogBO = new BusinessObject();
-        catalogBO.setQualifiedName("org.bonita.pojo.ProductCatalog");
+        catalogBO.setQualifiedName(PRODUCT_CATALOG_QUALIFIED_NAME);
         catalogBO.addField(name);
         catalogBO.addField(products);
 

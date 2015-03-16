@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -17,8 +17,8 @@ public class ParameterNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = -5548436489951596184L;
 
-    public ParameterNotFoundException(final Throwable cause) {
-        super(cause);
+    public ParameterNotFoundException(String message, final Throwable cause) {
+        super(message, cause);
     }
 
     public ParameterNotFoundException(final long processDefinitionId, final String parameterName) {

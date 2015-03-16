@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -12,21 +12,15 @@ import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 
 /**
  * @author Matthieu Chaffotte
+ * @deprecated since version 7.0.0, use {@link org.bonitasoft.engine.business.data.impl.SimpleBusinessDataReferenceImpl}
  */
-public class SimpleBusinessDataReferenceImpl extends BusinessDataReferenceImpl implements SimpleBusinessDataReference {
+@Deprecated
+public class SimpleBusinessDataReferenceImpl extends org.bonitasoft.engine.business.data.impl.SimpleBusinessDataReferenceImpl implements SimpleBusinessDataReference {
 
     private static final long serialVersionUID = -434357449996998735L;
 
-    private final Long storageId;
-
-    public SimpleBusinessDataReferenceImpl(final String name, final String type, final Long storageId) {
-        super(name, type);
-        this.storageId = storageId;
-    }
-
-    @Override
-    public Long getStorageId() {
-        return storageId;
+    public SimpleBusinessDataReferenceImpl(org.bonitasoft.engine.business.data.SimpleBusinessDataReference dataReference) {
+        super(dataReference.getName(), dataReference.getType(), dataReference.getStorageId());
     }
 
 }

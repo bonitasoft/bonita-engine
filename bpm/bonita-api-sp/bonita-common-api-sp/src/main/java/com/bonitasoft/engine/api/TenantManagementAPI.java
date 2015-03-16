@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -19,7 +19,9 @@ import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
  * 
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
+ * @deprecated from version 7.0.0 on, use {@link org.bonitasoft.engine.api.TenantAdministrationAPI} instead.
  */
+@Deprecated
 public interface TenantManagementAPI {
 
     /**

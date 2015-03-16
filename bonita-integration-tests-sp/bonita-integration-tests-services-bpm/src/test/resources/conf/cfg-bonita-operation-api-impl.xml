@@ -36,7 +36,7 @@
           class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>
 
      <bean id="javaMethodOperationExecutorStrategy"
-          class="com.bonitasoft.engine.operation.BusinessDataJavaMethodOperationExecutorStrategy">
+          class="org.bonitasoft.engine.operation.BusinessDataJavaMethodOperationExecutorStrategy">
         <constructor-arg name="businessDataService" ref="businessDataService"/>
     </bean>      
 

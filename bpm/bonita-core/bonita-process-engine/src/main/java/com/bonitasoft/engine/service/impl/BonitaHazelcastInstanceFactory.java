@@ -1,6 +1,5 @@
-/**
- * /*******************************************************************************
- * Copyright (C) 2013, 2014 BonitaSoft S.A.
+/*******************************************************************************
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -18,8 +17,8 @@ import org.bonitasoft.engine.commons.PlatformLifecycleService;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.MapConfig.EvictionPolicy;
-import com.hazelcast.config.MapConfig.InMemoryFormat;
+import com.hazelcast.config.EvictionPolicy;
+import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.config.MaxSizeConfig;
 import com.hazelcast.config.MaxSizeConfig.MaxSizePolicy;
 import com.hazelcast.config.NearCacheConfig;

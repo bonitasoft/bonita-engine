@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -9,12 +9,16 @@
 package com.bonitasoft.engine.page;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
+
+import com.bonitasoft.engine.converter.EnumConverter;
 
 /**
  * @author Laurent Leseigneur
+ * @author Emmanuel Duchastenier
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.page.PageCreator} instead.
  */
+@Deprecated
 public class PageCreator implements Serializable {
 
     public enum PageField {
@@ -23,65 +27,42 @@ public class PageCreator implements Serializable {
 
     private static final long serialVersionUID = 8174091386958635983L;
 
-    private final Map<PageField, Serializable> fields;
+    private final org.bonitasoft.engine.page.PageCreator delegate;
 
     public PageCreator(final String name, final String contentName) {
-        fields = new HashMap<PageField, Serializable>(2);
-        fields.put(PageField.NAME, name);
-        fields.put(PageField.CONTENT_NAME, contentName);
+        delegate = new org.bonitasoft.engine.page.PageCreator(name, contentName);
     }
 
     public String getName() {
-        return fields.get(PageField.NAME).toString();
+        return delegate.getName();
     }
 
     public PageCreator setDescription(final String description) {
-        fields.put(PageField.DESCRIPTION, description);
+        delegate.setDescription(description);
         return this;
     }
 
     public PageCreator setDisplayName(final String displayName) {
-        fields.put(PageField.DISPLAY_NAME, displayName);
+        delegate.setDisplayName(displayName);
         return this;
     }
 
     public Map<PageField, Serializable> getFields() {
-        return fields;
+        return new EnumConverter().convert(delegate.getFields(), PageField.class);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (fields == null ? 0 : fields.hashCode());
-        return result;
+        return delegate.hashCode();
     }
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        PageCreator other = (PageCreator) obj;
-        if (fields == null) {
-            if (other.fields != null) {
-                return false;
-            }
-        } else if (!fields.equals(other.fields)) {
-            return false;
-        }
-        return true;
+        return delegate.equals(obj);
     }
 
-    @Override
-    public String toString() {
-        return "PageCreator [fields=" + fields + "]";
+    public org.bonitasoft.engine.page.PageCreator getDelegate() {
+        return delegate;
     }
 
 }
