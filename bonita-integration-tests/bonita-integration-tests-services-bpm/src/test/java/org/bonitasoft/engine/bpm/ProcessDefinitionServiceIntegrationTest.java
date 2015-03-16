@@ -30,6 +30,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
+import org.bonitasoft.engine.data.model.LightEmployee;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -48,27 +49,24 @@ import org.junit.Test;
  */
 public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTest {
 
-    private static BPMServicesBuilder bpmServicesBuilder;
+    private final ProcessDefinitionService processDefinitionService;
 
-    private final static ProcessDefinitionService processDefinitionService;
+    private final ActorMappingService actorMappingService;
 
-    private final static ActorMappingService actorMappingService;
-
-    static {
-        bpmServicesBuilder = new BPMServicesBuilder();
-        processDefinitionService = bpmServicesBuilder.getProcessDefinitionService();
-        actorMappingService = bpmServicesBuilder.getActorMappingService();
+    public ProcessDefinitionServiceIntegrationTest() {
+        processDefinitionService = getTenantAccessor().getProcessDefinitionService();
+        actorMappingService = getTenantAccessor().getActorMappingService();
     }
 
     private SessionService getSessionService() {
-        return bpmServicesBuilder.getSessionService();
+        return getTenantAccessor().getSessionService();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void storeNullProcessDefinition() throws Exception {
-        getServicesBuilder().getTransactionService().begin();
+        getTransactionService().begin();
         processDefinitionService.store(null, "", "");
-        getServicesBuilder().getTransactionService().complete();
+        getTransactionService().complete();
     }
 
     @Test
@@ -141,10 +139,10 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         getTransactionService().begin();
         final Long processId = sProcessDefinition.getId();
         final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService.getProcessDeploymentInfo(processId);
-        assertEquals(processDefinitionDeployInfo.getDeployedBy(), getSessionService().getSession(getsSession().getId()).getUserId());
+        assertEquals(processDefinitionDeployInfo.getDeployedBy(), getSessionService().getSession(getAPISession().getId()).getUserId());
         getTransactionService().complete();
 
-        assertEquals(processDefinitionDeployInfo.getDeployedBy(), getSessionService().getSession(getsSession().getId()).getUserId());
+        assertEquals(processDefinitionDeployInfo.getDeployedBy(), getSessionService().getSession(getAPISession().getId()).getUserId());
 
         getTransactionService().begin();
         actorMappingService.deleteActors(processId);

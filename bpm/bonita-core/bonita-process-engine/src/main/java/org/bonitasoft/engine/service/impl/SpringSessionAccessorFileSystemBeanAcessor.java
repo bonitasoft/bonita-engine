@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -21,6 +20,7 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.core.env.PropertiesPropertySource;
 
 /**
  * @author Matthieu Chaffotte
@@ -40,8 +40,8 @@ public class SpringSessionAccessorFileSystemBeanAcessor {
         }
     }
 
-    private static CustomPropertySource getCustomPropertySource() {
-       return new CustomPropertySource("pre-init", new Properties());
+    private static PropertiesPropertySource getPropertySource() {
+       return new PropertiesPropertySource("pre-init", new Properties());
     }
 
     protected static SessionAccessor getSessionAccessor() {
@@ -57,11 +57,11 @@ public class SpringSessionAccessorFileSystemBeanAcessor {
 
     public static synchronized void initializeContext(final ClassLoader classLoader) {
         if (context == null) {// synchronized null check
-            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), false, null);
+            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), null);
             if (classLoader != null) {
                 context.setClassLoader(classLoader);
             }
-            context.getEnvironment().getPropertySources().addLast(getCustomPropertySource());
+            context.getEnvironment().getPropertySources().addFirst(getPropertySource());
             context.refresh();
         }
     }

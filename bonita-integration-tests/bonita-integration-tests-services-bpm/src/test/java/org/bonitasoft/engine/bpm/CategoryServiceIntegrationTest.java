@@ -44,8 +44,8 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
     private static TransactionService transactionService;
 
     public CategoryServiceIntegrationTest() {
-        categoryService = getServicesBuilder().getCategoryService();
-        transactionService = getServicesBuilder().getTransactionService();
+        categoryService = getTenantAccessor().getCategoryService();
+        transactionService = getTransactionService();
     }
 
     @Test

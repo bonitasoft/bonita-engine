@@ -149,4 +149,17 @@ public class Folder {
         }
         return resources;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Folder{folder=");
+        sb.append(folder);
+        sb.append(" --- exists:");
+        sb.append(folder.exists());
+        sb.append(" --- is directory:");
+        sb.append(folder.isDirectory());
+        sb.append('}');
+        return sb.toString();
+    }
 }

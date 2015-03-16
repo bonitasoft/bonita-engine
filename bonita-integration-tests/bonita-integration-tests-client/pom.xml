@@ -7,11 +7,11 @@
 		<artifactId>bonita-integration-tests</artifactId>
 		<version>7.0.0-SNAPSHOT</version>
 	</parent>
-
 	<artifactId>bonita-integration-tests-client</artifactId>
 
+
 	<properties>
-		<bonita.home>${project.build.directory}/bonita home</bonita.home>
+		<bonita.home>${project.build.directory}/bonita_home</bonita.home>
 		<bonita.home.ejb3>${project.build.directory}/bonita_home_client_EJB3</bonita.home.ejb3>
 		<bonita.home.invalid.api.type>${project.build.directory}/bonita_home_client_invalidAPIType</bonita.home.invalid.api.type>
 	</properties>
@@ -152,25 +152,14 @@
 						<configuration>
 							<target>
 								<!-- Standard -->
-								<mkdir dir="${bonita.home}" />
-								<copy todir="${bonita.home}">
-									<fileset dir="${basedir}/home/" />
-								</copy>
-								<move file="${bonita.home}/client/conf/bonita-client-local.properties" tofile="${bonita.home}/client/conf/bonita-client.properties" />
+								<touch file="${bonita.home}/engine-client/conf/bonita-client-user-custom.properties" mkdirs="true"/>
+								<copy file="${basedir}/bonita-client-local.properties" tofile="${bonita.home}/engine-client/work/bonita-client.properties"/>
 
-								<!-- EJB3 -->
-								<mkdir dir="${bonita.home.ejb3}" />
-								<copy todir="${bonita.home.ejb3}">
-									<fileset dir="${basedir}/home/" />
-								</copy>
-								<move file="${bonita.home.ejb3}/client/conf/bonita-client-ejb3.properties" tofile="${bonita.home.ejb3}/client/conf/bonita-client.properties" />
+								<touch file="${bonita.home.ejb3}/engine-client/conf/bonita-client-user-custom.properties" mkdirs="true"/>
+								<copy file="${basedir}/bonita-client-ejb3.properties" tofile="${bonita.home.ejb3}/engine-client/work/bonita-client.properties"/>
 
-								<!-- invalid api type -->
-								<mkdir dir="${bonita.home.invalid.api.type}" />
-								<copy todir="${bonita.home.invalid.api.type}">
-									<fileset dir="${basedir}/home/" />
-								</copy>
-								<move file="${bonita.home.invalid.api.type}/client/conf/bonita-client-invalid.properties" tofile="${bonita.home.invalid.api.type}/client/conf/bonita-client.properties" />
+								<touch file="${bonita.home.invalid.api.type}/engine-client/conf/bonita-client-user-custom.properties" mkdirs="true"/>
+								<copy file="${basedir}/bonita-client-invalid.properties" tofile="${bonita.home.invalid.api.type}/engine-client/work/bonita-client.properties"/>
 							</target>
 						</configuration>
 					</execution>

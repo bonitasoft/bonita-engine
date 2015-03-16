@@ -45,13 +45,9 @@ import org.junit.Test;
 
 public class ActorMappingServiceTest extends CommonBPMServicesTest {
 
-    private final BPMServicesBuilder servicesBuilder;
-
-    private final TransactionService transactionService;
+    private final SActorBuilderFactory sActorBuilderFactory;
 
     private final ActorMappingService actorMappingService;
-
-    private final SActorBuilderFactory sActorBuilderFactory;
 
     private Group mainGroup;
 
@@ -69,9 +65,9 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     @After
     public void tearDown() throws DeletionException {
         try {
-            transactionService.begin();
+            getTransactionService().begin();
             new IdentityAPIImpl().deleteGroups(Arrays.asList(childGroup.getId(), parentGroup.getId(), mainGroup.getId()));
-            transactionService.complete();
+            getTransactionService().complete();
         } catch (STransactionException e) {
             throw new DeletionException(e);
         }
@@ -79,15 +75,13 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
 
     public ActorMappingServiceTest() {
         super();
-        servicesBuilder = getServicesBuilder();
-        transactionService = servicesBuilder.getTransactionService();
-        actorMappingService = servicesBuilder.getActorMappingService();
         sActorBuilderFactory = BuilderFactory.getInstance().get(SActorBuilderFactory.class);
+        actorMappingService = getTenantAccessor().getActorMappingService();
     }
 
     @Test(expected = SActorNotFoundException.class)
     public void cannotGetAnUnknownActor() throws Exception {
-        transactionService.executeInTransaction(new Callable<SActor>() {
+        getTransactionService().executeInTransaction(new Callable<SActor>() {
             @Override
             public SActor call() throws Exception {
                 return actorMappingService.getActor(0);
@@ -102,13 +96,13 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final long scopeId = 12;
         final SActor actor = sActorBuilderFactory.create(manager, scopeId, false).getActor();
         actors.add(actor);
-        transactionService.begin();
+        getTransactionService().begin();
         try {
             actorMappingService.addActors(actors);
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
-        transactionService.begin();
+        getTransactionService().begin();
         try {
             final SActor sActor = actorMappingService.getActor(manager, scopeId);
             assertNotNull(sActor);
@@ -116,7 +110,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             assertEquals(scopeId, sActor.getScopeId());
             actorMappingService.deleteActors(scopeId);
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
     }
 
@@ -134,13 +128,13 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final SActor actor2 = sActorBuilderFactory.create(manager2, scopeId2, false).getActor();
         actors.add(actor2);
 
-        transactionService.begin();
+        getTransactionService().begin();
         try {
             actorMappingService.addActors(actors);
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
-        transactionService.begin();
+        getTransactionService().begin();
         long actor1id, actor2id;
         try {
             final SActor sActor1 = actorMappingService.getActor(manager, scopeId);
@@ -155,10 +149,10 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             assertEquals(scopeId2, sActor2.getScopeId());
             actor2id = sActor2.getId();
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
 
-        transactionService.begin();
+        getTransactionService().begin();
         try {
             final List<Long> actorIds = Arrays.asList(actor1id, actor2id);
             final List<SActor> actorsRes = actorMappingService.getActors(actorIds);
@@ -179,7 +173,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
 
             actorMappingService.deleteActors(scopeId2);
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
     }
 
@@ -189,7 +183,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
-        transactionService.begin();
+        getTransactionService().begin();
         actors = actorMappingService.addActors(actors);
         final long actorId = actors.iterator().next().getId();
 
@@ -197,9 +191,9 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         Assert.assertEquals(0, actorMembers.size());
 
         actorMappingService.addUserToActor(actorId, 1);
-        transactionService.complete();
+        getTransactionService().complete();
 
-        transactionService.begin();
+        getTransactionService().begin();
         try {
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(1, actorMembers.size());
@@ -210,7 +204,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
     }
 
@@ -226,7 +220,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
-        transactionService.begin();
+        getTransactionService().begin();
         actors = actorMappingService.addActors(actors);
         final long actorId = actors.iterator().next().getId();
 
@@ -234,9 +228,9 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         Assert.assertEquals(0, actorMembers.size());
 
         actorMappingService.addRoleToActor(actorId, 1);
-        transactionService.complete();
+        getTransactionService().complete();
 
-        transactionService.begin();
+        getTransactionService().begin();
         try {
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(1, actorMembers.size());
@@ -247,7 +241,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
     }
 
@@ -257,7 +251,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
-        transactionService.begin();
+        getTransactionService().begin();
         actors = actorMappingService.addActors(actors);
         final long actorId = actors.iterator().next().getId();
 
@@ -265,9 +259,9 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         Assert.assertEquals(0, actorMembers.size());
 
         actorMappingService.addGroupToActor(actorId, mainGroup.getId());
-        transactionService.complete();
+        getTransactionService().complete();
 
-        transactionService.begin();
+        getTransactionService().begin();
         try {
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(1, actorMembers.size());
@@ -278,7 +272,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
     }
 
@@ -288,7 +282,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
-        transactionService.begin();
+        getTransactionService().begin();
         actors = actorMappingService.addActors(actors);
         final long actorId = actors.iterator().next().getId();
 
@@ -296,9 +290,9 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         Assert.assertEquals(0, actorMembers.size());
 
         actorMappingService.addGroupToActor(actorId, parentGroup.getId());
-        transactionService.complete();
+        getTransactionService().complete();
 
-        transactionService.begin();
+        getTransactionService().begin();
         try {
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(2, actorMembers.size());
@@ -311,7 +305,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
     }
 
@@ -321,7 +315,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
-        transactionService.begin();
+        getTransactionService().begin();
         actors = actorMappingService.addActors(actors);
         final long actorId = actors.iterator().next().getId();
 
@@ -329,9 +323,9 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         Assert.assertEquals(0, actorMembers.size());
 
         actorMappingService.addRoleAndGroupToActor(actorId, 1, mainGroup.getId());
-        transactionService.complete();
+        getTransactionService().complete();
 
-        transactionService.begin();
+        getTransactionService().begin();
         try {
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(1, actorMembers.size());
@@ -342,7 +336,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
     }
 
@@ -352,7 +346,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
-        transactionService.begin();
+        getTransactionService().begin();
         actors = actorMappingService.addActors(actors);
         final long actorId = actors.iterator().next().getId();
 
@@ -360,9 +354,9 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         Assert.assertEquals(0, actorMembers.size());
 
         actorMappingService.addRoleAndGroupToActor(actorId, 1, parentGroup.getId());
-        transactionService.complete();
+        getTransactionService().complete();
 
-        transactionService.begin();
+        getTransactionService().begin();
         try {
             actorMembers = actorMappingService.getActorMembers(actorId, 0, 10);
             Assert.assertEquals(2, actorMembers.size());
@@ -375,7 +369,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
             Assert.assertEquals(0, actorMembers.size());
             actorMappingService.deleteActors(12);
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
     }
 
@@ -384,7 +378,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final long scopId = 12;
         SActor actor = sActorBuilderFactory.create("Manager", scopId, false).getActor();
 
-        transactionService.begin();
+        getTransactionService().begin();
         actor = actorMappingService.addActor(actor);
 
         final List<SActorMember> actorMembers = actorMappingService.getActorMembers(actor.getId(), 0, 10);
@@ -400,20 +394,20 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         assertEquals(5L, numberOfActorMembers);
         actorMappingService.deleteActors(12);
 
-        transactionService.complete();
+        getTransactionService().complete();
     }
 
     @Test
     public void getNumberOfRolesOfActorShouldNotCountMemberships() throws Exception {
         final long scopId = 12;
-        transactionService.begin();
+        getTransactionService().begin();
         final IdentityAPIImpl identityAPI = new IdentityAPIImpl();
         final Role role1 = identityAPI.createRole("roletest");
         final Role role2 = identityAPI.createRole("role2test");
-        transactionService.complete();
+        getTransactionService().complete();
 
         SActor actor = sActorBuilderFactory.create("ActorRoleTest", scopId, false).getActor();
-        transactionService.begin();
+        getTransactionService().begin();
         actor = actorMappingService.addActor(actor);
 
         final List<SActorMember> actorMembers = actorMappingService.getActorMembers(actor.getId(), 0, 10);
@@ -423,16 +417,16 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         actorMappingService.addRoleToActor(actor.getId(), role2.getId());
 
         final long numberOfActorMembers = actorMappingService.getNumberOfRolesOfActor(actor.getId());
-        transactionService.complete();
+        getTransactionService().complete();
 
         assertEquals(1L, numberOfActorMembers);
 
         // clean-up:
-        transactionService.begin();
+        getTransactionService().begin();
         actorMappingService.deleteActors(12);
         identityAPI.deleteRole(role1.getId());
         identityAPI.deleteRole(role2.getId());
-        transactionService.complete();
+        getTransactionService().complete();
     }
 
     @Test
@@ -440,7 +434,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final long scopId = 12;
         SActor actor = sActorBuilderFactory.create("ActorGroupTest", scopId, false).getActor();
 
-        transactionService.begin();
+        getTransactionService().begin();
         actor = actorMappingService.addActor(actor);
 
         final List<SActorMember> actorMembers = actorMappingService.getActorMembers(actor.getId(), 0, 10);
@@ -453,6 +447,6 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         assertEquals(1L, numberOfActorMembers);
 
         actorMappingService.deleteActors(12);
-        transactionService.complete();
+        getTransactionService().complete();
     }
 }

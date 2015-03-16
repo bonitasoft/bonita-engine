@@ -15,6 +15,7 @@ package org.bonitasoft.engine.login;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -44,7 +45,7 @@ public class PlatformLoginAPIIT extends CommonAPIIT {
     private static PlatformLoginAPI platformLoginAPI;
 
     @Before
-    public void before() throws BonitaException {
+    public void before() throws BonitaException, IOException {
         platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
     }
 

@@ -49,10 +49,9 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
 
     private static String documentNameKey;
 
-    static {
-        final BPMServicesBuilder bpmServicesBuilder = new BPMServicesBuilder();
-        documentService = bpmServicesBuilder.getDocumentService();
-        transactionService = bpmServicesBuilder.getTransactionService();
+    public DocumentServiceTest() {
+        documentService = getTenantAccessor().getDocumentService();
+        transactionService = getTransactionService();
         documentNameKey = BuilderFactory.get(SDocumentBuilderFactory.class).getNameKey();
     }
 

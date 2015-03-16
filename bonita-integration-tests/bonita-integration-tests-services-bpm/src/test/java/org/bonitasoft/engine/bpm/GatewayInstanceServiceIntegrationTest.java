@@ -19,12 +19,10 @@ import static org.junit.Assert.assertNotNull;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
-import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Test;
 
 /**
@@ -33,23 +31,15 @@ import org.junit.Test;
  */
 public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest {
 
-    @Override
-    protected GatewayInstanceService gatewayInstanceService() {
-        return getServicesBuilder().getGatewayInstanceService();
-    }
-
-    protected static TransactionService getTransactionService() {
-        return getServicesBuilder().getTransactionService();
-    }
 
     protected void deleteGatewayInstance(final SGatewayInstance gatewayInstance) throws SBonitaException {
-        transactionService.begin();
+        getTransactionService().begin();
         try {
-            getServicesBuilder().getTenantRecorder().recordDelete(new DeleteRecord(gatewayInstanceService().getGatewayInstance(gatewayInstance.getId())), null);
+            getTenantAccessor().getActivityInstanceService().deleteFlowNodeInstance(gatewayInstance);
         } catch (final SBonitaException e) {
             throw new SFlowNodeDeletionException(e);
         } finally {
-            transactionService.complete();
+            getTransactionService().complete();
         }
     }
 
@@ -69,7 +59,7 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
 
     private SGatewayInstance getGatewayInstanceFromDB(final Long gatewayId) throws SBonitaException {
         getTransactionService().begin();
-        final SGatewayInstance gatewayInstanceRes = gatewayInstanceService().getGatewayInstance(gatewayId);
+        final SGatewayInstance gatewayInstanceRes = getTenantAccessor().getGatewayInstanceService().getGatewayInstance(gatewayId);
         getTransactionService().complete();
         return gatewayInstanceRes;
     }
@@ -87,15 +77,15 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
 
     private void updateGatewayState(final SGatewayInstance gatewayInstance, final int stateId) throws SBonitaException {
         getTransactionService().begin();
-        final SGatewayInstance gatewayInstance2 = gatewayInstanceService().getGatewayInstance(gatewayInstance.getId());
-        gatewayInstanceService().setState(gatewayInstance2, stateId);
+        final SGatewayInstance gatewayInstance2 = getTenantAccessor().getGatewayInstanceService().getGatewayInstance(gatewayInstance.getId());
+        getTenantAccessor().getGatewayInstanceService().setState(gatewayInstance2, stateId);
         getTransactionService().complete();
     }
 
     private void updateGatewayHitbys(final SGatewayInstance gatewayInstance, final long transitionIndex) throws SBonitaException {
         getTransactionService().begin();
-        final SGatewayInstance gatewayInstance2 = gatewayInstanceService().getGatewayInstance(gatewayInstance.getId());
-        gatewayInstanceService().hitTransition(gatewayInstance2, transitionIndex);
+        final SGatewayInstance gatewayInstance2 = getTenantAccessor().getGatewayInstanceService().getGatewayInstance(gatewayInstance.getId());
+        getTenantAccessor().getGatewayInstanceService().hitTransition(gatewayInstance2, transitionIndex);
         getTransactionService().complete();
     }
 

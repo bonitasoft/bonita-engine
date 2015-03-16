@@ -88,10 +88,16 @@ public class BonitaHomeServer extends BonitaHome {
 
     private String[] getResourcesFromFiles(final List<File> files) {
         final List<String> resources = new ArrayList<String>();
-        for (File file : files) {
-            resources.add(file.getAbsolutePath());
+        if (files != null) {
+            for (File file : files) {
+                resources.add(file.getAbsolutePath());
+            }
         }
-        return (String[]) resources.toArray();
+        //System.err.println(this.getClass().getName() + "-" + "getResourcesFromFiles" + ":" + "resources=" + resources);
+        final String[] strings = resources.toArray(new String[resources.size()]);
+        //System.err.println(this.getClass().getName() + "-" + "getResourcesFromFiles" + ":" + "strings=" + strings);
+        return strings
+                ;
     }
 
     private static List<File> getXmlResourcesOfFolder(final Folder folder) throws IOException {
@@ -112,9 +118,13 @@ public class BonitaHomeServer extends BonitaHome {
     }
 
     public String[] getPrePlatformInitConfigurationFiles() throws BonitaHomeNotSetException, IOException {
+        //System.err.println(this.getClass().getName() + "-" + "getPrePlatformInitConfigurationFiles" + ":" + "start");
         final List<File> files = new ArrayList<File>();
         final Folder folder = FolderMgr.getPlatformInitWorkFolder(getBonitaHomeFolder());
-        files.add(folder.getFile("bonita-platform-session-accessor.xml"));
+        //System.err.println(this.getClass().getName() + "-" + "getPrePlatformInitConfigurationFiles" + ":" + "folder=" + folder);
+        final File file = folder.getFile("bonita-platform-session-accessor.xml");
+        //System.err.println(this.getClass().getName() + "-" + "getPrePlatformInitConfigurationFiles" + ":" + "file=" + file);
+        files.add(file);
         return getResourcesFromFiles(files);
     }
 
@@ -149,7 +159,9 @@ public class BonitaHomeServer extends BonitaHome {
 
     @Override
     protected void refresh() {
+        System.err.println("----- REFRESH Thread: " + Thread.currentThread().getId() + "-----");
         platformProperties = null;
+        System.err.println("----- END REFRESH Thread: " + Thread.currentThread().getId() + "-----");
     }
 
     private Properties getProperties(final File folder, final String fileName) throws IOException {
@@ -161,13 +173,24 @@ public class BonitaHomeServer extends BonitaHome {
     }
 
     public Properties getPlatformProperties() throws BonitaHomeNotSetException, IOException {
+        //System.err.println("----- getPlatformProperties Thread: " + Thread.currentThread().getId() + "-----");
+        //Thread.dumpStack();
+        //System.err.println("before platformProperties = " + platformProperties);
         if (platformProperties == null) {
             final Properties defaultProperties = getProperties(FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder()).getFile("bonita-platform.properties"));
+            final Properties privateProperties = getProperties(FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder()).getFile("bonita-platform-private.properties"));
             final Properties customProperties = getProperties(FolderMgr.getPlatformConfFolder(getBonitaHomeFolder()).getFile("bonita-platform-user-custom.properties"));
+            //System.err.println("defaultProperties = " + defaultProperties);
+            //System.err.println("privateProperties = " + privateProperties);
+            //System.err.println("customProperties = " + customProperties);
+
             platformProperties = new Properties();
             platformProperties.putAll(defaultProperties);
+            platformProperties.putAll(privateProperties);
             platformProperties.putAll(customProperties);
         }
+        //System.err.println("after platformProperties = " + platformProperties);
+        //System.err.println("----- end getPlatformProperties Thread: " + Thread.currentThread().getId() + "-----");
         return platformProperties;
     }
 

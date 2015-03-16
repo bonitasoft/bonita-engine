@@ -21,6 +21,7 @@ import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -64,6 +65,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
     private PlatformCacheService platformCacheService;
     private BroadcastService broadcastService;
+    private PlatformAuthenticationService platformAuthenticationService;
 
     @Override
     public TransactionService getTransactionService() {
@@ -190,5 +192,13 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
             broadcastService = SpringPlatformFileSystemBeanAccessor.getService(BroadcastService.class);
         }
         return broadcastService;
+    }
+
+    @Override
+    public PlatformAuthenticationService getPlatformAuthenticationService() {
+        if (platformAuthenticationService == null) {
+            platformAuthenticationService = SpringPlatformFileSystemBeanAccessor.getService(PlatformAuthenticationService.class);
+        }
+        return platformAuthenticationService;
     }
 }

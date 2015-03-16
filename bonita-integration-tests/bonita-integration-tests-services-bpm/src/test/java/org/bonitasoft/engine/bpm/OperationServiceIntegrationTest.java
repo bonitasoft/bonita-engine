@@ -56,8 +56,6 @@ import org.junit.Test;
  */
 public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
 
-    private static BPMServicesBuilder servicesBuilder;
-
     private static TransactionService transactionService;
 
     private static OperationService operationService;
@@ -67,11 +65,10 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     private static ParentContainerResolver parentContainerResolver;
 
     public OperationServiceIntegrationTest() {
-        servicesBuilder = getServicesBuilder();
-        transactionService = servicesBuilder.getTransactionService();
-        dataInstanceService = servicesBuilder.getDataInstanceService();
-        operationService = servicesBuilder.getOperationService();
-        parentContainerResolver = servicesBuilder.getParentContainerResolver();
+        transactionService = getTransactionService();
+        dataInstanceService =getTenantAccessor().getDataInstanceService();
+        operationService = getTenantAccessor().getOperationService();
+        parentContainerResolver = getTenantAccessor().getParentContainerResolver();
     }
 
     /**

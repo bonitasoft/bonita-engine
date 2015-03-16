@@ -13,20 +13,14 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.MissingServiceException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.core.env.PropertiesPropertySource;
 
 /**
  * @author Matthieu Chaffotte
@@ -54,9 +48,9 @@ public class SpringTenantFileSystemBeanAccessor {
         }
     }
 
-    private CustomPropertySource getCustomPropertySource() {
+    private PropertiesPropertySource getPropertySource() {
         try {
-            return new CustomPropertySource("tenant", BonitaHomeServer.getInstance().getTenantProperties(tenantId));
+            return new PropertiesPropertySource("tenant", BonitaHomeServer.getInstance().getTenantProperties(tenantId));
         } catch (final BonitaHomeNotSetException e) {
             throw new RuntimeException(e);
         } catch (final IOException e) {
@@ -94,8 +88,8 @@ public class SpringTenantFileSystemBeanAccessor {
             SpringPlatformFileSystemBeanAccessor.initializeContext(classLoader);
             final FileSystemXmlApplicationContext platformContext = SpringPlatformFileSystemBeanAccessor.getContext();
             // Delay the refresh so we can set our BeanFactoryPostProcessor to be able to resolve the placeholder.
-            final AbsoluteFileSystemXmlApplicationContext localContext = new AbsoluteFileSystemXmlApplicationContext(getResources(), false /* refresh */, platformContext);
-            localContext.getEnvironment().getPropertySources().addLast(getCustomPropertySource());
+            final AbsoluteFileSystemXmlApplicationContext localContext = new AbsoluteFileSystemXmlApplicationContext(getResources(), platformContext);
+            localContext.getEnvironment().getPropertySources().addFirst(getPropertySource());
             localContext.refresh();
             this.context = localContext;
         }

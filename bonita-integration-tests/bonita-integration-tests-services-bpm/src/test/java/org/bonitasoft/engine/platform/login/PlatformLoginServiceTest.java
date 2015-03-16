@@ -32,7 +32,7 @@ public class PlatformLoginServiceTest extends CommonBPMServicesTest {
     private final PlatformLoginService platformLoginService;
 
     public PlatformLoginServiceTest() {
-        platformLoginService = getServicesBuilder().getPlatformLoginService();
+        platformLoginService = getPlatformAccessor().getPlatformLoginService();
     }
 
     @Test

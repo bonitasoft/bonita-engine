@@ -40,7 +40,7 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
 
     @Before
     public void setUp() {
-        connectorInstanceService = getServicesBuilder().getConnectorInstanceService();
+        connectorInstanceService = getTenantAccessor().getConnectorInstanceService();
     }
 
     @After

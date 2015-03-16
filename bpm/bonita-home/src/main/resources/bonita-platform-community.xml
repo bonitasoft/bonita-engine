@@ -8,86 +8,6 @@
 	http://www.springframework.org/schema/context	http://www.springframework.org/schema/context/spring-context-3.0.xsd
 	">
 
-    <bean id="h2.sql.delimiter" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value=";"/>
-    </bean>
-
-    <bean id="h2.hibernate.journal.dialect" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.hibernate.dialect.H2Dialect"/>
-    </bean>
-
-    <bean id="h2.hibernate.journal.interceptor" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value=""/>
-    </bean>
-
-    <bean id="h2.quartz.connection.jobstoredriver" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.quartz.impl.jdbcjobstore.StdJDBCDelegate"/>
-    </bean>
-
-    <bean id="mysql.sql.delimiter" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value=";"/>
-    </bean>
-
-    <bean id="mysql.hibernate.journal.dialect" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
-    </bean>
-
-    <bean id="mysql.hibernate.journal.interceptor" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value=""/>
-    </bean>
-
-    <bean id="mysql.quartz.connection.jobstoredriver" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.quartz.impl.jdbcjobstore.StdJDBCDelegate"/>
-    </bean>
-
-    <bean id="oracle.sql.delimiter" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value=";"/>
-    </bean>
-
-    <bean id="oracle.hibernate.journal.dialect" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.hibernate.dialect.Oracle10gDialect"/>
-    </bean>
-
-    <bean id="oracle.hibernate.journal.interceptor" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value=""/>
-    </bean>
-
-    <bean id="oracle.quartz.connection.jobstoredriver" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.quartz.impl.jdbcjobstore.StdJDBCDelegate"/>
-    </bean>
-
-    <bean id="postgres.sql.delimiter" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value=";"/>
-    </bean>
-
-    <bean id="postgres.hibernate.journal.dialect" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.hibernate.dialect.PostgreSQLDialect"/>
-    </bean>
-
-    <bean id="postgres.hibernate.journal.interceptor" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.bonitasoft.engine.persistence.PostgresInterceptor"/>
-    </bean>
-
-    <bean id="postgres.quartz.connection.jobstoredriver" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.quartz.impl.jdbcjobstore.PostgreSQLDelegate"/>
-    </bean>
-
-    <bean id="sqlserver.sql.delimiter" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="GO"/>
-    </bean>
-
-    <bean id="sqlserver.hibernate.journal.dialect" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.hibernate.dialect.SQLServerDialect"/>
-    </bean>
-
-    <bean id="sqlserver.hibernate.journal.interceptor" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.bonitasoft.engine.persistence.SQLServerInterceptor"/>
-    </bean>
-
-    <bean id="sqlserver.quartz.connection.jobstoredriver" class="java.lang.String">
-        <constructor-arg type="java.lang.String" value="org.quartz.impl.jdbcjobstore.MSSQLDelegate"/>
-    </bean>
-
     <bean id="archivingStrategy" class="org.bonitasoft.engine.archive.impl.DefaultArchivingStrategy" />
 
     <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl" >
@@ -114,7 +34,7 @@
                 <prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
                 <prop key="org.quartz.threadPool.threadCount">5</prop>
                 <prop key="org.quartz.jobStore.class">org.bonitasoft.engine.scheduler.impl.BonitaJobStoreCMT</prop>
-                <prop key="org.quartz.jobStore.driverDelegateClass" ref="${db.vendor}.quartz.connection.jobstoredriver">
+                <prop key="org.quartz.jobStore.driverDelegateClass">${db.vendor}.quartz.connection.jobstoredriver</prop>
                 <prop key="org.quartz.jobStore.dataSource">managedDS</prop>
                 <prop key="org.quartz.jobStore.useProperties">true</prop>
                 <prop key="org.quartz.jobStore.nonManagedTXDataSource">notManagedDS</prop>
@@ -194,7 +114,7 @@
         <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
         <!-- read SQL files from within bonita-server.jar -->
         <constructor-arg name="sqlFolder" value="/sql/${db.vendor}" />
-        <constructor-arg name="statementDelimiter" ref="${db.vendor}.sql.delimiter" />
+        <constructor-arg name="statementDelimiter" value="${db.vendor}.sql.delimiter" />
     </bean>
 
     <bean id="platformProperties" class="org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl" />
@@ -376,10 +296,6 @@
     </bean>
 
     <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal"/>
-
-	<bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <context:property-placeholder order="1" location="${bonita.home}/server/platform/conf/jdbc-${db.vendor}.xml"/>
-	</bean>
 
     <bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
         <constructor-arg name="sessionService" ref="sessionService" />
@@ -622,7 +538,7 @@
     </bean>
 
     <bean id="transactionManager" class="org.springframework.jndi.JndiObjectFactoryBean">
-        <property name="jndiName" value="${transaction.manager}" />
+        <property name="jndiName" value="trucmuch"/>
     </bean>
 
     <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" scope="singleton">
@@ -899,7 +815,7 @@
                         <entry key="hibernate.current_session_context_class" value="jta" />
                         <entry key="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
                         <entry key="hibernate.transaction.jta.platform" value="${hibernate.transaction.jta_platform}" />
-                        <entry key="hibernate.dialect" ref="${db.vendor}.hibernate.journal.dialect" />
+                        <entry key="hibernate.dialect" value="${db.vendor}.hibernate.journal.dialect" />
                         <entry key="hibernate.interceptor" value="${db.vendor}.hibernate.journal.interceptor" />
                         <entry key="hibernate.show_sql" value="${hibernate.journal.show_sql}" />
                         <entry key="hibernate.format_sql" value="${hibernate.journal.format_sql}" />

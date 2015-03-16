@@ -14,10 +14,16 @@ public class CustomPropertySource extends PropertySource<String> {
     public CustomPropertySource(final String name, final Properties properties) {
         super(name);
         this.properties = properties;
+        //System.err.println("----- CustomPropertySource(" + name + ") Thread: " + Thread.currentThread().getId() + "-----");
+        //Thread.dumpStack();
+        //System.err.println("Loading properties: " + properties);
+        //System.err.println("----- END CustomPropertySource(" + name + ") Thread: " + Thread.currentThread().getId() + "-----");
     }
 
     @Override
     public Object getProperty(String key) {
-        return properties.get(key);
+        final Object value = properties.get(key);
+        System.err.println("--- (" + name + " --- Retrieving " + key + "=" + value);
+        return value;
     }
 }

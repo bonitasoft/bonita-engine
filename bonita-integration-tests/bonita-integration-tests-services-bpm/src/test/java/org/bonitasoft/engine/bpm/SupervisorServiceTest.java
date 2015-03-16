@@ -49,8 +49,6 @@ import org.junit.Test;
  */
 public class SupervisorServiceTest extends CommonBPMServicesTest {
 
-    private final BPMServicesBuilder servicesBuilder;
-
     private final TransactionService transactionService;
 
     private static SupervisorMappingService supervisorService;
@@ -65,10 +63,9 @@ public class SupervisorServiceTest extends CommonBPMServicesTest {
 
     public SupervisorServiceTest() {
         super();
-        this.servicesBuilder = getServicesBuilder();
-        this.transactionService = this.servicesBuilder.getTransactionService();
-        supervisorService = this.servicesBuilder.getSupervisorService();
-        this.identityService = this.servicesBuilder.getIdentityService();
+        this.transactionService = getTransactionService();
+        supervisorService = getTenantAccessor().getSupervisorService();
+        this.identityService = getTenantAccessor().getIdentityService();
     }
 
     @Test

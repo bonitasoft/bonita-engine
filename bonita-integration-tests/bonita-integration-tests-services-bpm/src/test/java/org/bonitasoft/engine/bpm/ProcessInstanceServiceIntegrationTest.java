@@ -59,28 +59,15 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonBPMServicesTest.class);
 
-    private static BPMServicesBuilder bpmServicesBuilder;
+    private final TransactionService transactionService;
+    private final ProcessInstanceService processInstanceService;
+    private final ActivityInstanceService activityInstanceService;
 
-    private static ProcessInstanceService processInstanceService;
-
-    private static TransactionService transactionService;
-
-    private static DataInstanceService dataInstanceService;
-
-    private static ActivityInstanceService activityInstanceService;
-
-    static {
-        bpmServicesBuilder = new BPMServicesBuilder();
-        processInstanceService = getProcessInstanceService();
-        transactionService = bpmServicesBuilder.getTransactionService();
-        dataInstanceService = bpmServicesBuilder.getDataInstanceService();
-        activityInstanceService = bpmServicesBuilder.getActivityInstanceService();
+    public ProcessInstanceServiceIntegrationTest() {
+        transactionService = getTransactionService();
+        processInstanceService = getTenantAccessor().getProcessInstanceService();
+        activityInstanceService = getTenantAccessor().getActivityInstanceService();
     }
-
-    static ProcessInstanceService getProcessInstanceService() {
-        return bpmServicesBuilder.getProcessInstanceService();
-    }
-
     /**
      * Clean up of all existing process instances
      */
@@ -384,7 +371,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
         dataInstanceBuilder.setContainerType(containerType.name());
 
         final SDataInstance dataInstance = dataInstanceBuilder.done();
-        dataInstanceService.createDataInstance(dataInstance);
+        getTenantAccessor().getDataInstanceService().createDataInstance(dataInstance);
 
         getTransactionService().complete();
         return dataInstance;
@@ -394,7 +381,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
         SDataInstance dataInstance = null;
         getTransactionService().begin();
         try {
-            dataInstance = dataInstanceService.getDataInstance(dataInstanceId);
+            dataInstance = getTenantAccessor().getDataInstanceService().getDataInstance(dataInstanceId);
         } finally {
             getTransactionService().complete();
         }

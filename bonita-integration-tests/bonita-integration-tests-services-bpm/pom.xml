@@ -13,10 +13,17 @@
     <name>Bonita Integration Tests Service BPM</name>
 
 	<properties>
-        <bonita.home>${project.build.directory}/test-classes/home</bonita.home>
+        <bonita.home>${project.build.directory}/bonita-home</bonita.home>
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.bonitasoft.engine.test</groupId>
+			<artifactId>bonita-integration-tests-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 
 		<!-- Actor Mapping -->
 		<dependency>
@@ -450,6 +457,16 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
@@ -552,35 +569,17 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
-                        <id>generate bonita home version file</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-                            <target name="copy-bos-home-version-file">
-								<copy todir="${bonita.home}">
-									<fileset dir="${basedir}/home" />
-									<filterset>
-										<filter token="VERSION" value="${project.version}" />
-									</filterset>
-								</copy>
-							</target>
-						</configuration>
-					</execution>
-					<execution>
 						<id>complete test conf setup</id>
 						<phase>process-test-resources</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<target name="copy-bpm-test-conf">
-                                <copy todir="${project.build.directory}/test-classes/conf">
-                                    <fileset dir="${project.build.directory}/server/conf/service" />
-                                </copy>
-                                <copy todir="${project.build.directory}/test-classes/conf" overwrite="true">
-                                    <fileset dir="${project.build.directory}/server/conf/bpm" />
+							<target name="copy-overriding-conf">
+                                <copy todir="${project.build.directory}/bonita-home/engine-server/conf/platform" overwrite="true">
+									<fileset dir="${basedir}/src/test/resources" >
+										<include name="bonita-platform-community-user-custom.xml"/>
+									</fileset>
                                 </copy>
 							</target>
 						</configuration>
@@ -592,7 +591,7 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>initialize test conf setup</id>
+						<id>unpack</id>
 						<phase>generate-test-resources</phase>
 						<goals>
 							<goal>unpack</goal>
@@ -601,12 +600,19 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>org.bonitasoft.engine.test</groupId>
-									<artifactId>bonita-server-test-utils</artifactId>
+									<artifactId>bonita-integration-tests-services-sql</artifactId>
 									<version>${project.version}</version>
 									<type>zip</type>
+									<outputDirectory>${project.build.directory}/test-classes/sql-test</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.bonitasoft.engine</groupId>
+									<artifactId>bonita-home</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+									<outputDirectory>${project.build.directory}</outputDirectory>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>${project.build.directory}/server</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -617,11 +623,11 @@
 				<configuration>
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
-                        <bonita.services.folder>${project.build.directory}/test-classes/conf</bonita.services.folder>
 						<sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
 					</systemPropertyVariables>
 					<includes>
-						<include>org/bonitasoft/engine/bpm/test/AllBPMTestsWithJNDI.java</include>
+						<include>org/bonitasoft/engine/AllTestsWithJNDI.java</include>
+						<include>org/bonitasoft/engine/AllBPMTestsWithJNDI.java</include>
 					</includes>
 				</configuration>
 				<executions>
@@ -634,6 +640,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>

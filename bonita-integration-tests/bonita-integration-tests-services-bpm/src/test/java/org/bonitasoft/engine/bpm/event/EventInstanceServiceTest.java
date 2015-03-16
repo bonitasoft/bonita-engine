@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -59,12 +58,9 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private final EventInstanceService eventInstanceService;
 
-    private final BPMServicesBuilder servicesBuilder;
-
     public EventInstanceServiceTest() {
-        servicesBuilder = getServicesBuilder();
-        userTransactionService = servicesBuilder.getUserTransactionService();
-        eventInstanceService = servicesBuilder.getEventInstanceService();
+        userTransactionService = getTenantAccessor().getUserTransactionService();
+        eventInstanceService = getTenantAccessor().getEventInstanceService();
     }
 
     private void checkStartEventInstance(final SEventInstance expectedEventInstance, final SEventInstance actualEventInstance) {
@@ -320,7 +316,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     private <T extends SWaitingEvent> List<T> searchWaitingEvents(final Class<T> clazz, final QueryOptions searchOptions) throws Exception {
-        return transactionService.executeInTransaction(new Callable<List<T>>() {
+        return getTransactionService().executeInTransaction(new Callable<List<T>>() {
 
             @Override
             public List<T> call() throws Exception {
@@ -330,7 +326,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     private long getNumberOfWaitingEvents(final Class<? extends SWaitingEvent> clazz, final QueryOptions countOptions) throws Exception {
-        return transactionService.executeInTransaction(new Callable<Long>() {
+        return getTransactionService().executeInTransaction(new Callable<Long>() {
 
             @Override
             public Long call() throws Exception {

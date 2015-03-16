@@ -67,7 +67,7 @@ public class LoginAPIIT extends CommonAPIIT {
     private static PlatformSession session;
 
     @Before
-    public void before() throws BonitaException {
+    public void before() throws BonitaException, IOException {
         session = loginOnPlatform();
         platformCommandAPI = PlatformAPIAccessor.getPlatformCommandAPI(session);
     }

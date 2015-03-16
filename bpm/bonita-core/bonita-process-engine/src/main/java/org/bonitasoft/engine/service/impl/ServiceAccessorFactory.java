@@ -38,11 +38,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public final class ServiceAccessorFactory {
 
-    private static final String DB_VENDOR = "db.vendor";
-
     private static final ServiceAccessorFactory INSTANCE = new ServiceAccessorFactory();
-
-    private Properties properties = null;
 
     private SessionAccessorAccessor sessionAccessorAccessor;
 
@@ -63,32 +59,21 @@ public final class ServiceAccessorFactory {
     public synchronized PlatformServiceAccessor createPlatformServiceAccessor() throws BonitaHomeNotSetException, InstantiationException,
             IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         if (platformServiceAccessor == null) {
-            initPropertiesIfNeeded();
-            final String platformClassName = properties.getProperty("platformClassName");
+            final String platformClassName = BonitaHomeServer.getInstance().getPlatformProperties().getProperty("platformClassName");
             if (platformClassName == null) {
-                throw new BonitaHomeConfigurationException("platformClassName not set in bonita-platform.properties");
+                throw new BonitaHomeConfigurationException("platformClassName not set in bonita-platform-private.properties");
             }
             platformServiceAccessor = (PlatformServiceAccessor) Class.forName(platformClassName).newInstance();
         }
         return platformServiceAccessor;
     }
 
-    private void initPropertiesIfNeeded() throws BonitaHomeNotSetException, IOException {
-        if (properties == null) {
-            properties = BonitaHomeServer.getInstance().getPlatformProperties();
-            // set system properties
-            final String dbVendor = properties.getProperty(DB_VENDOR);
-            System.setProperty(DB_VENDOR, dbVendor);
-        }
-    }
-
     public synchronized TenantServiceAccessor createTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         if (!tenantServiceAccessor.containsKey(tenantId)) {
-            initPropertiesIfNeeded();
-            final String tenantClassName = properties.getProperty("tenantClassName");
+            final String tenantClassName = BonitaHomeServer.getInstance().getPlatformProperties().getProperty("tenantClassName");
             if (tenantClassName == null) {
-                throw new BonitaHomeConfigurationException("tenantClassName not set in bonita-platform.properties");
+                throw new BonitaHomeConfigurationException("tenantClassName not set in bonita-platform-private.properties");
             }
             final Class<TenantServiceAccessor> tenantClass = ClassReflector.getClass(TenantServiceAccessor.class, tenantClassName);
             final Constructor<TenantServiceAccessor> constructor = tenantClass.getConstructor(Long.class);
@@ -100,8 +85,7 @@ public final class ServiceAccessorFactory {
     public synchronized SessionAccessor createSessionAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         if (sessionAccessorAccessor == null) {
-            initPropertiesIfNeeded();
-            final String sessionAccessorStr = properties.getProperty("sessionAccessor");
+            final String sessionAccessorStr = BonitaHomeServer.getInstance().getPlatformProperties().getProperty("sessionAccessor");
             if (sessionAccessorStr == null) {
                 throw new BonitaHomeConfigurationException("sessionAccessor not set in bonita-platform.properties");
             }
@@ -113,10 +97,9 @@ public final class ServiceAccessorFactory {
     public synchronized APIAccessResolver createAPIAccessResolver() throws BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException,
             InstantiationException, IllegalAccessException, ClassNotFoundException {
         if (apiAccessResolver == null) {
-            initPropertiesIfNeeded();
-            final String sessionAccessorStr = properties.getProperty("apiAccessResolver");
+            final String sessionAccessorStr = BonitaHomeServer.getInstance().getPlatformProperties().getProperty("apiAccessResolver");
             if (sessionAccessorStr == null) {
-                throw new BonitaHomeConfigurationException("ApiAccessResolver not set in bonita-platform.properties");
+                throw new BonitaHomeConfigurationException("ApiAccessResolver not set in bonita-platform-private.properties");
             }
             apiAccessResolver = (APIAccessResolver) Class.forName(sessionAccessorStr).newInstance();
         }

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.io.IOException;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
@@ -40,19 +41,36 @@ import org.bonitasoft.engine.util.APITypeManager;
 public final class TenantAPIAccessor {
 
     private static ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        final ApiAccessType apiType = APITypeManager.getAPIType();
+        final ApiAccessType apiType;
+        try {
+            apiType = APITypeManager.getAPIType();
+        } catch (IOException e) {
+            throw new ServerAPIException(e);
+        }
         Map<String, String> parameters = null;
         switch (apiType) {
             case LOCAL:
                 return LocalServerAPIFactory.getServerAPI();
             case EJB3:
-                parameters = APITypeManager.getAPITypeParameters();
+                try {
+                    parameters = APITypeManager.getAPITypeParameters();
+                } catch (IOException e) {
+                    throw new ServerAPIException(e);
+                }
                 return new EJB3ServerAPI(parameters);
             case HTTP:
-                parameters = APITypeManager.getAPITypeParameters();
+                try {
+                    parameters = APITypeManager.getAPITypeParameters();
+                } catch (IOException e) {
+                    throw new ServerAPIException(e);
+                }
                 return new HTTPServerAPI(parameters);
             case TCP:
-                parameters = APITypeManager.getAPITypeParameters();
+                try {
+                    parameters = APITypeManager.getAPITypeParameters();
+                } catch (IOException e) {
+                    throw new ServerAPIException(e);
+                }
                 return new TCPServerAPI(parameters);
             default:
                 throw new UnknownAPITypeException("Unsupported API Type: " + apiType);

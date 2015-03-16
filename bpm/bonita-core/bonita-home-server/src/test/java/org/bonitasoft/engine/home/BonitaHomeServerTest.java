@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -28,7 +29,7 @@ import org.junit.Test;
 public class BonitaHomeServerTest {
 
     @Test(expected = BonitaHomeNotSetException.class)
-    public void testBonitaHomeServerNotSet() throws BonitaException {
+    public void testBonitaHomeServerNotSet() throws BonitaException, IOException {
         System.setProperty(BonitaHome.BONITA_HOME, "");// same as not set
         final BonitaHomeServer bonitaHome = BonitaHomeServer.getInstance();
         bonitaHome.refreshBonitaHome();

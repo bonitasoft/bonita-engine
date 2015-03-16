@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -47,12 +46,9 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
 
     private final ActivityInstanceService activityInstanceService;
 
-    private final BPMServicesBuilder servicesBuilder;
-
     public FlowNodeInstanceServiceTest() {
-        servicesBuilder = getServicesBuilder();
-        userTransactionService = servicesBuilder.getUserTransactionService();
-        activityInstanceService = servicesBuilder.getActivityInstanceService();
+        userTransactionService = getTenantAccessor().getUserTransactionService();
+        activityInstanceService = getTenantAccessor().getActivityInstanceService();
     }
 
     private long getNbFlowNodeInstances(final QueryOptions countOptions) throws Exception {

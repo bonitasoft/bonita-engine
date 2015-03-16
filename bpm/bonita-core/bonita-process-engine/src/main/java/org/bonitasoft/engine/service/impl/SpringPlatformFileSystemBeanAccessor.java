@@ -19,6 +19,7 @@ import java.io.IOException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.core.env.PropertiesPropertySource;
 
 /**
  * @author Matthieu Chaffotte
@@ -39,9 +40,9 @@ public class SpringPlatformFileSystemBeanAccessor {
         }
     }
 
-    private static CustomPropertySource getCustomPropertySource() {
+    private static PropertiesPropertySource getPropertySource() {
         try {
-            return new CustomPropertySource("platform", BonitaHomeServer.getInstance().getPlatformProperties());
+            return new PropertiesPropertySource("platform", BonitaHomeServer.getInstance().getPlatformProperties());
         } catch (final BonitaHomeNotSetException e) {
             throw new RuntimeException(e);
         } catch (final IOException e) {
@@ -64,8 +65,8 @@ public class SpringPlatformFileSystemBeanAccessor {
         if (context == null) {// synchronized null check
             SpringSessionAccessorFileSystemBeanAcessor.initializeContext(classLoader);
             final FileSystemXmlApplicationContext sessionContext = SpringSessionAccessorFileSystemBeanAcessor.getContext();
-            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), true, sessionContext);
-            context.getEnvironment().getPropertySources().addLast(getCustomPropertySource());
+            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), sessionContext);
+            context.getEnvironment().getPropertySources().addFirst(getPropertySource());
             context.refresh();
 
         }
