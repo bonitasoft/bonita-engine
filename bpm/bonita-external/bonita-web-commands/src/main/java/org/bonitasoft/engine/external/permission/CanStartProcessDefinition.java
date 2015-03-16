@@ -14,11 +14,9 @@
 package org.bonitasoft.engine.external.permission;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
@@ -51,11 +49,9 @@ public class CanStartProcessDefinition extends CommandWithParameters {
         final long processDefinitionId = getLongMandadoryParameter(parameters, PROCESS_DEFINITION_ID_KEY);
 
         try {
-            final List<SActor> sActors = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId, 0, 1);
-            return !sActors.isEmpty();
+            return actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId);
         } catch (final SBonitaException e) {
-            throw new SCommandExecutionException(
-                    "Error executing command 'Boolean CanStartProcessDefinition(long userId, long processInstanceId)'", e);
+            throw new SCommandExecutionException("Error executing command 'Boolean CanStartProcessDefinition(long userId, long processInstanceId)'", e);
         }
     }
 
