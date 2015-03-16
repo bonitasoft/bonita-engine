@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -23,6 +23,10 @@ import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.FailAction;
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
@@ -344,6 +348,32 @@ public class XMLProcessDefinition {
 
     public static final String TRIGGERED_BY_EVENT = "triggeredByEvent";
 
+    public static final String CONTRACT_NODE = "contract";
+
+    private static final String CONTRACT_INPUTS_NODE = "inputDefinitions";
+
+    public static final String CONTRACT_SIMPLE_INPUT_NODE = "inputDefinition";
+
+    public static final String CONTRACT_COMPLEX_INPUT_NODE = "complexInputDefinition";
+
+    public static final String TYPE = "type";
+
+    public static final String CONSTRAINT_TYPE = "type";
+
+    public static final String MULTIPLE = "multiple";
+
+    public static final String CONTRACT_CONSTRAINTS_NODE = "constraintDefinitions";
+
+    public static final String CONTRACT_CONSTRAINT_NODE = "constraintDefinition";
+
+    public static final String CONSTRAINT_EXPRESSION = "conditionalExpression";
+
+    public static final String CONSTRAINT_EXPLANATION = "explanation";
+
+    public static final String INPUT_NAMES = "inputDefinitionNames";
+
+    public static final String INPUT_NAME = "inputDefinitionName";
+
     public Map<Object, String> objectToId = new HashMap<Object, String>();
 
     public static final class BEntry<K, V> implements Map.Entry<K, V> {
@@ -500,6 +530,9 @@ public class XMLProcessDefinition {
                     fillUserFilterNode(userFilterNode, humanTaskDefinition.getUserFilter());
                     activityNode.addChild(userFilterNode);
                 }
+                if (humanTaskDefinition instanceof UserTaskDefinition && ((UserTaskDefinition) humanTaskDefinition).getContract() != null) {
+                    activityNode.addChild(createContractNode(((UserTaskDefinition) humanTaskDefinition).getContract()));
+                }
             } else if (activity instanceof CallActivityDefinition) {
                 fillCallActivity((CallActivityDefinition) activity, activityNode);
             } else if (activity instanceof SubProcessDefinition) {
@@ -522,6 +555,70 @@ public class XMLProcessDefinition {
         createAndfillIntermediateCatchEvents(containerDefinition, flowNodes);
         createAndFillIntermediateThrowEvents(containerDefinition, flowNodes);
         createAndFillEndEvents(containerDefinition, flowNodes);
+    }
+
+    private XMLNode createContractNode(final ContractDefinition contract) {
+        final XMLNode contractNode = new XMLNode(CONTRACT_NODE);
+        final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
+        if (!contract.getSimpleInputs().isEmpty()) {
+            for (final SimpleInputDefinition input : contract.getSimpleInputs()) {
+                inputsNode.addChild(createSimpleInputNode(input));
+            }
+        }
+        if (!contract.getComplexInputs().isEmpty()) {
+            for (final ComplexInputDefinition input : contract.getComplexInputs()) {
+                inputsNode.addChild(createComplexInputNode(input));
+            }
+        }
+        if (!inputsNode.getChildNodes().isEmpty()) {
+            contractNode.addChild(inputsNode);
+        }
+        final List<ConstraintDefinition> constraints = contract.getConstraints();
+        if (!constraints.isEmpty()) {
+            final XMLNode rulesNode = new XMLNode(CONTRACT_CONSTRAINTS_NODE);
+            contractNode.addChild(rulesNode);
+            for (final ConstraintDefinition constraintDefinition : constraints) {
+                rulesNode.addChild(createConstraintNode(constraintDefinition));
+            }
+        }
+        return contractNode;
+    }
+
+    private XMLNode createConstraintNode(final ConstraintDefinition constraintDefinition) {
+        final XMLNode xmlNode = new XMLNode(CONTRACT_CONSTRAINT_NODE);
+        xmlNode.addAttribute(NAME, constraintDefinition.getName());
+        xmlNode.addAttribute(CONSTRAINT_TYPE, constraintDefinition.getConstraintType().toString());
+        xmlNode.addChild(CONSTRAINT_EXPRESSION, constraintDefinition.getExpression());
+        xmlNode.addChild(CONSTRAINT_EXPLANATION, constraintDefinition.getExplanation());
+        final XMLNode namesNode = new XMLNode(INPUT_NAMES);
+        xmlNode.addChild(namesNode);
+        for (final String inputName : constraintDefinition.getInputNames()) {
+            namesNode.addChild(INPUT_NAME, inputName);
+        }
+        return xmlNode;
+    }
+
+    private XMLNode createComplexInputNode(final ComplexInputDefinition input) {
+        final XMLNode inputNode = new XMLNode(CONTRACT_COMPLEX_INPUT_NODE);
+        inputNode.addAttribute(NAME, input.getName());
+        inputNode.addAttribute(MULTIPLE, String.valueOf(input.isMultiple()));
+        inputNode.addAttribute(DESCRIPTION, input.getDescription());
+        for (final SimpleInputDefinition inputDefinition : input.getSimpleInputs()) {
+            inputNode.addChild(createSimpleInputNode(inputDefinition));
+        }
+        for (final ComplexInputDefinition inputDefinition : input.getComplexInputs()) {
+            inputNode.addChild(createComplexInputNode(inputDefinition));
+        }
+        return inputNode;
+    }
+
+    private XMLNode createSimpleInputNode(final SimpleInputDefinition input) {
+        final XMLNode inputNode = new XMLNode(CONTRACT_SIMPLE_INPUT_NODE);
+        inputNode.addAttribute(NAME, input.getName());
+        inputNode.addAttribute(MULTIPLE, String.valueOf(input.isMultiple()));
+        inputNode.addAttribute(DESCRIPTION, input.getDescription());
+        inputNode.addAttribute(TYPE, input.getType().toString());
+        return inputNode;
     }
 
     private void addBusinessDataDefinitionNodes(final List<BusinessDataDefinition> businessDataDefinitions, final XMLNode containerNode) {

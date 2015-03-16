@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -30,9 +30,10 @@ import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * Factory to construct works
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class WorkFactory {
 
@@ -54,14 +55,14 @@ public class WorkFactory {
             final FlowNodeSelector selectorForConnectorOnEnter) {
         BonitaWork wrappedWork = new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName, processInstanceId,
                 rootProcessInstanceId, activationEvent, selectorForConnectorOnEnter);
-        ProcessInstanceContextWork processInstanceContextWork = buildProcessInstanceContextWork(processDefinitionId, processInstanceId, rootProcessInstanceId,
+        final ProcessInstanceContextWork processInstanceContextWork = buildProcessInstanceContextWork(processDefinitionId, processInstanceId, rootProcessInstanceId,
                 wrappedWork);
         wrappedWork = new ConnectorDefinitionAndInstanceContextWork(processInstanceContextWork, connectorDefinitionName, connectorInstanceId,
                 activationEvent);
         return new FailureHandlingBonitaWork(wrappedWork);
     }
 
-    public static BonitaWork createExecuteFlowNodeWork(long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,
+    public static BonitaWork createExecuteFlowNodeWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,
             final List<SOperation> operations, final SExpressionContext contextDependency) {
         if (processInstanceId <= 0) {
             throw new RuntimeException("It is forbidden to create a ExecuteFlowNodeWork with a processInstanceId equals to " + processInstanceId);
@@ -100,14 +101,14 @@ public class WorkFactory {
     }
 
     private static BonitaWork buildFlowNodeDefinitionAndInstanceContextWork(final long processDefinitionId, final long processInstanceId,
-            final long rootProcessInstanceId, final long flowNodeInstanceId, BonitaWork wrappedWork) {
+            final long rootProcessInstanceId, final long flowNodeInstanceId, final BonitaWork wrappedWork) {
         final ProcessInstanceContextWork processInstanceContextWork = buildProcessInstanceContextWork(processDefinitionId, processInstanceId,
                 rootProcessInstanceId, wrappedWork);
         return new FlowNodeDefinitionAndInstanceContextWork(processInstanceContextWork, flowNodeInstanceId);
     }
 
     private static ProcessInstanceContextWork buildProcessInstanceContextWork(final long processDefinitionId, final long processInstanceId,
-            final long rootProcessInstanceId, BonitaWork wrappedWork) {
+            final long rootProcessInstanceId, final BonitaWork wrappedWork) {
         final ProcessDefinitionContextWork processDefinitionContextWork = new ProcessDefinitionContextWork(wrappedWork, processDefinitionId);
         return new ProcessInstanceContextWork(processDefinitionContextWork, processInstanceId, rootProcessInstanceId);
     }

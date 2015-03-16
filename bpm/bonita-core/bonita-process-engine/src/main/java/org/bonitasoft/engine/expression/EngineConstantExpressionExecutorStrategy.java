@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
- * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -28,6 +28,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
@@ -51,7 +52,6 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -266,7 +266,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     private Serializable createContext(final Map<String, Object> context, final ContainerState containerState) throws SProcessInstanceNotFoundException,
-            SProcessInstanceReadException, SActivityInstanceNotFoundException, SBonitaReadException {
+            SProcessInstanceReadException, SActivityInstanceNotFoundException, SFlowNodeReadException, SBonitaReadException {
         final EngineExecutionContext ctx = new EngineExecutionContext();
         if (context.containsKey(SExpressionContext.CONTAINER_TYPE_KEY) && context.containsKey(SExpressionContext.CONTAINER_ID_KEY)) {
             final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
@@ -319,7 +319,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         ctx.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
     }
 
-    private void updateContextFromActivityInstance(final EngineExecutionContext ctx, final long activityInstanceId) throws SBonitaReadException,
+    private void updateContextFromActivityInstance(final EngineExecutionContext ctx, final long activityInstanceId) throws SActivityReadException,
             SActivityInstanceNotFoundException {
         ctx.setActivityInstanceId(activityInstanceId);
         final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);

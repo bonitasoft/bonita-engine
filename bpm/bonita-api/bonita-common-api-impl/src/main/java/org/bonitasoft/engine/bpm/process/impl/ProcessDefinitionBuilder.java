@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,10 +21,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.lang.model.SourceVersion;
+
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.AutomaticTaskDefinition;
@@ -36,12 +42,14 @@ import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
+import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.ReceiveTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.SendTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
+import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -79,9 +87,9 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * {@link #getProcess()} is called.
      *
      * @param name
-     *            the process name
+     *        the process name
      * @param version
-     *            the process version
+     *        the process version
      * @return
      */
     public ProcessDefinitionBuilder createNewInstance(final String name, final String version) {
@@ -99,7 +107,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      *
      * @return the process being build
      * @throws InvalidProcessDefinitionException
-     *             when the process definition is inconsistent. The exception contains causes
+     *         when the process definition is inconsistent. The exception contains causes
      */
     public DesignProcessDefinition done() throws InvalidProcessDefinitionException {
         validateProcess();
@@ -120,19 +128,85 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         validateBusinessData();
     }
 
+    /**
+     * Add a new {@link BusinessDataDefinition} on this process.
+     *
+     * @param name
+     *        The name of the new {@link BusinessDataDefinition}
+     * @param className
+     *        The complete name of class defining the new {@link BusinessDataDefinition} type
+     * @param defaultValue
+     *        The expression representing the default value
+     * @return The {@link BusinessDataDefinitionBuilder} containing the new {@link BusinessDataDefinition}
+     */
+    public BusinessDataDefinitionBuilder addBusinessData(final String name, final String className, final Expression defaultValue) {
+        return new BusinessDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue);
+    }
+
     protected void validateBusinessData() {
         final FlowElementContainerDefinition processContainer = process.getProcessContainer();
         final List<BusinessDataDefinition> businessDataDefinitions = processContainer.getBusinessDataDefinitions();
-        if (!businessDataDefinitions.isEmpty()) {
-            addError("It is not possible to use business data in the process");
+        for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+            final Expression defaultValueExpression = businessDataDefinition.getDefaultValueExpression();
+            if (businessDataDefinition.isMultiple() && defaultValueExpression != null && !defaultValueExpression.getReturnType().equals(List.class.getName())) {
+                addError("The return type of the initial value expression of the multiple business data: '" + businessDataDefinition.getName() + "' must be "
+                        + List.class.getName());
+            }
+
+            final List<ActivityDefinition> activities = processContainer.getActivities();
+            for (final ActivityDefinition activity : activities) {
+                final LoopCharacteristics loopCharacteristics = activity.getLoopCharacteristics();
+                if (loopCharacteristics instanceof MultiInstanceLoopCharacteristics) {
+                    if (businessDataDefinition.getName().equals(((MultiInstanceLoopCharacteristics) loopCharacteristics).getLoopDataInputRef())
+                            && !businessDataDefinition.isMultiple()) {
+                        addError("The business data " + businessDataDefinition.getName() + " used in the multi instance " + activity.getName()
+                                + " must be multiple");
+                    }
+                }
+            }
         }
 
         for (final ActivityDefinition activity : processContainer.getActivities()) {
             final List<BusinessDataDefinition> dataDefinitions = activity.getBusinessDataDefinitions();
-            if (!dataDefinitions.isEmpty()) {
-                addError("It is not possible to use business data in the activity " + activity.getName());
+            if (activity.getLoopCharacteristics() instanceof MultiInstanceLoopCharacteristics) {
+                final MultiInstanceLoopCharacteristics multiInstanceCharacteristics = (MultiInstanceLoopCharacteristics) activity.getLoopCharacteristics();
+                final String loopDataInputRef = multiInstanceCharacteristics.getLoopDataInputRef();
+                if (!isReferenceValid(loopDataInputRef)) {
+                    addError("The activity " + activity.getName() + "contains a reference " + loopDataInputRef
+                            + " for the loop data input to an unknown data");
+                }
+                final String dataInputItemRef = multiInstanceCharacteristics.getDataInputItemRef();
+                if (!isReferenceValid(dataInputItemRef, activity)) {
+                    addError("The activity " + activity.getName() + "contains a reference " + dataInputItemRef
+                            + " for the data input item to an unknown data");
+                }
+                final String dataOutputItemRef = multiInstanceCharacteristics.getDataOutputItemRef();
+                if (!isReferenceValid(dataOutputItemRef, activity)) {
+                    addError("The activity " + activity.getName() + "contains a reference " + dataOutputItemRef
+                            + " for the data output item to an unknown data");
+                }
+                final String loopDataOutputRef = multiInstanceCharacteristics.getLoopDataOutputRef();
+                if (!isReferenceValid(loopDataOutputRef)) {
+                    addError("The activity " + activity.getName() + "contains a reference " + loopDataOutputRef
+                            + " for the loop data input to an unknown data");
+                }
+            } else if (!dataDefinitions.isEmpty()) {
+                addError("The activity " + activity.getName() + " contains business data but this activity does not have the multiple instance behaviour");
             }
         }
+    }
+
+    private boolean isReferenceValid(final String dataReference) {
+        final FlowElementContainerDefinition processContainer = process.getProcessContainer();
+        return dataReference == null || processContainer.getBusinessDataDefinition(dataReference) != null
+                || processContainer.getDataDefinition(dataReference) != null;
+    }
+
+    private boolean isReferenceValid(final String dataReference, final ActivityDefinition activity) {
+        final FlowElementContainerDefinition processContainer = process.getProcessContainer();
+        return dataReference == null || activity.getBusinessDataDefinition(dataReference) != null
+                || processContainer.getBusinessDataDefinition(dataReference) != null || activity.getDataDefinition(dataReference) != null
+                || processContainer.getDataDefinition(dataReference) != null;
     }
 
     private void validateConnectors(final List<ConnectorDefinition> connectorDefinitions) {
@@ -211,6 +285,9 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private void validateActivities(final FlowElementContainerDefinition processContainer) {
         for (final ActivityDefinition activity : processContainer.getActivities()) {
+            if (activity instanceof UserTaskDefinition) {
+                validateUserTask((UserTaskDefinition) activity);
+            }
             if (activity instanceof CallActivityDefinition && ((CallActivityDefinition) activity).getCallableElement() == null) {
                 addError("The call activity " + activity.getName() + " has a null callable element");
             }
@@ -231,6 +308,47 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                             + " through the same activty");
                 }
             }
+        }
+    }
+
+    private void validateUserTask(final UserTaskDefinition userTaskDefinition) {
+        final ContractDefinition contract = userTaskDefinition.getContract();
+        if (contract != null) {
+            validateUserTaskContractInputs(contract.getSimpleInputs(), contract.getComplexInputs());
+
+            for (final ConstraintDefinition constraint : contract.getConstraints()) {
+                if (constraint.getName() == null) {
+                    addError("A constraint name is missing");
+                }
+                if (constraint.getExpression() == null) {
+                    addError("The expression of constraint" + constraint.getName() + " is missing");
+                }
+            }
+        }
+    }
+
+    private void validateUserTaskContractInputs(final List<SimpleInputDefinition> simpleInputDefinitions,
+            final List<ComplexInputDefinition> complexInputDefinitions) {
+        for (final SimpleInputDefinition simpleInputDefinition : simpleInputDefinitions) {
+            validateContractInput(simpleInputDefinition);
+        }
+        for (final ComplexInputDefinition complexInputDefinition : complexInputDefinitions) {
+            validateContractInput(complexInputDefinition);
+        }
+    }
+
+    private void validateContractInput(final ComplexInputDefinition complexInputDefinition) {
+        validateContractInputName(complexInputDefinition.getName());
+        validateUserTaskContractInputs(complexInputDefinition.getSimpleInputs(), complexInputDefinition.getComplexInputs());
+    }
+
+    private void validateContractInput(final SimpleInputDefinition inputDefinition) {
+        validateContractInputName(inputDefinition.getName());
+    }
+
+    private void validateContractInputName(final String name) {
+        if (!SourceVersion.isIdentifier(name)) {
+            designErrors.add("contract input name " + name + " is invalid");
         }
     }
 
@@ -426,7 +544,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * Sets the process display name. When set, It is used to replace the name in the Bonita BPM Portal
      *
      * @param name
-     *            display name
+     *        display name
      * @return
      */
     public ProcessDefinitionBuilder addDisplayName(final String name) {
@@ -438,7 +556,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * Sets the process display description
      *
      * @param description
-     *            display description
+     *        display description
      * @return
      */
     public ProcessDefinitionBuilder addDisplayDescription(final String description) {
@@ -622,7 +740,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * Adds an actor on this process
      *
      * @param actorName
-     *            actor name
+     *        actor name
      * @see #addActor(String, boolean)
      */
     public ActorDefinitionBuilder addActor(final String actorName) {
@@ -633,9 +751,9 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * Adds an actor on this process
      *
      * @param name
-     *            actor name
+     *        actor name
      * @param initiator
-     *            defines whether it's the actor initiator (actor that's able to start the process)
+     *        defines whether it's the actor initiator (actor that's able to start the process)
      * @return
      */
     public ActorDefinitionBuilder addActor(final String name, final boolean initiator) {
@@ -663,10 +781,24 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * @return
      *         the process being build
      * @throws InvalidProcessDefinitionException
-     *             when the process definition is inconsistent. The exception contains causes
+     *         when the process definition is inconsistent. The exception contains causes
      */
     public DesignProcessDefinition getProcess() throws InvalidProcessDefinitionException {
         return done();
+    }
+
+
+    /**
+     * Add a parameter on this process.
+     *
+     * @param parameterName
+     *        The name of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
+     * @param type
+     *        The type of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition} (complete class name)
+     * @return The {@link ParameterDefinitionBuilder} containing the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
+     */
+    public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
+        return new ParameterDefinitionBuilder(this, process, parameterName, type);
     }
 
 }

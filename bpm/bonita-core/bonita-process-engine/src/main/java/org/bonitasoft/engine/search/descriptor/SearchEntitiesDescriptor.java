@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -65,6 +65,8 @@ public class SearchEntitiesDescriptor {
 
     private final SearchProfileDescriptor searchProfileDescriptor;
 
+    private final SearchFormMappingDescriptor searchFormMappingDescriptor;
+
     private final SearchProfileEntryDescriptor searchProfileEntryDescriptor;
 
     private final SearchProfileMemberUserDescriptor searchProfileMemberUserDescriptor;
@@ -78,6 +80,14 @@ public class SearchEntitiesDescriptor {
     private final SearchThemeDescriptor searchThemeDescriptor;
 
     private final SearchEventTriggerInstanceDescriptor searchEventTriggerInstanceDescriptor;
+
+    private final SearchPageDescriptor searchPageDescriptor;
+
+    private final SearchApplicationDescriptor searchApplicationDescriptor;
+
+    private final SearchApplicationMenuDescriptor searchApplicationMenuDescriptor;
+
+    private final SearchApplicationPageDescriptor searchApplicationPageDescriptor;
 
     public SearchEntitiesDescriptor() {
         searchUserDescriptor = new SearchUserDescriptor();
@@ -109,6 +119,11 @@ public class SearchEntitiesDescriptor {
         searchProfileMemberRoleAndGroupDescriptor = new SearchProfileMemberRoleAndGroupDescriptor();
         searchThemeDescriptor = new SearchThemeDescriptor();
         searchEventTriggerInstanceDescriptor = new SearchEventTriggerInstanceDescriptor();
+        searchPageDescriptor = new SearchPageDescriptor();
+        searchApplicationDescriptor = new SearchApplicationDescriptor();
+        searchApplicationMenuDescriptor = new SearchApplicationMenuDescriptor();
+        searchApplicationPageDescriptor = new SearchApplicationPageDescriptor();
+        searchFormMappingDescriptor = new SearchFormMappingDescriptor();
     }
 
     public SearchUserDescriptor getSearchUserDescriptor() {
@@ -199,6 +214,10 @@ public class SearchEntitiesDescriptor {
         return searchProfileDescriptor;
     }
 
+    public SearchFormMappingDescriptor getSearchFormMappingDescriptor() {
+        return searchFormMappingDescriptor;
+    }
+
     public SearchProfileEntryDescriptor getSearchProfileEntryDescriptor() {
         return searchProfileEntryDescriptor;
     }
@@ -225,6 +244,22 @@ public class SearchEntitiesDescriptor {
 
     public SearchEventTriggerInstanceDescriptor getSearchEventTriggerInstanceDescriptor() {
         return searchEventTriggerInstanceDescriptor;
+    }
+
+    public SearchPageDescriptor getSearchPageDescriptor() {
+        return searchPageDescriptor;
+    }
+
+    public SearchApplicationDescriptor getSearchApplicationDescriptor() {
+        return searchApplicationDescriptor;
+    }
+
+    public SearchApplicationMenuDescriptor getSearchApplicationMenuDescriptor() {
+        return searchApplicationMenuDescriptor;
+    }
+
+    public SearchApplicationPageDescriptor getSearchApplicationPageDescriptor() {
+        return searchApplicationPageDescriptor;
     }
 
 }

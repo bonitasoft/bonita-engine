@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,9 +13,13 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.process;
 
+import java.util.List;
+
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.form.FormMappingService;
+import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -30,18 +34,27 @@ public class DeleteProcess extends DeleteArchivedProcessInstances {
     private final ProcessDefinitionService processDefinitionService;
     private final ActorMappingService actorMappingService;
     private final ClassLoaderService classLoaderService;
+    private final FormMappingService formMappingService;
 
     public DeleteProcess(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) {
         super(tenantAccessor, processDefinitionId);
         processDefinitionService = tenantAccessor.getProcessDefinitionService();
         actorMappingService = tenantAccessor.getActorMappingService();
         classLoaderService = tenantAccessor.getClassLoaderService();
+        formMappingService = tenantAccessor.getFormMappingService();
     }
 
     @Override
     public void execute() throws SBonitaException {
         super.execute();
         actorMappingService.deleteActors(getProcessDefinitionId());
+        List<SFormMapping> formMappings;
+        do {
+            formMappings = formMappingService.list(getProcessDefinitionId(), 0, 100);
+            for (SFormMapping formMapping : formMappings) {
+                formMappingService.delete(formMapping);
+            }
+        } while (formMappings.size() == 100);
         try {
             processDefinitionService.delete(getProcessDefinitionId());
         } catch (final SProcessDefinitionNotFoundException spdnfe) {

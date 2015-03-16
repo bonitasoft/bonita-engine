@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2013-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,6 +15,7 @@ package org.bonitasoft.engine.io;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,13 +34,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.xml.sax.SAXException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -233,7 +246,7 @@ public class IOUtil {
             public void run() {
                 try {
                     final boolean deleted = deleteDir(tmpDir);
-                    if(!deleted) {
+                    if (!deleted) {
                         System.err.println("Unable to delete the directory: " + tmpDir);
                     }
                 } catch (final IOException e) {
@@ -393,7 +406,7 @@ public class IOUtil {
     }
 
     private static int copyFileToZip(final ZipOutputStream zos, final byte[] readBuffer, final File file, final int bytesInOfZip) throws FileNotFoundException,
-    IOException {
+            IOException {
         final FileInputStream fis = new FileInputStream(file);
         int bytesIn = bytesInOfZip;
         try {
@@ -444,7 +457,7 @@ public class IOUtil {
 
     /**
      * Read the contents of the given file.
-     *
+     * 
      * @param file
      */
     public static String read(final File file) throws IOException {
@@ -478,7 +491,7 @@ public class IOUtil {
     }
 
     private static void extractZipEntries(final ZipInputStream zipInputstream, final File outputFolder) throws FileNotFoundException,
-    IOException {
+            IOException {
         ZipEntry zipEntry = null;
         while ((zipEntry = zipInputstream.getNextEntry()) != null) {
             try {
@@ -533,13 +546,13 @@ public class IOUtil {
         }
     }
 
-    public static void write(final File file, final Entry<String, byte[]> entry) throws FileNotFoundException, IOException {
+    public static void write(final File file, final byte[] content) throws FileNotFoundException, IOException {
         FileOutputStream fos = null;
         BufferedOutputStream bos = null;
         try {
             fos = new FileOutputStream(file);
             bos = new BufferedOutputStream(fos);
-            bos.write(entry.getValue());
+            bos.write(content);
             bos.flush();
         } finally {
             if (bos != null) {
@@ -569,6 +582,51 @@ public class IOUtil {
             if (fin != null) {
                 fin.close();
             }
+        }
+    }
+
+    public static byte[] marshallObjectToXML(final Object jaxbModel, final URL schemaURL) throws JAXBException, IOException, SAXException {
+        if (jaxbModel == null) {
+            return null;
+        }
+        if (schemaURL == null) {
+            throw new IllegalArgumentException("schemaURL is null");
+        }
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        final Schema schema = sf.newSchema(schemaURL);
+        try {
+            final JAXBContext contextObj = JAXBContext.newInstance(jaxbModel.getClass());
+            final Marshaller m = contextObj.createMarshaller();
+            m.setSchema(schema);
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.marshal(jaxbModel, baos);
+        } finally {
+            baos.close();
+        }
+        return baos.toByteArray();
+    }
+
+    public static <T> T unmarshallXMLtoObject(final byte[] xmlObject, final Class<T> objectClass, final URL schemaURL) throws JAXBException, IOException,
+            SAXException {
+        if (xmlObject == null) {
+            return null;
+        }
+        if (schemaURL == null) {
+            throw new IllegalArgumentException("schemaURL is null");
+        }
+        final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        final Schema schema = sf.newSchema(schemaURL);
+        final JAXBContext contextObj = JAXBContext.newInstance(objectClass);
+        final Unmarshaller um = contextObj.createUnmarshaller();
+        um.setSchema(schema);
+        final ByteArrayInputStream bais = new ByteArrayInputStream(xmlObject);
+        final StreamSource ss = new StreamSource(bais);
+        try {
+            final JAXBElement<T> jaxbElement = um.unmarshal(ss, objectClass);
+            return jaxbElement.getValue();
+        } finally {
+            bais.close();
         }
     }
 

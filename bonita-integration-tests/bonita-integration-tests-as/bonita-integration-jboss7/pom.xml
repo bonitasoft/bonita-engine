@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.bonitasoft.engine.test</groupId>
         <artifactId>bonita-integration-tests-as</artifactId>
-        <version>6.5.0-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-integration-jboss7</artifactId>
@@ -27,7 +27,6 @@
         <jboss.conf.dir>${jboss.default.dir}/configuration</jboss.conf.dir>
         <jboss.deploy.dir>${jboss.default.dir}/deployments</jboss.deploy.dir>
         <jboss.lib.dir>${jboss.default.dir}/lib</jboss.lib.dir>
-        <invoker.port>4411</invoker.port>
 
         <bonita.home>${jboss.home}/bonita</bonita.home>
         <if.task>net.sf.antcontrib.logic.IfTask</if.task>
@@ -256,6 +255,17 @@
                                         <copy file="${basedir}/client/jboss-ejb-client.properties" todir="${project.build.directory}/test-classes" overwrite="true" />
                                         <copy file="${basedir}/client/logback.xml" todir="${bonita.home}/client/conf" overwrite="true" />
                                         
+                                        <!-- Change Dialect of BDR -->
+                                         <if>
+                                            <not><equals arg1="${db.vendor}" arg2="h2" /></not>
+                                            <then><replaceregexp
+                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties"
+                                                match="businessdata.hibernate.dialect=.*"
+                                                replace="businessdata.hibernate.dialect=org.hibernate.dialect.PostgreSQL82Dialect"
+                                                byline="true"/>
+                                            </then>
+                                        </if>
+
                                         <mkdir dir="${project.build.directory}/test-classes"/>
                                         <copy file="${basedir}/client/logback.xml" todir="${project.build.directory}/test-classes" overwrite="true" />
 
@@ -350,6 +360,8 @@
 									<sysprop.bonita.transaction.manager>java:jboss/TransactionManager</sysprop.bonita.transaction.manager>
 									<sysprop.bonita.userTransaction>java:jboss/UserTransaction</sysprop.bonita.userTransaction>
 									<sysprop.bonita.database.journal.datasource.name>java:jboss/datasources/bonitaDS</sysprop.bonita.database.journal.datasource.name>
+                                    <sysprop.bonita.businessdata.datasource.jndi>java:jboss/datasources/BusinessDataDS</sysprop.bonita.businessdata.datasource.jndi>
+                                    <sysprop.bonita.businessdata.notmanageddatasource.jndi>java:jboss/datasources/NotManagedBizDataDS</sysprop.bonita.businessdata.notmanageddatasource.jndi>
 									<sysprop.bonita.database.sequence.manager.datasource.name>jboss/datasources/bonitaSequenceManagerDS</sysprop.bonita.database.sequence.manager.datasource.name>
 									<sysprop.bonita.hibernate.transaction.jta_platform>org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</sysprop.bonita.hibernate.transaction.jta_platform>
                                     <hibernate.transaction.manager_lookup_class>org.bonitasoft.JBoss7TransactionManagerLookup</hibernate.transaction.manager_lookup_class>

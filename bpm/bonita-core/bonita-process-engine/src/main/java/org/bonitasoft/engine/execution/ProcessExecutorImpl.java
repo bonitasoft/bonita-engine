@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
+import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bpm.bar.DocumentsResourcesContribution;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
@@ -33,6 +34,7 @@ import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -53,6 +55,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
@@ -67,13 +70,16 @@ import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefini
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionCreationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
@@ -85,6 +91,8 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.business.data.SRefBusinessDataInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -110,7 +118,6 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
@@ -165,6 +172,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private final TransitionEvaluator transitionEvaluator;
 
+    private BusinessDataRepository businessDataRepository;
+
+    private RefBusinessDataService refBusinessDataService;
+
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
             final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
             final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
@@ -173,7 +184,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
-            final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager, final TransitionEvaluator transitionEvaluator) {
+            final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager, BusinessDataRepository businessDataRepository, RefBusinessDataService refBusinessDataService, final TransitionEvaluator transitionEvaluator) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
@@ -194,6 +205,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
         this.transitionEvaluator = transitionEvaluator;
+        this.businessDataRepository = businessDataRepository;
+        this.refBusinessDataService = refBusinessDataService;
         // dependency injection because of circular references...
         flowNodeStateManager.setProcessExecutor(this);
         eventsHandler.setProcessExecutor(this);
@@ -292,7 +305,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return createProcessInstance(processDefinition, starterId, starterSubstituteId, callerId, null, -1);
     }
 
-    private SActivityInstance getCaller(final long callerId) throws SBonitaReadException, SActivityInstanceNotFoundException {
+    private SActivityInstance getCaller(final long callerId) throws SActivityReadException, SActivityInstanceNotFoundException {
         if (callerId > 0) {
             return activityInstanceService.getActivityInstance(callerId);
         }
@@ -372,6 +385,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         flowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, 0, stateCategory, -1);
     }
 
+    
     protected void executeOperations(final List<SOperation> operations, final Map<String, Object> context, final SExpressionContext expressionContext,
             SProcessInstance sProcessInstance) throws SBonitaException {
         if (operations != null && !operations.isEmpty()) {
@@ -389,15 +403,21 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors,
             final FlowNodeSelector selectorForConnectorOnEnter) throws BonitaHomeNotSetException, IOException,
             InvalidEvaluationConnectorConditionException, SBonitaException {
+        if (expressionContext == null) {
+            expressionContext = new SExpressionContext();
+        }
+        expressionContext.setProcessDefinitionId(sProcessDefinition.getId());
+
         // Create SDataInstances
         bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition, expressionContext, operations, context);
+
+        initializeData(sProcessDefinition, sProcessInstance);
+        initializeBusinessData(sProcessDefinition, sProcessInstance, expressionContext);
+
         createDocuments(sProcessDefinition, sProcessInstance, userId);
         createDocumentLists(sProcessDefinition, sProcessInstance, userId, expressionContext, context);
         if (connectors != null) {
             executeConnectors(sProcessDefinition, sProcessInstance, connectors);
-        }
-        if (expressionContext == null) {
-            expressionContext = new SExpressionContext();
         }
         executeOperations(operations, context, expressionContext, sProcessInstance);
 
@@ -405,6 +425,57 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         bpmInstancesCreator.createConnectorInstances(sProcessInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
 
         return executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_ENTER, selectorForConnectorOnEnter);
+    }
+
+    protected void initializeData(final SProcessDefinition sDefinition, final SProcessInstance sInstance) throws SProcessInstanceCreationException {
+        // nothing to do
+    }
+
+    private void initializeBusinessData(SProcessDefinition sDefinition, SProcessInstance sInstance, SExpressionContext expressionContext)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException,
+            SRefBusinessDataInstanceCreationException {
+        final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
+        for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
+            final SExpression expression = bdd.getDefaultValueExpression();
+            if (bdd.isMultiple()) {
+                final List<Long> dataIds = initializeMultipleBusinessDataIds(expressionContext, expression);
+                final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
+                final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), dataIds, bdd.getClassName())
+                        .done();
+                refBusinessDataService.addRefBusinessDataInstance(instance);
+            } else {
+                Long primaryKey = initializeSingleBusinessData(expressionContext, expression);
+                final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
+                final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey,
+                        bdd.getClassName())
+                        .done();
+                refBusinessDataService.addRefBusinessDataInstance(instance);
+            }
+        }
+    }
+
+    private Long initializeSingleBusinessData(SExpressionContext expressionContext, SExpression expression) throws SExpressionTypeUnknownException,
+            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+        Long primaryKey = null;
+        if (expression != null) {
+            Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
+            businessData = businessDataRepository.merge(businessData);
+            primaryKey = businessData.getPersistenceId();
+        }
+        return primaryKey;
+    }
+
+    private List<Long> initializeMultipleBusinessDataIds(SExpressionContext expressionContext, SExpression expression) throws SExpressionTypeUnknownException,
+            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+        final List<Long> dataIds = new ArrayList<Long>();
+        if (expression != null) {
+            final List<Entity> businessData = (List<Entity>) expressionResolverService.evaluate(expression, expressionContext);
+            for (final Entity entity : businessData) {
+                final Entity tmp = businessDataRepository.merge(entity);
+                dataIds.add(tmp.getPersistenceId());
+            }
+        }
+        return dataIds;
     }
 
     protected void createDocuments(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance, final long authorId)
@@ -732,7 +803,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             try {
                 localClassLoader.loadClass(this.getClass().getName());
             } catch (final ClassNotFoundException e) {
-                //ignore, just to load
+                // ignore, just to load
             }
             final SProcessInstance sProcessInstance = createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, callerId);
 

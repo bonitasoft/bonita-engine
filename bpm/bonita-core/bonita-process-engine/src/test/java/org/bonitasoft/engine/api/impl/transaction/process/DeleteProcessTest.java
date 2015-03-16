@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
- * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl.transaction.process;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -42,6 +43,8 @@ public class DeleteProcessTest {
     @Mock
     private ActorMappingService actorMappingService;
     @Mock
+    private FormMappingService formMappingService;
+    @Mock
     private ProcessInstanceService processInstanceService;
 
     /**
@@ -56,6 +59,7 @@ public class DeleteProcessTest {
         Mockito.when(tenantAccessor.getClassLoaderService()).thenReturn(classLoaderService);
         Mockito.when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
         Mockito.when(tenantAccessor.getActorMappingService()).thenReturn(actorMappingService);
+        Mockito.when(tenantAccessor.getFormMappingService()).thenReturn(formMappingService);
         Mockito.when(tenantAccessor.getProcessInstanceService()).thenReturn(processInstanceService);
         final DeleteProcess deleteProcess = new DeleteProcess(tenantAccessor, processDefinitionId);
 

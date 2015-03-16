@@ -18,6 +18,7 @@
 				  <linecontains>
 				    <contains value="version>"/>
 				  </linecontains>
+                <headfilter lines="1" />
 				<replaceregex pattern=".*&lt;version&gt;(.*)&lt;/version&gt;.*" replace="\1" />
 			</filterchain>
 		</loadfile>

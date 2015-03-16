@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.bonitasoft.engine.test</groupId>
 		<artifactId>bonita-integration-tests-as</artifactId>
-		<version>6.5.0-SNAPSHOT</version>
+		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-tomcat7</artifactId>
@@ -258,6 +258,13 @@
 										<copy todir="${bonita.home}" verbose="true">
                                             <fileset dir="${distrib.dir}/resources/home/"/>
 										</copy>
+
+										<!-- Change Dialect of BDR -->
+                                        <property file="tomcat/${db.vendor}/bdm.properties"/>
+                                        <replaceregexp
+                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties"
+                                                match="businessdata.hibernate.dialect=.*"
+                                                replace="businessdata.hibernate.dialect=${bdm.dialect}" byline="true"/>
 
                                         <copy file="${basedir}/client/bonita-client.properties"
                                               todir="${bonita.home}/client/conf" overwrite="true"/>

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -640,12 +640,8 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public long getNumberOfProfiles(final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.emptyMap();
-            return persistenceService.getNumberOfEntities(SProfile.class, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+        final Map<String, Object> parameters = Collections.emptyMap();
+        return persistenceService.getNumberOfEntities(SProfile.class, queryOptions, parameters);
     }
 
     @Override
@@ -662,12 +658,8 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public long getNumberOfProfileEntries(final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.emptyMap();
-            return persistenceService.getNumberOfEntities(SProfileEntry.class, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+        final Map<String, Object> parameters = Collections.emptyMap();
+        return persistenceService.getNumberOfEntities(SProfileEntry.class, queryOptions, parameters);
     }
 
     @Override

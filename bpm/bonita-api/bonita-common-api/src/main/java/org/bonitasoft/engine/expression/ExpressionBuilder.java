@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -418,6 +418,10 @@ public class ExpressionBuilder {
             throws InvalidExpressionException {
         createNewInstance(expressionName).setExpressionType(ExpressionType.TYPE_PARAMETER).setReturnType(returnType).setContent(parameterName);
         return done();
+    }
+
+    public Expression createContractInputExpression(final String inputName, final String returnType) throws InvalidExpressionException {
+        return createNewInstance(inputName).setContent(inputName).setExpressionType(ExpressionType.TYPE_CONTRACT_INPUT).setReturnType(returnType).done();
     }
 
     public Expression createComparisonExpression(final String name, final Expression leftOperand, final ComparisonOperator operator,

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2011, 2014 BonitaSoft S.A.
- * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -49,7 +50,9 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
     private final Map<String, Serializable> results = new HashMap<String, Serializable>(0);
 
     public EvaluateExpressionsDefinitionLevel(final Map<Expression, Map<String, Serializable>> expressions, final long processDefinitionId,
-            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService) {
+            final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
+            final BusinessDataRepository bdrService) {
+        super(bdrService);
         expressionsAndTheirPartialContext = expressions;
         this.processDefinitionId = processDefinitionId;
         expressionResolver = expressionResolverService;

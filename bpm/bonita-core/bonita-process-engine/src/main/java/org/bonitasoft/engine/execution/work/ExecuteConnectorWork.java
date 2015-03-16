@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -54,11 +54,17 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
 
     public ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
             final SExpressionContext inputParametersContext) {
+        this(processDefinitionId, connectorInstanceId, connectorDefinitionName, inputParametersContext, null);
+    }
+
+    public ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
+            final SExpressionContext inputParametersContext, final Map<String, Object> inputs) {
         super();
         this.processDefinitionId = processDefinitionId;
         this.connectorInstanceId = connectorInstanceId;
         this.connectorDefinitionName = connectorDefinitionName;
         this.inputParametersContext = inputParametersContext;
+        this.inputParametersContext.setInputValues(inputs);
     }
 
     protected abstract void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition, Exception Exception)

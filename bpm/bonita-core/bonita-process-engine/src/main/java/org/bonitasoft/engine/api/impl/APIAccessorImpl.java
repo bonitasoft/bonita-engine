@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,17 +14,16 @@
 package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.APIAccessor;
+import org.bonitasoft.engine.api.ApplicationAPI;
+import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Matthieu Chaffotte
@@ -63,5 +62,24 @@ public class APIAccessorImpl implements APIAccessor {
     @Override
     public PermissionAPI getPermissionAPI() {
         return new PermissionAPIImpl();
+    }
+
+    public PageAPI getCustomPageAPI() {
+        return new PageAPIImpl();
+    }
+
+    @Override
+    public ApplicationAPI getLivingApplicationAPI() {
+        return new ApplicationAPIImpl();
+    }
+
+    @Override
+    public ProcessConfigurationAPI getProcessConfigurationAPIi() {
+        return new ProcessConfigurationAPIImpl();
+    }
+
+    @Override
+    public BusinessDataAPI getBusinessDataAPI() {
+        return new BusinessDataAPIImpl();
     }
 }

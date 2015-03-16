@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-process-definition</artifactId>
 		<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-		<version>6.5.0-SNAPSHOT</version>
+		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-process-definition-api</artifactId>
@@ -62,6 +62,16 @@
 			<groupId>org.bonitasoft.engine.xml</groupId>
 			<artifactId>bonita-xml-api</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+            <scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.assertj</groupId>
+		    <artifactId>assertj-core</artifactId>
+		    <scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -12,6 +12,8 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 package org.bonitasoft.engine.expression;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -100,4 +102,16 @@ public class ExpressionBuilderTest {
     public void setReturnTypeShouldAllowNonPrimitiveBooleanType() throws Exception {
         new ExpressionBuilder().createNewInstance("someName").setReturnType(Boolean.class.getName());
     }
+
+    @Test
+    public void createContractInputExpressionShouldConstructARightExpression() throws Exception {
+        final Expression expression = new ExpressionBuilder().createContractInputExpression("comment", String.class.getName());
+        assertThat(expression.getName()).isEqualTo("comment");
+        assertThat(expression.getContent()).isEqualTo("comment");
+        assertThat(expression.getReturnType()).isEqualTo(String.class.getName());
+        assertThat(expression.getDependencies()).isEmpty();
+        assertThat(expression.getExpressionType()).isEqualTo(ExpressionType.TYPE_CONTRACT_INPUT.toString());
+        assertThat(expression.getInterpreter()).isNull();
+    }
+
 }

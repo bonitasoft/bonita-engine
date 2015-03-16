@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -38,28 +38,15 @@ public class ContainerRegistry {
 
     private final WorkService workService;
 
-    /**
-     * @param workService
-     */
     public ContainerRegistry(final WorkService workService) {
         super();
         this.workService = workService;
     }
 
-    /**
-     * @param containerExecutor
-     */
     public void addContainerExecutor(final ContainerExecutor containerExecutor) {
         executors.put(containerExecutor.getHandledType(), containerExecutor);
     }
 
-    /**
-     * @param processDefinitionId
-     * @param flowNodeInstanceId
-     * @param parentId
-     * @param parentType
-     * @throws SBonitaException
-     */
     public void nodeReachedState(final long processDefinitionId, final long flowNodeInstanceId, final long parentId, final String parentType)
             throws SBonitaException {
         final ContainerExecutor containerExecutor = executors.get(parentType);
@@ -74,32 +61,16 @@ public class ContainerRegistry {
         return executors.get(containerType);
     }
 
-    /**
-     * @param processDefinitionId
-     * @param flowNodeInstanceId
-     * @param contextDependency
-     * @param operations
-     * @param processInstanceId
-     * @throws SWorkRegisterException
-     */
     public void executeFlowNode(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,
             final SExpressionContext contextDependency, final List<SOperation> operations) throws SWorkRegisterException {
         workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, processInstanceId, flowNodeInstanceId, operations,
                 contextDependency));
     }
 
-    /**
-     * @param flowNodeInstanceId
-     * @param contextDependency
-     * @param operations
-     * @param containerType
-     * @param processInstanceId
-     * @throws SFlowNodeReadException
-     * @throws SFlowNodeExecutionException
-     */
     public void executeFlowNodeInSameThread(final Long processInstanceId, final long flowNodeInstanceId, final SExpressionContext contextDependency,
             final List<SOperation> operations, final String containerType) throws SFlowNodeReadException, SFlowNodeExecutionException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
         containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
     }
+
 }

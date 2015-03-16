@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
@@ -87,7 +101,7 @@ public class ActivityInstanceServiceImplTest {
     }
 
     @Test
-    public void getPossibleUserIdsOfPendingTasks() throws SBonitaReadException {
+    public void getPossibleUserIdsOfPendingTasks() throws Exception {
         final List<Long> sUserIds = new ArrayList<Long>();
         Collections.addAll(sUserIds, 78l, 2l, 5l, 486l);
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(sUserIds);
@@ -96,14 +110,14 @@ public class ActivityInstanceServiceImplTest {
         assertEquals(sUserIds, userIds);
     }
 
-    @Test(expected = SBonitaReadException.class)
-    public void throwExceptionwhenGettingPossibleUserIdsOfPendingTasksDueToPersistenceException() throws SBonitaReadException {
+    @Test(expected = SActivityReadException.class)
+    public void throwExceptionwhenGettingPossibleUserIdsOfPendingTasksDueToPersistenceException() throws Exception {
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenThrow(new SBonitaReadException("database out"));
         activityInstanceServiceImpl.getPossibleUserIdsOfPendingTasks(2, 0, 10);
     }
 
     @Test
-    public void getEmptyPossibleUserIdsOfPendingTasks() throws SBonitaReadException {
+    public void getEmptyPossibleUserIdsOfPendingTasks() throws Exception {
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(Collections.<Long> emptyList());
 
         final List<Long> userIds = activityInstanceServiceImpl.getPossibleUserIdsOfPendingTasks(2, 0, 10);

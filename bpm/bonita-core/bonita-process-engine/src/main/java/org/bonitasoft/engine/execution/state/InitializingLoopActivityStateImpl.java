@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,8 +107,7 @@ public class InitializingLoopActivityStateImpl implements FlowNodeState {
 
     private boolean evaluateLoop(final SStandardLoopCharacteristics standardLoop, final SLoopActivityInstance loopActivity)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
-
-        final Map<String, Serializable> input = new HashMap<String, Serializable>(0);
+        final Map<String, Object> input = new HashMap<String, Object>(1);
         input.put(ExpressionConstants.LOOP_COUNTER.getEngineConstantName(), loopActivity.getLoopCounter());
         final SExpressionContext sExpressionContext = new SExpressionContext(loopActivity.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), input);
         return ((Boolean) expressionResolverService.evaluate(standardLoop.getLoopCondition(), sExpressionContext)).booleanValue();

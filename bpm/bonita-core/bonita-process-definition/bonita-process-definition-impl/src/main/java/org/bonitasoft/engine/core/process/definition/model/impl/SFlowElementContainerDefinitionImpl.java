@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
- * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -25,6 +25,7 @@ import java.util.Set;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
@@ -235,7 +236,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
                 activity = new SAutomaticTaskDefinitionImpl(activityDefinition, transitionsMap);
             } else if (activityDefinition instanceof HumanTaskDefinitionImpl) {
                 if (activityDefinition instanceof UserTaskDefinitionImpl) {
-                    activity = new SUserTaskDefinitionImpl((UserTaskDefinitionImpl) activityDefinition, transitionsMap);
+                    activity = initializeUserTask((UserTaskDefinitionImpl) activityDefinition);
                 } else {
                     activity = new SManualTaskDefinitionImpl((ManualTaskDefinitionImpl) activityDefinition, transitionsMap);
                 }
@@ -260,6 +261,15 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
             }
             addActivity(activity);
         }
+    }
+
+    private SUserTaskDefinitionImpl initializeUserTask(final UserTaskDefinitionImpl userTaskDefinition) {
+        final SUserTaskDefinitionImpl userTask = new SUserTaskDefinitionImpl(userTaskDefinition, transitionsMap);
+        final ContractDefinition contract = userTaskDefinition.getContract();
+        if (contract != null) {
+            userTask.setContract(new SContractDefinitionImpl(contract));
+        }
+        return userTask;
     }
 
     private List<SEndEventDefinition> initializeEndEvents(final List<EndEventDefinition> endEvents, final Map<String, STransitionDefinition> transitionsMap) {

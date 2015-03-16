@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bpm.bar;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 
@@ -69,7 +70,7 @@ public class BusinessArchiveBuilder {
      *
      * @see org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder
      * @param parameters
-     *      the parameters value to use
+     *        the parameters value to use
      * @return
      *         the same {@link BusinessArchiveBuilder} in order to chain calls
      */
@@ -134,7 +135,8 @@ public class BusinessArchiveBuilder {
 
     /**
      * Set the actor mapping for this {@link BusinessArchive} <p>
-     * The file must be compliant with the xsd actorMapping.xsd The actor mapping specify for each {@link org.bonitasoft.engine.bpm.actor.ActorDefinition} of the process who it is in the
+     * The file must be compliant with the xsd actorMapping.xsd The actor mapping specify for each {@link org.bonitasoft.engine.bpm.actor.ActorDefinition} of
+     * the process who it is in the
      * organization.
      * <p>
      * It is not mandatory to set it in the {@link BusinessArchive}, it can be set after the process was deployed using
@@ -149,6 +151,22 @@ public class BusinessArchiveBuilder {
      */
     public BusinessArchiveBuilder setActorMapping(final byte[] xmlContent) {
         entity.addResource(ActorMappingContribution.ACTOR_MAPPING_FILE, xmlContent);
+        return this;
+    }
+
+    /**
+     * Set the form mappings Model for this {@link BusinessArchive}.
+     * <p>
+     * This allows to map tasks and process to internal forms or external pages, so that .
+     * <p>
+     *
+     * @param formMappingModel
+     *        The model containing the form mappings for this process definition.
+     * @return
+     *         the same {@link BusinessArchiveBuilder} in order to chain calls
+     */
+    public BusinessArchiveBuilder setFormMappings(final FormMappingModel formMappingModel) {
+        entity.setFormMappings(formMappingModel);
         return this;
     }
 

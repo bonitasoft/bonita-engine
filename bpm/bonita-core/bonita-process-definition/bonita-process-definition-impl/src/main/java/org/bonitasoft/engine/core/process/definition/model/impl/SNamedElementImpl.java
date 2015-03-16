@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -41,16 +41,27 @@ public class SNamedElementImpl extends SBaseElementImpl implements SNamedElement
         return result;
     }
 
+    protected EQUALS_STATE checkFurtherNaiveEquality(final Object obj) {
+        EQUALS_STATE state;
+        if ((state = super.checkNaiveEquality(obj)) != EQUALS_STATE.CONTINUE) {
+            return state;
+        } else if (!super.equals(obj)) {
+            return EQUALS_STATE.RETURN_FALSE;
+        } else {
+            return EQUALS_STATE.CONTINUE;
+        }
+    }
+
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
+        switch (checkFurtherNaiveEquality(obj)) {
+            case RETURN_FALSE:
+                return false;
+            case RETURN_TRUE:
+                return true;
+            case CONTINUE:
+            default:
+                break;
         }
         final SNamedElementImpl other = (SNamedElementImpl) obj;
         if (name == null) {

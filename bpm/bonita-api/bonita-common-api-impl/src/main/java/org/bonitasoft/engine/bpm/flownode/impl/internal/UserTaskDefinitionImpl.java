@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 
 /**
@@ -24,12 +25,23 @@ public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements U
 
     private static final long serialVersionUID = -8168685139931497082L;
 
+    private ContractDefinition contract;
+
     public UserTaskDefinitionImpl(final String name, final String actorName) {
         super(name, actorName);
     }
 
     public UserTaskDefinitionImpl(final long id, final String name, final String actorName) {
         super(id, name, actorName);
+    }
+
+    public void setContract(final ContractDefinition contract) {
+        this.contract = contract;
+    }
+
+    @Override
+    public ContractDefinition getContract() {
+        return contract;
     }
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -24,6 +24,10 @@ public class SBaseElementImpl implements SBaseElement {
 
     private Long id;
 
+    protected static enum EQUALS_STATE {
+        CONTINUE, RETURN_FALSE, RETURN_TRUE
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -41,16 +45,28 @@ public class SBaseElementImpl implements SBaseElement {
         return result;
     }
 
+    protected EQUALS_STATE checkNaiveEquality(final Object obj) {
+        if (this == obj) {
+            return EQUALS_STATE.RETURN_TRUE;
+        } else if (obj == null) {
+            return EQUALS_STATE.RETURN_FALSE;
+        } else if (getClass() != obj.getClass()) {
+            return EQUALS_STATE.RETURN_FALSE;
+        } else {
+            return EQUALS_STATE.CONTINUE;
+        }
+    }
+
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
+        switch (checkNaiveEquality(obj)) {
+            case RETURN_FALSE:
+                return false;
+            case RETURN_TRUE:
+                return true;
+            case CONTINUE:
+            default:
+                break;
         }
         final SBaseElementImpl other = (SBaseElementImpl) obj;
         if (id == null) {

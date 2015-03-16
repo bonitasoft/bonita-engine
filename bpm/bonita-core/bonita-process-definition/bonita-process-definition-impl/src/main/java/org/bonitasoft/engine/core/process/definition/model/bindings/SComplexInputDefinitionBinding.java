@@ -1,0 +1,58 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.core.process.definition.model.bindings;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
+import org.bonitasoft.engine.xml.SXMLParseException;
+
+/**
+ * @author Laurent Leseigneur
+ */
+public class SComplexInputDefinitionBinding extends SInputDefinitionBinding {
+
+    List<SSimpleInputDefinition> simpleInputDefinitions = new ArrayList<SSimpleInputDefinition>();
+    List<SComplexInputDefinition> complexInputDefinitions = new ArrayList<SComplexInputDefinition>();
+
+    @Override
+    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+        if (XMLSProcessDefinition.CONTRACT_SIMPLE_INPUT_NODE.equals(name)) {
+            simpleInputDefinitions.add((SSimpleInputDefinition) value);
+        }
+        else if (XMLSProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE.equals(name)) {
+            complexInputDefinitions.add((SComplexInputDefinition) value);
+        }
+    }
+
+    @Override
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    }
+
+    @Override
+    public Object getObject() {
+        return new SComplexInputDefinitionImpl(name,description,multiple,simpleInputDefinitions,complexInputDefinitions);
+    }
+
+    @Override
+    public String getElementTag() {
+        return XMLSProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE;
+    }
+
+
+}

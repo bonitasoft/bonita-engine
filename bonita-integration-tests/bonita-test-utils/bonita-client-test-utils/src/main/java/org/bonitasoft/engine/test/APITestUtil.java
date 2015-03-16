@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,13 +29,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.api.ApplicationAPI;
+import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
@@ -88,6 +93,7 @@ import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.connector.AbstractConnector;
+import org.bonitasoft.engine.connectors.TestConnectorEngineExecutionContext;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -126,9 +132,12 @@ import org.bonitasoft.engine.test.wait.WaitForDataValue;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
 import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 /**
  * @author Emmanuel Duchastenier
@@ -171,6 +180,16 @@ public class APITestUtil extends PlatformTestUtil {
 
     private PermissionAPI permissionAPI;
 
+    private PageAPI pageAPI;
+
+    private ApplicationAPI applicationAPI;
+
+    private TenantAdministrationAPI tenantManagementCommunityAPI;
+    
+    private ProcessConfigurationAPI processConfigurationAPI;
+
+    private BusinessDataAPI businessDataAPI;
+
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
         if (strTimeout != null) {
@@ -179,6 +198,7 @@ public class APITestUtil extends PlatformTestUtil {
             DEFAULT_TIMEOUT = 2 * 60 * 1000;
         }
     }
+
 
     @After
     public void clearSynchroRepository() {
@@ -205,11 +225,24 @@ public class APITestUtil extends PlatformTestUtil {
 
     protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
+        setProcessConfigurationAPI(TenantAPIAccessor.getProcessConfigurationAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
+        setPageAPI(TenantAPIAccessor.getCustomPageAPI(getSession()));
+        setApplicationAPI(TenantAPIAccessor.getLivingApplicationAPI(getSession()));
+        setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantAdministrationAPI(getSession()));
+        setBusinessDataAPI(TenantAPIAccessor.getBusinessDataAPI(getSession()));
+    }
+
+    public BusinessDataAPI getBusinessDataAPI() {
+        return businessDataAPI;
+    }
+
+    public void setBusinessDataAPI(final BusinessDataAPI businessDataAPI) {
+        this.businessDataAPI = businessDataAPI;
     }
 
     public void logoutOnTenant() throws BonitaException {
@@ -217,11 +250,16 @@ public class APITestUtil extends PlatformTestUtil {
         loginAPI.logout(session);
         setSession(null);
         setIdentityAPI(null);
+        setProcessConfigurationAPI(null);
         setProcessAPI(null);
         setCommandAPI(null);
         setProfileAPI(null);
         setThemeAPI(null);
         setPermissionAPI(null);
+        setApplicationAPI(null);
+        setTenantManagementCommunityAPI(null);
+        setPageAPI(null);
+        setBusinessDataAPI(null);
     }
 
     public void logoutThenlogin() throws BonitaException {
@@ -559,7 +597,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder,
             final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies) throws BonitaException {
         final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
+                connectorImplementations, generateConnectorDependencies, Collections.<BarResource>emptyList());
         return deployAndEnableProcess(businessArchiveBuilder.done());
     }
 
@@ -574,6 +612,12 @@ public class APITestUtil extends PlatformTestUtil {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actorName, user,
                 Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
                 Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)), null);
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(final ProcessDefinitionBuilder processDefinitionBuilder,
+            final String actorName, final User user) throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, actorName, user, "TestConnectorEngineExecutionContext.impl",
+                TestConnectorEngineExecutionContext.class, "TestConnectorEngineExecutionContext.jar");
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndConnectorAndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
@@ -606,7 +650,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
             throws BonitaException {
-        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
+        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource>emptyList(),
                 generateFilterDependencies, userFilters);
     }
 
@@ -1449,6 +1493,38 @@ public class APITestUtil extends PlatformTestUtil {
         this.session = session;
     }
 
+    protected void setPageAPI(final PageAPI pageAPI) {
+        this.pageAPI = pageAPI;
+    }
+
+    public PageAPI getPageAPI() {
+        return pageAPI;
+    }
+
+    public ApplicationAPI getApplicationAPI() {
+        return applicationAPI;
+    }
+
+    public ProcessConfigurationAPI getProcessConfigurationAPI() {
+        return processConfigurationAPI;
+    }
+
+    public void setProcessConfigurationAPI(ProcessConfigurationAPI processConfigurationAPI) {
+        this.processConfigurationAPI = processConfigurationAPI;
+    }
+
+    public void setApplicationAPI(final ApplicationAPI applicationAPI) {
+        this.applicationAPI = applicationAPI;
+    }
+
+    public TenantAdministrationAPI getTenantAdministrationAPI() {
+        return tenantManagementCommunityAPI;
+    }
+
+    public void setTenantManagementCommunityAPI(final TenantAdministrationAPI tenantManagementCommunityAPI) {
+        this.tenantManagementCommunityAPI = tenantManagementCommunityAPI;
+    }
+
     public void deleteSupervisors(final List<ProcessSupervisor> processSupervisors) throws BonitaException {
         if (processSupervisors != null) {
             for (final ProcessSupervisor processSupervisor : processSupervisors) {
@@ -1522,4 +1598,22 @@ public class APITestUtil extends PlatformTestUtil {
         return processDefinitions;
     }
 
+    protected void assertThatXmlHaveNoDifferences(final String xmlPrettyFormatExpected, final String xmlPrettyFormatExported) throws SAXException, IOException {
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+        final DetailedDiff diff = new DetailedDiff(XMLUnit.compareXML(xmlPrettyFormatExported, xmlPrettyFormatExpected));
+        final List<?> allDifferences = diff.getAllDifferences();
+        assertThat(allDifferences).as("should have no differences between:\n%s\n and:\n%s\n", xmlPrettyFormatExpected, xmlPrettyFormatExported).isEmpty();
+    }
+
+    public BarResource getBarResource(final String path, final String name, Class<?> clazz) throws IOException {
+        final InputStream stream = clazz.getResourceAsStream(path);
+        assertThat(stream).isNotNull();
+        try {
+            final byte[] byteArray = IOUtils.toByteArray(stream);
+            return new BarResource(name, byteArray);
+        } finally {
+            stream.close();
+        }
+    }
 }

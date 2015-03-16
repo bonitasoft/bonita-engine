@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -70,31 +70,8 @@ public class SExpressionContext implements Serializable {
     }
 
     public SExpressionContext(final Long containerId, final String containerType, final Long processDefinitionId) {
-        this.containerId = containerId;
-        this.containerType = containerType;
+        this(containerId, containerType, (Map<String, Object>) null);
         this.processDefinitionId = processDefinitionId;
-        inputValues = new HashMap<String, Object>();
-    }
-
-    public SExpressionContext(final Long containerId, final String containerType, final Map<String, Serializable> inputValues) {
-        this.containerId = containerId;
-        this.containerType = containerType;
-        if (inputValues == null) {
-            this.inputValues = new HashMap<String, Object>();
-        } else {
-            this.inputValues = new HashMap<String, Object>(inputValues);
-        }
-    }
-
-    public SExpressionContext(final Long containerId, final String containerType, final Map<String, Serializable> inputValues, final long time) {
-        this.containerId = containerId;
-        this.containerType = containerType;
-        if (inputValues == null) {
-            this.inputValues = new HashMap<String, Object>();
-        } else {
-            this.inputValues = new HashMap<String, Object>(inputValues);
-        }
-        this.time = time;
     }
 
     public SExpressionContext(final long containerId, final String containerType, final Map<String, Object> inputValues) {
@@ -113,12 +90,6 @@ public class SExpressionContext implements Serializable {
 
     public void setProcessDefinitionId(final Long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
-    }
-
-    public void setSerializableInputValues(final Map<String, Serializable> inputValues) {
-        if (inputValues != null) {
-            this.inputValues.putAll(inputValues);
-        }
     }
 
     public long getTime() {
@@ -191,7 +162,19 @@ public class SExpressionContext implements Serializable {
         if (inputValues == null) {
             this.inputValues = new HashMap<String, Object>();
         } else {
-            this.inputValues = inputValues;
+            this.inputValues = new HashMap<String, Object>(inputValues);
+        }
+    }
+
+    public void putAllInputValues(final Map<String, Object> inputValues) {
+        if (inputValues != null) {
+            this.inputValues.putAll(inputValues);
+        }
+    }
+
+    public void setSerializableInputValues(final Map<String, Serializable> inputValues) {
+        if (inputValues != null) {
+            this.inputValues.putAll(inputValues);
         }
     }
 
@@ -217,5 +200,6 @@ public class SExpressionContext implements Serializable {
     public void setParentProcessDefinitionId(final Long parentProcessDefinitionId) {
         this.parentProcessDefinitionId = parentProcessDefinitionId;
     }
+
 
 }

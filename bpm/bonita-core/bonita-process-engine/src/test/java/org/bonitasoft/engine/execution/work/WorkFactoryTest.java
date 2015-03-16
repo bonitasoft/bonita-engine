@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Bonitasoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -35,7 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 /**
  * @author Aurelien Pupier
  * @author Celine Souchet
- * 
+ *
  */
 @RunWith(MockitoJUnitRunner.class)
 public class WorkFactoryTest {
@@ -49,29 +49,29 @@ public class WorkFactoryTest {
     @Test
     public void createExecuteMessageCoupleWorkHasNoLockProcessInstanceWorkIfNoTargetProcess() {
         doReturn(-1L).when(waitingMessageEvent).getParentProcessInstanceId();
-        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
-        boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
+        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
+        final boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
         Assert.assertFalse("A lock Process Instance Work is used although there is no Target process", containsLockProcessInstance);
     }
 
     @Test
     public void createExecuteMessageCoupleWorkWithLockProcessInstanceWork() {
         doReturn(1L).when(waitingMessageEvent).getParentProcessInstanceId();
-        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
-        boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
+        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
+        final boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
         Assert.assertTrue("A lock Process Instance Work is missing although there is a Target process", containsLockProcessInstance);
     }
 
     @Test
     public void createExecuteMessageCoupleWork() {
-        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
+        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
         Assert.assertTrue("A MessageInstanceContextWork is missing", containsFailureHandlingMessageInstance(work));
         Assert.assertTrue("A FailureHandlingProcessDefinitionCOntextWork is missing", containsFailureHandlingProcessDefinition(work));
     }
 
     @Test
     public void createExecuteFlowNode() {
-        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteFlowNodeWork(1L, 1L, 3, Collections.<SOperation> emptyList(), null);
+        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteFlowNodeWork(1L, 1L, 3, Collections.<SOperation> emptyList(), null);
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
@@ -79,47 +79,47 @@ public class WorkFactoryTest {
 
     @Test
     public void createExecuteConnectorOfProcess() {
-        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfProcess(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
+        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfProcess(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER,
                 null);
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
     }
 
     @Test
     public void createExecuteConnectorOfActivity() {
-        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfActivity(1L, 3L, 4L, 5L, 6, "connectorDefName");
+        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfActivity(1L, 3L, 4L, 5L, 6, "connectorDefName");
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
     }
 
     @Test
     public void createNotifyChildFinishedWork() {
-        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createNotifyChildFinishedWork(1L, 2L, 3L, 4L, "parentType");
+        final WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createNotifyChildFinishedWork(1L, 2L, 3L, 4L, "parentType");
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
     }
 
-    private boolean containsFailureHandlingFlowNodeInstance(WrappingBonitaWork work) {
+    private boolean containsFailureHandlingFlowNodeInstance(final WrappingBonitaWork work) {
         return containsWorkOfClass(work, FlowNodeDefinitionAndInstanceContextWork.class);
     }
 
-    private boolean containsFailureHandlingProcessInstance(WrappingBonitaWork work) {
+    private boolean containsFailureHandlingProcessInstance(final WrappingBonitaWork work) {
         return containsWorkOfClass(work, ProcessInstanceContextWork.class);
     }
 
-    private boolean containsFailureHandlingProcessDefinition(WrappingBonitaWork work) {
+    private boolean containsFailureHandlingProcessDefinition(final WrappingBonitaWork work) {
         return containsWorkOfClass(work, ProcessDefinitionContextWork.class);
     }
 
-    private boolean containsFailureHandlingMessageInstance(WrappingBonitaWork work) {
+    private boolean containsFailureHandlingMessageInstance(final WrappingBonitaWork work) {
         return containsWorkOfClass(work, MessageInstanceContextWork.class);
     }
 
-    private boolean containsLockProcessInstanceWork(WrappingBonitaWork work) {
+    private boolean containsLockProcessInstanceWork(final WrappingBonitaWork work) {
         return containsWorkOfClass(work, LockProcessInstanceWork.class);
     }
 
-    private boolean containsWorkOfClass(WrappingBonitaWork work, Class<?> clazz) {
+    private boolean containsWorkOfClass(WrappingBonitaWork work, final Class<?> clazz) {
         boolean containsLockProcessInstance = clazz.isAssignableFrom(work.getClass());
         while (work.getWrappedWork() != null && !containsLockProcessInstance) {
             final BonitaWork wrappedWork = work.getWrappedWork();

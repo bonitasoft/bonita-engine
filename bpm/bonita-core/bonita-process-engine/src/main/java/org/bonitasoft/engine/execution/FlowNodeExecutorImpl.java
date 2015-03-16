@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,6 +22,8 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
+import org.bonitasoft.engine.core.contract.data.SContractDataDeletionException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -99,11 +101,13 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     private final WorkService workService;
 
+    private final ContractDataService contractDataService;
+
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
             final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
             final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService, final SCommentService commentService,
             final ProcessInstanceService processInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final WorkService workService) {
+            final ClassLoaderService classLoaderService, final WorkService workService, final ContractDataService contractDataService) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
@@ -118,6 +122,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         containerRegistry.addContainerExecutor(this);
         this.processDefinitionService = processDefinitionService;
         this.commentService = commentService;
+        this.contractDataService = contractDataService;
     }
 
     @Override
@@ -275,7 +280,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     @Override
     public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final long parentId) throws SFlowNodeNotFoundException,
             SFlowNodeReadException, SProcessDefinitionNotFoundException, SProcessDefinitionReadException, SArchivingException, SFlowNodeModificationException,
-            SFlowNodeExecutionException {
+            SFlowNodeExecutionException, SContractDataDeletionException {
         final SFlowNodeInstance sFlowNodeInstanceChild = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
 
         // TODO check deletion here
@@ -338,7 +343,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     public void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive, final long processDefinitionId)
             throws SArchivingException {
         ProcessArchiver.archiveFlowNodeInstance(flowNodeInstance, deleteAfterArchive, processDefinitionId, processInstanceService, processDefinitionService,
-                archiveService, dataInstanceService, activityInstanceService, connectorInstanceService);
+                archiveService, dataInstanceService, activityInstanceService, connectorInstanceService, contractDataService);
     }
 
 }

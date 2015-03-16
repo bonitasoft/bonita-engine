@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -18,25 +18,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.ApplicationAPI;
+import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformCommandAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
+import org.bonitasoft.engine.api.impl.ApplicationAPIImpl;
+import org.bonitasoft.engine.api.impl.BusinessDataAPIImpl;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
+import org.bonitasoft.engine.api.impl.PageAPIImpl;
 import org.bonitasoft.engine.api.impl.PermissionAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformCommandAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformLoginAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
+import org.bonitasoft.engine.api.impl.ProcessConfigurationAPIImpl;
 import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
+import org.bonitasoft.engine.api.impl.TenantAdministrationAPIImpl;
 import org.bonitasoft.engine.api.impl.ThemeAPIImpl;
 import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
 import org.bonitasoft.engine.service.APIAccessResolver;
@@ -62,6 +72,11 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(ProfileAPI.class.getName(), new ProfileAPIImpl());
         apis.put(ThemeAPI.class.getName(), new ThemeAPIImpl());
         apis.put(PermissionAPI.class.getName(), new PermissionAPIImpl());
+        apis.put(PageAPI.class.getName(), new PageAPIImpl());
+        apis.put(ApplicationAPI.class.getName(), new ApplicationAPIImpl());
+        apis.put(ProcessConfigurationAPI.class.getName(), new ProcessConfigurationAPIImpl());
+        apis.put(TenantAdministrationAPI.class.getName(), new TenantAdministrationAPIImpl());
+        apis.put(BusinessDataAPI.class.getName(), new BusinessDataAPIImpl());
     }
 
     @Override

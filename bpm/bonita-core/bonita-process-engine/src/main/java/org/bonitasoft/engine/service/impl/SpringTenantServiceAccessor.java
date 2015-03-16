@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -30,6 +30,10 @@ import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
+import org.bonitasoft.engine.business.data.BusinessDataRepository;
+import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
@@ -38,10 +42,12 @@ import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
+import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
@@ -49,6 +55,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -68,6 +75,8 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.parameter.ParameterService;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.xml.ChildrenEntriesBinding;
 import org.bonitasoft.engine.profile.xml.MembershipBinding;
@@ -223,15 +232,36 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private TransientDataService transientDataService;
 
     private TimeTracker timeTracker;
+
     private PermissionService permissionService;
 
     private ParentContainerResolver parentContainerResolver;
 
+    private ContractDataService contractDataService;
+
+    private ParameterService parameterService;
+
+    private PageService pageService;
+
+    private ApplicationService applicationService;
+
+    private FormMappingService formMappingService;
+
+    private BusinessDataRepository businessDataRespository;
+
+    private RefBusinessDataService refBusinessDataService;
+
+    private BusinessDataModelRepository businessDataModelRespository;
+
+    private BusinessDataService businessDataService;
+
+
+    @Override
     public ParentContainerResolver getParentContainerResolver() {
         if (parentContainerResolver == null) {
             parentContainerResolver = beanAccessor.getService(ParentContainerResolver.class);
         }
-        return this.parentContainerResolver;
+        return parentContainerResolver;
     }
 
     public SpringTenantServiceAccessor(final Long tenantId) {
@@ -252,7 +282,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         if (timeTracker == null) {
             timeTracker = beanAccessor.getService(TimeTracker.class);
         }
-        return this.timeTracker;
+        return timeTracker;
     }
 
     @Override
@@ -785,5 +815,79 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             permissionService = beanAccessor.getService(PermissionService.class);
         }
         return permissionService;
+    }
+
+    @Override
+    public ContractDataService getContractDataService() {
+        if (contractDataService == null) {
+            contractDataService = beanAccessor.getService(ContractDataService.class);
+        }
+        return contractDataService;
+    }
+
+    @Override
+    public ParameterService getParameterService() {
+        if (parameterService == null) {
+            parameterService = beanAccessor.getService(ParameterService.class);
+        }
+        return parameterService;
+    }
+    /**
+     * might not be an available service
+     */
+    @Override
+    public PageService getPageService() {
+        if (pageService == null) {
+            pageService = beanAccessor.getService(PageService.class);
+        }
+        return pageService;
+    }
+
+    @Override
+    public ApplicationService getApplicationService() {
+        if (applicationService == null) {
+            applicationService = beanAccessor.getService(ApplicationService.class);
+        }
+        return applicationService;
+    }
+
+    @Override
+    public BusinessDataRepository getBusinessDataRepository() {
+        if (businessDataRespository == null) {
+            businessDataRespository = beanAccessor.getService(BusinessDataRepository.class);
+        }
+        return businessDataRespository;
+    }
+
+    @Override
+    public BusinessDataModelRepository getBusinessDataModelRepository() {
+        if (businessDataModelRespository == null) {
+            businessDataModelRespository = beanAccessor.getService(BusinessDataModelRepository.class);
+        }
+        return businessDataModelRespository;
+    }
+
+    @Override
+    public RefBusinessDataService getRefBusinessDataService() {
+        if (refBusinessDataService == null) {
+            refBusinessDataService = beanAccessor.getService(RefBusinessDataService.class);
+        }
+        return refBusinessDataService;
+    }
+
+    @Override
+    public BusinessDataService getBusinessDataService() {
+        if (businessDataService == null) {
+            businessDataService = beanAccessor.getService(BusinessDataService.class);
+        }
+        return businessDataService;
+    }
+
+    @Override
+    public FormMappingService getFormMappingService() {
+        if (formMappingService == null) {
+            formMappingService = beanAccessor.getService(FormMappingService.class);
+        }
+        return formMappingService;
     }
 }

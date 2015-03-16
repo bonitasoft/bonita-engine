@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -119,7 +118,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 activityInstanceService.addMultiInstanceNumberOfCompletedActivities(miActivity, 1);
                 // check the completionCondition
                 final SExpression completionCondition = loopCharacteristics.getCompletionCondition();
-                final Map<String, Serializable> input = new HashMap<String, Serializable>(1);
+                final Map<String, Object> input = new HashMap<String, Object>(1);
                 input.put(ExpressionConstants.NUMBER_OF_ACTIVE_INSTANCES.getEngineConstantName(), miActivity.getNumberOfActiveInstances());
                 input.put(ExpressionConstants.NUMBER_OF_TERMINATED_INSTANCES.getEngineConstantName(), miActivity.getNumberOfTerminatedInstances());
                 input.put(ExpressionConstants.NUMBER_OF_COMPLETED_INSTANCES.getEngineConstantName(), miActivity.getNumberOfCompletedInstances());

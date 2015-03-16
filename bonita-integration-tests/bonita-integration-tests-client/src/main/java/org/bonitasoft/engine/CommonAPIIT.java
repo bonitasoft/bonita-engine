@@ -1,11 +1,17 @@
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine;
-
-import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
@@ -31,6 +37,13 @@ import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializer.class)
@@ -111,11 +124,7 @@ public abstract class CommonAPIIT extends APITestUtil {
     }
 
     public BarResource getResource(final String path, final String name) throws IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream(path);
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
-        return new BarResource(name, byteArray);
+        return getBarResource(path, name, BPMRemoteTests.class);
     }
 
     public void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
@@ -168,4 +177,8 @@ public abstract class CommonAPIIT extends APITestUtil {
         }
     }
 
+    @Override
+    public BarResource getBarResource(String path, String name, Class<?> clazz) throws IOException {
+        return super.getBarResource(path, name, clazz);
+    }
 }

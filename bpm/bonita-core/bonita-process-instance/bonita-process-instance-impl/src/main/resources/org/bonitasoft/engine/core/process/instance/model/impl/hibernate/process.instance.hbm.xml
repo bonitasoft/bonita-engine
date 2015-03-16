@@ -326,4 +326,42 @@
 		<filter name="tenantFilter" />
 	</class>
 
+    <class name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" abstract="true" table="ref_biz_data_inst">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long" />
+            <key-property name="id" column="id" type="long" />
+        </composite-id>
+        <discriminator column="kind" type="string" />
+        <property name="name" column="name" />
+        <property name="dataClassName" column="data_classname" />
+        <filter name="tenantFilter" />
+    </class>
+
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" abstract="true">
+        <property name="dataId" column="data_id" />
+    </subclass>
+
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SMultiRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" abstract="true">
+        <list name="dataIds" table="multi_biz_data">
+            <key>
+                <column name="tenantid" />
+                <column name="id" />
+            </key>
+            <list-index column="idx" />
+            <element column="data_id" type="long" />
+        </list>
+    </subclass>
+
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" discriminator-value="proc_simple_ref">
+        <property name="processInstanceId" column="proc_inst_id" />
+    </subclass>
+
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SMultiRefBusinessDataInstanceImpl" discriminator-value="proc_multi_ref">
+        <property name="processInstanceId" column="proc_inst_id" />
+    </subclass>
+
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl" extends="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" discriminator-value="fn_simple_ref">
+        <property name="flowNodeInstanceId" column="fn_inst_id" />
+    </subclass>
+
 </hibernate-mapping>
