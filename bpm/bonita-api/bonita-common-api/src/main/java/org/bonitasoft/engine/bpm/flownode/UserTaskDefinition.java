@@ -25,6 +25,12 @@ import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
  */
 public interface UserTaskDefinition extends HumanTaskDefinition {
 
+    /**
+     * Contract that must be respected when executing an instance of this user task
+     *
+     * @return
+     *         the user task execution contract
+     */
     ContractDefinition getContract();
 
 }

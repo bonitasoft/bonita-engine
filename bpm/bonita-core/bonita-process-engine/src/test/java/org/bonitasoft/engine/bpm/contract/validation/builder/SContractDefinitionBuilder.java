@@ -80,7 +80,7 @@ public class SContractDefinitionBuilder {
             contract.addComplexInput(input);
         }
         for (final SConstraintDefinition constraint : constraints) {
-            contract.addRule(constraint);
+            contract.addConstraint(constraint);
         }
         return contract;
     }

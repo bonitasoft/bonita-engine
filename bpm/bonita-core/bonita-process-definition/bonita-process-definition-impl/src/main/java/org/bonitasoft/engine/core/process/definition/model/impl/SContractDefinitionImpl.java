@@ -76,7 +76,7 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
         return constraints;
     }
 
-    public void addRule(final SConstraintDefinition rule) {
+    public void addConstraint(final SConstraintDefinition rule) {
         constraints.add(rule);
     }
 

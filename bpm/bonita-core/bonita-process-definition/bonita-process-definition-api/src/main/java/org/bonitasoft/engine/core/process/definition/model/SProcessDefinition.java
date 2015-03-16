@@ -44,4 +44,5 @@ public interface SProcessDefinition extends SNamedElement {
 
     boolean hasConnectors();
 
+    SContractDefinition getContract();
 }
