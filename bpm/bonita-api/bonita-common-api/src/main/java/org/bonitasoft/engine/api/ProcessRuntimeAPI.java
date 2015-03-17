@@ -1796,6 +1796,28 @@ public interface ProcessRuntimeAPI {
     boolean isInvolvedInProcessInstance(long userId, long processInstanceId) throws ProcessInstanceNotFoundException, UserNotFoundException;
 
     /**
+     * Check whether a specific user is involved in a given human task instance.<br/>
+     * User A is involved with a  human task  instance if any of the following is true:
+     * <ul>
+     * <li>the human task instance is assigned to user A</li>
+     * <li>the human task instance is pending for user A</li>
+     * </ul>
+     *
+     * @param userId
+     *        The identifier of the user.
+     * @param humanTaskInstanceId
+     *        The identifier of the human task instance.
+     * @return True if the user is involved with the human task instance.
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid, e.g. the session has expired.
+     * @throws ActivityInstanceNotFoundException
+     *         If there is no the human task instance with the specified identifier.
+     * @since 6.5.1
+     * @see #isManagerOfUserInvolvedInProcessInstance(long, long)
+     */
+    boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId) throws ActivityInstanceNotFoundException, UserNotFoundException;
+
+    /**
      * Check whether a specific user has at least one subordinate (person he / she is the manager of) involved in a given process instance.<br/>
      * User A is involved with a process instance if any of the following is true:
      * <ul>

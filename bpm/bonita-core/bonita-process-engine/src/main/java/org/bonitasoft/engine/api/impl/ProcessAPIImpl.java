@@ -2811,6 +2811,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         return new ProcessInvolvementAPIImpl(this).isInvolvedInProcessInstance(userId, processInstanceId);
     }
 
+
+    public boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId) throws ActivityInstanceNotFoundException, UserNotFoundException {
+        return new ProcessInvolvementAPIImpl(this).isInvolvedInHumanTaskInstance(userId, humanTaskInstanceId);
+    }
+
     @Override
     public boolean isManagerOfUserInvolvedInProcessInstance(final long managerUserId, final long processInstanceId) throws ProcessInstanceNotFoundException,
     BonitaException {
