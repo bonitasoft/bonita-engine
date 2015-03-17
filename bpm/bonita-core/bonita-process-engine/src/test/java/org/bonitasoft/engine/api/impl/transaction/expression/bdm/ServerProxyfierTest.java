@@ -1,17 +1,31 @@
-/*******************************************************************************
- * Copyright (C) 2015 Bonitasoft S.A.
- * Bonitasoft is a trademark of Bonitasoft SA.
- * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
- * For commercial licensing information, contact:
- * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
- * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
- *******************************************************************************/
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.*;
+
+import java.lang.reflect.Method;
+
+import java.lang.reflect.Method;
 
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 import javassist.util.proxy.ProxyObject;
-import org.assertj.core.api.Assertions;
+
 import org.bonitasoft.engine.bdm.Entity;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,12 +33,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.lang.reflect.Method;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * @author Romain Bioteau
+ * @author Laurent Leseigneur
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ServerProxyfierTest {
@@ -43,7 +54,7 @@ public class ServerProxyfierTest {
         PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
 
         assertThat(proxy).isInstanceOf(ProxyObject.class);
-        Assertions.assertThat(proxy.getClass().getSuperclass()).isEqualTo(PersonEntity.class);
+        assertThat(proxy.getClass().getSuperclass()).isEqualTo(PersonEntity.class);
     }
 
     @Test
@@ -70,4 +81,35 @@ public class ServerProxyfierTest {
         assertThat(proxy).isNotSameAs(aProxy);
     }
 
+    @Test
+    public void should_call_on_lazy_loaded_getter_use_lazyLoader() throws Exception {
+        //given
+        PersonEntity personEntity = new PersonEntity();
+
+        final Method method = PersonEntity.class.getMethod("getWithLazyLoadedAnnotation");
+        doReturn("lazyResult").when(lazyLoader).load(any(Method.class), anyLong());
+
+        //when
+        PersonEntity proxy = serverProxyfier.proxify(personEntity);
+        final String withLazyLoadedAnnotation = proxy.getWithLazyLoadedAnnotation();
+
+        //
+        verify(lazyLoader).load(method, personEntity.getPersistenceId());
+        assertThat(withLazyLoadedAnnotation).isEqualTo("lazyResult");
+    }
+
+    @Test
+    public void should_not_call_lazyLoader() throws Exception {
+        //given
+        PersonEntity personEntity = new PersonEntity();
+        final Method method = PersonEntity.class.getMethod("getWithoutLazyLoadedAnnotation");
+
+        //when
+        PersonEntity proxy = serverProxyfier.proxify(personEntity);
+        final String withLazyLoadedAnnotation = proxy.getWithoutLazyLoadedAnnotation();
+
+        //
+        verify(lazyLoader, never()).load(method, personEntity.getPersistenceId());
+        assertThat(withLazyLoadedAnnotation).isEqualTo("getWithoutLazyLoadedAnnotation");
+    }
 }

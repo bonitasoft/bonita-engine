@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.command;
 
-import org.bonitasoft.engine.command.CommandDescriptor;
 
 /**
  * @author Zhang Bole

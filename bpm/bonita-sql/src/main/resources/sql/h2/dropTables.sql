@@ -1,3 +1,5 @@
+DROP TABLE arch_contract_data;
+DROP TABLE contract_data;
 DROP TABLE actormember;
 DROP TABLE actor;
 DROP TABLE processcategorymapping;
@@ -59,3 +61,4 @@ DROP TABLE sequence;
 DROP TABLE tenant;
 DROP TABLE platform;
 DROP TABLE platformCommand;
+DROP TABLE form_mapping;

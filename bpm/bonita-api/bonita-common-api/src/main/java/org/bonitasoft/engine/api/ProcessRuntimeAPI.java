@@ -24,6 +24,8 @@ import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -46,6 +48,7 @@ import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
@@ -2391,5 +2394,70 @@ public interface ProcessRuntimeAPI {
      */
     Date updateExecutionDateOfTimerEventTriggerInstance(long timerEventTriggerInstanceId, Date executionDate)
             throws TimerEventTriggerInstanceNotFoundException, UpdateException;
+
+    /**
+     * Gets the contract of the user task.
+     *
+     * @param userTaskId the identifier of the user task.
+     * @return the contract of the user task
+     * @throws UserTaskNotFoundException
+     *         if identifier does not refer to a real user task.
+     */
+    ContractDefinition getUserTaskContract(long userTaskId) throws UserTaskNotFoundException;
+
+    /**
+     * Executes a user task that is in a stable state.
+     * Will move the activity to the next stable state and then continue the execution of the process.
+     *
+     * @param userTaskInstanceId
+     *        The identifier of the user task to execute.
+     * @param inputs
+     *        the inputs used for user task execution
+     * @throws UserTaskNotFoundException
+     *         If user task to execute is not found
+     * @throws ContractViolationException
+     *         If inputs don't fit with task contract
+     * @throws FlowNodeExecutionException
+     *         If an execution exception occurs
+     * @since 7.0
+     */
+    void executeUserTask(long userTaskInstanceId, Map<String, Serializable> inputs) throws UserTaskNotFoundException, ContractViolationException,
+            FlowNodeExecutionException;
+
+    /**
+     * Executes a user task that is in a stable state on behalf of a given user
+     * Will make the task go in the next stable state and then continue the execution of the process
+     * If userId equals 0, the logged-in user is declared as the executer of the task.
+     * The user, who executed the task on behalf of a given user, is declared as a executer delegate.
+     *
+     * @param userId
+     *        The identifier of the user for which you want to execute the flow node
+     * @param userTaskInstanceId
+     *        The identifier of the user task to execute
+     * @param inputs
+     *        the input used for user task execution
+     * @throws UserTaskNotFoundException
+     *         If user task to execute is not found
+     * @throws ContractViolationException
+     *         If inputs don't fit with task contract
+     * @throws FlowNodeExecutionException
+     *         If an execution exception occurs
+     * @since 7.0
+     */
+    void executeUserTask(long userId, long userTaskInstanceId, Map<String, Serializable> inputs) throws UserTaskNotFoundException, ContractViolationException,
+            FlowNodeExecutionException;
+
+    /**
+     * Gets the value of the variable of the user task contract.
+     *
+     * @param userTaskInstanceId
+     *        The identifier of the user task
+     * @param name
+     *        The name of the variable
+     * @return The identifier of the user task
+     * @throws UserTaskNotFoundException
+     *         if identifier does not refer to a real user task.
+     */
+    Serializable getUserTaskContractVariableValue(long userTaskInstanceId, String name) throws UserTaskNotFoundException;
 
 }

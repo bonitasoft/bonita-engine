@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 
 /**
@@ -39,6 +40,8 @@ public class BusinessArchive implements Serializable {
     private Map<String, String> parameters;
 
     private final Map<String, byte[]> resources = new HashMap<String, byte[]>();
+
+    private FormMappingModel formMappingModel = new FormMappingModel();
 
     /**
      * Default constructor. Creates an instance of {@code BusinessArchive}
@@ -136,11 +139,29 @@ public class BusinessArchive implements Serializable {
     /**
      * Retrieves a {@code Map} containing all resources of this {@code BusinessArchive}. The {@code Map} keys store the resource full paths and the {@code Map}
      * values store the resource content.
-     * 
+     *
      * @return a {@code Map} containing all resources of this {@code BusinessArchive}
      */
     public Map<String, byte[]> getResources() {
         return Collections.unmodifiableMap(resources);
+    }
+
+    /**
+     * Sets the task-to-form (or process-to-form) mapping in this {@link BusinessArchive}.
+     *
+     * @param formMappingModel the model to store.
+     */
+    public void setFormMappings(final FormMappingModel formMappingModel) {
+        this.formMappingModel = formMappingModel;
+    }
+
+    /**
+     * Retrieves the form mapping model for this {@link BusinessArchive}.
+     *
+     * @return the form mapping model for this {@link BusinessArchive}.
+     */
+    public FormMappingModel getFormMappingModel() {
+        return formMappingModel;
     }
 
 }

@@ -92,6 +92,7 @@
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService"/>
         <constructor-arg name="classLoaderService" ref="classLoaderService"/>
         <constructor-arg name="workService" ref="workService"/>
+        <constructor-arg name="contractDataService" ref="contractDataService"/>
     </bean>
 
     <bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">

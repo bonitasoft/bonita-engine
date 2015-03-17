@@ -19,4 +19,6 @@ package org.bonitasoft.engine.core.process.definition.model;
  */
 public interface SUserTaskDefinition extends SHumanTaskDefinition {
 
+    SContractDefinition getContract();
+
 }

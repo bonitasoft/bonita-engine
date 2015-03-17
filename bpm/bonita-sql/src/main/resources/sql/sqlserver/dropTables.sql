@@ -1,3 +1,7 @@
+DROP TABLE arch_contract_data
+GO
+DROP TABLE contract_data
+GO
 DROP TABLE actormember
 GO
 DROP TABLE actor
@@ -119,4 +123,6 @@ GO
 DROP TABLE platform
 GO
 DROP TABLE platformCommand
+GO
+DROP TABLE form_mapping
 GO
