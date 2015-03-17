@@ -329,6 +329,7 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.SUnreleasableTaskException;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -399,6 +400,7 @@ import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesInvolv
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesWithoutSubProcess;
 import org.bonitasoft.engine.search.process.SearchFailedProcessInstances;
+import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUser;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUsersManagedBy;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesSupervisedBy;
@@ -3448,14 +3450,16 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void setActivityStateById(final long activityInstanceId, final int stateId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
+        final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
+        final WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(eventInstanceService, tenantAccessor.getSchedulerService(), tenantAccessor.getTechnicalLoggerService());
         final StateBehaviors stateBehaviors = new StateBehaviors(tenantAccessor.getBPMInstancesCreator(), tenantAccessor.getEventsHandler(),
                 tenantAccessor.getActivityInstanceService(), tenantAccessor.getUserFilterService(), tenantAccessor.getClassLoaderService(),
                 tenantAccessor.getActorMappingService(), tenantAccessor.getConnectorInstanceService(), tenantAccessor.getExpressionResolverService(),
                 tenantAccessor.getProcessDefinitionService(), tenantAccessor.getDataInstanceService(), tenantAccessor.getOperationService(),
                 tenantAccessor.getWorkService(), tenantAccessor.getContainerRegistry(), tenantAccessor.getEventInstanceService(),
-                tenantAccessor.getSchedulerService(), tenantAccessor.getCommentService(), tenantAccessor.getIdentityService(),
-                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getProcessInstanceService(), tenantAccessor.getParentContainerResolver(),
-                tenantAccessor.getRefBusinessDataService());
+                tenantAccessor.getCommentService(), tenantAccessor.getIdentityService(),
+                tenantAccessor.getProcessInstanceService(), tenantAccessor.getParentContainerResolver(), waitingEventsInterrupter,
+                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getRefBusinessDataService());
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
             if (sActivityInstance instanceof SHumanTaskInstance) {
@@ -3844,12 +3848,50 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.api.ProcessRuntimeAPI#searchFailedProcessInstancesSupervisedBy(long, org.bonitasoft.engine.search.SearchOptions)
+     */
+    @Override
+    public SearchResult<ProcessInstance> searchFailedProcessInstancesSupervisedBy(final long userId, final SearchOptions searchOptions) throws SearchException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        final GetSUser getUser = createTxUserGetter(userId, identityService);
+        try {
+            getUser.execute();
+        } catch (final SBonitaException e) {
+            return new SearchResultImpl<ProcessInstance>(0, Collections.<ProcessInstance> emptyList());
+        }
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final SearchFailedProcessInstancesSupervisedBy searchFailedProcessInstances = createSearchFailedProcessInstancesSupervisedBy(userId, searchOptions, processInstanceService, searchEntitiesDescriptor, processDefinitionService);
+        try {
+            searchFailedProcessInstances.execute();
+            return searchFailedProcessInstances.getResult();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
+    }
+
+    protected SearchFailedProcessInstancesSupervisedBy createSearchFailedProcessInstancesSupervisedBy(final long userId, final SearchOptions searchOptions,
+            final ProcessInstanceService processInstanceService, final SearchEntitiesDescriptor searchEntitiesDescriptor,
+            final ProcessDefinitionService processDefinitionService) {
+        return new SearchFailedProcessInstancesSupervisedBy(processInstanceService,
+                searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), userId, searchOptions, processDefinitionService);
+    }
+
+    protected GetSUser createTxUserGetter(final long userId, final IdentityService identityService) {
+        return new GetSUser(identityService, userId);
+    }
+
     @Override
     public SearchResult<ProcessInstance> searchOpenProcessInstancesSupervisedBy(final long userId, final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final GetSUser getUser = new GetSUser(identityService, userId);
+        final GetSUser getUser = createTxUserGetter(userId, identityService);
         try {
             getUser.execute();
         } catch (final SBonitaException e) {

@@ -67,6 +67,20 @@ public class ProcessInstanceRepository extends TestRepository {
         return namedQuery.list();
     }
 
+    public long getNumberOfFailedSProcessInstanceSupervisedBy(final long userId) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        final Query namedQuery = getNamedQuery("getNumberOfSProcessInstanceFailedAndSupervisedBy");
+        namedQuery.setParameter("userId", userId);
+        return ((Number) namedQuery.uniqueResult()).longValue();
+    }
+
+    public List<SProcessInstance> searchFailedSProcessInstanceSupervisedBy(final long userId) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        final Query namedQuery = getNamedQuery("searchSProcessInstanceFailedAndSupervisedBy");
+        namedQuery.setParameter("userId", userId);
+        return namedQuery.list();
+    }
+
     public long getNumberOfSProcessInstanceFailed() {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         final Query namedQuery = getNamedQuery("getNumberOfSProcessInstanceFailed");

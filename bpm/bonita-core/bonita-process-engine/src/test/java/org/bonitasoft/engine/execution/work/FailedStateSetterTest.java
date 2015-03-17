@@ -23,7 +23,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.execution.FlowNodeExecutor;
+import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -39,7 +39,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class FailedStateSetterTest {
 
     @Mock
-    private FlowNodeExecutor flowNodeExecutor;
+    private WaitingEventsInterrupter waitingEventsInterrupter;
 
     @Mock
     private ActivityInstanceService activityInstanceService;
@@ -65,16 +65,19 @@ public class FailedStateSetterTest {
 
     public static final int STATE_ID = 10;
 
+    public static final int FAILED_STATE_ID = 100;
+
     @Before
     public void setUp() throws Exception {
         given(flowNodeStateManager.getFailedState()).willReturn(failedState);
+        given(failedState.getId()).willReturn(FAILED_STATE_ID);
         given(flowNodeInstance.getProcessDefinitionId()).willReturn(PROCESS_DEFINITION_ID);
         given(flowNodeInstance.getStateId()).willReturn(STATE_ID);
         given(loggerService.isLoggable(Matchers.<Class<?>> any(), any(TechnicalLogSeverity.class))).willReturn(true);
     }
 
     @Test
-    public void setAsFailed_should_archive_the_current_flow_node_and_call_setState() throws Exception {
+    public void setAsFailed_should_setState_to_failed_and_interrupt_waitingEvents() throws Exception {
         //given
         given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willReturn(flowNodeInstance);
 
@@ -82,7 +85,7 @@ public class FailedStateSetterTest {
         failedStateSetter.setAsFailed(FLOW_NODE_INSTANCE_ID);
 
         //then
-        verify(flowNodeExecutor).archiveFlowNodeInstance(flowNodeInstance, false, PROCESS_DEFINITION_ID);
+        verify(waitingEventsInterrupter).interruptWaitingEvents(flowNodeInstance);
         verify(activityInstanceService).setState(flowNodeInstance, failedState);
     }
 
@@ -95,10 +98,21 @@ public class FailedStateSetterTest {
         failedStateSetter.setAsFailed(FLOW_NODE_INSTANCE_ID);
 
         //then
-        verify(loggerService).log(Matchers.<Class<?>> any(), eq(TechnicalLogSeverity.DEBUG),
+        verify(loggerService).log(Matchers.<Class<?>>any(), eq(TechnicalLogSeverity.DEBUG),
                 eq("Impossible to put flow node instance in failed state: flow node instance with id '" + FLOW_NODE_INSTANCE_ID + "' not found."));
-        verify(flowNodeExecutor, never()).archiveFlowNodeInstance(flowNodeInstance, false, PROCESS_DEFINITION_ID);
         verify(activityInstanceService, never()).setState(flowNodeInstance, failedState);
     }
 
+    @Test
+    public void setAsFailed_should_do_nothing_when_flow_node_is_already_in_failed_state() throws Exception {
+        //given
+        given(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).willReturn(flowNodeInstance);
+        given(flowNodeInstance.getStateId()).willReturn(FAILED_STATE_ID);
+
+        //when
+        failedStateSetter.setAsFailed(FLOW_NODE_INSTANCE_ID);
+
+        //then
+        verify(activityInstanceService, never()).setState(any(SFlowNodeInstance.class), any(FlowNodeState.class));
+    }
 }
