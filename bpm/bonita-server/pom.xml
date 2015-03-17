@@ -505,10 +505,39 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- Reporting -->
+      <!-- Reporting -->
+      <dependency>
+          <groupId>com.bonitasoft.engine.core.reporting</groupId>
+          <artifactId>bonita-reporting-impl</artifactId>
+          <version>${project.version}</version>
+      </dependency>
 
+      <!-- Scheduler -->
+      <dependency>
+          <groupId>org.bonitasoft.engine.scheduler</groupId>
+          <artifactId>bonita-scheduler-quartz</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>com.bonitasoft.engine.scheduler</groupId>
+          <artifactId>bonita-scheduler-quartz-sp</artifactId>
+          <version>${project.version}</version>
+      </dependency>
 
-    <!-- Service Commons -->
+      <!-- Service Commons -->
+
+      <!-- Sequence -->
+      <dependency>
+          <groupId>org.bonitasoft.engine.persistence</groupId>
+          <artifactId>bonita-sequence-api</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.bonitasoft.engine.persistence</groupId>
+          <artifactId>bonita-sequence-impl</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+
     <!-- Session -->
     <dependency>
       <groupId>org.bonitasoft.engine.session</groupId>
