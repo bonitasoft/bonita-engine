@@ -26,6 +26,7 @@ import java.util.Collections;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
@@ -63,7 +64,7 @@ public class ProcessInvolvementAPIImplTest {
     private ActivityInstanceService activityInstanceService;
 
     @Before
-    public void before() throws SActivityInstanceNotFoundException, SBonitaReadException {
+    public void before() throws SBonitaException {
         humanTaskInstance = new SUserTaskInstanceImpl();
         humanTaskInstance.setId(EXISTING_TASK);
         humanTaskInstance.setLogicalGroup(1, PROCESS_DEFINITION_ID);

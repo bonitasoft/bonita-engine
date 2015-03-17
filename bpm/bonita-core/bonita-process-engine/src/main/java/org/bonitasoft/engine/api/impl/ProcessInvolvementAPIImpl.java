@@ -29,6 +29,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
@@ -125,6 +126,8 @@ public class ProcessInvolvementAPIImpl {
             throw new ActivityInstanceNotFoundException(humanTaskInstanceId);
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
+        } catch (SActivityReadException e) {
+            throw new RetrieveException(e);
         } catch (SActorNotFoundException e) {
             throw new RetrieveException(e);
         }
@@ -132,7 +135,7 @@ public class ProcessInvolvementAPIImpl {
 
 
     private Boolean isInvolvedInHumanTaskInstance(final long userId, final long humanTaskInstanceId, final TenantServiceAccessor serviceAccessor)
-            throws SActivityInstanceNotFoundException, SActorNotFoundException, SBonitaReadException {
+            throws SActivityInstanceNotFoundException, SActorNotFoundException, SBonitaReadException, SActivityReadException {
         final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
         long assigneeId;
         final SHumanTaskInstance humanTaskInstance = activityInstanceService.getHumanTaskInstance(humanTaskInstanceId);
