@@ -540,7 +540,7 @@ public interface ProcessRuntimeAPI {
      * @throws ProcessExecutionException
      *         If a problem occurs when starting the process.
      * @throws ContractViolationException
-     *         If inputs don't fit with task contract
+     *         If inputs don't fit with process contract
      * @since 7.0.0
      */
     ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
