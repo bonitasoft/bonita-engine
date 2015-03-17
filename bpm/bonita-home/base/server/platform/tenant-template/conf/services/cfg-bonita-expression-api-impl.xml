@@ -28,6 +28,7 @@
 				<ref bean="businessDataExpressionExecutorStrategy" />
 				<ref bean="queryBusinessDataExpressionExecutorStrategy" />
 				<ref bean="businessObjectDAOExpressionStrategy" />
+                <ref bean="contractInputExpressionExecutorStrategy" />
 			</list>
 		</property>
 	</bean>
@@ -92,5 +93,9 @@
 	<bean id="parameterExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
 		<constructor-arg name="parameterService" ref="parameterService" />
 	</bean>
+
+    <bean id="contractInputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ContractInputExpressionExecutorStrategy" >
+        <constructor-arg name="contractDataService" ref="contractDataService" />
+    </bean>
 
 </beans>
