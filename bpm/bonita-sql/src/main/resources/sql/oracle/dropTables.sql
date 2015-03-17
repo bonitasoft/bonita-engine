@@ -1,3 +1,5 @@
+DROP TABLE arch_contract_data cascade constraints purge;
+DROP TABLE contract_data cascade constraints purge;
 DROP TABLE actormember cascade constraints purge;
 DROP TABLE actor cascade constraints purge;
 DROP TABLE processcategorymapping cascade constraints purge;
@@ -59,3 +61,4 @@ DROP TABLE sequence cascade constraints purge;
 DROP TABLE tenant cascade constraints purge;
 DROP TABLE platform cascade constraints purge;
 DROP TABLE platformCommand cascade constraints purge;
+DROP TABLE form_mapping cascade constraints purge;

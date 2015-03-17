@@ -38,9 +38,12 @@ import org.bonitasoft.engine.bpm.bar.xml.CallableElementVersionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CatchErrorEventTriggerDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CatchMessageEventTriggerDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CatchSignalEventTriggerDefinitionBinding;
+import org.bonitasoft.engine.bpm.bar.xml.ComplexInputDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConditionalExpressionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionInputBinding;
+import org.bonitasoft.engine.bpm.bar.xml.ConstraintDefinitionBinding;
+import org.bonitasoft.engine.bpm.bar.xml.ContractDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationKeyBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationValueBinding;
@@ -75,6 +78,7 @@ import org.bonitasoft.engine.bpm.bar.xml.ProcessDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ReceiveTaskDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.RightOperandBinding;
 import org.bonitasoft.engine.bpm.bar.xml.SendTaskDefinitionBinding;
+import org.bonitasoft.engine.bpm.bar.xml.SimpleInputDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StandardLoopCharacteristicsBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StartEventDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StringIndexBinding;
@@ -177,6 +181,10 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(TargetFlowNodeBinding.class);
         bindings.add(SubProcessDefinitionBinding.class);
         bindings.add(FlowElementBinding.class);
+        bindings.add(ContractDefinitionBinding.class);
+        bindings.add(SimpleInputDefinitionBinding.class);
+        bindings.add(ComplexInputDefinitionBinding.class);
+        bindings.add(ConstraintDefinitionBinding.class);
 
         //        final InputStream schemaStream = ProcessDefinitionBARContribution.class.getResourceAsStream("ProcessDefinition.xsd");
         //        try {

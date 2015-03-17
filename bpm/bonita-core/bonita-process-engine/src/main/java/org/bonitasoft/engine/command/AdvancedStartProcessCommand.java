@@ -18,112 +18,40 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.impl.ProcessStarter;
-import org.bonitasoft.engine.bpm.process.ProcessActivationException;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.command.system.CommandWithParameters;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.execution.AdvancedStartProcessValidator;
-import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-
 /**
- * This command starts the process in the specified activity. Connectors on process start will be executed.
+ * This command starts the process in the specified activity (if you need to specify several activities as start points, please, use
+ * {@link MultipleStartPointsProcessCommand}). Connectors on process start will be executed.
+ * <p>It can be executed using the {@link org.bonitasoft.engine.api.CommandAPI#execute(String, java.util.Map)}.
+ * Example: {@code commandAPI.execute("advancedStartProcessCommand", parameters)}</p>
  * Parameters:
- * - started_by: the user id (long) is used as the process starter. It's a mandatory parameter.
- * - process_definition_id: the process definition id (long) identifies the process to start. It's a mandatory parameter.
- * - activity_name: the name of the activity (String) where the process will start the execution. It's a mandatory
- * parameter.
- * - operations: the operations (ArrayList<Operation>) are executed when the process starts (set variables and documents). It's an optional parameter.
- * - context: the context (HashMap<String, Serializable>) is used during operations execution. It's an optional parameter.
+ * <ul>
+ *      <li> started_by: the user id (long) is used as the process starter. It's a mandatory parameter.</li>
+ *      <li> process_definition_id: the process definition id (long) identifies the process to start. It's a mandatory parameter.</li>
+ *      <li> activity_name: the name of the activity (String) where the process will start the execution. It's a mandatory parameter.</li>
+ *      <li> operations: the operations (ArrayList<Operation>) are executed when the process starts (set variables and documents). It's an optional parameter.</li>
+ *      <li> context: the context (HashMap<String, Serializable>) is used during operations execution. It's an optional parameter.</li>
+ * </ul>
  * Limitations:
- * - It is not possible to start the execution of a process from a gateway, a boundary event or an event sub-process
- * - The process must be started when there is only one active branch.
+ * <ul>
+ *      <li> It is not possible to start the execution of a process from a gateway, a boundary event or an event sub-process</li>
+ *      <li> The process must be started when there is only one active branch. Otherwise use {@code MultipleStartPointsProcessCommand}</li>
+ * </ul>
  * Example:
  * start -> step1 -> gateway1 -> (step2 || step3) -> gateway2 -> step4 -> end
- * - Ok: start from "start" or "step1" or "step4" or "end"
- * - All other start points are invalid.
- * 
+ * <ul>
+ * <li> Ok: start from "start" or "step1" or "step4" or "end"</li>
+ * <li> All other start points are invalid.</li>
+ * </ul>
+ *
  * @author Vincent Elcrin
+ * @see org.bonitasoft.engine.command.MultipleStartPointsProcessCommand
  */
-public class AdvancedStartProcessCommand extends CommandWithParameters {
-
-    public static final String STARTED_BY = "started_by";
-
-    public static final String PROCESS_DEFINITION_ID = "process_definition_id";
+public class AdvancedStartProcessCommand extends AbstractStartProcessCommand {
 
     public static final String ACTIVITY_NAME = "activity_name";
 
-    public static final String OPERATIONS = "operations";
-
-    public static final String CONTEXT = "context";
-
-    @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
-            throws SCommandParameterizationException, SCommandExecutionException {
-        // get parameters
-        final long processDefinitionId = getProcessDefinitionId(parameters);
-        final List<String> activityNames = Collections.singletonList(getActivityName(parameters));
-        final long startedBy = getStartedBy(parameters);
-        final Map<String, Serializable> context = getContext(parameters);
-        final List<Operation> operations = getOperations(parameters);
-
-        try {
-            validateInputs(serviceAccessor, processDefinitionId, activityNames);
-
-            return startProcess(processDefinitionId, activityNames, startedBy, context, operations);
-        } catch (final SCommandExecutionException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new SCommandExecutionException(e);
-        }
-    }
-
-    private ProcessInstance startProcess(final long processDefinitionId, final List<String> activityNames, final long startedBy,
-            final Map<String, Serializable> context, final List<Operation> operations) throws ProcessDefinitionNotFoundException, ProcessActivationException,
-            ProcessExecutionException {
-        final ProcessStarter starter = new ProcessStarter(startedBy, processDefinitionId, operations, context, activityNames);
-        return starter.start();
-    }
-
-    private void validateInputs(final TenantServiceAccessor serviceAccessor, final long processDefinitionId, final List<String> activityNames)
-            throws SBonitaException, SCommandExecutionException {
-        final AdvancedStartProcessValidator validator = new AdvancedStartProcessValidator(serviceAccessor.getProcessDefinitionService(), processDefinitionId);
-        final List<String> problems = validator.validate(activityNames);
-        handleProblems(problems);
-    }
-
-    private void handleProblems(final List<String> problems) throws SCommandExecutionException {
-        if (!problems.isEmpty()) {
-            final StringBuilder stb = new StringBuilder();
-            for (final String problem : problems) {
-                stb.append(problem);
-                stb.append("\n");
-            }
-            throw new SCommandExecutionException(stb.toString());
-        }
-    }
-
-    private Long getStartedBy(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getLongMandadoryParameter(parameters, STARTED_BY);
-    }
-
-    private Long getProcessDefinitionId(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getLongMandadoryParameter(parameters, PROCESS_DEFINITION_ID);
-    }
-
-    private List<Operation> getOperations(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getParameter(parameters, OPERATIONS);
-    }
-
-    private Map<String, Serializable> getContext(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getParameter(parameters, CONTEXT);
-    }
-
-    private String getActivityName(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
-        return getStringMandadoryParameter(parameters, ACTIVITY_NAME);
+    protected List<String> getActivityNames(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
+        return Collections.singletonList(getStringMandadoryParameter(parameters, ACTIVITY_NAME));
     }
 
 }

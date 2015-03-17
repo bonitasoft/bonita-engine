@@ -25,6 +25,7 @@
 				<ref bean="javaMethodCallExpressionExecutorStrategy" />
 				<ref bean="parameterExpressionExecutorStrategy" />
 				<ref bean="xPathReadExpressionExecutorStrategy" />
+                <ref bean="contractInputExpressionExecutorStrategy" />
                 <ref bean="businessDataExpressionExecutorStrategy" />
                 <ref bean="queryBusinessDataExpressionExecutorStrategy" />
                 <ref bean="businessObjectDAOExpressionStrategy" />
@@ -68,7 +69,7 @@
 	</bean>
 
 	<bean id="listExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ListExpressionExecutorStrategy" />
-
+	
 	<bean id="equalityComparator" class="org.bonitasoft.engine.expression.impl.condition.EqualityComparator" />
 	<bean id="inequalityComparator" class="org.bonitasoft.engine.expression.impl.condition.InequalityComparator" />
 	<bean id="binaryComparatorMapper" class="org.bonitasoft.engine.expression.impl.condition.BinaryComparatorMapper">
@@ -89,8 +90,12 @@
 
 	<bean id="javaMethodCallExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.JavaMethodCallExpressionExecutorStrategy" />
 
+    <bean id="contractInputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ContractInputExpressionExecutorStrategy" >
+        <constructor-arg name="contractDataService" ref="contractDataService" />
+    </bean>
+
 	<bean id="parameterExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
 		<constructor-arg name="parameterService" ref="parameterService" />
-	</bean>
+    </bean>
 
 </beans>

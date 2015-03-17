@@ -1,4 +1,4 @@
-/*******************************************************************************
+/**
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,11 +10,27 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ******************************************************************************/
+ **/
 package org.bonitasoft.engine.bdm;
 
-import java.util.List;
+import com.sun.codemodel.JAnnotationArrayMember;
+import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JClassAlreadyExistsException;
+import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JMethod;
+import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
+import org.bonitasoft.engine.bdm.model.BusinessObject;
+import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import org.bonitasoft.engine.bdm.model.Index;
+import org.bonitasoft.engine.bdm.model.Query;
+import org.bonitasoft.engine.bdm.model.UniqueConstraint;
+import org.bonitasoft.engine.bdm.model.field.Field;
+import org.bonitasoft.engine.bdm.model.field.FieldType;
+import org.bonitasoft.engine.bdm.model.field.RelationField;
+import org.bonitasoft.engine.bdm.model.field.SimpleField;
 
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -30,37 +46,22 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
-import org.bonitasoft.engine.bdm.model.BusinessObject;
-import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import org.bonitasoft.engine.bdm.model.Index;
-import org.bonitasoft.engine.bdm.model.Query;
-import org.bonitasoft.engine.bdm.model.UniqueConstraint;
-import org.bonitasoft.engine.bdm.model.field.Field;
-import org.bonitasoft.engine.bdm.model.field.FieldType;
-import org.bonitasoft.engine.bdm.model.field.RelationField;
-import org.bonitasoft.engine.bdm.model.field.SimpleField;
-
-import com.sun.codemodel.JAnnotationArrayMember;
-import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JMethod;
-
 /**
- * @author Colin PUY
+ * @author Colin PUY,
+ * @author Matthieu Chaffotte
  */
 public class EntityCodeGenerator {
 
     private final CodeGenerator codeGenerator;
+
     private final RelationFieldAnnotator relationFieldAnnotator;
+
     private final BusinessObjectModel bom;
 
-    public EntityCodeGenerator(final CodeGenerator codeGenerator, BusinessObjectModel bom) {
+    public EntityCodeGenerator(final CodeGenerator codeGenerator, final BusinessObjectModel bom) {
         this.codeGenerator = codeGenerator;
         this.bom = bom;
-        this.relationFieldAnnotator = new RelationFieldAnnotator(codeGenerator);
+        relationFieldAnnotator = new RelationFieldAnnotator(codeGenerator);
     }
 
     public JDefinedClass addEntity(final BusinessObject bo) throws JClassAlreadyExistsException {
@@ -259,8 +260,8 @@ public class EntityCodeGenerator {
         }
     }
 
-    private boolean isCollectionField(Field field) {
-        if (field == null) {
+    private boolean isCollectionField(final Field field) {
+        if (field==null){
             return false;
         }
         final Boolean collection = field.isCollection();

@@ -25,8 +25,19 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoDefinition;
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoValue;
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.Type;
+import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
@@ -35,10 +46,22 @@ import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
+import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
+import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
@@ -53,6 +76,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STim
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.form.FormMapping;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
@@ -351,4 +376,127 @@ public class ModelConvertorTest {
         assertEquals(sProcessDefinition.getStringIndexLabel(5), archivedProcessInstance.getStringIndexLabel(5));
         assertEquals(saProcessInstance.getStringIndex5(), archivedProcessInstance.getStringIndexValue(5));
     }
+
+
+    @Test
+    public void toFormMapping_can_convert() {
+        // Given
+        SFormMappingImpl sFormMapping = new SFormMappingImpl();
+        sFormMapping.setId(555l);
+        sFormMapping.setIsExternal(true);
+        sFormMapping.setForm("myForm1");
+        sFormMapping.setType(FormMappingType.TASK.name());
+        sFormMapping.setTask("myTask");
+        sFormMapping.setProcessDefinitionId(666l);
+
+        // Then
+        FormMapping formMapping = ModelConvertor.toFormMapping(sFormMapping);
+
+        // When
+        assertThat(formMapping).isNotNull();
+        assertThat(formMapping.getId()).isEqualTo(555l);
+        assertThat(formMapping.getType()).isEqualTo(FormMappingType.TASK);
+        assertThat(formMapping.isExternal()).isTrue();
+        assertThat(formMapping.getForm()).isEqualTo("myForm1");
+        assertThat(formMapping.getTask()).isEqualTo("myTask");
+        assertThat(formMapping.getProcessDefinitionId()).isEqualTo(666l);
+
+    }
+
+    @Test
+    public void toFormMappings_can_convert() {
+        // Given
+        SFormMappingImpl sFormMapping = new SFormMappingImpl();
+        sFormMapping.setId(555l);
+        sFormMapping.setIsExternal(true);
+        sFormMapping.setForm("myForm1");
+        sFormMapping.setType(FormMappingType.TASK.name());
+        sFormMapping.setTask("myTask");
+        sFormMapping.setProcessDefinitionId(666l);
+
+        // Then
+        List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping>asList(sFormMapping));
+
+        // When
+        assertThat(formMapping).hasSize(1);
+        assertThat(formMapping.get(0).getId()).isEqualTo(555l);
+        assertThat(formMapping.get(0).getType()).isEqualTo(FormMappingType.TASK);
+        assertThat(formMapping.get(0).isExternal()).isTrue();
+        assertThat(formMapping.get(0).getForm()).isEqualTo("myForm1");
+        assertThat(formMapping.get(0).getTask()).isEqualTo("myTask");
+        assertThat(formMapping.get(0).getProcessDefinitionId()).isEqualTo(666l);
+
+    }
+
+    @Test
+    public void toFormMapping_can_convert_null() {
+        // Given
+
+        // Then
+        FormMapping formMapping = ModelConvertor.toFormMapping(null);
+
+        // When
+        assertThat(formMapping).isNull();
+
+    }
+
+    @Test
+    public void convertSContractDefinition() {
+        //given
+        final SimpleInputDefinition expectedSimpleInput = new SimpleInputDefinitionImpl("name", Type.TEXT, "description");
+        final ComplexInputDefinition expectedComplexInput = new ComplexInputDefinitionImpl("complex input", "complex description",
+                Arrays.asList(expectedSimpleInput), null);
+        final ConstraintDefinition expectedRule = new ConstraintDefinitionImpl("name", "expression", "explanation");
+        expectedRule.getInputNames().add("input1");
+        expectedRule.getInputNames().add("input2");
+
+        //when
+        final SContractDefinition contractDefinition = new SContractDefinitionImpl();
+        final SConstraintDefinition sRule = new SConstraintDefinitionImpl(expectedRule);
+        final SSimpleInputDefinition sSimpleInput = new SSimpleInputDefinitionImpl(expectedSimpleInput);
+        final SComplexInputDefinition sComplexInput = new SComplexInputDefinitionImpl(expectedComplexInput);
+
+        contractDefinition.getConstraints().add(sRule);
+        contractDefinition.getSimpleInputs().add(sSimpleInput);
+        contractDefinition.getComplexInputs().add(sComplexInput);
+
+        final ContractDefinition contract = ModelConvertor.toContract(contractDefinition);
+
+        //then
+        assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
+        assertThat(contract.getSimpleInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput);
+        assertThat(contract.getComplexInputs()).as("should convert complex inputs").containsExactly(expectedComplexInput);
+    }
+
+    @Test
+    public void convertMultipleSContractDefinition() {
+        //given
+        final SimpleInputDefinition expectedSimpleInput = new SimpleInputDefinitionImpl("name", Type.TEXT, "description", true);
+        final ComplexInputDefinition expectedComplexInput = new ComplexInputDefinitionImpl("complex input", "complex description", true,
+                Arrays.asList(expectedSimpleInput), null);
+        final ComplexInputDefinition expectedComplexWithComplexInput = new ComplexInputDefinitionImpl("complex in complext", "complex description", true,
+                null, Arrays.asList(expectedComplexInput));
+
+        final ConstraintDefinition expectedRule = new ConstraintDefinitionImpl("name", "expression", "explanation");
+        expectedRule.getInputNames().add("input1");
+        expectedRule.getInputNames().add("input2");
+
+        //when
+        final SContractDefinition contractDefinition = new SContractDefinitionImpl();
+        final SConstraintDefinition sRule = new SConstraintDefinitionImpl(expectedRule);
+        final SSimpleInputDefinition sSimpleInput = new SSimpleInputDefinitionImpl(expectedSimpleInput);
+        final SComplexInputDefinition sComplexInput = new SComplexInputDefinitionImpl(expectedComplexWithComplexInput);
+
+        contractDefinition.getConstraints().add(sRule);
+        contractDefinition.getSimpleInputs().add(sSimpleInput);
+        contractDefinition.getComplexInputs().add(sComplexInput);
+
+        final ContractDefinition contract = ModelConvertor.toContract(contractDefinition);
+
+        //then
+        assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
+        assertThat(contract.getSimpleInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput);
+        assertThat(contract.getComplexInputs()).as("should convert complex inputs").containsExactly(expectedComplexWithComplexInput);
+    }
+
 }

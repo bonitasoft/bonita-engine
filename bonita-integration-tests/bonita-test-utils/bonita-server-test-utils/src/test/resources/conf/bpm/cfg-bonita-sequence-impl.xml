@@ -145,6 +145,7 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl" value="10060" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" value="10060" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="10080" />
+				<entry key="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" value="10300" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" value="20050" />

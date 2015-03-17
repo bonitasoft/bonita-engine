@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
@@ -100,7 +101,7 @@ public class ActivityInstanceServiceImplTest {
     }
 
     @Test
-    public void getPossibleUserIdsOfPendingTasks() throws SBonitaReadException {
+    public void getPossibleUserIdsOfPendingTasks() throws Exception {
         final List<Long> sUserIds = new ArrayList<Long>();
         Collections.addAll(sUserIds, 78l, 2l, 5l, 486l);
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(sUserIds);
@@ -109,14 +110,14 @@ public class ActivityInstanceServiceImplTest {
         assertEquals(sUserIds, userIds);
     }
 
-    @Test(expected = SBonitaReadException.class)
-    public void throwExceptionwhenGettingPossibleUserIdsOfPendingTasksDueToPersistenceException() throws SBonitaReadException {
+    @Test(expected = SActivityReadException.class)
+    public void throwExceptionwhenGettingPossibleUserIdsOfPendingTasksDueToPersistenceException() throws Exception {
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenThrow(new SBonitaReadException("database out"));
         activityInstanceServiceImpl.getPossibleUserIdsOfPendingTasks(2, 0, 10);
     }
 
     @Test
-    public void getEmptyPossibleUserIdsOfPendingTasks() throws SBonitaReadException {
+    public void getEmptyPossibleUserIdsOfPendingTasks() throws Exception {
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(Collections.<Long> emptyList());
 
         final List<Long> userIds = activityInstanceServiceImpl.getPossibleUserIdsOfPendingTasks(2, 0, 10);

@@ -27,9 +27,11 @@ import org.bonitasoft.engine.core.process.definition.model.bindings.SCallableEle
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCatchErrorEventTriggerDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCatchMessageEventTriggerDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCatchSignalEventTriggerDefinitionBinding;
+import org.bonitasoft.engine.core.process.definition.model.bindings.SComplexInputDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SConditionalExpressionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SConnectorDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SConnectorDefinitionInputBinding;
+import org.bonitasoft.engine.core.process.definition.model.bindings.SContractDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCorrelationBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCorrelationKeyBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCorrelationValueBinding;
@@ -48,6 +50,7 @@ import org.bonitasoft.engine.core.process.definition.model.bindings.SExpressionB
 import org.bonitasoft.engine.core.process.definition.model.bindings.SFlowElementBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SGatewayDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SIncomingTransitionRefBinding;
+import org.bonitasoft.engine.core.process.definition.model.bindings.SSimpleInputDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SIntermediateCatchEventDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SIntermediateThrowEventDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SLeftOperandBinding;
@@ -63,6 +66,7 @@ import org.bonitasoft.engine.core.process.definition.model.bindings.SParameterDe
 import org.bonitasoft.engine.core.process.definition.model.bindings.SProcessDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SReceiveTaskDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SRightOperandBinding;
+import org.bonitasoft.engine.core.process.definition.model.bindings.SConstraintDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SSendTaskDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SStandardLoopCharacteristicsBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SStartEventDefinitionBinding;
@@ -158,6 +162,10 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         bindings.add(new SFlowElementBinding());
         bindings.add(new SSubProcessDefinitionBinding());
         bindings.add(new SStringIndexBinding());
+        bindings.add(new SContractDefinitionBinding());
+        bindings.add(new SSimpleInputDefinitionBinding());
+        bindings.add(new SComplexInputDefinitionBinding());
+        bindings.add(new SConstraintDefinitionBinding());
     }
 
     @Override
@@ -362,9 +370,19 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         if (SFlowElementBinding.class.equals(binderClass)) {
             return new SFlowElementBinding();
         }
-        if (SFlowElementBinding.class.equals(binderClass)) {
-            return new SFlowElementBinding();
+        if (SContractDefinitionBinding.class.equals(binderClass)) {
+            return new SContractDefinitionBinding();
+        }
+        if (SSimpleInputDefinitionBinding.class.equals(binderClass)) {
+            return new SSimpleInputDefinitionBinding();
+        }
+        if (SComplexInputDefinitionBinding.class.equals(binderClass)) {
+            return new SComplexInputDefinitionBinding();
+        }
+        if (SConstraintDefinitionBinding.class.equals(binderClass)) {
+            return new SConstraintDefinitionBinding();
         }
         return null;
     }
+
 }

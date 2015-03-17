@@ -28,6 +28,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
@@ -265,7 +266,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     private Serializable createContext(final Map<String, Object> context, final ContainerState containerState) throws SProcessInstanceNotFoundException,
-            SProcessInstanceReadException, SActivityInstanceNotFoundException, SBonitaReadException {
+            SProcessInstanceReadException, SActivityInstanceNotFoundException, SFlowNodeReadException, SBonitaReadException {
         final EngineExecutionContext ctx = new EngineExecutionContext();
         if (context.containsKey(SExpressionContext.CONTAINER_TYPE_KEY) && context.containsKey(SExpressionContext.CONTAINER_ID_KEY)) {
             final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
@@ -318,7 +319,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         ctx.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
     }
 
-    private void updateContextFromActivityInstance(final EngineExecutionContext ctx, final long activityInstanceId) throws SBonitaReadException,
+    private void updateContextFromActivityInstance(final EngineExecutionContext ctx, final long activityInstanceId) throws SActivityReadException,
             SActivityInstanceNotFoundException {
         ctx.setActivityInstanceId(activityInstanceId);
         final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);

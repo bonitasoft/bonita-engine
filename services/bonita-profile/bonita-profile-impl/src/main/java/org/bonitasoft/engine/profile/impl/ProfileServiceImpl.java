@@ -640,12 +640,8 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public long getNumberOfProfiles(final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.emptyMap();
-            return persistenceService.getNumberOfEntities(SProfile.class, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+        final Map<String, Object> parameters = Collections.emptyMap();
+        return persistenceService.getNumberOfEntities(SProfile.class, queryOptions, parameters);
     }
 
     @Override
@@ -662,12 +658,8 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public long getNumberOfProfileEntries(final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.emptyMap();
-            return persistenceService.getNumberOfEntities(SProfileEntry.class, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+        final Map<String, Object> parameters = Collections.emptyMap();
+        return persistenceService.getNumberOfEntities(SProfileEntry.class, queryOptions, parameters);
     }
 
     @Override

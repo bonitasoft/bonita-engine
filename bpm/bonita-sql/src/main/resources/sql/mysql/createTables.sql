@@ -1,3 +1,28 @@
+CREATE TABLE contract_data (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  scopeId BIGINT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  val LONGBLOB
+) ENGINE = INNODB;
+ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id);
+ALTER TABLE contract_data ADD CONSTRAINT uc_cd_scope_name UNIQUE (scopeId, name, tenantid);
+CREATE INDEX idx_cd_scope_name ON contract_data (scopeId, name, tenantid);
+
+CREATE TABLE arch_contract_data (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  scopeId BIGINT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  val LONGBLOB,
+  archiveDate BIGINT NOT NULL,
+  sourceObjectId BIGINT NOT NULL
+) ENGINE = INNODB;
+ALTER TABLE arch_contract_data ADD CONSTRAINT pk_arch_contract_data PRIMARY KEY (tenantid, id);
+ALTER TABLE arch_contract_data ADD CONSTRAINT uc_acd_scope_name UNIQUE (scopeId, name, tenantid);
+CREATE INDEX idx_acd_scope_name ON arch_contract_data (scopeId, name, tenantid);
+
+
 CREATE TABLE actor (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -60,7 +85,7 @@ CREATE TABLE arch_process_comment(
   userId BIGINT,
   processInstanceId BIGINT NOT NULL,
   postDate BIGINT NOT NULL,
-  content VARCHAR(255) NOT NULL,
+  content VARCHAR(512) NOT NULL,
   archiveDate BIGINT NOT NULL,
   sourceObjectId BIGINT NOT NULL,
   PRIMARY KEY (tenantid, id)
@@ -75,7 +100,7 @@ CREATE TABLE process_comment (
   userId BIGINT,
   processInstanceId BIGINT NOT NULL,
   postDate BIGINT NOT NULL,
-  content VARCHAR(255) NOT NULL,
+  content VARCHAR(512) NOT NULL,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
@@ -974,5 +999,17 @@ CREATE TABLE theme (
   type VARCHAR(50) NOT NULL,
   lastUpdateDate BIGINT NOT NULL,
   CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
+  PRIMARY KEY (tenantId, id)
+) ENGINE = INNODB;
+CREATE TABLE form_mapping (
+  tenantId BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  process BIGINT NOT NULL,
+  task VARCHAR(255) NULL,
+  form VARCHAR(1024) NULL,
+  isexternal BOOLEAN NOT NULL,
+  type VARCHAR(16) NOT NULL,
+  lastUpdateDate BIGINT NULL,
+  lastUpdatedBy BIGINT NULL,
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;

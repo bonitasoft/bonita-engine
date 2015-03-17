@@ -13,17 +13,38 @@
  **/
 package org.bonitasoft.engine.bpm.bar.xml;
 
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowNodeDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class UserTaskDefinitionBinding extends HumanTaskDefinitionBinding {
+
+    private ContractDefinition contract;
 
     @Override
     public String getElementTag() {
         return XMLProcessDefinition.USER_TASK_NODE;
+    }
+
+    @Override
+    public void setChildObject(final String name, final Object value) {
+        super.setChildObject(name, value);
+        if (XMLProcessDefinition.CONTRACT_NODE.equals(name)) {
+            contract = (ContractDefinition) value;
+        }
+    }
+
+    @Override
+    protected void fillNode(final FlowNodeDefinitionImpl flowNode) {
+        super.fillNode(flowNode);
+        if (contract != null) {
+            ((UserTaskDefinitionImpl) flowNode).setContract(contract);
+        }
     }
 
     @Override
@@ -32,4 +53,5 @@ public class UserTaskDefinitionBinding extends HumanTaskDefinitionBinding {
         fillNode(userTaskDefinitionImpl);
         return userTaskDefinitionImpl;
     }
+
 }
