@@ -187,7 +187,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" value="20040" />
                 <entry key="org.bonitasoft.engine.core.contract.data.SATaskContractData" value="20210" />
-                <entry key="org.bonitasoft.engine.core.contract.data.SATaskContractData" value="20220" />
+                <entry key="org.bonitasoft.engine.core.contract.data.SAProcessContractData" value="20220" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
