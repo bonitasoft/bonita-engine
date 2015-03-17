@@ -514,10 +514,12 @@ public interface ProcessRuntimeAPI {
      *         If an exception occurs during activation.
      * @throws ProcessExecutionException
      *         If a problem occurs when starting the process.
+     * @throws ContractViolationException
+     *         If inputs don't fit with task contract
      * @since 7.0.0
      */
     ProcessInstance startProcessWithInputs(final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
-            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException;
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and provides inputs to fullfill Process Contract.
@@ -537,10 +539,12 @@ public interface ProcessRuntimeAPI {
      *         If an exception occurs during activation.
      * @throws ProcessExecutionException
      *         If a problem occurs when starting the process.
+     * @throws ContractViolationException
+     *         If inputs don't fit with task contract
      * @since 7.0.0
      */
     ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
-            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException;
 
     /**
      * Executes a flow node that is in a stable state.

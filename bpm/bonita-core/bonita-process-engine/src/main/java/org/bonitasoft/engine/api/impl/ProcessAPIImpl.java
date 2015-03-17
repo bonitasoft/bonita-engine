@@ -3249,13 +3249,13 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessInstance startProcessWithInputs(final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
-            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
-        return new ProcessInstanceImpl("DUMMY");
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
+        return startProcess(processDefinitionId, instantiationInputs);
     }
 
     @Override
     public ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
-            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException,ContractViolationException {
         return new ProcessInstanceImpl("DUMMY");
     }
 
@@ -5883,11 +5883,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ContractDefinition getProcessContract(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
             final SProcessDefinition processDefinition = getTenantAccessor().getProcessDefinitionService().getProcessDefinition(processDefinitionId);
-            return ModelConvertor.toContract(processDefinition.getProcessContainer().getContract());
+            return ModelConvertor.toContract(processDefinition.getContract());
         } catch (final SProcessDefinitionNotFoundException spdnfe) {
             throw new ProcessDefinitionNotFoundException(spdnfe.getMessage());
         } catch (final SProcessDefinitionReadException spdre) {
