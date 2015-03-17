@@ -15,6 +15,7 @@ package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
@@ -62,12 +63,13 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     private final ProcessDefinitionService processDefinitionService;
 
     private final ConnectorInstanceService connectorInstanceService;
+    private ClassLoaderService classLoaderService;
 
     public EndingCallActivityExceptionStateImpl(final ActivityInstanceService activityInstanceService,
-            final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
-            final SCommentService commentService, final DataInstanceService dataInstanceService,
-            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
-            final ConnectorInstanceService connectorInstanceService) {
+                                                final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
+                                                final SCommentService commentService, final DataInstanceService dataInstanceService,
+                                                final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
+                                                final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
@@ -79,6 +81,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
         this.logger = logger;
         this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
+        this.classLoaderService = classLoaderService;
     }
 
     @Override
@@ -115,7 +118,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
             SBonitaSearchException {
         final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
         ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentMappingService, logger,
-                commentService, processDefinitionService, connectorInstanceService);
+                commentService, processDefinitionService, connectorInstanceService, classLoaderService);
     }
 
     @Override

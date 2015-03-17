@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -32,12 +33,12 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 public class CancellingCallActivityStateImpl extends EndingCallActivityExceptionStateImpl {
 
     public CancellingCallActivityStateImpl(final ActivityInstanceService activityInstanceService,
-            final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
-            final SCommentService commentService, final DataInstanceService dataInstanceService,
-            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
-            final ConnectorInstanceService connectorInstanceService) {
+                                           final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
+                                           final SCommentService commentService, final DataInstanceService dataInstanceService,
+                                           final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
+                                           final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) {
         super(activityInstanceService, processInstanceService, containerRegistry, archiveService, commentService,
-                dataInstanceService, documentMappingService, logger, processDefinitionService, connectorInstanceService);
+                dataInstanceService, documentMappingService, logger, processDefinitionService, connectorInstanceService, classLoaderService);
     }
 
     @Override

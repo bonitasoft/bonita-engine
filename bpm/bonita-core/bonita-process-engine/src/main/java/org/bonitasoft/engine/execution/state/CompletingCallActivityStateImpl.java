@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -33,6 +34,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -61,12 +63,13 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
     private final ProcessDefinitionService processDeifnitionService;
 
     private final ConnectorInstanceService connectorInstanceService;
+    private final ClassLoaderService classLoaderService;
 
     public CompletingCallActivityStateImpl(final StateBehaviors stateBehaviors, final OperationService operationService,
-            final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
-            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger,
-            final ArchiveService archiveService, final SCommentService commentService,
-            final ProcessDefinitionService processDeifnitionService, final ConnectorInstanceService connectorInstanceService) {
+                                           final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
+                                           final DocumentMappingService documentMappingService, final TechnicalLoggerService logger,
+                                           final ArchiveService archiveService, final SCommentService commentService,
+                                           final ProcessDefinitionService processDeifnitionService, final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) {
         super(stateBehaviors);
         this.operationService = operationService;
         this.processInstanceService = processInstanceService;
@@ -77,6 +80,7 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
         this.commentService = commentService;
         this.processDeifnitionService = processDeifnitionService;
         this.connectorInstanceService = connectorInstanceService;
+        this.classLoaderService = classLoaderService;
     }
 
     @Override
@@ -100,7 +104,7 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
             }
             // archive child process instance
             ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentMappingService, logger,
-                    commentService, processDeifnitionService, connectorInstanceService);
+                    commentService, processDeifnitionService, connectorInstanceService, classLoaderService);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }

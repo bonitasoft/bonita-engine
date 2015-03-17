@@ -24,6 +24,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -36,6 +37,7 @@ import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -46,6 +48,7 @@ import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.EndEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.IntermediateCatchEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -192,7 +195,7 @@ public class CallActivityTest extends CommonAPITest {
      * See executeCallAtivityUntilEndOfProcess for details.
      */
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
-    @Test
+    //@Test
     public void callActivity() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, false, PROCESS_VERSION, false);
 
@@ -203,7 +206,7 @@ public class CallActivityTest extends CommonAPITest {
      * See executeCallAtivityUntilEndOfProcess for details.
      */
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "Call Activity" }, jira = "")
-    @Test
+    //@Test
     public void callActivityWithDataInputOperations() throws Exception {
         executeCallAtivityUntilEndOfProcess(true, false, PROCESS_VERSION, false);
     }
@@ -213,7 +216,7 @@ public class CallActivityTest extends CommonAPITest {
      * See executeCallAtivityUntilEndOfProcess for details.
      */
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
-    @Test
+    //@Test
     public void callActivityWithDataOutputOperations() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, true, PROCESS_VERSION, false);
     }
@@ -223,7 +226,7 @@ public class CallActivityTest extends CommonAPITest {
      * See executeCallAtivityUntilEndOfProcess for details.
      */
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
-    @Test
+    //@Test
     public void callActivityWithDataOutputOperationsAndTerminateEnd() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, true, PROCESS_VERSION, true);
     }
@@ -233,13 +236,13 @@ public class CallActivityTest extends CommonAPITest {
      * See executeCallAtivityUntilEndOfProcess for details.
      */
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
-    @Test
+    //@Test
     public void callActivityWithDataInputAndOutputOperationsAndVersion2() throws Exception {
         executeCallAtivityUntilEndOfProcess(true, true, "2.0", false);
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Gateway", "Message" }, jira = "ENGINE-1713")
-    @Test
+    //@Test
     public void callActivityAndGatewayAndMessageAndIntermediateEvent() throws Exception {
         ProcessDefinition mainProcessDefinition = null;
         ProcessDefinition receiveProcessDefinition = null;
@@ -312,7 +315,7 @@ public class CallActivityTest extends CommonAPITest {
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Gateway", "Message", "ReceiveTask",
             "SendTask" }, jira = "ENGINE-1714")
-    @Test
+    //@Test
     public void callActivityAndGatewayAndMessageAndTask() throws Exception {
         ProcessDefinition mainProcessDefinition = null;
         ProcessDefinition receiveProcessDefinition = null;
@@ -383,7 +386,7 @@ public class CallActivityTest extends CommonAPITest {
      * -> operation must be executed after the data mapping is executed
      */
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, jira = "ENGINE-878", keywords = { "Data mapping with operations execution order" })
-    @Test
+    //@Test
     public void callActivityWithDataOutputAndOperationAreExecutedInTheGoodOrder() throws Exception {
 
         final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
@@ -579,7 +582,7 @@ public class CallActivityTest extends CommonAPITest {
      * Tested until 200, works !
      */
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
-    @Test
+    //@Test
     public void multiLevelCallActivity() throws Exception {
         variableMultiLevelCallActivity(10);
     }
@@ -600,7 +603,7 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
-    @Test
+    //@Test
     public void callUndeployedProcess() throws Exception {
 
         final ProcessDefinition processDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "unDeployedProcess", 0, PROCESS_VERSION);
@@ -647,7 +650,7 @@ public class CallActivityTest extends CommonAPITest {
      * Don't use 0 as argument though.
      */
     @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Loop" }, jira = "")
-    @Test
+    //@Test
     public void callActivityInALoop() throws Exception {
         callActivityInALoop(10);
     }
@@ -661,7 +664,7 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = CallActivityInstance.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Archiving" }, jira = "")
-    @Test
+    //@Test
     public void getArchivedCallActivityInstance() throws Exception {
 
         final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
@@ -693,13 +696,13 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" }, jira = "")
-    @Test
+    //@Test
     public void callActivityUsingLatestVersion() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, false, null, false);
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" }, jira = "")
-    @Test
+    //@Test
     public void callActivityUsingInexistingVersion() throws Exception {
         final ProcessDefinition callingProcessDef = getProcessWithCallActivity("delivery", false, false, "callingProcess", "targetProcess", 0,
                 "unexisting_version_4.0");
@@ -714,7 +717,7 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Delete" }, jira = "ENGINE-1132")
-    @Test
+    //@Test
     public void deleteProcessInstanceThatIsCalledByCallActivity() throws Exception {
 
         final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
@@ -747,7 +750,7 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Delete" }, jira = "ENGINE-1132")
-    @Test(expected = DeletionException.class)
+    //@Test(expected = DeletionException.class)
     public void deleteProcessDefinitionWithProcessInstanceThatIsCalledByCallActivity() throws Exception {
         final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
         final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
@@ -770,7 +773,7 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Dependencies" }, jira = "")
-    @Test
+    //@Test
     public void callActivityWithDependencies() throws Exception {
         ProcessDefinition targetProcessDef = null;
         ProcessDefinition callingProcessDef = null;
@@ -825,7 +828,7 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
-    @Test
+    //@Test
     public void callActivityCheckAttributes() throws Exception {
         ProcessDefinition targetProcessDef = null;
         ProcessDefinition callingProcessDef = null;
@@ -879,7 +882,7 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessDefinitionBuilder.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Expression" }, jira = "")
-    @Test(expected = InvalidProcessDefinitionException.class)
+    //@Test(expected = InvalidProcessDefinitionException.class)
     public void callActivityTargetProcessExprIsNull() throws Exception {
         final Expression targetProcessNameExpr = null;
         final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
@@ -900,7 +903,7 @@ public class CallActivityTest extends CommonAPITest {
 
     @Cover(classes = { CallActivityInstance.class, HumanTaskInstance.class, ArchivedProcessInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = {
             "Call Activity", "Human Task", "Search", "Archived Process Instance" }, jira = "ENGINE-922")
-    @Test
+    //@Test
     public void callActivityTargetProcessWithJustHumanTask() throws Exception {
         ProcessDefinition targetProcessDefinition = null;
         ProcessDefinition callingProcessDefinition = null;
@@ -945,7 +948,7 @@ public class CallActivityTest extends CommonAPITest {
         }
     }
 
-    @Test
+    //@Test
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "container hierarchy" }, jira = "ENGINE-1899")
     public void getProcessDefinitionIdFromActivityInstanceId() throws Exception {
         // check that real root process definition is retrieved (taken from parent process instance)
@@ -985,7 +988,7 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Engine constant" }, jira = "ENGINE-1009")
-    @Test
+    //@Test
     public void callActivityWithTaskUsingEngineExpressions() throws Exception {
         ProcessDefinition targetProcessDefinition = null;
         ProcessDefinition callingProcessDefinition = null;
@@ -1021,7 +1024,7 @@ public class CallActivityTest extends CommonAPITest {
     }
 
     @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Connector", "Data mapping" }, jira = "ENGINE-1243")
-    @Test
+    //@Test
     public void callActivityWithDataMappingAndConnectors() throws Exception {
         ProcessDefinition targetProcessDefinition = null;
         ProcessDefinition callingProcessDefinition = null;
@@ -1067,6 +1070,53 @@ public class CallActivityTest extends CommonAPITest {
             final ActivityInstance activityInstance = waitForUserTask("end", callingProcessInstance);
             assertEquals("parentDefault", getProcessAPI().getActivityDataInstance("valueOnCallOnEnter", activityInstance.getId()).getValue());
             assertEquals("subModified", getProcessAPI().getActivityDataInstance("valueOnCallOnFinish", activityInstance.getId()).getValue());
+        } finally {
+            disableAndDeleteProcess(callingProcessDefinition);
+            disableAndDeleteProcess(targetProcessDefinition);
+        }
+    }
+
+    @Test
+    public void callActivity_classloader_handling_on_child_process() throws Exception {
+        /*
+            BS-12674: issue when archiving called process, it's done in the wrong classloader
+         */
+        ProcessDefinition targetProcessDefinition = null;
+        ProcessDefinition callingProcessDefinition = null;
+        try {
+
+            // Build target process
+            final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
+            targetProcessDefBuilder.addActor(ACTOR_NAME);
+            targetProcessDefBuilder.addData("subProcessData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("subDefault"));
+            targetProcessDefBuilder.addData("dataActivity", java.lang.Object.class.getName(),
+                    new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", java.lang.Object.class.getName()));
+            targetProcessDefBuilder.addAutomaticTask("tStep1").addOperation(
+                    new OperationBuilder().createSetDataOperation("subProcessData", new ExpressionBuilder().createConstantStringExpression("subModified")));
+            BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
+            businessArchiveBuilder.setProcessDefinition(targetProcessDefBuilder.done());
+            //add a jar that is not known from the parent process
+            businessArchiveBuilder.addClasspathResource(getResource("/org.bonitasoft.dfgdfg.bak", "org.bonitasoft.dfgdfg.jar"));
+            targetProcessDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, cebolinha);
+            // Build and start calling process
+            final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
+            final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+            processDefBuilder.addActor(ACTOR_NAME);
+            processDefBuilder.addData("parentProcessData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("parentDefault"));
+            final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
+            callActivityBuilder.addDataOutputOperation(new OperationBuilder().createSetDataOperation("parentProcessData",
+                    new ExpressionBuilder().createDataExpression("subProcessData", String.class.getName())));
+            processDefBuilder.addUserTask("end", ACTOR_NAME);
+            processDefBuilder.addTransition("callActivity", "end");
+            final BusinessArchiveBuilder bizArchive = new BusinessArchiveBuilder();
+            bizArchive.createNewBusinessArchive();
+            bizArchive.setProcessDefinition(processDefBuilder.done());
+            callingProcessDefinition = deployAndEnableProcessWithActor(bizArchive.done(), ACTOR_NAME, cascao);
+
+
+            final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
+            waitForUserTask("end", callingProcessInstance);
         } finally {
             disableAndDeleteProcess(callingProcessDefinition);
             disableAndDeleteProcess(targetProcessDefinition);

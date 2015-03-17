@@ -22,6 +22,8 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
@@ -68,6 +70,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -84,39 +87,57 @@ public class ProcessArchiver {
     private static final int BATCH_SIZE = 100;
 
     public static void archiveProcessInstance(final SProcessInstance processInstance, final ArchiveService archiveService,
-            final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
-            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger,
-            final SCommentService commentService, final ProcessDefinitionService processDefinitionService,
-            final ConnectorInstanceService connectorInstanceService) throws SArchivingException {
-        final SAProcessInstance saProcessInstance = BuilderFactory.get(SAProcessInstanceBuilderFactory.class).createNewInstance(processInstance).done();
-        final long archiveDate = saProcessInstance.getEndDate();
+                                              final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
+                                              final DocumentMappingService documentMappingService, final TechnicalLoggerService logger,
+                                              final SCommentService commentService, final ProcessDefinitionService processDefinitionService,
+                                              final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) throws SArchivingException {
+
+        //set the classloader to this process because we need it e.g. to archive data instance
+
+        ClassLoader processClassLoader;
         try {
-            dataInstanceService.removeContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.toString());
-        } catch (final SDataInstanceException e) {
-            throw new SArchivingException("Unable to delete data mapping.", e);
-        }
-        SProcessDefinition processDefinition = null;
-        try {
-            processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
-        } catch (final SBonitaException e) {
+            processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processInstance.getProcessDefinitionId());
+
+        } catch (SClassLoaderException e) {
             throw new SArchivingException(e);
         }
-        if (!processDefinition.getProcessContainer().getDataDefinitions().isEmpty()) {
-            // Archive SADataInstance
-            archiveDataInstances(processDefinition, processInstance, dataInstanceService, archiveDate);
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(processClassLoader);
+        try {
+
+            final SAProcessInstance saProcessInstance = BuilderFactory.get(SAProcessInstanceBuilderFactory.class).createNewInstance(processInstance).done();
+            final long archiveDate = saProcessInstance.getEndDate();
+            try {
+                dataInstanceService.removeContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.toString());
+            } catch (final SDataInstanceException e) {
+                throw new SArchivingException("Unable to delete data mapping.", e);
+            }
+            SProcessDefinition processDefinition = null;
+            try {
+                processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
+            } catch (final SBonitaException e) {
+                throw new SArchivingException(e);
+            }
+            if (!processDefinition.getProcessContainer().getDataDefinitions().isEmpty()) {
+                // Archive SADataInstance
+                archiveDataInstances(processDefinition, processInstance, dataInstanceService, archiveDate);
+            }
+            // Archive SComment
+            archiveComments(processDefinition, processInstance, archiveService, logger, commentService, archiveDate);
+
+            // archive document mappings
+            archiveDocumentMappings(processDefinition, processInstance, documentMappingService, archiveDate);
+
+            if (!processDefinition.getProcessContainer().getConnectors().isEmpty()) {
+                archiveConnectors(connectorInstanceService, archiveDate, processInstance.getId(), SConnectorInstance.PROCESS_TYPE);
+            }
+
+            // Archive
+            archiveProcessInstance(processDefinition, processInstance, saProcessInstance, archiveDate, archiveService, processInstanceService, logger);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-        // Archive SComment
-        archiveComments(processDefinition, processInstance, archiveService, logger, commentService, archiveDate);
 
-        // archive document mappings
-        archiveDocumentMappings(processDefinition, processInstance, documentMappingService, archiveDate);
-
-        if (!processDefinition.getProcessContainer().getConnectors().isEmpty()) {
-            archiveConnectors(connectorInstanceService, archiveDate, processInstance.getId(), SConnectorInstance.PROCESS_TYPE);
-        }
-
-        // Archive
-        archiveProcessInstance(processDefinition, processInstance, saProcessInstance, archiveDate, archiveService, processInstanceService, logger);
     }
 
     /**
