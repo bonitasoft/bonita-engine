@@ -113,39 +113,4 @@ public class UserPermissionCommandIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(processDef1, processDef2);
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Command", "User", "Human task" }, jira = "BS-8961")
-    @Test
-    public void isInvolvedInHumanTaskCommand() throws Exception {
-        final String actor11 = "killer";
-        final String actor12 = "Slayer";
-        final String actor13 = "Drawer";
-        final Map<String, List<User>> actorUsers1 = new HashMap<String, List<User>>();
-        actorUsers1.put(actor11, Arrays.asList(d1, d2));
-        actorUsers1.put(actor12, Arrays.asList(d2));
-        actorUsers1.put(actor13, Arrays.asList(d1));
-
-        // First process definition:
-        final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance("FirstProcess", "1.0");
-        processBuilder1.addActor(actor11, true).addDescription("Killing daily").addUserTask("userTask1", actor11);
-        processBuilder1.addActor(actor12).addDescription("Slaying vampires").addUserTask("userTask2", actor12);
-        processBuilder1.addActor(actor13).addDescription("Classify files").addUserTask("userTask3", actor13);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder1.done(), actorUsers1);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long userTask3Id = waitForUserTask(processInstance, "userTask3");
-        final long userTask1Id = waitForUserTask(processInstance, "userTask1");
-
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put("USER_ID_KEY", manager.getId());
-        parameters.put("HUMAN_TASK_INSTANCE_ID_KEY", userTask3Id);
-        Boolean isInvolvedInHumanTask = (Boolean) getCommandAPI().execute("isInvolvedInHumanTask", parameters);
-        assertTrue(isInvolvedInHumanTask);
-
-        parameters.put("USER_ID_KEY", manager.getId());
-        parameters.put("HUMAN_TASK_INSTANCE_ID_KEY", userTask1Id);
-        isInvolvedInHumanTask = (Boolean) getCommandAPI().execute("isInvolvedInHumanTask", parameters);
-        assertTrue(isInvolvedInHumanTask);
-
-        // clean up:
-        disableAndDeleteProcess(processDefinition);
-    }
 }
