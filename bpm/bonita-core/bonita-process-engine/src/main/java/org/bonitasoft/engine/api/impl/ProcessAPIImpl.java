@@ -202,7 +202,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
-import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -3250,13 +3249,29 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessInstance startProcessWithInputs(final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
-        return startProcess(processDefinitionId, instantiationInputs);
+        throwContractViolationExceptionIfProcessContractIsInvalid(instantiationInputs, processDefinitionId);
+        return startProcessWithInputs(0, processDefinitionId, instantiationInputs);
     }
 
     @Override
     public ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
-            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException,ContractViolationException {
-        return new ProcessInstanceImpl("DUMMY");
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
+        return new ProcessStarter(userId, processDefinitionId, instantiationInputs).start();
+    }
+
+    private void throwContractViolationExceptionIfProcessContractIsInvalid(final Map<String, Serializable> inputs, long processDefinitionId)
+            throws ContractViolationException, ProcessDefinitionNotFoundException {
+        final SContractDefinition contractDefinition;
+        try {
+            contractDefinition = getTenantAccessor().getProcessDefinitionService().getProcessDefinition(processDefinitionId)
+                    .getContract();
+        } catch (SProcessDefinitionNotFoundException | SProcessDefinitionReadException e) {
+            throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
+        }
+        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(getTenantAccessor().getTechnicalLoggerService());
+        if (!validator.isValid(contractDefinition, inputs)) {
+            throw new ContractViolationException("Contract is not valid: ", validator.getComments());
+        }
     }
 
     @Override
@@ -6010,7 +6025,12 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Serializable getProcessInstanciationInputValue(long processInstanceId, String name) throws ProcessInstanceNotFoundException {
-        return new String();
+        try {
+            return getTenantAccessor().getContractDataService().getProcessDataValue(processInstanceId, name);
+        } catch (SContractDataNotFoundException | SBonitaReadException e) {
+            // FIXME: add specific exception for contract data not found:
+            throw new ProcessInstanceNotFoundException(e);
+        }
     }
 
     @Override

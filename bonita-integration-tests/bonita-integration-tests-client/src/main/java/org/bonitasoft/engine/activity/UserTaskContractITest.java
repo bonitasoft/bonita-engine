@@ -86,12 +86,22 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME);
-        builder.addContract().addSimpleInput("numberOfDays", Type.INTEGER, null).addMandatoryConstraint("numberOfDays");
+        String numberOfDays = "numberOfDays";
+        builder.addContract().addSimpleInput(numberOfDays, Type.INTEGER, null).addMandatoryConstraint(numberOfDays);
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
         assertThat(processDeploymentInfo.getActivationState()).isEqualTo(ActivationState.ENABLED);
+
+        Map<String, Serializable> inputs = new HashMap<>(1);
+        int value = 14;
+        inputs.put(numberOfDays, value);
+        ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), inputs);
+        waitForUserTask(processInstance, TASK1);
+        Serializable processInstanciationInputValue = getProcessAPI().getProcessInstanciationInputValue(processInstance.getId(), numberOfDays);
+
+        assertThat(processInstanciationInputValue).isEqualTo(value);
 
         //clean up
         disableAndDeleteProcess(processDefinition);

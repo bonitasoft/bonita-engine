@@ -292,24 +292,24 @@ public class StateBehaviors {
     public void mapDataOutputOfMultiInstance(final SFlowNodeInstance flowNodeInstance, final SMultiInstanceLoopCharacteristics miLoop)
             throws SActivityExecutionException, SBonitaException {
         final SDataInstance outputData = dataInstanceService.getDataInstance(miLoop.getDataOutputItemRef(), flowNodeInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name(),parentContainerResolver);
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         final SDataInstance loopData = dataInstanceService.getDataInstance(miLoop.getLoopDataOutputRef(), flowNodeInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name(),parentContainerResolver);
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         if (outputData != null && loopData != null) {
             final Serializable value = loopData.getValue();
             final int index = flowNodeInstance.getLoopCounter();
             if (value instanceof List<?>) {
                 ((List<Serializable>) value).set(index, outputData.getValue());
-                            } else {
-                                throw new SActivityExecutionException("unable to map the ouput of the multi instanciated activity "
-                                        + flowNodeInstance.getName() + " the output loop data named " + loopData.getName() + " is not a list but "
-                                        + loopData.getClassName());
-                            }
-                            final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-                            entityUpdateDescriptor.addField("value", value);
-                            dataInstanceService.updateDataInstance(loopData, entityUpdateDescriptor);
-                        }
-                    }
+            } else {
+                throw new SActivityExecutionException("unable to map the ouput of the multi instanciated activity "
+                        + flowNodeInstance.getName() + " the output loop data named " + loopData.getName() + " is not a list but "
+                        + loopData.getClassName());
+            }
+            final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+            entityUpdateDescriptor.addField("value", value);
+            dataInstanceService.updateDataInstance(loopData, entityUpdateDescriptor);
+        }
+    }
 
     public void mapActors(final SFlowNodeInstance flowNodeInstance, final SFlowElementContainerDefinition processContainer)
             throws SActivityStateExecutionException {
@@ -462,7 +462,8 @@ public class StateBehaviors {
     }
 
     private BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorToExecuteOnFinish(final SFlowNodeDefinition flowNodeDefinition,
-            final SFlowNodeInstance flowNodeInstance, final boolean executeConnectorsOnFinish, final boolean onEnterExecuted) throws SConnectorInstanceReadException,
+            final SFlowNodeInstance flowNodeInstance, final boolean executeConnectorsOnFinish, final boolean onEnterExecuted)
+            throws SConnectorInstanceReadException,
             SActivityStateExecutionException {
         final List<SConnectorDefinition> connectorsOnFinish = flowNodeDefinition.getConnectors(ConnectorEvent.ON_FINISH);
         if (connectorsOnFinish.size() > 0 && executeConnectorsOnFinish) {
@@ -594,7 +595,7 @@ public class StateBehaviors {
         final List<SOperation> operationList = callActivityDefinition.getDataInputOperations();
         final SExpressionContext context = new SExpressionContext(callerId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
         final OperationsWithContext operations = new OperationsWithContext(context, operationList);
-        processExecutor.start(targetProcessDefinitionId, -1, 0, 0, operations.getContext(), operations.getOperations(), null, null, callerId, -1);
+        processExecutor.start(targetProcessDefinitionId, -1, 0, 0, operations.getContext(), operations.getOperations(), null, null, callerId, -1, null); // Change this last NULL when inputs are supported in CallActivity
     }
 
     public void updateDisplayNameAndDescription(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
@@ -842,8 +843,8 @@ public class StateBehaviors {
     public void interrupWaitinEvents(final SFlowNodeInstance receiveTaskInstance) throws SBonitaException {
         if (receiveTaskInstance instanceof SReceiveTaskInstance || receiveTaskInstance instanceof SIntermediateCatchEventInstance
                 || receiveTaskInstance instanceof SBoundaryEventInstance) {
-        interruptWaitingEvents(receiveTaskInstance.getId(), SWaitingEvent.class);
-    }
+            interruptWaitingEvents(receiveTaskInstance.getId(), SWaitingEvent.class);
+        }
     }
 
     private QueryOptions getWaitingEventsCountOptions(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
@@ -968,8 +969,8 @@ public class StateBehaviors {
                 final List<?> loopDataInputCollection = (List<?>) value;
                 return loopDataInputCollection.size();
             }
-                throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName() + " of process "
-                        + processDefinition.getName() + " " + processDefinition.getVersion() + " have a loop data input which is not a java.util.List");
+            throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName() + " of process "
+                    + processDefinition.getName() + " " + processDefinition.getVersion() + " have a loop data input which is not a java.util.List");
         }
         return numberOfInstanceMax;
     }

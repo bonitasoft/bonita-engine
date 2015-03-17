@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -39,15 +40,15 @@ public interface ProcessExecutor extends ContainerExecutor {
 
     SProcessInstance start(long processDefinitionId, long targetSFlowNodeDefinitionId, long starterId, long starterSubstituteId,
                            SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context,
-                           List<ConnectorDefinitionWithInputValues> connectors, long callerId, long subProcessDefinitionId) throws SProcessInstanceCreationException;
+                           List<ConnectorDefinitionWithInputValues> connectors, long callerId, long subProcessDefinitionId, Map<String, Serializable> processInputs) throws SProcessInstanceCreationException;
 
     SProcessInstance start(long starterId, long starterSubstituteId, List<SOperation> operations,
-                           Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectorsWithInput, FlowNodeSelector selector)
+                           Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectorsWithInput, FlowNodeSelector selector, Map<String, Serializable> processInputs)
             throws SProcessInstanceCreationException;
 
     SProcessInstance start(long starterId, long starterSubstituteId,
                            SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context,
-                           List<ConnectorDefinitionWithInputValues> connectors, long callerId, FlowNodeSelector selector) throws SProcessInstanceCreationException;
+                           List<ConnectorDefinitionWithInputValues> connectors, long callerId, FlowNodeSelector selector, Map<String, Serializable> instantiationInputs) throws SProcessInstanceCreationException;
 
     boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance, ConnectorEvent activationEvent,
                               FlowNodeSelector selector) throws SBonitaException;
@@ -57,6 +58,4 @@ public interface ProcessExecutor extends ContainerExecutor {
 
     void handleProcessCompletion(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance, final boolean hasActionsToExecute)
             throws SBonitaException;
-
-//    SProcessInstance start(long starterUserId, long starterSubstituteUserId, List<ConnectorDefinitionWithInputValues> connectorsWithInput, Map<String, Serializable> instantiationInputs);
 }

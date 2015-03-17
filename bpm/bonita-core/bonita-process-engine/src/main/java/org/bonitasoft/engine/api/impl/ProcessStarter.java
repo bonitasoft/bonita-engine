@@ -123,15 +123,9 @@ public class ProcessStarter {
 
         final SProcessInstance startedSProcessInstance;
         try {
-            // two ways to start a process:
-            //            if (instantiationinputs != null) {
-            //                startedsprocessinstance = processexecutor.start(starteruserid, startersubstituteuserid, connectorswithinput, instantiationinputs);
-            //            }
-            //            else {
             final List<SOperation> sOperations = ModelConvertor.convertOperations(operations);
             startedSProcessInstance = processExecutor.start(starterUserId, starterSubstituteUserId, sOperations, operationContext, connectorsWithInput,
-                    new FlowNodeSelector(sProcessDefinition, filter));
-            //            }
+                    new FlowNodeSelector(sProcessDefinition, filter), instantiationInputs);
         } catch (final SProcessInstanceCreationException e) {
             log(tenantAccessor, e);
             e.setProcessDefinitionIdOnContext(sProcessDefinition.getId());
@@ -202,11 +196,8 @@ public class ProcessStarter {
             final IdentityService identityService = tenantAccessor.getIdentityService();
             try {
                 final SUser starter = identityService.getUser(starterId);
-                final StringBuilder stb = new StringBuilder();
-                stb.append("The user ").append(SessionInfos.getUserNameFromSession()).append(" ");
-                stb.append("acting as delegate of the user ").append(starter.getUserName()).append(" ");
-                stb.append("has started the case.");
-                commentService.addSystemComment(sProcessInstance.getId(), stb.toString());
+                commentService.addSystemComment(sProcessInstance.getId(), "The user " + SessionInfos.getUserNameFromSession()
+                        + " acting as delegate of the user " + starter.getUserName() + " has started the case.");
             } catch (final SBonitaException e) {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error when adding a comment on the process instance.", e);
             }
