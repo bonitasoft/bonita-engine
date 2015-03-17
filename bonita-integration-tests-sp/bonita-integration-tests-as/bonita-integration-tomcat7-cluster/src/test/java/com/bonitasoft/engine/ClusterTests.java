@@ -34,6 +34,7 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
+import org.bonitasoft.engine.connectors.TestExternalConnector;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
@@ -203,6 +204,42 @@ public class ClusterTests extends CommonAPISPIT {
         }
         assertTrue("no data has 'Node1' as value: no work were executed on node1", node1Ok);
         assertFalse("a data has 'Node2' as value: a work was executed on node2", node2Ok);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    /*
+ * Check that works are executed on node that started it
+ */
+    @Test
+    public void executeAProcessInCluster() throws Exception {
+
+        // Input expression
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+                "1.0");
+        designProcessDefinition.addActor(ACTOR_NAME);
+        designProcessDefinition.addConnector("connectorOnEnter1", "org.bonitasoft.connector.testExternalConnector", "1.0", ConnectorEvent.ON_ENTER);
+        designProcessDefinition.addConnector("connectorOnEnter2","org.bonitasoft.connector.testExternalConnector","1.0",ConnectorEvent.ON_ENTER).addInput("param1", new ExpressionBuilder().createConstantStringExpression("plop"));
+        designProcessDefinition.addConnector("connectorOnFinish","org.bonitasoft.connector.testExternalConnector","1.0",ConnectorEvent.ON_FINISH).addInput("param1",new ExpressionBuilder().createConstantStringExpression("plop"));
+
+        designProcessDefinition.addStartEvent("start");
+        // create 10 tasks that set a data with the node name
+        for (int i = 1; i <= 10; i++) {
+            designProcessDefinition.addShortTextData("data" + i, null);
+            designProcessDefinition.addAutomaticTask("autoStep" + i).addOperation(
+                    new OperationBuilder().createSetDataOperation(
+                            "data" + i,
+                            new ExpressionBuilder().createGroovyScriptExpression("getNodeName", "return System.getProperty(\"node.name\");",
+                                    String.class.getName())));
+            designProcessDefinition.addTransition("start", "autoStep" + i);
+        }
+
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndConnector(designProcessDefinition, ACTOR_NAME, user, "TestExternalConnector.impl",
+                TestExternalConnector.class,
+                "TestExternalConnector.jar");
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        waitProcessToFinishAndBeArchived(processInstance, getProcessAPI());
 
         disableAndDeleteProcess(processDefinition);
     }

@@ -22,10 +22,8 @@ import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
-import org.bonitasoft.engine.commons.SystemOperationUtil;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
@@ -213,7 +211,7 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
             recorder.recordInsert(insertContentRecord, insertContentEvent);
             report.setId(reportContent.getId());
 
-            initiateLogBuilder(reportContent.getId(), SQueriableLog.STATUS_OK, logBuilder, "addReport");
+            log(reportContent.getId(), SQueriableLog.STATUS_OK, logBuilder, "addReport");
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "addReport"));
             }
@@ -222,7 +220,7 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "addReport", re));
             }
-            initiateLogBuilder(report.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addReport");
+            log(report.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addReport");
             throw new SReportCreationException(re);
         }
     }
@@ -333,7 +331,7 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
             final DeleteRecord deleteRecord = new DeleteRecord(report);
             final SDeleteEvent deleteEvent = getDeleteEvent(report, REPORT);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(report.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteReport");
+            log(report.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteReport");
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteReport"));
             }
@@ -341,7 +339,7 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteReport", re));
             }
-            initiateLogBuilder(report.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteReport");
+            log(report.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteReport");
             throw new SReportDeletionException(re);
         }
     }
@@ -375,7 +373,7 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
         return null;
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
+    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
@@ -418,10 +416,10 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
                     entityUpdateDescriptor);
             final SUpdateEvent updatePageEvent = getUpdateEvent(reportWithContent, REPORT);
             recorder.recordUpdate(updateRecord, updatePageEvent);
-            initiateLogBuilder(report.getId(), SQueriableLog.STATUS_OK, logBuilder, "update");
+            log(report.getId(), SQueriableLog.STATUS_OK, logBuilder, "update");
             return reportWithContent;
         } catch (SBonitaException e) {
-            initiateLogBuilder(report.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "update");
+            log(report.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "update");
             throw new SObjectModificationException(e);
         }
 
