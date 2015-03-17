@@ -110,7 +110,7 @@ public class FormMappingIT extends TestWithUser {
         FormMapping updatedStep2Form1 = processConfigurationAPI.getTaskForm(p1.getId(), "step2");
         assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1,"form", "target", "lastUpdateDate", "lastUpdatedBy");
         assertThat(updatedStep2Form1.getForm()).isEqualTo("newFormUrlForStep2");
-        assertThat(updatedStep2Form1.getTarget()).isEqualTo(FormMappingTarget.URL.name());
+        assertThat(updatedStep2Form1.getTarget()).isEqualTo(FormMappingTarget.URL);
         assertThat(updatedStep2Form1.getLastUpdateDate()).isAfter(new Date(afterDeploy));
         assertThat(updatedStep2Form1.getLastUpdatedBy()).isEqualTo(user.getId());
         assertThat(step2Form1.getLastUpdateDate()).isNull();
