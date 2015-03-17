@@ -1,12 +1,17 @@
 CREATE TABLE contract_data (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
-  scopeId NUMBER(19, 0) NOT NULL,
   name VARCHAR2(50 CHAR) NOT NULL,
   val BLOB
 );
 ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id);
-ALTER TABLE contract_data ADD CONSTRAINT uc_cd_scope_name UNIQUE (scopeId, name, tenantid);
+
+CREATE TABLE task_contract_data (
+  tenantid NUMBER(19, 0) NOT NULL,
+  id NUMBER(19, 0) NOT NULL,
+  userTaskId NUMBER(19, 0) NOT NULL,
+);
+ALTER TABLE task_contract_data ADD CONSTRAINT pk_task_contract_data PRIMARY KEY (tenantid, id, userTaskId);
 
 CREATE TABLE arch_contract_data (
   tenantid NUMBER(19, 0) NOT NULL,
@@ -985,10 +990,10 @@ CREATE TABLE form_mapping (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   process NUMBER(19, 0) NOT NULL,
-  task VARCHAR2(255) NULL,
-  form VARCHAR2(1024) NULL,
+  task VARCHAR2(255 CHAR) NULL,
+  form VARCHAR2(1024 CHAR) NULL,
   isexternal NUMBER(1) NOT NULL,
-  type VARCHAR2(16) NOT NULL,
+  type VARCHAR2(16 CHAR) NOT NULL,
   lastUpdateDate NUMBER(19, 0) NULL,
   lastUpdatedBy NUMBER(19, 0) NULL,
   PRIMARY KEY (tenantId, id)

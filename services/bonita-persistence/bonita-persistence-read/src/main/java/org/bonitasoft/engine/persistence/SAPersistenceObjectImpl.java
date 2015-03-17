@@ -11,9 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.instance.model.archive.impl;
-
-import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+package org.bonitasoft.engine.persistence;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -23,13 +21,13 @@ public abstract class SAPersistenceObjectImpl implements ArchivedPersistentObjec
 
     private static final long serialVersionUID = 1963528483109540503L;
 
-    private long id;
+    protected long id;
 
-    private long tenantId;
+    protected long tenantId;
 
-    private long archiveDate;
+    protected long archiveDate;
 
-    private long sourceObjectId;
+    protected long sourceObjectId;
 
     public SAPersistenceObjectImpl(final long sourceObjectId) {
         this.sourceObjectId = sourceObjectId;

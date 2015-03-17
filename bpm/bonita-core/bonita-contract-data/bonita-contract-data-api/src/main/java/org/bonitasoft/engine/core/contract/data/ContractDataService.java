@@ -26,12 +26,22 @@ public interface ContractDataService {
 
     void addUserTaskData(final long userTaskId, Map<String, Serializable> data) throws SContractDataCreationException;
 
-    Object getUserTaskDataValue(final long userTaskId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
+    Serializable getUserTaskDataValue(final long userTaskId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
 
     void deleteUserTaskData(final long userTaskId) throws SContractDataDeletionException;
 
     void archiveUserTaskData(final long userTaskId, final long archiveDate) throws SObjectModificationException;
 
-    Object getArchivedUserTaskDataValue(final long userTaskId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
+    Serializable getArchivedUserTaskDataValue(final long userTaskId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
 
+    void addProcessData(long processInstanceId, Map<String, Serializable> data) throws SContractDataCreationException;
+
+    Serializable getProcessDataValue(long processInstanceId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
+
+    void deleteProcessData(long processInstanceId) throws SContractDataDeletionException;
+
+    void archiveProcessData(long processInstanceId, long archiveDate) throws SObjectModificationException;
+
+    Serializable getArchivedProcessDataValue(long processInstanceId, String dataName) throws SContractDataNotFoundException,
+            SBonitaReadException;
 }

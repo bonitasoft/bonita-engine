@@ -44,7 +44,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.session.model.SSession;
 
 /**
  * @author Ruiheng Fan
@@ -155,7 +154,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, flowNodeInstance.getProcessDefinitionId(), executerUserId, executerSubstituteId);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && flowNodeInstance.getStateId() != 0 /* don't log when create subtask */) {
             final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, sessionInfos.getUsername(), executerUserId,
-                    executerSubstituteId);
+                    executerSubstituteId, null); // no inputs taken in this LEGACY command for old-version web form execution
             logger.log(getClass(), TechnicalLogSeverity.INFO, message);
         }
 

@@ -16,11 +16,7 @@ package org.bonitasoft.engine.core.contract.data;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +72,7 @@ public class ContractDataServiceImplTest {
 
     @Test
     public void getUserTaskData_returns_the_stored_value() throws Exception {
-        final SContractData contractData = new SContractData("id", 10L, 1983L);
+        final STaskContractData contractData = new STaskContractData(1983L, "id", 10L);
         when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(contractData);
 
         final Long id = (Long) contractDataService.getUserTaskDataValue(1983L, "id");
@@ -100,7 +96,7 @@ public class ContractDataServiceImplTest {
 
     @Test
     public void addUserTaskData_store_values_for_the_user_task() throws Exception {
-        final SContractData contractData = new SContractData("id", 54L, 1983L);
+        final STaskContractData contractData = new STaskContractData(1983L, "id", 54L);
         contractData.setId(10L);
         when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
 
@@ -113,14 +109,14 @@ public class ContractDataServiceImplTest {
     public void addUserTaskData_accept_null_inputs() throws Exception {
         when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
 
-        contractDataService.addUserTaskData(54L,null);
+        contractDataService.addUserTaskData(54L, null);
 
-        verify(recorder,times(0)).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        verify(recorder, times(0)).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
     }
 
-    @Test(expected=SContractDataCreationException.class)
+    @Test(expected = SContractDataCreationException.class)
     public void addUserTaskData_throws_an_exception_if_not_able_to_store_the_data() throws Exception {
-        final SContractData contractData = new SContractData("id", 54L, 1983L);
+        final STaskContractData contractData = new STaskContractData(1983L, "id", 54L);
         contractData.setId(10L);
         when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
         doThrow(new SRecorderException("exception")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
@@ -130,9 +126,9 @@ public class ContractDataServiceImplTest {
 
     @Test
     public void deleteUserTaskData_deletes_data() throws Exception {
-        final List<SContractData> data = new ArrayList<SContractData>();
-        data.add(new SContractData("id", 456478L, 1983L));
-        data.add(new SContractData("id2", 4564456478L, 1983L));
+        final List<STaskContractData> data = new ArrayList<STaskContractData>();
+        data.add(new STaskContractData(1983L, "id", 456478L));
+        data.add(new STaskContractData(1983L, "id2", 4564456478L));
         when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
 
@@ -144,9 +140,9 @@ public class ContractDataServiceImplTest {
     @Test(expected = SContractDataDeletionException.class)
     public void deleteUserTaskData_throws_exception() throws Exception {
         when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
-        final List<SContractData> data = new ArrayList<SContractData>();
-        data.add(new SContractData("id", 456478L, 1983L));
-        data.add(new SContractData("id2", 4564456478L, 1983L));
+        final List<STaskContractData> data = new ArrayList<STaskContractData>();
+        data.add(new STaskContractData(1983L, "id", 456478L));
+        data.add(new STaskContractData(1983L, "id2", 4564456478L));
         when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
         doThrow(new SRecorderException("exception")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
@@ -166,14 +162,14 @@ public class ContractDataServiceImplTest {
     public void archiveUserTaskData_should_create_archive_data() throws Exception {
         final long usertTaskId = 1983L;
         final long time = 1010101010101001L;
-        final List<SContractData> data = new ArrayList<SContractData>();
-        final SContractData scd1 = new SContractData("id", 456478L, usertTaskId);
-        final SContractData scd2 = new SContractData("id2", 4564456478L, usertTaskId);
+        final List<STaskContractData> data = new ArrayList<STaskContractData>();
+        final STaskContractData scd1 = new STaskContractData(usertTaskId, "id", 456478L);
+        final STaskContractData scd2 = new STaskContractData(usertTaskId, "id2", 4564456478L);
         data.add(scd1);
         data.add(scd2);
         final ArchiveInsertRecord[] archivedata = new ArchiveInsertRecord[2];
-        archivedata[0] = new ArchiveInsertRecord(new SAContractData(scd1));
-        archivedata[1] = new ArchiveInsertRecord(new SAContractData(scd2));
+        archivedata[0] = new ArchiveInsertRecord(new SATaskContractData(scd1));
+        archivedata[1] = new ArchiveInsertRecord(new SATaskContractData(scd2));
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
 
         contractDataService.archiveUserTaskData(usertTaskId, time);
@@ -185,7 +181,7 @@ public class ContractDataServiceImplTest {
     public void archiveUserTaskData_should_not_create_archive_data_if_no_data_defined() throws Exception {
         final long usertTaskId = 1983L;
         final long time = 1010101010101001L;
-        final List<SContractData> data = new ArrayList<SContractData>();
+        final List<STaskContractData> data = new ArrayList<STaskContractData>();
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
 
         contractDataService.archiveUserTaskData(usertTaskId, time);
@@ -204,10 +200,10 @@ public class ContractDataServiceImplTest {
 
     @Test
     public void getArchivedUserTaskData_returns_the_stored_value() throws Exception {
-        final SContractData contractData = new SContractData("id", 10L, 1983L);
-        final SAContractData saContractData = new SAContractData(contractData);
-        saContractData.setArchiveDate(768468743687L);
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(saContractData);
+        final STaskContractData contractData = new STaskContractData(1983L, "id", 10L);
+        final SATaskContractData saTaskContractData = new SATaskContractData(contractData);
+        saTaskContractData.setArchiveDate(768468743687L);
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(saTaskContractData);
 
         final Long id = (Long) contractDataService.getArchivedUserTaskDataValue(1983L, "id");
 
@@ -228,4 +224,160 @@ public class ContractDataServiceImplTest {
         contractDataService.getArchivedUserTaskDataValue(1983L, "id");
     }
 
+    /************* Process Data tests *************/
+
+    @Test
+    public void addProcessDataStoreValuesForTheProcessInstance() throws Exception {
+        final SProcessContractData contractData = new SProcessContractData(1983L, "id", 54L);
+        contractData.setId(10L);
+        when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
+
+        contractDataService.addProcessData(contractData);
+
+        verify(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+    }
+
+    @Test
+    public void addProcessData_accept_null_inputs() throws Exception {
+        when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
+
+        contractDataService.addProcessData(54L, null);
+
+        verify(recorder, times(0)).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+    }
+
+    @Test(expected = SContractDataCreationException.class)
+    public void addProcessData_throws_an_exception_if_not_able_to_store_the_data() throws Exception {
+        final SProcessContractData contractData = new SProcessContractData(1983L, "id", 54L);
+        contractData.setId(10L);
+        when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
+        doThrow(new SRecorderException("exception")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+
+        contractDataService.addProcessData(contractData);
+    }
+
+    @Test
+    public void getProcessDataReturnsTheStoredValue() throws Exception {
+        long processInstanceId = 1117L;
+        final SProcessContractData contractData = new SProcessContractData(processInstanceId, "TheName", "TheValue");
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(contractData);
+
+        final String dataValue = (String) contractDataService.getProcessDataValue(processInstanceId, "TheName");
+
+        assertThat(dataValue).isEqualTo("TheValue");
+    }
+
+    @Test(expected = SContractDataNotFoundException.class)
+    public void getProcessDataShouldThrowContractDataNotFoundWhenNoDataIsReturned() throws Exception {
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+
+        contractDataService.getProcessDataValue(147L, null);
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void getProcessData_throws_an_exception_with_a_read_exception() throws Exception {
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+
+        contractDataService.getProcessDataValue(1983L, "id");
+    }
+
+    @Test
+    public void deleteProcessData_deletes_data() throws Exception {
+        final List<SProcessContractData> data = new ArrayList<SProcessContractData>();
+        data.add(new SProcessContractData(1983L, "id", 456478L));
+        data.add(new SProcessContractData(1983L, "id2", 4564456478L));
+        when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
+        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
+
+        contractDataService.deleteProcessData(1983L);
+
+        verify(recorder, times(2)).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+    }
+
+    @Test(expected = SContractDataDeletionException.class)
+    public void deleteProcessData_throws_exception() throws Exception {
+        when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
+        final List<SProcessContractData> data = new ArrayList<SProcessContractData>();
+        data.add(new SProcessContractData(1983L, "id", 456478L));
+        data.add(new SProcessContractData(1983L, "id2", 4564456478L));
+        when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
+        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
+        doThrow(new SRecorderException("exception")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+
+        contractDataService.deleteProcessData(1983L);
+    }
+
+    @Test(expected = SContractDataDeletionException.class)
+    public void deleteProcessData_throws_exception_when_retrieving_data() throws Exception {
+        when(queriableLoggerService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
+        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+
+        contractDataService.deleteProcessData(1983L);
+    }
+
+    @Test
+    public void archiveProcessData_should_create_archive_data() throws Exception {
+        final long processInstanceId = 1983L;
+        final long time = 1010101010101001L;
+        final List<SProcessContractData> data = new ArrayList<SProcessContractData>();
+        final SProcessContractData scd1 = new SProcessContractData(processInstanceId, "id", 456478L);
+        final SProcessContractData scd2 = new SProcessContractData(processInstanceId, "id2", 4564456478L);
+        data.add(scd1);
+        data.add(scd2);
+        final ArchiveInsertRecord[] archivedata = new ArchiveInsertRecord[2];
+        archivedata[0] = new ArchiveInsertRecord(new SAProcessContractData(scd1));
+        archivedata[1] = new ArchiveInsertRecord(new SAProcessContractData(scd2));
+        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
+
+        contractDataService.archiveProcessData(processInstanceId, time);
+
+        verify(archiveService).recordInserts(time, archivedata);
+    }
+
+    @Test
+    public void archiveProcessData_should_not_create_archive_data_if_no_data_defined() throws Exception {
+        final long usertProcessId = 1983L;
+        final long time = 1010101010101001L;
+        final List<SProcessContractData> data = new ArrayList<SProcessContractData>();
+        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
+
+        contractDataService.archiveProcessData(usertProcessId, time);
+
+        verifyZeroInteractions(archiveService);
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void archiveProcessData_should_throw_exception_when_an_exception_occurs_when_getting_data() throws Exception {
+        final long usertProcessId = 1983L;
+        final long time = 1010101010101001L;
+        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+
+        contractDataService.archiveProcessData(usertProcessId, time);
+    }
+
+    @Test
+    public void getArchivedProcessData_returns_the_stored_value() throws Exception {
+        final SProcessContractData contractData = new SProcessContractData(1983L, "id", 10L);
+        final SAProcessContractData saProcessContractData = new SAProcessContractData(contractData);
+        saProcessContractData.setArchiveDate(768468743687L);
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(saProcessContractData);
+
+        final Long id = (Long) contractDataService.getArchivedProcessDataValue(1983L, "id");
+
+        assertThat(id).isEqualTo(10L);
+    }
+
+    @Test(expected = SContractDataNotFoundException.class)
+    public void getArchivedProcessData_throws_an_exception_when_data_not_found() throws Exception {
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+
+        contractDataService.getArchivedProcessDataValue(1983L, "id");
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void getArchivedProcessData_throws_an_exception_with_a_read_exception() throws Exception {
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
+
+        contractDataService.getArchivedProcessDataValue(1983L, "id");
+    }
 }
