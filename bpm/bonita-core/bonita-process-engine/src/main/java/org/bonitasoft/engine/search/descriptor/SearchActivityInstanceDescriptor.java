@@ -49,8 +49,6 @@ public class SearchActivityInstanceDescriptor extends SearchEntityDescriptor {
                 keyProvider.getRootProcessInstanceKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, new FieldDescriptor(SActivityInstance.class,
                 keyProvider.getParentActivityInstanceKey()));
-        activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, new FieldDescriptor(SActivityInstance.class,
-                keyProvider.getParentProcessInstanceKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.PARENT_CONTAINER_ID, new FieldDescriptor(SActivityInstance.class,
                 keyProvider.getParentContainerIdKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.LAST_MODIFICATION_DATE, new FieldDescriptor(SActivityInstance.class,

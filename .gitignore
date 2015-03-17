@@ -2,7 +2,6 @@
 .settings
 target
 .classpath
-.metadata
 FILEPATH.*.db
 dependency-reduced-pom.xml
 Temporary*.java

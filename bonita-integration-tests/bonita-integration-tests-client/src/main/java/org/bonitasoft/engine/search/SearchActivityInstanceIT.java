@@ -1137,22 +1137,6 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ActivityInstance activityInstance2 = activityInstancesSearch.getResult().get(0);
         assertEquals(pi2.getId(), activityInstance2.getParentProcessInstanceId());
 
-        // ********** all fields **********
-        searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.ACTIVITY_TYPE, activityInstance2.getType());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.DISPLAY_NAME, activityInstance2.getDisplayName());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.NAME, activityInstance2.getName());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID, activityInstance2.getProcessDefinitionId());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, activityInstance2.getRootContainerId());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, activityInstance2.getParentProcessInstanceId());
-        searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.LAST_MODIFICATION_DATE, activityInstance2.getLastUpdateDate().getTime());
-        activityInstancesSearch = getProcessAPI().searchActivities(searchOptionsBuilder.done());
-
-        assertEquals(1, activityInstancesSearch.getCount());
-        final ActivityInstance activityInstance2Result = activityInstancesSearch.getResult().get(0);
-        assertEquals(activityInstance2,activityInstance2Result);
-
-
         // ********* DIFFERENT FROM operator *********
         SearchOptionsBuilder sob = new SearchOptionsBuilder(0, 10);
         sob.filter(HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDef.getId());
@@ -1176,7 +1160,6 @@ public class SearchActivityInstanceIT extends TestWithUser {
         sob.differentFrom(HumanTaskInstanceSearchDescriptor.ASSIGNEE_ID, 0);
         humanTasksSR = getProcessAPI().searchHumanTaskInstances(sob.done());
         assertEquals(2, humanTasksSR.getCount());
-
 
         disableAndDeleteProcess(processDef);
     }

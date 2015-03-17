@@ -18,10 +18,8 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.execution.Filter;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.work.failurewrapping.ConnectorDefinitionAndInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.FlowNodeDefinitionAndInstanceContextWork;
@@ -54,9 +52,9 @@ public class WorkFactory {
 
     public static BonitaWork createExecuteConnectorOfProcess(final long processDefinitionId, final long processInstanceId, final long rootProcessInstanceId,
             final long connectorInstanceId, final String connectorDefinitionName, final ConnectorEvent activationEvent,
-            final FlowNodeSelector flowNodeSelector) {
+            final FlowNodeSelector selectorForConnectorOnEnter) {
         BonitaWork wrappedWork = new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName, processInstanceId,
-                rootProcessInstanceId, activationEvent, flowNodeSelector);
+                rootProcessInstanceId, activationEvent, selectorForConnectorOnEnter);
         final ProcessInstanceContextWork processInstanceContextWork = buildProcessInstanceContextWork(processDefinitionId, processInstanceId, rootProcessInstanceId,
                 wrappedWork);
         wrappedWork = new ConnectorDefinitionAndInstanceContextWork(processInstanceContextWork, connectorDefinitionName, connectorInstanceId,

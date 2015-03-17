@@ -50,6 +50,8 @@ import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.ServicesResolver;
 import org.bonitasoft.engine.scheduler.StatelessJob;
+import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilder;
+import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -91,7 +93,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     private final int batchSize;
 
     /**
-     * Create a new instance of scheduler service.
+     * Create a new instance of scheduler service. Synchronous
+     * QueriableLoggerService must be used to avoid an infinite loop.
      */
     public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService, final TechnicalLoggerService logger,
             final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor,
@@ -142,6 +145,14 @@ public class SchedulerServiceImpl implements SchedulerService {
         logBuilder.setActionType(actionType);
     }
 
+    private SSchedulerQueriableLogBuilder getLogBuilder(final ActionType actionType, final String message, final String scope) {
+        final SSchedulerQueriableLogBuilder logBuilder = BuilderFactory.get(SSchedulerQueriableLogBuilderFactory.class).createNewInstance();
+        initializeLogBuilder(logBuilder, message);
+        updateLog(actionType, logBuilder);
+        logBuilder.actionScope(scope);
+        return logBuilder;
+    }
+
     @Override
     public void schedule(final SJobDescriptor jobDescriptor, final Trigger trigger) throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "schedule");
@@ -189,13 +200,17 @@ public class SchedulerServiceImpl implements SchedulerService {
     private void internalSchedule(final SJobDescriptor jobDescriptor, final Trigger trigger) throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "internalSchedule");
         final String tenantId = getTenantIdAsString();
+        final SSchedulerQueriableLogBuilder schedulingLogBuilder = getLogBuilder(ActionType.SCHEDULED, "Scheduled job with name " + jobDescriptor.getJobName(),
+                jobDescriptor.getJobName());
         try {
             if (trigger == null) {
                 schedulerExecutor.executeNow(jobDescriptor.getId(), tenantId, jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
             } else {
                 schedulerExecutor.schedule(jobDescriptor.getId(), tenantId, jobDescriptor.getJobName(), trigger, jobDescriptor.disallowConcurrentExecution());
             }
+            schedulingLogBuilder.actionStatus(SQueriableLog.STATUS_OK);
         } catch (final Throwable e) {
+            schedulingLogBuilder.actionStatus(SQueriableLog.STATUS_FAIL);
             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             try {
                 eventService.fireEvent(jobFailed);

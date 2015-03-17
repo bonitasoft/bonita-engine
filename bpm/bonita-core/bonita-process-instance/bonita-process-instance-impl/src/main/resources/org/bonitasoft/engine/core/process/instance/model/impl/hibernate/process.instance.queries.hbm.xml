@@ -1104,66 +1104,6 @@
 			org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE p.callerId = a.id and a.logicalGroup4 = :processInstanceId
 	</query>
-    
-    <query name="getNumberOfSProcessInstanceFailedAndSupervisedBy">
-        SELECT COUNT(DISTINCT p.id)
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-             org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-        WHERE (
-            p.stateId = 7 
-            OR EXISTS (
-    			SELECT f.id 
-    			FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
-    			WHERE f.logicalGroup4 = p.id 
-    			AND f.stateId = 3
-    		)
-        )
-        AND p.processDefinitionId = supervisor.processDefId
-        AND (supervisor.userId = :userId
-            OR (supervisor.id IN (
-                    SELECT supervisor.id
-                    FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
-                         org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
-                    WHERE um.userId = :userId
-                    AND (
-                        (supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
-                        OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
-                        OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
-                    )
-                )
-            )
-        )
-    </query>
-
-    <query name="searchSProcessInstanceFailedAndSupervisedBy">
-        SELECT DISTINCT p
-        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
-             org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-        WHERE (
-            p.stateId = 7 
-            OR EXISTS (
-    			SELECT f.id 
-    			FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
-    			WHERE f.logicalGroup4 = p.id 
-    			AND f.stateId = 3
-    		)
-        )
-        AND p.processDefinitionId = supervisor.processDefId
-        AND (supervisor.userId = :userId
-            OR (supervisor.id IN (
-                    SELECT supervisor.id
-                    FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
-                         org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
-                    WHERE um.userId = :userId
-                    AND (
-                        (supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
-                        OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
-                        OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
-                    )
-                )
-            )
-        )
-    </query>
 	
 	<query name="getNumberOfSProcessInstanceSupervisedBy">
 		SELECT COUNT(DISTINCT p.id)

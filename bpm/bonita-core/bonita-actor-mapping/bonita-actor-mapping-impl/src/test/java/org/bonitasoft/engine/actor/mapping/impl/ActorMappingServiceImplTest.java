@@ -17,8 +17,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.withSettings;
 import static org.powermock.api.mockito.PowerMockito.doCallRealMethod;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
@@ -32,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.actor.mapping.SActorCreationException;
 import org.bonitasoft.engine.actor.mapping.SActorDeletionException;
 import org.bonitasoft.engine.actor.mapping.SActorMemberDeletionException;
@@ -134,7 +135,7 @@ public class ActorMappingServiceImplTest {
     public final void getNumberOfActorMembers() throws SBonitaReadException {
         final long actorId = 456L;
         final long numberOfActorMemebers = 1L;
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>>any())).thenReturn(numberOfActorMemebers);
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>> any())).thenReturn(numberOfActorMemebers);
 
         Assert.assertEquals(numberOfActorMemebers, actorMappingServiceImpl.getNumberOfActorMembers(actorId));
     }
@@ -255,13 +256,13 @@ public class ActorMappingServiceImplTest {
     @Test
     public final void getActorMembersByActorPaginated() throws SBonitaReadException {
         final List<SActorMember> actors = new ArrayList<SActorMember>();
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SActorMember>>any())).thenReturn(actors);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SActorMember>> any())).thenReturn(actors);
 
         Assert.assertEquals(actors, actorMappingServiceImpl.getActorMembers(4115L, 0, 1));
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfGroup(long, int, int)}.
+     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfGroup(long)}.
      *
      * @throws SBonitaReadException
      */
@@ -274,7 +275,7 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfRole(long, int, int)}.
+     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfRole(long)}.
      *
      * @throws SBonitaReadException
      */
@@ -361,37 +362,16 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#canUserStartProcessDefinition(long, long)}.
+     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorsOfUserCanStartProcessDefinition(long, long)}.
      *
      * @throws SBonitaReadException
      */
     @Test
-    public final void shouldBeAllowedToStartProcessDefinition() throws SBonitaReadException {
-        final List<Long> actorMembers = new ArrayList<Long>(1);
-        actorMembers.add(123L);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>>any())).thenReturn(3L);
+    public final void getActorsOfUserCanStartProcessDefinition() throws SBonitaReadException {
+        final List<SActor> actors = new ArrayList<SActor>(3);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SActor>> any())).thenReturn(actors);
 
-        Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L)).as("Should be allowed to start Process").isTrue();
-    }
-
-    @Test
-    public final void shouldNotBeAllowedToStartProcessDefinitionIfNoActorMembers() throws SBonitaReadException {
-        final List<Long> actorMembers = new ArrayList<Long>(0);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
-
-        Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L)).as("Should NOT be allowed to start Process").isFalse();
-    }
-
-
-    @Test
-    public final void shouldNotBeAllowedToStartProcessDefinitionIfNoUserMemberships() throws SBonitaReadException {
-        final List<Long> actorMembers = new ArrayList<Long>(1);
-        actorMembers.add(123L);
-        when(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).thenReturn(actorMembers);
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>>any())).thenReturn(0L);
-
-        Assertions.assertThat(actorMappingServiceImpl.canUserStartProcessDefinition(315L, 5484L)).as("Should NOT be allowed to start Process").isFalse();
+        Assert.assertEquals(actors, actorMappingServiceImpl.getActorsOfUserCanStartProcessDefinition(315L, 5484L, 0, 1));
     }
 
     /**

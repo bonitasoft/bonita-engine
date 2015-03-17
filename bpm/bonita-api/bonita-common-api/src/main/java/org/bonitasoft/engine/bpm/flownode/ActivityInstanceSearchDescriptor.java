@@ -34,8 +34,6 @@ public class ActivityInstanceSearchDescriptor {
 
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
 
-    public static final String PARENT_PROCESS_INSTANCE_ID = "parentProcessInstanceId";
-
     public static final String PARENT_ACTIVITY_INSTANCE_ID = "parentActivityInstanceId";
 
     public static final String PARENT_CONTAINER_ID = "parentContainerId";

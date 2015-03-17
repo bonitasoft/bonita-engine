@@ -129,22 +129,6 @@ public interface ProcessRuntimeAPI {
     SearchResult<ProcessInstance> searchFailedProcessInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * List all process instances with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state that
-     * are supervised by the given user.
-     * If the specified userId does not correspond to a user, an empty SearchResult is returned.
-     *
-     * @param userId
-     *        The identifier of the user.
-     * @param searchOptions
-     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
-     * @return The list of failed process instances supervised by the specified user.
-     * @throws SearchException
-     *         If an exception occurs when getting the list of process instances.
-     * @since 7.0
-     */
-    SearchResult<ProcessInstance> searchFailedProcessInstancesSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
-
-    /**
      * List all open process instances supervised by a user.
      * If the specified userId does not correspond to a user, an empty SearchResult is returned.
      *

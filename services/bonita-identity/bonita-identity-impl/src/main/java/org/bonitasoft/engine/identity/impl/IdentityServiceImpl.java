@@ -143,12 +143,12 @@ public class IdentityServiceImpl implements IdentityService {
             final SInsertEvent insertEvent = getInsertEvent(group, GROUP);
             recorder.recordInsert(insertRecord, insertEvent);
             final int status = SQueriableLog.STATUS_OK;
-            log(insertRecord.getEntity().getId(), status, logBuilder, methodName);
+            initiateLogBuilder(insertRecord.getEntity().getId(), status, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
             final int status = SQueriableLog.STATUS_FAIL;
-            log(objectId, status, logBuilder, methodName);
+            initiateLogBuilder(objectId, status, logBuilder, methodName);
             throw new SGroupCreationException(re);
         }
     }
@@ -179,7 +179,7 @@ public class IdentityServiceImpl implements IdentityService {
             final InsertRecord insertRecord = new InsertRecord(customUserInfo);
             final SInsertEvent insertEvent = getInsertEvent(customUserInfo, CUSTOM_USER_INFO_DEFINITION);
             recorder.recordInsert(insertRecord, insertEvent);
-            log(customUserInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
             return customUserInfo;
         } catch (final SRecorderException e) {
@@ -200,7 +200,7 @@ public class IdentityServiceImpl implements IdentityService {
     private SCustomUserInfoDefinitionCreationException handleCustomUserInfoDefinitionCreationFailure(final SCustomUserInfoDefinition customUserInfo,
             final String methodName, final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception) {
         logOnExceptionMethod(methodName, exception);
-        log(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+        initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         return new SCustomUserInfoDefinitionCreationException(customUserInfo.getName(), exception);
     }
 
@@ -229,11 +229,11 @@ public class IdentityServiceImpl implements IdentityService {
             final InsertRecord insertRecord = new InsertRecord(role);
             final SInsertEvent insertEvent = getInsertEvent(role, ROLE);
             recorder.recordInsert(insertRecord, insertEvent);
-            log(role.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(role.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SIdentityException("Can't add role " + role, e);
         }
     }
@@ -272,12 +272,12 @@ public class IdentityServiceImpl implements IdentityService {
             sUserLogin.setId(hashedUser.getId());
             sUserLogin.setTenantId(((SUserImpl)hashedUser).getTenantId());
             recorder.recordInsert(new InsertRecord(sUserLogin), null);
-            log(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
             return hashedUser;
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
-            log(hashedUser.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(hashedUser.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SUserCreationException(re);
         }
     }
@@ -292,12 +292,12 @@ public class IdentityServiceImpl implements IdentityService {
             final InsertRecord insertRecord = new InsertRecord(contactInfo);
             final SInsertEvent insertEvent = getInsertEvent(contactInfo, USER_CONTACT_INFO);
             recorder.recordInsert(insertRecord, insertEvent);
-            log(contactInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(contactInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
             return contactInfo;
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
-            log(contactInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(contactInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SUserCreationException(re);
         }
     }
@@ -314,11 +314,11 @@ public class IdentityServiceImpl implements IdentityService {
             final InsertRecord insertRecord = new InsertRecord(userMembership);
             final SInsertEvent insertEvent = getInsertEvent(userMembership, USERMEMBERSHIP);
             recorder.recordInsert(insertRecord, insertEvent);
-            log(userMembership.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(userMembership.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
-            log(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SUserMembershipCreationException(re);
         }
     }
@@ -338,11 +338,11 @@ public class IdentityServiceImpl implements IdentityService {
             final DeleteRecord deleteRecord = new DeleteRecord(group);
             final SDeleteEvent deleteEvent = getDeleteEvent(group, GROUP);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            log(group.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(group.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
-            log(group.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(group.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SGroupDeletionException(re);
         }
     }
@@ -451,11 +451,11 @@ public class IdentityServiceImpl implements IdentityService {
             final DeleteRecord deleteRecord = new DeleteRecord(info);
             final SDeleteEvent deleteEvent = getDeleteEvent(info, CUSTOM_USER_INFO_DEFINITION);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            log(info.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(info.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            log(info.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(info.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SIdentityException("Can't delete profile custom user info definition " + info, e);
         }
     }
@@ -495,11 +495,11 @@ public class IdentityServiceImpl implements IdentityService {
             final DeleteRecord deleteRecord = new DeleteRecord(role);
             final SDeleteEvent deleteEvent = getDeleteEvent(role, ROLE);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            log(role.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(role.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
-            log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SRoleDeletionException(re);
         }
     }
@@ -534,11 +534,11 @@ public class IdentityServiceImpl implements IdentityService {
             final DeleteRecord deleteRecord = new DeleteRecord(user);
             final SDeleteEvent deleteEvent = getDeleteEvent(user, USER);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            log(user.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(user.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
-            log(user.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(user.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SUserDeletionException(re);
         }
     }
@@ -607,11 +607,11 @@ public class IdentityServiceImpl implements IdentityService {
             final DeleteRecord deleteRecord = new DeleteRecord(userMembership);
             final SDeleteEvent deleteEvent = getDeleteEvent(userMembership, USERMEMBERSHIP);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            log(userMembership.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(userMembership.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            log(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SMembershipDeletionException("Can't delete membership " + userMembership, e);
         }
     }
@@ -1418,11 +1418,11 @@ public class IdentityServiceImpl implements IdentityService {
                 updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(GROUP).setObject(group).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
-            log(group.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(group.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            log(group.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(group.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SIdentityException("Can't update group " + group, e);
         }
     }
@@ -1442,11 +1442,11 @@ public class IdentityServiceImpl implements IdentityService {
                         .setObject(customUserInfo).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
-            log(customUserInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            log(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SIdentityException("Can't update custom user info definition " + customUserInfo, e);
         }
     }
@@ -1483,10 +1483,10 @@ public class IdentityServiceImpl implements IdentityService {
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             logAfterMethod(methodName);
-            log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            log(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(role.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SIdentityException("Can't update role " + role, e);
         }
     }
@@ -1525,11 +1525,11 @@ public class IdentityServiceImpl implements IdentityService {
                 updateEvent.setOldObject(oldUser);
             }
             recorder.recordUpdate(updateRecord, updateEvent);
-            log(user.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(user.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
-            log(user.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(user.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SUserUpdateException(re);
         }
     }
@@ -1551,11 +1551,11 @@ public class IdentityServiceImpl implements IdentityService {
                 updateEvent.setOldObject(oldContactInfo);
             }
             recorder.recordUpdate(updateRecord, updateEvent);
-            log(contactInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(contactInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {
             logOnExceptionMethod(methodName, re);
-            log(contactInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(contactInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SUserUpdateException(re);
         }
     }
@@ -1580,10 +1580,10 @@ public class IdentityServiceImpl implements IdentityService {
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             logAfterMethod(methodName);
-            log(userMembership.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(userMembership.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            log(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            initiateLogBuilder(userMembership.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SIdentityException("Can't update user membership " + userMembership, e);
         }
     }
@@ -1776,7 +1776,7 @@ public class IdentityServiceImpl implements IdentityService {
         return listsGroups;
     }
 
-    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
+    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);

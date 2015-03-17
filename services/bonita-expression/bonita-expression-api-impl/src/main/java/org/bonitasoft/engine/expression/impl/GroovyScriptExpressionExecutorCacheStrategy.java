@@ -21,7 +21,6 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -73,11 +72,8 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
     }
 
     Class getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, SClassLoaderException {
-        if (definitionId == null) {
-            throw new SBonitaRuntimeException("Unable to evaluate expression without a definitionId");
-        }
         final GroovyShell shell = getShell(definitionId);
-        final String key = getScriptKey(expressionContent);
+        final String key = getScriptKey(expressionContent, definitionId);
 
         GroovyCodeSource gcs = (GroovyCodeSource) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
 
@@ -94,20 +90,35 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
         return shell.getClassLoader().parseClass(gcs, true);
     }
 
-    private String getScriptKey(String expressionContent) {
-        return SCRIPT_KEY + expressionContent.hashCode();
+    private String getScriptKey(String expressionContent, Long definitionId) {
+        final StringBuilder builder = new StringBuilder().append(SCRIPT_KEY);
+        if (definitionId != null) {
+            builder.append(definitionId);
+        }
+        builder.append(expressionContent.hashCode());
+        return builder.toString();
     }
 
     GroovyShell getShell(final Long definitionId) throws SClassLoaderException, SCacheException {
-        String key = SHELL_KEY + definitionId;
-        GroovyShell shell = (GroovyShell) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
+        String key = null;
+        GroovyShell shell = null;
+        if (definitionId != null) {
+            key = SHELL_KEY + definitionId;
+            shell = (GroovyShell) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
+        } else {
+            if (debugEnabled) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "no definitionId provided ");
+            }
+        }
         if (shell == null) {
             ClassLoader classLoader = getClassLoaderForShell(definitionId);
             if (debugEnabled) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Create a new groovy classloader for " + definitionId + " " + classLoader);
             }
             shell = new GroovyShell(classLoader);
-            cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
+            if (definitionId != null) {
+                cacheService.store(GROOVY_SCRIPT_CACHE_NAME, key, shell);
+            }
         }
         return shell;
     }

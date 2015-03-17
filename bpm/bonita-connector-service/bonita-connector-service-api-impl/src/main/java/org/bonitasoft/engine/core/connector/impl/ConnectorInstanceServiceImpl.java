@@ -38,6 +38,8 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithF
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceLogBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceLogBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceWithFailureInfoBuilderFactory;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
@@ -298,6 +300,22 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         } catch (final SBonitaReadException e) {
             throw new SConnectorInstanceReadException(e);
         }
+    }
+
+    protected SConnectorInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final SConnectorInstance connectorInstance) {
+        final SConnectorInstanceLogBuilder logBuilder = BuilderFactory.get(SConnectorInstanceLogBuilderFactory.class).createNewInstance();
+        this.initializeLogBuilder(logBuilder, message);
+        this.updateLog(actionType, logBuilder);
+        logBuilder.containerId(connectorInstance.getContainerId());
+        return logBuilder;
+    }
+
+    protected SConnectorInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final SAConnectorInstance connectorInstance) {
+        final SConnectorInstanceLogBuilder logBuilder = BuilderFactory.get(SConnectorInstanceLogBuilderFactory.class).createNewInstance();
+        this.initializeLogBuilder(logBuilder, message);
+        this.updateLog(actionType, logBuilder);
+        logBuilder.containerId(connectorInstance.getContainerId());
+        return logBuilder;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {

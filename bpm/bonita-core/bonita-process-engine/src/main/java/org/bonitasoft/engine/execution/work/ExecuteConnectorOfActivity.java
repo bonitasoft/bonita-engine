@@ -38,9 +38,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEvent
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.work.BonitaWork;
@@ -89,12 +88,14 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     @Override
     protected void setContainerInFail(final Map<String, Object> context) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(tenantAccessor.getEventInstanceService(),
-                tenantAccessor.getSchedulerService(), logger);
-        FailedStateSetter failedStateSetter = new FailedStateSetter(waitingEventsInterrupter, tenantAccessor.getActivityInstanceService(),
-                tenantAccessor.getFlowNodeStateManager(), logger);
-        failedStateSetter.setAsFailed(flowNodeInstanceId);
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
+
+        final SFlowNodeInstance intTxflowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+        activityInstanceService.setState(intTxflowNodeInstance, flowNodeStateManager.getFailedState());
+        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        tenantAccessor.getFlowNodeExecutor().executeState(processDefinition, intTxflowNodeInstance, flowNodeStateManager.getFailedState());
     }
 
     @Override
