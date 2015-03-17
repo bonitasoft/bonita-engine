@@ -10,6 +10,7 @@ package com.bonitasoft.engine.execution;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -43,14 +44,14 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
     private final BreakpointService breakpointService;
 
     public FlowNodeStateManagerExt(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
-            final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ExpressionResolverService expressionResolverService, final DataInstanceService dataInstanceService, final OperationService operationService,
-            final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
-            final TechnicalLoggerService logger, final DocumentService documentService, final SCommentService commentService,
-            final BreakpointService breakpointService, StateBehaviorsExt stateBehaviors, WaitingEventsInterrupter waitingEventsInterrupter) {
+                                   final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
+                                   final ExpressionResolverService expressionResolverService, final DataInstanceService dataInstanceService, final OperationService operationService,
+                                   final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
+                                   final TechnicalLoggerService logger, final DocumentService documentService, final SCommentService commentService,
+                                   final BreakpointService breakpointService, StateBehaviorsExt stateBehaviors, WaitingEventsInterrupter waitingEventsInterrupter, ClassLoaderService classLoaderService) {
         super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, expressionResolverService,
                 dataInstanceService, operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentService, commentService,
-                stateBehaviors, waitingEventsInterrupter);
+                stateBehaviors, waitingEventsInterrupter, classLoaderService);
         this.breakpointService = breakpointService;
     }
 
