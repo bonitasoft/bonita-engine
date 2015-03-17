@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 
@@ -41,17 +42,6 @@ public class SpringPlatformFileSystemBeanAccessor {
         }
     }
 
-    private static PropertiesPropertySource getPropertySource() {
-        try {
-            final Properties props = BonitaHomeServer.getInstance().getPlatformProperties();
-            return new PropertiesPropertySource("platform", props);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new RuntimeException(e);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static <T> T getService(final Class<T> serviceClass) {
         return getContext().getBean(serviceClass);
     }
@@ -68,7 +58,20 @@ public class SpringPlatformFileSystemBeanAccessor {
             SpringSessionAccessorFileSystemBeanAcessor.initializeContext(classLoader);
             final FileSystemXmlApplicationContext sessionContext = SpringSessionAccessorFileSystemBeanAcessor.getContext();
             context = new AbsoluteFileSystemXmlApplicationContext(getResources(), sessionContext);
-            context.getEnvironment().getPropertySources().addFirst(getPropertySource());
+
+            PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
+            Properties properties = null;
+            try {
+                properties = BonitaHomeServer.getInstance().getPlatformProperties();
+            } catch (BonitaHomeNotSetException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            configurer.setProperties(properties);
+            context.addBeanFactoryPostProcessor(configurer);
+
+            //context.getEnvironment().getPropertySources().addFirst(getPropertySource());
             context.refresh();
 
         }

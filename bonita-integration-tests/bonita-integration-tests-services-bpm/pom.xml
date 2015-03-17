@@ -615,7 +615,6 @@
 						<sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
 					</systemPropertyVariables>
 					<includes>
-						<include>org/bonitasoft/engine/AllTestsWithJNDI.java</include>
 						<include>org/bonitasoft/engine/AllBPMTestsWithJNDI.java</include>
 					</includes>
 				</configuration>

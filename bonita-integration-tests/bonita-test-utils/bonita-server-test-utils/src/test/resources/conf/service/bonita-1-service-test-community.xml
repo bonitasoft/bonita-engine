@@ -28,15 +28,6 @@
 
 	<bean id="archivingStrategy" class="org.bonitasoft.engine.archive.impl.DefaultArchivingStrategyForTest" />
 
-	<bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations">
-			<array>
-				<value>file:${bonita.services.folder}/bonita-platform.properties</value>
-				<value>classpath:jdbc-${sysprop.bonita.db.vendor}.properties</value>
-			</array>
-		</property>
-	</bean>
-
 	<bean id="journalConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateConfigurationProviderImpl">
 		<constructor-arg name="properties">
 			<props>

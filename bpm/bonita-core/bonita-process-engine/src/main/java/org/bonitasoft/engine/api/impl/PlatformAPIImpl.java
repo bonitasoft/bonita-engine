@@ -640,18 +640,30 @@ public class PlatformAPIImpl implements PlatformAPI {
         String userName = "";
         SessionAccessor sessionAccessor = null;
         long platformSessionId = -1;
+        Long tenantId = -1L;
         try {
             // add tenant to database
             final String createdBy = "defaultUser";
             final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class)
                     .createNewInstance(tenantName, createdBy, System.currentTimeMillis(), STATUS_DEACTIVATED, true).setDescription(description).done();
-            final Long tenantId = platformService.createTenant(tenant);
+            tenantId = platformService.createTenant(tenant);
 
             transactionService.complete();
             transactionService.begin();
-            createTenantFolderInBonitaHome(tenant);
-            // Get user name
-            userName = getUserName(tenant, tenantId);
+            try {
+                createTenantFolderInBonitaHome(tenantId);
+            } catch (STenantCreationException e) {
+                transactionService.complete();
+                throw e;
+            }
+
+            try {
+                // Get user name
+                userName = getUserName(tenant, tenantId);
+            } catch (Exception e) {
+                transactionService.complete();
+                throw new STenantCreationException(e);
+            }
 
             // Create session
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
@@ -673,6 +685,13 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             sessionService.deleteSession(session.getId());
         } catch (final STenantCreationException e) {
+            if (tenantId != -1L) {
+                try {
+                    deleteTenant(tenantId);
+                } catch (STenantDeletionException e1) {
+                    throw new STenantCreationException("Unable to delete default tenant (after a STenantCreationException) that was being created", e1);
+                }
+            }
             throw e;
         } catch (final Exception e) {
             throw new STenantCreationException("Unable to create default tenant", e);
@@ -681,22 +700,15 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private String getUserName(final STenant tenant, final Long tenantId) throws IOException, STenantDeletionException,
-            STenantCreationException {
-        try {
-            return getUserName(tenantId);
-        } catch (final Exception e) {
-            deleteTenant(tenant.getId());
-            throw new STenantCreationException("Access File Exception !!");
-        }
+    private String getUserName(final STenant tenant, final Long tenantId) throws IOException, BonitaHomeNotSetException {
+        return getUserName(tenantId);
     }
 
-    private void createTenantFolderInBonitaHome(final STenant tenant) throws STenantDeletionException, STenantCreationException, IOException {
+    private void createTenantFolderInBonitaHome(final long tenantId) throws STenantCreationException {
         final BonitaHomeServer home = BonitaHomeServer.getInstance();
         try {
-            home.createTenant(tenant.getId());
+            home.createTenant(tenantId);
         } catch (Exception e) {
-            deleteTenant(tenant.getId());
             throw new STenantCreationException("Exception while creating tenant folder");
         }
     }

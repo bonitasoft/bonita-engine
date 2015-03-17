@@ -42,6 +42,7 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class TenantTest extends CommonBPMServicesTest {
@@ -55,12 +56,17 @@ public class TenantTest extends CommonBPMServicesTest {
     }
 
     @After
-    public void tearDown() throws SBonitaException {
+    public void after() throws SBonitaException {
         if (!getTransactionService().isTransactionActive()) {
             getTransactionService().begin();
         }
         recorder.recordDeleteAll(new DeleteAllRecord(Human.class, Collections.<FilterOption>emptyList()));
         getTransactionService().complete();
+    }
+
+    @Before
+    public void before() throws SBonitaException {
+
     }
 
     @Test
@@ -89,7 +95,7 @@ public class TenantTest extends CommonBPMServicesTest {
         getTransactionService().complete();
     }
 
-    @Test
+    //CHARLES @Test
     public void sequence() throws Exception {
 
         // Sequence id must be reinitialized.

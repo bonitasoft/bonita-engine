@@ -98,6 +98,8 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
     @Test
     public void testDeleteAll() throws Exception {
         getTransactionService().begin();
+        final int initialNbOfCommands = commandService.getAllCommands(0, 500, SCommandCriterion.NAME_ASC).size();
+
         final SCommand command1 = commandBuilderFactory
                 .createNewInstance("createCommand1", "this is a command", "command implementation").done();
         final SCommand command2 = commandBuilderFactory
@@ -108,7 +110,7 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
         commandService.create(command2);
         commandService.create(command3);
         final List<SCommand> commands1 = commandService.getAllCommands(0, 500, SCommandCriterion.NAME_ASC);
-        assertEquals(3, commands1.size());
+        assertEquals(3 + initialNbOfCommands, commands1.size());
 
         commandService.deleteAll();
         final List<SCommand> commands2 = commandService.getAllCommands(0, 500, SCommandCriterion.NAME_ASC);
@@ -152,21 +154,23 @@ public class CommandServiceIntegrationTest extends CommonBPMServicesTest {
     @Test
     public void testGetCommandsWithCriterion() throws Exception {
         getTransactionService().begin();
-        final SCommand sCommand1 = commandBuilderFactory.createNewInstance("commandB", "this is command1", "command implementation")
+        final int initialNbOfCommands = commandService.getAllCommands(0, 500, SCommandCriterion.NAME_ASC).size();
+
+        final SCommand sCommand1 = commandBuilderFactory.createNewInstance("aaaaa", "this is command1", "command implementation")
                 .done();
-        final SCommand sCommand2 = commandBuilderFactory.createNewInstance("commandC", "this is command2", "command implementation")
+        final SCommand sCommand2 = commandBuilderFactory.createNewInstance("aaaab", "this is command2", "command implementation")
                 .done();
-        final SCommand sCommand3 = commandBuilderFactory.createNewInstance("commandA", "this is command3", "command implementation")
+        final SCommand sCommand3 = commandBuilderFactory.createNewInstance("aaaac", "this is command3", "command implementation")
                 .done();
         commandService.create(sCommand1);
         commandService.create(sCommand2);
         commandService.create(sCommand3);
 
-        final List<SCommand> commands = commandService.getAllCommands(0, 5, SCommandCriterion.NAME_ASC);
-        assertEquals(3, commands.size());
-        assertEquals("commandA", commands.get(0).getName());
-        assertEquals("commandB", commands.get(1).getName());
-        assertEquals("commandC", commands.get(2).getName());
+        final List<SCommand> commands = commandService.getAllCommands(0, 500, SCommandCriterion.NAME_ASC);
+        assertEquals(3 + initialNbOfCommands, commands.size());
+        assertEquals("aaaaa", commands.get(0).getName());
+        assertEquals("aaaab", commands.get(1).getName());
+        assertEquals("aaaac", commands.get(2).getName());
 
         commandService.deleteAll();
         getTransactionService().complete();

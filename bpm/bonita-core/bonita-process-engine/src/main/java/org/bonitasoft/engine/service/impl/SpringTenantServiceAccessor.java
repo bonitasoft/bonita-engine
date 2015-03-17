@@ -889,7 +889,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public ReadPersistenceService getReadPersistenceService() {
         if (readPersistenceService == null) {
-            readPersistenceService = beanAccessor.getService(ReadPersistenceService.class);
+            readPersistenceService = beanAccessor.getService("persistenceService");
         }
         return readPersistenceService;
     }

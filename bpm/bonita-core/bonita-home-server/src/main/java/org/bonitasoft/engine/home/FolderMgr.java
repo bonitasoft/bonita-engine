@@ -37,6 +37,10 @@ class FolderMgr {
         return getFolder(getWorkFolder(bonitaHomeFolder), "platform-init");
     }
 
+    public static Folder getPlatformInitConfFolder(File bonitaHomeFolder) throws IOException {
+        return getFolder(getConfFolder(bonitaHomeFolder), "platform-init");
+    }
+
     public static Folder getPlatformWorkFolder(final File bonitaHomeFolder) throws IOException {
         return getFolder(getWorkFolder(bonitaHomeFolder), "platform");
     }
@@ -76,6 +80,10 @@ class FolderMgr {
         return getFolder(getTenantsConfFolder(bonitaHomeFolder), "template");
     }
 
+    public static Folder getTenantTemplateTempFolder(File bonitaHomeFolder) throws IOException {
+        return getFolder(getTenantsTempFolder(bonitaHomeFolder), "template");
+    }
+
     public static Folder getTenantWorkProcessesFolder(File bonitaHomeFolder, long tenantId) throws IOException {
         return getFolder(getTenantWorkFolder(bonitaHomeFolder, tenantId), "processes");
     }
@@ -105,19 +113,18 @@ class FolderMgr {
         final Folder tenantTempFolder = getTenantTempFolder(bonitaHomeFolder, tenantId);
         final Folder templateWorkFolder = FolderMgr.getTenantTemplateWorkFolder(bonitaHomeFolder);
         final Folder templateConfFolder = FolderMgr.getTenantTemplateConfFolder(bonitaHomeFolder);
+        final Folder templateTempFolder = FolderMgr.getTenantTemplateTempFolder(bonitaHomeFolder);
 
         // copy configuration file
         try {
             templateWorkFolder.copyTo(tenantWorkFolder);
             templateConfFolder.copyTo(tenantConfFolder);
-            tenantTempFolder.create();
+            templateTempFolder.copyTo(tenantTempFolder);
             getTenantWorkProcessesFolder(bonitaHomeFolder, tenantId).create();
         } catch (final IOException e) {
             deleteTenant(bonitaHomeFolder, tenantId);
             throw e;
         }
-        final Folder tenantWorkProcessesFolder = getTenantWorkProcessesFolder(bonitaHomeFolder, tenantId);
-        tenantWorkProcessesFolder.create();
     }
 
     public static void createTenantWorkProcessFolder(File bonitaHomeFolder, long tenantId, long processId) throws IOException {

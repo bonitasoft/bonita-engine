@@ -13,19 +13,16 @@
  **/
 package org.bonitasoft.engine.archive.impl;
 
+import org.bonitasoft.engine.persistence.PersistentObject;
+
 /**
  * @author Celine Souchet
  */
 public class DefaultArchivingStrategyForTest extends AbstractArchivingStrategy {
 
-    public DefaultArchivingStrategyForTest() {
-        super();
-        archives.put("org.bonitasoft.engine.archive.model.Address", true);
-        archives.put("org.bonitasoft.engine.archive.model.Employee", true);
-        archives.put("org.bonitasoft.engine.archive.model.EmployeeProjectMapping", true);
-        archives.put("org.bonitasoft.engine.archive.model.Laptop", true);
-        archives.put("org.bonitasoft.engine.archive.model.Project", true);
-        archives.put("org.bonitasoft.engine.data.instance.model.SDataInstance", true);
+    @Override
+    public boolean isArchivable(final Class<? extends PersistentObject> srcClass) {
+        return true;
     }
 
 }

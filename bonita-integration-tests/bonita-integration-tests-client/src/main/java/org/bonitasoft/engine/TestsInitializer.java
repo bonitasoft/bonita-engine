@@ -79,18 +79,23 @@ public class TestsInitializer {
     }
 
     private Object startH2Server() throws ClassNotFoundException, NoSuchMethodException, IOException, BonitaHomeNotSetException, InvocationTargetException, IllegalAccessException {
-        final String h2Port = (String) BonitaHomeServer.getInstance().getPlatformProperties().get("h2.db.server.port");
+        final String h2Port = (String) BonitaHomeServer.getInstance().getPrePlatformInitProperties().get("h2.db.server.port");
         final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
 
         final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
         final Method createTcpServer = h2ServerClass.getMethod("createTcpServer", new Class[] {String[].class});
-        return createTcpServer.invoke(createTcpServer, new Object[]{args});
+        final Object server = createTcpServer.invoke(createTcpServer, new Object[]{args});
+        final Method start = server.getClass().getMethod("start");
+        start.invoke(server);
+        System.err.println("--- H2 Server started on port " + h2Port + " ---");
+        return server;
     }
 
     private void stopH2Server(Object h2Server) throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
         final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
         final Method stop = h2ServerClass.getMethod("stop");
-        stop.invoke(stop);
+        stop.invoke(h2Server);
+        System.err.println("--- H2 Server stopped ---");
     }
 
     protected void after() throws Exception {
@@ -98,10 +103,13 @@ public class TestsInitializer {
         System.out.println("============ CLEANING OF TEST ENVIRONMENT ===========");
         System.out.println("=====================================================");
 
-        deleteTenantAndPlatform();
-        checkThreadsAreStopped();
-        if (this.h2Server != null) {
-            stopH2Server(this.h2Server);
+        try {
+            deleteTenantAndPlatform();
+            checkThreadsAreStopped();
+        } finally {
+            if (this.h2Server != null) {
+                stopH2Server(this.h2Server);
+            }
         }
     }
 

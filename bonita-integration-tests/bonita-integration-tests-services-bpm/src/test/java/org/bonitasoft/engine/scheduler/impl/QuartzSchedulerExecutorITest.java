@@ -61,7 +61,7 @@ public class QuartzSchedulerExecutorITest extends CommonBPMServicesTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void before() throws Exception {
         tenant1 = PlatformUtil.createTenant(getTransactionService(), platformService, "tenant1", PlatformUtil.DEFAULT_CREATED_BY,
                 PlatformUtil.DEFAULT_TENANT_STATUS);
 
@@ -74,7 +74,7 @@ public class QuartzSchedulerExecutorITest extends CommonBPMServicesTest {
     }
 
     @After
-    public void stopScheduler() throws Exception {
+    public void after() throws Exception {
         TestUtil.stopScheduler(schedulerService, getTransactionService());
         storage.clear();
         PlatformUtil.deleteTenant(getTransactionService(), platformService, tenant1);

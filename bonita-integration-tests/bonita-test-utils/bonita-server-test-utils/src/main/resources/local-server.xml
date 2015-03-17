@@ -4,15 +4,10 @@
 	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"/>
-
-	<!-- We need 2 datasources that target the same DB : -->
-	<!-- First datasource (bonitaDataSource) for the whole Bonita platform -->
-	<!-- Second datasource (bonitaSequenceManagerDataSource) for the SequenceManager implementation in order not to be stuck when we need some new ids -->
     <bean id="bonitaDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
-        <property name="className" value="${sysprop.bonita.db.vendor}.db.datasource.class" />
-        <property name="uniqueName" value="java:comp/env/bonitaDS" /> <!--  Is it really useful and/or used ?  --> 
-         <property name="minPoolSize" value="1" />
+        <property name="className" value="${${sysprop.bonita.db.vendor}.db.datasource.class}" />
+        <property name="uniqueName" value="java:comp/env/bonitaDS" />
+        <property name="minPoolSize" value="1" />
         <property name="maxPoolSize" value="7" />
 		<property name="acquireIncrement" value="1" />
         <property name="allowLocalTransactions" value="true" /> <!--  For hibernate : see if we can set it to false --> 
@@ -21,10 +16,10 @@
     </bean>  
 
 	<bean id="bonitaSequenceManagerDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
-		<property name="driverClass" value="${sysprop.bonita.db.vendor}.db.driver.class"/>
-		<property name="jdbcUrl" value="${sysprop.bonita.db.vendor}.db.url"/>
-		<property name="username" value="${sysprop.bonita.db.vendor}.db.user"/>
-		<property name="password" value="${sysprop.bonita.db.vendor}.db.password"/>
+		<property name="driverClass" value="${${sysprop.bonita.db.vendor}.db.driver.class}"/>
+		<property name="jdbcUrl" value="${${sysprop.bonita.db.vendor}.db.url}"/>
+		<property name="username" value="${${sysprop.bonita.db.vendor}.db.user}"/>
+		<property name="password" value="${${sysprop.bonita.db.vendor}.db.password}"/>
 
 		<property name="idleConnectionTestPeriodInMinutes" value="60"/>
 		<property name="idleMaxAgeInMinutes" value="30"/>
@@ -37,18 +32,21 @@
 	</bean>
 
     <bean id="businessDataDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
-        <property name="className" value="${sysprop.bonita.db.vendor}.db.datasource.class" />
-        <property name="uniqueName" value="java:comp/env/BusinessDataDS" /> <!-- Is it really useful and/or used ? -->
+        <property name="className" value="${${sysprop.bonita.db.vendor}.db.datasource.class}" />
+        <property name="uniqueName" value="java:comp/env/BusinessDataDS" />
+        <property name="minPoolSize" value="1" />
         <property name="maxPoolSize" value="3" />
+        <property name="acquireIncrement" value="1" />
+        <property name="allowLocalTransactions" value="true" /> <!--  For hibernate : see if we can set it to false -->
         <property name="driverProperties" ref="${sysprop.bonita.db.vendor}.properties">
         </property>
     </bean>
 
     <bean id="notManagedBizDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
-        <property name="driverClass" value="${sysprop.bonita.db.vendor}.db.driver.class" />
-        <property name="jdbcUrl" value="${sysprop.bonita.db.vendor}.db.url" />
-        <property name="username" value="${sysprop.bonita.db.vendor}.db.user" />
-        <property name="password" value="${sysprop.bonita.db.vendor}.db.password" />
+        <property name="driverClass" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
+        <property name="jdbcUrl" value="${${sysprop.bonita.db.vendor}.db.url}" />
+        <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
+        <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
         <property name="idleConnectionTestPeriodInMinutes" value="60" />
         <property name="idleMaxAgeInMinutes" value="30" />
         <property name="maxConnectionsPerPartition" value="3" />
@@ -60,13 +58,13 @@
     </bean>
 
     <!-- H2 -->
-    <bean id="h2.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    <bean id="h2.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean" >
         <property name="properties">
-            <props>
-                <prop key="user">${h2.db.user}</prop>
-                <prop key="password">${h2.db.password}</prop>
-                <prop key="URL">${h2.db.url}</prop>
-            </props>
+        <props>
+            <prop key="user">${h2.db.user}</prop>
+            <prop key="password">${h2.db.password}</prop>
+            <prop key="URL">${h2.db.url}</prop>
+        </props>
         </property>
     </bean>
 
@@ -145,7 +143,7 @@
     <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate" />
 
     <!-- Bind the mapping into Carol -->
-    <bean id="jndiSetup" class="org.bonitasoft.engine.local.MemoryJNDISetup" scope="singleton" init-method="init" destroy-method="clean">
+    <bean id="jndiSetup" lazy-init="false" class="org.bonitasoft.engine.local.MemoryJNDISetup" scope="singleton" init-method="init" destroy-method="clean">
         <constructor-arg name="jndiTemplate" ref="jndiTemplate" />
         <constructor-arg name="jndiMapping" ref="jndiMapping" />
     </bean>

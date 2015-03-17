@@ -98,11 +98,11 @@ public class CommonBPMServicesTest {
 
     private APISession apiSession = null;
 
-    private SessionAccessor sessionAccessor;
+    private static SessionAccessor sessionAccessor;
 
-    private PlatformServiceAccessor platformServiceAccessor;
+    private static PlatformServiceAccessor platformServiceAccessor;
 
-    private Map<Long, TenantServiceAccessor> tenantServiceAccessors;
+    private static Map<Long, TenantServiceAccessor> tenantServiceAccessors;
 
     @Rule
     public TestRule testWatcher = new TestWatcher() {
@@ -156,7 +156,7 @@ public class CommonBPMServicesTest {
     }
 
     @BeforeClass
-    public void beforeClass() throws Exception {
+    public static void beforeClass() throws Exception {
         sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         tenantServiceAccessors = new HashMap<Long, TenantServiceAccessor>();
@@ -171,7 +171,7 @@ public class CommonBPMServicesTest {
 
     protected TenantServiceAccessor getTenantAccessor() {
         try {
-            return getAccessor(apiSession.getTenantId());
+            return getAccessor(getDefaultTenantId());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -212,14 +212,16 @@ public class CommonBPMServicesTest {
     @After
     public void after() throws Exception {
         TestUtil.closeTransactionIfOpen(platformServiceAccessor.getTransactionService());
-        new LoginAPIImpl().logout(apiSession);
+        if (apiSession != null) {
+            new LoginAPIImpl().logout(apiSession);
+        }
     }
 
     private List<String> clean() throws Exception {
         try {
-            apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
+            final APISession apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
             platformServiceAccessor.getTransactionService().begin();
-            sessionAccessor.setSessionInfo(apiSession.getId(), apiSession.getTenantId());
+            //sessionAccessor.setSessionInfo(apiSession.getId(), apiSession.getTenantId());
             final List<String> messages = new ArrayList<String>();
             // final STenant tenant = platformService.getTenant(tenantId);
             final QueryOptions queryOptions = new QueryOptions(0, 200, SProcessDefinitionDeployInfo.class, "name", OrderByType.ASC);
@@ -289,11 +291,11 @@ public class CommonBPMServicesTest {
             // }
 
             getTenantAccessor().getLoginService().logout(apiSession.getId());
-            apiSession = null;
             return messages;
         } finally {
-            platformServiceAccessor.getTransactionService().complete();
-            sessionAccessor.deleteSessionId();
+            if (platformServiceAccessor.getTransactionService().isTransactionActive()) {
+                platformServiceAccessor.getTransactionService().complete();
+            }
         }
     }
 

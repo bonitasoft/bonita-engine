@@ -36,7 +36,7 @@
 		<!-- ENGINE SERVER - WORK -->
 		<copy todir="${bh.dir}/engine-server/work/platform-init">
 			<fileset dir="${resources.dir}">
-				<include name="bonita-platform-session-accessor.xml"/>
+				<include name="bonita-platform-init-community.xml"/>
 			</fileset>
 		</copy>
 
@@ -69,6 +69,12 @@
 
 		<!-- ENGINE SERVER - CONF -->
 
+		<copy todir="${bh.dir}/engine-server/conf/platform-init">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-platform-init-community-user-custom.xml"/>
+			</fileset>
+		</copy>
+
 		<copy todir="${bh.dir}/engine-server/conf/platform">
 			<fileset dir="${resources.dir}">
 				<include name="bonita-platform-community-user-custom.xml"/>
@@ -94,6 +100,12 @@
 				<include name="bonita-tenants-community-user-custom.xml"/>
 			</fileset>
 		</copy>
+
+		<!-- ENGINE SERVER - TEMP -->
+		<mkdir dir="${bh.dir}/engine-server/temp/tenants/template"/>
+		<mkdir dir="${bh.dir}/engine-server/temp/platform"/>
+		<mkdir dir="${bh.dir}/engine-server/temp/platform-init"/>
+
 	</target>
 
 </project>

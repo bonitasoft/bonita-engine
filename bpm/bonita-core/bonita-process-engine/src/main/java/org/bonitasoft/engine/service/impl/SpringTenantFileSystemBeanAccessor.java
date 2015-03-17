@@ -14,11 +14,13 @@
 package org.bonitasoft.engine.service.impl;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.MissingServiceException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 
@@ -44,16 +46,6 @@ public class SpringTenantFileSystemBeanAccessor {
         } catch (final BonitaHomeNotSetException e) {
             throw new RuntimeException("Bonita home not set");
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private PropertiesPropertySource getPropertySource() {
-        try {
-            return new PropertiesPropertySource("tenant", BonitaHomeServer.getInstance().getTenantProperties(tenantId));
-        } catch (final BonitaHomeNotSetException e) {
-            throw new RuntimeException(e);
-        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -87,11 +79,19 @@ public class SpringTenantFileSystemBeanAccessor {
         if (context == null) {// synchronized null check
             SpringPlatformFileSystemBeanAccessor.initializeContext(classLoader);
             final FileSystemXmlApplicationContext platformContext = SpringPlatformFileSystemBeanAccessor.getContext();
-            // Delay the refresh so we can set our BeanFactoryPostProcessor to be able to resolve the placeholder.
-            final AbsoluteFileSystemXmlApplicationContext localContext = new AbsoluteFileSystemXmlApplicationContext(getResources(), platformContext);
-            localContext.getEnvironment().getPropertySources().addFirst(getPropertySource());
-            localContext.refresh();
-            this.context = localContext;
+            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), platformContext);
+            PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
+            Properties properties = null;
+            try {
+                properties = BonitaHomeServer.getInstance().getTenantProperties(tenantId);
+            } catch (BonitaHomeNotSetException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            configurer.setProperties(properties);
+            context.addBeanFactoryPostProcessor(configurer);
+            context.refresh();
         }
     }
 

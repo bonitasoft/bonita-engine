@@ -70,7 +70,7 @@ import org.junit.Test;
  * @author Emmanuel Duchastenier
  */
 @SuppressWarnings("javadoc")
-public abstract class DataInstanceServiceTest extends CommonBPMServicesTest {
+public class DataInstanceServiceTest extends CommonBPMServicesTest {
 
     private static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.<Integer, Object> emptyMap();
 
