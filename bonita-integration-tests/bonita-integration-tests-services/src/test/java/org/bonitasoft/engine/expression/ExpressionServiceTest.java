@@ -152,7 +152,7 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
         //given
         final String strContent = "return \"junit test checkGroovyScriptStrategyUsesCache\"";
         final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_READ_ONLY_SCRIPT, String.class.getName(), SExpression.GROOVY, null);
-        final String cacheKey = GroovyScriptExpressionExecutorCacheStrategy.SCRIPT_KEY + strContent.hashCode();
+        final String cacheKey = GroovyScriptExpressionExecutorCacheStrategy.SCRIPT_KEY + DEFINITION_ID_VALUE + strContent.hashCode();
         assertThat(cacheService.get(GroovyScriptExpressionExecutorCacheStrategy.GROOVY_SCRIPT_CACHE_NAME, cacheKey)).as("should not contains key").isNull();
 
         //when

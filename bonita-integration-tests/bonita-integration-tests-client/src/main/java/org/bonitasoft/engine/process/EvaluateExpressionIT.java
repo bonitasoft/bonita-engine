@@ -426,6 +426,77 @@ public class EvaluateExpressionIT extends TestWithUser {
         getProcessAPI().evaluateExpressionsOnProcessDefinition(36, expressions);
     }
 
+    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Complex expression" }, story = "Evaluate a complex expression.", jira = "")
+    @Ignore("not yet supported")
+    @Test
+    public void evaluateComplexExpression() throws Exception {
+        final String a = "a";
+        final String b = "b";
+        final String c = "c";
+        final int a_value = 1;
+        final Expression aExpr = new ExpressionBuilder().createDataExpression(a, Integer.class.getName());
+        final Expression bExpr = new ExpressionBuilder().createDataExpression(b, Integer.class.getName());
+        final Expression cExpr = new ExpressionBuilder().createDataExpression(c, Integer.class.getName());
+
+        // get processInstance
+        final Expression s1 = new ExpressionBuilder().createGroovyScriptExpression("script1", "a+2", Integer.class.getName(), aExpr);
+        final Expression s2 = new ExpressionBuilder().createGroovyScriptExpression("g", "a+b", Integer.class.getName(), aExpr, bExpr);
+        final Expression s3 = new ExpressionBuilder().createGroovyScriptExpression("script3", "a+b+g", Integer.class.getName(), aExpr, bExpr, s2);
+        final Expression s4 = new ExpressionBuilder().createGroovyScriptExpression("theScript", "a+b+c", Integer.class.getName(), aExpr, bExpr, cExpr);
+
+        final Expression defaultA = new ExpressionBuilder().createConstantIntegerExpression(a_value);
+        final Expression defaultB = s1;
+        final Expression defaultC = s3;
+        // create a processDefinition with data and parameter...
+        final DesignProcessDefinition processDef = createProcessDefinitionBuilderWithHumanAndAutomaticSteps("My_Process", "1.0", Arrays.asList("step1"),
+                Arrays.asList(true)).addIntegerData(a, defaultA).addIntegerData(b, defaultB).addIntegerData(c, defaultC)
+                .addDescription("Delivery all day and night long").getProcess();
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, "Actor1", user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
+
+        // on processInstance
+        final Map<Expression, Map<String, Serializable>> expressions = createExpression(s4);
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessDefinition(processDefinition.getId(), expressions);
+        assertEquals(Integer.valueOf(12), result.get("theScript"));
+
+        cleanup(processDefinition.getId());
+    }
+
+    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Complex expression", "Process instance" }, story = "Evaluate a complex expression on process instance.", jira = "")
+    @Ignore("not yet supported")
+    @Test
+    public void evaluateComplexExpressionOnProcessInstance() throws Exception {
+        final String a = "a";
+        final int a_value = 1;
+        final Expression aExpr = new ExpressionBuilder().createDataExpression(a, Integer.class.getName());
+
+        // get processInstance
+        final Expression ga = new ExpressionBuilder().createGroovyScriptExpression("ga", "a+3", Integer.class.getName(), aExpr);
+        final Expression gb = new ExpressionBuilder().createGroovyScriptExpression("gb", "4", Integer.class.getName());
+        final Expression gc = new ExpressionBuilder().createGroovyScriptExpression("gc", "ga+gb", Integer.class.getName(), ga, gb);
+        final Expression g = new ExpressionBuilder().createGroovyScriptExpression("g", "ga+gb+gc", Integer.class.getName(), ga, gb, gc);
+        final Expression script = new ExpressionBuilder().createGroovyScriptExpression("theScript", "1+g", Integer.class.getName(), g);
+
+        final Expression defaultA = new ExpressionBuilder().createConstantIntegerExpression(a_value);
+        // create a processDefinition with data and parameter...
+        final DesignProcessDefinition processDef = createProcessDefinitionBuilderWithHumanAndAutomaticSteps("My_Process", "1.0", Arrays.asList("step1"),
+                Arrays.asList(true)).addIntegerData(a, defaultA).addDescription("Delivery all day and night long").getProcess();
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, "Actor1", user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
+        // on processInstance
+        final Map<Expression, Map<String, Serializable>> expressions = createExpression(script);
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
+        assertEquals(Integer.valueOf(17), result.get("theScript"));
+
+        cleanup(processDefinition.getId());
+    }
+
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Pattern expression" }, story = "Evaluate a pattern expression.", jira = "")
     @Test
     public void evaluatePatternExpression() throws Exception {

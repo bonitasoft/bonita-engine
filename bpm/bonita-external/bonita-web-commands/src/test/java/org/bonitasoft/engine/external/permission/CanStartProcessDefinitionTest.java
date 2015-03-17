@@ -36,7 +36,7 @@ public class CanStartProcessDefinitionTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.external.permission.CanStartProcessDefinition#execute(java.util.Map, org.bonitasoft.engine.service.TenantServiceAccessor)}.
+     * {@link org.bonitasoft.engine.external.actor.CanStartProcessDefinition#execute(java.util.Map, org.bonitasoft.engine.service.TenantServiceAccessor)} .
      */
     @Test(expected = SCommandParameterizationException.class)
     public final void should_throw_exception_when_Execute_with_wrong_parameter() throws SCommandParameterizationException, SCommandExecutionException {

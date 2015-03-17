@@ -21,18 +21,18 @@ import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
-import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
+import org.bonitasoft.engine.execution.StateBehaviors;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public abstract class EndingIntermediateCatchEventExceptionStateImpl implements FlowNodeState {
 
-    private final WaitingEventsInterrupter waitingEventsInterrupter;
+    private final StateBehaviors stateBehaviors;
 
-    public EndingIntermediateCatchEventExceptionStateImpl(WaitingEventsInterrupter waitingEventsInterrupter) {
+    public EndingIntermediateCatchEventExceptionStateImpl(final StateBehaviors stateBehaviors) {
         super();
-        this.waitingEventsInterrupter = waitingEventsInterrupter;
+        this.stateBehaviors = stateBehaviors;
     }
 
     @Override
@@ -46,7 +46,7 @@ public abstract class EndingIntermediateCatchEventExceptionStateImpl implements 
                 instance.getFlowNodeDefinitionId());
         try {
             final SIntermediateCatchEventInstance intermediateCatchEventInstance = (SIntermediateCatchEventInstance) instance;
-            waitingEventsInterrupter.interruptWaitingEvents(processDefinition, intermediateCatchEventInstance, catchEventDef);
+            stateBehaviors.interrupWaitinEvents(processDefinition, intermediateCatchEventInstance, catchEventDef);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }

@@ -15,15 +15,15 @@ package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
+import org.bonitasoft.engine.execution.StateBehaviors;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class AbortingBoundaryAndIntermediateCatchEventStateImpl extends EndingIntermediateCatchEventExceptionStateImpl {
 
-    public AbortingBoundaryAndIntermediateCatchEventStateImpl(WaitingEventsInterrupter waitingEventsInterrupter) {
-        super(waitingEventsInterrupter);
+    public AbortingBoundaryAndIntermediateCatchEventStateImpl(final StateBehaviors stateBehaviors) {
+        super(stateBehaviors);
     }
 
     @Override

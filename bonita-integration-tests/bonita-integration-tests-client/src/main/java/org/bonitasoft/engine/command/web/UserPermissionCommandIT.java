@@ -94,20 +94,15 @@ public class UserPermissionCommandIT extends TestWithTechnicalUser {
         final ProcessDefinition processDef2 = deployAndEnableProcessWithActor(processBuilder2.done(), actorUsers2);
 
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put("USER_ID_KEY", d1.getId());
-        parameters.put("PROCESS_DEFINITION_ID_KEY", processDef1.getId());
-        Boolean canStartProcessDefinition = (Boolean) getCommandAPI().execute("canStartProcessDefinition", parameters);
-        assertTrue("User " + d1 + " should be allowed to start process " + processDef1, canStartProcessDefinition);
-
         parameters.put("USER_ID_KEY", manager.getId());
         parameters.put("PROCESS_DEFINITION_ID_KEY", processDef1.getId());
-        canStartProcessDefinition = (Boolean) getCommandAPI().execute("canStartProcessDefinition", parameters);
+        Boolean canStartProcessDefinition = (Boolean) getCommandAPI().execute("canStartProcessDefinition", parameters);
         assertTrue(canStartProcessDefinition);
 
         parameters.put("USER_ID_KEY", manager.getId());
         parameters.put("PROCESS_DEFINITION_ID_KEY", processDef2.getId());
         canStartProcessDefinition = (Boolean) getCommandAPI().execute("canStartProcessDefinition", parameters);
-        assertTrue("Manager should be allowed to start process " + processDef1, canStartProcessDefinition);
+        assertTrue(canStartProcessDefinition);
 
         parameters.put("USER_ID_KEY", d2.getId());
         parameters.put("PROCESS_DEFINITION_ID_KEY", processDef2.getId());

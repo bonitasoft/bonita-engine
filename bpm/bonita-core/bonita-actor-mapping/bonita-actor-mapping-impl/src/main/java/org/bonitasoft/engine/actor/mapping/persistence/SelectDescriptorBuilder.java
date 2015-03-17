@@ -16,13 +16,11 @@ package org.bonitasoft.engine.actor.mapping.persistence;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
-import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -47,8 +45,8 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<SActor>("getActorFromNameAndScopeId", parameters, SActor.class);
     }
 
-    public static SelectByIdDescriptor<SActorMember> getActorMember(final long actorMemberId) {
-        return new SelectByIdDescriptor<SActorMember>("getActorMemberById", SActorMember.class, actorMemberId);
+    public static SelectByIdDescriptor<SActorMember> getActorMember(final long actorMmeberId) {
+        return new SelectByIdDescriptor<SActorMember>("getActorMemberById", SActorMember.class, actorMmeberId);
     }
 
     public static SelectOneDescriptor<SActorMember> getActorMember(final long actorId, final long userId, final long groupId, final long roleId) {
@@ -93,24 +91,27 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SActorMember>("getActorMembersOfUser", parameters, SActorMember.class, queryOptions);
     }
 
-    public static SelectListDescriptor<Long> getActorMembersInitiatorForProcess(final long processDefinitionId, final int index,
+    public static SelectListDescriptor<SActorMember> getActorMembersForUserOrManaged(final long userId, final long processInstanceId, final int index,
             final int numberPerPage) {
-        final Map<String, Object> parameters = new HashMap<String, Object>(1);
-        parameters.put("processDefinitionId", processDefinitionId);
-        final QueryOptions queryOptions = new QueryOptions(index, numberPerPage, SActorMember.class, "id", OrderByType.ASC);
-        return new SelectListDescriptor<Long>("getActorMembersInitiatorForProcess", parameters, SActorMember.class, queryOptions);
-    }
-
-    public static SelectOneDescriptor<Long> getNumberOfUserMembersForUserOrManagerForActorMembers(final long userId, final List<Long> actorMemberIds) {
-        final Map<String, Object> parameters = new HashMap<String, Object>(2);
+        final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("userId", userId);
-        parameters.put("actorMemberIds", actorMemberIds);
-        return new SelectOneDescriptor<Long>("getNumberOfUserMembersForUserOrManagerForActorMembers", parameters, SUserMembership.class);
+        parameters.put("processInstanceId", processInstanceId);
+        final QueryOptions queryOptions = new QueryOptions(index, numberPerPage, SActorMember.class, "id", OrderByType.ASC);
+        return new SelectListDescriptor<SActorMember>("getActorMembersForUserOrManaged", parameters, SActorMember.class, queryOptions);
     }
 
     public static SelectListDescriptor<SActor> getActorsOfScope(final long scopeId, final QueryOptions queryOptions) {
         final Map<String, Object> parameters = Collections.singletonMap("scopeId", (Object) scopeId);
         return new SelectListDescriptor<SActor>("getActorsOfScope", parameters, SActor.class, queryOptions);
+    }
+
+    public static SelectListDescriptor<SActor> getActorsOfUserCanStartProcessDefinition(final long userId, final long processDefinitionId, final int fromIndex,
+            final int numberOfElements) {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("userId", userId);
+        parameters.put("processDefinitionId", processDefinitionId);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements);
+        return new SelectListDescriptor<SActor>("getActorsOfUserCanStartProcessDefinition", parameters, SActor.class, queryOptions);
     }
 
     public static <T extends PersistentObject> SelectListDescriptor<T> getElementsByIds(final Class<T> clazz, final String elementName,

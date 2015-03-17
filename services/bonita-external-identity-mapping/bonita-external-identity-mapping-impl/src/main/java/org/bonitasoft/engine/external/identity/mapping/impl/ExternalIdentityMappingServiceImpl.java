@@ -94,7 +94,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
                         .setObject(externalIdentityMapping).done();
             }
             recorder.recordInsert(insertRecord, insertEvent);
-            log(externalIdentityMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "createExternalIdentityMapping");
+            initiateLogBuilder(externalIdentityMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "createExternalIdentityMapping");
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createExternalIdentityMapping"));
             }
@@ -103,7 +103,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createExternalIdentityMapping", re));
             }
-            log(externalIdentityMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createExternalIdentityMapping");
+            initiateLogBuilder(externalIdentityMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createExternalIdentityMapping");
             throw new SExternalIdentityMappingCreationException(re);
         }
     }
@@ -196,7 +196,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
         final SExternalIdentityMappingLogBuilder queriableLog = getQueriableLog(ActionType.DELETED, "deleting external identity mapping");
         try {
             recorder.recordDelete(record, deleteEvent);
-            log(externalIdentityMapping.getId(), SQueriableLog.STATUS_OK, queriableLog, "deleteExternalIdentityMapping");
+            initiateLogBuilder(externalIdentityMapping.getId(), SQueriableLog.STATUS_OK, queriableLog, "deleteExternalIdentityMapping");
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteExternalIdentityMapping"));
             }
@@ -204,7 +204,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteExternalIdentityMapping", e));
             }
-            log(externalIdentityMapping.getId(), SQueriableLog.STATUS_FAIL, queriableLog, "deleteExternalIdentityMapping");
+            initiateLogBuilder(externalIdentityMapping.getId(), SQueriableLog.STATUS_FAIL, queriableLog, "deleteExternalIdentityMapping");
             throw new SExternalIdentityMappingDeletionException("Can't delete process external identity mapping " + externalIdentityMapping, e);
         }
     }
@@ -346,7 +346,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
         }
     }
 
-    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);

@@ -71,8 +71,4 @@ public class FlowNodeSelector {
     public long getSubProcessDefinitionId() {
         return subProcessDefinitionId;
     }
-
-    public Filter<SFlowNodeDefinition> getSelector() {
-        return selector;
-    }
 }

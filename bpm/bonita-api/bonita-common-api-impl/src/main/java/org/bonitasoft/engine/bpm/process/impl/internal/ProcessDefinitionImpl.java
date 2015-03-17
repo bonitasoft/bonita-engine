@@ -88,9 +88,7 @@ public class ProcessDefinitionImpl extends NamedElementImpl implements ProcessDe
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append("ProcessDefinitionImpl [name=");
-        builder.append(getName());
-        builder.append(", version=");
+        builder.append("ProcessDefinitionImpl [version=");
         builder.append(version);
         builder.append(", description=");
         builder.append(description);

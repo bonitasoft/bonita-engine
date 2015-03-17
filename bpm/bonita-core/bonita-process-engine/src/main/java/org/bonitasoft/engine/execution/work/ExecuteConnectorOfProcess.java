@@ -28,7 +28,6 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SEndEventDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowErrorEventTriggerDefinitionBuilderFactory;
@@ -42,7 +41,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.execution.Filter;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.StartFlowNodeFilter;
@@ -64,25 +62,17 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     private final ConnectorEvent activationEvent;
 
-    private final Filter<SFlowNodeDefinition> filter;
-
-    private long subProcessDefinitionId;
+    private final FlowNodeSelector selectorForConnectorOnEnter;
 
     ExecuteConnectorOfProcess(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
-                              final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent,
-                              final FlowNodeSelector flowNodeSelector) {
+            final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent,
+            final FlowNodeSelector selectorForConnectorOnEnter) {
         super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(processInstanceId,
                 DataInstanceContainer.PROCESS_INSTANCE.name(), processDefinitionId));
         this.processInstanceId = processInstanceId;
         this.rootProcessInstanceId = rootProcessInstanceId;
         this.activationEvent = activationEvent;
-        if(flowNodeSelector != null){
-            this.filter = flowNodeSelector.getSelector();
-            this.subProcessDefinitionId = flowNodeSelector.getSubProcessDefinitionId();
-        }else{
-            this.filter = null;
-            this.subProcessDefinitionId = -1;
-        }
+        this.selectorForConnectorOnEnter = selectorForConnectorOnEnter;
     }
 
     @Override
@@ -100,13 +90,13 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
-        Filter<SFlowNodeDefinition> filterToUse = filter != null ? filter : new StartFlowNodeFilter();
-        FlowNodeSelector flowNodeSelector = new FlowNodeSelector(sProcessDefinition, filterToUse, subProcessDefinitionId);
         final boolean connectorTriggered = processExecutor.executeConnectors(sProcessDefinition, intTxProcessInstance, activationEvent,
-                flowNodeSelector);
+                selectorForConnectorOnEnter);
         if (!connectorTriggered) {
             if (activationEvent == ConnectorEvent.ON_ENTER) {
-                processExecutor.startElements(intTxProcessInstance, flowNodeSelector);
+                final FlowNodeSelector selector = selectorForConnectorOnEnter != null ? selectorForConnectorOnEnter : new FlowNodeSelector(sProcessDefinition,
+                        new StartFlowNodeFilter());
+                processExecutor.startElements(intTxProcessInstance, selector);
             } else {
                 processExecutor.handleProcessCompletion(sProcessDefinition, intTxProcessInstance, false);
             }

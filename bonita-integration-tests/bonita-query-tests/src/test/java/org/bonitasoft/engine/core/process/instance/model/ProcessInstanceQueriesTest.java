@@ -13,17 +13,18 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.SupervisorBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
+import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
+import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.aCallActivityInstanceBuilder;
+import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
+import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
+import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
+import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
+import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -614,73 +615,6 @@ public class ProcessInstanceQueriesTest {
         assertEquals(processInstanceWithFailedFlowNode, failedSProcessInstance.get(0));
     }
 
-    @Test
-    public void getNumberOfSProcessInstanceFailedAndSupervisedBy_should_return_number_of_distinct_process_instances() {
-        // Given
-        final long userId = 2L;
-        repository.add(buildFailedProcessInstance(1));
-        repository.add(aSupervisor().withProcessDefinitionId(9L).withUserId(userId).build());
-
-        repository.add(aProcessInstance().withProcessDefinitionId(8L).withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
-        repository.add(aSupervisor().withProcessDefinitionId(8L).withUserId(userId).build());
-
-        SProcessInstanceImpl processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 10L);
-        processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        repository.add(processInstanceWithFailedFlowNode);
-        repository.add(buildFailedGateway(852, processInstanceWithFailedFlowNode.getId()));
-        repository.add(buildFailedProcessInstance(3, 11L));
-
-        processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 15L);
-        processInstanceWithFailedFlowNode.setId(4);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        repository.add(processInstanceWithFailedFlowNode);
-        repository.add(buildFailedGateway(853, processInstanceWithFailedFlowNode.getId()));
-        repository.add(buildStartedProcessInstance(5, 15L));
-        repository.add(aSupervisor().withProcessDefinitionId(15L).withUserId(userId).build());
-
-        // When
-        final long numberOfSProcessInstanceFailed = repository.getNumberOfFailedSProcessInstanceSupervisedBy(userId);
-
-        // Then
-        assertEquals(2, numberOfSProcessInstanceFailed);
-    }
-
-    @Test
-    public void getSProcessInstanceFailedAndSupervisedBy_should_return_number_of_distinct_process_instances() {
-        // Given
-        final long userId = 2L;
-        repository.add(buildFailedProcessInstance(1));
-        repository.add(aSupervisor().withProcessDefinitionId(9L).withUserId(userId).build());
-
-        repository.add(aProcessInstance().withProcessDefinitionId(8L).withContainerId(1).withName("test Parent Process Instance")
-                .withStateId(ProcessInstanceState.STARTED.getId()).build());
-        repository.add(aSupervisor().withProcessDefinitionId(8L).withUserId(userId).build());
-
-        SProcessInstanceImpl processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 10L);
-        processInstanceWithFailedFlowNode.setId(2);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        repository.add(processInstanceWithFailedFlowNode);
-        repository.add(buildFailedGateway(852, processInstanceWithFailedFlowNode.getId()));
-        repository.add(buildFailedProcessInstance(3, 11L));
-
-        processInstanceWithFailedFlowNode = new SProcessInstanceImpl("process2", 15L);
-        processInstanceWithFailedFlowNode.setId(4);
-        processInstanceWithFailedFlowNode.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        repository.add(processInstanceWithFailedFlowNode);
-        repository.add(buildFailedGateway(853, processInstanceWithFailedFlowNode.getId()));
-        repository.add(buildStartedProcessInstance(5, 15L));
-        repository.add(aSupervisor().withProcessDefinitionId(15L).withUserId(userId).build());
-
-        // When
-        final List<SProcessInstance> sProcessInstanceFailedList = repository.searchFailedSProcessInstanceSupervisedBy(userId);
-
-        // Then
-        assertThat(sProcessInstanceFailedList).hasSize(2).extracting("id").contains(1L, 4L);
-
-    }
-
     private SGatewayInstanceImpl buildFailedGateway(final long gatewayId, final long parentProcessInstanceId) {
         final SGatewayInstanceImpl sGatewayInstanceImpl = new SGatewayInstanceImpl();
         sGatewayInstanceImpl.setId(gatewayId);
@@ -692,14 +626,6 @@ public class ProcessInstanceQueriesTest {
 
     private SProcessInstanceImpl buildFailedProcessInstance(final long processInstanceId) {
         return buildFailedProcessInstance(processInstanceId, 9L);
-    }
-
-    private SProcessInstanceImpl buildStartedProcessInstance(final long processInstanceId, final long processDefinitionId) {
-        final SProcessInstanceImpl sProcessInstance = new SProcessInstanceImpl("process" + processInstanceId, processDefinitionId);
-        sProcessInstance.setId(processInstanceId);
-        sProcessInstance.setStateId(ProcessInstanceState.STARTED.getId());
-        sProcessInstance.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        return sProcessInstance;
     }
 
     private SProcessInstanceImpl buildFailedProcessInstance(final long processInstanceId, final long processDefinitionId) {

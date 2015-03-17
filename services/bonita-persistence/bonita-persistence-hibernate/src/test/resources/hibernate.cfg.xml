@@ -18,7 +18,7 @@
         <!-- Disable the second-level cache -->
         <property name="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
         <!-- Echo all executed SQL to stdout -->
-        <property name="hibernate.show_sql">false</property>
+        <property name="hibernate.show_sql">true</property>
         <!-- Drop and re-create the database schema on startup -->
         <property name="hibernate.hbm2ddl.auto">create</property>
         <mapping resource="org/bonitasoft/engine/persistence/Book.hbm.xml" />

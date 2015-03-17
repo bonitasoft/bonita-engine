@@ -212,6 +212,7 @@ public class SelectDescriptorBuilder {
     public static SelectOneDescriptor<Long> getNumberOfChildInstancesOfProcessInstance(final long processInstanceId) {
         final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
         return new SelectOneDescriptor<Long>("getNumberOfChildInstancesOfProcessInstance", parameters, SProcessInstance.class, Long.class);
+
     }
 
     public static SelectListDescriptor<SWaitingErrorEvent> getCaughtError(final long relatedActivityInstanceId, final QueryOptions queryOptions) {
