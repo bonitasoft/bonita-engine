@@ -98,6 +98,7 @@
         <constructor-arg name="commentService" ref="commentService"/>
         <constructor-arg name="stateBehaviors" ref="stateBehaviors"/>
         <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter"/>
+        <constructor-arg name="classLoaderService" ref="classLoaderService"/>
     </bean>
 
     <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
@@ -35,9 +36,9 @@ public class AbortingCallActivityStateImpl extends EndingCallActivityExceptionSt
     public AbortingCallActivityStateImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
             final ContainerRegistry containerRegistry, final ArchiveService archiveService, final SCommentService commentService,
             final DataInstanceService dataInstanceService, final DocumentService documentService, final TechnicalLoggerService logger,
-            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) {
+                                         final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) {
         super(activityInstanceService, processInstanceService, containerRegistry, archiveService, commentService, dataInstanceService, documentService,
-                logger, processDefinitionService, connectorInstanceService);
+                logger, processDefinitionService, connectorInstanceService, classLoaderService);
     }
 
     @Override
