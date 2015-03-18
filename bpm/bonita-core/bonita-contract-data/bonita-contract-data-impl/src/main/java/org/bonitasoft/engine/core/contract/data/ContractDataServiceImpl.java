@@ -76,34 +76,34 @@ public class ContractDataServiceImpl implements ContractDataService {
             return;
         }
         for (final Entry<String, Serializable> datum : data.entrySet()) {
-            addUserTaskData(new SContractData(datum.getKey(), datum.getValue(), userTaskId));
+            addUserTaskData(new STaskContractData(userTaskId, datum.getKey(), datum.getValue()));
         }
     }
 
-    protected void addUserTaskData(final SContractData contractData) throws SContractDataCreationException {
+    protected void addUserTaskData(final STaskContractData taskContractData) throws SContractDataCreationException {
         final SContractDataLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new user task contract data");
-        final InsertRecord insertRecord = new InsertRecord(contractData);
+        final InsertRecord insertRecord = new InsertRecord(taskContractData);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers("CONTRACT_DATA", EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent("CONTRACT_DATA").setObject(contractData).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent("CONTRACT_DATA").setObject(taskContractData).done();
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(contractData.getId(), SQueriableLog.STATUS_OK, logBuilder, "addUserTaskData");
+            initiateLogBuilder(taskContractData.getId(), SQueriableLog.STATUS_OK, logBuilder, "addUserTaskData");
         } catch (final SRecorderException re) {
-            initiateLogBuilder(contractData.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addUserTaskData");
+            initiateLogBuilder(taskContractData.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addUserTaskData");
             throw new SContractDataCreationException(re);
         }
     }
 
     @Override
-    public Object getUserTaskDataValue(final long userTaskId, final String dataName) throws SContractDataNotFoundException, SBonitaReadException {
+    public Serializable getUserTaskDataValue(final long userTaskId, final String dataName) throws SContractDataNotFoundException, SBonitaReadException {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("name", dataName);
         parameters.put("scopeId", userTaskId);
-        final SelectOneDescriptor<SContractData> descriptor = new SelectOneDescriptor<SContractData>("getContractDataByUserTaskIdAndDataName", parameters,
-                SContractData.class);
-        final SContractData contractData = persistenceService.selectOne(descriptor);
+        final SelectOneDescriptor<STaskContractData> descriptor = new SelectOneDescriptor<STaskContractData>("getContractDataByUserTaskIdAndDataName",
+                parameters, STaskContractData.class);
+        final STaskContractData contractData = persistenceService.selectOne(descriptor);
         if (contractData == null) {
             throw new SContractDataNotFoundException("No contract data found named: " + dataName + " of user task: " + userTaskId);
         }
@@ -113,8 +113,8 @@ public class ContractDataServiceImpl implements ContractDataService {
     @Override
     public void deleteUserTaskData(final long userTaskId) throws SContractDataDeletionException {
         try {
-            final List<SContractData> contractData = getContractDataOfUserTask(userTaskId);
-            for (final SContractData data : contractData) {
+            final List<STaskContractData> contractData = getContractDataOfUserTask(userTaskId);
+            for (final STaskContractData data : contractData) {
                 deleteUserTaskData(data);
             }
         } catch (final SBonitaReadException sbre) {
@@ -122,11 +122,11 @@ public class ContractDataServiceImpl implements ContractDataService {
         }
     }
 
-    protected void deleteUserTaskData(final SContractData contractData) throws SContractDataDeletionException {
-        final DeleteRecord deleteRecord = new DeleteRecord(contractData);
+    protected void deleteUserTaskData(final STaskContractData taskContractData) throws SContractDataDeletionException {
+        final DeleteRecord deleteRecord = new DeleteRecord(taskContractData);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers("CONTRACT_DATA", EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("CONTRACT_DATA").setObject(contractData).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("CONTRACT_DATA").setObject(taskContractData).done();
         }
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
@@ -136,35 +136,40 @@ public class ContractDataServiceImpl implements ContractDataService {
     }
 
     @Override
-    public void archiveUserTaskData(final long userTaskId, final long archiveDate) throws SObjectModificationException {
+    public void archiveAndDeleteUserTaskData(final long userTaskId, final long archiveDate) throws SObjectModificationException {
         try {
-            final List<SContractData> contractData = getContractDataOfUserTask(userTaskId);
+            final List<STaskContractData> contractData = getContractDataOfUserTask(userTaskId);
             if (!contractData.isEmpty()) {
-                final ArchiveInsertRecord[] records = buildArchiveRecords(contractData);
+                final ArchiveInsertRecord[] records = buildArchiveUserTaskRecords(contractData);
                 archiveService.recordInserts(archiveDate, records);
+                for (STaskContractData taskContractData : contractData) {
+                    deleteUserTaskData(taskContractData);
+                }
             }
         } catch (final SBonitaException sbe) {
             throw new SObjectModificationException(sbe);
         }
     }
 
-    private ArchiveInsertRecord[] buildArchiveRecords(final List<SContractData> contractData) {
-        final ArchiveInsertRecord[] records = new ArchiveInsertRecord[contractData.size()];
+    private ArchiveInsertRecord[] buildArchiveUserTaskRecords(final List<STaskContractData> taskContractData) {
+        final ArchiveInsertRecord[] records = new ArchiveInsertRecord[taskContractData.size()];
         int i = 0;
-        for (final SContractData data : contractData) {
-            final SAContractData aData = new SAContractData(data);
-            records[i] = new ArchiveInsertRecord(aData);
-            i++;
+        for (final STaskContractData data : taskContractData) {
+            if (data != null) {
+                final SATaskContractData aData = new SATaskContractData(data);
+                records[i] = new ArchiveInsertRecord(aData);
+                i++;
+            }
         }
         return records;
     }
 
-    private List<SContractData> getContractDataOfUserTask(final long userTaskId) throws SBonitaReadException {
+    private List<STaskContractData> getContractDataOfUserTask(final long userTaskId) throws SBonitaReadException {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("scopeId", userTaskId);
         final QueryOptions queryOptions = new QueryOptions(0, 10000);
-        final SelectListDescriptor<SContractData> descriptor = new SelectListDescriptor<SContractData>("getContractDataByUserTaskId", parameters,
-                SContractData.class, queryOptions);
+        final SelectListDescriptor<STaskContractData> descriptor = new SelectListDescriptor<STaskContractData>("getContractDataByUserTaskId", parameters,
+                STaskContractData.class, queryOptions);
         return persistenceService.selectList(descriptor);
     }
 
@@ -194,18 +199,138 @@ public class ContractDataServiceImpl implements ContractDataService {
     }
 
     @Override
-    public Object getArchivedUserTaskDataValue(final long userTaskId, final String dataName) throws SContractDataNotFoundException, SBonitaReadException {
+    public Serializable getArchivedUserTaskDataValue(final long userTaskId, final String dataName) throws SContractDataNotFoundException, SBonitaReadException {
         final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("scopeId", userTaskId);
         parameters.put("name", dataName);
-        final SelectOneDescriptor<SAContractData> descriptor = new SelectOneDescriptor<SAContractData>("getArchivedContractDataByUserTaskIdAndDataName",
-                parameters, SAContractData.class);
-        final SAContractData contractData = readPersistenceService.selectOne(descriptor);
+        final SelectOneDescriptor<SATaskContractData> descriptor = new SelectOneDescriptor<SATaskContractData>(
+                "getArchivedContractDataByUserTaskIdAndDataName", parameters, SATaskContractData.class);
+        final SATaskContractData contractData = readPersistenceService.selectOne(descriptor);
         if (contractData == null) {
             throw new SContractDataNotFoundException("No contract data found named: " + dataName + " of user task: " + userTaskId);
         }
         return contractData.getValue();
     }
 
+    @Override
+    public void addProcessData(final long processInstanceId, final Map<String, Serializable> data) throws SContractDataCreationException {
+        if (data == null) {
+            return;
+        }
+        for (final Entry<String, Serializable> datum : data.entrySet()) {
+            addProcessData(new SProcessContractData(processInstanceId, datum.getKey(), datum.getValue()));
+        }
+    }
+
+    protected void addProcessData(SProcessContractData processContractData) throws SContractDataCreationException {
+        final SContractDataLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new process contract data");
+        final InsertRecord insertRecord = new InsertRecord(processContractData);
+        SInsertEvent insertEvent = null;
+        if (eventService.hasHandlers("CONTRACT_DATA", EventActionType.CREATED)) {
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent("CONTRACT_DATA").setObject(processContractData)
+                    .done();
+        }
+        try {
+            recorder.recordInsert(insertRecord, insertEvent);
+            initiateLogBuilder(processContractData.getId(), SQueriableLog.STATUS_OK, logBuilder, "addProcessData");
+        } catch (final SRecorderException re) {
+            initiateLogBuilder(processContractData.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "addProcessData");
+            throw new SContractDataCreationException(re);
+        }
+    }
+
+    @Override
+    public Serializable getProcessDataValue(final long processInstanceId, final String dataName) throws SContractDataNotFoundException, SBonitaReadException {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("name", dataName);
+        parameters.put("scopeId", processInstanceId);
+        final SelectOneDescriptor<SProcessContractData> descriptor = new SelectOneDescriptor<>("getContractDataByProcessInstanceIdAndDataName", parameters,
+                SProcessContractData.class);
+        final SProcessContractData contractData = persistenceService.selectOne(descriptor);
+        if (contractData == null) {
+            throw new SContractDataNotFoundException("No contract data found named: " + dataName + " for process instance with id: " + processInstanceId);
+        }
+        return contractData.getValue();
+    }
+
+    @Override
+    public void deleteProcessData(final long processInstanceId) throws SContractDataDeletionException {
+        try {
+            final List<SProcessContractData> contractData = getContractDataOfProcess(processInstanceId);
+            for (final SProcessContractData data : contractData) {
+                deleteProcessData(data);
+            }
+        } catch (final SBonitaReadException sbre) {
+            throw new SContractDataDeletionException(sbre);
+        }
+    }
+
+    protected void deleteProcessData(final SProcessContractData processContractData) throws SContractDataDeletionException {
+        final DeleteRecord deleteRecord = new DeleteRecord(processContractData);
+        SDeleteEvent deleteEvent = null;
+        if (eventService.hasHandlers("CONTRACT_DATA", EventActionType.DELETED)) {
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("CONTRACT_DATA").setObject(processContractData)
+                    .done();
+        }
+        try {
+            recorder.recordDelete(deleteRecord, deleteEvent);
+        } catch (final SRecorderException sre) {
+            throw new SContractDataDeletionException(sre);
+        }
+    }
+
+    @Override
+    public void archiveAndDeleteProcessData(final long processInstanceId, final long archiveDate) throws SObjectModificationException {
+        try {
+            final List<SProcessContractData> contractData = getContractDataOfProcess(processInstanceId);
+            if (!contractData.isEmpty()) {
+                final ArchiveInsertRecord[] records = buildArchiveProcessRecords(contractData);
+                archiveService.recordInserts(archiveDate, records);
+                for (SProcessContractData processContractData : contractData) {
+                    deleteProcessData(processContractData);
+                }
+            }
+        } catch (final SBonitaException sbe) {
+            throw new SObjectModificationException(sbe);
+        }
+    }
+
+    private ArchiveInsertRecord[] buildArchiveProcessRecords(final List<SProcessContractData> processContractData) {
+        final ArchiveInsertRecord[] records = new ArchiveInsertRecord[processContractData.size()];
+        int i = 0;
+        for (final SProcessContractData data : processContractData) {
+            if (data != null) {
+                final SAProcessContractData aData = new SAProcessContractData(data);
+                records[i] = new ArchiveInsertRecord(aData);
+                i++;
+            }
+        }
+        return records;
+    }
+
+    private List<SProcessContractData> getContractDataOfProcess(final long processInstanceId) throws SBonitaReadException {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("scopeId", processInstanceId);
+        final QueryOptions queryOptions = new QueryOptions(0, 10000);
+        final SelectListDescriptor<SProcessContractData> descriptor = new SelectListDescriptor<>("getContractDataByProcessInstanceId",
+                parameters, SProcessContractData.class, queryOptions);
+        return persistenceService.selectList(descriptor);
+    }
+
+    @Override
+    public Serializable getArchivedProcessDataValue(final long processInstanceId, final String dataName) throws SContractDataNotFoundException,
+            SBonitaReadException {
+        final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("scopeId", processInstanceId);
+        parameters.put("name", dataName);
+        final SelectOneDescriptor<SAProcessContractData> descriptor = new SelectOneDescriptor<>(
+                "getArchivedContractDataByProcessInstanceIdAndDataName", parameters, SAProcessContractData.class);
+        final SAProcessContractData contractData = readPersistenceService.selectOne(descriptor);
+        if (contractData == null) {
+            throw new SContractDataNotFoundException("No contract data found named: " + dataName + " of process instance: " + processInstanceId);
+        }
+        return contractData.getValue();
+    }
 }

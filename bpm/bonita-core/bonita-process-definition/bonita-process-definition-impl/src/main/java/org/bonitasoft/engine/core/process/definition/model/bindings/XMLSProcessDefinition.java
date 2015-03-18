@@ -452,6 +452,10 @@ public class XMLSProcessDefinition {
             rootNode.addChild(initiatorNode);
             fillActorNode(initiatorNode, actorInitiator);
         }
+        final SContractDefinition contract = definition.getContract();
+        if (contract != null) {
+            rootNode.addChild(createContractNode(contract));
+        }
         return rootNode;
     }
 

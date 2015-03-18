@@ -27,14 +27,7 @@ import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.Serializable;
@@ -48,11 +41,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.DocumentAPI;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
+import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -61,12 +56,12 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.parser.JarDependencies;
@@ -118,6 +113,7 @@ import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.operation.LeftOperand;
@@ -139,6 +135,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
+import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -149,8 +146,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import com.google.common.collect.Lists;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessAPIImplTest {
@@ -1126,7 +1121,6 @@ public class ProcessAPIImplTest {
         processAPI.getUserTaskContractVariableValue(1983L, "id");
     }
 
-    @Test(expected = UserTaskNotFoundException.class)
     public void getUserTaskContractVariableValue_should_throw_an_exception_if_an_exception_occurs_when_getting_data() throws Exception {
         when(contractDataService.getArchivedUserTaskDataValue(1983L, "id")).thenThrow(new SContractDataNotFoundException("exception"));
 
@@ -1149,5 +1143,43 @@ public class ProcessAPIImplTest {
 
         final ArchivedProcessInstance archivedProcessInstance = processAPI.getArchivedProcessInstance(processInstanceId);
         assertThat(archivedProcessInstance).isEqualTo(archivedProcessInstanceMocked);
+    }
+
+    @Test
+    public void searchFailedProcessInstancesSupervisedBy_should_Return_ProcessInstances_And_Call_ProcessInstanceService() throws Exception {
+        final long userId = 0;
+        final ProcessInstance mockedProcessInstance = mock(ProcessInstance.class);
+        final IdentityService identityService = mock(IdentityService.class);
+        when(tenantAccessor.getIdentityService()).thenReturn(identityService);
+        doReturn(mock(GetSUser.class)).when(processAPI).createTxUserGetter(userId, identityService);
+
+        final SearchOptions searchOptions = mock(SearchOptions.class);
+        final SearchFailedProcessInstancesSupervisedBy searchFailedProcessInstancesSupervisedBy = mock(SearchFailedProcessInstancesSupervisedBy.class);
+        doReturn(searchFailedProcessInstancesSupervisedBy).when(processAPI).createSearchFailedProcessInstancesSupervisedBy(userId, searchOptions,
+                processInstanceService, searchEntitiesDescriptor, processDefinitionService);
+
+        final SearchResult<ProcessInstance> searchResult = mock(SearchResult.class);
+        when(searchFailedProcessInstancesSupervisedBy.getResult()).thenReturn(searchResult);
+
+        final SearchResult<ProcessInstance> failedProcessInstancesSupervisedBy = processAPI.searchFailedProcessInstancesSupervisedBy(userId,
+                searchOptions);
+        assertThat(failedProcessInstancesSupervisedBy).isEqualTo(searchResult);
+    }
+
+    @Test
+    public void searchFailedProcessInstancesSupervisedBy_should_Return_Empty_Result_When_User_Does_Not_Exist() throws Exception {
+        final long userId = 0;
+        final ProcessInstance mockedProcessInstance = mock(ProcessInstance.class);
+        final IdentityService identityService = mock(IdentityService.class);
+        when(tenantAccessor.getIdentityService()).thenReturn(identityService);
+        final GetSUser getSUser = mock(GetSUser.class);
+        doReturn(getSUser).when(processAPI).createTxUserGetter(userId, identityService);
+        doThrow(new SBonitaException() {
+        }).when(getSUser).execute();
+
+        final SearchResult<ProcessInstance> failedProcessInstancesSupervisedBy = processAPI.searchFailedProcessInstancesSupervisedBy(userId,
+                mock(SearchOptions.class));
+        assertThat(failedProcessInstancesSupervisedBy.getCount()).isEqualTo(0);
+        assertThat(failedProcessInstancesSupervisedBy.getResult()).hasSize(0);
     }
 }

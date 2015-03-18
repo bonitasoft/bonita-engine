@@ -18,9 +18,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -70,6 +72,8 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
 
     private SExpression stringIndexValue5;
 
+    private SContractDefinition contract;
+
     public SProcessDefinitionImpl(final DesignProcessDefinition processDefinition) {
         super(processDefinition.getName());
         description = processDefinition.getDescription();
@@ -98,7 +102,10 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
         if (actorInitiator != null) {
             sActorInitiator = new SActorDefinitionImpl(actorInitiator);
         }
-
+        final ContractDefinition contract = processDefinition.getContract();
+        if (contract != null) {
+            setContract(new SContractDefinitionImpl(contract));
+        }
         container = new SFlowElementContainerDefinitionImpl(this, processDefinition.getProcessContainer());
     }
 
@@ -240,4 +247,12 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
         return getProcessContainer().getConnectors().size() > 0;
     }
 
+    @Override
+    public SContractDefinition getContract() {
+        return contract;
+    }
+
+    public void setContract(SContractDefinition contract) {
+        this.contract = contract;
+    }
 }

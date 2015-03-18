@@ -129,7 +129,7 @@ public interface ExpressionExecutorStrategy {
      *            map containing the result of the evaluation of dependencies
      *            and also informations about the context of evaluation given by {@link #CONTAINER_ID_KEY} and {@link #CONTAINER_TYPE_KEY}
      * @return
-     *         an {@link ExpressionResult} having the result of the evaluation of the expression and the return type
+     *         the result of the evaluation of the expression of appropriate type
      * @throws SExpressionEvaluationException
      * @throws SExpressionDependencyMissingException
      */

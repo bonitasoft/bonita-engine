@@ -23,6 +23,7 @@
                 <value>/org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.hbm.xml</value>
+                <value>/org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
 
                 <value>/org/bonitasoft/engine/core/category/model/impl/hibernate/category.hbm.xml</value>
 
@@ -93,6 +94,11 @@
     </bean>
 
     <bean id="saDataInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.SADataInstanceRepository">
+        <constructor-arg ref="sessionFactory" />
+    </bean>
+
+
+    <bean id="userMembershipRepository" class="org.bonitasoft.engine.test.persistence.repository.UserMembershipRepository">
         <constructor-arg ref="sessionFactory" />
     </bean>
 
