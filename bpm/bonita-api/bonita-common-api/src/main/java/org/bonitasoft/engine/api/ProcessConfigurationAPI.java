@@ -17,6 +17,7 @@ import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -96,5 +97,5 @@ public interface ProcessConfigurationAPI {
      *         when there is an issue when updating the form mapping
      * @since 7.0.0
      */
-    void updateFormMapping(final long formMappingId, final String form, String target) throws FormMappingNotFoundException, UpdateException;
+    void updateFormMapping(final long formMappingId, final String form, FormMappingTarget target) throws FormMappingNotFoundException, UpdateException;
 }
