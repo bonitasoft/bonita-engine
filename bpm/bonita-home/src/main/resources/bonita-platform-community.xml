@@ -345,62 +345,11 @@
         <constructor-arg name="platformService" ref="platformService" />
     </bean>
 
-    <bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
-        <constructor-arg name="lockService" ref="lockService" />
-        <constructor-arg name="rangeSizes">
-            <map>
-                <!-- Most used objects: range size depends on process design -->
-                <entry key="70" value="2000" /><!-- Job description -->
-                <entry key="30" value="10000" /><!-- queriable log -->
-                <entry key="31" value="200000" /><!-- queriable log parameter -->
-                <entry key="10010" value="1000" /><!-- ProcessInstance -->
-                <entry key="10011" value="20000" /><!-- ActivityInstance --><!-- 20 step by process average -->
-                <entry key="10013" value="20000" /><!-- TransitoinInstance --><!-- same as activity instance -->
-                <entry key="10014" value="20000" /><!-- ConnectorInstance --><!-- same as activity instance -->
-                <entry key="20010" value="3000" /><!-- archived ProcessInstance --><!-- Process instance * nb state -->
-                <entry key="20011" value="80000" /><!-- archived ActivityInstance --><!-- Activity instance * average nb state -->
-                <entry key="20012" value="40000" /><!-- archived TransitionInstance --><!-- transition instance * nb state -->
-                <entry key="10015" value="4000" /><!-- EventTriggerInstance --><!-- 1/5 of activity -->
-                <entry key="10016" value="4000" /><!-- WaitingEvent --><!-- 1/5 of activity -->
-                <entry key="10017" value="4000" /><!-- MessageInstance --><!-- 1/5 of activity -->
-                <entry key="10018" value="4000" /><!-- PendingActivityMapping --><!-- 1/5 of activity -->
-                <entry key="10020" value="5000" /><!-- data -->
-                <entry key="20050" value="25000" /><!-- archived data --><!-- 5 change by data -->
-                <entry key="10060" value="20000" /><!-- comment -->
-                <entry key="10080" value="20000" /><!-- SAComment -->
-
-                <!-- less used objects : -->
-                <!-- <entry key="10012" value="100" />ProcessDefinition -->
-                <!-- <entry key="20" value="100" />user -->
-                <!-- <entry key="21" value="100" />group -->
-                <!-- <entry key="22" value="100" />role -->
-                <!-- <entry key="23" value="100" />user_memebership -->
-                <!-- <entry key="24" value="100" />P-metadata_def -->
-                <!-- <entry key="25" value="100" />P-metadata_val -->
-                <!-- <entry key="26" value="100" />user_contactinfo -->
-                <!-- <entry key="60" value="100" />employee -->
-                <!-- <entry key="61" value="100" />laptop -->
-                <!-- <entry key="62" value="100" />address -->
-                <!-- <entry key="63" value="100" />project -->
-                <!-- <entry key="64" value="100" />employeeprojectmapping -->
-                <!-- <entry key="65" value="100" />saemployee -->
-                <!-- <entry key="70" value="100" />jobDescriptor -->
-                <!-- <entry key="71" value="100" />jobParameter -->
-                <!-- <entry key="90" value="100" />command -->
-                <!-- <entry key="4" value="100" />platform command -->
-                <!-- <entry key="10000" value="100" />actor -->
-                <!-- <entry key="10001" value="100" />actorMapping -->
-                <!-- <entry key="10030" value="100" />category -->
-                <!-- <entry key="10040" value="100" />SDocumentMapping -->
-                <!-- <entry key="10050" value="100" />supervisor -->
-                <!-- <entry key="10070" value="100" />ExternalIdentityMapping -->
-                <!-- <entry key="10090" value="100" />document_content -->
-                <!-- <entry key="10096" value="100" />RefBusinessDataInstance -->
-                <!-- <entry key="20040" value="100" />SADocumentMapping -->
-            </map>
-        </constructor-arg>
-        <constructor-arg name="defaultRangeSize" value="100" />
-        <constructor-arg name="sequencesMappings">
+    <bean id="communitySequenceMappings" class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="targetMapClass">
+            <value>java.util.HashMap</value>
+        </property>
+        <property name="sourceMap">
             <map>
                 <!-- platform -->
                 <entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="0" />
@@ -528,7 +477,76 @@
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" value="20050" />
                 <entry key="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" value="20040" />
             </map>
+        </property>
+    </bean>
+
+    <bean id="sequenceMappings" parent="communitySequenceMappings" class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="targetMapClass">
+            <value>java.util.HashMap</value>
+        </property>
+        <property name="sourceMap">
+            <map merge="true">
+
+            </map>
+        </property>
+    </bean>
+
+    <bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
+        <constructor-arg name="lockService" ref="lockService" />
+        <constructor-arg name="rangeSizes">
+            <map>
+                <!-- Most used objects: range size depends on process design -->
+                <entry key="70" value="2000" /><!-- Job description -->
+                <entry key="30" value="10000" /><!-- queriable log -->
+                <entry key="31" value="200000" /><!-- queriable log parameter -->
+                <entry key="10010" value="1000" /><!-- ProcessInstance -->
+                <entry key="10011" value="20000" /><!-- ActivityInstance --><!-- 20 step by process average -->
+                <entry key="10013" value="20000" /><!-- TransitoinInstance --><!-- same as activity instance -->
+                <entry key="10014" value="20000" /><!-- ConnectorInstance --><!-- same as activity instance -->
+                <entry key="20010" value="3000" /><!-- archived ProcessInstance --><!-- Process instance * nb state -->
+                <entry key="20011" value="80000" /><!-- archived ActivityInstance --><!-- Activity instance * average nb state -->
+                <entry key="20012" value="40000" /><!-- archived TransitionInstance --><!-- transition instance * nb state -->
+                <entry key="10015" value="4000" /><!-- EventTriggerInstance --><!-- 1/5 of activity -->
+                <entry key="10016" value="4000" /><!-- WaitingEvent --><!-- 1/5 of activity -->
+                <entry key="10017" value="4000" /><!-- MessageInstance --><!-- 1/5 of activity -->
+                <entry key="10018" value="4000" /><!-- PendingActivityMapping --><!-- 1/5 of activity -->
+                <entry key="10020" value="5000" /><!-- data -->
+                <entry key="20050" value="25000" /><!-- archived data --><!-- 5 change by data -->
+                <entry key="10060" value="20000" /><!-- comment -->
+                <entry key="10080" value="20000" /><!-- SAComment -->
+
+                <!-- less used objects : -->
+                <!-- <entry key="10012" value="100" />ProcessDefinition -->
+                <!-- <entry key="20" value="100" />user -->
+                <!-- <entry key="21" value="100" />group -->
+                <!-- <entry key="22" value="100" />role -->
+                <!-- <entry key="23" value="100" />user_memebership -->
+                <!-- <entry key="24" value="100" />P-metadata_def -->
+                <!-- <entry key="25" value="100" />P-metadata_val -->
+                <!-- <entry key="26" value="100" />user_contactinfo -->
+                <!-- <entry key="60" value="100" />employee -->
+                <!-- <entry key="61" value="100" />laptop -->
+                <!-- <entry key="62" value="100" />address -->
+                <!-- <entry key="63" value="100" />project -->
+                <!-- <entry key="64" value="100" />employeeprojectmapping -->
+                <!-- <entry key="65" value="100" />saemployee -->
+                <!-- <entry key="70" value="100" />jobDescriptor -->
+                <!-- <entry key="71" value="100" />jobParameter -->
+                <!-- <entry key="90" value="100" />command -->
+                <!-- <entry key="4" value="100" />platform command -->
+                <!-- <entry key="10000" value="100" />actor -->
+                <!-- <entry key="10001" value="100" />actorMapping -->
+                <!-- <entry key="10030" value="100" />category -->
+                <!-- <entry key="10040" value="100" />SDocumentMapping -->
+                <!-- <entry key="10050" value="100" />supervisor -->
+                <!-- <entry key="10070" value="100" />ExternalIdentityMapping -->
+                <!-- <entry key="10090" value="100" />document_content -->
+                <!-- <entry key="10096" value="100" />RefBusinessDataInstance -->
+                <!-- <entry key="20040" value="100" />SADocumentMapping -->
+            </map>
         </constructor-arg>
+        <constructor-arg name="defaultRangeSize" value="100" />
+        <constructor-arg name="sequencesMappings" ref="sequenceMappings"/>
         <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
         <constructor-arg name="retries" value="9" />
         <constructor-arg name="delay" value="10" />
