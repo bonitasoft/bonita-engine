@@ -21,7 +21,6 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.springframework.core.env.PropertiesPropertySource;
 
 /**
  * @author Matthieu Chaffotte
@@ -55,8 +54,8 @@ public class SpringPlatformFileSystemBeanAccessor {
 
     public static synchronized void initializeContext(final ClassLoader classLoader) {
         if (context == null) {// synchronized null check
-            SpringSessionAccessorFileSystemBeanAcessor.initializeContext(classLoader);
-            final FileSystemXmlApplicationContext sessionContext = SpringSessionAccessorFileSystemBeanAcessor.getContext();
+            SpringPlatformInitFileSystemBeanAcessor.initializeContext(classLoader);
+            final FileSystemXmlApplicationContext sessionContext = SpringPlatformInitFileSystemBeanAcessor.getContext();
             context = new AbsoluteFileSystemXmlApplicationContext(getResources(), sessionContext);
 
             PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();

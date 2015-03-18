@@ -25,7 +25,7 @@
     /**
      * @author Matthieu Chaffotte
      */
-    public class SpringSessionAccessorFileSystemBeanAcessor {
+    public class SpringPlatformInitFileSystemBeanAcessor {
 
         private static AbsoluteFileSystemXmlApplicationContext context;
 

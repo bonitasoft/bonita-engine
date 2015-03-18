@@ -18,13 +18,13 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * @author Matthieu Chaffotte
  */
-public class SpringSessionAccessor implements SessionAccessorAccessor {
+public class SpringPlatformInitServiceAccessor implements SessionAccessorAccessor {
 
-    private static final SessionAccessorAccessor instance = new SpringSessionAccessor();
+    private static final SessionAccessorAccessor instance = new SpringPlatformInitServiceAccessor();
 
     private static SessionAccessor sessionAccessor;
 
-    public SpringSessionAccessor() {
+    public SpringPlatformInitServiceAccessor() {
 
     }
 
@@ -35,14 +35,14 @@ public class SpringSessionAccessor implements SessionAccessorAccessor {
     @Override
     public SessionAccessor getSessionAccessor() {
         if (sessionAccessor == null) {
-            sessionAccessor = SpringSessionAccessorFileSystemBeanAcessor.getSessionAccessor();
+            sessionAccessor = SpringPlatformInitFileSystemBeanAcessor.getSessionAccessor();
         }
         return sessionAccessor;
     }
 
     @Override
     public void destroy() {
-        SpringSessionAccessorFileSystemBeanAcessor.destroy();
+        SpringPlatformInitFileSystemBeanAcessor.destroy();
 
     }
 
