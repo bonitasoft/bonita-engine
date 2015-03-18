@@ -59,6 +59,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.ContractDataNotFoundException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
@@ -2515,19 +2516,28 @@ public interface ProcessRuntimeAPI {
      * @param name
      *        The name of the variable
      * @return The identifier of the user task
-     * @throws UserTaskNotFoundException
-     *         if identifier does not refer to a real user task.
+     * @throws ContractDataNotFoundException if no data found for the given user task instance and name.
      */
-    Serializable getUserTaskContractVariableValue(long userTaskInstanceId, String name) throws UserTaskNotFoundException;
+    Serializable getUserTaskContractVariableValue(long userTaskInstanceId, String name) throws ContractDataNotFoundException;
 
     /**
-     * Gets the value of a process instanciation input.
+     * Gets the value of a process instantiation input, during the phase of initializing. For instance, if a connector on_enter fails, this method can be called
+     * to check the current value.
      *
      * @param processInstanceId The identifier of the process instance
      * @param name The name of the process input to retrieve
      * @return The identifier of the user task
-     * @throws ProcessInstanceNotFoundException if identifier does not refer to an existing process instance.
+     * @throws ContractDataNotFoundException if no data found for the given process instance and name.
      */
-    Serializable getProcessInstanciationInputValue(long processInstanceId, String name) throws ProcessInstanceNotFoundException;
+    Serializable getProcessInputValueDuringInitialization(long processInstanceId, String name) throws ContractDataNotFoundException;
 
+    /**
+     * Gets the value of a process instantiation input, after initialization has finished. Requires Archiving feature to be enabled (default behaviour).
+     *
+     * @param processInstanceId The identifier of the process instance
+     * @param name The name of the process input to retrieve
+     * @return The identifier of the user task
+     * @throws ContractDataNotFoundException if identifier does not refer to an existing process instance.
+     */
+    Serializable getProcessInputValueAfterInitialization(long processInstanceId, String name) throws ContractDataNotFoundException;
 }

@@ -136,12 +136,15 @@ public class ContractDataServiceImpl implements ContractDataService {
     }
 
     @Override
-    public void archiveUserTaskData(final long userTaskId, final long archiveDate) throws SObjectModificationException {
+    public void archiveAndDeleteUserTaskData(final long userTaskId, final long archiveDate) throws SObjectModificationException {
         try {
             final List<STaskContractData> contractData = getContractDataOfUserTask(userTaskId);
             if (!contractData.isEmpty()) {
                 final ArchiveInsertRecord[] records = buildArchiveUserTaskRecords(contractData);
                 archiveService.recordInserts(archiveDate, records);
+                for (STaskContractData taskContractData : contractData) {
+                    deleteUserTaskData(taskContractData);
+                }
             }
         } catch (final SBonitaException sbe) {
             throw new SObjectModificationException(sbe);
@@ -278,12 +281,15 @@ public class ContractDataServiceImpl implements ContractDataService {
     }
 
     @Override
-    public void archiveProcessData(final long processInstanceId, final long archiveDate) throws SObjectModificationException {
+    public void archiveAndDeleteProcessData(final long processInstanceId, final long archiveDate) throws SObjectModificationException {
         try {
             final List<SProcessContractData> contractData = getContractDataOfProcess(processInstanceId);
             if (!contractData.isEmpty()) {
                 final ArchiveInsertRecord[] records = buildArchiveProcessRecords(contractData);
                 archiveService.recordInserts(archiveDate, records);
+                for (SProcessContractData processContractData : contractData) {
+                    deleteProcessData(processContractData);
+                }
             }
         } catch (final SBonitaException sbe) {
             throw new SObjectModificationException(sbe);

@@ -172,7 +172,7 @@ public class ContractDataServiceImplTest {
         archivedata[1] = new ArchiveInsertRecord(new SATaskContractData(scd2));
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
 
-        contractDataService.archiveUserTaskData(usertTaskId, time);
+        contractDataService.archiveAndDeleteUserTaskData(usertTaskId, time);
 
         verify(archiveService).recordInserts(time, archivedata);
     }
@@ -184,7 +184,7 @@ public class ContractDataServiceImplTest {
         final List<STaskContractData> data = new ArrayList<STaskContractData>();
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
 
-        contractDataService.archiveUserTaskData(usertTaskId, time);
+        contractDataService.archiveAndDeleteUserTaskData(usertTaskId, time);
 
         verifyZeroInteractions(archiveService);
     }
@@ -195,7 +195,7 @@ public class ContractDataServiceImplTest {
         final long time = 1010101010101001L;
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
 
-        contractDataService.archiveUserTaskData(usertTaskId, time);
+        contractDataService.archiveAndDeleteUserTaskData(usertTaskId, time);
     }
 
     @Test
@@ -329,7 +329,7 @@ public class ContractDataServiceImplTest {
         archivedata[1] = new ArchiveInsertRecord(new SAProcessContractData(scd2));
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
 
-        contractDataService.archiveProcessData(processInstanceId, time);
+        contractDataService.archiveAndDeleteProcessData(processInstanceId, time);
 
         verify(archiveService).recordInserts(time, archivedata);
     }
@@ -341,7 +341,7 @@ public class ContractDataServiceImplTest {
         final List<SProcessContractData> data = new ArrayList<SProcessContractData>();
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(data);
 
-        contractDataService.archiveProcessData(usertProcessId, time);
+        contractDataService.archiveAndDeleteProcessData(usertProcessId, time);
 
         verifyZeroInteractions(archiveService);
     }
@@ -352,7 +352,7 @@ public class ContractDataServiceImplTest {
         final long time = 1010101010101001L;
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("exception"));
 
-        contractDataService.archiveProcessData(usertProcessId, time);
+        contractDataService.archiveAndDeleteProcessData(usertProcessId, time);
     }
 
     @Test

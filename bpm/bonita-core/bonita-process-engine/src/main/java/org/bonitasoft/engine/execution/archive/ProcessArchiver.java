@@ -205,7 +205,8 @@ public class ProcessArchiver {
             final long processInstanceId = processInstance.getId();
             final int archiveBatchSize = 50;
             int currentIndex = 0;
-            List<SDataInstance> sDataInstances = dataInstanceService.getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,
+            List<SDataInstance> sDataInstances = dataInstanceService.getLocalDataInstances(processInstanceId,
+                    DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,
                     archiveBatchSize);
 
             while (sDataInstances != null && sDataInstances.size() > 0) {
@@ -213,7 +214,8 @@ public class ProcessArchiver {
                     dataInstanceService.archiveDataInstance(sDataInstance, archiveDate);
                 }
                 currentIndex += archiveBatchSize;
-                sDataInstances = dataInstanceService.getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex, archiveBatchSize);
+                sDataInstances = dataInstanceService.getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,
+                        archiveBatchSize);
             }
         } catch (final SDataInstanceException e) {
             setExceptionContext(processDefinition, processInstance, e);
@@ -361,8 +363,7 @@ public class ProcessArchiver {
     private static void archiveContractData(final ContractDataService contractDataService, final long archiveDate, final long userTaskId)
             throws SArchivingException {
         try {
-            contractDataService.archiveUserTaskData(userTaskId, archiveDate);
-            //contractDataService.deleteUserTaskData(userTaskId);
+            contractDataService.archiveAndDeleteUserTaskData(userTaskId, archiveDate);
         } catch (final SBonitaException e) {
             throw new SArchivingException("Unable to archive contract data of container instance with id " + userTaskId, e);
         }

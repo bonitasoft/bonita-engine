@@ -315,6 +315,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.ContractDataNotFoundException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
@@ -3479,7 +3480,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
-        final WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(eventInstanceService, tenantAccessor.getSchedulerService(), tenantAccessor.getTechnicalLoggerService());
+        final WaitingEventsInterrupter waitingEventsInterrupter = new WaitingEventsInterrupter(eventInstanceService, tenantAccessor.getSchedulerService(),
+                tenantAccessor.getTechnicalLoggerService());
         final StateBehaviors stateBehaviors = new StateBehaviors(tenantAccessor.getBPMInstancesCreator(), tenantAccessor.getEventsHandler(),
                 tenantAccessor.getActivityInstanceService(), tenantAccessor.getUserFilterService(), tenantAccessor.getClassLoaderService(),
                 tenantAccessor.getActorMappingService(), tenantAccessor.getConnectorInstanceService(), tenantAccessor.getExpressionResolverService(),
@@ -3894,7 +3896,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SearchFailedProcessInstancesSupervisedBy searchFailedProcessInstances = createSearchFailedProcessInstancesSupervisedBy(userId, searchOptions, processInstanceService, searchEntitiesDescriptor, processDefinitionService);
+        final SearchFailedProcessInstancesSupervisedBy searchFailedProcessInstances = createSearchFailedProcessInstancesSupervisedBy(userId, searchOptions,
+                processInstanceService, searchEntitiesDescriptor, processDefinitionService);
         try {
             searchFailedProcessInstances.execute();
             return searchFailedProcessInstances.getResult();
@@ -6054,24 +6057,32 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Serializable getUserTaskContractVariableValue(final long userTaskInstanceId, final String name) throws UserTaskNotFoundException {
+    public Serializable getUserTaskContractVariableValue(final long userTaskInstanceId, final String name) throws ContractDataNotFoundException {
         final ContractDataService contractDataService = getTenantAccessor().getContractDataService();
         try {
             return (Serializable) contractDataService.getArchivedUserTaskDataValue(userTaskInstanceId, name);
         } catch (final SContractDataNotFoundException scdnfe) {
-            throw new UserTaskNotFoundException(scdnfe);
+            throw new ContractDataNotFoundException(scdnfe);
         } catch (final SBonitaReadException sbe) {
             throw new RetrieveException(sbe);
         }
     }
 
     @Override
-    public Serializable getProcessInstanciationInputValue(long processInstanceId, String name) throws ProcessInstanceNotFoundException {
+    public Serializable getProcessInputValueDuringInitialization(long processInstanceId, String name) throws ContractDataNotFoundException {
         try {
             return getTenantAccessor().getContractDataService().getProcessDataValue(processInstanceId, name);
         } catch (SContractDataNotFoundException | SBonitaReadException e) {
-            // FIXME: add specific exception for contract data not found:
-            throw new ProcessInstanceNotFoundException(e);
+            throw new ContractDataNotFoundException(e);
+        }
+    }
+
+    @Override
+    public Serializable getProcessInputValueAfterInitialization(long processInstanceId, String name) throws ContractDataNotFoundException {
+        try {
+            return getTenantAccessor().getContractDataService().getArchivedProcessDataValue(processInstanceId, name);
+        } catch (SContractDataNotFoundException | SBonitaReadException e) {
+            throw new ContractDataNotFoundException(e);
         }
     }
 

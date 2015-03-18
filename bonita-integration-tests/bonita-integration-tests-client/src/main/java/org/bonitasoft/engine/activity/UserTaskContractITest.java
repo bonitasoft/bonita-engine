@@ -39,6 +39,7 @@ import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
+import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
@@ -81,7 +82,7 @@ public class UserTaskContractITest extends CommonAPIIT {
     }
 
     @Test
-    public void shouldHandleContractDefinitionAtProcessLevel() throws Exception {
+    public void shouldHandleContractInputsAtProcessLevel() throws Exception {
         //given
         String numberOfDaysProcessContractData = "numberOfDaysProcessContractData";
 
@@ -103,9 +104,11 @@ public class UserTaskContractITest extends CommonAPIIT {
         inputs.put(numberOfDaysProcessContractData, value);
         ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), inputs);
         waitForUserTask(processInstance, TASK1);
-        Serializable processInstanciationInputValue = getProcessAPI().getProcessInstanciationInputValue(processInstance.getId(),
-                numberOfDaysProcessContractData);
+        DataInstance processDataValueInitializedFromInput = getProcessAPI().getProcessDataInstance("nbDaysProcessData", processInstance.getId());
+        assertThat(processDataValueInitializedFromInput.getValue()).isEqualTo(value);
 
+        Serializable processInstanciationInputValue = getProcessAPI().getProcessInputValueAfterInitialization(processInstance.getId(),
+                numberOfDaysProcessContractData);
         assertThat(processInstanciationInputValue).isEqualTo(value);
 
         //clean up

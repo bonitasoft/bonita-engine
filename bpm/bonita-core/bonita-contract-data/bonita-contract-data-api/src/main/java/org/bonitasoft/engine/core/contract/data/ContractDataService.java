@@ -30,7 +30,7 @@ public interface ContractDataService {
 
     void deleteUserTaskData(final long userTaskId) throws SContractDataDeletionException;
 
-    void archiveUserTaskData(final long userTaskId, final long archiveDate) throws SObjectModificationException;
+    void archiveAndDeleteUserTaskData(final long userTaskId, final long archiveDate) throws SObjectModificationException;
 
     Serializable getArchivedUserTaskDataValue(final long userTaskId, String dataName) throws SContractDataNotFoundException, SBonitaReadException;
 
@@ -40,7 +40,7 @@ public interface ContractDataService {
 
     void deleteProcessData(long processInstanceId) throws SContractDataDeletionException;
 
-    void archiveProcessData(long processInstanceId, long archiveDate) throws SObjectModificationException;
+    void archiveAndDeleteProcessData(long processInstanceId, long archiveDate) throws SObjectModificationException;
 
     Serializable getArchivedProcessDataValue(long processInstanceId, String dataName) throws SContractDataNotFoundException,
             SBonitaReadException;
