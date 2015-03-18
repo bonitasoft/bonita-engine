@@ -107,28 +107,33 @@
         AND actormember.roleId &gt; -1
     </query>
 
-    <query name="getActorsOfUserCanStartProcessDefinition">
-        SELECT actor
+    <query name="getActorMembersInitiatorForProcess">
+        SELECT actormember.id
         FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-        org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
-        org.bonitasoft.engine.identity.model.impl.SUserImpl as user
+             org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
         WHERE actor.id = actormember.actorId
         AND actor.scopeId =:processDefinitionId AND actor.initiator = TRUE
-        AND (user.id = :userId OR user.managerUserId = :userId)
-        AND ( actormember.userId = user.id
-        OR actormember.id IN (
-        SELECT actormember2.id
-        FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember2,
-        org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
-        WHERE um.userId = user.id
+    </query>
+
+    <query name="getNumberOfUserMembersForUserOrManagerForActorMembers">
+        SELECT count(*)
+        FROM org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS am,
+             org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
+        WHERE (user.id = :userId OR user.managerUserId = :userId)
+        AND am.id IN (:actorMemberIds)
         AND (
-        (actormember2.groupId = um.groupId AND actormember2.roleId &lt;= 0)
-        OR (actormember2.roleId = um.roleId AND actormember2.groupId &lt;= 0)
-        OR (actormember2.groupId = um.groupId AND actormember2.roleId = um.roleId)
+            am.userId = user.id
+            OR exists (
+                SELECT um.id
+                FROM   org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+                WHERE um.userId = user.id
+                AND (
+                       (am.groupId = um.groupId AND am.roleId &lt;= 0)
+                    OR (am.roleId = um.roleId AND am.groupId &lt;= 0)
+                    OR (am.groupId = um.groupId AND am.roleId = um.roleId)
+                )
+            )
         )
-        )
-        )
-        ORDER BY actor.name ASC
     </query>
 
     <query name="getActorMembersOfUser">

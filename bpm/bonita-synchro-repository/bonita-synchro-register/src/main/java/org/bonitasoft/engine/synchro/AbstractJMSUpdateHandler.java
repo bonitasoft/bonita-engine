@@ -21,6 +21,7 @@ import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 
 /**
  * @author Baptiste Mesta
+ * @author Guillaume Rosinosky
  */
 public abstract class AbstractJMSUpdateHandler extends AbstractUpdateHandler {
 
@@ -28,14 +29,17 @@ public abstract class AbstractJMSUpdateHandler extends AbstractUpdateHandler {
 
     private final Long messageTimeout;
 
-    public AbstractJMSUpdateHandler(final long tenantId, final long messageTimeout) {
+    private String brokerURL;
+    
+    public AbstractJMSUpdateHandler(final long tenantId, final long messageTimeout, String brokerURL) {
         super(tenantId);
         this.messageTimeout = messageTimeout;
+        this.brokerURL = brokerURL;
     }
-
+    
     @Override
     protected BonitaTransactionSynchronization getSynchronization(final Map<String, Serializable> event, final Long id,
             final TenantServiceAccessor tenantServiceAccessor) {
-        return new SendJMSMessageSynchronization(event, id, JMSProducer.getInstance(messageTimeout));
+        return new SendJMSMessageSynchronization(event, id, JMSProducer.getInstance(messageTimeout, brokerURL));
     }
 }

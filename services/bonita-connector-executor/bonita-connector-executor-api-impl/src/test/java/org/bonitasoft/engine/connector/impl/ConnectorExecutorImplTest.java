@@ -11,17 +11,12 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.connector.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -80,7 +75,8 @@ public class ConnectorExecutorImplTest {
         doReturn(future).when(executorService).submit(any(ExecuteConnectorCallable.class));
         doReturn(Collections.singletonMap("result", "resultValue")).when(future).get();
         // when
-        final Map<String, Object> result = connectorExecutorImpl.execute(connector, Collections.<String, Object> singletonMap("key", "value"));
+        final Map<String, Object> result = connectorExecutorImpl.execute(connector, Collections.<String, Object> singletonMap("key", "value"), Thread
+                .currentThread().getContextClassLoader());
 
         // then
         assertThat(result.size()).isEqualTo(1);
@@ -93,7 +89,7 @@ public class ConnectorExecutorImplTest {
         connectorExecutorImpl.setExecutor(executorService);
         connectorExecutorImpl.stop();
         // when
-        connectorExecutorImpl.execute(connector, Collections.<String, Object> singletonMap("key", "value"));
+        connectorExecutorImpl.execute(connector, Collections.<String, Object> singletonMap("key", "value"), Thread.currentThread().getContextClassLoader());
     }
 
     @Test
@@ -162,7 +158,7 @@ public class ConnectorExecutorImplTest {
         connectorExecutorImpl.start();
 
         // then
-        assertNotNull("The executor service must be not null.", connectorExecutorImpl.getExecutorService());
+        assertThat(connectorExecutorImpl.getExecutorService()).as("The executor service must be not null.").isNotNull();
     }
 
     @Test
@@ -171,7 +167,7 @@ public class ConnectorExecutorImplTest {
         connectorExecutorImpl.resume();
 
         // then
-        assertNotNull("The executor service must be not null.", connectorExecutorImpl.getExecutorService());
+        assertThat(connectorExecutorImpl.getExecutorService()).as("The executor service must be not null.").isNotNull();
     }
 
 }
