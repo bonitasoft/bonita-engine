@@ -414,10 +414,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
         expressionContext.setProcessDefinitionId(sProcessDefinition.getId());
 
+        storeProcessInstantiationInputs(sProcessInstance.getId(), processInputs);
+
         // Create SDataInstances
         bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition, expressionContext, operations, context);
 
-        storeProcessInstantiationInputs(sProcessInstance.getId(), processInputs);
         initializeData(sProcessDefinition, sProcessInstance);
         initializeBusinessData(sProcessDefinition, sProcessInstance, expressionContext);
 

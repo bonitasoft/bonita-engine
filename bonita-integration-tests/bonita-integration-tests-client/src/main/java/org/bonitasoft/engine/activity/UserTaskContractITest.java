@@ -83,11 +83,15 @@ public class UserTaskContractITest extends CommonAPIIT {
     @Test
     public void shouldHandleContractDefinitionAtProcessLevel() throws Exception {
         //given
+        String numberOfDaysProcessContractData = "numberOfDaysProcessContractData";
+
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        // have a initial data value using process input, so that we ensure inputs are treated before data at process instantiation:
+        builder.addData("nbDaysProcessData", Integer.class.getName(),
+                new ExpressionBuilder().createContractInputExpression(numberOfDaysProcessContractData, Integer.class.getName()));
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME);
-        String numberOfDays = "numberOfDays";
-        builder.addContract().addSimpleInput(numberOfDays, Type.INTEGER, null).addMandatoryConstraint(numberOfDays);
+        builder.addContract().addSimpleInput(numberOfDaysProcessContractData, Type.INTEGER, null).addMandatoryConstraint(numberOfDaysProcessContractData);
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -96,10 +100,11 @@ public class UserTaskContractITest extends CommonAPIIT {
 
         Map<String, Serializable> inputs = new HashMap<>(1);
         int value = 14;
-        inputs.put(numberOfDays, value);
+        inputs.put(numberOfDaysProcessContractData, value);
         ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), inputs);
         waitForUserTask(processInstance, TASK1);
-        Serializable processInstanciationInputValue = getProcessAPI().getProcessInstanciationInputValue(processInstance.getId(), numberOfDays);
+        Serializable processInstanciationInputValue = getProcessAPI().getProcessInstanciationInputValue(processInstance.getId(),
+                numberOfDaysProcessContractData);
 
         assertThat(processInstanciationInputValue).isEqualTo(value);
 
