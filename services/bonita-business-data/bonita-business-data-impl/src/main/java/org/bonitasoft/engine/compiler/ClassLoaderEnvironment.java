@@ -15,11 +15,13 @@
 package org.bonitasoft.engine.compiler;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.batch.CompilationUnit;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
@@ -45,11 +47,17 @@ public class ClassLoaderEnvironment extends FileSystem {
     public ClassLoaderEnvironment(ClassLoader classLoader, CompilationUnit[] compilationUnits) {
         super(new String[] {}, null, "UTF-8");
         this.classLoader = classLoader;
-        this.compilationUnits = new HashMap<String, CompilationUnit>(compilationUnits.length);
+        this.compilationUnits = new HashMap<>(compilationUnits.length);
         for (CompilationUnit compilationUnit : compilationUnits) {
-            this.compilationUnits.put(new String(compilationUnit.getFileName()), compilationUnit);
+            this.compilationUnits.put(getQualifiedName(compilationUnit), compilationUnit);
         }
-        loadedClassFiles = new HashMap<String, IBinaryType>();
+        loadedClassFiles = new HashMap<>();
+    }
+
+    String getQualifiedName(CompilationUnit compilationUnit) {
+        String fileName = new String(compilationUnit.getFileName());
+        fileName = fileName.replaceAll(File.separator, ".");
+        return fileName.substring(0,fileName.lastIndexOf("."));
     }
 
     @Override
@@ -59,7 +67,7 @@ public class ClassLoaderEnvironment extends FileSystem {
 
     @Override
     public NameEnvironmentAnswer findType(char[] typeName, char[][] packageName) {
-        return findType(toPointedNotation(packageName)+"."+new String(typeName));
+        return findType(getClassName(toPointedNotation(packageName), new String(typeName)));
     }
 
 
@@ -92,17 +100,17 @@ public class ClassLoaderEnvironment extends FileSystem {
                 loadedClassFiles.put(className, classFileReader);
                 return new NameEnvironmentAnswer(classFileReader, null);
             }
-        } catch (IOException exc) {
+        } catch (IOException | ClassFormatException exc) {
             System.err.println("Compilation error");
             exc.printStackTrace();
-        } catch (ClassFormatException e) {
-            System.err.println("Compilation error");
-            e.printStackTrace();
         }
         return null;
     }
 
     private boolean isPackage(String result) {
+        if(result.isEmpty()){
+            return true;
+        }
         if (compilationUnits.containsKey(result)) {
             return false;
         }
@@ -115,14 +123,22 @@ public class ClassLoaderEnvironment extends FileSystem {
 
     @Override
     public boolean isPackage(char[][] parentPackageName,
-            char[] packageName) {
+            char[] className) {
         String parentPackage = toPointedNotation(parentPackageName);
-        if (Character.isUpperCase(packageName[0])) {
+        if (Character.isUpperCase(className[0])) {
             if (!isPackage(parentPackage)) {
                 return false;
             }
         }
-        return isPackage(parentPackage+"."+new String(packageName));
+        return isPackage(getClassName(parentPackage, new String(className)));
+    }
+
+    String getClassName(String parentPackage, String className) {
+        if(parentPackage.isEmpty()){
+            return className;
+        }else{
+            return parentPackage+"."+className;
+        }
     }
 
     String toPointedNotation(char[][] parentPackageName) {
