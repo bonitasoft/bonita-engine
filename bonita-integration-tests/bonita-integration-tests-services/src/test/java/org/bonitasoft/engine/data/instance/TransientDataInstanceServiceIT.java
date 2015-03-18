@@ -111,7 +111,7 @@ public class TransientDataInstanceServiceIT extends CommonServiceTest {
     private void evaluateDefaultValueOf(final SDataDefinition dataDefinition, final SDataInstanceBuilder dataInstanceBuilder) throws SBonitaException {
         final SExpression expression = dataDefinition.getDefaultValueExpression();
         if (expression != null) {
-            dataInstanceBuilder.setValue((Serializable) expressionService.evaluate(expression, EMPTY_RESOLVED_EXPRESSIONS, ContainerState.ACTIVE));
+            dataInstanceBuilder.setValue((Serializable) expressionService.evaluate(expression, Collections.<String,Object>singletonMap("processDefinitionId",546l), EMPTY_RESOLVED_EXPRESSIONS, ContainerState.ACTIVE));
         }
     }
 

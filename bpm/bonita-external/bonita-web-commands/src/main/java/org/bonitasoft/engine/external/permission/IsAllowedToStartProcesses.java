@@ -19,13 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -62,13 +60,7 @@ public class IsAllowedToStartProcesses extends CommandWithParameters {
         if (!processDefinitionIds.isEmpty()) {
             for (final Long processDefinitionId : processDefinitionIds) {
                 try {
-                    final List<SActor> ckRes = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId, 0,
-                            QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
-                    if (ckRes != null && ckRes.size() == 1) {
-                        resMap.put(processDefinitionId, true);
-                    } else {
-                        resMap.put(processDefinitionId, false);
-                    }
+                    resMap.put(processDefinitionId, actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId));
                 } catch (final SBonitaReadException e) {
                     e.setProcessDefinitionIdOnContext(processDefinitionId);
                     throw new SCommandExecutionException("No actor of user who can start the processDefinition.", e);
