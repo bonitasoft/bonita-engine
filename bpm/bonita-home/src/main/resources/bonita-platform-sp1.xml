@@ -1,0 +1,401 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="eventService" class="com.bonitasoft.engine.events.impl.ConfigurableEventServiceImpl">
+		<constructor-arg name="handlers">
+			<map />
+		</constructor-arg>
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+	</bean>
+
+	<bean id="queriableLoggerStrategy" class="com.bonitasoft.engine.log.api.impl.MapQueriableLoggerStrategy" >
+		<constructor-arg name="loggableLevels">
+			<map>
+				<entry key="ACTOR_CREATED:INTERNAL" value="true" />
+				<entry key="ACTOR_DELETED:INTERNAL" value="true" />
+				<entry key="ACTOR_UPDATED:INTERNAL" value="true" />
+				<entry key="APPLICATION_CREATED:INTERNAL" value="true" />
+				<entry key="APPLICATION_DELETED:INTERNAL" value="true" />
+				<entry key="APPLICATION_UPDATED:INTERNAL" value="true" />
+				<entry key="APPLICATION_PAGE_CREATED:INTERNAL" value="true" />
+				<entry key="APPLICATION_PAGE_DELETED:INTERNAL" value="true" />
+				<entry key="APPLICATION_PAGE_UPDATED:INTERNAL" value="true" />
+				<entry key="APPLICATION_MENU_CREATED:INTERNAL" value="true" />
+				<entry key="APPLICATION_MENU_DELETED:INTERNAL" value="true" />
+				<entry key="APPLICATION_MENU_UPDATED:INTERNAL" value="true" />
+				<entry key="BREAKPOINT_CREATED:INTERNAL" value="true" />
+				<entry key="BREAKPOINT_DELETED:INTERNAL" value="true" />
+				<entry key="CATEGORY_CREATED:INTERNAL" value="true" />
+				<entry key="CATEGORY_DELETED:INTERNAL" value="true" />
+				<entry key="CATEGORY_UPDATED:INTERNAL" value="true" />
+				<entry key="COMMAND_CREATED:INTERNAL" value="true" />
+				<entry key="COMMAND_DELETED:INTERNAL" value="true" />
+				<entry key="COMMAND_UPDATED:INTERNAL" value="true" />
+				<entry key="COMMENT_CREATED:INTERNAL" value="true" />
+				<entry key="COMMENT_DELETED:INTERNAL" value="true" />
+				<entry key="CONNECTOR_INSTANCE_CREATED:INTERNAL" value="true" />
+				<entry key="CONNECTOR_INSTANCE_UPDATED:INTERNAL" value="true" />
+				<entry key="CONNECTOR_INSTANCE_DELETED:INTERNAL" value="true" />
+				<entry key="DATA_SOURCE_CREATED:INTERNAL" value="true" />
+				<entry key="DATA_INSTANCE_CREATED:INTERNAL" value="true" />
+				<entry key="DATA_INSTANCE_DELETED:INTERNAL" value="true" />
+				<entry key="DATA_INSTANCE_UPDATED:INTERNAL" value="true" />
+				<entry key="DEPENDENCY_CREATED:INTERNAL" value="true" />
+				<entry key="DEPENDENCY_DELETED:INTERNAL" value="true" />
+				<entry key="DEPENDENCY_UPDATED:INTERNAL" value="true" />
+				<entry key="DEPENDENCY_MAPPING_CREATED:INTERNAL" value="true" />
+				<entry key="DEPENDENCY_MAPPING_DELETED:INTERNAL" value="true" />
+				<entry key="DOCUMENT_CREATED:INTERNAL" value="true" />
+				<entry key="DOCUMENT_DELETED:INTERNAL" value="true" />
+				<entry key="DOCUMENTMAPPING_CREATED:INTERNAL" value="true" />
+				<entry key="DOCUMENTMAPPING_DELETED:INTERNAL" value="true" />
+				<entry key="DOCUMENTMAPPING_UPDATED:INTERNAL" value="true" />
+				<entry key="EVENT_INSTANCE_TRIGGER_CREATED:INTERNAL" value="true" />
+				<entry key="EVENT_INSTANCE_TRIGGER_DELETED:INTERNAL" value="true" />
+				<entry key="EVENT_INSTANCE_TRIGGER_UPDATED:INTERNAL" value="true" />
+				<entry key="EXTERNAL_IDENTITY_MAPPING_CREATED:INTERNAL" value="true" />
+				<entry key="EXTERNAL_IDENTITY_MAPPING_DELETED:INTERNAL" value="true" />
+				<entry key="FLOW_INSTANCE_CREATED:INTERNAL" value="true" />
+				<entry key="FLOW_INSTANCE_DELETED:INTERNAL" value="true" />
+				<entry key="FLOW_INSTANCE_UPDATED:INTERNAL" value="true" />
+				<entry key="GATEWAY_INSTANCE_CREATED:INTERNAL" value="true" />
+				<entry key="GATEWAY_INSTANCE_UPDATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_GROUP_CREATED:INTERNAL" value="false" />
+				<entry key="IDENTITY_GROUP_DELETED:INTERNAL" value="false" />
+				<entry key="IDENTITY_GROUP_UPDATED:INTERNAL" value="false" />
+				<entry key="IDENTITY_ROLE_CREATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_ROLE_DELETED:INTERNAL" value="true" />
+				<entry key="IDENTITY_ROLE_UPDATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_USER_CREATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_USER_DELETED:INTERNAL" value="true" />
+				<entry key="IDENTITY_USER_UPDATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_USER_CONTACT_INFO_CREATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_USER_CONTACT_INFO_UPDATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_USER_MEMBERSHIP_CREATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_USER_MEMBERSHIP_DELETED:INTERNAL" value="true" />
+				<entry key="IDENTITY_USER_MEMBERSHIP_UPDATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_CREATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_DELETED:INTERNAL" value="true" />
+				<entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_UPDATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_CUSTOM_USER_INFO_VALUE_CREATED:INTERNAL" value="true" />
+				<entry key="IDENTITY_CUSTOM_USER_INFO_VALUE_DELETED:INTERNAL" value="true" />
+				<entry key="IDENTITY_CUSTOM_USER_INFO_VALUE_UPDATED:INTERNAL" value="true" />
+				<entry key="JOB_CREATED:INTERNAL" value="false" />
+				<entry key="JOB_DELETED:INTERNAL" value="false" />
+				<entry key="JOB_PARAMETER_CREATED:INTERNAL" value="true" />
+				<entry key="MESSAGE_INSTANCE_CREATED:INTERNAL" value="true" />
+				<entry key="MESSAGE_INSTANCE_UPDATED:INTERNAL" value="true" />
+				<entry key="PAGE_CREATED:INTERNAL" value="true" />
+				<entry key="PAGE_DELETED:INTERNAL" value="true" />
+				<entry key="PAGE_UPDATED:INTERNAL" value="true" />
+				<entry key="PENDING_ACTIVITY_MAPPING_CREATED:INTERNAL" value="true" />
+				<entry key="PROCESS_DEFINITION_CREATED:INTERNAL" value="true" />
+				<entry key="PROCESS_DEFINITION_DELETED:INTERNAL" value="true" />
+				<entry key="PROCESS_DEFINITION_UPDATED:INTERNAL" value="true" />
+				<entry key="PROCESS_INSTANCE_CREATED:INTERNAL" value="true" />
+				<entry key="PROCESS_INSTANCE_DELETED:INTERNAL" value="true" />
+				<entry key="PROCESS_INSTANCE_UPDATED:INTERNAL" value="true" />
+				<entry key="PROFILE_CREATED:INTERNAL" value="true" />
+				<entry key="PROFILE_DELETED:INTERNAL" value="true" />
+				<entry key="PROFILE_UPDATED:INTERNAL" value="true" />
+				<entry key="PROFILE_MEMBER_CREATED:INTERNAL" value="true" />
+				<entry key="PROFILE_MEMBER_DELETED:INTERNAL" value="true" />
+				<entry key="PROFILE_MEMBER_UPDATED:INTERNAL" value="true" />
+				<entry key="PROFILE_ENTRY_CREATED:INTERNAL" value="true" />
+				<entry key="PROFILE_ENTRY_DELETED:INTERNAL" value="true" />
+				<entry key="PROFILE_ENTRY_UPDATED:INTERNAL" value="true" />
+				<entry key="REF_BUSINESS_DATA_INSTANCE_CREATED:INTERNAL" value="true" />
+				<entry key="REF_BUSINESS_DATA_INSTANCE_UPDATED:INTERNAL" value="true" />
+				<entry key="REF_BUSINESS_DATA_INSTANCE_DELETED:INTERNAL" value="true" />
+				<entry key="SCHEDULER_SCHEDULED:INTERNAL" value="false" />
+				<entry key="SUPERVISOR_CREATED:INTERNAL" value="true" />
+				<entry key="SUPERVISOR_DELETED:INTERNAL" value="true" />
+				<entry key="THEME_CREATED:INTERNAL" value="true" />
+				<entry key="THEME_DELETED:INTERNAL" value="true" />
+				<entry key="THEME_UPDATED:INTERNAL" value="true" />
+				<entry key="TRANSITION_INSTANCE_CREATED:INTERNAL" value="true" />
+				<entry key="TRANSITION_INSTANCE_DELETED:INTERNAL" value="true" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="syncQueriableLoggerService" class="com.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
+		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+		<constructor-arg name="platformService" ref="platformService" />
+		<constructor-arg name="delayable" value="false" />
+	</bean>
+
+	<bean id="batchLogRegister" class="com.bonitasoft.engine.log.api.impl.InsertBatchLogsJobRegister">
+		<constructor-arg name="cronExpression" value="0/5 * * * * ?" />
+	</bean>
+
+	<bean id="jvmMXBean" class="com.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl" />
+
+	<bean id="platformMonitoringService" class="com.bonitasoft.engine.monitoring.impl.PlatformMonitoringServiceImpl">
+		<constructor-arg name="allowMbeansRegistration" value="true" />
+		<constructor-arg name="jvmMBean" ref="jvmMXBean" />
+		<constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="schedulerService" ref="scheduler" />
+		<constructor-arg name="technicalLog" ref="platformTechnicalLoggerService" />
+	</bean>
+
+	<bean id="sequenceMappings" parent="communitySequenceMappings" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass">
+			<value>java.util.HashMap</value>
+		</property>
+		<property name="sourceMap">
+			<map merge="true">
+				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" value="10019" />
+				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" value="500" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="transactionService" class="com.bonitasoft.engine.transaction.JTATransactionServiceExt" scope="singleton">
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+		<constructor-arg name="txManager" ref="transactionManager" />
+		<constructor-arg name="retries" value="3" />
+		<constructor-arg name="delay" value="20" />
+		<constructor-arg name="delayFactor" value="1.5" />
+	</bean>
+
+	<bean id="searchPlatformEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor" />
+
+	<bean id="hbm-bos-reporting-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+		<property name="resources">
+			<set>
+				<value>com/bonitasoft/engine/core/reporting/model/impl/hibernate/report.hbm.xml</value>
+				<value>com/bonitasoft/engine/core/reporting/model/impl/hibernate/report.queries.hbm.xml</value>
+			</set>
+		</property>
+		<property name="classAliasMappings">
+			<map>
+				<entry key="com.bonitasoft.engine.core.reporting.SReport" value="report" />
+				<entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="reportcontent" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="hbm-bonita-process-instance-model-ext" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+		<property name="resources">
+			<set>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
+				<value>com/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
+			</set>
+		</property>
+		<property name="classAliasMappings">
+			<map>
+				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="breakpoint" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" value="ref" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="hibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+		<property name="map">
+			<map>
+				<entry key="hibernate.cache.use_second_level_cache" value="true" />
+				<entry key="hibernate.cache.use_query_cache" value="true" />
+				<entry key="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="extraPlatformHibernateProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+		<property name="map">
+			<map>
+				<entry key="net.sf.ehcache.configurationResourceName">
+					<bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
+						<property name="filePath" value="/server/platform/conf/hibernate-cache-platform.xml" />
+						<property name="baseFolder" value="${bonita.home}" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="extraTenantHibernateProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+		<property name="map">
+			<map>
+				<entry key="net.sf.ehcache.configurationResourceName">
+					<bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
+						<property name="filePath" value="/server/platform/conf/hibernate-cache-tenant.xml" />
+						<property name="baseFolder" value="${bonita.home}" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+
+	<bean id="hbmConfigurationProviderProperties" parent="communityHbmConfigurationProviderProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+		<property name="map">
+			<map merge="true">
+				<entry key="hibernate.jdbc.batch_size" value="50"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="interfaceToClassMapping" parent="communityInterfaceToClassMapping" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass">
+			<value>java.util.HashMap</value>
+		</property>
+		<property name="sourceMap">
+			<map merge="true">
+				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
+				<entry key="com.bonitasoft.engine.core.reporting.SReport" value="com.bonitasoft.engine.core.reporting.SReportImpl" />
+				<entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="com.bonitasoft.engine.core.reporting.SReportContentImpl" />
+				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContent" value="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" />
+
+			</map>
+		</property>
+	</bean>
+
+	<bean id="cacheQueries" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass">
+			<value>java.util.HashMap</value>
+		</property>
+		<property name="sourceMap">
+			<map>
+				<entry key="getDirectProfileMembersOfGroup" value="true" />
+				<entry key="getDirectProfileMembersOfRole" value="true" />
+				<entry key="getDirectProfileMembersOfUser" value="true" />
+				<entry key="getEntriesOfProfile" value="true" />
+				<entry key="getEntriesOfProfileByParentId" value="true" />
+				<entry key="getNumberOfEntriesOfProfile" value="true" />
+				<entry key="getNumberOfProfile" value="true" />
+				<entry key="getNumberOfProfileMemberOfProfile" value="true" />
+				<entry key="getNumberOfSProfileMemberForGroup" value="true" />
+				<entry key="getNumberOfSProfileMemberForRole" value="true" />
+				<entry key="getNumberOfSProfileMemberForRoleAndGroup" value="true" />
+				<entry key="getNumberOfSProfileMemberForUser" value="true" />
+				<entry key="getNumberOfSProfileMemberwithSGroupForGroup" value="true" />
+				<entry key="getNumberOfSProfileMemberwithSGroupForRoleAndGroup" value="true" />
+				<entry key="getNumberOfSProfileMemberwithSGroupwithSRoleForRoleAndGroup" value="true" />
+				<entry key="getNumberOfSProfileMemberwithSRoleForRole" value="true" />
+				<entry key="getNumberOfSProfileMemberwithSRoleForRoleAndGroup" value="true" />
+				<entry key="getNumberOfSProfileMemberwithSUserForUser" value="true" />
+				<entry key="getProfileByName" value="true" />
+				<entry key="getProfileMemberWithoutDisplayNameById" value="true" />
+				<entry key="getProfileMembersFromProfileIds" value="true" />
+				<entry key="getProfiles" value="true" />
+				<entry key="getProfilesOfUser" value="true" />
+				<entry key="getSProfileMembersWithoutDisplayName" value="true" />
+				<entry key="searchSProfileMemberForGroup" value="true" />
+				<entry key="searchSProfileMemberForRole" value="true" />
+				<entry key="searchSProfileMemberForRoleAndGroup" value="true" />
+				<entry key="searchSProfileMemberForUser" value="true" />
+				<entry key="searchSProfileMemberwithSGroupForGroup" value="true" />
+				<entry key="searchSProfileMemberwithSGroupForRoleAndGroup" value="true" />
+				<entry key="searchSProfileMemberwithSGroupwithSRoleForRoleAndGroup" value="true" />
+				<entry key="searchSProfileMemberwithSRoleForRole" value="true" />
+				<entry key="searchSProfileMemberwithSRoleForRoleAndGroup" value="true" />
+				<entry key="searchSProfileMemberwithSUserForUser" value="true" />
+				<entry key="getCategories" value="true" />
+				<entry key="getCategoriesOfProcess" value="true" />
+				<entry key="getCategorizedProcessIds" value="true" />
+				<entry key="getCategoryByName" value="true" />
+				<entry key="getNumberOfCategoriesOfProcess" value="true" />
+				<entry key="getNumberOfCategorizedProcessIds" value="true" />
+				<entry key="getNumberOfCategory" value="true" />
+				<entry key="getProcessCategoryMappingsOfCategory" value="true" />
+				<entry key="getProcessCategoryMappingsOfProcess" value="true" />
+				<entry key="getProcessIdsOfCategory" value="true" />
+				<entry key="getActorFromNameAndScopeId" value="true" />
+				<entry key="getActorMembersOfActor" value="true" />
+				<entry key="getActorMembersOfGroup" value="true" />
+				<entry key="getActorMembersOfRole" value="true" />
+				<entry key="getActorMembersOfUser" value="true" />
+				<entry key="getActorsByIds" value="true" />
+				<entry key="getActorsOfScope" value="true" />
+				<entry key="getActorsOfScopes" value="true" />
+				<entry key="getActorsOfUser" value="true" />
+				<entry key="getActorsOfUserCanStartProcessDefinition" value="true" />
+				<entry key="getNumberOfActorMembersOfActor" value="true" />
+				<entry key="getDataSourceByNameAndVersion" value="true" />
+				<entry key="getDataSourceParameterByNameAndDataSourceId" value="true" />
+				<entry key="getDataSourceParametersByDataSourceId" value="true" />
+				<entry key="getDataSources" value="true" />
+				<entry key="getPlatform" value="true" />
+				<entry key="getDeployInfoByProcessDefId" value="true" />
+				<entry key="getCommandByName" value="true" />
+				<entry key="getUserByUserName" value="true" />
+				<entry key="getRoleByName" value="true" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="hbmConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateConfigurationProviderExt">
+		<constructor-arg name="properties" ref="hbmConfigurationProviderProperties"/>
+		<constructor-arg name="cacheProperties" ref="hibernateCacheProperties"/>
+		<constructor-arg name="interfaceToClassMapping" ref="interfaceToClassMapping"/>
+		<constructor-arg name="mappingExclusions" ref="mappingExclusions"/>
+		<constructor-arg ref="hbmResourcesConfigurationProvider" />
+		<!-- Query cache -->
+		<constructor-arg name="cacheQueries" ref="cacheQueries"/>
+	</bean>
+
+	<bean id="hbmResources" parent="communityHbmResources" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list merge="true">
+				<ref bean="hbm-bonita-process-instance-model-ext" />
+				<ref bean="hbm-bos-reporting-model" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="cacheConcurrencyStrategies" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass">
+			<value>java.util.HashMap</value>
+		</property>
+		<property name="sourceMap">
+			<map>
+				<entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.command.model.SCommandImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SGroupImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SRoleImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SUserLoginImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.theme.model.impl.SThemeImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="read-write" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="hbmResourcesConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderExt">
+		<property name="hbmResources" ref="hbmResources"/>
+		<!-- L2 cache -->
+		<constructor-arg name="cacheConcurrencyStrategies" ref="cacheConcurrencyStrategies"/>
+	</bean>
+</beans>

@@ -8,12 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.test;
 
-import static org.bonitasoft.engine.bpm.CommonBPMServicesTest.getServicesBuilder;
+import static org.bonitasoft.engine.bpm.CommonBPMServicesTest.platformServiceAccessor;
 
 import javax.naming.Context;
 
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
-import org.bonitasoft.engine.bpm.test.AllBPMTests;
+import org.bonitasoft.engine.AllBPMTests;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.util.TestUtil;
@@ -41,7 +41,7 @@ public class AllBPMSPTestsWithJNDI {
         setupSpringContext();
 
         final PlatformAPIImpl platformAPI = new PlatformAPIImpl();
-        getServicesBuilder().getSessionAccessor().setSessionInfo(1l, -1);
+        platformServiceAccessor().getSessionAccessor().setSessionInfo(1l, -1);
         platformAPI.createAndInitializePlatform();
         platformAPI.startNode();
     }
@@ -50,12 +50,12 @@ public class AllBPMSPTestsWithJNDI {
     public static void afterClass() throws Exception {
         System.err.println("=================== AllBPMSPTestsWithJNDI.afterClass()");
 
-        TransactionService transactionService = getServicesBuilder().getTransactionService();
+        TransactionService transactionService = platformServiceAccessor().getTransactionService();
         TestUtil.closeTransactionIfOpen(transactionService);
         // stopScheduler();
-        PlatformService platformService = getServicesBuilder().getPlatformService();
-        SessionAccessor sessionAccessor = getServicesBuilder().getSessionAccessor();
-        TestUtil.deleteDefaultTenantAndPlatForm(transactionService, platformService, sessionAccessor, getServicesBuilder().getSessionService());
+        PlatformService platformService = platformServiceAccessor().getPlatformService();
+        SessionAccessor sessionAccessor = platformServiceAccessor().getSessionAccessor();
+        TestUtil.deleteDefaultTenantAndPlatForm(transactionService, platformService, sessionAccessor, platformServiceAccessor().getSessionService());
 
         closeSpringContext();
     }

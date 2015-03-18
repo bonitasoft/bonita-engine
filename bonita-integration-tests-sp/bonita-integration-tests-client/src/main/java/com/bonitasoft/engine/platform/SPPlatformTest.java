@@ -629,7 +629,7 @@ public class SPPlatformTest {
                 @Override
                 protected void refresh() {
                 }
-            }.getBonitaHomeFolder());
+            }.getBonitaHomeFolderPath());
             path.append(File.separatorChar);
             path.append("server");
             path.append(File.separatorChar);

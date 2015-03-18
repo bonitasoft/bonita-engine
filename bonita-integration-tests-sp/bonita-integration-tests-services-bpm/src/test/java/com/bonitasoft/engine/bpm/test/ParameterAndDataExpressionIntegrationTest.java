@@ -67,27 +67,27 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
     }
 
     protected static SessionAccessor getSessionAccessor() {
-        return getServicesBuilder().getSessionAccessor();
+        return platformServiceAccessor().getSessionAccessor();
     }
 
     protected static PlatformService getPlatformService() {
-        return getServicesBuilder().getPlatformService();
+        return platformServiceAccessor().getPlatformService();
     }
 
     protected ExpressionService getExpressionService() {
-        return getServicesBuilder().getExpressionService();
+        return platformServiceAccessor().getExpressionService();
     }
 
     protected ProcessDefinitionService getProcessDefinitionService() {
-        return getServicesBuilder().getProcessDefinitionService();
+        return platformServiceAccessor().getProcessDefinitionService();
     }
 
     protected DataInstanceService getDataInstanceService() {
-        return getServicesBuilder().getDataInstanceService();
+        return platformServiceAccessor().getDataInstanceService();
     }
 
     protected static TransactionService getTransactionService() {
-        return getServicesBuilder().getTransactionService();
+        return platformServiceAccessor().getTransactionService();
     }
 
     protected String getParameterClassName() {
