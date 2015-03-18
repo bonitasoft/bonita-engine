@@ -9,12 +9,12 @@ import java.io.IOException;
 class FolderMgr {
 
 
-    private static Folder getFolder(final File baseFolder, final String... subSequentFolders) throws IOException {
-        return new Folder(baseFolder, subSequentFolders);
+    private static Folder getFolder(final File baseFolder, final String subFolder) throws IOException {
+        return new Folder(new Folder(baseFolder), subFolder);
     }
 
-    private static Folder getFolder(final Folder baseFolder, final String... subSequentFolders) throws IOException {
-        return new Folder(baseFolder, subSequentFolders);
+    private static Folder getFolder(final Folder baseFolder, final String subFolder) throws IOException {
+        return new Folder(baseFolder, subFolder);
     }
 
     private static Folder getServerFolder(final File bonitaHomeFolder) throws IOException {
@@ -121,6 +121,8 @@ class FolderMgr {
             templateConfFolder.copyTo(tenantConfFolder);
             templateTempFolder.copyTo(tenantTempFolder);
             getTenantWorkProcessesFolder(bonitaHomeFolder, tenantId).create();
+            getTenantTempProcessesFolder(bonitaHomeFolder, tenantId).create();
+            getTenantWorkSecurityFolder(bonitaHomeFolder, tenantId).create();
         } catch (final IOException e) {
             deleteTenant(bonitaHomeFolder, tenantId);
             throw e;
@@ -133,6 +135,14 @@ class FolderMgr {
         getTenantWorkProcessConnectorsFolder(bonitaHomeFolder, tenantId, processId).create();
         getTenantWorkProcessDocumentFolder(bonitaHomeFolder, tenantId, processId).create();
         getTenantWorkProcessUserFiltersFolder(bonitaHomeFolder, tenantId, processId).create();
+    }
+
+    public static void createTenantTempProcessFolder(File bonitaHomeFolder, long tenantId, long processId) throws IOException {
+        getTenantTempProcessFolder(bonitaHomeFolder, tenantId, processId).create();
+        //getTenantTempProcessClasspathFolder(bonitaHomeFolder, tenantId, processId).create();
+        //getTenantTempProcessConnectorsFolder(bonitaHomeFolder, tenantId, processId).create();
+        //getTenantTempProcessDocumentFolder(bonitaHomeFolder, tenantId, processId).create();
+        //getTenantTempProcessUserFiltersFolder(bonitaHomeFolder, tenantId, processId).create();
     }
 
     public static Folder getTenantWorkProcessClasspathFolder(File bonitaHomeFolder, long tenantId, long processId) throws IOException {
@@ -154,7 +164,7 @@ class FolderMgr {
     }
 
     public static Folder getTenantWorkProcessConnectorsFolder(File bonitaHomeFolder, long tenantId, long processId) throws IOException {
-        return getFolder(getTenantWorkProcessFolder(bonitaHomeFolder, tenantId, processId), "connectors");
+        return getFolder(getTenantWorkProcessFolder(bonitaHomeFolder, tenantId, processId), "connector");
     }
 
     public static Folder getTenantWorkSecurityFolder(File bonitaHomeFolder, long tenantId) throws IOException {

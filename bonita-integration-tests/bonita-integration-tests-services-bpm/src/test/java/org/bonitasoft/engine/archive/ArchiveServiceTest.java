@@ -22,19 +22,13 @@ import org.bonitasoft.engine.archive.model.EmployeeProjectMapping;
 import org.bonitasoft.engine.archive.model.Laptop;
 import org.bonitasoft.engine.archive.model.Project;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.util.PlatformUtil;
-import org.bonitasoft.engine.test.util.TestUtil;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class ArchiveServiceTest extends CommonBPMServicesTest {
@@ -47,37 +41,8 @@ public class ArchiveServiceTest extends CommonBPMServicesTest {
 
     private final ArchiveService archiveService;
 
-    private long sessionId;
-
     public ArchiveServiceTest() {
         this.archiveService = getTenantAccessor().getArchiveService();
-    }
-
-
-    @Before
-    public void createTenant() throws Exception {
-        final long tenantId = PlatformUtil.createTenant(getTransactionService(), getPlatformAccessor().getPlatformService(), "aTenant", "me", "test");
-        createSession(tenantId);
-    }
-
-    private void createSession(final long tenantId) throws SBonitaException {
-        getTransactionService().begin();
-        getSessionAccessor().deleteSessionId();
-        final SSession session = getTenantAccessor().getSessionService().createSession(tenantId, "me");
-        getSessionAccessor().setSessionInfo(session.getId(), tenantId);
-        sessionId = session.getId();
-        getTransactionService().complete();
-    }
-
-    @After
-    public void deleteTenant() throws Exception {
-        TestUtil.closeTransactionIfOpen(getTransactionService());
-        getTransactionService().begin();
-        final long tenantId = getPlatformAccessor().getPlatformService().getTenantByName("aTenant").getId();
-        getTransactionService().complete();
-        PlatformUtil.deleteTenant(getTransactionService(), getPlatformAccessor().getPlatformService(), tenantId);
-        getSessionAccessor().deleteSessionId();
-        getTenantAccessor().getSessionService().deleteSession(sessionId);
     }
 
     @Test

@@ -15,7 +15,10 @@ package org.bonitasoft.engine.test.util;
 
 import java.util.List;
 
+import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -75,15 +78,6 @@ public class PlatformUtil {
         }
     }
 
-    public static boolean isPlatformCreated(final TransactionService transactionService, final PlatformService platformService) throws Exception {
-        try {
-            transactionService.begin();
-            return platformService.isPlatformCreated();
-        } finally {
-            transactionService.complete();
-        }
-    }
-
     public static void deleteTenant(final TransactionService transactionService, final PlatformService platformService, final long tenantId) throws Exception {
         transactionService.begin();
         // delete tenant objects
@@ -102,67 +96,16 @@ public class PlatformUtil {
         }
     }
 
-    public static void createPlatform(final TransactionService transactionService, final PlatformService platformService)
-            throws Exception {
-        final String version = "myVersion";
-        final String previousVersion = "previousVersion";
-        final String initialVersion = "initialVersion";
-        final String createdBy = "mycreatedBy";
-        final long created = System.currentTimeMillis();
-
-        platformService.createTables();
-
-        try {
-            transactionService.begin();
-            platformService.initializePlatformStructure();
-        } finally {
-            transactionService.complete();
-        }
-
-        final SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class)
-                .createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
-        try {
-            transactionService.begin();
-            platformService.createPlatform(platform);
-        } finally {
-            transactionService.complete();
-        }
+    public static void createPlatform() throws CreationException {
+        new PlatformAPIImpl().createPlatform();
     }
 
-    public static void deletePlatform(final TransactionService transactionService, final PlatformService platformService) throws Exception {
-        try {
-            transactionService.begin();
-            deactiveAndDeleteAllTenants(platformService);
-            platformService.deletePlatform();
-        } finally {
-            transactionService.complete();
-        }
-        platformService.deleteTables();
-    }
-
-    private static void deactiveAndDeleteAllTenants(final PlatformService platformService) throws STenantException, STenantNotFoundException,
-    STenantDeactivationException, STenantDeletionException, SDeletingActivatedTenantException {
-        List<STenant> existingTenants;
-        do {
-            existingTenants = platformService.getTenants(new QueryOptions(0, 100, STenant.class, "id", OrderByType.ASC));
-            for (final STenant sTenant : existingTenants) {
-                final long tenantId = sTenant.getId();
-                platformService.deactiveTenant(tenantId);
-                platformService.deleteTenant(tenantId);
-            }
-        } while (existingTenants.size() == 100);
-    }
-
-    public static String getDefaultTenantName() {
-        return DEFAULT_TENANT_NAME;
+    public static void deletePlatform() throws DeletionException {
+        new PlatformAPIImpl().deletePlatform();
     }
 
     public static long getDefaultTenantId(final PlatformService platformService) throws STenantNotFoundException {
         return platformService.getDefaultTenant().getId();
-    }
-
-    public static String getDefaultCreatedBy() {
-        return DEFAULT_CREATED_BY;
     }
 
     public static long createDefaultTenant(final TransactionService transactionService, final PlatformService platformService) throws Exception {

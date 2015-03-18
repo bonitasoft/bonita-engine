@@ -232,9 +232,6 @@ public class BonitaHomeServer extends BonitaHome {
 
     public FileOutputStream getProcessDefinitionFileOutputstream(long tenantId, long processId, String fileName) throws BonitaHomeNotSetException, IOException {
         final Folder processFolder = getProcessFolder(tenantId, processId);
-        if (!processFolder.exists()) {
-            processFolder.create();
-        }
         final File file = processFolder.getFile(fileName);
         return new FileOutputStream(file);
     }
@@ -317,14 +314,18 @@ public class BonitaHomeServer extends BonitaHome {
 
     public void storeSecurityScript(long tenantId, String scriptFileContent, String fileName, String[] folders) throws IOException, BonitaHomeNotSetException {
         final Folder secuFolder = FolderMgr.getTenantWorkSecurityFolder(getBonitaHomeFolder(), tenantId);
-        final Folder finalFolder = new Folder(secuFolder, folders);
-        finalFolder.create();
-        final File fileToWrite = finalFolder.newFile(fileName);
+        Folder current = secuFolder;
+        for (String folder : folders) {
+            current = new Folder(current, folder);
+            current.create();
+        }
+        final File fileToWrite = current.newFile(fileName);
         org.bonitasoft.engine.commons.io.IOUtil.writeFile(fileToWrite, scriptFileContent);
     }
 
     public void createProcess(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
         FolderMgr.createTenantWorkProcessFolder(getBonitaHomeFolder(), tenantId, processId);
+        FolderMgr.createTenantTempProcessFolder(getBonitaHomeFolder(), tenantId, processId);
     }
 
     public File[] getProcessClasspathFiles(final long tenantId, final long processId, final FilenameFilter filter) throws BonitaHomeNotSetException, IOException {
@@ -358,5 +359,9 @@ public class BonitaHomeServer extends BonitaHome {
 
     private Folder getUserFiltersFolder(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
         return FolderMgr.getTenantWorkProcessUserFiltersFolder(getBonitaHomeFolder(), tenantId, processId);
+    }
+
+    public File getSecurityScriptsFolder(long tenantId) throws BonitaHomeNotSetException, IOException {
+        return FolderMgr.getTenantWorkSecurityFolder(getBonitaHomeFolder(), tenantId).getFile();
     }
 }

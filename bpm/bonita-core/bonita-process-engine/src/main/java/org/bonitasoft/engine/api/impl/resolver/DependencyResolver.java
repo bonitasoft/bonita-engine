@@ -128,14 +128,12 @@ public class DependencyResolver {
                 loggerService.log(clazz, TechnicalLogSeverity.WARNING, "Unable to resolve dependencies after they were modified because of " + e.getMessage()
                         + ". Please retry it manually");
             }
-        } catch (final BonitaHomeNotSetException e) {
-            throw new BonitaRuntimeException("Bonita home not set", e);
         }
     }
 
     private void changeResolutionStatus(final long processDefinitionId, final TenantServiceAccessor tenantAccessor,
             final ProcessDefinitionService processDefinitionService, final DependencyService dependencyService,
-            final boolean resolved) throws SBonitaException, BonitaHomeNotSetException {
+            final boolean resolved) throws SBonitaException {
         final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
         if (resolved) {
             if (ConfigurationState.UNRESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {

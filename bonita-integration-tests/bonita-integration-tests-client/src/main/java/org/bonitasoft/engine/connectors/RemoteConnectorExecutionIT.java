@@ -66,6 +66,7 @@ import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
@@ -86,10 +87,15 @@ import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @SuppressWarnings("javadoc")
 public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private static final String CONNECTOR_OUTPUT_NAME = "output1";
 
@@ -398,6 +404,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
 
     @Test
     public void getNumberofConnectorImplementationsWhenProcessDoesNotExists() {
+        expectedException.expect(RetrieveException.class);
         assertEquals(0, getProcessAPI().getNumberOfConnectorImplementations(123L));
     }
 

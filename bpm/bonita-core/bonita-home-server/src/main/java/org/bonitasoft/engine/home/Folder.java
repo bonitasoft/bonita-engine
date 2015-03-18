@@ -26,22 +26,21 @@ public class Folder {
 
     private final File folder;
 
-
-    public Folder(final File folder, final String... subSequentFolders) throws IOException {
+    public Folder(final File folder) throws IOException {
         if (folder == null) {
             throw new IOException("Folder is null");
         }
-        this.folder = FileUtils.getFile(folder, subSequentFolders);
+        this.folder = new File(folder.getAbsolutePath());
     }
 
-    public Folder(final Folder folder, final String... subSequentFolders) throws IOException {
+    public Folder(final Folder folder, final String subFolder) throws IOException {
         if (folder == null) {
             throw new IOException("Folder is null");
         }
-        this.folder = FileUtils.getFile(folder.getFile(), subSequentFolders);
+        this.folder = new File(folder.getFile(), subFolder);
     }
 
-    private File getFile() {
+    public File getFile() {
         return this.folder;
     }
 

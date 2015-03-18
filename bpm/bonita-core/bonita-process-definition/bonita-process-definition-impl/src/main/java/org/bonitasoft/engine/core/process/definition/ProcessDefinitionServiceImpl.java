@@ -385,6 +385,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             final long processId = setIdOnProcessDefinition(definition);
             // storeProcessDefinition(processId, tenantId, definition);// FIXME remove that to check the read of processes
 
+            BonitaHomeServer.getInstance().createProcess(tenantId, processId);
             FileOutputStream outputStream = null;
 
             try {

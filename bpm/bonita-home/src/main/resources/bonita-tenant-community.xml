@@ -974,7 +974,6 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="scriptFolder" value="${bonita.home}/server/tenants/${tenantId}/conf/security-scripts/" />
         <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 

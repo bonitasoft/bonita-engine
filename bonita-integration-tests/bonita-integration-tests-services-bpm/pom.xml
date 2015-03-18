@@ -575,7 +575,7 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<target name="copy-overriding-conf">
+							<target name="build-home">
 								<ant antfile="build-home.xml" target="build"/>
 							</target>
 						</configuration>

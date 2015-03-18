@@ -80,45 +80,14 @@ public class TestUtil {
     public static long createPlatformAndDefaultTenant(final TransactionService txService, final PlatformService platformService,
             final SessionAccessor sessionAccessor,
             final SessionService sessionService) throws Exception {
-        PlatformUtil.createPlatform(txService, platformService);
+        PlatformUtil.createPlatform();
         final long defaultTenantId = PlatformUtil.createDefaultTenant(txService, platformService);
         final SSession session = createSession(txService, sessionService, defaultTenantId, DEFAULT_USER_NAME);
         sessionAccessor.setSessionInfo(session.getId(), defaultTenantId);
         return defaultTenantId;
     }
 
-    public static void createPlatform(final TransactionService txService, final PlatformService platformService)
-            throws Exception {
-        if (PlatformUtil.isPlatformCreated(txService, platformService)) {
-            PlatformUtil.deletePlatform(txService, platformService);
-        }
-        PlatformUtil.createPlatform(txService, platformService);
-    }
-
-    public static long createDefaultTenant(final TransactionService txService, final PlatformService platformService, final SessionAccessor sessionAccessor,
-            final SessionService sessionService) throws Exception {
-        if (!PlatformUtil.isPlatformCreated(txService, platformService)) {
-            PlatformUtil.createPlatform(txService, platformService);
-        }
-        final long defaultTenantId = PlatformUtil.createDefaultTenant(txService, platformService);
-        final SSession session = createSession(txService, sessionService, defaultTenantId, DEFAULT_USER_NAME);
-        sessionAccessor.deleteSessionId();
-        sessionAccessor.setSessionInfo(session.getId(), defaultTenantId);
-        return defaultTenantId;
-    }
-
-    public static void deleteDefaultTenant(final TransactionService txService, final PlatformService platformService, final SessionAccessor sessionAccessor,
-            final SessionService sessionService) throws Exception {
-        PlatformUtil.deleteDefaultTenant(txService, platformService, sessionAccessor, sessionService);
-    }
-
-    public static void deletePlatForm(final TransactionService txService, final PlatformService platformService, final SchedulerService schedulerService)
-            throws Exception {
-        stopScheduler(schedulerService, txService);
-        PlatformUtil.deletePlatform(txService, platformService);
-    }
-
-    public static SSession createSession(final TransactionService txService, final SessionService sessionService, final long defaultTenantId,
+    private static SSession createSession(final TransactionService txService, final SessionService sessionService, final long defaultTenantId,
             final String username) throws SBonitaException {
         txService.begin();
         final SSession session = sessionService.createSession(defaultTenantId, username);
@@ -130,7 +99,7 @@ public class TestUtil {
             final SessionAccessor sessionAccessor, final SessionService sessionService) throws Exception {
         sessionAccessor.deleteSessionId();
         PlatformUtil.deleteDefaultTenant(txService, platformService, sessionAccessor, sessionService);
-        PlatformUtil.deletePlatform(txService, platformService);
+        PlatformUtil.deletePlatform();
         sessionAccessor.deleteSessionId();
     }
 

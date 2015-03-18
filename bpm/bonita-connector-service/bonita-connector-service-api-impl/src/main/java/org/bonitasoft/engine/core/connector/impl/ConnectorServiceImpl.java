@@ -400,9 +400,9 @@ public class ConnectorServiceImpl implements ConnectorService {
                 }
             }
         } catch (final BonitaHomeNotSetException e) {
-            throw new BonitaRuntimeException("Bonita home is not set !!");
+            throw new SConnectorException("Bonita home is not set !!", e);
         } catch (IOException e) {
-            throw new BonitaRuntimeException(e);
+            throw new SConnectorException(e);
         }
         return resolved;
     }
