@@ -102,6 +102,21 @@
 
     <bean id="platformAuthenticationService" class="org.bonitasoft.engine.service.impl.PlatformAuthenticationChecker" />
 
+    <bean id="sqlFolders" parent="communitySqlFolders" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="communitySqlFolders" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+                <value>/sql/${db.vendor}</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="platformService" class="org.bonitasoft.engine.platform.impl.PlatformServiceImpl">
         <constructor-arg ref="platformPersistenceService" />
         <constructor-arg name="tenantPersistenceServices">
@@ -115,7 +130,7 @@
         <constructor-arg name="recorder" ref="platformRecorderSync" />
         <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
         <!-- read SQL files from within bonita-server.jar -->
-        <constructor-arg name="sqlFolder" value="/sql/${db.vendor}" />
+        <constructor-arg name="sqlFolders" ref="sqlFolders" />
         <constructor-arg name="statementDelimiter" value="${${db.vendor}.sql.delimiter}" />
     </bean>
 

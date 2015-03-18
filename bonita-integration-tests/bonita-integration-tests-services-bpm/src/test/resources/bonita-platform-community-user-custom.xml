@@ -77,26 +77,12 @@
 		</property>
 	</bean>
 
-	<!-- to add test sql scripts -->
-	<bean id="platformService" class="org.bonitasoft.engine.platform.impl.PlatformServiceImpl">
-		<constructor-arg ref="platformPersistenceService" />
-		<constructor-arg name="tenantPersistenceServices">
-			<list>
-				<ref bean="persistenceService" />
-			</list>
-		</constructor-arg>
-		<constructor-arg ref="platformTechnicalLoggerService" />
-		<constructor-arg ref="platformCacheService" />
-		<constructor-arg ref="platformProperties" />
-		<constructor-arg name="recorder" ref="platformRecorderSync" />
-		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
-		<constructor-arg name="sqlFolders">
-			<list>
-				<value>/sql/${db.vendor}</value>
+	<bean id="sqlFolders" parent="communitySqlFolders" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list merge="true">
 				<value>target/test-classes/sql-test/sql/${db.vendor}</value>
 			</list>
-		</constructor-arg>
-		<constructor-arg name="statementDelimiter" value="${${db.vendor}.sql.delimiter}" />
+		</property>
 	</bean>
 
 	<bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.MockQueriableLoggerStrategy" />
