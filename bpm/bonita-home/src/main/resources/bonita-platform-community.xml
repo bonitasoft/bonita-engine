@@ -3,9 +3,11 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:p="http://www.springframework.org/schema/p"
         xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="
 	http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 	http://www.springframework.org/schema/context	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
 	">
 
     <bean id="archivingStrategy" class="org.bonitasoft.engine.archive.impl.DefaultArchivingStrategy" />
@@ -979,8 +981,8 @@
         <constructor-arg ref="hbmResourcesConfigurationProvider" />
     </bean>
 
-    <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl">
-        <property name="hbmResources">
+    <bean id="communityHbmResources" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
             <list>
                 <ref bean="hbm-bonita-dependency-model" />
                 <ref bean="hbm-bonita-dependency-platform-model" />
@@ -1008,6 +1010,17 @@
                 <ref bean="hbm-bos-application-model" />
             </list>
         </property>
+    </bean>
+    <bean id="hbmResources" parent="communityHbmResources" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+
+            </list>
+        </property>
+    </bean>
+
+    <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl">
+        <property name="hbmResources" ref="hbmResources"/>
     </bean>
 
     <bean id="hbm-bos-page-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
