@@ -505,38 +505,38 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- Reporting -->
-    <dependency>
-      <groupId>com.bonitasoft.engine.core.reporting</groupId>
-      <artifactId>bonita-reporting-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+      <!-- Reporting -->
+      <dependency>
+          <groupId>com.bonitasoft.engine.core.reporting</groupId>
+          <artifactId>bonita-reporting-impl</artifactId>
+          <version>${project.version}</version>
+      </dependency>
 
-    <!-- Scheduler -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.scheduler</groupId>
-      <artifactId>bonita-scheduler-quartz</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.bonitasoft.engine.scheduler</groupId>
-      <artifactId>bonita-scheduler-quartz-sp</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+      <!-- Scheduler -->
+      <dependency>
+          <groupId>org.bonitasoft.engine.scheduler</groupId>
+          <artifactId>bonita-scheduler-quartz</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>com.bonitasoft.engine.scheduler</groupId>
+          <artifactId>bonita-scheduler-quartz-sp</artifactId>
+          <version>${project.version}</version>
+      </dependency>
 
-    <!-- Service Commons -->
+      <!-- Service Commons -->
 
-    <!-- Sequence -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.persistence</groupId>
-      <artifactId>bonita-sequence-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.persistence</groupId>
-      <artifactId>bonita-sequence-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+      <!-- Sequence -->
+      <dependency>
+          <groupId>org.bonitasoft.engine.persistence</groupId>
+          <artifactId>bonita-sequence-api</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.bonitasoft.engine.persistence</groupId>
+          <artifactId>bonita-sequence-impl</artifactId>
+          <version>${project.version}</version>
+      </dependency>
 
     <!-- Session -->
     <dependency>
@@ -752,11 +752,11 @@
                                     <include>com.bonitasoft.engine.authentication:bonita-authentication-jaas</include>
                                     <include>com.bonitasoft.engine.authentication:bonita-authentication-impl</include>
                                     <!-- Business application -->
-                                    <inlude>org.bonitasoft.engine.application:bonita-business-application-api</inlude>
-                                    <inlude>org.bonitasoft.engine.application:bonita-business-application-impl</inlude>
-                                    <!-- Business Data -->
-                                    <inlude>org.bonitasoft.engine.data:bonita-business-data-api</inlude>
-                                    <inlude>org.bonitasoft.engine.data:bonita-business-data-impl</inlude>
+                                    <include>org.bonitasoft.engine.application:bonita-business-application-api</include>
+                                    <include>org.bonitasoft.engine.application:bonita-business-application-impl</include>
+									<!-- Business Data -->
+                                    <include>org.bonitasoft.engine.data:bonita-business-data-api</include>
+                                    <include>org.bonitasoft.engine.data:bonita-business-data-impl</include>
                                     <!-- Cache -->
                                     <include>org.bonitasoft.engine.cache:bonita-cache-api</include>
                                     <include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
@@ -817,11 +817,15 @@
                                     <include>org.bonitasoft.engine.core:bonita-expression-resolver-api</include>
                                     <include>org.bonitasoft.engine.core:bonita-expression-resolver-api-impl</include>
                                     <!-- External Identity Mapping -->
-                                    <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-api</include>
-                                    <include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl</include>
+                                    <include>
+                                        org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-api
+                                    </include>
                                     <!-- Form Mapping -->
                                     <include>org.bonitasoft.engine.core:bonita-form-mapping-api</include>
                                     <include>org.bonitasoft.engine.core:bonita-form-mapping-impl</include>
+                                    <include>
+                                        org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl
+                                    </include>
                                     <!-- Home Server -->
                                     <include>org.bonitasoft.engine.core:bonita-home-server</include>
                                     <!-- Incident -->
@@ -853,8 +857,6 @@
                                     <include>org.bonitasoft.engine.page:bonita-page-api</include>
                                     <include>org.bonitasoft.engine.page:bonita-page-impl</include>
                   <!-- Parameter -->
-                                    <include>org.bonitasoft.engine.core:bonita-parameter-api</include>
-                                    <include>org.bonitasoft.engine.core:bonita-parameter-propertyfile</include>
                   <!-- Persistence -->
                   <include>org.bonitasoft.engine.persistence:bonita-persistence-api</include>
                   <include>org.bonitasoft.engine.persistence:bonita-persistence-db</include>

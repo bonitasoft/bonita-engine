@@ -177,7 +177,6 @@
                 <!-- <entry key="getActorsOfScope" value="true"/> -->
                 <!-- <entry key="getActorsOfScopes" value="true"/> -->
                 <!-- <entry key="getActorsOfUser" value="true"/> -->
-                <!-- <entry key="getActorsOfUserCanStartProcessDefinition" value="true"/> -->
                 <!-- <entry key="getNumberOfActorMembersOfActor" value="true"/> -->
                 <!-- <entry key="getDataSourceByNameAndVersion" value="true"/> -->
                 <!-- <entry key="getDataSourceParameterByNameAndDataSourceId" value="true"/> -->
