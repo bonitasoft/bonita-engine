@@ -804,10 +804,24 @@
         </property>
     </bean>
 
+    <bean id="extraPlatformHibernateProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+        <property name="map">
+            <map>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="extraTenantHibernateProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+        <property name="map">
+            <map>
+            </map>
+        </property>
+    </bean>
+
     <bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformHibernatePersistenceService" destroy-method="destroy">
         <constructor-arg name="name" value="platform" />
-        <constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
-        <constructor-arg name="extraHibernateProperties"><null /></constructor-arg>
+        <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
+        <constructor-arg name="extraHibernateProperties" ref="extraPlatformHibernateProperties"/>
         <constructor-arg name="likeEscapeCharacter" value="#" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
@@ -823,8 +837,8 @@
     <bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" destroy-method="destroy">
         <constructor-arg name="name" value="journal" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
-        <constructor-arg name="extraHibernateProperties"><null /></constructor-arg>
+        <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
+        <constructor-arg name="extraHibernateProperties" ref="extraTenantHibernateProperties"/>
         <constructor-arg name="likeEscapeCharacter" value="#" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
@@ -837,30 +851,49 @@
         </constructor-arg>
     </bean>
 
-    <bean id="journalConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateConfigurationProviderImpl">
-        <constructor-arg name="properties">
-            <bean class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
-                <property name="map">
-                    <map>
-                        <entry key="hibernate.connection.datasource" value="${database.journal.datasource.name}"/>
-                        <entry key="hibernate.current_session_context_class" value="jta" />
-                        <entry key="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
-                        <entry key="hibernate.transaction.jta.platform" value="${hibernate.transaction.jta_platform}" />
-                        <entry key="hibernate.dialect" value="${${db.vendor}.hibernate.journal.dialect}" />
-                        <entry key="hibernate.interceptor" value="${${db.vendor}.hibernate.journal.interceptor}" />
-                        <entry key="hibernate.show_sql" value="${hibernate.journal.show_sql}" />
-                        <entry key="hibernate.format_sql" value="${hibernate.journal.format_sql}" />
-                        <entry key="hibernate.use_sql_comments" value="${hibernate.journal.use_sql_comments}" />
-                        <entry key="hibernate.generate_statistics" value="false" />
-                        <entry key="hibernate.connection.shutdown" value="true" />
-                        <entry key="hibernate.validator.autoregister_listeners" value="false" />
-                        <entry key="hibernate.validator.apply_to_ddl" value="false" />
-                        <entry key="javax.persistence.validation.mode" value="NONE" />
-                    </map>
-                </property>
-            </bean>
-        </constructor-arg>
-        <constructor-arg name="interfaceToClassMapping">
+    <bean id="hbmConfigurationProviderProperties" parent="communityHbmConfigurationProviderProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+        <property name="map">
+            <map merge="true">
+            </map>
+        </property>
+    </bean>
+
+    <bean id="communityHbmConfigurationProviderProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+        <property name="map">
+            <map>
+                <entry key="hibernate.connection.datasource" value="${database.journal.datasource.name}"/>
+                <entry key="hibernate.current_session_context_class" value="jta" />
+                <entry key="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
+                <entry key="hibernate.transaction.jta.platform" value="${hibernate.transaction.jta_platform}" />
+                <entry key="hibernate.dialect" value="${${db.vendor}.hibernate.journal.dialect}" />
+                <entry key="hibernate.interceptor" value="${${db.vendor}.hibernate.journal.interceptor}" />
+                <entry key="hibernate.show_sql" value="${hibernate.journal.show_sql}" />
+                <entry key="hibernate.format_sql" value="${hibernate.journal.format_sql}" />
+                <entry key="hibernate.use_sql_comments" value="${hibernate.journal.use_sql_comments}" />
+                <entry key="hibernate.generate_statistics" value="false" />
+                <entry key="hibernate.connection.shutdown" value="true" />
+                <entry key="hibernate.validator.autoregister_listeners" value="false" />
+                <entry key="hibernate.validator.apply_to_ddl" value="false" />
+                <entry key="javax.persistence.validation.mode" value="NONE" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="interfaceToClassMapping" parent="communityInterfaceToClassMapping" class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="targetMapClass">
+            <value>java.util.HashMap</value>
+        </property>
+        <property name="sourceMap">
+            <map merge="true">
+            </map>
+        </property>
+    </bean>
+
+    <bean id="communityInterfaceToClassMapping" class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="targetMapClass">
+            <value>java.util.HashMap</value>
+        </property>
+        <property name="sourceMap">
             <map>
                 <!-- platform -->
                 <entry key="org.bonitasoft.engine.platform.model.SPlatform" value="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" />
@@ -1005,12 +1038,20 @@
                 <entry key="org.bonitasoft.engine.core.document.model.archive.SADocumentMapping" value="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" />
                 <entry key="org.bonitasoft.engine.core.document.model.archive.SAMappedDocument" value="org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl" />
             </map>
-        </constructor-arg>
-        <constructor-arg name="mappingExclusions">
+        </property>
+    </bean>
+
+    <bean id="mappingExclusions" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
             <list>
                 <value>org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple</value>
             </list>
-        </constructor-arg>
+        </property>
+    </bean>
+    <bean id="hbmConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateConfigurationProviderImpl">
+        <constructor-arg name="properties" ref="hbmConfigurationProviderProperties"/>
+        <constructor-arg name="interfaceToClassMapping" ref="interfaceToClassMapping"/>
+        <constructor-arg name="mappingExclusions" ref="mappingExclusions"/>
         <constructor-arg ref="hbmResourcesConfigurationProvider" />
     </bean>
 

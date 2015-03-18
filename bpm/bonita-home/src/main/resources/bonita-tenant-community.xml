@@ -210,9 +210,16 @@
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
     </bean>
 
-    <bean id="defaultCommandProvider" class="org.bonitasoft.engine.command.DefaultCommandProvider">
-        <property name="defaultCommands">
-            <list>
+    <bean id="defaultCommands" parent="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
                 <ref bean="canStartProcessDefinition" />
                 <ref bean="isInvolvedInHumanTask" />
                 <ref bean="importProfiles" />
@@ -242,6 +249,10 @@
                 <ref bean="getBusinessDataByQueryCommand" />
             </list>
         </property>
+    </bean>
+
+    <bean id="defaultCommandProvider" class="org.bonitasoft.engine.command.DefaultCommandProvider">
+        <property name="defaultCommands" ref="defaultCommands"/>
     </bean>
 
     <bean id="canStartProcessDefinition" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
@@ -693,11 +704,11 @@
         <constructor-arg name="platformService" ref="platformService" />
     </bean>
 
+    <bean id="workSynchronizationFactory" class="org.bonitasoft.engine.work.SequenceWorkSynchronizationFactory" />
+
     <bean id="workService" class="org.bonitasoft.engine.work.ExecutorWorkService">
         <constructor-arg name="transactionService" ref="transactionService" />
-        <constructor-arg name="workSynchronizationFactory">
-            <bean class="org.bonitasoft.engine.work.SequenceWorkSynchronizationFactory" />
-        </constructor-arg>
+        <constructor-arg name="workSynchronizationFactory" ref="workSynchronizationFactory"/>
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="bonitaExecutorServiceFactory" ref="bonitaExecutorServiceFactory" />
@@ -714,8 +725,15 @@
     <bean id="operationExecutorStrategyProvider"
           class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="constructor"/>
 
-    <bean id="leftOperandHandlerProvider" class="org.bonitasoft.engine.core.operation.LeftOperandHandlerProvider">
-        <property name="leftOperandHandlers">
+    <bean id="leftOperandHandlers" parent="communityLeftOperandHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="communityLeftOperandHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
             <list>
                 <ref bean="dataLeftOperandHandler"/>
                 <ref bean="transientDataLeftOperandHandler"/>
@@ -725,6 +743,10 @@
                 <ref bean="businessDataLeftOperandHandler" />
             </list>
         </property>
+    </bean>
+
+    <bean id="leftOperandHandlerProvider" class="org.bonitasoft.engine.core.operation.LeftOperandHandlerProvider">
+        <property name="leftOperandHandlers" ref="leftOperandHandlers"/>
     </bean>
 
     <bean id="businessDataLeftOperandHandler" class="org.bonitasoft.engine.operation.BusinessDataLeftOperandHandler">
@@ -989,7 +1011,7 @@
 
 
     <bean id="loginService" class="org.bonitasoft.engine.core.login.SecuredLoginServiceImpl">
-        <constructor-arg ref="authenticationService" />
+        <constructor-arg ref="${authentication.service.ref.name:authenticationService}" />
         <constructor-arg ref="sessionService" />
         <constructor-arg ref="sessionAccessor" />
         <constructor-arg ref="identityService" />
