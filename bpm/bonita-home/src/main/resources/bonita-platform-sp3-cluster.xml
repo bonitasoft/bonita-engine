@@ -178,7 +178,7 @@
 			<map merge="true">
 				<!-- 				Hazelcast second level cache configuration, more details here : http://www.hazelcast.com/docs/3.0/manual/multi_html/ch13.html -->
 				<entry key="hibernate.cache.use_second_level_cache" value="false"/>
-				<entry key="hibernate.cache.use_query_cache" value="false""/>
+				<entry key="hibernate.cache.use_query_cache" value="false"/>
 				<entry key="hibernate.cache.use_minimal_puts" value="false"/>
 				<!-- 				name of the default instance used by bonita, it's configuration is set using cfg-bonita-clustering.xml -->
 				<entry key="hibernate.cache.hazelcast.instance_name" value="bonita"/>

@@ -341,6 +341,11 @@
         <constructor-arg name="transactionService" ref="transactionService" />
     </bean>
 
+    <bean id="bonitaDSJNDI" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${database.journal.datasource.name}" />
+    </bean>
+
+
     <bean id="reportingService" class="com.bonitasoft.engine.core.reporting.ReportingServiceImpl">
         <constructor-arg name="dataSource" ref="bonitaDSJNDI" />
         <constructor-arg name="persistenceService" ref="persistenceService" />

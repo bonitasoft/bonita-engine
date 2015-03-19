@@ -198,6 +198,12 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.events</groupId>
+			<artifactId>bonita-events-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- Expression -->
 		<dependency>
@@ -560,6 +566,18 @@
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.reporting</groupId>
 			<artifactId>bonita-reporting-api</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.core.reporting</groupId>
+			<artifactId>bonita-reporting-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.authentication</groupId>
+			<artifactId>bonita-authentication-jaas</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
