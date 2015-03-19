@@ -13,23 +13,13 @@
  **/
 package org.bonitasoft.engine.test.util;
 
-import java.util.List;
-
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
-import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
-import org.bonitasoft.engine.platform.exception.STenantDeletionException;
-import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
-import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.session.SessionService;

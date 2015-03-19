@@ -28,12 +28,12 @@ public class AllBPMTestsWithJNDI {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        System.err.println("=================== AllBPMTests.beforeClass()");
+        System.err.println("=================== AllBPMTestsWithJNDI.beforeClass()");
     }
 
     @AfterClass
     public static void afterClass() throws Exception {
-        System.err.println("=================== AllBPMTests.afterClass()");
+        System.err.println("=================== AllBPMTestsWithJNDI.afterClass()");
     }
 
 }
