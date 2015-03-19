@@ -17,6 +17,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -72,12 +73,13 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
-             final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
-            final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService, TransitionEvaluator transitionEvaluator) {
+            final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
+            final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService, TransitionEvaluator transitionEvaluator,
+            final ContractDataService contractDataService) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
                 transitionService, eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
                 expressionResolverService, eventService, handlers, documentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
-                eventsHandler, flowNodeStateManager, businessDataRepository, refBusinessDataService, transitionEvaluator);
+                eventsHandler, flowNodeStateManager, businessDataRepository, refBusinessDataService, transitionEvaluator, contractDataService);
     }
 
     protected void initializeData(final SProcessDefinition sDefinition, final SProcessInstance sInstance) throws SProcessInstanceCreationException {
