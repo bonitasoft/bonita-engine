@@ -1,4 +1,4 @@
-<project name="bonita-integration-tests-servives-bpm" default="build">
+<project name="bonita-integration-tests-servives-bpm" default="build-home-tests">
 
 	<property name="target.dir" value="${basedir}/target"/>
 	<property name="resources.dir" value="${basedir}/src/test/resources"/>
@@ -9,7 +9,7 @@
 	<property name="bh.target.conf.tenant.dir" value="${bh.target.dir}/engine-server/conf/tenants/template"/>
 	<property name="bh.target.conf.platforminit.dir" value="${bh.target.dir}/engine-server/conf/platform-init"/>
 	
-	<target name="build">
+	<target name="build-home-tests">
 		<delete dir="${bh.target.dir}" />
 		<copy todir="${bh.target.dir}">
 			<fileset dir="${bh.source.dir}">

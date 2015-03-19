@@ -125,7 +125,7 @@
                         <configuration>
                             <target>
                                 <echo file="${project.build.directory}/VERSION" append="false">${project.version}</echo>
-                                <ant antfile="build-home.xml" target="build"/>
+                                <ant antfile="build-home.xml" target="build-home"/>
                             </target>
                         </configuration>
                     </execution>
