@@ -26,6 +26,7 @@ import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 
 /**
  * @author Matthieu Chaffotte
@@ -36,10 +37,15 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     private final ContractDefinitionImpl contract;
 
     public ContractDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
-            final UserTaskDefinitionImpl activity) {
+                                     final UserTaskDefinitionImpl activity) {
         super(container, processDefinitionBuilder);
         contract = new ContractDefinitionImpl();
         activity.setContract(contract);
+    }
+    public ContractDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final DesignProcessDefinitionImpl container) {
+        super((FlowElementContainerDefinitionImpl) container.getProcessContainer(), processDefinitionBuilder);
+        contract = new ContractDefinitionImpl();
+        container.setContract(contract);
     }
 
     public ContractDefinitionBuilder addSimpleInput(final String name, final Type type, final String description) {

@@ -29,6 +29,7 @@ import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -99,7 +100,6 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         assertThat(shell2).isNotNull();
         assertThat(shell1).isNotEqualTo(shell2);
     }
-
     @Test
     public void should_getShell_return_same_shell_for_1_definition() throws Exception {
         // when
@@ -110,6 +110,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         assertThat(shell1).isNotNull();
         assertThat(shell1).isEqualTo(shell2);
     }
+
 
     @Test
     public void should_getScriptFromCache_return_a_the_same_script_class_if_in_same_definition() throws Exception {
@@ -175,21 +176,13 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
         assertThat(script1).isNotEqualTo(script2);
     }
 
-    @Test
+    @Test(expected = SBonitaRuntimeException.class)
     public void should_not_put_in_cache_script_without_definition_id() throws Exception {
-        //given
-        final List<Object> keys = cacheService.getKeys(GroovyScriptExpressionExecutorCacheStrategy.GROOVY_SCRIPT_CACHE_NAME);
-        assertThat(keys).as("cache should be empty").isEmpty();
 
         // when
         groovyScriptExpressionExecutorCacheStrategy.getScriptFromCache("MyScriptContent1", null);
 
         // then
-        final List<Object> cacheServiceKeys = cacheService.getKeys(GroovyScriptExpressionExecutorCacheStrategy.GROOVY_SCRIPT_CACHE_NAME);
-        for (Object key : cacheServiceKeys) {
-            assertThat(key.toString()).as("should store only script definitions").startsWith(GroovyScriptExpressionExecutorCacheStrategy.SCRIPT_KEY);
-        }
-        assertThat(cacheServiceKeys).as("should store one script definitions").hasSize(1);
-
+        //exception
     }
 }

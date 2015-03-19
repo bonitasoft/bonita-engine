@@ -30,8 +30,8 @@ public class TaskReadyHandler extends AbstractJMSUpdateHandler {
 
     private final String identifier;
 
-    public TaskReadyHandler(final long tenantId, final long messageTimeout) {
-        super(tenantId, messageTimeout);
+    public TaskReadyHandler(final long tenantId, final long messageTimeout, final String brokerURL) {
+        super(tenantId, messageTimeout, brokerURL);
         this.identifier = UUID.randomUUID().toString();
     }
 

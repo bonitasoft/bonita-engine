@@ -125,6 +125,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 final int numberOfInstances = miActivity.getNumberOfInstances();
                 input.put(ExpressionConstants.NUMBER_OF_INSTANCES.getEngineConstantName(), numberOfInstances);
                 final SExpressionContext sExpressionContext = new SExpressionContext(miActivity.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), input);
+                sExpressionContext.setProcessDefinitionId(miActivity.getProcessDefinitionId());
                 if (completionCondition != null) {
                     final boolean complete = (Boolean) expressionResolverService.evaluate(completionCondition, sExpressionContext);
                     if (complete) {

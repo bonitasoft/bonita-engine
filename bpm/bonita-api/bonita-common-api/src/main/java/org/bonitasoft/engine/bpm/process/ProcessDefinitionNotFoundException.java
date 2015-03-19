@@ -59,6 +59,6 @@ public class ProcessDefinitionNotFoundException extends NotFoundException {
      *        cause is nonexistent or unknown.)
      */
     public ProcessDefinitionNotFoundException(final long processDefinitionId, final Throwable cause) {
-        super("Process definition does not found, with id=" + processDefinitionId, cause);
+        super("Process definition not found with id: " + processDefinitionId, cause);
     }
 }

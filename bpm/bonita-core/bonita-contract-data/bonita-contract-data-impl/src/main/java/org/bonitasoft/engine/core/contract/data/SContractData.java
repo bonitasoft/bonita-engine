@@ -21,7 +21,7 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 /**
  * @author Matthieu Chaffotte
  */
-public class SContractData extends PersistentObjectId implements PersistentObject {
+public abstract class SContractData extends PersistentObjectId implements PersistentObject {
 
     private static final long serialVersionUID = 4666337073276985147L;
 
@@ -29,13 +29,21 @@ public class SContractData extends PersistentObjectId implements PersistentObjec
 
     private Serializable value;
 
+    public long getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(long scopeId) {
+        this.scopeId = scopeId;
+    }
+
     private long scopeId;
 
     public SContractData() {
         super();
     }
 
-    public SContractData(final String name, final Serializable value, final long scopeId) {
+    public SContractData(final String name, final Serializable value, long scopeId) {
         super();
         this.name = name;
         this.value = value;
@@ -61,14 +69,6 @@ public class SContractData extends PersistentObjectId implements PersistentObjec
     @Override
     public String getDiscriminator() {
         return SContractData.class.getName();
-    }
-
-    public long getScopeId() {
-        return scopeId;
-    }
-
-    public void setScopeId(final long scopeId) {
-        this.scopeId = scopeId;
     }
 
 }
