@@ -115,7 +115,7 @@ public class ProcessConfigurationAPIImplTest {
         SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, FormMappingTarget.INTERNAL.name(), "myForm", PROCESS_DEF_ID);
         doReturn(sFormMapping).when(formMappingService).get(FORM_MAPPING_ID);
         //when
-        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", FormMappingTarget.INTERNAL.name());
+        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", FormMappingTarget.INTERNAL);
         //then
         verify(formMappingService, times(1)).update(sFormMapping,"theNewForm",FormMappingTarget.INTERNAL.name());
 
