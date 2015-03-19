@@ -18,8 +18,10 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
+import org.bonitasoft.engine.execution.Filter;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.work.failurewrapping.ConnectorDefinitionAndInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.FlowNodeDefinitionAndInstanceContextWork;
@@ -30,9 +32,10 @@ import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * Factory to construct works
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class WorkFactory {
 
@@ -51,17 +54,17 @@ public class WorkFactory {
 
     public static BonitaWork createExecuteConnectorOfProcess(final long processDefinitionId, final long processInstanceId, final long rootProcessInstanceId,
             final long connectorInstanceId, final String connectorDefinitionName, final ConnectorEvent activationEvent,
-            final FlowNodeSelector selectorForConnectorOnEnter) {
+            final FlowNodeSelector flowNodeSelector) {
         BonitaWork wrappedWork = new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName, processInstanceId,
-                rootProcessInstanceId, activationEvent, selectorForConnectorOnEnter);
-        ProcessInstanceContextWork processInstanceContextWork = buildProcessInstanceContextWork(processDefinitionId, processInstanceId, rootProcessInstanceId,
+                rootProcessInstanceId, activationEvent, flowNodeSelector);
+        final ProcessInstanceContextWork processInstanceContextWork = buildProcessInstanceContextWork(processDefinitionId, processInstanceId, rootProcessInstanceId,
                 wrappedWork);
         wrappedWork = new ConnectorDefinitionAndInstanceContextWork(processInstanceContextWork, connectorDefinitionName, connectorInstanceId,
                 activationEvent);
         return new FailureHandlingBonitaWork(wrappedWork);
     }
 
-    public static BonitaWork createExecuteFlowNodeWork(long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,
+    public static BonitaWork createExecuteFlowNodeWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,
             final List<SOperation> operations, final SExpressionContext contextDependency) {
         if (processInstanceId <= 0) {
             throw new RuntimeException("It is forbidden to create a ExecuteFlowNodeWork with a processInstanceId equals to " + processInstanceId);
@@ -100,14 +103,14 @@ public class WorkFactory {
     }
 
     private static BonitaWork buildFlowNodeDefinitionAndInstanceContextWork(final long processDefinitionId, final long processInstanceId,
-            final long rootProcessInstanceId, final long flowNodeInstanceId, BonitaWork wrappedWork) {
+            final long rootProcessInstanceId, final long flowNodeInstanceId, final BonitaWork wrappedWork) {
         final ProcessInstanceContextWork processInstanceContextWork = buildProcessInstanceContextWork(processDefinitionId, processInstanceId,
                 rootProcessInstanceId, wrappedWork);
         return new FlowNodeDefinitionAndInstanceContextWork(processInstanceContextWork, flowNodeInstanceId);
     }
 
     private static ProcessInstanceContextWork buildProcessInstanceContextWork(final long processDefinitionId, final long processInstanceId,
-            final long rootProcessInstanceId, BonitaWork wrappedWork) {
+            final long rootProcessInstanceId, final BonitaWork wrappedWork) {
         final ProcessDefinitionContextWork processDefinitionContextWork = new ProcessDefinitionContextWork(wrappedWork, processDefinitionId);
         return new ProcessInstanceContextWork(processDefinitionContextWork, processInstanceId, rootProcessInstanceId);
     }

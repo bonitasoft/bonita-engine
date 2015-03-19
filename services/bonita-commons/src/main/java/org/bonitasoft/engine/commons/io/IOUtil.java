@@ -59,7 +59,6 @@ import org.bonitasoft.engine.commons.ClassDataUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.Pair;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 import sun.misc.IOUtils;
 import sun.security.util.ManifestDigester;
 

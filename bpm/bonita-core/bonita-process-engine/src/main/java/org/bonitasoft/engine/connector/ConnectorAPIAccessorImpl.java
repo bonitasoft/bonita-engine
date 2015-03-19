@@ -23,6 +23,7 @@ import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
@@ -62,7 +63,7 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
             try {
                 final SSession session = sessionService.createSession(tenantId, ConnectorAPIAccessorImpl.class.getSimpleName());// FIXME get the
                 sessionAccessor.setSessionInfo(session.getId(), tenantId);
-                return ModelConvertor.toAPISession(session, null);
+                apiSession = ModelConvertor.toAPISession(session, null);
             } catch (final BonitaRuntimeException e) {
                 throw e;
             } catch (final Exception e) {
@@ -110,6 +111,11 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     @Override
     public ApplicationAPI getLivingApplicationAPI() {
         return getAPI(ApplicationAPI.class, getAPISession());
+    }
+
+    @Override
+    public ProcessConfigurationAPI getProcessConfigurationAPIi() {
+        return getAPI(ProcessConfigurationAPI.class, getAPISession());
     }
 
     @Override

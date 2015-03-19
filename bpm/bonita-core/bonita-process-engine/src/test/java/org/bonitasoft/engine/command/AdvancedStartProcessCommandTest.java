@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.command;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 
@@ -23,8 +23,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-
-import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
@@ -93,7 +91,7 @@ public class AdvancedStartProcessCommandTest {
             command.execute(parameters, serviceAccessor);
             fail("As the activity names is empty and exception must be thrown during the validation");
         } catch (SCommandExecutionException e) {
-            assertTrue(e.getMessage().contains("No flownode named '' was found in the process"));
+            assertThat(e.getMessage()).contains("No flownode named '' was found in the process");
         }
     }
 

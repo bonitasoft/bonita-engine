@@ -31,6 +31,7 @@ import org.bonitasoft.engine.cache.CacheServiceTest;
 import org.bonitasoft.engine.classloader.ClassLoaderServiceTest;
 import org.bonitasoft.engine.command.CommandServiceIntegrationTest;
 import org.bonitasoft.engine.continuation.WorkServiceTest;
+import org.bonitasoft.engine.core.form.impl.FormMappingServiceIT;
 import org.bonitasoft.engine.data.instance.DataInstanceServiceTest;
 import org.bonitasoft.engine.data.instance.TransientDataInstanceServiceIT;
 import org.bonitasoft.engine.dependency.DependencyServiceTest;
@@ -89,7 +90,8 @@ import org.junit.runners.Suite.SuiteClasses;
         SupervisorServiceTest.class,
         NodeConfigurationTest.class,
         ConnectorInstanceServiceIntegrationTests.class,
-        PlatformLoginServiceTest.class
+        PlatformLoginServiceTest.class,
+        FormMappingServiceIT.class
 })
 public class AllBPMTests {
 }

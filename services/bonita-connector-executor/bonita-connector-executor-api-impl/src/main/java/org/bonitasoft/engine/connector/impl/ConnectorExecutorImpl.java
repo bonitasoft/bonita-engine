@@ -32,6 +32,7 @@ import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.tracking.TimeTracker;
@@ -42,6 +43,7 @@ import org.bonitasoft.engine.tracking.TimeTrackerRecords;
  *
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class ConnectorExecutorImpl implements ConnectorExecutor {
 
@@ -101,12 +103,20 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     }
 
     @Override
-    public Map<String, Object> execute(final SConnector sConnector, final Map<String, Object> inputParameters) throws SConnectorException {
+    public Map<String, Object> execute(final SConnector sConnector, final Map<String, Object> inputParameters, final ClassLoader classLoader)
+            throws SConnectorException {
         final long startTime = System.currentTimeMillis();
         if (executorService == null) {
             throw new SConnectorException("Unable to execute a connector, if the node is not started. Start it first");
         }
-        final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector);
+
+        long tenantId;
+        try {
+            tenantId = sessionAccessor.getTenantId();
+        } catch (final STenantIdNotSetException tenantIdNotSetException) {
+            throw new SConnectorException("Tenant id not set.", tenantIdNotSetException);
+        }
+        final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector, tenantId, classLoader);
         final Future<Map<String, Object>> submit = executorService.submit(callable);
         try {
             return getValue(submit);
@@ -172,14 +182,25 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
         private final SConnector sConnector;
 
-        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector) {
+        private final long tenantId;
+
+        private final ClassLoader loader;
+
+        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, final long tenantId, final ClassLoader loader) {
             this.inputParameters = inputParameters;
             this.sConnector = sConnector;
+            this.tenantId = tenantId;
+            this.loader = loader;
         }
 
         @Override
         public Map<String, Object> call() throws Exception {
             final long startTime = System.currentTimeMillis();
+
+            //Fix Classloading issue with ThreadLocal implementation of SessionAccessor
+            sessionAccessor.setTenantId(tenantId);
+            Thread.currentThread().setContextClassLoader(loader);
+
             sConnector.setInputParameters(inputParameters);
             try {
                 sConnector.validate();

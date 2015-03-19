@@ -38,16 +38,17 @@ import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.command.DefaultCommandProvider;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
+import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
@@ -207,8 +208,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private DependencyResolver dependencyResolver;
 
-    private DefaultCommandProvider commandProvider;
-
     private WorkService workService;
 
     private SessionService sessionService;
@@ -241,11 +240,15 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private ParentContainerResolver parentContainerResolver;
 
+    private ContractDataService contractDataService;
+
     private ParameterService parameterService;
 
     private PageService pageService;
 
     private ApplicationService applicationService;
+
+    private FormMappingService formMappingService;
 
     private BusinessDataRepository businessDataRespository;
 
@@ -731,14 +734,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public DefaultCommandProvider getDefaultCommandProvider() {
-        if (commandProvider == null) {
-            commandProvider = beanAccessor.getService(DefaultCommandProvider.class);
-        }
-        return commandProvider;
-    }
-
-    @Override
     public WorkService getWorkService() {
         if (workService == null) {
             workService = beanAccessor.getService(WorkService.class);
@@ -829,6 +824,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
+    public ContractDataService getContractDataService() {
+        if (contractDataService == null) {
+            contractDataService = beanAccessor.getService(ContractDataService.class);
+        }
+        return contractDataService;
+    }
+
+    @Override
     public ParameterService getParameterService() {
         if (parameterService == null) {
             parameterService = beanAccessor.getService(ParameterService.class);
@@ -912,4 +915,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
 
 
+    @Override
+    public FormMappingService getFormMappingService() {
+        if (formMappingService == null) {
+            formMappingService = beanAccessor.getService(FormMappingService.class);
+        }
+        return formMappingService;
+    }
 }

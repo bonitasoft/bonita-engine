@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 
 /**
@@ -24,12 +25,23 @@ public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements U
 
     private static final long serialVersionUID = -8168685139931497082L;
 
+    private ContractDefinition contract;
+
     public UserTaskDefinitionImpl(final String name, final String actorName) {
         super(name, actorName);
     }
 
     public UserTaskDefinitionImpl(final long id, final String name, final String actorName) {
         super(id, name, actorName);
+    }
+
+    public void setContract(final ContractDefinition contract) {
+        this.contract = contract;
+    }
+
+    @Override
+    public ContractDefinition getContract() {
+        return contract;
     }
 
 }

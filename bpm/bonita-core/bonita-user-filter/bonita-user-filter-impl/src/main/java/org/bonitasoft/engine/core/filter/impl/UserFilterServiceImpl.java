@@ -111,7 +111,7 @@ public class UserFilterServiceImpl implements UserFilterService {
         }
 
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            StringBuilder stb = new StringBuilder();
+            final StringBuilder stb = new StringBuilder();
             stb.append("Executed userFilter [name: <");
             stb.append(sUserFilterDefinition.getName());
             stb.append(">, user filter id: <");
@@ -157,7 +157,7 @@ public class UserFilterServiceImpl implements UserFilterService {
                     inputParameters.put(input.getKey(), expressionResolverService.evaluate(input.getValue()));
                 }
             }
-            connectorExecutor.execute(sConnectorAdapter, inputParameters);
+            connectorExecutor.execute(sConnectorAdapter, inputParameters, classLoader);
             return new FilterResultImpl(sConnectorAdapter.getUserIds(), sConnectorAdapter.shouldAutoAssignTaskIfSingleResult());
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);

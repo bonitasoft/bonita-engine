@@ -38,6 +38,7 @@ import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
@@ -184,6 +185,8 @@ public class APITestUtil extends PlatformTestUtil {
     private ApplicationAPI applicationAPI;
 
     private TenantAdministrationAPI tenantManagementCommunityAPI;
+    
+    private ProcessConfigurationAPI processConfigurationAPI;
 
     private BusinessDataAPI businessDataAPI;
 
@@ -192,9 +195,10 @@ public class APITestUtil extends PlatformTestUtil {
         if (strTimeout != null) {
             DEFAULT_TIMEOUT = Integer.valueOf(strTimeout);
         } else {
-            DEFAULT_TIMEOUT = 2* 60  * 1000;
+            DEFAULT_TIMEOUT = 2 * 60 * 1000;
         }
     }
+
 
     @After
     public void clearSynchroRepository() {
@@ -221,6 +225,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
+        setProcessConfigurationAPI(TenantAPIAccessor.getProcessConfigurationAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
@@ -245,6 +250,7 @@ public class APITestUtil extends PlatformTestUtil {
         loginAPI.logout(session);
         setSession(null);
         setIdentityAPI(null);
+        setProcessConfigurationAPI(null);
         setProcessAPI(null);
         setCommandAPI(null);
         setProfileAPI(null);
@@ -591,13 +597,13 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder,
             final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies) throws BonitaException {
         final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
+                connectorImplementations, generateConnectorDependencies, Collections.<BarResource>emptyList());
         return deployAndEnableProcess(businessArchiveBuilder.done());
     }
 
-    public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String name,
+    public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String connectorImplName,
             final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
-        return deployAndEnableProcessWithConnector(processDefinitionBuilder, Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(name, clazz)),
+        return deployAndEnableProcessWithConnector(processDefinitionBuilder, Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(connectorImplName, clazz)),
                 Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)));
     }
 
@@ -644,7 +650,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
             throws BonitaException {
-        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
+        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource>emptyList(),
                 generateFilterDependencies, userFilters);
     }
 
@@ -1419,6 +1425,9 @@ public class APITestUtil extends PlatformTestUtil {
         final List<String> messages = new ArrayList<String>();
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1000);
         searchOptionsBuilder.filter(CommandSearchDescriptor.SYSTEM, false);
+        searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.EXECUTE_EVENTS_COMMAND);
+        searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.ADD_HANDLER_COMMAND);
+        searchOptionsBuilder.differentFrom(CommandSearchDescriptor.NAME, ClientEventUtil.WAIT_SERVER_COMMAND);
         final SearchResult<CommandDescriptor> searchCommands = getCommandAPI().searchCommands(searchOptionsBuilder.done());
         final List<CommandDescriptor> commands = searchCommands.getResult();
         if (searchCommands.getCount() > 0) {
@@ -1494,6 +1503,14 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ApplicationAPI getApplicationAPI() {
         return applicationAPI;
+    }
+
+    public ProcessConfigurationAPI getProcessConfigurationAPI() {
+        return processConfigurationAPI;
+    }
+
+    public void setProcessConfigurationAPI(ProcessConfigurationAPI processConfigurationAPI) {
+        this.processConfigurationAPI = processConfigurationAPI;
     }
 
     public void setApplicationAPI(final ApplicationAPI applicationAPI) {

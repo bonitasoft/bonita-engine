@@ -1,3 +1,7 @@
+DELETE FROM arch_contract_data WHERE tenantid = ${tenantid}
+GO
+DELETE FROM contract_data WHERE tenantid = ${tenantid}
+GO
 DELETE FROM actormember WHERE tenantid = ${tenantid}
 GO
 DELETE FROM actor WHERE tenantid = ${tenantid}
@@ -107,4 +111,6 @@ GO
 DELETE FROM job_desc WHERE tenantid = ${tenantid}
 GO
 DELETE FROM theme WHERE tenantid = ${tenantid}
+GO
+DELETE FROM form_mapping WHERE tenantid = ${tenantid}
 GO

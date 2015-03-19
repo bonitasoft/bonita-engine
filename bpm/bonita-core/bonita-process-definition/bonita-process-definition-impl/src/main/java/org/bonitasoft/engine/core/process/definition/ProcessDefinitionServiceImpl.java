@@ -162,7 +162,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 throw new SDeletingEnabledProcessException("Process is enabled.", processDefinitionDeployInfo);
             }
         } catch (final SProcessDefinitionReadException e) {
-            initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
+            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDeletionException(e, processId);
         }
 
@@ -175,22 +175,22 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             }
             final DeleteRecord deleteRecord = new DeleteRecord(processDefinitionDeployInfo);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(processId, SQueriableLog.STATUS_OK, logBuilder, "delete");
+            log(processId, SQueriableLog.STATUS_OK, logBuilder, "delete");
             dependencyService.deleteDependencies(processId, ScopeType.PROCESS);
         } catch (final SCacheException e) {
-            initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
+            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDefinitionNotFoundException(e, processDefinitionDeployInfo);
         } catch (final SRecorderException e) {
-            initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
+            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDeletionException(e, processDefinitionDeployInfo);
         } catch (final SDependencyNotFoundException e) {
-            initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
+            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDeletionException(e, processDefinitionDeployInfo);
         } catch (final SDependencyDeletionException e) {
-            initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
+            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDeletionException(e, processDefinitionDeployInfo);
         } catch (final SDependencyException e) {
-            initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
+            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDeletionException(e, processDefinitionDeployInfo);
         }
     }
@@ -226,9 +226,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, "disableProcess");
+            log(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, "disableProcess");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "disableProcess");
+            log(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "disableProcess");
             throw new SProcessDisablementException(e);
         }
     }
@@ -271,9 +271,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(processId, SQueriableLog.STATUS_OK, logBuilder, "enableProcess");
+            log(processId, SQueriableLog.STATUS_OK, logBuilder, "enableProcess");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "enableProcess");
+            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "enableProcess");
             throw new SProcessEnablementException(e);
         }
     }
@@ -415,12 +415,12 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                         .setObject(definitionDeployInfo).done();
             }
             recorder.recordInsert(record, insertEvent);
-            initiateLogBuilder(definition.getId(), SQueriableLog.STATUS_OK, logBuilder, "store");
+            log(definition.getId(), SQueriableLog.STATUS_OK, logBuilder, "store");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");
+            log(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");
             throw new SProcessDefinitionException(e);
         } catch (final Exception e) {
-            initiateLogBuilder(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");
+            log(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");
             throw new SProcessDefinitionException(e);
         }
         return definition;
@@ -466,9 +466,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, "resolveProcess");
+            log(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, "resolveProcess");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "resolveProcess");
+            log(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "resolveProcess");
             throw new SProcessDisablementException(e);
         }
     }
@@ -614,9 +614,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(processId, SQueriableLog.STATUS_OK, logBuilder, "updateProcessDeploymentInfo");
+            log(processId, SQueriableLog.STATUS_OK, logBuilder, "updateProcessDeploymentInfo");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "updateProcessDeploymentInfo");
+            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "updateProcessDeploymentInfo");
             throw new SProcessDeploymentInfoUpdateException(e);
         }
         return processDefinitionDeployInfo;
@@ -847,7 +847,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 .setDeploymentDate(deploymentDate).setIconPath(iconPath).done();
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);

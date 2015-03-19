@@ -1,3 +1,25 @@
+CREATE TABLE contract_data (
+  tenantid NUMBER(19, 0) NOT NULL,
+  id NUMBER(19, 0) NOT NULL,
+  scopeId NUMBER(19, 0) NOT NULL,
+  name VARCHAR2(50 CHAR) NOT NULL,
+  val BLOB
+);
+ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id);
+ALTER TABLE contract_data ADD CONSTRAINT uc_cd_scope_name UNIQUE (scopeId, name, tenantid);
+
+CREATE TABLE arch_contract_data (
+  tenantid NUMBER(19, 0) NOT NULL,
+  id NUMBER(19, 0) NOT NULL,
+  scopeId NUMBER(19, 0) NOT NULL,
+  name VARCHAR2(50 CHAR) NOT NULL,
+  val BLOB,
+  archiveDate NUMBER(19, 0) NOT NULL,
+  sourceObjectId NUMBER(19, 0) NOT NULL
+);
+ALTER TABLE arch_contract_data ADD CONSTRAINT pk_arch_contract_data PRIMARY KEY (tenantid, id);
+ALTER TABLE arch_contract_data ADD CONSTRAINT uc_acd_scope_name UNIQUE (scopeId, name, tenantid);
+
 CREATE TABLE actor (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
@@ -59,7 +81,7 @@ CREATE TABLE arch_process_comment(
   userId NUMBER(19, 0),
   processInstanceId NUMBER(19, 0) NOT NULL,
   postDate NUMBER(19, 0) NOT NULL,
-  content VARCHAR2(255 CHAR) NOT NULL,
+  content VARCHAR2(512 CHAR) NOT NULL,
   archiveDate NUMBER(19, 0) NOT NULL,
   sourceObjectId NUMBER(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
@@ -74,7 +96,7 @@ CREATE TABLE process_comment (
   userId NUMBER(19, 0),
   processInstanceId NUMBER(19, 0) NOT NULL,
   postDate NUMBER(19, 0) NOT NULL,
-  content VARCHAR2(255 CHAR) NOT NULL,
+  content VARCHAR2(512 CHAR) NOT NULL,
   PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE process_definition (
@@ -957,5 +979,17 @@ CREATE TABLE theme (
   type VARCHAR2(50 CHAR) NOT NULL,
   lastUpdateDate NUMBER(19, 0) NOT NULL,
   CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
+  PRIMARY KEY (tenantId, id)
+);
+CREATE TABLE form_mapping (
+  tenantId NUMBER(19, 0) NOT NULL,
+  id NUMBER(19, 0) NOT NULL,
+  process NUMBER(19, 0) NOT NULL,
+  task VARCHAR2(255) NULL,
+  form VARCHAR2(1024) NULL,
+  isexternal NUMBER(1) NOT NULL,
+  type VARCHAR2(16) NOT NULL,
+  lastUpdateDate NUMBER(19, 0) NULL,
+  lastUpdatedBy NUMBER(19, 0) NULL,
   PRIMARY KEY (tenantId, id)
 );

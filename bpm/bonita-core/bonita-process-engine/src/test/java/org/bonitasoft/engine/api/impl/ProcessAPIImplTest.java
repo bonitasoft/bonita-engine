@@ -17,7 +17,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertEquals;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
@@ -27,7 +27,14 @@ import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.Serializable;
@@ -46,6 +53,7 @@ import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.DocumentAPI;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
+import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -54,15 +62,19 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.parser.JarDependencies;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
+import org.bonitasoft.engine.core.contract.data.ContractDataService;
+import org.bonitasoft.engine.core.contract.data.SContractDataNotFoundException;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -97,6 +109,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExceptionContext;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
@@ -107,6 +120,7 @@ import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.operation.LeftOperand;
@@ -128,8 +142,8 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
+import org.bonitasoft.engine.search.process.SearchFailedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -216,6 +230,9 @@ public class ProcessAPIImplTest {
     @Mock
     private GetConnectorImplementations getConnectorImplementation;
 
+    @Mock
+    private ContractDataService contractDataService;
+
     @Captor
     private ArgumentCaptor<List<String>> argument;
 
@@ -249,36 +266,37 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
         when(tenantAccessor.getFlowNodeStateManager()).thenReturn(flowNodeStateManager);
         when(tenantAccessor.getParentContainerResolver()).thenReturn(parentContainerResolver);
+        when(tenantAccessor.getContractDataService()).thenReturn(contractDataService);
     }
 
     @Test
     public void getFlownodeStateCounters_should_build_proper_journal_and_archived_counters() throws Exception {
         final long processInstanceId = 9811L;
-        List<SFlowNodeInstanceStateCounter> flownodes = new ArrayList<SFlowNodeInstanceStateCounter>(4);
+        final List<SFlowNodeInstanceStateCounter> flownodes = new ArrayList<SFlowNodeInstanceStateCounter>(4);
         flownodes.add(new SFlowNodeInstanceStateCounter("step1", "completed", 2L));
         flownodes.add(new SFlowNodeInstanceStateCounter("step2", "completed", 4L));
         flownodes.add(new SFlowNodeInstanceStateCounter("step1", "ready", 1L));
         flownodes.add(new SFlowNodeInstanceStateCounter("step3", "failed", 8L));
         when(activityInstanceService.getNumberOfFlownodesInAllStates(processInstanceId)).thenReturn(flownodes);
 
-        List<SFlowNodeInstanceStateCounter> archivedFlownodes = new ArrayList<SFlowNodeInstanceStateCounter>(1);
+        final List<SFlowNodeInstanceStateCounter> archivedFlownodes = new ArrayList<SFlowNodeInstanceStateCounter>(1);
         archivedFlownodes.add(new SFlowNodeInstanceStateCounter("step2", "aborted", 3L));
         when(activityInstanceService.getNumberOfArchivedFlownodesInAllStates(processInstanceId)).thenReturn(archivedFlownodes);
 
-        Map<String, Map<String, Long>> flownodeStateCounters = processAPI.getFlownodeStateCounters(processInstanceId);
+        final Map<String, Map<String, Long>> flownodeStateCounters = processAPI.getFlownodeStateCounters(processInstanceId);
         assertThat(flownodeStateCounters.size()).isEqualTo(3);
 
-        Map<String, Long> step1 = flownodeStateCounters.get("step1");
+        final Map<String, Long> step1 = flownodeStateCounters.get("step1");
         assertThat(step1.size()).isEqualTo(2);
         assertThat(step1.get("completed")).isEqualTo(2L);
         assertThat(step1.get("ready")).isEqualTo(1L);
 
-        Map<String, Long> step2 = flownodeStateCounters.get("step2");
+        final Map<String, Long> step2 = flownodeStateCounters.get("step2");
         assertThat(step2.size()).isEqualTo(2);
         assertThat(step2.get("aborted")).isEqualTo(3L);
         assertThat(step2.get("completed")).isEqualTo(4L);
 
-        Map<String, Long> step3 = flownodeStateCounters.get("step3");
+        final Map<String, Long> step3 = flownodeStateCounters.get("step3");
         assertThat(step3.size()).isEqualTo(1);
         assertThat(step3.get("failed")).isEqualTo(8L);
     }
@@ -313,7 +331,7 @@ public class ProcessAPIImplTest {
         processAPI.updateProcessDataInstance("foo", PROCESS_INSTANCE_ID, "go");
 
         // Then
-        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.<String, Serializable>singletonMap("foo", "go")));
+        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.<String, Serializable> singletonMap("foo", "go")));
     }
 
     @Test(expected = UpdateException.class)
@@ -338,7 +356,8 @@ public class ProcessAPIImplTest {
         sDataBar.setClassName(String.class.getName());
         sDataBar.setName("bar");
 
-        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(argument.capture(), anyLong(), anyString(), any(ParentContainerResolver.class));
+        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(argument.capture(), anyLong(), anyString(),
+                any(ParentContainerResolver.class));
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -351,7 +370,7 @@ public class ProcessAPIImplTest {
         // Then
         // Check that we called DataInstanceService for each pair data/value
         verify(dataInstanceService, times(2)).updateDataInstance(any(SDataInstance.class), any(EntityUpdateDescriptor.class));
-        assertThat(argument.getValue()).containsOnly("foo","bar");
+        assertThat(argument.getValue()).containsOnly("foo", "bar");
         verify(dataInstanceService).updateDataInstance(eq(sDataFoo), any(EntityUpdateDescriptor.class));
         verify(dataInstanceService).updateDataInstance(eq(sDataBar), any(EntityUpdateDescriptor.class));
     }
@@ -374,11 +393,12 @@ public class ProcessAPIImplTest {
             fail("An exception should have been thrown.");
         } catch (final UpdateException e) {
             // Then
-            assertEquals("DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
-                    + "] is not compatible with the type of the data.", e.getMessage());
+            assertThat(e.getMessage()).isEqualTo(
+                    "DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
+                            + "] is not compatible with the type of the data.");
             final Map<ExceptionContext, Serializable> exceptionContext = e.getContext();
-            assertEquals(List.class.getName(), exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
-            assertEquals(dataName, exceptionContext.get(ExceptionContext.DATA_NAME));
+            assertThat(List.class.getName()).isEqualTo(exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
+            assertThat(dataName).isEqualTo(exceptionContext.get(ExceptionContext.DATA_NAME));
         }
     }
 
@@ -386,7 +406,8 @@ public class ProcessAPIImplTest {
     public void should_updateProcessDataInstances_call_DataInstance_on_non_existing_data_throw_UpdateException() throws Exception {
         final long processInstanceId = 42l;
         doReturn(null).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
-        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(argument.capture(), anyLong(), anyString(), any(ParentContainerResolver.class));
+        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(argument.capture(), anyLong(), anyString(),
+                any(ParentContainerResolver.class));
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -401,7 +422,7 @@ public class ProcessAPIImplTest {
 
         // Check that we called DataInstanceService for each pair data/value
         verify(dataInstanceService, never()).updateDataInstance(any(SDataInstance.class), any(EntityUpdateDescriptor.class));
-        assertThat(argument.getValue()).containsOnly("foo","bar");
+        assertThat(argument.getValue()).containsOnly("foo", "bar");
     }
 
     @Test
@@ -531,7 +552,8 @@ public class ProcessAPIImplTest {
         final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
         dataInstance.setClassName(List.class.getName());
         dataInstance.setName(dataName);
-        doReturn(dataInstance).when(dataInstanceService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
+        doReturn(dataInstance).when(dataInstanceService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
+                parentContainerResolver);
 
         // When
         try {
@@ -540,11 +562,11 @@ public class ProcessAPIImplTest {
             fail("An exception should have been thrown.");
         } catch (final UpdateException e) {
             // Then
-            assertEquals("DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
-                    + "] is not compatible with the type of the data.", e.getMessage());
+            assertThat("DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
+                    + "] is not compatible with the type of the data.").isEqualTo(e.getMessage());
             final Map<ExceptionContext, Serializable> exceptionContext = e.getContext();
-            assertEquals(List.class.getName(), exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
-            assertEquals(dataName, exceptionContext.get(ExceptionContext.DATA_NAME));
+            assertThat(List.class.getName()).isEqualTo(exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
+            assertThat(dataName).isEqualTo(exceptionContext.get(ExceptionContext.DATA_NAME));
         }
     }
 
@@ -565,11 +587,11 @@ public class ProcessAPIImplTest {
             fail("An exception should have been thrown.");
         } catch (final UpdateException e) {
             // Then
-            assertEquals("DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
-                    + "] is not compatible with the type of the data.", e.getMessage());
+            assertThat("DATA_NAME=" + dataName + " | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
+                    + "] is not compatible with the type of the data.").isEqualTo(e.getMessage());
             final Map<ExceptionContext, Serializable> exceptionContext = e.getContext();
-            assertEquals(List.class.getName(), exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
-            assertEquals(dataName, exceptionContext.get(ExceptionContext.DATA_NAME));
+            assertThat(List.class.getName()).isEqualTo(exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
+            assertThat(dataName).isEqualTo(exceptionContext.get(ExceptionContext.DATA_NAME));
         }
     }
 
@@ -693,6 +715,11 @@ public class ProcessAPIImplTest {
         verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void deleteArchivedProcessInstances_by_ids_should_throw_exception_when_list_is_empty() throws Exception {
+        processAPI.deleteArchivedProcessInstancesInAllStates(Collections.<Long> emptyList());
+    }
+
     @Test
     public void searchFailedProcessInstances_should_return_failed_process_instances() throws Exception {
         // Given
@@ -709,8 +736,32 @@ public class ProcessAPIImplTest {
         final SearchResult<ProcessInstance> searchFailedProcessInstances = processAPI.searchFailedProcessInstances(searchOptions);
 
         // Then
-        assertEquals(numberOfFailedProcessInstances, searchFailedProcessInstances.getCount());
-        assertEquals(failedProcessInstances, searchFailedProcessInstances.getResult());
+        assertThat(numberOfFailedProcessInstances).isEqualTo(searchFailedProcessInstances.getCount());
+        assertThat(failedProcessInstances).isEqualTo(searchFailedProcessInstances.getResult());
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void getConnectorsImplementations_should_throw__exception() throws Exception {
+        //given
+        final SConnectorException sConnectorException = new SConnectorException("message");
+        doThrow(sConnectorException).when(connectorService).getConnectorImplementations(anyLong(), anyLong(),
+                anyInt(), anyInt(), anyString(),
+                any(OrderByType.class));
+
+        //when then exception
+        processAPI.getConnectorImplementations(PROCESS_DEFINITION_ID, START_INDEX, MAX_RESULT, CONNECTOR_CRITERION_DEFINITION_ID_ASC);
+
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void getNumberOfConnectorImplementations_should_throw__exception() throws Exception {
+        //given
+        final SConnectorException sConnectorException = new SConnectorException("message");
+        doThrow(sConnectorException).when(connectorService).getNumberOfConnectorImplementations(anyLong(), anyLong());
+
+        //when then exception
+        processAPI.getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID);
+
     }
 
     @Test(expected = SearchException.class)
@@ -723,9 +774,77 @@ public class ProcessAPIImplTest {
         processAPI.searchFailedProcessInstances(searchOptions);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void deleteArchivedProcessInstances_by_ids_should_throw_exception_when_list_is_empty() throws Exception {
-        processAPI.deleteArchivedProcessInstancesInAllStates(Collections.<Long> emptyList());
+    @Test
+    public void getConnectorsImplementations_should_return_list() throws Exception {
+        //given
+        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = createConnectorList();
+
+        doReturn(sConnectorImplementationDescriptors).when(connectorService).getConnectorImplementations(anyLong(), anyLong(),
+                anyInt(), anyInt(), anyString(),
+                any(OrderByType.class));
+
+        //when
+        final List<ConnectorImplementationDescriptor> connectorImplementations = processAPI.getConnectorImplementations(PROCESS_DEFINITION_ID, START_INDEX,
+                MAX_RESULT, CONNECTOR_CRITERION_DEFINITION_ID_ASC);
+
+        //then
+        assertThat(connectorImplementations).as("should return connectore implementation").hasSameSizeAs(sConnectorImplementationDescriptors);
+    }
+
+    @Test
+    public void getNumberOfConnectorImplementations_should_return_count() throws Exception {
+        //given
+        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = createConnectorList();
+
+        doReturn((long) sConnectorImplementationDescriptors.size()).when(connectorService)
+                .getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID, TENANT_ID);
+
+        //when
+        final long numberOfConnectorImplementations = processAPI.getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID);
+
+        //then
+        assertThat(numberOfConnectorImplementations).as("should return count").isEqualTo(sConnectorImplementationDescriptors.size());
+    }
+
+    private List<SConnectorImplementationDescriptor> createConnectorList() {
+        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = new ArrayList<SConnectorImplementationDescriptor>();
+        final SConnectorImplementationDescriptor sConnectorImplementationDescriptor = new SConnectorImplementationDescriptor("className", "id", "version",
+                "definitionId", "definitionVersion", new JarDependencies(Arrays.asList("dep1", "dep2")));
+        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
+        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
+        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
+        return sConnectorImplementationDescriptors;
+    }
+
+    @Test
+    public void evaluateExpressionsOnCompletedActivityInstance_should_call_getLastArchivedProcessInstance_using_parentProcessInstanceId() throws Exception {
+        //given
+        final long processInstanceId = 21L;
+        final long activityInstanceId = 5L;
+        final ArchivedActivityInstance activityInstance = mock(ArchivedActivityInstance.class);
+        given(activityInstance.getProcessInstanceId()).willReturn(processInstanceId);
+        given(activityInstance.getArchiveDate()).willReturn(new Date());
+        doReturn(activityInstance).when(processAPI).getArchivedActivityInstance(activityInstanceId);
+
+        final ArchivedProcessInstance procInst = mock(ArchivedProcessInstance.class);
+        given(procInst.getProcessDefinitionId()).willReturn(1000L);
+        doReturn(procInst).when(processAPI).getLastArchivedProcessInstance(anyLong());
+
+        //when
+        processAPI.evaluateExpressionsOnCompletedActivityInstance(activityInstanceId, new HashMap<Expression, Map<String, Serializable>>());
+
+        //then
+        verify(processAPI).getLastArchivedProcessInstance(processInstanceId);
+        verify(activityInstance, never()).getParentContainerId();
+        verify(activityInstance, never()).getParentActivityInstanceId();
+        verify(activityInstance, never()).getRootContainerId();
+    }
+
+    @Test
+    public void purgeClassLoader_should_call_delegate() throws Exception {
+        processAPI.purgeClassLoader(45L);
+
+        verify(managementAPIImplDelegate).purgeClassLoader(45L);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -744,7 +863,7 @@ public class ProcessAPIImplTest {
         final long deleteArchivedProcessInstances = processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
 
         // Then
-        assertEquals("Must to return 0, when there are no archived process instance to delete.", 0, deleteArchivedProcessInstances);
+        assertThat(0L).isEqualTo(deleteArchivedProcessInstances).as("Must to return 0, when there are no archived process instance to delete.");
         verify(processInstanceService).getArchivedProcessInstancesInAllStates(archivedProcessInstanceIds);
     }
 
@@ -761,7 +880,7 @@ public class ProcessAPIImplTest {
         final long deleteArchivedProcessInstances = processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
 
         // Then
-        assertEquals("Must to return 1 deleted archived process instance.", 1L, deleteArchivedProcessInstances);
+        assertThat(1L).as("Must to return 1 deleted archived process instance.").isEqualTo(deleteArchivedProcessInstances);
         verify(processInstanceService).getArchivedProcessInstancesInAllStates(archivedProcessInstanceIds);
         verify(processInstanceService).deleteArchivedParentProcessInstancesAndElements(archivedProcessInstancesToDelete);
     }
@@ -925,7 +1044,7 @@ public class ProcessAPIImplTest {
         doReturn(new SearchHumanTaskInstanceDescriptor()).when(searchEntitiesDescriptor).getSearchHumanTaskInstanceDescriptor();
 
         final SearchResult<HumanTaskInstance> humanTasksSearch = processAPI.searchHumanTaskInstances(searchOptionsBuilder.sort("tyefv", Order.ASC).done());
-        assertEquals(0, humanTasksSearch.getCount());
+        assertThat(0).isEqualTo(humanTasksSearch.getCount());
     }
 
     @Test
@@ -951,104 +1070,84 @@ public class ProcessAPIImplTest {
                 eq(orderAndField.getOrder()));
     }
 
-    @Test(expected = RetrieveException.class)
-    public void getConnectorsImplementations_should_throw__exception() throws Exception {
+    @Test
+    public void getUserTaskContractVariableValue_should_return_archived_value() throws Exception {
+        when(contractDataService.getArchivedUserTaskDataValue(1983L, "id")).thenReturn(10L);
+
+        final Long id = (Long) processAPI.getUserTaskContractVariableValue(1983L, "id");
+
+        assertThat(id).isEqualTo(10L);
+    }
+
+    @Test(expected = BonitaRuntimeException.class)
+    public void getUserTaskContractVariableValue_should_throw_an_exception_if_an_exception_occurs_when_reading_data() throws Exception {
         //given
-        final SConnectorException sConnectorException = new SConnectorException("message");
-        doThrow(sConnectorException).when(connectorService).getConnectorImplementations(anyLong(), anyLong(),
-                anyInt(), anyInt(), anyString(),
-                any(OrderByType.class));
+        when(contractDataService.getArchivedUserTaskDataValue(1983L, "id")).thenThrow(new SBonitaReadException("exception"));
 
         //when then exception
-        processAPI.getConnectorImplementations(PROCESS_DEFINITION_ID, START_INDEX, MAX_RESULT, CONNECTOR_CRITERION_DEFINITION_ID_ASC);
-
+        processAPI.getUserTaskContractVariableValue(1983L, "id");
     }
 
-    @Test(expected = RetrieveException.class)
-    public void getNumberOfConnectorImplementations_should_throw__exception() throws Exception {
-        //given
-        final SConnectorException sConnectorException = new SConnectorException("message");
-        doThrow(sConnectorException).when(connectorService).getNumberOfConnectorImplementations(anyLong(), anyLong());
+    @Test(expected = UserTaskNotFoundException.class)
+    public void getUserTaskContractVariableValue_should_throw_an_exception_if_an_exception_occurs_when_getting_data() throws Exception {
+        when(contractDataService.getArchivedUserTaskDataValue(1983L, "id")).thenThrow(new SContractDataNotFoundException("exception"));
 
-        //when then exception
-        processAPI.getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID);
-
+        processAPI.getUserTaskContractVariableValue(1983L, "id");
     }
 
     @Test
-    public void getConnectorsImplementations_should_return_list() throws Exception {
-        //given
-        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = createConnectorList();
+    public void getArchivedProcessInstance_Should_Return_Instance_Of_Disabled_Process() throws Exception {
+        final long processInstanceId = PROCESS_INSTANCE_ID;
+        final long processDefinitionId = PROCESS_DEFINITION_ID;
 
-        doReturn(sConnectorImplementationDescriptors).when(connectorService).getConnectorImplementations(anyLong(), anyLong(),
-                anyInt(), anyInt(), anyString(),
-                any(OrderByType.class));
+        final SAProcessInstance saProcessInstance = mock(SAProcessInstance.class);
+        when(processInstanceService.getArchivedProcessInstance(processInstanceId)).thenReturn(saProcessInstance);
+        when(saProcessInstance.getProcessDefinitionId()).thenReturn(PROCESS_DEFINITION_ID);
+        final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
+        when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenReturn(sProcessDefinition);
 
-        //when
-        final List<ConnectorImplementationDescriptor> connectorImplementations = processAPI.getConnectorImplementations(PROCESS_DEFINITION_ID, START_INDEX,
-                MAX_RESULT, CONNECTOR_CRITERION_DEFINITION_ID_ASC);
+        final ArchivedProcessInstance archivedProcessInstanceMocked = mock(ArchivedProcessInstance.class);
+        doReturn(archivedProcessInstanceMocked).when(processAPI).toArchivedProcessInstance(saProcessInstance, sProcessDefinition);
 
-        //then
-        assertThat(connectorImplementations).as("should return connectore implementation").hasSameSizeAs(sConnectorImplementationDescriptors);
+        final ArchivedProcessInstance archivedProcessInstance = processAPI.getArchivedProcessInstance(processInstanceId);
+        assertThat(archivedProcessInstance).isEqualTo(archivedProcessInstanceMocked);
     }
 
     @Test
-    public void getNumberOfConnectorImplementations_should_return_count() throws Exception {
-        //given
-        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = createConnectorList();
+    public void searchFailedProcessInstancesSupervisedBy_should_Return_ProcessInstances_And_Call_ProcessInstanceService() throws Exception {
+        final long userId = 0;
+        final ProcessInstance mockedProcessInstance = mock(ProcessInstance.class);
+        final IdentityService identityService = mock(IdentityService.class);
+        when(tenantAccessor.getIdentityService()).thenReturn(identityService);
+        doReturn(mock(GetSUser.class)).when(processAPI).createTxUserGetter(userId, identityService);
 
-        doReturn((long) sConnectorImplementationDescriptors.size()).when(connectorService)
-                .getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID, TENANT_ID);
+        final SearchOptions searchOptions = mock(SearchOptions.class);
+        final SearchFailedProcessInstancesSupervisedBy searchFailedProcessInstancesSupervisedBy = mock(SearchFailedProcessInstancesSupervisedBy.class);
+        doReturn(searchFailedProcessInstancesSupervisedBy).when(processAPI).createSearchFailedProcessInstancesSupervisedBy(userId, searchOptions,
+                processInstanceService, searchEntitiesDescriptor, processDefinitionService);
 
-        //when
-        final long numberOfConnectorImplementations = processAPI.getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID);
+        final SearchResult<ProcessInstance> searchResult = mock(SearchResult.class);
+        when(searchFailedProcessInstancesSupervisedBy.getResult()).thenReturn(searchResult);
 
-        //then
-        assertThat(numberOfConnectorImplementations).as("should return count").isEqualTo(sConnectorImplementationDescriptors.size());
-    }
-
-    private List<SConnectorImplementationDescriptor> createConnectorList() {
-        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = new ArrayList<SConnectorImplementationDescriptor>();
-        final SConnectorImplementationDescriptor sConnectorImplementationDescriptor = new SConnectorImplementationDescriptor("className", "id", "version",
-                "definitionId", "definitionVersion", new JarDependencies(Arrays.asList("dep1", "dep2")));
-        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
-        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
-        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
-        return sConnectorImplementationDescriptors;
+        final SearchResult<ProcessInstance> failedProcessInstancesSupervisedBy = processAPI.searchFailedProcessInstancesSupervisedBy(userId,
+                searchOptions);
+        assertThat(failedProcessInstancesSupervisedBy).isEqualTo(searchResult);
     }
 
     @Test
-    public void evaluateExpressionsOnCompletedActivityInstance_should_call_getLastArchivedProcessInstance_using_parentProcessInstanceId() throws Exception {
-        //given
-        final ArchivedActivityInstance activityInstance = mock(ArchivedActivityInstance.class);
-        when(activityInstance.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
-        when(activityInstance.getArchiveDate()).thenReturn(new Date());
-        doReturn(activityInstance).when(processAPI).getArchivedActivityInstance(FLOW_NODE_INSTANCE_ID);
+    public void searchFailedProcessInstancesSupervisedBy_should_Return_Empty_Result_When_User_Does_Not_Exist() throws Exception {
+        final long userId = 0;
+        final ProcessInstance mockedProcessInstance = mock(ProcessInstance.class);
+        final IdentityService identityService = mock(IdentityService.class);
+        when(tenantAccessor.getIdentityService()).thenReturn(identityService);
+        final GetSUser getSUser = mock(GetSUser.class);
+        doReturn(getSUser).when(processAPI).createTxUserGetter(userId, identityService);
+        doThrow(new SBonitaException() {
+        }).when(getSUser).execute();
 
-        final ArchivedProcessInstance procInst = mock(ArchivedProcessInstance.class);
-        when(procInst.getProcessDefinitionId()).thenReturn(1000L);
-        doReturn(procInst).when(processAPI).getLastArchivedProcessInstance(anyLong());
-
-        //when
-        processAPI.evaluateExpressionsOnCompletedActivityInstance(FLOW_NODE_INSTANCE_ID, new HashMap<Expression, Map<String, Serializable>>());
-
-        //then
-        verify(processAPI).getLastArchivedProcessInstance(PROCESS_INSTANCE_ID);
-        verify(activityInstance, never()).getParentContainerId();
-        verify(activityInstance, never()).getParentActivityInstanceId();
-        verify(activityInstance, never()).getRootContainerId();
+        final SearchResult<ProcessInstance> failedProcessInstancesSupervisedBy = processAPI.searchFailedProcessInstancesSupervisedBy(userId,
+                mock(SearchOptions.class));
+        assertThat(failedProcessInstancesSupervisedBy.getCount()).isEqualTo(0);
+        assertThat(failedProcessInstancesSupervisedBy.getResult()).hasSize(0);
     }
-
-    @Test
-    public void purgeClassLoader_should_call_delegate() throws Exception {
-        processAPI.purgeClassLoader(45L);
-
-        verify(managementAPIImplDelegate).purgeClassLoader(45L);
-    }
-
-    @Test(expected = UpdateException.class)
-    public void updateDueDateOfTask_should_throw_exception_when_date_is_null() throws Exception {
-        processAPI.updateDueDateOfTask(123456789L, null);
-    }
-
 }

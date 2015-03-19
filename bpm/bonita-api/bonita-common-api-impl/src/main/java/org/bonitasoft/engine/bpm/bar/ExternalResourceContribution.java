@@ -23,7 +23,7 @@ import org.bonitasoft.engine.io.IOUtil;
 
 /**
  * Deals with the external resources in a BusinessArchive. Is considered external a resource that is not managed by the Bonita Engine.
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */

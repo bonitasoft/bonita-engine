@@ -54,11 +54,17 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
 
     public ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
             final SExpressionContext inputParametersContext) {
+        this(processDefinitionId, connectorInstanceId, connectorDefinitionName, inputParametersContext, null);
+    }
+
+    public ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
+            final SExpressionContext inputParametersContext, final Map<String, Object> inputs) {
         super();
         this.processDefinitionId = processDefinitionId;
         this.connectorInstanceId = connectorInstanceId;
         this.connectorDefinitionName = connectorDefinitionName;
         this.inputParametersContext = inputParametersContext;
+        this.inputParametersContext.setInputValues(inputs);
     }
 
     protected abstract void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition, Exception Exception)

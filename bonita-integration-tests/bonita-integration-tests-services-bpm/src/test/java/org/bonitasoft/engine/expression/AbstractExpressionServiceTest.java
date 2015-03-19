@@ -16,6 +16,7 @@ package org.bonitasoft.engine.expression;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,8 @@ import org.bonitasoft.engine.transaction.STransactionRollbackException;
  * @author Elias Ricken de Medeiros
  */
 public abstract class AbstractExpressionServiceTest extends CommonBPMServicesTest {
+
+    protected static final long DEFINITION_ID_VALUE = 123L;
 
     protected static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.emptyMap();
 
@@ -75,7 +78,9 @@ public abstract class AbstractExpressionServiceTest extends CommonBPMServicesTes
             SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, STransactionCreationException,
             STransactionCommitException, STransactionRollbackException {
         getTransactionService().begin();
-        final Object result = getExpressionService().evaluate(expression, resolvedExpressions, ContainerState.ACTIVE);
+        final Map<String, Object> dependencyValues = new HashMap<String, Object>();
+        dependencyValues.put(ExpressionExecutorStrategy.DEFINITION_ID, DEFINITION_ID_VALUE);
+        final Object result = getExpressionService().evaluate(expression, dependencyValues, resolvedExpressions, ContainerState.ACTIVE);
         getTransactionService().complete();
         return result;
     }

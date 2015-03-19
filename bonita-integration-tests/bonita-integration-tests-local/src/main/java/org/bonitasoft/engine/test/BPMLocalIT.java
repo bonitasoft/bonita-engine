@@ -40,6 +40,11 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.flownode.ActivityStates;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -53,6 +58,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
@@ -61,6 +67,8 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
@@ -467,12 +475,30 @@ public class BPMLocalIT extends CommonAPILocalIT {
         System.out.println("node started");
         logoutOnPlatform(loginPlatform);
         loginOnDefaultTenantWithDefaultTechnicalUser();
+
+        //during stop node some flow node can be put in failed state
+        retryFailedFlowNodes();
+
         // check we have all task ready
         waitForPendingTasks(john.getId(), 3);
 
         disableAndDeleteProcess(p1.getId());
         disableAndDeleteProcess(p2.getId());
         disableAndDeleteProcess(p3.getId());
+    }
+
+    private void retryFailedFlowNodes() throws SearchException, ActivityInstanceNotFoundException, ActivityExecutionException {
+        List<FlowNodeInstance> failedFlowNodes = getFailedFlowNodes();
+        for (FlowNodeInstance failedFlowNode : failedFlowNodes) {
+            getProcessAPI().retryTask(failedFlowNode.getId());
+        }
+    }
+
+    private List<FlowNodeInstance> getFailedFlowNodes() throws SearchException {
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 3);
+        builder.filter(FlowNodeInstanceSearchDescriptor.STATE_NAME, ActivityStates.FAILED_STATE);
+        SearchResult<FlowNodeInstance> searchResult = getProcessAPI().searchFlowNodeInstances(builder.done());
+        return searchResult.getResult();
     }
 
     public static void tryAcquireSemaphore1() throws InterruptedException {

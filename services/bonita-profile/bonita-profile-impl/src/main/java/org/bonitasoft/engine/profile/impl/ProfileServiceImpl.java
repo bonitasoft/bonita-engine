@@ -126,12 +126,12 @@ public class ProfileServiceImpl implements ProfileService {
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_OK, logBuilder, "createProfile");
+            log(profile.getId(), SQueriableLog.STATUS_OK, logBuilder, "createProfile");
             logAfterMethod("createProfile");
             return profile;
         } catch (final SRecorderException re) {
             logOnExceptionMethod("createProfile", re);
-            initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createProfile");
+            log(profile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createProfile");
             throw new SProfileCreationException(re);
         }
     }
@@ -198,11 +198,11 @@ public class ProfileServiceImpl implements ProfileService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(sProfile.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateProfile");
+            log(sProfile.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateProfile");
             logAfterMethod("updateProfile");
         } catch (final SRecorderException re) {
             logOnExceptionMethod("updateProfile", re);
-            initiateLogBuilder(sProfile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProfile");
+            log(sProfile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProfile");
             throw new SProfileUpdateException(re);
         }
         return sProfile;
@@ -221,11 +221,11 @@ public class ProfileServiceImpl implements ProfileService {
             deleteAllProfileEntriesOfProfile(profile);
             deleteAllProfileMembersOfProfile(profile);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfile");
+            log(profile.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfile");
             logAfterMethod("deleteProfile");
         } catch (final SRecorderException re) {
             logOnExceptionMethod("deleteProfile", re);
-            initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProfile");
+            log(profile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProfile");
             throw new SProfileDeletionException(re);
         } catch (final SProfileEntryDeletionException e) {
             logOnExceptionMethod("deleteProfile", e);
@@ -334,12 +334,12 @@ public class ProfileServiceImpl implements ProfileService {
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_OK, logBuilder, "createProfileEntry");
+            log(profileEntry.getId(), SQueriableLog.STATUS_OK, logBuilder, "createProfileEntry");
             logAfterMethod("createProfileEntry");
             return profileEntry;
         } catch (final SRecorderException re) {
             logOnExceptionMethod("createProfileEntry", re);
-            initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createProfileEntry");
+            log(profileEntry.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createProfileEntry");
             throw new SProfileEntryCreationException(re);
         }
     }
@@ -358,11 +358,11 @@ public class ProfileServiceImpl implements ProfileService {
                 updateEvent.setOldObject(oldProfileEntry);
             }
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateProfileEntry");
+            log(profileEntry.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateProfileEntry");
             logAfterMethod("updateProfileEntry");
         } catch (final SRecorderException re) {
             logOnExceptionMethod("updateProfileEntry", re);
-            initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProfileEntry");
+            log(profileEntry.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProfileEntry");
             throw new SProfileEntryUpdateException(re);
         }
         return profileEntry;
@@ -379,11 +379,11 @@ public class ProfileServiceImpl implements ProfileService {
                 deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ENTRY_PROFILE).setObject(profileEntry).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfileEntry");
+            log(profileEntry.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfileEntry");
             logAfterMethod("deleteProfileEntry");
         } catch (final SRecorderException re) {
             logOnExceptionMethod("deleteProfileEntry", re);
-            initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProfileEntry");
+            log(profileEntry.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProfileEntry");
             throw new SProfileEntryDeletionException(re);
         }
     }
@@ -426,9 +426,9 @@ public class ProfileServiceImpl implements ProfileService {
                 insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PROFILE_MEMBER).setObject(profileMember).done();
             }
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(profileMember.getId(), SQueriableLog.STATUS_OK, logBuilder, "insertProfileMember");
+            log(profileMember.getId(), SQueriableLog.STATUS_OK, logBuilder, "insertProfileMember");
         } catch (final SRecorderException re) {
-            initiateLogBuilder(profileMember.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "insertProfileMember");
+            log(profileMember.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "insertProfileMember");
             throw new SProfileMemberCreationException(re);
         }
     }
@@ -501,11 +501,11 @@ public class ProfileServiceImpl implements ProfileService {
                 deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROFILE_MEMBER).setObject(profileMember).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(profileMember.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfileMember");
+            log(profileMember.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfileMember");
             logAfterMethod("deleteProfileMember");
         } catch (final SRecorderException re) {
             logOnExceptionMethod("deleteProfileMember", re);
-            initiateLogBuilder(profileMember.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProfileMember");
+            log(profileMember.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProfileMember");
             throw new SProfileMemberDeletionException(re);
         }
     }
@@ -618,7 +618,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
+    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
         logBuilder.objectId(objectId);
@@ -640,12 +640,8 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public long getNumberOfProfiles(final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.emptyMap();
-            return persistenceService.getNumberOfEntities(SProfile.class, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+        final Map<String, Object> parameters = Collections.emptyMap();
+        return persistenceService.getNumberOfEntities(SProfile.class, queryOptions, parameters);
     }
 
     @Override
@@ -662,12 +658,8 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public long getNumberOfProfileEntries(final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.emptyMap();
-            return persistenceService.getNumberOfEntities(SProfileEntry.class, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+        final Map<String, Object> parameters = Collections.emptyMap();
+        return persistenceService.getNumberOfEntities(SProfileEntry.class, queryOptions, parameters);
     }
 
     @Override

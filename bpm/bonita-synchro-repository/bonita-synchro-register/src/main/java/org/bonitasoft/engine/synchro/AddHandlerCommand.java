@@ -14,18 +14,15 @@
 package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 public class AddHandlerCommand extends TenantCommand {
@@ -59,14 +56,6 @@ public class AddHandlerCommand extends TenantCommand {
             if (!containsHandler(eventService, GATEWAYINSTANCE_CREATED, GatewayHandler.class)) {
                 eventService.addHandler(GATEWAYINSTANCE_CREATED, new GatewayHandler(tenantId));
                 eventService.addHandler(GATEWAYINSTANCE_STATE_UPDATED, new GatewayHandler(tenantId));
-            }
-            final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-            entityUpdateDescriptor.addField("system", true);
-            final CommandService commandService = serviceAccessor.getCommandService();
-            @SuppressWarnings("unchecked")
-            final List<Long> commandIds = (List<Long>) parameters.get("commands");
-            for (final Long commandId : commandIds) {
-                commandService.update(commandService.get(commandId), entityUpdateDescriptor);
             }
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(e);

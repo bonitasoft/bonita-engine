@@ -234,7 +234,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         // taskBuilder.addLongData(localDataName, new ExpressionBuilder().createConstantLongExpression(1L));
         // taskBuilder
         // .addConnector("connector", CONNECTOR_WITH_OUTPUT_ID, "1.0", activationEvent)
-        // .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createDataExpression(localDataName, Long.class.getName()))
+        // .addSimpleInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createDataExpression(localDataName, Long.class.getName()))
         // .addOutput(
         // new LeftOperandBuilder().createDataLeftOperand(globalDataName),
         // OperatorType.ASSIGNMENT, "=", "",

@@ -13,9 +13,8 @@
  **/
 package org.bonitasoft.engine.expression;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.Serializable;
@@ -41,6 +40,7 @@ import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingEx
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
+import org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorCacheStrategy;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
@@ -68,7 +68,7 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
         cacheService = getTenantAccessor().getCacheService();
         try {
             cacheService.start();
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new RuntimeException(e);
         }
     }
@@ -149,13 +149,17 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
 
     @Test
     public void checkGroovyScriptStrategyUsesCache() throws Exception {
+        //given
         final String strContent = "return \"junit test checkGroovyScriptStrategyUsesCache\"";
         final SExpression strExpr = buildExpression(strContent, SExpression.TYPE_READ_ONLY_SCRIPT, String.class.getName(), SExpression.GROOVY, null);
-        Object exprInCache = cacheService.get("GROOVY_SCRIPT_CACHE_NAME" + "SCRIPT_", strContent.hashCode());
-        assertNull(exprInCache);
+        final String cacheKey = GroovyScriptExpressionExecutorCacheStrategy.SCRIPT_KEY + strContent.hashCode();
+        assertThat(cacheService.get(GroovyScriptExpressionExecutorCacheStrategy.GROOVY_SCRIPT_CACHE_NAME, cacheKey)).as("should not contains key").isNull();
+
+        //when
         evaluate(strExpr, EMPTY_RESOLVED_EXPRESSIONS);
-        exprInCache = cacheService.get("GROOVY_SCRIPT_CACHE_NAME", Thread.currentThread().getId() + "SCRIPT_" + null + strContent.hashCode());
-        assertNotNull(exprInCache);
+
+        //then
+        assertThat(cacheService.get(GroovyScriptExpressionExecutorCacheStrategy.GROOVY_SCRIPT_CACHE_NAME, cacheKey)).as("should contains key").isNotNull();
     }
 
     @Test

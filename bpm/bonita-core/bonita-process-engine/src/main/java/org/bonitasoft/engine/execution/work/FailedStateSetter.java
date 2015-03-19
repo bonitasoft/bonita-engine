@@ -13,13 +13,11 @@
  **/
 package org.bonitasoft.engine.execution.work;
 
-import org.bonitasoft.engine.SArchivingException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.execution.FlowNodeExecutor;
+import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -29,38 +27,38 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class FailedStateSetter {
 
-    private final FlowNodeExecutor flowNodeExecutor;
+    private final WaitingEventsInterrupter waitingEventsInterrupter;
 
     private final ActivityInstanceService activityInstanceService;
 
     private final FlowNodeStateManager flowNodeStateManager;
+
     private final TechnicalLoggerService loggerService;
 
-    public FailedStateSetter(final FlowNodeExecutor flowNodeExecutor, final ActivityInstanceService activityInstanceService,
+    public FailedStateSetter(WaitingEventsInterrupter waitingEventsInterrupter, final ActivityInstanceService activityInstanceService,
             final FlowNodeStateManager flowNodeStateManager, TechnicalLoggerService loggerService) {
-        this.flowNodeExecutor = flowNodeExecutor;
+        this.waitingEventsInterrupter = waitingEventsInterrupter;
         this.activityInstanceService = activityInstanceService;
         this.flowNodeStateManager = flowNodeStateManager;
         this.loggerService = loggerService;
     }
 
-    public void setAsFailed(long flowNodeInstanceId) throws SFlowNodeReadException, SArchivingException, SFlowNodeModificationException {
+    public void setAsFailed(long flowNodeInstanceId) throws SBonitaException {
         final SFlowNodeInstance flowNodeInstance;
         try {
             flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-            setAsFailed(flowNodeInstance);
+
+            //nothing to do if the flownode is already in failed state
+            if (flowNodeInstance.getStateId() != flowNodeStateManager.getFailedState().getId()) {
+                activityInstanceService.setState(flowNodeInstance, flowNodeStateManager.getFailedState());
+                waitingEventsInterrupter.interruptWaitingEvents(flowNodeInstance);
+            }
         } catch (SFlowNodeNotFoundException e) {
             if (loggerService.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG,
                         "Impossible to put flow node instance in failed state: flow node instance with id '" + flowNodeInstanceId + "' not found.");
             }
         }
-    }
-
-    private void setAsFailed(final SFlowNodeInstance flowNodeInstance) throws SArchivingException, SFlowNodeModificationException {
-        final long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
-        flowNodeExecutor.archiveFlowNodeInstance(flowNodeInstance, false, processDefinitionId);
-        activityInstanceService.setState(flowNodeInstance, flowNodeStateManager.getFailedState());
     }
 
 }

@@ -13,19 +13,34 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SUserTaskDefinitionImpl;
 
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class SUserTaskDefinitionBinding extends SHumanTaskDefinitionBinding {
 
+    private SContractDefinition contract;
+
+    @Override
+    public void setChildObject(final String name, final Object value) {
+        super.setChildObject(name, value);
+        if (XMLSProcessDefinition.CONTRACT_NODE.equals(name)) {
+            contract = (SContractDefinition) value;
+        }
+    }
+
     @Override
     public Object getObject() {
-        final SUserTaskDefinitionImpl userTaskDefinitionImpl = new SUserTaskDefinitionImpl(id, name, actorName);
-        fillNode(userTaskDefinitionImpl);
-        return userTaskDefinitionImpl;
+        final SUserTaskDefinitionImpl userTask = new SUserTaskDefinitionImpl(id, name, actorName);
+        fillNode(userTask);
+        if (contract != null) {
+            userTask.setContract(contract);
+        }
+        return userTask;
     }
 
     @Override
