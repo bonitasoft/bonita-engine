@@ -13,9 +13,13 @@
  **/
 package org.bonitasoft.engine.home;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,10 +29,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.bpm.actor.ActorMappingExportException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.process.ProcessExportException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
 
@@ -261,11 +269,6 @@ public class BonitaHomeServer extends BonitaHome {
         return processFolder.getResources(filenamesPattern);
     }
 
-    public byte[] getProcessDefinitionFolderAsZip(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        final Folder processFolder = getProcessFolder(tenantId, processId);
-        return processFolder.zip(processFolder);
-    }
-
     public byte[] getProcessDocument(long tenantId, long processId, String documentName) throws BonitaHomeNotSetException, IOException {
         final Folder documentsFolder = FolderMgr.getTenantWorkProcessDocumentFolder(getBonitaHomeFolder(), tenantId, processId);
         return FileUtils.readFileToByteArray(documentsFolder.getFile(documentName));
@@ -363,5 +366,49 @@ public class BonitaHomeServer extends BonitaHome {
 
     public File getSecurityScriptsFolder(long tenantId) throws BonitaHomeNotSetException, IOException {
         return FolderMgr.getTenantWorkSecurityFolder(getBonitaHomeFolder(), tenantId).getFile();
+    }
+
+    public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException, BonitaHomeNotSetException {
+        final Folder workFolder = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId);
+        final File propertiesFile = workFolder.getFile("bonita-tenant.properties");
+
+        final BufferedReader br = new BufferedReader(new FileReader(propertiesFile));
+        try {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                String lineToWrite = line;
+                if (!line.startsWith("#")) {
+                    //it is not a comment
+                    final String[] splittedLine = line.split("=");
+                    if (splittedLine.length == 2) {
+                        //this is a key-value pair
+                        if ("userName=".equals(splittedLine[0].trim())) {
+                            lineToWrite = "userName=" + userName;
+                        } else if ("userPassword=".equals(splittedLine[0].trim())) {
+                            lineToWrite = "userPassword=" + password;
+                        }
+                    }
+                }
+                sb.append(lineToWrite);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+            IOUtil.writeContentToFile(sb.toString(), propertiesFile);
+        } finally {
+            if (br != null) {
+                br.close();
+            }
+        }
+    }
+
+    public byte[] exportBarProcessContentUnderHome(long tenantId, long processId, final String actorMappingContent) throws IOException, BonitaHomeNotSetException {
+        final FileOutputStream actorMappingOS = getProcessDefinitionFileOutputstream(tenantId, processId, "actorMapping.xml");
+        IOUtil.writeContentToFileOutputStream(actorMappingContent, actorMappingOS);
+        //final FileOutputStream parametersOS = getProcessDefinitionFileOutputstream(tenantId, processId, "current-parameters.properties");
+        //IOUtil.writeContentToFileOutputStream(parametersContent, parametersOS);
+        final Folder processFolder = getProcessFolder(tenantId, processId);
+        return processFolder.zip(processFolder);
     }
 }
