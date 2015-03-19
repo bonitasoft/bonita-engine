@@ -106,42 +106,59 @@ public class BonitaHomeServer extends BonitaHome {
                 ;
     }
 
-    private static List<File> getXmlResourcesOfFolder(final Folder folder) throws IOException {
-        final FileFilter filter = new FileFilter() {
+    private static class AllXmlFilesFilter implements FileFilter {
+        @Override
+        public boolean accept(final File pathname) {
+            return pathname.isFile() && pathname.getName().endsWith(".xml");
+        }
+    }
 
-            @Override
-            public boolean accept(final File pathname) {
-                return pathname.isFile() && pathname.getName().endsWith(".xml");
-            }
-        };
-        /*
-         * sort this to have always the same order
-         */
+    private static class NonClusterXmlFilesFilter extends AllXmlFilesFilter {
+        @Override
+        public boolean accept(final File pathname) {
+            return super.accept(pathname) && !pathname.getName().contains("cluster");
+        }
+    }
+
+    private static List<File> getXmlResourcesOfFolder(final Folder folder, final FileFilter filter) throws IOException {
+        //sort this to have always the same order
         File[] listFiles = folder.listFiles(filter);
         List<File> listFilesCollection = Arrays.asList(listFiles);
         Collections.sort(listFilesCollection);
         return listFilesCollection;
     }
 
-    public String[] getPrePlatformInitConfigurationFiles() throws BonitaHomeNotSetException, IOException {
+    private String[] getConfigurationFiles(final Folder... folders) throws BonitaHomeNotSetException, IOException {
+        final Properties platformProperties = getPlatformProperties();
+        final boolean cluster = Boolean.valueOf(platformProperties.getProperty("bonita.cluster", "false"));
+        FileFilter filter;
+        if (cluster) {
+            filter = new NonClusterXmlFilesFilter();
+        } else {
+            filter = new AllXmlFilesFilter();
+        }
         final List<File> files = new ArrayList<File>();
-        files.addAll(getXmlResourcesOfFolder(FolderMgr.getPlatformInitWorkFolder(getBonitaHomeFolder())));
-        files.addAll(getXmlResourcesOfFolder(FolderMgr.getPlatformInitConfFolder(getBonitaHomeFolder())));
+        for (Folder folder : folders) {;
+            files.addAll(getXmlResourcesOfFolder(folder, filter));
+        }
         return getResourcesFromFiles(files);
+    }
+    public String[] getPrePlatformInitConfigurationFiles() throws BonitaHomeNotSetException, IOException {
+        final Folder f1 = FolderMgr.getPlatformInitWorkFolder(getBonitaHomeFolder());
+        final Folder f2 = FolderMgr.getPlatformInitConfFolder(getBonitaHomeFolder());
+        return getConfigurationFiles(f1, f2);
     }
 
     public String[] getPlatformConfigurationFiles() throws BonitaHomeNotSetException, IOException {
-        final List<File> files = new ArrayList<File>();
-        files.addAll(getXmlResourcesOfFolder(FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder())));
-        files.addAll(getXmlResourcesOfFolder(FolderMgr.getPlatformConfFolder(getBonitaHomeFolder())));
-        return getResourcesFromFiles(files);
+        final Folder f1 = FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder());
+        final Folder f2 = FolderMgr.getPlatformConfFolder(getBonitaHomeFolder());
+        return getConfigurationFiles(f1, f2);
     }
 
     public String[] getTenantConfigurationFiles(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        final List<File> files = new ArrayList<File>();
-        files.addAll(getXmlResourcesOfFolder(FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId)));
-        files.addAll(getXmlResourcesOfFolder(FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId)));
-        return getResourcesFromFiles(files);
+        final Folder f1 = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId);
+        final Folder f2 = FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId);
+        return getConfigurationFiles(f1, f2);
     }
 
     public void createTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
