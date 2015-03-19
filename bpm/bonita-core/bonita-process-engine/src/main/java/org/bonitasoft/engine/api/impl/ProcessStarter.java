@@ -70,22 +70,29 @@ public class ProcessStarter {
 
     private final Filter<SFlowNodeDefinition> filter;
 
+    private final Map<String, Serializable> instantiationInputs;
+
     private ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
-           final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter) {
+            final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter, final Map<String, Serializable> instantiationInputs) {
         this.userId = userId;
         this.processDefinitionId = processDefinitionId;
         this.operations = operations;
         this.context = context;
         this.filter = filter;
+        this.instantiationInputs = instantiationInputs;
     }
 
     public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context) {
-        this(userId, processDefinitionId, operations, context, new StartFlowNodeFilter());
+        this(userId, processDefinitionId, operations, context, new StartFlowNodeFilter(), null);
     }
 
     public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context,
             final List<String> activityNames) {
-        this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames));
+        this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames), null);
+    }
+
+    public ProcessStarter(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs) {
+        this(userId, processDefinitionId, null, null, new StartFlowNodeFilter(), instantiationInputs);
     }
 
     public ProcessInstance start() throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
@@ -117,20 +124,19 @@ public class ProcessStarter {
         final SProcessInstance startedSProcessInstance;
         try {
             final List<SOperation> sOperations = ModelConvertor.convertOperations(operations);
-            startedSProcessInstance =
-                    processExecutor.start(starterUserId, starterSubstituteUserId, sOperations, operationContext, connectorsWithInput,
-                            new FlowNodeSelector(sProcessDefinition, filter));
+            startedSProcessInstance = processExecutor.start(starterUserId, starterSubstituteUserId, sOperations, operationContext, connectorsWithInput,
+                    new FlowNodeSelector(sProcessDefinition, filter), instantiationInputs);
         } catch (final SProcessInstanceCreationException e) {
             log(tenantAccessor, e);
             e.setProcessDefinitionIdOnContext(sProcessDefinition.getId());
             e.setProcessDefinitionNameOnContext(sProcessDefinition.getName());
             e.setProcessDefinitionVersionOnContext(sProcessDefinition.getVersion());
             throw e;
-            }
+        }
 
         logProcessInstanceStartedAndAddComment(sProcessDefinition, starterUserId, starterSubstituteUserId, startedSProcessInstance);
         return ModelConvertor.toProcessInstance(sProcessDefinition, startedSProcessInstance);
-        }
+    }
 
     protected void log(final TenantServiceAccessor tenantAccessor, final Exception e) {
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
@@ -156,22 +162,22 @@ public class ProcessStarter {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
 
-            final StringBuilder stb = new StringBuilder();
-            stb.append("The user <");
-            stb.append(SessionInfos.getUserNameFromSession());
+        final StringBuilder stb = new StringBuilder();
+        stb.append("The user <");
+        stb.append(SessionInfos.getUserNameFromSession());
         if (starterId != starterSubstituteId) {
-                stb.append("> acting as delegate of user with id <");
-                stb.append(starterId);
-            }
+            stb.append("> acting as delegate of user with id <");
+            stb.append(starterId);
+        }
         stb.append("> has started the process instance <");
         stb.append(sProcessInstance.getId());
-            stb.append("> of process <");
-            stb.append(sProcessDefinition.getName());
-            stb.append("> in version <");
-            stb.append(sProcessDefinition.getVersion());
-            stb.append("> and id <");
-            stb.append(sProcessDefinition.getId());
-            stb.append(">");
+        stb.append("> of process <");
+        stb.append(sProcessDefinition.getName());
+        stb.append("> in version <");
+        stb.append(sProcessDefinition.getVersion());
+        stb.append("> and id <");
+        stb.append(sProcessDefinition.getId());
+        stb.append(">");
 
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, stb.toString());
@@ -190,11 +196,8 @@ public class ProcessStarter {
             final IdentityService identityService = tenantAccessor.getIdentityService();
             try {
                 final SUser starter = identityService.getUser(starterId);
-                final StringBuilder stb = new StringBuilder();
-                stb.append("The user ").append(SessionInfos.getUserNameFromSession()).append(" ");
-                stb.append("acting as delegate of the user ").append(starter.getUserName()).append(" ");
-                stb.append("has started the case.");
-                commentService.addSystemComment(sProcessInstance.getId(), stb.toString());
+                commentService.addSystemComment(sProcessInstance.getId(), "The user " + SessionInfos.getUserNameFromSession()
+                        + " acting as delegate of the user " + starter.getUserName() + " has started the case.");
             } catch (final SBonitaException e) {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error when adding a comment on the process instance.", e);
             }

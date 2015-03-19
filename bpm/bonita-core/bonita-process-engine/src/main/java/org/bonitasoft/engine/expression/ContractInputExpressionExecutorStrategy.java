@@ -39,11 +39,18 @@ public class ContractInputExpressionExecutorStrategy implements ExpressionExecut
     }
 
     @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions, final ContainerState containerState)
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
+            final ContainerState containerState)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         final Long containerId = (Long) context.get(CONTAINER_ID_KEY);
+        final String containerType = (String) context.get(CONTAINER_TYPE_KEY);
         try {
-            return contractDataService.getUserTaskDataValue(containerId, expression.getContent());
+            if ("PROCESS_INSTANCE".equals(containerType)) {
+                return contractDataService.getProcessDataValue(containerId, expression.getContent());
+            }
+            else {
+                return contractDataService.getUserTaskDataValue(containerId, expression.getContent());
+            }
         } catch (final SContractDataNotFoundException scdnfe) {
             throw new SExpressionEvaluationException(scdnfe, expression.getName());
         } catch (final SBonitaReadException sre) {

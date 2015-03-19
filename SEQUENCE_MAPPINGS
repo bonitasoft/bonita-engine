@@ -109,7 +109,8 @@ SBusinessApplication -> 10200
 SBusinessApplicationPage -> 10201
 SBusinessApplicationMenu -> 10202
 
-SContractData -> 10210
+SUSerTaskContractData -> 10210
+SProcessContractData --> 10220
 
 =Archived objects==
 
@@ -130,7 +131,8 @@ SALongTextDataInstance --> 20050
 SAXMLDataInstance --> 20050
 SABlobDataInstance --> 20050
 
-SContractData --> 20210
+SAUSerTaskContractData -> 20210
+SAProcessContractData --> 20220
 SFormMappingImpl --> 10300
 
 =TESTS=
