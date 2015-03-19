@@ -32,6 +32,7 @@ import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
 import org.bonitasoft.engine.execution.StateBehaviors;
+import org.bonitasoft.engine.execution.WaitingEventsInterrupter;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -60,13 +61,15 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
             final TechnicalLoggerService logger, final DocumentService documentService, final SCommentService commentService,
             final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
             final WorkService workService, final IdentityService identityService, final BreakpointService breakpointService,
-            final RefBusinessDataService refBusinessDataService, final ParentContainerResolver parentContainerResolver) {
+            final RefBusinessDataService refBusinessDataService, final ParentContainerResolver parentContainerResolver,
+            final WaitingEventsInterrupter waitingEventsInterrupter) {
         super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, expressionResolverService,
                 dataInstanceService, operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentService, commentService,
                 new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
                         connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
-                        containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, processInstanceService,
-                        parentContainerResolver, refBusinessDataService));
+                        containerRegistry, eventInstanceService, commentService, identityService, processInstanceService, parentContainerResolver,
+                        waitingEventsInterrupter, logger,
+                        refBusinessDataService), waitingEventsInterrupter);
         this.breakpointService = breakpointService;
     }
 
