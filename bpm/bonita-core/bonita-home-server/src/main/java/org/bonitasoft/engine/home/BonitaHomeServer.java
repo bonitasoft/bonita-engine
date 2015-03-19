@@ -109,7 +109,7 @@ public class BonitaHomeServer extends BonitaHome {
     private static class AllXmlFilesFilter implements FileFilter {
         @Override
         public boolean accept(final File pathname) {
-            return pathname.isFile() && pathname.getName().endsWith(".xml");
+            return pathname.isFile() && pathname.getName().endsWith(".xml") && !pathname.getName().endsWith("-cache.xml");
         }
     }
 
@@ -133,9 +133,9 @@ public class BonitaHomeServer extends BonitaHome {
         final boolean cluster = Boolean.valueOf(platformProperties.getProperty("bonita.cluster", "false"));
         FileFilter filter;
         if (cluster) {
-            filter = new NonClusterXmlFilesFilter();
-        } else {
             filter = new AllXmlFilesFilter();
+        } else {
+            filter = new NonClusterXmlFilesFilter();
         }
         final List<File> files = new ArrayList<File>();
         for (Folder folder : folders) {;
