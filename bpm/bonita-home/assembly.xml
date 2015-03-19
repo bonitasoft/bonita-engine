@@ -9,7 +9,7 @@
 
 		<fileSet>
 			<directory>${project.build.directory}/bonita-home</directory>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>bonita-home</outputDirectory>
 		</fileSet>
 	</fileSets>
 
