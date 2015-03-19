@@ -26,6 +26,12 @@ public class SContractDataLogBuilder extends CRUDELogBuilder implements SPersist
 
     private static final int CONTRACT_DATA_INDEX = 0;
 
+    private String contractDataPrefix;
+
+    public SContractDataLogBuilder(String contractDataPrefix) {
+        this.contractDataPrefix = contractDataPrefix;
+    }
+
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
         queriableLogBuilder.numericIndex(CONTRACT_DATA_INDEX, objectId);
@@ -34,13 +40,13 @@ public class SContractDataLogBuilder extends CRUDELogBuilder implements SPersist
 
     @Override
     protected String getActionTypePrefix() {
-        return "CONTRACT_DATA";
+        return contractDataPrefix;
     }
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(CONTRACT_DATA_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Contract data Id");
+            throw new MissingMandatoryFieldsException("Some mandatory fields are missing: Contract data Id");
         }
     }
 
