@@ -26,7 +26,7 @@ public class SContractDataLogBuilder extends CRUDELogBuilder implements SPersist
 
     private static final int CONTRACT_DATA_INDEX = 0;
 
-    private String contractDataPrefix;
+    private String contractDataPrefix; // so that this object can be used for usertasks and process as well
 
     public SContractDataLogBuilder(String contractDataPrefix) {
         this.contractDataPrefix = contractDataPrefix;
