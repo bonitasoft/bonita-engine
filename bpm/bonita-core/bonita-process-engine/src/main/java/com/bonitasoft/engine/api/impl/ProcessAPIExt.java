@@ -27,6 +27,8 @@ import java.util.zip.ZipOutputStream;
 import org.bonitasoft.engine.api.impl.DocumentAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.SessionInfos;
+import org.bonitasoft.engine.api.impl.connector.ConnectorReseter;
+import org.bonitasoft.engine.api.impl.flownode.FlowNodeRetrier;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevel;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchived;
@@ -35,13 +37,11 @@ import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcess
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
 import org.bonitasoft.engine.bpm.actor.ActorMappingExportException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
-import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
@@ -81,7 +81,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -109,7 +108,6 @@ import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.Expression;
@@ -137,6 +135,7 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
 import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.impl.connector.ResetConnectorToSpecifiedStatesStrategy;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
 import com.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevelExt;
 import com.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchivedExt;
@@ -579,7 +578,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void replayActivity(final long activityInstanceId) throws ActivityExecutionException, ActivityInstanceNotFoundException {
-        replayActivity(activityInstanceId, null);
+        replayActivity(activityInstanceId, Collections.<Long, ConnectorStateReset> emptyMap());
     }
 
     @Override
@@ -588,63 +587,10 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         LicenseChecker.getInstance().checkLicenseAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-        final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
-
-        try {
-            // Reset connectors first:
-            if (connectorsToReset != null) {
-                for (final Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
-                    final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure = connectorInstanceService
-                            .getConnectorInstanceWithFailureInfo(connEntry.getKey());
-                    // set state
-                    final ConnectorStateReset state = connEntry.getValue();
-                    connectorInstanceService.setState(connectorInstanceWithFailure, state.name());
-                    // clean stack trace
-                    if (connectorInstanceWithFailure.getStackTrace() != null) {
-                        connectorInstanceService.setConnectorInstanceFailureException(connectorInstanceWithFailure, null);
-                    }
-                }
-            }
-
-            // Check if no connector remains in FAILED state:
-            ensureNoMoreConnectoFailed(activityInstanceId, connectorInstanceService);
-
-            // Then replay activity:
-            // can change state and call execute
-            final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
-            activityInstanceService.setState(activityInstance, flowNodeStateManager.getState(activityInstance.getPreviousStateId()));
-            activityInstanceService.setExecuting(activityInstance);
-
-            containerRegistry.executeFlowNode(activityInstance.getProcessDefinitionId(), activityInstance.getParentProcessInstanceId(), activityInstanceId,
-                    null, null);
-        } catch (final SActivityInstanceNotFoundException e) {
-            throw new ActivityInstanceNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new ActivityExecutionException(e);
-        } catch (final Exception e) {
-            throw new ActivityExecutionException(e);
-        }
-    }
-
-    /**
-     * @param activityInstanceId
-     * @param connectorInstanceService
-     * @throws SConnectorInstanceReadException
-     * @throws ActivityExecutionException
-     */
-    private void ensureNoMoreConnectoFailed(final long activityInstanceId, final ConnectorInstanceService connectorInstanceService)
-            throws SConnectorInstanceReadException, ActivityExecutionException {
-        for (final ConnectorEvent connectorEvent : ConnectorEvent.values()) {
-            List<SConnectorInstance> connectorInstances;
-            connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE, connectorEvent, 0, 1,
-                    ConnectorState.FAILED.name());
-            if (!connectorInstances.isEmpty()) {
-                throw new ActivityExecutionException("There is one connector in failed on " + connectorEvent.name() + " of the activity: "
-                        + connectorInstances.get(0).getName());
-            }
-        }
+        FlowNodeRetrier flowNodeRetrier = new FlowNodeRetrier(tenantAccessor.getContainerRegistry(), tenantAccessor.getFlowNodeExecutor(),
+                tenantAccessor.getActivityInstanceService(), tenantAccessor.getFlowNodeStateManager(),
+                new ResetConnectorToSpecifiedStatesStrategy(connectorInstanceService, new ConnectorReseter(connectorInstanceService), connectorsToReset));
+        flowNodeRetrier.retry(activityInstanceId);
     }
 
     @Override
