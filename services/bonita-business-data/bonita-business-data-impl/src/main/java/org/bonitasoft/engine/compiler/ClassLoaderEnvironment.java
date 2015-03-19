@@ -124,13 +124,7 @@ public class ClassLoaderEnvironment extends FileSystem {
     @Override
     public boolean isPackage(char[][] parentPackageName,
             char[] className) {
-        String parentPackage = toPointedNotation(parentPackageName);
-        if (Character.isUpperCase(className[0])) {
-            if (!isPackage(parentPackage)) {
-                return false;
-            }
-        }
-        return isPackage(getClassName(parentPackage, new String(className)));
+        return !Character.isUpperCase(className[0]) && isPackage(getClassName(toPointedNotation(parentPackageName), new String(className)));
     }
 
     String getClassName(String parentPackage, String className) {
