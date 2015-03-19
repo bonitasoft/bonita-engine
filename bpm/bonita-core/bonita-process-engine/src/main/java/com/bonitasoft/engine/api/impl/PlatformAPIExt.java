@@ -83,6 +83,7 @@ import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.exception.STenantCreationException;
+import org.bonitasoft.engine.platform.exception.STenantDeletionException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
@@ -181,6 +182,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private long create(final TenantCreator creator) throws CreationException {
         final Map<com.bonitasoft.engine.platform.TenantCreator.TenantField, Serializable> tenantFields = creator.getFields();
+        Long tenantId = -1L;
+        boolean bhTenantCreated = false;
         try {
             final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
             final PlatformServiceAccessor platformAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
@@ -190,46 +193,23 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             // add tenant to database
             final STenant tenant = SPModelConvertor.constructTenant(creator);
 
-            final Long tenantId = transactionService.executeInTransaction(new Callable<Long>() {
+            tenantId = transactionService.executeInTransaction(new Callable<Long>() {
 
                 @Override
                 public Long call() throws Exception {
                     return platformService.createTenant(tenant);
                 }
             });
-
-            // add tenant folder
-            String targetDir = null;
-            String sourceDir = null;
-            try {
-                final BonitaHomeServer home = BonitaHomeServer.getInstance();
-                targetDir = home.getTenantsFolder() + File.separator + tenant.getId();
-                sourceDir = home.getTenantTemplateFolder();
-            } catch (final Exception e) {
-                deleteTenant(tenant.getId());
-                throw new STenantCreationException("Bonita home not set!");
-            }
-            // copy configuration file
-            try {
-                FileUtils.copyDirectory(new File(sourceDir), new File(targetDir));
-            } catch (final IOException e) {
-                IOUtil.deleteDir(new File(targetDir));
-                deleteTenant(tenant.getId());
-                throw new STenantCreationException("Copy File Exception!");
-            }
+            BonitaHomeServer.getInstance().createTenant(tenantId);
+            bhTenantCreated = true;
             // modify user name and password
             final String userName = (String) tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.USERNAME);
-            try {
-                final String password = (String) tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.PASSWORD);
-                modifyTechnicalUser(tenant.getId(), userName, password);
-            } catch (final Exception e) {
-                IOUtil.deleteDir(new File(targetDir));
-                deleteTenant(tenant.getId());
-                throw new STenantCreationException("Modify File Exception!");
-            }
+            final String password = (String) tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.PASSWORD);
+            BonitaHomeServer.getInstance().modifyTechnicalUser(tenant.getId(), userName, password);
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
             final SessionService sessionService = platformAccessor.getSessionService();
+            final Long finalTenantId = tenantId;
             final Callable<Long> initializeTenant = new Callable<Long>() {
 
                 @Override
@@ -239,7 +219,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                     try {
                         // Create session
                         sessionAccessor = serviceAccessorFactory.createSessionAccessor();
-                        final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
+                        final SSession session = sessionService.createSession(finalTenantId, -1L, userName, true);
                         platformSessionId = sessionAccessor.getSessionId();
                         sessionAccessor.deleteSessionId();
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
@@ -256,10 +236,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         // Create default themes
                         getDelegate().createDefaultThemes(tenantServiceAccessor);
 
-                        registerTenantJobListeners(platformAccessor, tenantId);
+                        registerTenantJobListeners(platformAccessor, finalTenantId);
 
                         sessionService.deleteSession(session.getId());
-                        return tenantId;
+                        return finalTenantId;
                     } finally {
                         cleanSessionAccessor(sessionAccessor, platformSessionId);
                     }
@@ -268,6 +248,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             };
             return transactionService.executeInTransaction(initializeTenant);
         } catch (final Exception e) {
+            if (bhTenantCreated) {
+                try {
+                    BonitaHomeServer.getInstance().deleteTenant(tenantId);
+                } catch (Exception e1) {
+                    throw new CreationException("Unable to delete default tenant (after a STenantCreationException) that was being created", e1);
+                }
+            }
             throw new CreationException("Unable to create tenant " + tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.NAME), e);
         }
     }
@@ -291,23 +278,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
-    }
-
-    // modify user name and password
-    private void modifyTechnicalUser(final long tenantId, final String userName, final String password) throws IOException, BonitaHomeNotSetException {
-        final String tenantPath = BonitaHomeServer.getInstance().getTenantConfFolder(tenantId) + File.separator + "bonita-tenant.properties";
-        final File file = new File(tenantPath);
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-        final Properties properties = PropertiesManager.getProperties(file);
-        if (userName != null) {
-            properties.setProperty("userName", userName);
-        }
-        if (password != null) {
-            properties.setProperty("userPassword", password);
-        }
-        PropertiesManager.saveProperties(properties, file);
     }
 
     @Override
@@ -336,8 +306,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             tenantServiceAccessor.destroy();
 
             // delete tenant folder
-            final String targetDir = BonitaHomeServer.getInstance().getTenantsFolder() + File.separator + tenantId;
-            IOUtil.deleteDir(new File(targetDir));
+            BonitaHomeServer.getInstance().deleteTenant(tenantId);
         } catch (final STenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
             throw new DeletionException(e);
@@ -620,7 +589,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final String username = (String) updatedFields.get(TenantField.USERNAME);
             final String password = (String) updatedFields.get(TenantField.PASSWOWRD);
             if (username != null || password != null) {
-                modifyTechnicalUser(tenantId, username, password);
+                BonitaHomeServer.getInstance().modifyTechnicalUser(tenantId, username, password);
             }
             // update tenant in database
             final STenantUpdateBuilder tenantUpdateBuilder = getTenantUpdateDescriptor(udpater);

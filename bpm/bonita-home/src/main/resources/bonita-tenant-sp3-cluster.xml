@@ -37,4 +37,24 @@
 		</constructor-arg>
 	</bean>
 
+	<bean id="eventService" class="com.bonitasoft.engine.events.impl.ClusteredEventServiceImpl">
+		<constructor-arg name="handlers">
+			<map />
+		</constructor-arg>
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
+		<constructor-arg name="tenantId" value="${tenantId}" />
+	</bean>
+
+	<bean id="bonitaExecutorServiceFactory" class="com.bonitasoft.engine.work.ClusteredLocalQueueBonitaExecutorServiceFactory">
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+		<constructor-arg name="tenantId" value="${tenantId}" />
+		<constructor-arg name="corePoolSize" value="20" />
+		<constructor-arg name="maximumPoolSize" value="20" />
+		<!-- small value because of the hazelcast bug on queue not interrupted -->
+		<constructor-arg name="keepAliveTimeSeconds" value="15" />
+		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
+	</bean>
+
+
 </beans>

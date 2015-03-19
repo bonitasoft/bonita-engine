@@ -1,0 +1,45 @@
+<project name="bonita-engine-home" default="build" >
+
+	<property name="target.dir" value="${basedir}/target"/>
+	<property name="resources.dir" value="${basedir}/src/main/resources"/>
+	<property name="bh.dir" value="${target.dir}/bonita-home"/>
+	<property name="bh.community.dir" value="${target.dir}/bonita-home-community/bonita-home"/>
+
+	<target name="build">
+		<delete dir="${bh.dir}" />
+
+		<copy todir="${bh.dir}">
+			<fileset dir="${bh.community.dir}">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+
+		<!-- ENGINE SERVER - WORK -->
+
+		<copy todir="${bh.dir}/engine-server/work/platform">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-platform-private-sp.properties"/>
+				<include name="bonita-platform-sp.properties"/>
+				<include name="bonita-platform-sp1.xml"/>
+				<include name="bonita-platform-sp3-cluster.xml"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${bh.dir}/engine-server/work/tenants/template">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-tenant-sp1.properties"/>
+				<include name="bonita-tenant-sp1.xml"/>
+				<include name="bonita-tenant-sp3-cluster.xml"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${bh.dir}/engine-server/conf/platform">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-platform-hibernate-cache.xml"/>
+				<include name="bonita-tenant-hibernate-cache.xml"/>
+			</fileset>
+		</copy>
+
+	</target>
+
+</project>

@@ -195,7 +195,7 @@
 		</property>
 	</bean>
 
-	<bean id="hibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+	<bean id="sp1HibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
 		<property name="map">
 			<map>
 				<entry key="hibernate.cache.use_second_level_cache" value="true" />
@@ -205,12 +205,19 @@
 		</property>
 	</bean>
 
+	<bean id="hibernateCacheProperties" parent="sp1HibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+		<property name="map">
+			<map merge="true">
+			</map>
+		</property>
+	</bean>
+
 	<bean id="extraPlatformHibernateProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
 		<property name="map">
 			<map>
 				<entry key="net.sf.ehcache.configurationResourceName">
 					<bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
-						<property name="filePath" value="/server/platform/conf/hibernate-cache-platform.xml" />
+						<property name="filePath" value="/engine-server/work/platform/conf/bonita-platform-hibernate-cache.xml" />
 						<property name="baseFolder" value="${bonita.home}" />
 					</bean>
 				</entry>
@@ -223,7 +230,7 @@
 			<map>
 				<entry key="net.sf.ehcache.configurationResourceName">
 					<bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
-						<property name="filePath" value="/server/platform/conf/hibernate-cache-tenant.xml" />
+						<property name="filePath" value="/engine-server/work/platform/conf/bonita-tenant-hibernate-cache.xml" />
 						<property name="baseFolder" value="${bonita.home}" />
 					</bean>
 				</entry>

@@ -9,8 +9,6 @@
 package com.bonitasoft.engine.api.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,7 +19,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.zip.ZipOutputStream;
 
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
@@ -50,7 +47,6 @@ import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
-import org.bonitasoft.engine.bpm.actor.ActorMappingExportException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
@@ -120,7 +116,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -135,7 +130,6 @@ import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
@@ -580,53 +574,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     // TODO delete files after use/if an exception occurs
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
-        String processesFolder;
         try {
-            final long tenantId = getTenantAccessor().getTenantId();
-            processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new BonitaRuntimeException(e);
-        }
-        final File file = new File(processesFolder);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        final File processFolder = new File(file, String.valueOf(processDefinitionId));
-
-        // copy current parameter to parameter file
-        try {
-            final File currentParasF = new File(processFolder.getPath(), "current-parameters.properties");
-            if (currentParasF.exists()) {
-                final File parasF = new File(processFolder.getPath(), "parameters.properties");
-                if (!parasF.exists()) {
-                    parasF.createNewFile();
-                }
-                final String content = IOUtil.read(currentParasF);
-                IOUtil.writeContentToFile(content, parasF);
-            }
-
-            // export actormapping
-            final File actormappF = new File(processFolder.getPath(), "actorMapping.xml");
-            if (!actormappF.exists()) {
-                actormappF.createNewFile();
-            }
-            String xmlcontent = "";
-            try {
-                xmlcontent = exportActorMapping(processDefinitionId);
-            } catch (final ActorMappingExportException e) {
-                throw new ProcessExportException(e);
-            }
-            IOUtil.writeContentToFile(xmlcontent, actormappF);
-
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            final ZipOutputStream zos = new ZipOutputStream(baos);
-            try {
-                IOUtil.zipDir(processFolder.getPath(), zos, processFolder.getPath());
-                return baos.toByteArray();
-            } finally {
-                zos.close();
-            }
-        } catch (final IOException e) {
+            return BonitaHomeServer.getInstance().exportBarProcessContentUnderHome(getTenantAccessor().getTenantId(), processDefinitionId, exportActorMapping(processDefinitionId));
+        } catch (Exception e) {
             throw new ProcessExportException(e);
         }
     }
