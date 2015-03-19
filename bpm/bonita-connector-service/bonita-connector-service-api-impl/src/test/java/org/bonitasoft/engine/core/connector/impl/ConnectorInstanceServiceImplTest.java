@@ -13,20 +13,30 @@
  **/
 package org.bonitasoft.engine.core.connector.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceWithFailureInfoBuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -91,7 +101,7 @@ public class ConnectorInstanceServiceImplTest {
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
-        final String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
+        final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
         assertEquals(message, updateRecord.getFields().get(EXCEPTION_MESSAGE));
         assertTrue(stackTrace.startsWith(Exception.class.getName() + ": " + message));
@@ -109,7 +119,7 @@ public class ConnectorInstanceServiceImplTest {
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
-        final String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
+        final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
         assertNull(updateRecord.getFields().get(EXCEPTION_MESSAGE));
         assertTrue(stackTrace.startsWith(Exception.class.getName()));
@@ -128,12 +138,12 @@ public class ConnectorInstanceServiceImplTest {
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
-        final String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
+        final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
         assertEquals(causedByMessage, updateRecord.getFields().get(EXCEPTION_MESSAGE));
         assertTrue(stackTrace.startsWith(Exception.class.getName() + ": " + message));
         assertTrue(stackTrace.contains(getClass().getName() + ".setConnectorInstanceFailureExceptionWithCausedBy"));
-        assertTrue(stackTrace.contains("Caused by: " + Exception.class.getName() + ": " +  causedByMessage));
+        assertTrue(stackTrace.contains("Caused by: " + Exception.class.getName() + ": " + causedByMessage));
     }
 
     @Test
@@ -145,7 +155,7 @@ public class ConnectorInstanceServiceImplTest {
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
-        final String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
+        final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
         assertNull(updateRecord.getFields().get(EXCEPTION_MESSAGE));
         assertNull(stackTrace);
@@ -171,7 +181,7 @@ public class ConnectorInstanceServiceImplTest {
         final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
         final UpdateRecord updateRecord = updateRecordCaptor.getValue();
-        final String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
+        final String stackTrace = (String) updateRecord.getFields().get(STACK_TRACE);
 
         final String retrievedMessage = (String) updateRecord.getFields().get(EXCEPTION_MESSAGE);
         assertEquals(longMessage.substring(0, 255), retrievedMessage);
@@ -179,4 +189,27 @@ public class ConnectorInstanceServiceImplTest {
         assertTrue(stackTrace.contains(getClass().getName() + ".setConnectorInstanceFailureExceptionMessageGreaterThen255"));
     }
 
+    @Test
+    public void getConnectorInstanceWithFailureInfo_should_return_the_result_of_select_list() throws Exception {
+        //given
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("containerId", 1L);
+        parameters.put("containerType", "flowNode");
+        parameters.put("state", "failed");
+
+        List<SConnectorInstanceWithFailureInfo> connectors = Arrays.asList(mock(SConnectorInstanceWithFailureInfo.class),
+                mock(SConnectorInstanceWithFailureInfo.class));
+        given(
+                readPersitenceService.selectList(new SelectListDescriptor<SConnectorInstanceWithFailureInfo>("getConnectorInstancesWithFailureInfoInState",
+                        parameters,
+                        SConnectorInstanceWithFailureInfo.class, new QueryOptions(0, 100, SConnectorInstanceWithFailureInfo.class, "id", OrderByType.ASC))))
+                .willReturn(connectors);
+
+        //when
+        List<SConnectorInstanceWithFailureInfo> retrievedConnectors = connectorInstanceServiceImpl.getConnectorInstancesWithFailureInfo(1L, "flowNode",
+                "failed", 0, 100);
+
+        //then
+        assertThat(retrievedConnectors).isEqualTo(connectors);
+    }
 }

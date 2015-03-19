@@ -34,16 +34,22 @@ import java.util.Set;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
+import org.bonitasoft.engine.bpm.connector.ArchiveConnectorInstancesSearchDescriptor;
+import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
@@ -65,16 +71,20 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.StartProcessUntilStep;
@@ -343,7 +353,8 @@ public class ProcessManagementIT extends TestWithUser {
     }
 
     /**
-     * checks that {@link ProcessManagementAPI#getOpenedActivityInstances(long, int, int, ActivityInstanceCriterion)} returns the good list of open activities
+     * checks that {@link org.bonitasoft.engine.api.ProcessRuntimeAPI#getOpenActivityInstances(long, int, int, ActivityInstanceCriterion)} returns the good list
+     * of open activities
      * only.
      * An open activity is an activity with state NON-FINAL and STABLE.
      */
@@ -1341,6 +1352,89 @@ public class ProcessManagementIT extends TestWithUser {
 
         waitForProcessToFinish(pi0);
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.ACTIVITIES, jira = "BS-12685", keywords = "retry task, failed connector")
+    @Test
+    public void retryTask_should_retry_failed_connector_on_enter() throws Exception {
+        //given
+        Expression dataExpression = new ExpressionBuilder().createDataExpression("watchingVar", String.class.getName());
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addShortTextData("watchingVar", new ExpressionBuilder().createConstantStringExpression("normal"));
+        processBuilder.addAutomaticTask("auto").addConnector("testConnectorThatThrowException",
+                "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER)
+                .addInput("kind", dataExpression);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithConnector(processBuilder, "TestConnectorThatThrowException.impl",
+                TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        FlowNodeInstance flowNodeInstance = waitForFlowNodeInFailedState(processInstance, "auto");
+
+        //when
+        //set variable to a value different of 1: operation will execute with success
+        getProcessAPI().updateProcessDataInstance("watchingVar", processInstance.getId(), "none");
+        getProcessAPI().retryTask(flowNodeInstance.getId());
+
+        //then
+        waitForActivityInCompletedState(processInstance, "auto", true);
+        waitForProcessToFinish(processInstance);
+
+        List<ArchivedConnectorInstance> connectorInstances = getArchivedConnectorInstances(flowNodeInstance);
+        assertThat(connectorInstances).hasSize(1);
+        assertThat(connectorInstances.get(0).getState()).isEqualTo(ConnectorState.DONE);
+
+        //clean
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.ACTIVITIES, jira = "BS-12685", keywords = "retry task, failed connector")
+    @Test
+    public void can_retryTask_twice() throws Exception {
+        //given
+        Expression dataExpression = new ExpressionBuilder().createDataExpression("watchingVar", String.class.getName());
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addShortTextData("watchingVar", new ExpressionBuilder().createConstantStringExpression("normal"));
+        processBuilder.addAutomaticTask("auto").addConnector("testConnectorThatThrowException",
+                "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER)
+                .addInput("kind", dataExpression);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithConnector(processBuilder, "TestConnectorThatThrowException.impl",
+                TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        //first fail
+        FlowNodeInstance flowNodeInstance = waitForFlowNodeInFailedState(processInstance, "auto");
+
+        //when
+        getProcessAPI().retryTask(flowNodeInstance.getId());
+
+        //then fail again
+        waitForFlowNodeInFailedState(processInstance, "auto");
+
+        //when
+        //set variable to a value different of 1: operation will execute with success
+        getProcessAPI().updateProcessDataInstance("watchingVar", processInstance.getId(), "none");
+        getProcessAPI().retryTask(flowNodeInstance.getId());
+
+        //then success
+        waitForActivityInCompletedState(processInstance, "auto", true);
+        waitForProcessToFinish(processInstance);
+
+        List<ArchivedConnectorInstance> connectorInstances = getArchivedConnectorInstances(flowNodeInstance);
+        assertThat(connectorInstances).hasSize(1);
+        assertThat(connectorInstances.get(0).getState()).isEqualTo(ConnectorState.DONE);
+
+        //clean
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    private List<ArchivedConnectorInstance> getArchivedConnectorInstances(final FlowNodeInstance flowNodeInstance) throws SearchException {
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 100);
+        builder.filter(ArchiveConnectorInstancesSearchDescriptor.CONTAINER_ID, flowNodeInstance.getId());
+        builder.filter(ArchiveConnectorInstancesSearchDescriptor.CONTAINER_TYPE, "flowNode");
+        SearchResult<ArchivedConnectorInstance> searchResult = getProcessAPI().searchArchivedConnectorInstances(builder.done());
+        return searchResult.getResult();
     }
 
     @Test(expected = NotFoundException.class)

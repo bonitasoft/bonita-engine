@@ -62,8 +62,6 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
@@ -1209,7 +1207,8 @@ public interface ProcessRuntimeAPI {
      * Search the archived human tasks for tasks that match the search options.
      *
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
      *        fields
      *        for searching and sorting.
      * @return The archived human tasks that match the search conditions.
@@ -1345,18 +1344,23 @@ public interface ProcessRuntimeAPI {
     void cancelProcessInstance(long processInstanceId) throws ProcessInstanceNotFoundException, UpdateException;
 
     /**
-     * Reset the state of a failed activity instance to its previous state and then execute it.
-     * The activity must be in state FAILED.
+     * Reset the state of a failed {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstance} to its previous state and then execute it. Pre-condition: the
+     * {@code FlowNodeInstance} must be in state FAILED.
+     * <p>If the {@code FlowNodeInstance} contains failed {@link org.bonitasoft.engine.bpm.connector.ConnectorInstance}s, they will be re-executed. In the case
+     * where the
+     * connector execution fails again, the {@code FlowNodeInstance} will remain in failed state.</p>
      *
      * @param activityInstanceId
-     *        The identifier of the activity instance.
+     *        The identifier of the {@code FlowNodeInstance} to be re-retried.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid, e.g. the session has expired.
+     *         when session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
-     *         If there is no activity instance with the specified identifier.
+     *         when no {@code FlowNodeInstance} is found with the specified identifier.
      * @throws ActivityExecutionException
-     *         If an error occurs either while resetting the state of while executing the activity instance.
+     *         when an error occurs either while resetting the state or while executing the {@code FlowNodeInstance}.
      * @since 6.0
+     * @see org.bonitasoft.engine.bpm.flownode.FlowNodeInstance
+     * @see org.bonitasoft.engine.bpm.connector.ConnectorInstance
      */
     void retryTask(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
@@ -1798,7 +1802,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Check whether a specific user is involved in a given human task instance.<br/>
-     * User A is involved with a  human task  instance if any of the following is true:
+     * User A is involved with a human task instance if any of the following is true:
      * <ul>
      * <li>the human task instance is assigned to user A</li>
      * <li>the human task instance is pending for user A</li>
@@ -2364,7 +2368,7 @@ public interface ProcessRuntimeAPI {
     /**
      * Retrieve, for a given process instance, the current counters on flownodes. Please note: this method does not count the flownodes of sub-process instances
      * of the given process instance.
-     * 
+     *
      * @param processInstanceId ID of the process instance of which to retrieve the current indicators.
      * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the current counters for this flownode, that is,
      *         a map of &lt;state name, number of current flownode in that state&gt;
