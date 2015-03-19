@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.services.monitoring;
+package com.bonitasoft.engine.services.monitoring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -24,6 +24,7 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
+import com.bonitasoft.engine.CommonBPMServicesSPTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
@@ -41,17 +42,12 @@ import org.junit.Test;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
 import com.bonitasoft.engine.monitoring.mbean.impl.SServiceMXBeanImpl;
-import com.bonitasoft.services.CommonServiceSPTest;
 
-public class SServiceMXBeanTest extends CommonServiceSPTest {
+public class SServiceMXBeanTest extends CommonBPMServicesSPTest {
 
-    private static SchedulerService schedulerService;
+    private SchedulerService schedulerService;
 
-    private static TenantMonitoringService monitoringService;
-
-    private static long sessionId;
-
-    private static long tenantId;
+    private TenantMonitoringService monitoringService;
 
     private MBeanServer mbserver = null;
 
@@ -59,21 +55,14 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
 
     private ObjectName serviceMB;
 
-    static {
-        schedulerService = getServicesBuilder().buildSchedulerService();
-        monitoringService = getServicesBuilder().buildTenantMonitoringService();
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        sessionId = getSessionAccessor().getSessionId();
-        tenantId = getSessionAccessor().getTenantId();
+    public SServiceMXBeanTest() {
+        schedulerService = getTenantAccessor().getSchedulerService();
+        monitoringService = getTenantAccessor().getTenantMonitoringService();
     }
 
     @Before
     public void disableMBeans() throws Exception {
         TestUtil.startScheduler(schedulerService);
-        getSessionAccessor().setSessionInfo(sessionId, tenantId);
         final ArrayList<MBeanServer> mbservers = MBeanServerFactory.findMBeanServer(null);
         if (mbservers.size() > 0) {
             mbserver = mbservers.get(0);
@@ -82,31 +71,23 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
             mbserver = MBeanServerFactory.createMBeanServer();
         }
         // Constructs the mbean names
-        entityMB = new ObjectName(TenantMonitoringService.ENTITY_MBEAN_PREFIX + tenantId);
-        serviceMB = new ObjectName(TenantMonitoringService.SERVICE_MBEAN_PREFIX + tenantId);
+        entityMB = new ObjectName(TenantMonitoringService.ENTITY_MBEAN_PREFIX + getDefaultTenantId());
+        serviceMB = new ObjectName(TenantMonitoringService.SERVICE_MBEAN_PREFIX + getDefaultTenantId());
 
         unregisterMBeans();
 
     }
 
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        getSessionAccessor().setSessionInfo(sessionId, tenantId);
-        TestUtil.closeTransactionIfOpen(getTransactionService());
-        TestUtil.stopScheduler(schedulerService, getTransactionService());
-    }
-
     public SServiceMXBean getServiceMXBean() {
-        return new SServiceMXBeanImpl(getTransactionService(), monitoringService, getSessionAccessor(), getSessionService());
+        return new SServiceMXBeanImpl(getTransactionService(), monitoringService, getSessionAccessor(), getTenantAccessor().getSessionService());
     }
 
     /**
      * Assure that no Bonitasoft MBeans are registered in the MBServer before
      * each test.
      *
-     * @throws MBeanRegistrationException
-     * @throws InstanceNotFoundException
+     * @throws javax.management.MBeanRegistrationException
+     * @throws javax.management.InstanceNotFoundException
      */
     public void unregisterMBeans() throws MBeanRegistrationException, InstanceNotFoundException {
         if (mbserver.isRegistered(entityMB)) {
@@ -158,7 +139,6 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
         final long startNbOfExecutingJobs = (Long) mbserver.getAttribute(serviceMB, numberOfExecutingJobs);
 
         getTransactionService().begin();
-        getSessionAccessor().setSessionInfo(sessionId, tenantId);
         // create an action that will schedule a job
         final VariableStorageForMonitoring storage = VariableStorageForMonitoring.getInstance();
 
@@ -167,7 +147,7 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
 
         final Date now = new Date();
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("com.bonitasoft.services.monitoring.IncrementAVariable", "IncrementAVariable").setDescription("increment a variable").done();
+                .createNewInstance("com.bonitasoft.IncrementAVariable", "IncrementAVariable").setDescription("increment a variable").done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", theResponse).done());
         final Trigger trigger = new OneShotTrigger("events", now, 10);

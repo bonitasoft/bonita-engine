@@ -691,59 +691,43 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>complete test conf setup</id>
 						<phase>process-test-resources</phase>
-						<configuration>
-							<target name="copy-bos-home">
-								<copy todir="${bonita.home}">
-									<fileset dir="${basedir}/home" />
-									<filterset>
-										<filter token="VERSION" value="${project.version}" />
-									</filterset>
-								</copy>
-								<copy todir="${bonita.home}/server/licenses" failonerror="true">
-									<fileset dir="${user.home}/lic" includes="*.lic" />
-								</copy>
-                                <copy todir="${project.build.directory}/test-classes/conf">
-                                    <fileset dir="${project.build.directory}/server/conf/service" />
-                                </copy>
-                                <copy todir="${project.build.directory}/test-classes/conf" overwrite="true">
-                                    <fileset dir="${project.build.directory}/server/conf/bpm" />
-                                </copy>
-                                <copy todir="${project.build.directory}/test-classes/conf" overwrite="true">
-                                    <fileset dir="${basedir}/src/test/resources/conf" />
-                                </copy>
-							</target>
-						</configuration>
 						<goals>
 							<goal>run</goal>
 						</goals>
+						<configuration>
+							<target name="build-home">
+								<ant antfile="build-home-sp-tests.xml" target="build-home-sp-tests"/>
+							</target>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>initialize test conf setup</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.bonitasoft.engine.test</groupId>
-                                    <artifactId>bonita-server-test-utils-sp</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}/server</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.bonitasoft.engine.test</groupId>
+									<artifactId>bonita-integration-tests-services-sql</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+									<outputDirectory>${project.build.directory}/test-classes/sql-test</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
@@ -755,7 +739,7 @@
                         <sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
 					</systemPropertyVariables>
 					<includes>
-						<include>com/bonitasoft/engine/bpm/test/AllBPMSPTestsWithJNDI.java</include>
+						<include>com/bonitasoft/engine/AllBPMSPTestsWithJNDI.java</include>
 					</includes>
 				</configuration>
 				<executions>

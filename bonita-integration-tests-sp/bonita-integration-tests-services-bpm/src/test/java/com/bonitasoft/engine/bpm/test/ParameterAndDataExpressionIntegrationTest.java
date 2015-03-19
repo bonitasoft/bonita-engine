@@ -16,87 +16,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.impl.LoginAPIImpl;
+import com.bonitasoft.engine.CommonBPMServicesSPTest;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.expression.ContainerState;
-import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
-import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.test.util.PlatformUtil;
-import org.bonitasoft.engine.test.util.TestUtil;
-import org.bonitasoft.engine.transaction.TransactionService;
-import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.bonitasoft.engine.api.impl.LoginAPIExt;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import org.bonitasoft.engine.parameter.SParameter;
-import org.bonitasoft.engine.parameter.propertyfile.SParameterImpl;
 
 public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServicesSPTest {
 
     private static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.emptyMap();
 
-    private static APISession sSession;
-
     private final ProcessAPIImpl processAPIImpl = new ProcessAPIImpl();
-
-    @After
-    public void tearDownPersistence() throws Exception {
-        getTransactionService().begin();
-        final long tenantId = PlatformUtil.getDefaultTenantId(getPlatformService());
-        getTransactionService().complete();
-        sSession = new LoginAPIExt().login(tenantId, TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
-        getSessionAccessor().setSessionInfo(sSession.getId(), sSession.getTenantId());
-
-        new LoginAPIImpl().logout(sSession);
-    }
-
-    protected static SessionAccessor getSessionAccessor() {
-        return platformServiceAccessor().getSessionAccessor();
-    }
-
-    protected static PlatformService getPlatformService() {
-        return platformServiceAccessor().getPlatformService();
-    }
-
-    protected ExpressionService getExpressionService() {
-        return platformServiceAccessor().getExpressionService();
-    }
-
-    protected ProcessDefinitionService getProcessDefinitionService() {
-        return platformServiceAccessor().getProcessDefinitionService();
-    }
-
-    protected DataInstanceService getDataInstanceService() {
-        return platformServiceAccessor().getDataInstanceService();
-    }
-
-    protected static TransactionService getTransactionService() {
-        return platformServiceAccessor().getTransactionService();
-    }
-
-    protected String getParameterClassName() {
-        return String.class.getName();
-    }
-
-    protected SParameter createParameter(final String name, final String value) {
-        return new SParameterImpl(name, value);
-    }
 
     private SExpression newExpression(final String content, final String expressionType, final String returnType, final String interpreter,
             final List<SExpression> dependencies) throws SInvalidExpressionException {
@@ -112,7 +53,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
     private Object createAndEvaluateParameterExpression(final String nameParameter, final Long deployId, final String key) throws Exception {
         final SExpression strExpr = newExpression(nameParameter, SExpression.TYPE_PARAMETER, String.class.getName(), null, null);
         final Map<String, Object> dependencies = CollectionUtil.buildSimpleMap(key, deployId);
-        return getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS, ContainerState.ACTIVE);
+        return getTenantAccessor().getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS, ContainerState.ACTIVE);
     }
 
     private ProcessDefinition createProcessAndInsertParameterAndDeployIt(final String processName, final String version, final String parameterName,
@@ -181,7 +122,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         dependencies.put(intDataName, intDataValue);
         // check
         assertEquals("welcome " + parameterValue + " to " + strDataValue + ",Please call " + intDataValue,
-                getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS, ContainerState.ACTIVE));
+                getTenantAccessor().getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS, ContainerState.ACTIVE));
     }
 
 }

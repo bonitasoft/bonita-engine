@@ -6,11 +6,12 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.services.event.handler;
+package com.bonitasoft.engine.services.event;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import com.bonitasoft.engine.CommonBPMServicesSPTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -22,20 +23,18 @@ import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 
-import com.bonitasoft.services.CommonServiceSPTest;
-
 /**
  * @author Elias Ricken de Medeiros
  */
-public class IdentityServiceUsingEventServiceTest extends CommonServiceSPTest {
+public class IdentityServiceUsingEventServiceTest extends CommonBPMServicesSPTest {
 
-    private static IdentityService identityService;
+    private IdentityService identityService;
 
-    private static EventService eventService;
+    private EventService eventService;
 
-    static {
-        identityService = getServicesBuilder().buildIdentityService();
-        eventService = getServicesBuilder().buildEventService();
+    public IdentityServiceUsingEventServiceTest() {
+        identityService = getTenantAccessor().getIdentityService();
+        eventService = getTenantAccessor().getEventService();
     }
 
     @Test

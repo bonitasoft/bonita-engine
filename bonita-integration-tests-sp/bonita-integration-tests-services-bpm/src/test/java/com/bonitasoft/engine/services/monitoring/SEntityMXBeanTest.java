@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.services.monitoring;
+package com.bonitasoft.engine.services.monitoring;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,6 +18,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
+import com.bonitasoft.engine.CommonBPMServicesSPTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -29,9 +30,8 @@ import org.junit.Test;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.SEntityMXBean;
 import com.bonitasoft.engine.monitoring.mbean.impl.SEntityMXBeanImpl;
-import com.bonitasoft.services.CommonServiceSPTest;
 
-public class SEntityMXBeanTest extends CommonServiceSPTest {
+public class SEntityMXBeanTest extends CommonBPMServicesSPTest {
 
     protected static MBeanServer mbserver = null;
 
@@ -43,32 +43,21 @@ public class SEntityMXBeanTest extends CommonServiceSPTest {
 
     private SUser fakeUser;
 
-    private static TenantMonitoringService monitoringService;
+    private TenantMonitoringService monitoringService;
 
-    private static IdentityService identityService;
+    private IdentityService identityService;
 
-    private static long sessionId;
-
-    private static long tenantId;
-
-    static {
-        monitoringService = getServicesBuilder().buildTenantMonitoringService();
-        identityService = getServicesBuilder().buildIdentityService();
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        sessionId = getSessionAccessor().getSessionId();
-        tenantId = getSessionAccessor().getTenantId();
+    public SEntityMXBeanTest() {
+        monitoringService = getTenantAccessor().getTenantMonitoringService();
+        identityService = getTenantAccessor().getIdentityService();
     }
 
     public SEntityMXBean getEntityMXBean() {
-        return new SEntityMXBeanImpl(getTransactionService(), monitoringService, getSessionAccessor(), getSessionService());
+        return new SEntityMXBeanImpl(getTransactionService(), monitoringService, getSessionAccessor(), getTenantAccessor().getSessionService());
     }
 
     @Before
     public void disableMBeans() throws Exception {
-        getSessionAccessor().setSessionInfo(sessionId, tenantId);
         final ArrayList<MBeanServer> mbservers = MBeanServerFactory.findMBeanServer(null);
         if (mbservers.size() > 0) {
             mbserver = mbservers.get(0);
@@ -78,8 +67,8 @@ public class SEntityMXBeanTest extends CommonServiceSPTest {
         }
         // Constructs the mbean names
 
-        entityMB = new ObjectName(TenantMonitoringService.ENTITY_MBEAN_PREFIX + tenantId);
-        serviceMB = new ObjectName(TenantMonitoringService.SERVICE_MBEAN_PREFIX + tenantId);
+        entityMB = new ObjectName(TenantMonitoringService.ENTITY_MBEAN_PREFIX + getDefaultTenantId());
+        serviceMB = new ObjectName(TenantMonitoringService.SERVICE_MBEAN_PREFIX + getDefaultTenantId());
 
         unregisterMBeans();
     }
@@ -87,8 +76,8 @@ public class SEntityMXBeanTest extends CommonServiceSPTest {
     /**
      * Assure that no Bonitasoft MBeans are registered in the MBServer before each test.
      * 
-     * @throws MBeanRegistrationException
-     * @throws InstanceNotFoundException
+     * @throws javax.management.MBeanRegistrationException
+     * @throws javax.management.InstanceNotFoundException
      */
     public void unregisterMBeans() throws MBeanRegistrationException, InstanceNotFoundException {
         if (mbserver.isRegistered(entityMB)) {
@@ -130,7 +119,6 @@ public class SEntityMXBeanTest extends CommonServiceSPTest {
 
     private void deleteUser(final IdentityService identSvc) throws Exception {
         // SSession session = sessionService.createSession(tenantId, username);
-        getSessionAccessor().setSessionInfo(sessionId, tenantId);
         getTransactionService().begin();
         // delete the previously created user
         identSvc.deleteUser(fakeUser);
@@ -142,7 +130,6 @@ public class SEntityMXBeanTest extends CommonServiceSPTest {
     private void createUser(final IdentityService identSvc) throws Exception {
         // SSession session = sessionService.createSession(tenantId, username);
         // create a transaction
-        getSessionAccessor().setSessionInfo(sessionId, tenantId);
         getTransactionService().begin();
         // create a fake user
         fakeUser = identSvc.createUser(createNewUser(fakeUsername));

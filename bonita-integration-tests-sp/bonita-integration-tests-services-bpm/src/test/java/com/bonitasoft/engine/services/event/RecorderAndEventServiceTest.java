@@ -6,49 +6,42 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.services.event.handler;
+package com.bonitasoft.engine.services.event;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import com.bonitasoft.engine.CommonBPMServicesSPTest;
 import org.bonitasoft.engine.archive.model.Employee;
 import org.bonitasoft.engine.archive.model.SEmployeeHandlerImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.test.util.TestUtil;
-import org.junit.AfterClass;
 import org.junit.Test;
-
-import com.bonitasoft.services.CommonServiceSPTest;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class RecorderAndEventServiceTest extends CommonServiceSPTest {
+public class RecorderAndEventServiceTest extends CommonBPMServicesSPTest {
 
-    private static EventService eventService;
+    private EventService eventService;
 
-    private static PersistenceService persistenceService;
+    private ReadPersistenceService persistenceService;
 
-    private static Recorder recorder;
+    private Recorder recorder;
 
-    static {
-        eventService = getServicesBuilder().buildEventService();
-        persistenceService = getServicesBuilder().buildTenantPersistenceService();
-        recorder = getServicesBuilder().buildTenantRecorder();
-    }
-
-    @AfterClass
-    public static void tearDownPersistence() throws Exception {
-        TestUtil.stopScheduler(getServicesBuilder().buildSchedulerService(), getTransactionService());
+    public RecorderAndEventServiceTest() {
+        eventService = getTenantAccessor().getEventService();
+        persistenceService = getTenantAccessor().getReadPersistenceService();
+        recorder = getTenantAccessor().getRecorder();
     }
 
     @Test
@@ -56,7 +49,7 @@ public class RecorderAndEventServiceTest extends CommonServiceSPTest {
         // Add an Employee using persistence service
         getTransactionService().begin();
         Employee employee = new Employee("John", 15);
-        persistenceService.insert(employee);
+        recorder.recordInsert(new InsertRecord(employee), null);
         getTransactionService().complete();
 
         // Update an Employee using recorder
@@ -89,7 +82,7 @@ public class RecorderAndEventServiceTest extends CommonServiceSPTest {
         // Add an Employee using persistence service
         getTransactionService().begin();
         Employee employee = new Employee("John", 15);
-        persistenceService.insert(employee);
+        recorder.recordInsert(new InsertRecord(employee), null);
         getTransactionService().complete();
 
         // Update an Employee using recorder

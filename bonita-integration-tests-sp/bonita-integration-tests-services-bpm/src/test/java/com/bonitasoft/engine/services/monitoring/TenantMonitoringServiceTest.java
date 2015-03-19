@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.services.monitoring;
+package com.bonitasoft.engine.services.monitoring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -20,6 +20,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
+import com.bonitasoft.engine.CommonBPMServicesSPTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -34,13 +35,12 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.MBeanStartException;
-import com.bonitasoft.services.CommonServiceSPTest;
 
-public abstract class TenantMonitoringServiceTest extends CommonServiceSPTest {
+public abstract class TenantMonitoringServiceTest extends CommonBPMServicesSPTest {
 
     private final TenantMonitoringService monitoringSvc;
 
-    private static IdentityService identityService;
+    private IdentityService identityService;
 
     private static MBeanServer mbserver = null;
 
@@ -52,10 +52,7 @@ public abstract class TenantMonitoringServiceTest extends CommonServiceSPTest {
 
     public TenantMonitoringServiceTest() throws Exception {
         monitoringSvc = getMonitoringService();
-    }
-
-    static {
-        identityService = getServicesBuilder().buildIdentityService();
+        identityService = getTenantAccessor().getIdentityService();
     }
 
     @Before
@@ -77,24 +74,11 @@ public abstract class TenantMonitoringServiceTest extends CommonServiceSPTest {
         unregisterMBeans();
     }
 
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        // complete active transaction if assertion fails
-        try {
-            TestUtil.closeTransactionIfOpen(getTransactionService());
-        } catch (final STransactionCommitException e) {
-            // OK
-        } catch (final STransactionRollbackException e) {
-            // OK
-        }
-    }
-
     /**
      * Assure that no Bonitasoft MBeans are registered in the MBServer before each test.
      * 
-     * @throws MBeanRegistrationException
-     * @throws InstanceNotFoundException
+     * @throws javax.management.MBeanRegistrationException
+     * @throws javax.management.InstanceNotFoundException
      */
 
     public void unregisterMBeans() throws MBeanRegistrationException, InstanceNotFoundException {

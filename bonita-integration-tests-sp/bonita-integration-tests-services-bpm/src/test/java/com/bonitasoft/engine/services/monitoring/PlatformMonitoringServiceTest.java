@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.services.monitoring;
+package com.bonitasoft.engine.services.monitoring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -22,6 +22,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
+import com.bonitasoft.engine.CommonBPMServicesSPTest;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -33,20 +34,19 @@ import org.junit.Test;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.MBeanStartException;
 import com.bonitasoft.engine.monitoring.mbean.MBeanStopException;
-import com.bonitasoft.services.CommonServiceSPTest;
 
-public class PlatformMonitoringServiceTest extends CommonServiceSPTest {
+public class PlatformMonitoringServiceTest extends CommonBPMServicesSPTest {
 
-    private static PlatformMonitoringService monitoringService;
+    private PlatformMonitoringService monitoringService;
 
-    private static TechnicalLoggerService technicalLoggerService;
+    private TechnicalLoggerService technicalLoggerService;
 
-    private static SchedulerService schedulerService;
+    private SchedulerService schedulerService;
 
-    static {
-        monitoringService = getServicesBuilder().buildPlatformMonitoringService();
-        technicalLoggerService = getServicesBuilder().buildTechnicalLoggerService();
-        schedulerService = getServicesBuilder().buildSchedulerService();
+    public PlatformMonitoringServiceTest() {
+        monitoringService = getPlatformAccessor().getPlatformMonitoringService();
+        technicalLoggerService = getTenantAccessor().getTechnicalLoggerService();
+        schedulerService = getTenantAccessor().getSchedulerService();
     }
 
     protected static MBeanServer mbserver = null;
@@ -76,8 +76,8 @@ public class PlatformMonitoringServiceTest extends CommonServiceSPTest {
     /**
      * Assure that no Bonitasoft MBeans are registered in the MBServer before each test.
      * 
-     * @throws MBeanRegistrationException
-     * @throws InstanceNotFoundException
+     * @throws javax.management.MBeanRegistrationException
+     * @throws javax.management.InstanceNotFoundException
      */
 
     public void unregisterMBeans() throws MBeanRegistrationException, InstanceNotFoundException {

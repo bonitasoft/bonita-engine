@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.services.monitoring;
+package com.bonitasoft.engine.services.monitoring;
 
 import static org.junit.Assert.assertNotSame;
 
@@ -21,6 +21,7 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
+import com.bonitasoft.engine.CommonBPMServicesSPTest;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,9 +31,8 @@ import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.MBeanStartException;
 import com.bonitasoft.engine.monitoring.mbean.MBeanStopException;
 import com.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
-import com.bonitasoft.services.CommonServiceSPTest;
 
-public class SJvmMXBeanTest extends CommonServiceSPTest {
+public class SJvmMXBeanTest extends CommonBPMServicesSPTest {
 
     protected static MBeanServer mbserver = null;
 
@@ -62,8 +62,8 @@ public class SJvmMXBeanTest extends CommonServiceSPTest {
     /**
      * Assure that no Bonitasoft MBeans are registered in the MBServer before each test.
      * 
-     * @throws MBeanRegistrationException
-     * @throws InstanceNotFoundException
+     * @throws javax.management.MBeanRegistrationException
+     * @throws javax.management.InstanceNotFoundException
      */
     public void unregisterMBeans() throws MBeanRegistrationException, InstanceNotFoundException {
         if (mbserver.isRegistered(entityMB)) {
@@ -78,7 +78,7 @@ public class SJvmMXBeanTest extends CommonServiceSPTest {
     }
 
     public SJvmMXBean getJvmMXBean() {
-        return getServicesBuilder().getJvmMXBean();
+        return null;
     }
 
     @Test

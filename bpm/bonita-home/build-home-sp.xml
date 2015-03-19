@@ -1,11 +1,11 @@
-<project name="bonita-engine-home" default="build" >
+<project name="bonita-engine-home" default="build-home-sp" >
 
 	<property name="target.dir" value="${basedir}/target"/>
 	<property name="resources.dir" value="${basedir}/src/main/resources"/>
 	<property name="bh.dir" value="${target.dir}/bonita-home"/>
 	<property name="bh.community.dir" value="${target.dir}/bonita-home-community/bonita-home"/>
 
-	<target name="build">
+	<target name="build-home-sp">
 		<delete dir="${bh.dir}" />
 
 		<copy todir="${bh.dir}">

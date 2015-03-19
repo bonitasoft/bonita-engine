@@ -63,7 +63,7 @@
 						</goals>
 						<configuration>
 							<target>
-								<ant antfile="build-home.xml" target="build"/>
+								<ant antfile="build-home-sp.xml" target="build-home-sp"/>
 							</target>
 						</configuration>
 					</execution>

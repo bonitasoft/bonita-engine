@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.services.monitoring;
+package com.bonitasoft.engine.services.monitoring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -22,6 +22,7 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
+import com.bonitasoft.engine.CommonBPMServicesSPTest;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.Test;
@@ -29,22 +30,16 @@ import org.junit.Test;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
 import com.bonitasoft.engine.monitoring.mbean.impl.SPlatformServiceMXBeanImpl;
-import com.bonitasoft.services.CommonServiceSPTest;
 
-public class SPlatformServiceMXBeanTest extends CommonServiceSPTest {
+public class SPlatformServiceMXBeanTest extends CommonBPMServicesSPTest {
 
     protected static MBeanServer mbserver = null;
 
     private final ObjectName serviceMB;
 
-    private static SchedulerService schedulerService;
+    private SchedulerService schedulerService;
 
-    private static PlatformMonitoringService monitoringService;
-
-    static {
-        schedulerService = getServicesBuilder().buildSchedulerService();
-        monitoringService = getServicesBuilder().buildPlatformMonitoringService();
-    }
+    private PlatformMonitoringService monitoringService;
 
     public void startScheduler() throws Exception {
         TestUtil.startScheduler(schedulerService);
@@ -59,6 +54,8 @@ public class SPlatformServiceMXBeanTest extends CommonServiceSPTest {
     }
 
     public SPlatformServiceMXBeanTest() throws Exception {
+        schedulerService = getTenantAccessor().getSchedulerService();
+        monitoringService = getPlatformAccessor().getPlatformMonitoringService();
         final ArrayList<MBeanServer> mbservers = MBeanServerFactory.findMBeanServer(null);
         if (mbservers.size() > 0) {
             mbserver = mbservers.get(0);
