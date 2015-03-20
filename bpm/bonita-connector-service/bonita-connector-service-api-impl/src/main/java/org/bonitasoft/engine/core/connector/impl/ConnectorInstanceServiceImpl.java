@@ -56,11 +56,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -301,12 +296,22 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         }
     }
 
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
+    @Override
+    public List<SConnectorInstanceWithFailureInfo> getConnectorInstancesWithFailureInfo(final long containerId, final String containerType, final String state,
+            final int from, final int maxResults) throws SConnectorInstanceReadException {
+        final Map<String, Object> inputParameters = new HashMap<String, Object>(3);
+        inputParameters.put("containerId", containerId);
+        inputParameters.put("containerType", containerType);
+        inputParameters.put("state", state);
+        final SelectListDescriptor<SConnectorInstanceWithFailureInfo> selectListDescriptor = new SelectListDescriptor<SConnectorInstanceWithFailureInfo>(
+                "getConnectorInstancesWithFailureInfoInState",
+                inputParameters, SConnectorInstanceWithFailureInfo.class, new QueryOptions(from, maxResults, SConnectorInstanceWithFailureInfo.class, "id",
+                        OrderByType.ASC));
+        try {
+            return persistenceService.selectList(selectListDescriptor);
+        } catch (final SBonitaReadException e) {
+            throw new SConnectorInstanceReadException(e);
+        }
     }
 
     @Override

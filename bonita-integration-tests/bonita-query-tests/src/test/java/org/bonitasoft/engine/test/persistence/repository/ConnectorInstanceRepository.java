@@ -32,6 +32,16 @@ public class ConnectorInstanceRepository extends TestRepository {
         return namedQuery.list();
     }
 
+    public List<SConnectorInstanceWithFailureInfo> getConnectorInstancesWithFailureInfo(final long containerId, final String containerType, String state,
+            long tenantId) {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
+        Query namedQuery = getNamedQuery("getConnectorInstancesWithFailureInfoInState");
+        namedQuery.setParameter("containerId", containerId);
+        namedQuery.setParameter("containerType", containerType);
+        namedQuery.setParameter("state", state);
+        return namedQuery.list();
+    }
+
     public long getNumberOfConnectorInstances(final long containerId, final String containerType, long tenantId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", tenantId);
         Query namedQuery = getNamedQuery("getNumberOfConnectorInstances");
