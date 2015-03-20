@@ -27,7 +27,6 @@ import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.connector.CreateConnectorInstances;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -153,8 +152,6 @@ public class BPMInstancesCreator {
 
     private final TransientDataService transientDataService;
 
-    private final ArchiveService archiveService;
-
     private final TechnicalLoggerService logger;
 
     private final ParentContainerResolver parentContainerResolver;
@@ -162,9 +159,8 @@ public class BPMInstancesCreator {
     public BPMInstancesCreator(final ActivityInstanceService activityInstanceService,
             final ActorMappingService actorMappingService, final GatewayInstanceService gatewayInstanceService,
             final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final TransientDataService transientDataService,
-            final ArchiveService archiveService, final ParentContainerResolver parentContainerResolver) {
+            final ExpressionResolverService expressionResolverService, final DataInstanceService dataInstanceService, final TechnicalLoggerService logger,
+            final TransientDataService transientDataService, final ParentContainerResolver parentContainerResolver) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.actorMappingService = actorMappingService;
@@ -175,13 +171,12 @@ public class BPMInstancesCreator {
         this.dataInstanceService = dataInstanceService;
         this.logger = logger;
         this.transientDataService = transientDataService;
-        this.archiveService = archiveService;
         this.parentContainerResolver = parentContainerResolver;
     }
 
     public List<SFlowNodeInstance> createFlowNodeInstances(final Long processDefinitionId, final long rootContainerId, final long parentContainerId,
-                                                           final List<SFlowNodeDefinition> flowNodeDefinitions, final long rootProcessInstanceId, final long parentProcessInstanceId,
-                                                           final SStateCategory stateCategory) throws SBonitaException {
+            final List<SFlowNodeDefinition> flowNodeDefinitions, final long rootProcessInstanceId, final long parentProcessInstanceId,
+            final SStateCategory stateCategory) throws SBonitaException {
         final List<SFlowNodeInstance> flownNodeInstances = new ArrayList<SFlowNodeInstance>(flowNodeDefinitions.size());
         for (final SFlowNodeDefinition sFlowNodeDefinition : flowNodeDefinitions) {
             flownNodeInstances.add(createFlowNodeInstance(processDefinitionId, rootContainerId, parentContainerId, SFlowElementsContainerType.PROCESS,
@@ -191,9 +186,9 @@ public class BPMInstancesCreator {
     }
 
     public SFlowNodeInstance createFlowNodeInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
-                                                    final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
-                                                    final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
-                                                    final long relatedActivityInstanceId) throws SBonitaException {
+            final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
+            final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
+            final long relatedActivityInstanceId) throws SBonitaException {
         final SFlowNodeInstance flownNodeInstance = toFlowNodeInstance(processDefinitionId, rootContainerId, parentContainerId, parentContainerType,
                 sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, createInnerActivity, loopCounter, stateCategory,
                 relatedActivityInstanceId);
@@ -209,9 +204,9 @@ public class BPMInstancesCreator {
     }
 
     public SFlowNodeInstance toFlowNodeInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
-                                                final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
-                                                final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
-                                                final long relatedActivityInstanceId) throws SActorNotFoundException, SActivityReadException {
+            final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
+            final long parentProcessInstanceId, final boolean createInnerActivity, final int loopCounter, final SStateCategory stateCategory,
+            final long relatedActivityInstanceId) throws SActorNotFoundException, SActivityReadException {
         if (!createInnerActivity && sFlowNodeDefinition instanceof SActivityDefinition) {
             final SActivityDefinition activityDefinition = (SActivityDefinition) sFlowNodeDefinition;
             final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
