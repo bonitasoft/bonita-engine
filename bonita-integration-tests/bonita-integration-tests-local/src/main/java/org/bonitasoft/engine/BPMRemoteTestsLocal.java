@@ -33,9 +33,9 @@ import org.bonitasoft.engine.supervisor.SupervisorTests;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         RemoteConnectorExecutionIT.class,
         PlatformCommandIT.class,
@@ -56,7 +56,8 @@ import org.junit.runners.Suite.SuiteClasses;
         BDRepositoryIT.class,
         ExecuteBDMQueryCommandIT.class
 })
-@Initializer(TestsInitializer.class)
-public class BPMRemoteTests {
+@RunWith(BonitaSuiteRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
+public class BPMRemoteTestsLocal {
 
 }

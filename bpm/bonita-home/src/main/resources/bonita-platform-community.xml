@@ -205,9 +205,7 @@
     <bean id="incidentService" class="org.bonitasoft.engine.incident.IncidentServiceImpl">
         <constructor-arg name="handlers">
             <list>
-                <bean class="org.bonitasoft.engine.incident.FileLoggerIncidentHandler">
-                    <constructor-arg name="logFilePath" value="${bonita.home}/server/tenants" />
-                </bean>
+                <bean class="org.bonitasoft.engine.incident.FileLoggerIncidentHandler"/>
             </list>
         </constructor-arg>
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />

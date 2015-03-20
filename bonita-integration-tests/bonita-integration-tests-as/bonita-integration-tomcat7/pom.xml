@@ -256,7 +256,7 @@
 
 										<!-- Create default bonita.home folder -->
 										<copy todir="${bonita.home}" verbose="true">
-                                            <fileset dir="${distrib.dir}/resources/home/"/>
+                                            <fileset dir="${distrib.dir}/resources/bonita-home/"/>
 										</copy>
 
 										<!-- Change Dialect of BDR -->
@@ -266,8 +266,8 @@
                                                 match="businessdata.hibernate.dialect=.*"
                                                 replace="businessdata.hibernate.dialect=${bdm.dialect}" byline="true"/>
 
-                                        <copy file="${basedir}/client/bonita-client.properties"
-                                              todir="${bonita.home}/client/conf" overwrite="true"/>
+                                        <copy file="${basedir}/bonita-client-custom.properties"
+                                              todir="${bonita.home}/engine-client/conf" overwrite="true"/>
 									</target>
 								</configuration>
 							</execution>

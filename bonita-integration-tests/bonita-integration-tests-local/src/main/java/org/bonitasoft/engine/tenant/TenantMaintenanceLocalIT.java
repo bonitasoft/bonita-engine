@@ -17,7 +17,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.TestsInitializer;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
  * @author Celine Souchet
  */
 @RunWith(BonitaTestRunner.class)
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public class TenantMaintenanceLocalIT extends TestWithUser {
 
     @Test

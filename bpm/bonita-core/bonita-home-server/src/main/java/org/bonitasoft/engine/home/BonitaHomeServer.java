@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.FileHandler;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -106,10 +107,16 @@ public class BonitaHomeServer extends BonitaHome {
                 ;
     }
 
+    public FileHandler getIncidentFileHandler(long tenantId) throws BonitaHomeNotSetException, IOException {
+        final File incidentFile = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile("incidents.log");
+        return new FileHandler(incidentFile.getAbsolutePath());
+
+    }
+
     private static class AllXmlFilesFilter implements FileFilter {
         @Override
         public boolean accept(final File pathname) {
-            return pathname.isFile() && pathname.getName().endsWith(".xml");
+            return pathname.isFile() && pathname.getName().endsWith(".xml") && !pathname.getName().endsWith("-cache.xml");
         }
     }
 
@@ -133,9 +140,9 @@ public class BonitaHomeServer extends BonitaHome {
         final boolean cluster = Boolean.valueOf(platformProperties.getProperty("bonita.cluster", "false"));
         FileFilter filter;
         if (cluster) {
-            filter = new NonClusterXmlFilesFilter();
-        } else {
             filter = new AllXmlFilesFilter();
+        } else {
+            filter = new NonClusterXmlFilesFilter();
         }
         final List<File> files = new ArrayList<File>();
         for (Folder folder : folders) {;

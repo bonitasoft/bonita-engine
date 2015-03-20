@@ -1,11 +1,11 @@
-<project name="bonita-engine-home" default="build" >
+<project name="bonita-engine-home" default="build-home" >
 
 	<property name="target.dir" value="${basedir}/target"/>
 	<property name="resources.dir" value="${basedir}/src/main/resources"/>
 	<property name="bh.dir" value="${target.dir}/bonita-home"/>
 	<property name="bdm.lib.dir" value="${target.dir}/bdm-lib"/>
 
-	<target name="build">
+	<target name="build-home">
 		<delete dir="${bh.dir}" />
 
 		<!-- ENGINE CLIENT -->
@@ -16,7 +16,7 @@
 			</fileset>
 		</copy>
 
-		<copy file="${resources.dir}/bonita-client.properties" tofile="${target.dir}/bonita-client-user-custom.properties">
+		<copy file="${resources.dir}/bonita-client.properties" tofile="${target.dir}/bonita-client-custom.properties">
 			<filterchain>
 				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
 					<param name="prefix" value="#"/>
@@ -26,7 +26,7 @@
 
 		<copy todir="${bh.dir}/engine-client/conf">
 			<fileset dir="${target.dir}">
-				<include name="bonita-client-user-custom.properties"/>
+				<include name="bonita-client-custom.properties"/>
 			</fileset>
 		</copy>
 
@@ -71,17 +71,17 @@
 
 		<copy todir="${bh.dir}/engine-server/conf/platform-init">
 			<fileset dir="${resources.dir}">
-				<include name="bonita-platform-init-community-user-custom.xml"/>
+				<include name="bonita-platform-init-custom.xml"/>
 			</fileset>
 		</copy>
 
 		<copy todir="${bh.dir}/engine-server/conf/platform">
 			<fileset dir="${resources.dir}">
-				<include name="bonita-platform-community-user-custom.xml"/>
+				<include name="bonita-platform-custom.xml"/>
 			</fileset>
 		</copy>
 
-		<copy file="${resources.dir}/bonita-platform.properties" tofile="${target.dir}/bonita-platform-user-custom.properties">
+		<copy file="${resources.dir}/bonita-platform.properties" tofile="${target.dir}/bonita-platform-custom.properties">
 			<filterchain>
 				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
 					<param name="prefix" value="#"/>
@@ -91,13 +91,13 @@
 
 		<copy todir="${bh.dir}/engine-server/conf/platform">
 			<fileset dir="${target.dir}">
-				<include name="bonita-platform-user-custom.properties"/>
+				<include name="bonita-platform-custom.properties"/>
 			</fileset>
 		</copy>
 
 		<copy todir="${bh.dir}/engine-server/conf/tenants/template">
 			<fileset dir="${resources.dir}">
-				<include name="bonita-tenants-community-user-custom.xml"/>
+				<include name="bonita-tenants-custom.xml"/>
 			</fileset>
 		</copy>
 

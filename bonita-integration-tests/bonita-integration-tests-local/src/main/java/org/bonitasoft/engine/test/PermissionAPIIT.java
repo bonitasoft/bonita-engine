@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.IOException;
 
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -28,14 +29,19 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.service.PermissionService;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 
 /**
  * @author Baptiste Mesta
  */
+@RunWith(BonitaTestRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class PermissionAPIIT extends CommonAPILocalIT {
 
     @Rule

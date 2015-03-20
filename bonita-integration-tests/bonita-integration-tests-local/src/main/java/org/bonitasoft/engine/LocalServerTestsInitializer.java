@@ -28,31 +28,29 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class TestsInitializer {
+public class LocalServerTestsInitializer {
 
     private static final String BONITA_HOME_DEFAULT_PATH = "target/bonita-home";
 
     private static final String BONITA_HOME_PROPERTY = "bonita.home";
 
-    private static TestsInitializer INSTANCE;
+    private static LocalServerTestsInitializer INSTANCE;
     private Object h2Server;
 
-    private static TestsInitializer getInstance() {
+    private static LocalServerTestsInitializer getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new TestsInitializer();
+            INSTANCE = new LocalServerTestsInitializer();
         }
         return INSTANCE;
     }
 
     public static void beforeAll() throws Exception {
-        TestsInitializer.getInstance().before();
+        LocalServerTestsInitializer.getInstance().before();
     }
 
     public static void afterAll() throws Exception {
-        TestsInitializer.getInstance().after();
+        LocalServerTestsInitializer.getInstance().after();
 
     }
 

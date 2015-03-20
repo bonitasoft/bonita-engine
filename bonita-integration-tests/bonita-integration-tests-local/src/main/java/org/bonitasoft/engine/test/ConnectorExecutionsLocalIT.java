@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
+import org.bonitasoft.engine.BPMRemoteTestsLocal;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -70,7 +71,10 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Baptiste Mesta
@@ -78,6 +82,8 @@ import org.junit.Test;
  * @author Elias Ricken de Medeiros
  */
 @SuppressWarnings("javadoc")
+@RunWith(BonitaTestRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
     protected TenantServiceAccessor getTenantAccessor() {
@@ -575,7 +581,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
                     .addConnector("UnkownClassConnector", "unkownClassConnectorDef", "1.0.0", ConnectorEvent.ON_ENTER);
             final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                     processDefBuilder.done());
-            businessArchiveBuilder.addConnectorImplementation(new BarResource("UnknownClassConnector.impl", IOUtils.toByteArray(BPMRemoteTests.class
+            businessArchiveBuilder.addConnectorImplementation(new BarResource("UnknownClassConnector.impl", IOUtils.toByteArray(BPMRemoteTestsLocal.class
                     .getResourceAsStream("/org/bonitasoft/engine/connectors/UnknownClassConnector.impl"))));
             final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
 

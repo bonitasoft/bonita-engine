@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -42,11 +43,16 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(BonitaTestRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class ProcessArchiveIT extends CommonAPILocalIT {
 
     private User john;

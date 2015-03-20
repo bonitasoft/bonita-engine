@@ -24,7 +24,7 @@ import org.bonitasoft.engine.event.TimerEventIT;
 import org.bonitasoft.engine.platform.PlatformLoginIT;
 import org.bonitasoft.engine.platform.PlatformIT;
 import org.bonitasoft.engine.tenant.TenantMaintenanceIT;
-import org.bonitasoft.engine.test.APIMethodIT;
+import org.bonitasoft.engine.test.APIMethodLocalIT;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
@@ -36,8 +36,8 @@ import org.junit.runners.Suite.SuiteClasses;
         TestShades.class,
         // // Same suites as in LocalIntegrationTests below:
         BPMLocalSuiteTests.class,
-        BPMRemoteTests.class,
-        APIMethodIT.class,
+        BPMRemoteTestsLocal.class,
+        APIMethodLocalIT.class,
 
         // Specific slow test suites below:
         NonInterruptingTimerBoundaryEventIT.class,
@@ -53,7 +53,7 @@ import org.junit.runners.Suite.SuiteClasses;
         TenantMaintenanceIT.class
 
 })
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public class SlowExecutionLocalIntegrationTests extends LocalIntegrationTests {
 
 }

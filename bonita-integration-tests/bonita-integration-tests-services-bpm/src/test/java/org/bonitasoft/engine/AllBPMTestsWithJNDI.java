@@ -23,7 +23,7 @@ import org.junit.runners.Suite.SuiteClasses;
         AllBPMTests.class
 })
 @RunWith(BonitaSuiteRunner.class)
-@BonitaSuiteRunner.Initializer(TestsInitializer.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class AllBPMTestsWithJNDI {
 
     @BeforeClass

@@ -24,8 +24,13 @@ import java.util.Properties;
 
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.BPMLocalIT;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(BonitaTestRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class TestShades {
 
     private static final String ORG_BONITASOFT_ENGINE = "org.bonitasoft.engine";

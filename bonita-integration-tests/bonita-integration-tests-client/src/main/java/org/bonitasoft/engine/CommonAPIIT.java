@@ -28,25 +28,13 @@ import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertNotNull;
-
-@RunWith(BonitaTestRunner.class)
-@Initializer(TestsInitializer.class)
 public abstract class CommonAPIIT extends APITestUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPIIT.class);
@@ -124,7 +112,7 @@ public abstract class CommonAPIIT extends APITestUtil {
     }
 
     public BarResource getResource(final String path, final String name) throws IOException {
-        return getBarResource(path, name, BPMRemoteTests.class);
+        return getBarResource(path, name, CommonAPIIT.class);
     }
 
     public void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
