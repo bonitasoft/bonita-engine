@@ -233,9 +233,10 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
             ActivityExecutionException;
 
     /**
-     * Set state of {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstance} to its previous state and then execute it. The {@code FlowNodeInstance} can be
-     * replayed if no {@link org.bonitasoft.engine.bpm.connector.ConnectorInstance} is in the failed
-     * state. If that is the case, use the method {@link org.bonitasoft.engine.api.ProcessRuntimeAPI#retryTask(long)} that will automatically re-execute failed
+     * Set state of {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstance} to its previous state and then execute it. Pre-condition: the
+     * {@code FlowNodeInstance} must be in the FAILED state. The {@code FlowNodeInstance} can be replayed if no
+     * {@link org.bonitasoft.engine.bpm.connector.ConnectorInstance} is in the failed state. If that is the case, use the method
+     * {@link org.bonitasoft.engine.api.ProcessRuntimeAPI#retryTask(long)} that will automatically re-execute failed
      * connectors or the method {@link #replayActivity(long, java.util.Map)} that allows to re-execute or skip failed connectors.
      * 
      * @param activityInstanceId

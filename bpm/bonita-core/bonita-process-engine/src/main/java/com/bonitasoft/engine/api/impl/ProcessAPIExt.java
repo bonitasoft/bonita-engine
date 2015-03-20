@@ -135,7 +135,7 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
 import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.impl.connector.ResetConnectorToSpecifiedStatesStrategy;
+import com.bonitasoft.engine.api.impl.connector.ResetConnectorToSpecificStatesStrategy;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
 import com.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevelExt;
 import com.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevelAndArchivedExt;
@@ -589,7 +589,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         FlowNodeRetrier flowNodeRetrier = new FlowNodeRetrier(tenantAccessor.getContainerRegistry(), tenantAccessor.getFlowNodeExecutor(),
                 tenantAccessor.getActivityInstanceService(), tenantAccessor.getFlowNodeStateManager(),
-                new ResetConnectorToSpecifiedStatesStrategy(connectorInstanceService, new ConnectorReseter(connectorInstanceService), connectorsToReset));
+                new ResetConnectorToSpecificStatesStrategy(connectorInstanceService, new ConnectorReseter(connectorInstanceService), connectorsToReset));
         flowNodeRetrier.retry(activityInstanceId);
     }
 

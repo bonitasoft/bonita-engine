@@ -25,14 +25,14 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithF
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ResetConnectorToSpecifiedStatesStrategy implements ConnectorResetStrategy {
+public class ResetConnectorToSpecificStatesStrategy implements ConnectorResetStrategy {
 
     private final ConnectorInstanceService connectorInstanceService;
     private final ConnectorReseter connectorReseter;
     private final Map<Long, ConnectorStateReset> connectorStates;
 
-    public ResetConnectorToSpecifiedStatesStrategy(final ConnectorInstanceService connectorInstanceService, final ConnectorReseter connectorReseter,
-            final Map<Long, ConnectorStateReset> connectorStates) {
+    public ResetConnectorToSpecificStatesStrategy(final ConnectorInstanceService connectorInstanceService, final ConnectorReseter connectorReseter,
+                                                  final Map<Long, ConnectorStateReset> connectorStates) {
         this.connectorInstanceService = connectorInstanceService;
         this.connectorReseter = connectorReseter;
         this.connectorStates = connectorStates;
@@ -63,7 +63,7 @@ public class ResetConnectorToSpecifiedStatesStrategy implements ConnectorResetSt
         List<SConnectorInstanceWithFailureInfo> failedConnectors = connectorInstanceService.getConnectorInstancesWithFailureInfo(flowNodeInstanceId,
                 SConnectorInstanceWithFailureInfo.FLOWNODE_TYPE, ConnectorState.FAILED.name(), 0, 1);
         if (!failedConnectors.isEmpty()) {
-            throw new ActivityExecutionException("The flow node instance with id '" + flowNodeInstanceId + "' has still failed connectors.");
+            throw new ActivityExecutionException("The flow node instance with id '" + flowNodeInstanceId + "' still has failed connectors.");
         }
     }
 

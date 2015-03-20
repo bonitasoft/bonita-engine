@@ -34,7 +34,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ResetConnectorToSpecifiedStatesStrategyTest {
+public class ResetConnectorToSpecificStatesStrategyTest {
 
     public static final long FLOW_NODE_INSTANCE_ID = 20L;
     @Mock
@@ -50,7 +50,7 @@ public class ResetConnectorToSpecifiedStatesStrategyTest {
         connectorsToReset.put(1L, ConnectorStateReset.SKIPPED);
         connectorsToReset.put(2L, ConnectorStateReset.TO_RE_EXECUTE);
 
-        ResetConnectorToSpecifiedStatesStrategy strategy = new ResetConnectorToSpecifiedStatesStrategy(connectorInstanceService, connectorReseter,
+        ResetConnectorToSpecificStatesStrategy strategy = new ResetConnectorToSpecificStatesStrategy(connectorInstanceService, connectorReseter,
                 connectorsToReset);
 
         SConnectorInstanceWithFailureInfo instance1 = mock(SConnectorInstanceWithFailureInfo.class);
@@ -72,11 +72,11 @@ public class ResetConnectorToSpecifiedStatesStrategyTest {
         SConnectorInstanceWithFailureInfo instance1 = mock(SConnectorInstanceWithFailureInfo.class);
         SConnectorInstanceWithFailureInfo instance2 = mock(SConnectorInstanceWithFailureInfo.class);
 
-        ResetConnectorToSpecifiedStatesStrategy strategy = new ResetConnectorToSpecifiedStatesStrategy(connectorInstanceService, connectorReseter,
+        ResetConnectorToSpecificStatesStrategy strategy = new ResetConnectorToSpecificStatesStrategy(connectorInstanceService, connectorReseter,
                 Collections.<Long, ConnectorStateReset> emptyMap());
 
-        given(connectorInstanceService.getConnectorInstancesWithFailureInfo(FLOW_NODE_INSTANCE_ID, SConnectorInstance.FLOWNODE_TYPE, ConnectorState.FAILED.name(), 0, 1))
-                .willReturn(Arrays.asList(instance1, instance2));
+        given(connectorInstanceService.getConnectorInstancesWithFailureInfo(FLOW_NODE_INSTANCE_ID, SConnectorInstance.FLOWNODE_TYPE,
+                ConnectorState.FAILED.name(), 0, 1)).willReturn(Arrays.asList(instance1, instance2));
 
         try {
             //when
@@ -84,7 +84,7 @@ public class ResetConnectorToSpecifiedStatesStrategyTest {
             fail("Exception expected");
         } catch (ActivityExecutionException e) {
             //then
-            assertThat(e.getMessage()).isEqualTo("The flow node instance with id '" + FLOW_NODE_INSTANCE_ID + "' has still failed connectors.");
+            assertThat(e.getMessage()).isEqualTo("The flow node instance with id '" + FLOW_NODE_INSTANCE_ID + "' still has failed connectors.");
         }
 
     }
@@ -92,7 +92,7 @@ public class ResetConnectorToSpecifiedStatesStrategyTest {
     @Test(expected = ActivityExecutionException.class)
     public void resetConnectorsOf_should_throw_exception_when_connector_instance_is_not_found() throws Exception {
         //given
-        ResetConnectorToSpecifiedStatesStrategy strategy = new ResetConnectorToSpecifiedStatesStrategy(connectorInstanceService, connectorReseter,
+        ResetConnectorToSpecificStatesStrategy strategy = new ResetConnectorToSpecificStatesStrategy(connectorInstanceService, connectorReseter,
                 Collections.singletonMap(1L, ConnectorStateReset.SKIPPED));
         given(connectorInstanceService.getConnectorInstanceWithFailureInfo(1)).willThrow(new SConnectorInstanceNotFoundException(""));
 
