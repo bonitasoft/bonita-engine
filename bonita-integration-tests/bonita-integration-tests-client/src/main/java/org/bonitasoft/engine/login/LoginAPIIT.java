@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
+import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
@@ -93,7 +93,7 @@ public class LoginAPIIT extends CommonAPIIT {
     private void deleteSession(final long sessionId) throws IOException, AlreadyExistsException, CreationException, CreationException,
             CommandNotFoundException, CommandParameterizationException, CommandExecutionException, DeletionException, DependencyNotFoundException {
         // deploy and execute a command to delete a session
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/session-commands.jar.bak");
+        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/session-commands.jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();

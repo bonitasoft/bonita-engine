@@ -13,17 +13,15 @@
  **/
 package org.bonitasoft.engine.command.web;
 
-import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.command.web.profile.ProfileImportCommandIT;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * @author Emmanuel Duchastenier
  */
-@RunWith(BonitaSuiteRunner.class)
+@RunWith(Suite.class)
 @SuiteClasses({
         UserPermissionCommandIT.class,
         ProfileImportCommandIT.class,
@@ -31,7 +29,6 @@ import org.junit.runners.Suite.SuiteClasses;
         ActivityCommandIT.class,
         EntityMemberCommandsIT.class
 })
-@Initializer(LocalServerTestsInitializer.class)
 public class ExternalCommandsTests {
 
 }

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
+import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -1012,7 +1012,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
             final BusinessArchiveBuilder bizArchive = new BusinessArchiveBuilder();
             bizArchive.createNewBusinessArchive();
             bizArchive.setProcessDefinition(processDefBuilder.done());
-            bizArchive.addConnectorImplementation(new BarResource("TestConnectorWithOutput.impl", IOUtils.toByteArray(BPMRemoteTests.class
+            bizArchive.addConnectorImplementation(new BarResource("TestConnectorWithOutput.impl", IOUtils.toByteArray(CommonAPIIT.class
                     .getResourceAsStream("/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl"))));
             bizArchive.addClasspathResource(new BarResource("TestConnectorWithOutput.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
             callingProcessDefinition = deployAndEnableProcessWithActor(bizArchive.done(), ACTOR_NAME, cascao);

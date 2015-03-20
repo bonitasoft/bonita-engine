@@ -23,6 +23,11 @@
 			<artifactId>bonita-integration-tests-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.test</groupId>
+			<artifactId>bonita-integration-tests-local</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 
 		<!-- Actor Mapping -->
