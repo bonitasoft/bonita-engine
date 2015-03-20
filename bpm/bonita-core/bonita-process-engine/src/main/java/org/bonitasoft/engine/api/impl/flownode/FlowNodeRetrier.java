@@ -51,11 +51,11 @@ public class FlowNodeRetrier {
 
         try {
             final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+            FlowNodeState previousState = stateManager.getState(flowNodeInstance.getPreviousStateId());
             validateCurrentState(flowNodeInstance);
             strategy.resetConnectorsOf(flowNodeInstanceId);
             flowNodeExecutor.setStateByStateId(flowNodeInstance.getProcessDefinitionId(), flowNodeInstanceId, flowNodeInstance.getPreviousStateId());
 
-            FlowNodeState previousState = stateManager.getState(flowNodeInstance.getPreviousStateId());
             if (!previousState.isTerminal()) {
                 containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getParentProcessInstanceId(), flowNodeInstanceId,
                         null, null);

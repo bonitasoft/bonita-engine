@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
@@ -81,8 +83,11 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
@@ -1354,38 +1359,130 @@ public class ProcessManagementIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.ACTIVITIES, jira = "BS-12685", keywords = "retry task, failed connector")
+    /**
+     * Scenario in the same task:
+     * 1 -> connector on_enter fails
+     * 2 -> fix issue + retryTask
+     * 3 -> operation fails
+     * 4 -> fix issue + retryTask
+     * 5 -> connector on_finish fails
+     * 6 -> fix issue + retryTask
+     * 7 -> transition fails
+     * 8 -> fix issue + retryTask
+     * 9 -> task is finally completed
+     */
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.ACTIVITIES, jira = "BS-12685", keywords = { "retry task", "failed connector",
+            "failed operations" })
     @Test
-    public void retryTask_should_retry_failed_connector_on_enter() throws Exception {
+    public void retryTask_should_retry_failed_connectors_and_operations() throws Exception {
         //given
-        Expression dataExpression = new ExpressionBuilder().createDataExpression("watchingVar", String.class.getName());
+        String watchingOnEnterVar = "watchingOnEnterVar";
+        String watchingOnFinishVar = "watchingOnFinishVar";
+        String watchingOperationsVar = "watchingOperationsVar";
+        String watchingTransitionVar = "watchingTransitionVar";
+        String countVar = "count";
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.addShortTextData("watchingVar", new ExpressionBuilder().createConstantStringExpression("normal"));
-        processBuilder.addAutomaticTask("auto").addConnector("testConnectorThatThrowException",
-                "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER)
-                .addInput("kind", dataExpression);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithConnector(processBuilder, "TestConnectorThatThrowException.impl",
-                TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
-
+        String firstStepName = "auto";
+        String secondStepName = "auto1";
+        final ProcessDefinition processDefinition = deployProcessWithConnectorsAndOperationsThrowingException(watchingOnEnterVar, watchingOnFinishVar,
+                watchingOperationsVar, watchingTransitionVar, countVar, firstStepName, secondStepName);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        FlowNodeInstance flowNodeInstance = waitForFlowNodeInFailedState(processInstance, "auto");
+        //will fail on connector on enter
+        FlowNodeInstance flowNodeInstance = waitForFlowNodeInFailedState(processInstance, firstStepName);
 
         //when
         //set variable to a value different of 1: operation will execute with success
-        getProcessAPI().updateProcessDataInstance("watchingVar", processInstance.getId(), "none");
+        getProcessAPI().updateProcessDataInstance(watchingOnEnterVar, processInstance.getId(), "none");
         getProcessAPI().retryTask(flowNodeInstance.getId());
 
-        //then
-        waitForActivityInCompletedState(processInstance, "auto", true);
+        //then will fail on operation
+        waitForFlowNodeInFailedState(processInstance, firstStepName);
+
+        //when
+        getProcessAPI().updateProcessDataInstance(watchingOperationsVar, processInstance.getId(), 1);
+        getProcessAPI().retryTask(flowNodeInstance.getId());
+
+        //then will fail on connector on finish
+        waitForFlowNodeInFailedState(processInstance, firstStepName);
+
+        //when
+        getProcessAPI().updateProcessDataInstance(watchingOnFinishVar, processInstance.getId(), "none");
+        getProcessAPI().retryTask(flowNodeInstance.getId());
+
+        //then will fail due to exception on transition
+        waitForFlowNodeInFailedState(processInstance, firstStepName);
+
+        //when
+        getProcessAPI().updateProcessDataInstance(watchingTransitionVar, processInstance.getId(), 1);
+        System.out.println("------------------- retrying after expression -------------");
+        getProcessAPI().retryTask(flowNodeInstance.getId());
+
+        //finally completed
+        waitForActivityInCompletedState(processInstance, firstStepName, true);
+        waitForActivityInCompletedState(processInstance, secondStepName, true);
         waitForProcessToFinish(processInstance);
 
+        //check connectors
         List<ArchivedConnectorInstance> connectorInstances = getArchivedConnectorInstances(flowNodeInstance);
-        assertThat(connectorInstances).hasSize(1);
-        assertThat(connectorInstances.get(0).getState()).isEqualTo(ConnectorState.DONE);
+        assertThat(connectorInstances).extracting("state").containsExactly(ConnectorState.DONE, ConnectorState.DONE);
+        assertThat(connectorInstances).extracting("name").containsExactly("throwsExceptionOnEnter", "throwsExceptionOnFinish");
+
+        //check data instance
+        DataInstance count = getProcessAPI().getArchivedActivityDataInstance(countVar, flowNodeInstance.getId());
+        assertThat(count.getValue()).isEqualTo(1);
 
         //clean
         disableAndDeleteProcess(processDefinition);
+    }
+
+    private ProcessDefinition deployProcessWithConnectorsAndOperationsThrowingException(final String watchingOnEnterVar, final String watchingOnFinishVar,
+            final String watchingOperationsVar, final String watchingTransitionVar, final String countVar, final String firstStepName,
+            final String secondStepName) throws BonitaException, IOException {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        //global data
+        processBuilder.addShortTextData(watchingOnEnterVar, new ExpressionBuilder().createConstantStringExpression(TestConnectorThatThrowException.NORMAL));
+        processBuilder.addShortTextData(watchingOnFinishVar, new ExpressionBuilder().createConstantStringExpression("normal"));
+        processBuilder.addIntegerData(watchingOperationsVar, new ExpressionBuilder().createConstantIntegerExpression(0));
+        processBuilder.addIntegerData(countVar, new ExpressionBuilder().createConstantIntegerExpression(0));
+        processBuilder.addIntegerData(watchingTransitionVar, new ExpressionBuilder().createConstantIntegerExpression(0));
+        AutomaticTaskDefinitionBuilder taskBuilder = processBuilder.addAutomaticTask(firstStepName);
+        //local data
+        taskBuilder.addShortTextData("localData", new ExpressionBuilder().createConstantStringExpression("default"));
+
+        addConnectors(watchingOnEnterVar, watchingOnFinishVar, taskBuilder);
+        addOperation(watchingOperationsVar, countVar, taskBuilder);
+
+        processBuilder.addAutomaticTask(secondStepName);
+        addTransition(firstStepName, secondStepName, watchingTransitionVar, processBuilder);
+        return deployAndEnableProcessWithConnector(processBuilder, "TestConnectorThatThrowException.impl", TestConnectorThatThrowException.class,
+                "TestConnectorThatThrowException.jar");
+    }
+
+    private void addTransition(final String firstStepName, final String secondStepName, final String watchingTransitionVar,
+            final ProcessDefinitionBuilder processBuilder) throws InvalidExpressionException {
+        Expression transitionCondition = new ExpressionBuilder().createGroovyScriptExpression("throwExceptionIfZero", "if (" + watchingTransitionVar
+                + " == 0) {\nthrow new RuntimeException(\" was zero\");\n} \nreturn true;", Boolean.class.getName(),
+                new ExpressionBuilder().createDataExpression(watchingTransitionVar, Integer.class.getName()));
+        processBuilder.addTransition(firstStepName, secondStepName, transitionCondition);
+    }
+
+    private void addOperation(final String watchingOperationsVar, final String countVar, final AutomaticTaskDefinitionBuilder taskBuilder)
+            throws InvalidExpressionException {
+        List<Expression> dependencies = Arrays.asList(new ExpressionBuilder().createDataExpression(watchingOperationsVar, Integer.class.getName()),
+                new ExpressionBuilder().createDataExpression(countVar, Integer.class.getName()));
+        Expression leftOperationExpr = new ExpressionBuilder().createGroovyScriptExpression("throwExceptionIfZero", "if (" + watchingOperationsVar
+                + "== 0) {\nthrow new RuntimeException(\" was zero\");\n} \nreturn " + countVar + " + 1;", Integer.class.getName(), dependencies);
+        taskBuilder.addOperation(new OperationBuilder().createSetDataOperation(countVar, leftOperationExpr));
+    }
+
+    private void addConnectors(final String watchingOnEnterVar, final String watchingOnFinishVar, final AutomaticTaskDefinitionBuilder taskBuilder)
+            throws InvalidExpressionException {
+        //connector on enter
+        taskBuilder.addConnector("throwsExceptionOnEnter", "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER)
+                .addInput("kind", new ExpressionBuilder().createDataExpression(watchingOnEnterVar, String.class.getName()));
+        //connector on finish
+        taskBuilder.addConnector("throwsExceptionOnFinish", "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_FINISH)
+                .addInput("kind", new ExpressionBuilder().createDataExpression(watchingOnFinishVar, String.class.getName()));
     }
 
     @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.ACTIVITIES, jira = "BS-12685", keywords = "retry task, failed connector")
@@ -1433,6 +1530,7 @@ public class ProcessManagementIT extends TestWithUser {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 100);
         builder.filter(ArchiveConnectorInstancesSearchDescriptor.CONTAINER_ID, flowNodeInstance.getId());
         builder.filter(ArchiveConnectorInstancesSearchDescriptor.CONTAINER_TYPE, "flowNode");
+        builder.sort(ArchiveConnectorInstancesSearchDescriptor.NAME, Order.ASC);
         SearchResult<ArchivedConnectorInstance> searchResult = getProcessAPI().searchArchivedConnectorInstances(builder.done());
         return searchResult.getResult();
     }
