@@ -13,6 +13,13 @@
  **/
 package org.bonitasoft.engine;
 
+import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
