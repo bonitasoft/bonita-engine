@@ -11,7 +11,6 @@ package com.bonitasoft.engine.bpm.model.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -48,11 +47,12 @@ public class BPMInstancesCreatorExt extends BPMInstancesCreator {
     private final RefBusinessDataService refBusinessDataService;
 
     public BPMInstancesCreatorExt(final ActivityInstanceService activityInstanceService, final ActorMappingService actorMappingService,
-            final GatewayInstanceService gatewayInstanceService, final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ExpressionResolverService expressionResolverService, final DataInstanceService dataInstanceService, final TechnicalLoggerService logger,
-            final TransientDataService transientDataService, final RefBusinessDataService refBusinessDataService, final ArchiveService archiveService, final ParentContainerResolver parentContainerResolver) {
+            final GatewayInstanceService gatewayInstanceService, final EventInstanceService eventInstanceService,
+            final ConnectorInstanceService connectorInstanceService, final ExpressionResolverService expressionResolverService,
+            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final TransientDataService transientDataService,
+            final RefBusinessDataService refBusinessDataService, final ParentContainerResolver parentContainerResolver) {
         super(activityInstanceService, actorMappingService, gatewayInstanceService, eventInstanceService, connectorInstanceService, expressionResolverService,
-                dataInstanceService, logger, transientDataService, archiveService, parentContainerResolver);
+                dataInstanceService, logger, transientDataService, parentContainerResolver);
         this.refBusinessDataService = refBusinessDataService;
     }
 
