@@ -16,7 +16,6 @@
     <modules>
         <!-- This module is empty for now: -->
         <!-- <module>bonita-query-tests</module> -->
-        <module>bonita-integration-tests-services</module>
         <module>bonita-integration-tests-services-bpm</module>
         <module>bonita-integration-tests-client</module>
         <module>bonita-integration-tests-local</module>

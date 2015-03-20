@@ -20,7 +20,6 @@ import java.util.Map;
 
 import com.bonitasoft.engine.api.ProcessAPI;
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -160,7 +159,7 @@ public class ClusterTests extends CommonAPISPIT {
 
     private void addConnectorImplemWithDependency(final BusinessArchiveBuilder bizArchive, final String implemPath, final String implemName,
             final Class<? extends AbstractConnector> dependencyClassName, final String dependencyJarName) throws IOException {
-        bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
+        bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(this.getClass().getResourceAsStream(implemPath))));
         bizArchive.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
     }
 

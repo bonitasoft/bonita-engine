@@ -9,8 +9,11 @@
 package com.bonitasoft.engine;
 
 import com.bonitasoft.engine.bpm.test.ParameterAndDataExpressionIntegrationTest;
+import com.bonitasoft.engine.services.event.IdentityServiceUsingEventServiceTest;
+import com.bonitasoft.engine.services.event.RecorderAndEventServiceTest;
+import com.bonitasoft.engine.services.monitoring.MonitoringTests;
 import org.bonitasoft.engine.AllBPMTests;
-import org.bonitasoft.engine.TestsInitializer;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -18,12 +21,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.services.event.IdentityServiceUsingEventServiceTest;
-import com.bonitasoft.engine.services.event.RecorderAndEventServiceTest;
-import com.bonitasoft.engine.services.monitoring.MonitoringTests;
-
 @RunWith(BonitaSuiteRunner.class)
-@BonitaSuiteRunner.Initializer(TestsInitializer.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 @SuiteClasses({
         ParameterAndDataExpressionIntegrationTest.class,
         AllBPMTests.class,

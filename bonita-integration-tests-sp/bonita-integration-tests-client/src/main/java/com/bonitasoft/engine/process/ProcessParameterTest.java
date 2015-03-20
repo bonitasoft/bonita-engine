@@ -8,31 +8,31 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.bonitasoft.engine.CommonAPISPIT;
+import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
+import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
+import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
+import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.process.impl.ParameterDefinitionBuilder;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
-import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -42,7 +42,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -52,13 +51,6 @@ import org.bonitasoft.engine.process.ProcessManagementIT;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.bonitasoft.engine.CommonAPISPIT;
-import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
-import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
-import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
-import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 public class ProcessParameterTest extends CommonAPISPIT {
 
@@ -347,7 +339,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         ByteArrayOutputStream baos = null;
         ZipOutputStream zos = null;
         try {
-            stream = BPMRemoteTests.class.getResourceAsStream(implSourceFile);
+            stream = this.getClass().getResourceAsStream(implSourceFile);
             assertNotNull(stream);
             final String baseName = implSourceFile.substring(implSourceFile.lastIndexOf('/') + 1, implSourceFile.lastIndexOf('.'));
             final byte[] byteArray = IOUtils.toByteArray(stream);

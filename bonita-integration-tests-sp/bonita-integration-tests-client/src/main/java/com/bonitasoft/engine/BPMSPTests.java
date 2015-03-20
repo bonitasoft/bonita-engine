@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
@@ -16,7 +15,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        BPMRemoteTests.class,
         BPMRemoteSPTests.class
 })
 @Initializer(TestsInitializerSP.class)
