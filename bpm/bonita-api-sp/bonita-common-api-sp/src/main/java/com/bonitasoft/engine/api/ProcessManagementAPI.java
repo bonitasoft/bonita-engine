@@ -207,38 +207,50 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
             throws InvalidConnectorImplementationException, UpdateException;
 
     /**
-     * Set state of activity to its previous state and then execute.
-     * precondition: the activity is in state FAILED
+     * Set state of {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstance} to its previous state and then execute it. Pre-condition: the
+     * {@code FlowNodeInstance} must be in the FAILED state.
+     * <p>Failed {@link org.bonitasoft.engine.bpm.connector.ConnectorInstance}s can be re-executed or skipped. If you want to re-execute all failed connectors
+     * you can use directly the method {@link org.bonitasoft.engine.api.ProcessRuntimeAPI#retryTask(long)} that is equivalent of calling the current method with
+     * {@link org.bonitasoft.engine.bpm.connector.ConnectorStateReset#TO_RE_EXECUTE} for all failed connectors.</p>
      * 
      * @param activityInstanceId
-     *        The identifier of the activity instance
+     *        The identifier of the {@code FlowNodeInstance}
      * @param connectorsToReset
-     *        The map of connectors to reset before retrying the task
+     *        The map of connectors to be reset before retrying the task. The key represents the {@code ConnectorInstance} identifier and the value
+     *        represents new {@link org.bonitasoft.engine.bpm.connector.ConnectorStateReset}.
      * @throws ActivityInstanceNotFoundException
-     *         If no activity instance can be found with the provided activityInstanceId
+     *         If no {@code FlowNodeInstance} can be found with the provided activityInstanceId
      * @throws ActivityExecutionException
-     *         If the activity failed to replay.
+     *         If the {@code FlowNodeInstance} failed to replay.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         Generic exception thrown if API Session is invalid, e.g session has expired.
+     *         when API Session is invalid, e.g session has expired.
      * @since 6.0
+     * @see org.bonitasoft.engine.api.ProcessRuntimeAPI#retryTask(long)
+     * @see org.bonitasoft.engine.bpm.connector.ConnectorStateReset
+     * @see org.bonitasoft.engine.bpm.flownode.FlowNodeInstance
      */
     void replayActivity(long activityInstanceId, Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityInstanceNotFoundException,
             ActivityExecutionException;
 
     /**
-     * Replay a task that was in failed state.
-     * The task can be replayed if no connector is in state failed.
-     * If that is the case change state of failed connectors first to SKIPPED or TO_BE_EXECUTED
+     * Set state of {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstance} to its previous state and then execute it. Pre-condition: the
+     * {@code FlowNodeInstance} must be in the FAILED state. The {@code FlowNodeInstance} can be replayed if no
+     * {@link org.bonitasoft.engine.bpm.connector.ConnectorInstance} is in the failed state. If that is the case, use the method
+     * {@link org.bonitasoft.engine.api.ProcessRuntimeAPI#retryTask(long)} that will automatically re-execute failed
+     * connectors or the method {@link #replayActivity(long, java.util.Map)} that allows to re-execute or skip failed connectors.
      * 
      * @param activityInstanceId
-     *        The activity to replay
+     *        The identifier of the {@code FlowNodeInstance}
      * @throws ActivityInstanceNotFoundException
-     *         If no activity instance can be found with the provided activityInstanceId
+     *         If no {@code FlowNodeInstance} can be found with the provided activityInstanceId
      * @throws ActivityExecutionException
-     *         If the activity failed to replay.
+     *         If the {@code FlowNodeInstance} failed to replay.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         When the activity can't be modified
+     *         when API Session is invalid, e.g session has expired.
      * @since 6.0
+     * @see org.bonitasoft.engine.api.ProcessRuntimeAPI#retryTask(long)
+     * @see #replayActivity(long, java.util.Map)
+     * @see org.bonitasoft.engine.bpm.connector.ConnectorInstance
      */
     void replayActivity(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
