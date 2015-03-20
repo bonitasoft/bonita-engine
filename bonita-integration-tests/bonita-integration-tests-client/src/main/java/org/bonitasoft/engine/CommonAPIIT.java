@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(BonitaTestRunner.class)
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public abstract class CommonAPIIT extends APITestUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPIIT.class);

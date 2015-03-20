@@ -16,8 +16,8 @@
 				<include name="**/*"/>
 			</fileset>
 		</copy>
-		<copy file="${resources.dir}/bonita-platform-community-user-custom.xml" todir="${bh.target.conf.platform.dir}" overwrite="true"/>
-		<copy file="${resources.dir}/bonita-tenants-community-user-custom.xml" todir="${bh.target.conf.tenant.dir}" overwrite="true"/>
+		<copy file="${resources.dir}/bonita-platform-custom.xml" todir="${bh.target.conf.platform.dir}" overwrite="true"/>
+		<copy file="${resources.dir}/bonita-tenants-custom.xml" todir="${bh.target.conf.tenant.dir}" overwrite="true"/>
 		<copy todir="${bh.target.conf.platforminit.dir}">
 			<fileset dir="${local.test.resources.dir}">
 				<include name="*"/>

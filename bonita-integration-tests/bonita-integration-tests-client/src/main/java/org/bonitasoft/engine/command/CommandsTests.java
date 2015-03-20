@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.command;
 
-import org.bonitasoft.engine.TestsInitializer;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.command.web.ExternalCommandsTests;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
@@ -29,7 +29,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ExternalCommandsTests.class,
         AdvancedStartProcessCommandIT.class
 })
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public class CommandsTests {
 
 }

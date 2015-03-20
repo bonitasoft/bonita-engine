@@ -36,7 +36,7 @@ import org.junit.runners.Suite.SuiteClasses;
         TenantMaintenanceLocalIT.class,
         BDRepositoryLocalIT.class,
 })
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public class LocalIntegrationTests {
 
     @BeforeClass

@@ -152,13 +152,13 @@
 						<configuration>
 							<target>
 								<!-- Standard -->
-								<touch file="${bonita.home}/engine-client/conf/bonita-client-user-custom.properties" mkdirs="true"/>
+								<touch file="${bonita.home}/engine-client/conf/bonita-client-custom.properties" mkdirs="true"/>
 								<copy file="${basedir}/bonita-client-local.properties" tofile="${bonita.home}/engine-client/work/bonita-client.properties"/>
 
-								<touch file="${bonita.home.ejb3}/engine-client/conf/bonita-client-user-custom.properties" mkdirs="true"/>
+								<touch file="${bonita.home.ejb3}/engine-client/conf/bonita-client-custom.properties" mkdirs="true"/>
 								<copy file="${basedir}/bonita-client-ejb3.properties" tofile="${bonita.home.ejb3}/engine-client/work/bonita-client.properties"/>
 
-								<touch file="${bonita.home.invalid.api.type}/engine-client/conf/bonita-client-user-custom.properties" mkdirs="true"/>
+								<touch file="${bonita.home.invalid.api.type}/engine-client/conf/bonita-client-custom.properties" mkdirs="true"/>
 								<copy file="${basedir}/bonita-client-invalid.properties" tofile="${bonita.home.invalid.api.type}/engine-client/work/bonita-client.properties"/>
 							</target>
 						</configuration>

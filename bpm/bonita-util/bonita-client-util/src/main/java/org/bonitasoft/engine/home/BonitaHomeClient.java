@@ -78,7 +78,7 @@ public final class BonitaHomeClient extends BonitaHome {
     public static Properties getProperties() throws BonitaHomeNotSetException, ServerAPIException, IOException {
         final File clientFolder = getInstance().getBonitaHomeClientFolder();
         final Properties defaultProperties = PropertiesManager.getProperties(FileUtils.getFile(clientFolder, "work", "bonita-client.properties"));
-        final Properties customProperties = PropertiesManager.getProperties(FileUtils.getFile(clientFolder, "conf", "bonita-client-user-custom.properties"));
+        final Properties customProperties = PropertiesManager.getProperties(FileUtils.getFile(clientFolder, "conf", "bonita-client-custom.properties"));
         final Properties result = new Properties();
         result.putAll(defaultProperties);
         result.putAll(customProperties);

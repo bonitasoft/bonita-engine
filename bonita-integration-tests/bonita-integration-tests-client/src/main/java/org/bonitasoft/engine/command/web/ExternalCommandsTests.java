@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.command.web;
 
-import org.bonitasoft.engine.TestsInitializer;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.command.web.profile.ProfileImportCommandIT;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
@@ -31,7 +31,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ActivityCommandIT.class,
         EntityMemberCommandsIT.class
 })
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public class ExternalCommandsTests {
 
 }

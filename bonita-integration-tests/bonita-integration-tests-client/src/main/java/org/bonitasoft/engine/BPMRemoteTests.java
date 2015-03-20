@@ -54,7 +54,7 @@ import org.junit.runners.Suite.SuiteClasses;
         BDRepositoryIT.class,
         ExecuteBDMQueryCommandIT.class
 })
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public class BPMRemoteTests {
 
 }

@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.activity;
 
-import org.bonitasoft.engine.TestsInitializer;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.filter.user.UserFilterIT;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
@@ -33,7 +33,7 @@ import org.junit.runners.Suite.SuiteClasses;
         LoopIT.class,
         MultiInstanceIT.class,
 })
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public class TaskTests {
 
 }

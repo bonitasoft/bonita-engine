@@ -53,7 +53,7 @@ import org.junit.runners.Suite.SuiteClasses;
         TenantMaintenanceIT.class
 
 })
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public class SlowExecutionLocalIntegrationTests extends LocalIntegrationTests {
 
 }
