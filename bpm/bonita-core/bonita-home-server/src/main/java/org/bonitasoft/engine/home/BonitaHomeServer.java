@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.FileHandler;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -104,6 +105,12 @@ public class BonitaHomeServer extends BonitaHome {
         //System.err.println(this.getClass().getName() + "-" + "getResourcesFromFiles" + ":" + "strings=" + strings);
         return strings
                 ;
+    }
+
+    public FileHandler getIncidentFileHandler(long tenantId) throws BonitaHomeNotSetException, IOException {
+        final File incidentFile = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile("incidents.log");
+        return new FileHandler(incidentFile.getAbsolutePath());
+
     }
 
     private static class AllXmlFilesFilter implements FileFilter {
