@@ -10,6 +10,8 @@ package com.bonitasoft.engine.bdm.model;
 
 import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aBooleanField;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aRelationField;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
 import static com.bonitasoft.engine.bdm.builder.FieldBuilder.anAggregationField;
 import static com.bonitasoft.engine.bdm.model.assertion.BusinessObjectAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
+
+import com.bonitasoft.engine.bdm.model.field.RelationField;
 
 /**
  * @author Colin PUY
@@ -89,6 +93,42 @@ public class BusinessObjectTest {
         final Query query = businessObject.addQuery("userByName", "SELECT u FROM User u WHERE u.name='romain'", List.class.getName());
 
         assertThat(businessObject.getQueries()).containsExactly(query);
+    }
+
+    @Test
+    public void isARelationField_should_be_false_with_an_emtpy_object() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+
+        assertThat(bo.isARelationField("any")).isFalse();
+    }
+
+    @Test
+    public void isARelationField_should_be_false_with_an_object_without_relation_field_but_with_the_right_name() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        bo.addField(aBooleanField("bool"));
+
+        assertThat(bo.isARelationField("bool")).isFalse();
+    }
+
+    @Test
+    public void isARelationField_should_be_false_with_an_object_without_relation_field() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        bo.addField(aBooleanField("bool"));
+
+        assertThat(bo.isARelationField("any")).isFalse();
+    }
+
+    @Test
+    public void isARelationField_should_be_true_with_an_object_with_relation_field() throws Exception {
+        final BusinessObject bo = new BusinessObject();
+        final RelationField aggregationMultiple = aRelationField().withName("address").aggregation().referencing(addressBO()).build();
+        bo.addField(aggregationMultiple);
+
+        assertThat(bo.isARelationField("address")).isTrue();
+    }
+
+    private BusinessObject addressBO() {
+        return aBO("Address").withField(aStringField("street").build()).withField(aStringField("city").build()).build();
     }
 
 }

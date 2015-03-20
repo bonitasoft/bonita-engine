@@ -120,6 +120,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         dependencies.put(strDataName, strDataValue);
         final int intDataValue = 13812345;
         dependencies.put(intDataName, intDataValue);
+        dependencies.put("processDefinitionId", 158l);
         // check
         assertEquals("welcome " + parameterValue + " to " + strDataValue + ",Please call " + intDataValue,
                 getTenantAccessor().getExpressionService().evaluate(strExpr, dependencies, EMPTY_RESOLVED_EXPRESSIONS, ContainerState.ACTIVE));
