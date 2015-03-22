@@ -101,7 +101,7 @@
         </property>
     </bean>
 
-    <bean id="executeActionsAndStartInstanceExt" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="executeActionsAndStartInstanceExt" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>executeActionsAndStartInstanceExt</value>
         </constructor-arg>
@@ -113,7 +113,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="executeActionsAndTerminateExt" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="executeActionsAndTerminateExt" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>executeActionsAndTerminateExt</value>
         </constructor-arg>
@@ -125,7 +125,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="addBreakpointCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="addBreakpointCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>addBreakpoint</value>
         </constructor-arg>
@@ -137,7 +137,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="removeBreakpointCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="removeBreakpointCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>removeBreakpoint</value>
         </constructor-arg>
@@ -149,7 +149,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="getBreakpointsCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+    <bean id="getBreakpointsCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
         <constructor-arg name="name">
             <value>getBreakpoints</value>
         </constructor-arg>
