@@ -113,7 +113,7 @@ public class PageAPIIT extends CommonAPISPIT {
         final Page returnedPage = getSubscriptionPageAPI().getPage(page.getId());
 
         // then
-        assertThat(returnedPage).isEqualTo(page);
+        assertThat(returnedPage).isEqualToComparingFieldByField(page);
     }
 
     @Test
@@ -278,7 +278,7 @@ public class PageAPIIT extends CommonAPISPIT {
         final Page returnedPage = getSubscriptionPageAPI().getPageByName(page.getName());
 
         // then
-        assertThat(returnedPage).isEqualTo(page);
+        assertThat(returnedPage).isEqualToComparingFieldByField(page);
     }
 
     @Test(expected = AlreadyExistsException.class)
@@ -631,7 +631,7 @@ public class PageAPIIT extends CommonAPISPIT {
         // then
         final List<Page> results = searchPages.getResult();
         assertThat(results.size()).as("should have onlmy one matching page").isEqualTo(1);
-        assertThat(results.get(0)).as("should get the page whith matching search term").isEqualTo(pageWithMatchingSearchTerm);
+        assertThat(results.get(0)).as("should get the page whith matching search term").isEqualToComparingFieldByField(pageWithMatchingSearchTerm);
     }
 
     private String generateUniquePageName(final int i) {
@@ -721,7 +721,7 @@ public class PageAPIIT extends CommonAPISPIT {
 
         // then
         final List<Page> results = searchPages.getResult();
-        assertThat(results.get(0)).isEqualTo(expectedMatchingPage);
+        assertThat(results.get(0)).isEqualToComparingFieldByField(expectedMatchingPage);
 
     }
 
