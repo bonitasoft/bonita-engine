@@ -329,15 +329,11 @@
     <bean id="monitoringService" class="com.bonitasoft.engine.monitoring.impl.TenantMonitoringServiceImpl">
         <constructor-arg name="allowMbeansRegistration" value="true" />
         <constructor-arg name="identityService" ref="identityService" />
-        <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="jobHandler" ref="jobHandler" />
         <constructor-arg name="technicalLog" ref="tenantTechnicalLoggerService" />
     </bean>
-
-    <bean id="jobHandler" class="com.bonitasoft.engine.monitoring.impl.SJobHandlerImpl" />
 
     <bean id="breakpointService" class="com.bonitasoft.engine.core.process.instance.impl.BreakpointServiceImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />

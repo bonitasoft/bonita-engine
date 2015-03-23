@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.monitoring.impl;
 
+import static java.util.Arrays.asList;
+
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
@@ -17,6 +19,8 @@ import java.util.Map;
 import javax.management.MalformedObjectNameException;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.events.model.HandlerRegistrationException;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -35,6 +39,8 @@ import com.bonitasoft.engine.monitoring.mbean.impl.SPlatformServiceMXBeanImpl;
  */
 public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl implements PlatformMonitoringService {
 
+    private final SJobHandlerImpl jobHandler;
+
     private final SJvmMXBean jvmMBean;
 
     private final SchedulerService schedulerService;
@@ -42,13 +48,13 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
     private final TransactionService transactionService;
 
     public PlatformMonitoringServiceImpl(final boolean allowMbeansRegistration, final SJvmMXBean jvmMBean,
-            final TransactionService transactionService, final SchedulerService schedulerService, final TechnicalLoggerService technicalLog)
+            final TransactionService transactionService, final SchedulerService schedulerService, final SJobHandlerImpl jobHandler, final TechnicalLoggerService technicalLog)
             throws MalformedObjectNameException {
         super(allowMbeansRegistration, technicalLog);
         this.jvmMBean = jvmMBean;
         this.transactionService = transactionService;
         this.schedulerService = schedulerService;
-
+        this.jobHandler = jobHandler;
         addMBeans();
     }
 
@@ -211,4 +217,8 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
         return lastGcInfos;
     }
 
+    @Override
+    public long getNumberOfExecutingJobs() {
+        return jobHandler.getExecutingJobs();
+    }
 }

@@ -233,4 +233,13 @@ public interface PlatformMonitoringService extends MonitoringService {
      */
     Map<String, SGcInfo> getLastGcInfo();
 
+
+    /**
+     * Get the current number of executing jobs.
+     *
+     * @return the current number of executing jobs.
+     * @since 6.0
+     */
+    long getNumberOfExecutingJobs();
+
 }

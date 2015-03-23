@@ -3,7 +3,11 @@
 
 	<bean id="platformEventService" class="com.bonitasoft.engine.events.impl.ConfigurableEventServiceImpl">
 		<constructor-arg name="handlers">
-			<map />
+			<map>
+				<entry key="JOB_EXECUTING" value-ref="jobHandler"/>
+				<entry key="JOB_FAILED" value-ref="jobHandler"/>
+				<entry key="JOB_COMPLETED" value-ref="jobHandler"/>
+			</map>
 		</constructor-arg>
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
@@ -135,12 +139,15 @@
 
 	<bean id="jvmMXBean" class="com.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl" />
 
+	<bean id="jobHandler" class="com.bonitasoft.engine.monitoring.impl.SJobHandlerImpl" />
+
 	<bean id="platformMonitoringService" class="com.bonitasoft.engine.monitoring.impl.PlatformMonitoringServiceImpl">
 		<constructor-arg name="allowMbeansRegistration" value="true" />
 		<constructor-arg name="jvmMBean" ref="jvmMXBean" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="schedulerService" ref="scheduler" />
 		<constructor-arg name="technicalLog" ref="platformTechnicalLoggerService" />
+		<constructor-arg name="jobHandler" ref="jobHandler" />
 	</bean>
 
 	<bean id="sequenceMappings" parent="communitySequenceMappings" class="org.springframework.beans.factory.config.MapFactoryBean">

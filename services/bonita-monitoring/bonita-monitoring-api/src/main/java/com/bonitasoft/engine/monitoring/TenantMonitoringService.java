@@ -35,12 +35,4 @@ public interface TenantMonitoringService extends MonitoringService {
      */
     long getNumberOfActiveTransactions();
 
-    /**
-     * Get the current number of executing jobs.
-     * 
-     * @return the current number of executing jobs.
-     * @since 6.0
-     */
-    long getNumberOfExecutingJobs();
-
 }

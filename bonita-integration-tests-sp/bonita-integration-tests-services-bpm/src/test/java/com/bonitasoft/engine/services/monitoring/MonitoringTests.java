@@ -14,13 +14,14 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        TenantMonitoringServiceIntegrationTest.class,
+        TenantMonitoringServiceTest.class,
 
         // Beans
         SEntityMXBeanTest.class,
         SJvmMXBeanTest.class,
         SServiceMXBeanTest.class,
-        SPlatformServiceMXBeanTest.class
+        SPlatformServiceMXBeanTest.class,
+        PlatformMonitoringServiceTest.class
 })
 public class MonitoringTests {
 
