@@ -36,7 +36,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Matthieu Chaffotte
  * @author Frederic Bouquet
  */
-public final class ServiceAccessorFactory {
+public class ServiceAccessorFactory {
 
     private static final ServiceAccessorFactory INSTANCE = new ServiceAccessorFactory();
 

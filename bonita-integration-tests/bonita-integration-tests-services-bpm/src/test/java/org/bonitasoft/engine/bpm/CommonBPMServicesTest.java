@@ -98,11 +98,15 @@ public class CommonBPMServicesTest {
 
     private APISession apiSession = null;
 
-    private static SessionAccessor sessionAccessor;
+    protected static SessionAccessor sessionAccessor;
 
-    private static PlatformServiceAccessor platformServiceAccessor;
+    protected static PlatformServiceAccessor platformServiceAccessor;
 
-    private static Map<Long, TenantServiceAccessor> tenantServiceAccessors;
+    protected static Map<Long, TenantServiceAccessor> tenantServiceAccessors;
+
+    protected ServiceAccessorFactory getServiceAccessorFactory() {
+        return ServiceAccessorFactory.getInstance();
+    }
 
     @Rule
     public TestRule testWatcher = new TestWatcher() {
@@ -157,14 +161,12 @@ public class CommonBPMServicesTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-        platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         tenantServiceAccessors = new HashMap<Long, TenantServiceAccessor>();
     }
 
     protected TenantServiceAccessor getAccessor(final long tenantId) throws Exception {
         if (!tenantServiceAccessors.containsKey(tenantId)) {
-            tenantServiceAccessors.put(tenantId, ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId));
+            tenantServiceAccessors.put(tenantId, getServiceAccessorFactory().createTenantServiceAccessor(tenantId));
         }
         return tenantServiceAccessors.get(tenantId);
     }
@@ -187,6 +189,12 @@ public class CommonBPMServicesTest {
 
     @Before
     public void before() throws Exception {
+        if (sessionAccessor == null) {
+            sessionAccessor = getServiceAccessorFactory().createSessionAccessor();
+        }
+        if (platformServiceAccessor == null) {
+            platformServiceAccessor = getServiceAccessorFactory().createPlatformServiceAccessor();
+        }
         apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
         sessionAccessor.setSessionInfo(apiSession.getId(), apiSession.getTenantId());
     }

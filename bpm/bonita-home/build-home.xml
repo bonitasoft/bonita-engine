@@ -12,11 +12,11 @@
 
 		<copy todir="${bh.dir}/engine-client/work">
 			<fileset dir="${resources.dir}">
-				<include name="bonita-client.properties"/>
+				<include name="bonita-client-community.properties"/>
 			</fileset>
 		</copy>
 
-		<copy file="${resources.dir}/bonita-client.properties" tofile="${target.dir}/bonita-client-custom.properties">
+		<copy file="${resources.dir}/bonita-client-community.properties" tofile="${target.dir}/bonita-client-custom.properties">
 			<filterchain>
 				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
 					<param name="prefix" value="#"/>
@@ -42,8 +42,8 @@
 
 		<copy todir="${bh.dir}/engine-server/work/platform">
 			<fileset dir="${resources.dir}">
-				<include name="bonita-platform.properties"/>
-				<include name="bonita-platform-private.properties"/>
+				<include name="bonita-platform-community.properties"/>
+				<include name="bonita-platform-private-community.properties"/>
 				<include name="bonita-platform-community.xml"/>
 			</fileset>
 		</copy>
@@ -56,7 +56,7 @@
 
 		<copy todir="${bh.dir}/engine-server/work/tenants/template">
 			<fileset dir="${resources.dir}">
-				<include name="bonita-tenant.properties"/>
+				<include name="bonita-tenant-community.properties"/>
 				<include name="bonita-tenant-community.xml"/>
 			</fileset>
 		</copy>
@@ -81,7 +81,7 @@
 			</fileset>
 		</copy>
 
-		<copy file="${resources.dir}/bonita-platform.properties" tofile="${target.dir}/bonita-platform-custom.properties">
+		<copy file="${resources.dir}/bonita-platform-community.properties" tofile="${target.dir}/bonita-platform-custom.properties">
 			<filterchain>
 				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
 					<param name="prefix" value="#"/>
