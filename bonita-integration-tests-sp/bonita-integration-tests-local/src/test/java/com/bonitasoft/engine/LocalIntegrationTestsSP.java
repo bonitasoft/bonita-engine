@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import com.bonitasoft.engine.process.ProcessParameterTest;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
@@ -21,17 +22,7 @@ import com.bonitasoft.engine.tenant.TenantMaintenanceLocalIT;
 import com.bonitasoft.engine.theme.ThemeTest;
 
 @RunWith(BonitaSuiteRunner.class)
-@SuiteClasses({ BPMSPTests.class,
-        BPMLocalSuiteTests.class,
-        LocalLogTest.class,
-        APIMethodSPIT.class,
-        ConnectorExecutionTimeOutTest.class,
-        ConnectorImplementationLocalSPTest.class,
-        ThemeTest.class,
-        TenantMaintenanceLocalIT.class,
-        PageAPILocalIT.class,
-        TenantLocalIT.class,
-        BDRepositoryLocalIT.class
+@SuiteClasses({ ProcessParameterTest.class
 })
 @Initializer(LocalServerTestsInitializerSP.class)
 public class LocalIntegrationTestsSP {

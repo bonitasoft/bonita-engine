@@ -8,9 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.LocalServerTestsInitializer;
@@ -23,7 +20,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 public class LocalServerTestsInitializerSP extends LocalServerTestsInitializer {
 
-    static ConfigurableApplicationContext springContext;
 
     private static APITestSPUtil testUtil = new APITestSPUtil();
 
