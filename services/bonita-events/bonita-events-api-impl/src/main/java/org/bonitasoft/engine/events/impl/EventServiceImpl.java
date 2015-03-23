@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -38,8 +39,8 @@ public class EventServiceImpl extends AbstractEventServiceImpl {
      */
     protected Map<String, List<SHandler<SEvent>>> registeredHandlers;
 
-    public EventServiceImpl(final TechnicalLoggerService logger) {
-        super(logger);
+    public EventServiceImpl(final TechnicalLoggerService logger, final EventService parent) {
+        super(logger, parent);
         registeredHandlers = new HashMap<String, List<SHandler<SEvent>>>();
     }
 

@@ -32,7 +32,8 @@ public class EventServiceImplTest extends EventServiceTest {
     @Override
     protected EventService instantiateEventServiceImplementation() {
         final TechnicalLoggerService logger = mockTechnicalLoggerService();
-        return new EventServiceImpl(logger);
+        final EventService parent = mock(EventService.class);
+        return new EventServiceImpl(logger, parent);
     }
 
     protected TechnicalLoggerService mockTechnicalLoggerService() {

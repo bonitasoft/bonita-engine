@@ -340,6 +340,9 @@
 
     <bean id="platformEventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="parent">
+            <null />
+        </constructor-arg>
     </bean>
 
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
