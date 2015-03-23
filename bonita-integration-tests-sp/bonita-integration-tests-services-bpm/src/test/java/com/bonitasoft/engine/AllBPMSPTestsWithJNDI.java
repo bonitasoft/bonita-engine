@@ -26,7 +26,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         ParameterAndDataExpressionIntegrationTest.class,
         AllBPMTests.class,
-        AllTests.class,
         IdentityServiceUsingEventServiceTest.class,
         RecorderAndEventServiceTest.class,
         // Last test suite in order to check the correct begin/complete transactions

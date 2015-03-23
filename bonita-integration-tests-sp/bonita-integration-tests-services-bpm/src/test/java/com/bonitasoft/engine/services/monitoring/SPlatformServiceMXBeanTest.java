@@ -136,9 +136,6 @@ public class SPlatformServiceMXBeanTest extends CommonBPMServicesSPTest {
 
         final SPlatformServiceMXBean svcMB = getPlatformServiceMXBean();
         svcMB.start();
-
-        assertFalse((Boolean) mbserver.getAttribute(serviceMB, "SchedulerStarted"));
-
         startScheduler();
 
         final WaitFor waitForSchedulerStart = new WaitFor(50, 5000) {

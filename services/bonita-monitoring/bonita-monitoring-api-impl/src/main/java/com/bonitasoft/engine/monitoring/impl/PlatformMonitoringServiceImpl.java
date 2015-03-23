@@ -8,28 +8,22 @@
  *******************************************************************************/
 package com.bonitasoft.engine.monitoring.impl;
 
-import static java.util.Arrays.asList;
-
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.management.MalformedObjectNameException;
-
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.model.HandlerRegistrationException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import com.bonitasoft.engine.monitoring.SGcInfo;
 import com.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
 import com.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
 import com.bonitasoft.engine.monitoring.mbean.impl.SPlatformServiceMXBeanImpl;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -48,7 +42,7 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
     private final TransactionService transactionService;
 
     public PlatformMonitoringServiceImpl(final boolean allowMbeansRegistration, final SJvmMXBean jvmMBean,
-            final TransactionService transactionService, final SchedulerService schedulerService, final SJobHandlerImpl jobHandler, final TechnicalLoggerService technicalLog)
+                                         final TransactionService transactionService, final SchedulerService schedulerService, final SJobHandlerImpl jobHandler, final TechnicalLoggerService technicalLog)
             throws MalformedObjectNameException {
         super(allowMbeansRegistration, technicalLog);
         this.jvmMBean = jvmMBean;
@@ -210,7 +204,7 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
         for (final GarbageCollectorMXBean garbageCollectorMXBean : garbageCollectorMXBeans) {
             final com.sun.management.GcInfo gcInfo = ((com.sun.management.GarbageCollectorMXBean) garbageCollectorMXBean).getLastGcInfo();
             if (gcInfo != null) {
-                final String gcName = ((com.sun.management.GarbageCollectorMXBean) garbageCollectorMXBean).getName();
+                final String gcName = garbageCollectorMXBean.getName();
                 lastGcInfos.put(gcName, new SGcInfoImpl(gcInfo));
             }
         }

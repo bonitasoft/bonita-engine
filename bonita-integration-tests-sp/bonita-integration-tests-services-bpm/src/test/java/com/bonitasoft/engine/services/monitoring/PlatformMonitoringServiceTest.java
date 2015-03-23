@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Map;
-
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
@@ -23,6 +22,9 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
 import com.bonitasoft.engine.CommonBPMServicesSPTest;
+import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
+import com.bonitasoft.engine.monitoring.mbean.MBeanStartException;
+import com.bonitasoft.engine.monitoring.mbean.MBeanStopException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -30,10 +32,6 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
-import com.bonitasoft.engine.monitoring.mbean.MBeanStartException;
-import com.bonitasoft.engine.monitoring.mbean.MBeanStopException;
 
 public class PlatformMonitoringServiceTest extends CommonBPMServicesSPTest {
 
@@ -202,7 +200,7 @@ public class PlatformMonitoringServiceTest extends CommonBPMServicesSPTest {
     }
 
     @Test
-    public void isSchedulerStartedTest() throws SBonitaException, STransactionRollbackException {
+    public void isSchedulerStartedTest() throws SBonitaException {
         getTransactionService().begin();
         assertFalse(monitoringService.isSchedulerStarted());
 
