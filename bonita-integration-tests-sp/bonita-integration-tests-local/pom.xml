@@ -11,7 +11,7 @@
     <artifactId>bonita-integration-tests-local-sp</artifactId>
 
     <properties>
-        <bonita.home>${project.build.directory}/home</bonita.home>
+        <bonita.home>${project.build.directory}/bonita-home</bonita.home>
         <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
     </properties>
 
@@ -114,27 +114,18 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack</id>
-                        <phase>generate-resources</phase>
+                        <id>complete test conf setup</id>
+                        <phase>process-test-resources</phase>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>run</goal>
                         </goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.bonitasoft.engine</groupId>
-                                    <artifactId>bonita-home-sp</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                    <classifier>${bonita.home.classifier}</classifier>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <target name="build-home-sp">
+                                <ant antfile="build-home-sp.xml" target="build-home-sp"/>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>

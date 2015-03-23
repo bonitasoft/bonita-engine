@@ -55,7 +55,7 @@ import com.bonitasoft.engine.tenant.TenantMaintenanceIT;
         TenantMaintenanceIT.class,
         SPProcessManagementTest.class,
 })
-@Initializer(TestsInitializerSP.class)
+@Initializer(LocalServerTestsInitializerSP.class)
 public class SlowExecutionLocalIntegrationTestsSP {
 
 }

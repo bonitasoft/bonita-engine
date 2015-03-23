@@ -9,7 +9,6 @@
 package com.bonitasoft.engine;
 
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
@@ -17,7 +16,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         BPMRemoteSPTests.class
 })
-@Initializer(TestsInitializerSP.class)
 public class BPMSPTests {
 
 }

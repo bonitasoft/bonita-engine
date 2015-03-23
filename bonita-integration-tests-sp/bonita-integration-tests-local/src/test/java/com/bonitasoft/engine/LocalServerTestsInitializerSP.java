@@ -13,6 +13,7 @@ import java.util.List;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
@@ -20,44 +21,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class TestsInitializerSP  /*extendsTestsInitializer */{
+public class LocalServerTestsInitializerSP extends LocalServerTestsInitializer {
 
     static ConfigurableApplicationContext springContext;
 
     private static APITestSPUtil testUtil = new APITestSPUtil();
 
-    private static TestsInitializerSP _INSTANCE;
+    private static LocalServerTestsInitializerSP _INSTANCE;
 
     public static void beforeAll() throws Exception {
-//        TestsInitializerSP.getInstance().before();
+        LocalServerTestsInitializerSP.getInstance().before();
     }
 
-    private static TestsInitializerSP getInstance() {
+    private static LocalServerTestsInitializerSP getInstance() {
         if (_INSTANCE == null) {
-            _INSTANCE = new TestsInitializerSP();
+            _INSTANCE = new LocalServerTestsInitializerSP();
         }
         return _INSTANCE;
     }
 
     public static void afterAll() throws Exception {
-//        TestsInitializerSP.getInstance().after();
+        LocalServerTestsInitializerSP.getInstance().after();
     }
 
-//    @Override
-    protected List<String> getSpringConfigLocations() {
-        final List<String> springConfigLocations = new ArrayList<String>(/*super.getSpringConfigLocations()*/);
-        springConfigLocations.add("datasource-sp.xml");
-        springConfigLocations.add("jndi-setup-sp.xml");
-        return springConfigLocations;
-    }
-
-//    @Override
+    @Override
     protected void deleteTenantAndPlatform() throws BonitaException {
         BPMTestSPUtil.destroyPlatformAndTenants();
         testUtil.deletePlatformStructure();
     }
 
-//    @Override
+    @Override
     protected void initPlatformAndTenant() throws Exception {
         try {
             testUtil.createPlatformStructure();
@@ -71,14 +64,8 @@ public class TestsInitializerSP  /*extendsTestsInitializer */{
             testUtil.deletePlatformStructure();
             testUtil.createPlatformStructure();
         }
-        System.setProperty("delete.job.frequency", "0/30 * * * * ?");
 
         BPMTestSPUtil.createEnvironmentWithDefaultTenant();
-    }
-
-//    @Override
-    protected String getInitializerListenerClassName() {
-        return "com.bonitasoft.engine.EngineInitializerSP";
     }
 
 }

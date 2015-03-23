@@ -33,7 +33,7 @@ import com.bonitasoft.engine.theme.ThemeTest;
         TenantLocalIT.class,
         BDRepositoryLocalIT.class
 })
-@Initializer(TestsInitializerSP.class)
+@Initializer(LocalServerTestsInitializerSP.class)
 public class LocalIntegrationTestsSP {
 
 }

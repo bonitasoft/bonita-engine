@@ -30,7 +30,6 @@ import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.platform.Tenant;
 
 @RunWith(BonitaTestRunner.class)
-@Initializer(TestsInitializerSP.class)
 public abstract class CommonAPISPIT extends APITestSPUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPISPIT.class);

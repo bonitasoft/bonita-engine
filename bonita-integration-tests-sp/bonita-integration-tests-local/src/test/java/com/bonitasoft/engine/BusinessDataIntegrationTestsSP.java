@@ -19,7 +19,7 @@ import com.bonitasoft.engine.business.data.BDRepositoryIT;
 @SuiteClasses({
         BDRepositoryIT.class
 })
-@Initializer(TestsInitializerSP.class)
+@Initializer(LocalServerTestsInitializerSP.class)
 public class BusinessDataIntegrationTestsSP {
 
 }
