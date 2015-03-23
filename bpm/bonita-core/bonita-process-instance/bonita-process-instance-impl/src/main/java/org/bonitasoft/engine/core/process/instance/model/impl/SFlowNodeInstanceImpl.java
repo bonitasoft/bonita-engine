@@ -287,7 +287,7 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
 
     @Override
     public String toString() {
-        return "SFlowNodeInstanceImpl [name=" + getName() + ", stateId=" + stateId + ", stateName=" + stateName + ", previousStateId=" + previousStateId
+        return this.getClass().getName() + " [name=" + getName() + ", stateId=" + stateId + ", stateName=" + stateName + ", previousStateId=" + previousStateId
                 + ", reachedStateDate=" + reachedStateDate + ", lastUpdateDate=" + lastUpdateDate + ", displayName=" + displayName + ", displayDescription="
                 + displayDescription + ", tokenCount=" + tokenCount + ", loopCounter=" + loopCounter + ", executedBy=" + executedBy
                 + ", stateExecuting=" + stateExecuting + ", flownodeDefinitionId=" + flowNodeDefinitionId + "]";

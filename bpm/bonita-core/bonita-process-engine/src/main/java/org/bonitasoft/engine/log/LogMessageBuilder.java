@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -26,8 +26,6 @@ public class LogMessageBuilder {
      * process definition id)
      * 
      * @param flowNodeInstance
-     * @param initialMessage
-     *            the initial message
      * @return the message log built using the flow node's context.
      */
     public static String buildFlowNodeContextMessage(final SFlowNodeInstance flowNodeInstance) {

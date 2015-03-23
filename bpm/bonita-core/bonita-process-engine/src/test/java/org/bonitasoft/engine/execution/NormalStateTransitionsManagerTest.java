@@ -79,7 +79,7 @@ public class NormalStateTransitionsManagerTest {
             String message = e.getMessage();
             assertThat(message).startsWith("no state found after");
             assertThat(message).contains("for flow node of type");
-            assertThat(message).endsWith("in state category " + SStateCategory.NORMAL + ". Flow node instance id = " + FLOW_NODE_INSTANCE_ID);
+            assertThat(message).endsWith("in state category " + SStateCategory.NORMAL + ". Flow node instance: " + flowNodeInstance.toString());
         }
 
     }

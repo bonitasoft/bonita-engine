@@ -20,7 +20,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 
 /**
  * @author Elias Ricken de Medeiros
- * 
  */
 public class NormalStateTransitionsManager {
 
@@ -42,16 +41,8 @@ public class NormalStateTransitionsManager {
     }
 
     private String getMessage(FlowNodeState currentState) {
-        StringBuilder stb = new StringBuilder();
-        stb.append("no state found after ");
-        stb.append(currentState.getClass().getName());
-        stb.append(" for flow node of type ");
-        stb.append(flowNodeInstance.getClass().getName());
-        stb.append(" in state category ");
-        stb.append(flowNodeInstance.getStateCategory());
-        stb.append(". Flow node instance id = ");
-        stb.append(flowNodeInstance.getId());
-        return stb.toString();
+        return "no state found after " + currentState.getClass().getName() + " for flow node of type " + flowNodeInstance.getClass().getName()
+                + " in state category " + flowNodeInstance.getStateCategory() + ". Flow node instance: " + flowNodeInstance.toString();
     }
 
     protected FlowNodeState getNextStateFromMap(FlowNodeState currentState) {
