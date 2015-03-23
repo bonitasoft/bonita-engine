@@ -34,6 +34,9 @@ final class WithGlobalBefore extends Statement {
     @Override
     public void evaluate() throws Throwable {
         if (testRunner.isRoot()) {
+            if(initializer == null){
+                throw new IllegalStateException("Unable to run the suite as a root suite because it does not have a @Initialize set");
+            }
             Method declaredMethod = initializer.getDeclaredMethod("beforeAll");
             declaredMethod.invoke(null);
         }

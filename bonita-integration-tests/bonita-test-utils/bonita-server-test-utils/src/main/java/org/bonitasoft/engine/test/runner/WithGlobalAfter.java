@@ -37,6 +37,9 @@ final class WithGlobalAfter extends Statement {
         classBlock.evaluate();
         if (testRunner.isRoot()) {
             try {
+                if(initializer == null){
+                    throw new IllegalStateException("Unable to run the suite as a root suite because it does not have a @Initialize set");
+                }
                 Method declaredMethod = initializer.getDeclaredMethod("afterAll");
                 declaredMethod.invoke(null);
             } catch (final InvocationTargetException e) {

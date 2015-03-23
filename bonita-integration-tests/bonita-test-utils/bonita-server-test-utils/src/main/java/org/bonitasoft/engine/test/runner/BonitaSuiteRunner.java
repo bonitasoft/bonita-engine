@@ -40,10 +40,7 @@ public class BonitaSuiteRunner extends Suite implements BonitaRunner {
 
     static Class<?> getAnnotatedInitializer(final Class<?> klass) throws InitializationError {
         final Initializer annotation = klass.getAnnotation(Initializer.class);
-        if (annotation == null) {
-            throw new InitializationError(String.format("class '%s' must have a Initializer annotation", klass.getName()));
-        }
-        return annotation.value();
+        return annotation == null ? null : annotation.value();
     }
 
     private boolean isRoot;
@@ -78,13 +75,11 @@ public class BonitaSuiteRunner extends Suite implements BonitaRunner {
 
     @Override
     protected Statement childrenInvoker(final RunNotifier notifier) {
-        // TODO Auto-generated method stub
         return super.childrenInvoker(notifier);
     }
 
     @Override
     protected List<Runner> getChildren() {
-        // TODO Auto-generated method stub
         return super.getChildren();
     }
 
