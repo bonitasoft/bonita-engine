@@ -394,7 +394,7 @@ public class BonitaHomeServer extends BonitaHome {
 
     public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException, BonitaHomeNotSetException {
         final Folder workFolder = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId);
-        final File propertiesFile = workFolder.getFile("bonita-tenant.properties");
+        final File propertiesFile = workFolder.getFile("bonita-tenant-community.properties");
 
         final BufferedReader br = new BufferedReader(new FileReader(propertiesFile));
         try {
@@ -408,9 +408,9 @@ public class BonitaHomeServer extends BonitaHome {
                     final String[] splittedLine = line.split("=");
                     if (splittedLine.length == 2) {
                         //this is a key-value pair
-                        if ("userName=".equals(splittedLine[0].trim())) {
+                        if ("userName".equals(splittedLine[0].trim())) {
                             lineToWrite = "userName=" + userName;
-                        } else if ("userPassword=".equals(splittedLine[0].trim())) {
+                        } else if ("userPassword".equals(splittedLine[0].trim())) {
                             lineToWrite = "userPassword=" + password;
                         }
                     }
