@@ -22,15 +22,9 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Matthieu Chaffotte
  */
-public final class ServiceAccessorFactory {
+public class ServiceAccessorFactory extends org.bonitasoft.engine.service.impl.ServiceAccessorFactory {
 
     private static ServiceAccessorFactory instance = new ServiceAccessorFactory();
-
-    private final org.bonitasoft.engine.service.impl.ServiceAccessorFactory bosServiceAccessorFactory;
-
-    private ServiceAccessorFactory() {
-        bosServiceAccessorFactory = org.bonitasoft.engine.service.impl.ServiceAccessorFactory.getInstance();
-    }
 
     public static ServiceAccessorFactory getInstance() {
         return instance;
@@ -38,18 +32,13 @@ public final class ServiceAccessorFactory {
 
     public PlatformServiceAccessor createPlatformServiceAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException, BonitaHomeConfigurationException {
-        return (PlatformServiceAccessor) bosServiceAccessorFactory.createPlatformServiceAccessor();
+        return (PlatformServiceAccessor) super.createPlatformServiceAccessor();
     }
 
     public TenantServiceAccessor createTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
             IllegalAccessException, InvocationTargetException {
-        return (TenantServiceAccessor) bosServiceAccessorFactory.createTenantServiceAccessor(tenantId);
-    }
-
-    public SessionAccessor createSessionAccessor() throws BonitaHomeNotSetException, BonitaHomeConfigurationException, InstantiationException,
-            IllegalAccessException, ClassNotFoundException, IOException {
-        return bosServiceAccessorFactory.createSessionAccessor();
+        return (TenantServiceAccessor) super.createTenantServiceAccessor(tenantId);
     }
 
 }

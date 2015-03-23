@@ -11,16 +11,23 @@ package com.bonitasoft.engine;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
+import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 public class CommonBPMServicesSPTest extends CommonBPMServicesTest {
 
+
     @Override
-    protected TenantServiceAccessor getTenantAccessor() {
-        return (TenantServiceAccessor) super.getTenantAccessor();
+    protected ServiceAccessorFactory getServiceAccessorFactory() {
+        return com.bonitasoft.engine.service.impl.ServiceAccessorFactory.getInstance();
     }
 
     @Override
     protected PlatformServiceAccessor getPlatformAccessor() {
         return (PlatformServiceAccessor) super.getPlatformAccessor();
     }
+    @Override
+    protected TenantServiceAccessor getTenantAccessor() {
+        return (TenantServiceAccessor) super.getTenantAccessor();
+    }
+
 }
