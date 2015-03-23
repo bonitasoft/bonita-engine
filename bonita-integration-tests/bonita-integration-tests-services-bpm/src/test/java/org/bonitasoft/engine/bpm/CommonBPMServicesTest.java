@@ -113,12 +113,12 @@ public class CommonBPMServicesTest {
 
         @Override
         public void starting(final Description d) {
-            LOGGER.info("Starting test: " + this.getClass().getName() + "." + d.getMethodName());
+            LOGGER.info("Starting test: " + d.getClassName() + "." + d.getMethodName());
         }
 
         @Override
         public void failed(final Throwable e, final Description d) {
-            LOGGER.warn("Failed test: " + this.getClass().getName() + "." + d.getMethodName(), e);
+            LOGGER.warn("Failed test: " + d.getClassName() + "." + d.getMethodName(), e);
             try {
                 clean();
             } catch (final Exception be) {
@@ -137,7 +137,7 @@ public class CommonBPMServicesTest {
                 } catch (final Exception e) {
                     throw new BonitaRuntimeException(e);
                 }
-                LOGGER.info("Succeeded test: " + this.getClass().getName() + "." + d.getMethodName());
+                LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
                 if (!clean.isEmpty()) {
                     throw new BonitaRuntimeException(clean.toString());
                 }

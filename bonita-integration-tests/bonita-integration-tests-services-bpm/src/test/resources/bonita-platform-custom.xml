@@ -10,15 +10,6 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
 	">
 
-	<bean id="hbmResources" parent="communityHbmResources" class="org.springframework.beans.factory.config.ListFactoryBean">
-		<property name="sourceList">
-			<list merge="true">
-				<ref bean="hbm-bonita-persistence-test" />
-				<ref bean="hbm-bonita-archive-test" />
-			</list>
-		</property>
-	</bean>
-
 	<bean id="sequenceMappings" parent="communitySequenceMappings" class="org.springframework.beans.factory.config.MapFactoryBean">
 		<property name="targetMapClass">
 			<value>java.util.HashMap</value>
