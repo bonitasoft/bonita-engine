@@ -3,7 +3,6 @@
 	<property name="target.dir" value="${basedir}/target"/>
 	<property name="resources.dir" value="${basedir}/src/main/resources"/>
 	<property name="bh.dir" value="${target.dir}/bonita-home"/>
-	<property name="bdm.lib.dir" value="${target.dir}/bdm-lib"/>
 
 	<target name="build-home">
 		<delete dir="${bh.dir}" />
@@ -58,12 +57,6 @@
 			<fileset dir="${resources.dir}">
 				<include name="bonita-tenant-community.properties"/>
 				<include name="bonita-tenant-community.xml"/>
-			</fileset>
-		</copy>
-
-		<copy todir="${bh.dir}/engine-server/work/platform/lib">
-			<fileset dir="${bdm.lib.dir}">
-				<include name="**/*"/>
 			</fileset>
 		</copy>
 
