@@ -28,14 +28,13 @@ import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.parameter.SParameterNameNotFoundException;
 import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -68,13 +67,7 @@ public class PropertyFileParameterService implements ParameterService {
             }
             final String newValue = parameterValue == null ? NULL : parameterValue;
             putProperty(tenantId, processDefinitionId, parameterName, newValue);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final IOException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final SCacheException e) {
+        } catch (final BonitaHomeNotSetException | IOException | SCacheException | STenantIdNotSetException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }
@@ -90,13 +83,7 @@ public class PropertyFileParameterService implements ParameterService {
                 }
             }
             saveProperties(properties, sessionAccessor.getTenantId(), processDefinitionId);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final IOException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final SCacheException e) {
+        } catch (final BonitaHomeNotSetException | IOException | SCacheException | STenantIdNotSetException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }
@@ -111,37 +98,29 @@ public class PropertyFileParameterService implements ParameterService {
         try {
             final long tenantId = sessionAccessor.getTenantId();
             if (!BonitaHomeServer.getInstance().hasParameters(tenantId, processDefinitionId)) {
-                final StringBuilder errorBuilder = new StringBuilder();
-                errorBuilder.append("The process definition ").append(processDefinitionId).append(" does not exist");
-                throw new SParameterProcessNotFoundException(errorBuilder.toString());
+                throw new SParameterProcessNotFoundException("The process definition " + processDefinitionId + " does not exist");
             }
             final boolean isDeleted = BonitaHomeServer.getInstance().deleteParameters(tenantId, processDefinitionId);
             if (!isDeleted) {
-                throw new SParameterProcessNotFoundException("The property file was not deleted propertly");
+                throw new SParameterProcessNotFoundException("The property file was not deleted properly");
             }
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (IOException e) {
+        } catch (final BonitaHomeNotSetException | STenantIdNotSetException | IOException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }
 
     private List<SParameter> getListProperties(final Properties properties, final boolean onlyNulls) throws IOException, SCacheException {
-        final List<SParameter> paramters = new ArrayList<SParameter>();
+        final List<SParameter> parameters = new ArrayList<SParameter>();
         for (final Entry<Object, Object> property : properties.entrySet()) {
             String value = (String) property.getValue();
             if (NULL.equals(value)) {
                 value = null;
             }
-            if (!onlyNulls) {
-                paramters.add(new SParameterImpl(property.getKey().toString(), value));
-            } else if (value == null) {
-                paramters.add(new SParameterImpl(property.getKey().toString(), value));
+            if (!onlyNulls || value == null) {
+                parameters.add(new SParameterImpl(property.getKey().toString(), value));
             }
         }
-        return paramters;
+        return parameters;
     }
 
     private List<SParameter> getOrderedParameters(final Properties properties, final OrderBy order, final boolean onlyNulls) throws IOException, SCacheException {
@@ -180,19 +159,13 @@ public class PropertyFileParameterService implements ParameterService {
                 }
             }
             return contains;
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final IOException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final SCacheException e) {
+        } catch (final BonitaHomeNotSetException | STenantIdNotSetException | SCacheException | IOException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }
 
     @Override
-    public SParameter get(final long processDefinitionId, final String parameterName) throws SParameterProcessNotFoundException,
+    public SParameter get(final long processDefinitionId, final String parameterName) throws
             SParameterProcessNotFoundException {
         try {
             final long tenantId = sessionAccessor.getTenantId();
@@ -205,13 +178,7 @@ public class PropertyFileParameterService implements ParameterService {
             } else {
                 return new SParameterImpl(parameterName, property);
             }
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final SCacheException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (IOException e) {
+        } catch (final BonitaHomeNotSetException | STenantIdNotSetException | IOException | SCacheException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }
@@ -247,7 +214,7 @@ public class PropertyFileParameterService implements ParameterService {
     }
 
     private List<SParameter> getParameters(final long processDefinitionId, final int fromIndex, final int numberOfResult, final OrderBy order,
-            final boolean onlyNulls) throws SParameterProcessNotFoundException {
+                                           final boolean onlyNulls) throws SParameterProcessNotFoundException {
         try {
             final Properties properties = getProperties(sessionAccessor.getTenantId(), processDefinitionId);
             final List<SParameter> orderedParameters = getOrderedParameters(properties, order, onlyNulls);
@@ -263,13 +230,7 @@ public class PropertyFileParameterService implements ParameterService {
                 parameters.add(parameterDef);
             }
             return parameters;
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final IOException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final SCacheException e) {
+        } catch (final BonitaHomeNotSetException | STenantIdNotSetException | SCacheException | IOException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }

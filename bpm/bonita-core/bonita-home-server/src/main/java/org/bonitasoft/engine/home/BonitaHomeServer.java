@@ -360,7 +360,7 @@ public class BonitaHomeServer extends BonitaHome {
     }
 
     private File getParameterFile(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        return getProcessFolder(tenantId, processId).getFile("current-parameters.properties");
+        return getProcessFolder(tenantId, processId).getFile("parameters.properties");
     }
     public Properties getParameters(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
         return PropertiesManager.getProperties(getParameterFile(tenantId, processId));

@@ -577,7 +577,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
         // delete the .jar files for the specified connector
         if (jarFileNames != null) {
-            BonitaHomeServer.getInstance().deleteClasspathFiles(tenantId, processId, (String[])jarFileNames.toArray());
+            BonitaHomeServer.getInstance().deleteClasspathFiles(tenantId, processId, jarFileNames.toArray(new String[jarFileNames.size()]));
         }
     }
 
