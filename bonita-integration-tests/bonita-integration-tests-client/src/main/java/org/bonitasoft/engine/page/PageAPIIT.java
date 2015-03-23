@@ -51,6 +51,7 @@ import org.junit.rules.ExpectedException;
 @SuppressWarnings("javadoc")
 public class PageAPIIT extends CommonAPIIT {
 
+    public static final long PROCESS_DEFINITION_ID = 5846L;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -89,14 +90,19 @@ public class PageAPIIT extends CommonAPIIT {
         // given
         final String name = generateUniquePageName(0);
         final byte[] pageContent = createTestPageContent(INDEX_GROOVY, name, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+        final Page page = getPageAPI().createPage(
+                new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setContentType(ContentType.FORM)
+                        .setProcessDefinitionId(PROCESS_DEFINITION_ID),
                 pageContent);
 
         // when
         final Page returnedPage = getPageAPI().getPage(page.getId());
 
         // then
-        assertThat(returnedPage).isEqualTo(page);
+        assertThat(returnedPage).isEqualToComparingFieldByField(page);
+        PageAssert.assertThat(returnedPage)
+                .hasProcessDefinitionId(PROCESS_DEFINITION_ID)
+                .hasContentType(ContentType.FORM);
     }
 
     @Test
@@ -123,19 +129,24 @@ public class PageAPIIT extends CommonAPIIT {
         pageUpdater.setDescription(newDescription);
         pageUpdater.setDisplayName(newDisplayName);
         pageUpdater.setContentName(newContentName);
+        pageUpdater.setContentType(ContentType.FORM);
+        pageUpdater.setProcessDefinitionId(5L);
 
         final Page returnedPage = getPageAPI().updatePage(page.getId(), pageUpdater);
 
         // then
-        assertThat(returnedPage).as("page should be returned").isNotNull();
-        assertThat(returnedPage.getInstalledBy()).isEqualTo(john.getId());
-        assertThat(returnedPage.getLastUpdatedBy()).isEqualTo(jack.getId());
-        assertThat(returnedPage.getName()).as("page name not changed").isEqualTo(pageName);
-        assertThat(returnedPage.getInstallationDate()).as("installation date not changed").isEqualTo(page.getInstallationDate());
-        assertThat(returnedPage.getInstalledBy()).as("installed by not changed").isEqualTo(page.getInstalledBy());
-        assertThat(returnedPage.getDisplayName()).as("display name should be:" + newDisplayName).isEqualTo(newDisplayName);
-        assertThat(returnedPage.getContentName()).as("content name should be:" + newContentName).isEqualTo(newContentName);
-        assertThat(returnedPage.getDescription()).as("description should be:" + newDescription).isEqualTo(newDescription);
+        PageAssert.assertThat(returnedPage)
+                .hasInstalledBy(john.getId())
+                .hasInstalledBy(page.getInstalledBy())
+                .hasLastUpdatedBy(jack.getId())
+                .hasName(pageName)
+                .hasInstallationDate(page.getInstallationDate())
+                .hasDisplayName(newDisplayName)
+                .hasContentName(newContentName)
+                .hasDescription(newDescription)
+                .hasContentType(ContentType.FORM)
+                .hasProcessDefinitionId(5L);
+
         assertThat(returnedPage.getLastModificationDate()).as("last modification time should be updated").isAfter(page.getLastModificationDate());
 
         logoutOnTenant();
@@ -258,7 +269,7 @@ public class PageAPIIT extends CommonAPIIT {
         final Page returnedPage = getPageAPI().getPageByName(page.getName());
 
         // then
-        assertThat(returnedPage).isEqualTo(page);
+        assertThat(returnedPage).isEqualToComparingFieldByField(page);
     }
 
     @Test(expected = AlreadyExistsException.class)
@@ -406,6 +417,22 @@ public class PageAPIIT extends CommonAPIIT {
         getPageAPI().getPage(page.getId());
     }
 
+    @Test(expected = AlreadyExistsException.class)
+    public void should_duplicates_with_same_name_and_process_definitionId_throw_exception() throws Exception {
+        // given
+        final String pageName = generateUniquePageName(0);
+        final byte[] bytes = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
+        final Page page = getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                bytes);
+
+        // when then exception
+        getPageAPI().createPage(
+                new PageCreator(pageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                bytes);
+
+    }
+
     @Test
     public void should_search_with_search_term() throws BonitaException {
         final String description = "description";
@@ -435,7 +462,7 @@ public class PageAPIIT extends CommonAPIIT {
         // then
         final List<Page> results = searchPages.getResult();
         assertThat(results.size()).as("should have onlmy one matching page").isEqualTo(1);
-        assertThat(results.get(0)).as("should get the page whith matching search term").isEqualTo(pageWithMatchingSearchTerm);
+        assertThat(results.get(0)).as("should get the page whith matching search term").isEqualToComparingFieldByField(pageWithMatchingSearchTerm);
     }
 
     private String generateUniquePageName(final int i) {
@@ -499,6 +526,44 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     @Test
+    public void should_search_by_content_type() throws BonitaException {
+        // given
+        final String description = PAGE_DESCRIPTION;
+        final String matchingDisplayName = DISPLAY_NAME;
+        final String noneMatchingDisplayName = "aaa";
+
+        // given
+        final int expectedMatchingResults = 3;
+        for (int i = 0; i < expectedMatchingResults; i++) {
+            final String generateUniquePageName = generateUniquePageName(i);
+            final byte[] pageContent = createTestPageContent(INDEX_GROOVY, generateUniquePageName, matchingDisplayName, description);
+            getPageAPI().createPage(
+                    new PageCreator(generateUniquePageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID + i).setDescription(
+                            "should be excluded from results")
+                            .setDisplayName(matchingDisplayName),
+                    pageContent);
+            getPageAPI().createPage(
+                    new PageCreator(generateUniquePageName, CONTENT_NAME).setDescription("should be in search results")
+                            .setDisplayName(matchingDisplayName),
+                    pageContent);
+        }
+        final String anOtherName = generateUniquePageName(4);
+        getPageAPI().createPage(
+                new PageCreator(anOtherName, CONTENT_NAME).setDescription("should be excluded from results").setDisplayName(noneMatchingDisplayName),
+                createTestPageContent(INDEX_GROOVY, anOtherName, noneMatchingDisplayName, "an awesome page!!!!!!!"));
+
+        // when
+        final SearchResult<Page> searchPages = getPageAPI().searchPages(
+                new SearchOptionsBuilder(0, expectedMatchingResults + 2).filter(PageSearchDescriptor.DISPLAY_NAME, matchingDisplayName)
+                        .filter(PageSearchDescriptor.CONTENT_TYPE, ContentType.PAGE).done());
+        // then
+        final List<Page> results = searchPages.getResult();
+        assertThat(results.size()).as("should have "
+                + +expectedMatchingResults + " results").isEqualTo(expectedMatchingResults);
+
+    }
+
+    @Test
     public void should_search_work_on_desc_order() throws BonitaException {
         final String displayName = DISPLAY_NAME;
         final String description = PAGE_DESCRIPTION;
@@ -522,7 +587,7 @@ public class PageAPIIT extends CommonAPIIT {
 
         // then
         final List<Page> results = searchPages.getResult();
-        assertThat(results.get(0)).isEqualTo(expectedMatchingPage);
+        assertThat(results.get(0)).isEqualToComparingFieldByField(expectedMatchingPage);
 
     }
 

@@ -855,7 +855,7 @@ ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenanti
 CREATE TABLE page (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  name VARCHAR(512) NOT NULL,
   displayName VARCHAR(255) NOT NULL,
   description LONGVARCHAR,
   installationDate BIGINT NOT NULL,
@@ -865,9 +865,12 @@ CREATE TABLE page (
   lastUpdatedBy BIGINT NOT NULL,
   contentName VARCHAR(50) NOT NULL,
   content LONGBLOB,
-  UNIQUE (tenantId, name),
-  PRIMARY KEY (tenantId, id)
+  contentType VARCHAR(50) NOT NULL,
+  processDefinitionId BIGINT
 );
+ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);
+ALTER TABLE page ADD CONSTRAINT uk_page1 UNIQUE (tenantId, name, processDefinitionId);
+
 CREATE TABLE sequence (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,

@@ -35,4 +35,11 @@ public class PageRepository extends TestRepository {
         namedQuery.setParameter("pageName", name);
         return (SPage) namedQuery.uniqueResult();
     }
+
+    public SPage getPageByNameAndProcessDefinitionId(final String name,long processDefinitionId ) {
+        final Query namedQuery = getNamedQuery("getPageByNameAndProcessDefinitionId");
+        namedQuery.setParameter("pageName", name);
+        namedQuery.setParameter("processDefinitionId", processDefinitionId);
+        return (SPage) namedQuery.uniqueResult();
+    }
 }

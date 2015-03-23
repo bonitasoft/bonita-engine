@@ -108,4 +108,5 @@ public interface PageService extends TenantLifecycleService {
             SInvalidPageZipException,
             SInvalidPageTokenException;
 
+    SPage getPageByNameAndProcessDefinitionId(String name, long processDefinitionId) throws SBonitaReadException;
 }

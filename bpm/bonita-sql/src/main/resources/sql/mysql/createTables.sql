@@ -862,7 +862,7 @@ ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenanti
 CREATE TABLE page (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  name VARCHAR(512) NOT NULL,
   displayName VARCHAR(255) NOT NULL,
   description TEXT,
   installationDate BIGINT NOT NULL,
@@ -872,7 +872,9 @@ CREATE TABLE page (
   lastUpdatedBy BIGINT NOT NULL,
   contentName VARCHAR(50) NOT NULL,
   content LONGBLOB,
-  UNIQUE (tenantId, name),
+  contentType VARCHAR(50) NOT NULL,
+  processDefinitionId BIGINT,
+  UNIQUE (tenantId, name, processDefinitionId),
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;
 CREATE TABLE sequence (

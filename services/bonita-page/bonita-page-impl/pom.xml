@@ -76,4 +76,12 @@
             <artifactId>assertj-core</artifactId>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>

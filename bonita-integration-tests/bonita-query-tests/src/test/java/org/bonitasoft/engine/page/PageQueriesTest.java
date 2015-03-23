@@ -37,8 +37,8 @@ public class PageQueriesTest {
     public void getPageContent_should_return_the_content_of_the_page() {
         // given
         final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
-        //
-        // //when
+
+        //when
         final SPageContent pageContent = repository.getPageContent(page.getId());
         // //then
         assertThat(pageContent.getContent()).isEqualTo("The content".getBytes());
@@ -50,12 +50,28 @@ public class PageQueriesTest {
         // given
         repository.add(aPage().withName("MyPage1").withContent("The content".getBytes()).build());
         final SPage page2 = repository.add(aPage().withName("MyPage2").withContent("The content".getBytes()).build());
-        //
-        // //when
+
+        //when
         final SPage pageByName = repository.getPageByName("MyPage2");
 
         // //then
         assertThat(pageByName.getId()).isEqualTo(page2.getId());
+    }
+
+    @Test
+    public void getPageByNameAndProcessDefinition_should_return_the_page_having_the_name() {
+        // given
+        final SPageWithContent myPage1 = repository.add(aPage()
+                .withName("MyPage1")
+                .withProcessDefinitionId(1L)
+                .build());
+        assertThat(myPage1).as("should add the page").isNotNull();
+
+        //when
+        final SPage pageByName = repository.getPageByNameAndProcessDefinitionId("MyPage1", 1L);
+
+        // //then
+        assertThat(pageByName).as("should retrieve the page").isNotNull();
     }
 
 }

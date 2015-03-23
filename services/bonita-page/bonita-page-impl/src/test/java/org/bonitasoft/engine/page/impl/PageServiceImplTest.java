@@ -48,6 +48,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SInvalidPageTokenException;
 import org.bonitasoft.engine.page.SInvalidPageZipException;
 import org.bonitasoft.engine.page.SInvalidPageZipInconsistentException;
@@ -100,6 +101,7 @@ public class PageServiceImplTest {
     private static final int INSTALLATION_DATE_AS_LONG = 123456;
 
     private static final String PAGE_NAME = "pageName";
+    public static final long PROCESS_DEFINITION_ID = 846L;
 
     @Mock
     private EventService eventService;
@@ -208,6 +210,24 @@ public class PageServiceImplTest {
 
         // when
         when(pageServiceImpl.getPageByName(PAGE_NAME)).thenReturn(newPage);
+        final byte[] validContent = validPageContent(PAGE_NAME);
+        pageServiceImpl.addPage(newPage, validContent);
+
+        // then exception
+
+    }
+
+    @Test(expected = SObjectAlreadyExistsException.class)
+    public void should_create_page_with_processDefinitionId_throw_exception_when_name_exists() throws Exception {
+
+        // given
+        final SPageImpl newPage = new SPageImpl(PAGE_NAME, 123456, 45, true, CONTENT_NAME);
+        newPage.setContentType(SContentType.FORM);
+        newPage.setProcessDefinitionId(PROCESS_DEFINITION_ID);
+        newPage.setDisplayName("display Name");
+
+        // when
+        when(pageServiceImpl.getPageByNameAndProcessDefinitionId(PAGE_NAME, PROCESS_DEFINITION_ID)).thenReturn(newPage);
         final byte[] validContent = validPageContent(PAGE_NAME);
         pageServiceImpl.addPage(newPage, validContent);
 

@@ -107,6 +107,11 @@ public class PageAPIImpl implements PageAPI {
     }
 
     @Override
+    public Page getPageByNameAndProcessDefinitionId(String name, long processDefinitionId) throws PageNotFoundException {
+        return getPageAPIDelegate().getPageByNameAndProcessDefinition(name,processDefinitionId);
+    }
+
+    @Override
     public Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException,
             UpdatingWithInvalidPageTokenException, UpdatingWithInvalidPageZipContentException {
         return getPageAPIDelegate().updatePage(pageId, pageUpdater);
