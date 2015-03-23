@@ -14,10 +14,8 @@
 package org.bonitasoft.engine.home;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FilenameFilter;
@@ -30,14 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.FileHandler;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.bpm.actor.ActorMappingExportException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.process.ProcessExportException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
 
@@ -145,7 +139,7 @@ public class BonitaHomeServer extends BonitaHome {
             filter = new NonClusterXmlFilesFilter();
         }
         final List<File> files = new ArrayList<File>();
-        for (Folder folder : folders) {;
+        for (Folder folder : folders) {
             files.addAll(getXmlResourcesOfFolder(folder, filter));
         }
         return getResourcesFromFiles(files);
@@ -190,16 +184,24 @@ public class BonitaHomeServer extends BonitaHome {
         System.err.println("----- END REFRESH Thread: " + Thread.currentThread().getId() + "-----");
     }
 
-    private Properties getProperties(final Folder folder) throws IOException {
+    private Properties mergeProperties(final Folder folder, Properties mergeInto) throws IOException {
         final FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String filename) { return filename.endsWith(".properties"); }
         };
-        final Properties properties = new Properties();
-        final File[] files = folder.listFiles(filter);
+
+        final List<File> files = folder.listFiles(filter);
         for (File file : files) {
-            properties.putAll(getProperties(file));
+            System.out.println("load properties " + file);
+            Properties properties = getProperties(file);
+            for (Map.Entry<Object, Object> property : properties.entrySet()) {
+                Object put = mergeInto.put(property.getKey(), property.getValue());
+                if (put != null) {
+                    System.out.println("Overriding " + property.getKey() + " with " + property.getValue());
+                }
+            }
+            properties.putAll(properties);
         }
-        return properties;
+        return mergeInto;
     }
 
     private Properties getProperties(final File propertiesFile) throws IOException {
@@ -209,8 +211,8 @@ public class BonitaHomeServer extends BonitaHome {
     public Properties getPlatformProperties() throws BonitaHomeNotSetException, IOException {
         if (platformProperties == null) {
             platformProperties = new Properties();
-            platformProperties.putAll(getProperties(FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder())));
-            platformProperties.putAll(getProperties(FolderMgr.getPlatformConfFolder(getBonitaHomeFolder())));
+            mergeProperties(FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder()), platformProperties);
+            mergeProperties(FolderMgr.getPlatformConfFolder(getBonitaHomeFolder()), platformProperties);
         }
         return platformProperties;
     }
@@ -238,8 +240,9 @@ public class BonitaHomeServer extends BonitaHome {
 
     public Properties getTenantProperties(final long tenantId) throws BonitaHomeNotSetException, IOException {
         Properties tenantProperties = new Properties();
-        tenantProperties.putAll(getProperties(FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId)));
-        tenantProperties.putAll(getProperties(FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId)));
+        Folder tenantWorkFolder = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId);
+        mergeProperties(tenantWorkFolder, tenantProperties);
+        mergeProperties(FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId), tenantProperties);
         return tenantProperties;
     }
 
@@ -248,8 +251,8 @@ public class BonitaHomeServer extends BonitaHome {
 
     public Properties getPrePlatformInitProperties() throws BonitaHomeNotSetException, IOException {
         Properties preInitProperties = new Properties();
-        preInitProperties.putAll(getProperties(FolderMgr.getPlatformInitWorkFolder(getBonitaHomeFolder())));
-        preInitProperties.putAll(getProperties(FolderMgr.getPlatformInitConfFolder(getBonitaHomeFolder())));
+        mergeProperties(FolderMgr.getPlatformInitWorkFolder(getBonitaHomeFolder()), preInitProperties);
+        mergeProperties(FolderMgr.getPlatformInitConfFolder(getBonitaHomeFolder()), preInitProperties);
         return preInitProperties;
     }
 
@@ -353,10 +356,6 @@ public class BonitaHomeServer extends BonitaHome {
     public void createProcess(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
         FolderMgr.createTenantWorkProcessFolder(getBonitaHomeFolder(), tenantId, processId);
         FolderMgr.createTenantTempProcessFolder(getBonitaHomeFolder(), tenantId, processId);
-    }
-
-    public File[] getProcessClasspathFiles(final long tenantId, final long processId, final FilenameFilter filter) throws BonitaHomeNotSetException, IOException {
-        return getProcessClasspathFolder(tenantId, processId).listFiles(filter);
     }
 
     private File getParameterFile(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {

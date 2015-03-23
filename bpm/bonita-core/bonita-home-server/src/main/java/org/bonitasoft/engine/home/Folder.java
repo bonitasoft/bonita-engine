@@ -5,8 +5,12 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
 
@@ -14,9 +18,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.bonitasoft.engine.DeepRegexFileFilter;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveContribution;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
-import org.bonitasoft.engine.commons.StringUtils;
 import org.bonitasoft.engine.commons.io.IOUtil;
 
 /**
@@ -85,14 +87,24 @@ public class Folder {
         checkFolderExists();
         final File file = getFile(fileName);
         if (!file.exists()) {
-            throw new IOException("File denoted by path " + folder.getAbsolutePath() + " does not exist.");
+            //FIXME WARN ?
+            return;
+            //throw new IOException("File denoted by path " + file.getAbsolutePath() + " does not exist.");
         }
         file.delete();
     }
 
-    public File[] listFiles(FilenameFilter filter) throws IOException {
+    public List<File> listFiles(FilenameFilter filter) throws IOException {
         checkFolderExists();
-        return folder.listFiles(filter);
+        File[] filesArray = folder.listFiles(filter);
+        List<File> files = Arrays.asList(filesArray);
+        Collections.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File file, File t1) {
+                return file.getName().compareTo(t1.getName());
+            }
+        });
+        return files;
     }
 
     public void create() throws IOException {
