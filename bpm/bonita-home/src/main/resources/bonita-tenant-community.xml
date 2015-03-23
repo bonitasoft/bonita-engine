@@ -633,7 +633,6 @@
 
     <bean id="tenantEventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="parent" ref="platformEventService"/>
     </bean>
 
     <bean id="connectorExecutor" class="org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl">

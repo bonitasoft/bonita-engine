@@ -32,11 +32,9 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 public abstract class AbstractEventServiceImpl implements EventService {
 
     protected static TechnicalLoggerService logger;
-    private EventService parent;
 
-    protected AbstractEventServiceImpl(final TechnicalLoggerService logger, final EventService parent) {
+    protected AbstractEventServiceImpl(final TechnicalLoggerService logger) {
         AbstractEventServiceImpl.logger = logger;
-        this.parent = parent;
     }
 
     /**
@@ -50,9 +48,6 @@ public abstract class AbstractEventServiceImpl implements EventService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "fireEvent"));
         }
         if (event != null) {
-            if (parent != null) {
-                parent.fireEvent(event);
-            }
             // if at least 1 eventFilter contains a group of handlers for the given event type
             if (containsHandlerFor(event.getType())) {
                 // retrieve the handler list concerned by the given event
@@ -186,9 +181,6 @@ public abstract class AbstractEventServiceImpl implements EventService {
 
     @Override
     public final boolean hasHandlers(final String eventType, final EventActionType actionType) {
-        if (parent != null && parent.hasHandlers(eventType, actionType)) {
-            return true;
-        }
         String key = eventType;
         if (actionType != null) {
             switch (actionType) {
