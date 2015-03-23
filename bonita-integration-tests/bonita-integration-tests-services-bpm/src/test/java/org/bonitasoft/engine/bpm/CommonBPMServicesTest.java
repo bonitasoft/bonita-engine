@@ -188,13 +188,17 @@ public class CommonBPMServicesTest {
     }
 
     @Before
-    public void before() throws Exception {
+    public final void doNotOverrideBefore() throws Exception {
         if (sessionAccessor == null) {
             sessionAccessor = getServiceAccessorFactory().createSessionAccessor();
         }
         if (platformServiceAccessor == null) {
             platformServiceAccessor = getServiceAccessorFactory().createPlatformServiceAccessor();
         }
+    }
+
+    @Before
+    public void before() throws Exception {
         apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
         sessionAccessor.setSessionInfo(apiSession.getId(), apiSession.getTenantId());
     }

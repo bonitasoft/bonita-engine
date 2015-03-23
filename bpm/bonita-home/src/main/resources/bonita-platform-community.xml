@@ -51,7 +51,7 @@
     </bean>
 
     <bean id="jobService" class="org.bonitasoft.engine.scheduler.impl.JobServiceImpl">
-        <constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="eventService" ref="platformEventService" />
         <constructor-arg name="recorder" ref="tenantRecorderSyncForPlatform" />
         <constructor-arg name="readPersistenceService" ref="persistenceService" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
@@ -61,7 +61,7 @@
         <constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
         <constructor-arg name="jobService" ref="jobService" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="eventService" ref="platformEventService" />
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="servicesResolver" ref="servicesResolver" />
@@ -311,13 +311,13 @@
     <bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="platformPersistenceService" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="eventService" ref="platformEventService" />
     </bean>
 
     <bean id="tenantRecorderSyncForPlatform" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="eventService" ref="platformEventService" />
     </bean>
 
     <bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
@@ -338,7 +338,7 @@
         <constructor-arg name="transactionService" ref="transactionService" />
     </bean>
 
-    <bean id="eventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
+    <bean id="platformEventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
     </bean>
 
