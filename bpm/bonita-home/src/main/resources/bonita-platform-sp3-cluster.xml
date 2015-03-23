@@ -106,7 +106,7 @@
 		<constructor-arg name="statsPrintInterval" value="10000" />
 	</bean>
 
-	<bean id="eventService" class="com.bonitasoft.engine.events.impl.ClusteredEventServiceImpl">
+	<bean id="platformEventService" class="com.bonitasoft.engine.events.impl.ClusteredEventServiceImpl">
 		<constructor-arg name="handlers">
 			<map />
 		</constructor-arg>

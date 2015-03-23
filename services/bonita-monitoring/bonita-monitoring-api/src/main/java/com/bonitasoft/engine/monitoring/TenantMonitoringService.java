@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.monitoring;
 
+import com.bonitasoft.engine.monitoring.mbean.SEntityMXBean;
+import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
@@ -17,6 +20,10 @@ public interface TenantMonitoringService extends MonitoringService {
     String ENTITY_MBEAN_PREFIX = "Bonitasoft:name=Entity,type=EntityMBean,tenant=";
 
     String SERVICE_MBEAN_PREFIX = "Bonitasoft:name=Service,type=ServiceMBean,tenant=";
+
+    SEntityMXBean getEntityBean();
+
+    SServiceMXBean getServiceBean();
 
     long getNumberOfUsers() throws SMonitoringException;
 

@@ -77,8 +77,8 @@ public class SJvmMXBeanTest extends CommonBPMServicesSPTest {
         }
     }
 
-    public SJvmMXBean getJvmMXBean() {
-        return null;
+    public SJvmMXBean getJvmMXBean() throws InstanceNotFoundException {
+        return getPlatformAccessor().getPlatformMonitoringService().getJvmMBean();
     }
 
     @Test

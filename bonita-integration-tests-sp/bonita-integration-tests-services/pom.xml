@@ -416,46 +416,7 @@
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}/test-classes/sql-test</outputDirectory>
                                 </artifactItem>
-								<artifactItem>
-									<groupId>org.bonitasoft.engine.test</groupId>
-									<artifactId>bonita-integration-tests-services</artifactId>
-									<version>${project.version}</version>
-									<type>test-jar</type>
-									<outputDirectory>${project.build.directory}/service-test-community</outputDirectory>
-								</artifactItem>
                             </artifactItems>
-                            <outputDirectory>${project.build.directory}/server</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>complete test conf setup</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target name="copy-service-test-conf">
-                                <copy todir="${project.build.directory}/conf" overwrite="true">
-                                    <fileset dir="${project.build.directory}/server/conf/service" />
-                                </copy>
-								<copy todir="${project.build.directory}/conf" overwrite="true">
-									<fileset dir="${project.build.directory}/service-test-community/conf" />
-								</copy>
-								<copy todir="${project.build.directory}/test-classes" overwrite="true">
-									<fileset dir="${project.build.directory}/service-test-community" >
-										<include name="*.*"/>
-									</fileset>
-								</copy>
-                                <copy todir="${project.build.directory}/conf" overwrite="true">
-                                    <fileset dir="${basedir}/src/test/resources/conf" />
-                                </copy>
-                            </target>
                         </configuration>
                     </execution>
                 </executions>
@@ -473,11 +434,10 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
 					<systemPropertyVariables>
-						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
                         <sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
 					</systemPropertyVariables>
 					<includes>
-						<include>com/bonitasoft/services/AllTestsSPWithJNDI.java</include>
+						<include>com/bonitasoft/services/AllBPMTestsSPWithJNDI.java</include>
 					</includes>
 				</configuration>
 				<executions>

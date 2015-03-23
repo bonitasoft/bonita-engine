@@ -45,6 +45,8 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
     private final TransactionService transactionService;
 
     private final SessionAccessor sessionAccessor;
+    private SServiceMXBean serviceBean;
+    private SEntityMXBean entityBean;
 
     public TenantMonitoringServiceImpl(final boolean allowMbeansRegistration, final IdentityService identityService, final EventService eventService,
             final TransactionService transactionService, final SessionAccessor sessionAccessor, final SessionService sessionService,
@@ -56,16 +58,25 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
-
         addHandlers();
         addMBeans();
     }
 
     private void addMBeans() {
-        final SEntityMXBean entityBean = new SEntityMXBeanImpl(transactionService, this, sessionAccessor, sessionService);
-        final SServiceMXBean serviceBean = new SServiceMXBeanImpl(transactionService, this, sessionAccessor, sessionService);
+        entityBean = new SEntityMXBeanImpl(transactionService, this, sessionAccessor, sessionService);
+        serviceBean = new SServiceMXBeanImpl(transactionService, this, sessionAccessor, sessionService);
         addMBean(entityBean);
         addMBean(serviceBean);
+    }
+
+    @Override
+    public SEntityMXBean getEntityBean() {
+        return entityBean;
+    }
+
+    @Override
+    public SServiceMXBean getServiceBean() {
+        return serviceBean;
     }
 
     private void addHandlers() {

@@ -60,6 +60,11 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
     }
 
     @Override
+    public SJvmMXBean getJvmMBean() {
+        return jvmMBean;
+    }
+
+    @Override
     public boolean isSchedulerStarted() throws SBonitaException {
         return schedulerService.isStarted();
     }

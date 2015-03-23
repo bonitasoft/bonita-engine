@@ -47,8 +47,6 @@ public class SServiceMXBeanTest extends CommonBPMServicesSPTest {
 
     private SchedulerService schedulerService;
 
-    private TenantMonitoringService monitoringService;
-
     private MBeanServer mbserver = null;
 
     private ObjectName entityMB;
@@ -57,7 +55,6 @@ public class SServiceMXBeanTest extends CommonBPMServicesSPTest {
 
     public SServiceMXBeanTest() {
         schedulerService = getTenantAccessor().getSchedulerService();
-        monitoringService = getTenantAccessor().getTenantMonitoringService();
     }
 
     @Before
@@ -79,7 +76,7 @@ public class SServiceMXBeanTest extends CommonBPMServicesSPTest {
     }
 
     public SServiceMXBean getServiceMXBean() {
-        return new SServiceMXBeanImpl(getTransactionService(), monitoringService, getSessionAccessor(), getTenantAccessor().getSessionService());
+        return getTenantAccessor().getTenantMonitoringService().getServiceBean();
     }
 
     /**
@@ -147,7 +144,7 @@ public class SServiceMXBeanTest extends CommonBPMServicesSPTest {
 
         final Date now = new Date();
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("com.bonitasoft.IncrementAVariable", "IncrementAVariable").setDescription("increment a variable").done();
+                .createNewInstance(IncrementAVariable.class.getName(), "IncrementAVariable").setDescription("increment a variable").done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", theResponse).done());
         final Trigger trigger = new OneShotTrigger("events", now, 10);
@@ -174,6 +171,8 @@ public class SServiceMXBeanTest extends CommonBPMServicesSPTest {
 
             @Override
             boolean check() throws AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException {
+                System.err.println("mbserver.getAttribute(serviceMB, numberOfExecutingJobs)=" + mbserver.getAttribute(serviceMB, numberOfExecutingJobs));
+                System.err.println("startNbOfExecutingJobs=" + startNbOfExecutingJobs);
                 return (Long) mbserver.getAttribute(serviceMB, numberOfExecutingJobs) == startNbOfExecutingJobs;
             }
         };

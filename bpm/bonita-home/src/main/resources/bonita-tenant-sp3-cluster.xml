@@ -37,10 +37,8 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="eventService" class="com.bonitasoft.engine.events.impl.ClusteredEventServiceImpl">
-		<constructor-arg name="handlers">
-			<map />
-		</constructor-arg>
+	<bean id="tenantEventService" class="com.bonitasoft.engine.events.impl.ClusteredEventServiceImpl">
+		<constructor-arg name="handlers" ref="eventHandlers"/>
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
 		<constructor-arg name="tenantId" value="${tenantId}" />

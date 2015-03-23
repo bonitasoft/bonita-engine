@@ -36,9 +36,9 @@ import org.junit.Test;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.MBeanStartException;
 
-public abstract class TenantMonitoringServiceTest extends CommonBPMServicesSPTest {
+public class TenantMonitoringServiceTest extends CommonBPMServicesSPTest {
 
-    private final TenantMonitoringService monitoringSvc;
+    private TenantMonitoringService monitoringService;
 
     private IdentityService identityService;
 
@@ -48,10 +48,8 @@ public abstract class TenantMonitoringServiceTest extends CommonBPMServicesSPTes
 
     private static ObjectName serviceMB;
 
-    protected abstract TenantMonitoringService getMonitoringService() throws Exception;
-
     public TenantMonitoringServiceTest() throws Exception {
-        monitoringSvc = getMonitoringService();
+        monitoringService = getTenantAccessor().getTenantMonitoringService();
         identityService = getTenantAccessor().getIdentityService();
     }
 
@@ -95,7 +93,7 @@ public abstract class TenantMonitoringServiceTest extends CommonBPMServicesSPTes
         assertFalse(mbserver.isRegistered(entityMB));
         assertFalse(mbserver.isRegistered(serviceMB));
 
-        monitoringSvc.registerMBeans();
+        monitoringService.registerMBeans();
 
         assertTrue(mbserver.isRegistered(entityMB));
         assertTrue(mbserver.isRegistered(serviceMB));
@@ -113,16 +111,16 @@ public abstract class TenantMonitoringServiceTest extends CommonBPMServicesSPTes
     public void getActiveTransactionTest() throws Exception {
 
         // assertEquals(0, svcMB.getActiveTransactionNb());
-        assertEquals(0, monitoringSvc.getNumberOfActiveTransactions());
+        assertEquals(0, monitoringService.getNumberOfActiveTransactions());
 
         // create a transaction
         getTransactionService().begin();
         // check the transaction has been successfully counted
-        assertEquals(1, monitoringSvc.getNumberOfActiveTransactions());
+        assertEquals(1, monitoringService.getNumberOfActiveTransactions());
         // close the transaction
         getTransactionService().complete();
 
-        assertEquals(0, monitoringSvc.getNumberOfActiveTransactions());
+        assertEquals(0, monitoringService.getNumberOfActiveTransactions());
     }
 
 }

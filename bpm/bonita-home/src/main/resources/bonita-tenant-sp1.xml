@@ -46,7 +46,7 @@
         <constructor-arg name="classLoaderService" ref="classLoaderService"/>
         <constructor-arg name="operationService" ref="operationService"/>
         <constructor-arg name="expressionResolverService" ref="expressionResolverService"/>
-        <constructor-arg name="eventService" ref="eventService"/>
+        <constructor-arg name="eventService" ref="tenantEventService"/>
         <constructor-arg name="handlers">
             <map>
                 <entry key="PROCESSINSTANCE_STATE_UPDATED">
@@ -68,7 +68,7 @@
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
         <constructor-arg name="transitionEvaluator" ref="transitionEvaluator" />
     </bean>
-
+<!--
     <bean id="casAuthenticatorDelegate"
           class="com.bonitasoft.engine.authentication.impl.cas.CASAuthenticatorImpl" lazy-init="true">
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
@@ -81,14 +81,14 @@
     <bean id="nullAuthenticationDelegate"
           class="com.bonitasoft.engine.authentication.impl.NullAuthenticationDelegate"  lazy-init="true"/>
 
-    <bean id="jaasAuthenticationService"
+    <bean id="authenticationService"
           class="com.bonitasoft.engine.authentication.impl.JAASGenericAuthenticationServiceImpl" lazy-init="true">
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <property name="authenticatorDelegate"
                   ref="${authenticator.delegate:nullAuthenticationDelegate}" />
     </bean>
-
+-->
     <bean id="defaultCommands" parent="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
         <property name="sourceList">
             <list merge="true">
@@ -174,10 +174,18 @@
         <constructor-arg name="timeTracker" ref="timeTracker" />
     </bean>
 
-    <bean id="eventService" class="com.bonitasoft.engine.events.impl.ConfigurableEventServiceImpl">
-        <constructor-arg name="handlers">
-            <map />
-        </constructor-arg>
+    <bean id="eventHandlers" class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="targetMapClass">
+            <value>java.util.HashMap</value>
+        </property>
+        <property name="sourceMap">
+            <map>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="tenantEventService" class="com.bonitasoft.engine.events.impl.ConfigurableEventServiceImpl">
+        <constructor-arg name="handlers" ref="eventHandlers"/>
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
@@ -321,7 +329,7 @@
     <bean id="monitoringService" class="com.bonitasoft.engine.monitoring.impl.TenantMonitoringServiceImpl">
         <constructor-arg name="allowMbeansRegistration" value="true" />
         <constructor-arg name="identityService" ref="identityService" />
-        <constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
@@ -331,12 +339,10 @@
 
     <bean id="jobHandler" class="com.bonitasoft.engine.monitoring.impl.SJobHandlerImpl" />
 
-    <bean id="jvmMXBean" class="com.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl" />
-
     <bean id="breakpointService" class="com.bonitasoft.engine.core.process.instance.impl.BreakpointServiceImpl">
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="cacheService" ref="cacheService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="transactionService" ref="transactionService" />
@@ -352,7 +358,7 @@
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="queryPreProcessor" ref="queryPreProcessor" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="eventService" ref="eventService" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
     </bean>

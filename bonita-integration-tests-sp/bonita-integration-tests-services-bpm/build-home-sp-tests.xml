@@ -32,6 +32,11 @@
 				<include name="bonita-tenants-custom.xml"/>
 			</fileset>
 		</copy>
+		<copy todir="${bh.target.conf.tenant.dir}" overwrite="true">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-tenants-sp1-custom.xml"/>
+			</fileset>
+		</copy>
 		<ant antfile="../../bpm/bonita-home/install-license.xml"/>
 	</target>
 
