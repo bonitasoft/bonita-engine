@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.authentication</groupId>
 		<artifactId>bonita-authentication</artifactId>
-		<version>6.5.1.RC1</version>
+		<version>6.5.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-authentication-impl</artifactId>

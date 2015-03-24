@@ -4,7 +4,7 @@
     <parent>
         <artifactId>bonita-process-instance</artifactId>
         <groupId>com.bonitasoft.engine.core.process.instance</groupId>
-        <version>6.5.1.RC1</version>
+        <version>6.5.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-process-instance-impl-sp</artifactId>
