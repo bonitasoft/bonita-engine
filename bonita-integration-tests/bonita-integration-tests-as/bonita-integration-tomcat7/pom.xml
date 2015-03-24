@@ -259,13 +259,6 @@
                                             <fileset dir="${distrib.dir}/resources/bonita-home/"/>
 										</copy>
 
-										<!-- Change Dialect of BDR -->
-                                        <property file="tomcat/${db.vendor}/bdm.properties"/>
-                                        <replaceregexp
-                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-tenant.properties"
-                                                match="businessdata.hibernate.dialect=.*"
-                                                replace="businessdata.hibernate.dialect=${bdm.dialect}" byline="true"/>
-
                                         <copy file="${basedir}/bonita-client-custom.properties"
                                               todir="${bonita.home}/engine-client/conf" overwrite="true"/>
 									</target>
