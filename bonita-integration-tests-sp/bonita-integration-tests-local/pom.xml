@@ -135,22 +135,6 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>configure-bdm-repository</id>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <target>
-                                <!-- Change Dialect of BDR -->
-                                <property file="${bonita.home}/server/platform/conf/bonita-platform.properties" />
-                                <property file="${basedir}/src/test/resources/jdbc-${sysprop.bonita.db.vendor}.properties" />
-                                <replaceregexp file="${bonita.home}/server/platform/tenant-template/conf/bonita-tenant.properties" match="businessdata.hibernate.dialect=(.*)"
-                                    replace="businessdata.hibernate.dialect=${db.hibernate.dialect}" byline="true" />
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                    <execution>
                         <id>install license</id>
                         <phase>process-test-resources</phase>
                         <configuration>

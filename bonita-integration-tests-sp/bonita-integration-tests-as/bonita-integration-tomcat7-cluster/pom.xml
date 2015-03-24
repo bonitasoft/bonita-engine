@@ -14,7 +14,6 @@
 
 	<properties>
 		<cluster.group>mycluster</cluster.group>
-		<bonita.home.classifier>performance-cluster</bonita.home.classifier>
 		<tomcat.version>7.0.55</tomcat.version>
 		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
         <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-7/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
@@ -59,7 +58,6 @@
                                             <groupId>com.bonitasoft.engine</groupId>
                                             <artifactId>bonita-home-sp</artifactId>
                                             <version>${project.version}</version>
-                                            <classifier>${bonita.home.classifier}</classifier>
                                             <type>zip</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${distrib.dir}/resources</outputDirectory>
@@ -209,15 +207,15 @@
 
 										<!-- Create default bonita.home folder -->
 										<copy todir="${bonita.home}" verbose="true">
-                                            <fileset dir="${distrib.dir}/resources/home/"/>
+                                            <fileset dir="${distrib.dir}/resources/bonita-home/"/>
 										</copy>
 
 										<copy todir="${bonita.home}/server/licenses" failonerror="true">
                                             <fileset dir="${user.home}/lic" includes="*.lic"/>
 										</copy>
 
-										<copy file="${basedir}/client/bonita-client.properties"
-                                              todir="${bonita.home}/client/conf" overwrite="true"/>
+										<copy file="${basedir}/client/bonita-client-custom.properties"
+                                              todir="${bonita.home}/engine-client/conf" overwrite="true"/>
 									</target>
 								</configuration>
 							</execution>
