@@ -1475,7 +1475,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private String getClientBdmJarClassPath(final String bonitaHomePath) {
         String clientBdmJarPath;
-        clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("server").append(File.separator).append("tenants")
+        clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("engine-server").append(File.separator).append("tenants")
                 .append(File.separator).append(tenantId).append(File.separator).append("data-management").append(File.separator).append("client").toString();
         return clientBdmJarPath;
     }
