@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -133,6 +134,14 @@ public class BonitaHomeServer extends BonitaHome {
         if (bdmFile.exists()) {
             bdmFile.delete();
         }
+    }
+
+    public File getPlatformTempFile(final String fileName) throws BonitaHomeNotSetException, IOException {
+        final Folder tempFolder = FolderMgr.getPlatformTempFolder(getBonitaHomeFolder());
+        final File file = tempFolder.getFile(fileName);
+        file.delete();
+        file.createNewFile();
+        return file;
     }
 
     private static class AllXmlFilesFilter implements FileFilter {
