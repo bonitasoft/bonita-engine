@@ -179,9 +179,9 @@ public class BonitaHomeServer extends BonitaHome {
 
     @Override
     protected void refresh() {
-        System.err.println("----- REFRESH Thread: " + Thread.currentThread().getId() + "-----");
+        //System.err.println("----- REFRESH Thread: " + Thread.currentThread().getId() + "-----");
         platformProperties = null;
-        System.err.println("----- END REFRESH Thread: " + Thread.currentThread().getId() + "-----");
+        //System.err.println("----- END REFRESH Thread: " + Thread.currentThread().getId() + "-----");
     }
 
     private Properties mergeProperties(final Folder folder, Properties mergeInto) throws IOException {
@@ -191,12 +191,12 @@ public class BonitaHomeServer extends BonitaHome {
 
         final List<File> files = folder.listFiles(filter);
         for (File file : files) {
-            System.out.println("load properties " + file);
+            //System.out.println("load properties " + file);
             Properties properties = getProperties(file);
             for (Map.Entry<Object, Object> property : properties.entrySet()) {
                 Object put = mergeInto.put(property.getKey(), property.getValue());
                 if (put != null) {
-                    System.out.println("Overriding " + property.getKey() + " with " + property.getValue());
+                    //System.out.println("Overriding " + property.getKey() + " with " + property.getValue());
                 }
             }
             properties.putAll(properties);
