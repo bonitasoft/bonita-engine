@@ -44,7 +44,7 @@ public class ClientBDMJarBuilderTest {
 
     @Before
     public void setUp() {
-        clientBDMJarBuilder = new ClientBDMJarBuilder(compiler, resourcesLoader, "");
+        clientBDMJarBuilder = new ClientBDMJarBuilder(compiler, resourcesLoader);
     }
     
     @Test
