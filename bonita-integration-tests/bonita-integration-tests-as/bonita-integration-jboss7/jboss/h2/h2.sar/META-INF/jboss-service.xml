@@ -1,6 +1,6 @@
 <!-- Start the H2 server in tcp mode (useless if using another database vendor than H2) -->
 <server> 
 	<mbean code="org.bonitasoft.jboss.jdbc.H2Database" name="jboss:service=BonitaH2">
-   		<attribute name="Args">-tcp -tcpAllowOthers -tcpPort #database.port# -baseDir #bonita.home#/server/platform/work</attribute>
+   		<attribute name="Args">-tcp -tcpAllowOthers -tcpPort #database.port# -baseDir #bonita.home#/engine-server/work/platform</attribute>
     </mbean>
 </server>
