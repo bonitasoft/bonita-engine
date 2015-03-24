@@ -19,7 +19,6 @@
         <module>bonita-integration-tests-services-bpm</module>
         <module>bonita-integration-tests-client</module>
         <module>bonita-integration-tests-local</module>
-        <module>bonita-test-utils</module>
     </modules>
 
     <build>
