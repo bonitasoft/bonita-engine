@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -176,5 +177,20 @@ public class Folder {
 
     public boolean exists() {
         return this.folder.exists();
+    }
+
+    public URI toURI() throws IOException {
+        checkFolderExists();
+        return this.folder.toURI();
+    }
+
+    public void createIfNotExists() throws IOException {
+        if (!this.folder.exists()) {
+            create();
+        }
+    }
+
+    public void createAsTemporaryFolder() {
+        org.bonitasoft.engine.io.IOUtil.createTempDirectory(this.folder.toURI());
     }
 }

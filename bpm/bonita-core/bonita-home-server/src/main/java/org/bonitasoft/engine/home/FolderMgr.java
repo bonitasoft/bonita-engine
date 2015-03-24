@@ -2,6 +2,9 @@ package org.bonitasoft.engine.home;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+
+import org.bonitasoft.engine.commons.io.IOUtil;
 
 /**
  * @author Charles Souillard
@@ -30,7 +33,11 @@ class FolderMgr {
     }
 
     private static Folder getTempFolder(final File bonitaHomeFolder) throws IOException {
-        return getFolder(getServerFolder(bonitaHomeFolder), "temp");
+        final Folder tempFolder = getFolder(getServerFolder(bonitaHomeFolder), "temp");
+        if (!tempFolder.exists()) {
+            tempFolder.createAsTemporaryFolder();
+        }
+        return tempFolder;
     }
 
     public static Folder getPlatformInitWorkFolder(final File bonitaHomeFolder) throws IOException {
@@ -47,6 +54,10 @@ class FolderMgr {
 
     public static Folder getPlatformConfFolder(final File bonitaHomeFolder) throws IOException {
         return getFolder(getConfFolder(bonitaHomeFolder), "platform");
+    }
+
+    public static Folder getPlatformTempFolder(final File bonitaHomeFolder) throws IOException {
+        return getFolder(getWorkFolder(bonitaHomeFolder), "platform");
     }
 
     private static Folder getTenantsWorkFolder(final File bonitaHomeFolder) throws IOException {
@@ -173,5 +184,36 @@ class FolderMgr {
 
     public static Folder getTenantWorkProcessUserFiltersFolder(File bonitaHomeFolder, long tenantId, long processId) throws IOException {
         return getFolder(getTenantWorkProcessFolder(bonitaHomeFolder, tenantId, processId), "userFilters");
+    }
+
+    public static Folder getPlatformClassLoaderFolder(File bonitaHomeFolder) throws IOException {
+        final Folder classloadersFolder = getFolder(getPlatformTempFolder(bonitaHomeFolder), "classloaders");
+        classloadersFolder.createIfNotExists();
+        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        final String subFolderName = "bonita_engine_" + jvmName;
+        final Folder jvmFolder = getFolder(getPlatformTempFolder(bonitaHomeFolder), subFolderName);
+        jvmFolder.createIfNotExists();
+        return jvmFolder;
+    }
+
+    public static Folder getPlatformGobalClassLoaderFolder(File bonitaHomeFolder) throws IOException {
+        final Folder globalFolder = getFolder(getPlatformClassLoaderFolder(bonitaHomeFolder), "global");
+        globalFolder.createIfNotExists();
+        return globalFolder;
+    }
+
+    private static Folder getPlatformLocalClassLoaderFolder(File bonitaHomeFolder) throws IOException {
+        final Folder localFolder = getFolder(getPlatformClassLoaderFolder(bonitaHomeFolder), "local");
+        localFolder.createIfNotExists();
+        return localFolder;
+    }
+
+    public static Folder getPlatformLocalClassLoaderFolder(File bonitaHomeFolder, String artifactType, long artifactId) throws IOException {
+        final Folder localFolder = getPlatformLocalClassLoaderFolder(bonitaHomeFolder);
+        final Folder artifactTypeFolder = getFolder(localFolder, artifactType);
+        artifactTypeFolder.createIfNotExists();
+        final Folder artifactIdFolder = getFolder(artifactTypeFolder, Long.toString(artifactId));
+        artifactIdFolder.createIfNotExists();
+        return artifactIdFolder;
     }
 }

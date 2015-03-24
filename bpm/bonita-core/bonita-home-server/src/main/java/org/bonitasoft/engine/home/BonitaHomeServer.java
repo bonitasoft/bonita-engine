@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -434,4 +435,14 @@ public class BonitaHomeServer extends BonitaHome {
         final Folder processFolder = getProcessFolder(tenantId, processId);
         return processFolder.zip(processFolder);
     }
+
+    public URI getGlobalTemporaryFolder() throws BonitaHomeNotSetException, IOException {
+        return FolderMgr.getPlatformGobalClassLoaderFolder(getBonitaHomeFolder()).toURI();
+    }
+
+    public URI getLocalTemporaryFolder(final String artifactType, final long artifactId) throws BonitaHomeNotSetException, IOException {
+        return FolderMgr.getPlatformLocalClassLoaderFolder(getBonitaHomeFolder(), artifactType, artifactId).toURI();
+    }
+
+
 }
