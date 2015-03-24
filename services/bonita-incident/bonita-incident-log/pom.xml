@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.bonitasoft.engine.incident</groupId>
 		<artifactId>bonita-incident</artifactId>
-		<version>6.5.1.RC1</version>
+		<version>6.5.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-incident-log</artifactId>
