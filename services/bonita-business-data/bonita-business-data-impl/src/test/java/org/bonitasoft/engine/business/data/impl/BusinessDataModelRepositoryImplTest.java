@@ -21,6 +21,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +32,7 @@ import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,8 +43,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.bonitasoft.engine.BOMBuilder;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(BonitaHomeServer.class)
 public class BusinessDataModelRepositoryImplTest {
 
     @Mock
@@ -49,10 +55,16 @@ public class BusinessDataModelRepositoryImplTest {
 
     private BusinessDataModelRepositoryImpl businessDataModelRepository;
 
+    @Mock
+    private BonitaHomeServer bonitaHomeServer;
+
     @Before
     public void setUp() {
+        mockStatic(BonitaHomeServer.class);
+        when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
+
         dependencyService = mock(DependencyService.class);
-        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaManager.class), null));
+        businessDataModelRepository = spy(new BusinessDataModelRepositoryImpl(dependencyService, mock(SchemaManager.class), 1L));
     }
 
     @Test

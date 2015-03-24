@@ -216,4 +216,10 @@ class FolderMgr {
         artifactIdFolder.createIfNotExists();
         return artifactIdFolder;
     }
+
+    public static Folder getTenantWorkBDMFolder(File bonitaHomeFolder, final long tenantId) throws IOException {
+        final Folder folder = getFolder(getTenantWorkFolder(bonitaHomeFolder, tenantId), "data-management-client");
+        folder.createIfNotExists();
+        return folder;
+    }
 }

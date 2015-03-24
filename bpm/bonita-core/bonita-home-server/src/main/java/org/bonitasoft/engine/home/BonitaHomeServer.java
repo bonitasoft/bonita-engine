@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,6 +107,32 @@ public class BonitaHomeServer extends BonitaHome {
         final File incidentFile = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile("incidents.log");
         return new FileHandler(incidentFile.getAbsolutePath());
 
+    }
+
+
+    private File getBDMFile(final long tenantId) throws BonitaHomeNotSetException, IOException {
+        final Folder bdmFolder = FolderMgr.getTenantWorkBDMFolder(getBonitaHomeFolder(), tenantId);
+        return bdmFolder.getFile("client-bdm.zip");
+    }
+
+    public byte[] getClientBDMZip(final long tenantId) throws BonitaHomeNotSetException, IOException {
+        final File bdmFile = getBDMFile(tenantId);
+        return IOUtil.getAllContentFrom(bdmFile);
+    }
+
+    public void writeClientBDMZip(final long tenantId, byte[] clientBdmJar) throws BonitaHomeNotSetException, IOException {
+        final File bdmFile = getBDMFile(tenantId);
+        if (bdmFile.exists()) {
+            bdmFile.delete();
+        }
+        IOUtil.write(bdmFile, clientBdmJar);
+    }
+
+    public void removeBDMZip(final long tenantId) throws BonitaHomeNotSetException, IOException {
+        final File bdmFile = getBDMFile(tenantId);
+        if (bdmFile.exists()) {
+            bdmFile.delete();
+        }
     }
 
     private static class AllXmlFilesFilter implements FileFilter {
