@@ -101,6 +101,12 @@
           <groupId>org.bonitasoft.engine.data</groupId>
           <artifactId>bonita-business-data-client-resources</artifactId>
           <version>${project.version}</version>
+          <exclusions>
+              <exclusion>
+                  <groupId>org.bonitasoft.engine</groupId>
+                  <artifactId>bonita-common</artifactId>
+              </exclusion>
+          </exclusions>
       </dependency>
 
       <!-- Cache -->
