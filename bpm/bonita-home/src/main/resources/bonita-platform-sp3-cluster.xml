@@ -101,7 +101,6 @@
 		</constructor-arg>
 		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
 		<constructor-arg name="enableStats" value="false" />
-		<constructor-arg name="statsPath" value="${bonita.home}/engine-server/temp/platform" />
 		<constructor-arg name="statsPrintInterval" value="10000" />
 	</bean>
 

@@ -22,6 +22,7 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.core.IQueue;
 import com.hazelcast.monitor.LocalMapStats;
 import com.hazelcast.monitor.LocalQueueStats;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 
 public class HazelcastStatExtractor implements Runnable {
 
@@ -81,19 +82,16 @@ public class HazelcastStatExtractor implements Runnable {
 
     private final ArrayList<String> statsList;
 
-    public HazelcastStatExtractor(final HazelcastInstance hazelcastInstance, final String statsPath, final long statsPrintInterval) throws IOException {
+    public HazelcastStatExtractor(final HazelcastInstance hazelcastInstance, final long statsPrintInterval) throws IOException {
         this.hazelcastInstance = hazelcastInstance;
         this.statsPrintInterval = statsPrintInterval;
-        String statsFilePath = statsPath;
-        if (!statsFilePath.endsWith(File.separator)) {
-            statsFilePath += File.separator;
-        }
-        statsFilePath += "hazelcast-stats-" + hazelcastInstance.getCluster().getLocalMember().getUuid() + ".csv";
-        System.out.println("Saving hazelcast statistics in " + statsFilePath);
-        File file = new File(statsFilePath);
-        file.delete();
-        file.createNewFile();
+        final String fileName = "hazelcast-stats-" + hazelcastInstance.getCluster().getLocalMember().getUuid() + ".csv";
+
+        final File file = BonitaHomeServer.getInstance().getPlatformTempFile(fileName);
         fileWriter = new FileWriter(file);
+
+        System.out.println("Saving hazelcast statistics in " + file);
+
         statsList = new ArrayList<String>();
         statsList.add(EXECUTING_WORK_QUEUE_ITEM_COUNT);
         statsList.add(EXECUTING_WORK_QUEUE_OFFER_COUNT);

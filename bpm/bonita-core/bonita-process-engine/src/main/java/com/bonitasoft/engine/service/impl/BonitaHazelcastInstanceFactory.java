@@ -38,18 +38,18 @@ public class BonitaHazelcastInstanceFactory implements PlatformLifecycleService 
     }
 
     public synchronized HazelcastInstance newHazelcastInstance(final Config config, final CacheConfigurations cacheConfigurations, final boolean enableStats,
-            final String statsPath, final long statsPrintInterval) throws IOException {
+            final long statsPrintInterval) throws IOException {
         if (hazelcastInstance == null) {
             hazelcastInstance = createNewInstance(config, cacheConfigurations);
             if (enableStats) {
-                initThreadThatDumpStats(hazelcastInstance, statsPath, statsPrintInterval);
+                initThreadThatDumpStats(hazelcastInstance, statsPrintInterval);
             }
         }
         return hazelcastInstance;
     }
 
-    private void initThreadThatDumpStats(final HazelcastInstance hazelcastInstance, final String statsPath, final long statsPrintInterval) throws IOException {
-        final Thread thread = new Thread(new HazelcastStatExtractor(hazelcastInstance, statsPath, statsPrintInterval));
+    private void initThreadThatDumpStats(final HazelcastInstance hazelcastInstance, final long statsPrintInterval) throws IOException {
+        final Thread thread = new Thread(new HazelcastStatExtractor(hazelcastInstance, statsPrintInterval));
         thread.start();
     }
 
