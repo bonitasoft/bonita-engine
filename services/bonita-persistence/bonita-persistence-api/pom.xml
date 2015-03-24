@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-persistence</artifactId>
 		<groupId>org.bonitasoft.engine.persistence</groupId>
-		<version>6.5.1-SNAPSHOT</version>
+		<version>6.5.1.RC1</version>
 	</parent>
 
 	<artifactId>bonita-persistence-api</artifactId>
