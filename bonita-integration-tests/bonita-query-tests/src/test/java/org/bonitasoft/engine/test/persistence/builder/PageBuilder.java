@@ -37,7 +37,7 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, P
 
     private String contentName;
 
-    private ContentType contentType;
+    private String contentType;
 
     private Long processDefinitionId;
 
@@ -106,7 +106,7 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, P
         return this;
     }
 
-    public PageBuilder withContentType(final ContentType contentType) {
+    public PageBuilder withContentType(final String contentType) {
         this.contentType = contentType;
         return this;
     }

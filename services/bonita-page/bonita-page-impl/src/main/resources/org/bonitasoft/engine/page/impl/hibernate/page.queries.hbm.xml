@@ -22,6 +22,12 @@
         AND     page.processDefinitionId = :processDefinitionId
     </query>
 
+    <query name="getPageByProcessDefinitionId">
+        SELECT  page
+        FROM    org.bonitasoft.engine.page.impl.SPageImpl AS page
+        WHERE   page.processDefinitionId = :processDefinitionId
+    </query>
+
     <query name="getNumberOfSPage">
 		SELECT COUNT(page)
 		FROM org.bonitasoft.engine.page.impl.SPageImpl AS page

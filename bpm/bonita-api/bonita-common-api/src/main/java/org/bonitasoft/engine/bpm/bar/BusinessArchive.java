@@ -117,8 +117,8 @@ public class BusinessArchive implements Serializable {
      */
     public Map<String, byte[]> getResources(final String regex) {
         final Pattern pattern = Pattern.compile(regex);
-        final Map<String, byte[]> result = new HashMap<String, byte[]>();
-        for (final Entry<String, byte[]> resource : resources.entrySet()) {
+        final Map<String, byte[]> result = new HashMap<>();
+        for (final Entry<String, byte[]> resource : getResources().entrySet()) {
             if (pattern.matcher(resource.getKey()).matches()) {
                 result.put(resource.getKey(), resource.getValue());
             }

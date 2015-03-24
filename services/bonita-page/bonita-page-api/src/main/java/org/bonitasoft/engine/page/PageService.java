@@ -28,6 +28,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Baptiste Mesta
+ * @author Laurent Leseigneur
  */
 public interface PageService extends TenantLifecycleService {
 
@@ -108,5 +109,22 @@ public interface PageService extends TenantLifecycleService {
             SInvalidPageZipException,
             SInvalidPageTokenException;
 
+    /**
+     * get a page attached to a process
+     * @param name
+     * @param processDefinitionId
+     * @return
+     * @throws SBonitaReadException
+     */
     SPage getPageByNameAndProcessDefinitionId(String name, long processDefinitionId) throws SBonitaReadException;
+
+    /**
+     * get a list of page attached to a process
+     * @param processDefinitionId
+     * @param fromIndex
+     * @param numberOfResults
+     * @return
+     * @throws SBonitaReadException
+     */
+    List<SPage> getPageByProcessDefinitionId(long processDefinitionId,int fromIndex, int numberOfResults) throws SBonitaReadException;
 }

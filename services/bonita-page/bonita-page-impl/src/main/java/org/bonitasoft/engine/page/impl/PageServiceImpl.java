@@ -64,6 +64,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
@@ -97,6 +98,8 @@ public class PageServiceImpl implements PageService {
     private static final String QUERY_GET_PAGE_BY_NAME = "getPageByName";
 
     private static final String QUERY_GET_PAGE_BY_NAME_AND_PROCESS_DEFINITION_ID = "getPageByNameAndProcessDefinitionId";
+
+    private static final String QUERY_GET_PAGE_BY_PROCESS_DEFINITION_ID = "getPageByProcessDefinitionId";
 
     private static final String QUERY_GET_PAGE_BY_ID = "getPageById";
 
@@ -161,6 +164,16 @@ public class PageServiceImpl implements PageService {
         return persistenceService.selectOne(new SelectOneDescriptor<SPage>(QUERY_GET_PAGE_BY_NAME_AND_PROCESS_DEFINITION_ID, inputParameters, SPage.class));
     }
 
+    @Override
+    public List<SPage> getPageByProcessDefinitionId(long processDefinitionId, int fromIndex, int numberOfResults) throws SBonitaReadException {
+        Map<String, Object> inputParameters = new HashMap<>();
+        inputParameters.put("processDefinitionId", processDefinitionId);
+        final OrderByOption orderByOption = new OrderByOption(SPage.class, SPageFields.PAGE_NAME, OrderByType.ASC);
+        QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults, Collections.singletonList(orderByOption));
+        return persistenceService.selectList(new SelectListDescriptor<SPage>(QUERY_GET_PAGE_BY_PROCESS_DEFINITION_ID, inputParameters, SPage.class,
+                queryOptions));
+    }
+
     private SPage addPage(final byte[] content, final String contentName, final long userId, final boolean provided) throws SInvalidPageZipException,
             SInvalidPageTokenException, SObjectAlreadyExistsException, SObjectCreationException {
         final Properties pageProperties = readPageZip(content, provided);
@@ -221,7 +234,7 @@ public class PageServiceImpl implements PageService {
         if (pageByName != null) {
             return pageByName;
         }
-        if(page.getProcessDefinitionId()!=null){
+        if (page.getProcessDefinitionId() != null) {
             return getPageByNameAndProcessDefinitionId(page.getName(), page.getProcessDefinitionId());
         }
         return null;
@@ -460,11 +473,9 @@ public class PageServiceImpl implements PageService {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, "Update a page with id " + pageId);
         final String logMethodName = METHOD_UPDATE_PAGE;
         try {
-            if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME))
-            {
+            if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME)) {
                 final SPage pageByName = getPageByName(entityUpdateDescriptor.getFields().get(SPageFields.PAGE_NAME).toString());
-                if (null != pageByName && pageByName.getId() != pageId)
-                {
+                if (null != pageByName && pageByName.getId() != pageId) {
                     initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
                     throwAlreadyExistsException(pageByName.getName());
                 }
@@ -500,8 +511,7 @@ public class PageServiceImpl implements PageService {
     }
 
     private void updateProfileEntry(final String oldPageName, final String newPageName) throws SBonitaReadException, SProfileEntryUpdateException {
-        if (newPageName.equals(oldPageName))
-        {
+        if (newPageName.equals(oldPageName)) {
             return;
         }
         final List<FilterOption> filters = new ArrayList<FilterOption>();

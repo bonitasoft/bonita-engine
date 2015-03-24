@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.test.persistence.repository;
 
+import java.util.List;
+
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageContent;
 import org.hibernate.Query;
@@ -41,5 +43,12 @@ public class PageRepository extends TestRepository {
         namedQuery.setParameter("pageName", name);
         namedQuery.setParameter("processDefinitionId", processDefinitionId);
         return (SPage) namedQuery.uniqueResult();
+    }
+
+    public List<SPage> getPageByProcessDefinitionId(long processDefinitionId) {
+        final Query namedQuery = getNamedQuery("getPageByProcessDefinitionId");
+        namedQuery.setParameter("processDefinitionId", processDefinitionId);
+        return namedQuery.list();
+
     }
 }

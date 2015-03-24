@@ -16,6 +16,7 @@ package org.bonitasoft.engine.page;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.test.persistence.builder.PageBuilder.aPage;
 
+import java.util.List;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.test.persistence.repository.PageRepository;
@@ -72,6 +73,31 @@ public class PageQueriesTest {
 
         // //then
         assertThat(pageByName).as("should retrieve the page").isNotNull();
+    }
+
+    @Test
+    public void getPageByProcessDefinition_should_filter_results() {
+        // given
+        final SPageWithContent myPage1 = repository.add(aPage()
+                .withName("MyPage1")
+                .withProcessDefinitionId(1L)
+                .withContentType(ContentType.FORM)
+                .build());
+        final SPageWithContent myPage2 = repository.add(aPage()
+                .withName("MyPage2")
+                .withProcessDefinitionId(2L)
+                .withContentType(ContentType.FORM)
+                .build());
+
+        assertThat(myPage1).as("should add the page").isNotNull();
+
+        //when
+        final List<SPage> results = repository.getPageByProcessDefinitionId(1L);
+
+        // //then
+        assertThat(results).as("should retrieve the page").hasSize(1);
+        assertThat(results.get(0)).as("should retrieve the page").isEqualToComparingOnlyGivenFields(myPage1, "name", "processDefinitionId", "contentType");
+
     }
 
 }
