@@ -56,6 +56,7 @@
 		<copy todir="${bh.dir}/engine-server/work/tenants/template">
 			<fileset dir="${resources.dir}">
 				<include name="bonita-tenant-community.properties"/>
+				<include name="bonita-tenant-private-community.properties"/>
 				<include name="bonita-tenant-community.xml"/>
 			</fileset>
 		</copy>

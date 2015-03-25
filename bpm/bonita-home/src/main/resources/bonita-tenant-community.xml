@@ -1248,12 +1248,12 @@
         <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
         <constructor-arg name="configuration">
             <map>
-                <entry key="hibernate.dialect" value="${businessdata.hibernate.dialect}" />
-                <entry key="hibernate.connection.datasource" value="${businessdata.datasource.jndi.path}" />
+                <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
+                <entry key="hibernate.connection.datasource" value="${bdm.datasource.jndi.path}" />
                 <entry key="hibernate.show_sql" value="false" />
                 <entry key="hibernate.format_sql" value="false" />
                 <entry key="hibernate.transaction.jta.platform"
-                       value="${businessdata.hibernate.transaction.jta_platform}" />
+                       value="${bdm.hibernate.transaction.jta_platform}" />
                 <entry key="hibernate.validator.autoregister_listeners" value="false" />
                 <entry key="hibernate.validator.apply_to_ddl" value="false" />
                 <entry key="javax.persistence.validation.mode" value="NONE" />
@@ -1272,12 +1272,12 @@
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="configuration">
             <map>
-                <entry key="hibernate.dialect" value="${businessdata.hibernate.dialect}" />
-                <entry key="hibernate.connection.datasource" value="${businessdata.notmanageddatasource.jndi.path}" />
+                <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
+                <entry key="hibernate.connection.datasource" value="${bdm.notmanageddatasource.jndi.path}" />
                 <entry key="hibernate.show_sql" value="true" />
                 <entry key="hibernate.format_sql" value="true" />
                 <entry key="hibernate.transaction.jta.platform"
-                       value="${businessdata.hibernate.transaction.jta_platform}" />
+                       value="${bdm.hibernate.transaction.jta_platform}" />
                 <entry key="hibernate.validator.autoregister_listeners" value="false" />
                 <entry key="hibernate.validator.apply_to_ddl" value="false" />
                 <entry key="javax.persistence.validation.mode" value="NONE" />

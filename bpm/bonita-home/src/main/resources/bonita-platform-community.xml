@@ -877,7 +877,7 @@
                 <entry key="hibernate.current_session_context_class" value="jta" />
                 <entry key="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
                 <entry key="hibernate.transaction.jta.platform" value="${hibernate.transaction.jta_platform}" />
-                <entry key="hibernate.dialect" value="${${db.vendor}.hibernate.journal.dialect}" />
+                <entry key="hibernate.dialect" value="${${db.vendor}.hibernate.dialect}" />
                 <entry key="hibernate.interceptor" value="${${db.vendor}.hibernate.journal.interceptor}" />
                 <entry key="hibernate.show_sql" value="${hibernate.journal.show_sql}" />
                 <entry key="hibernate.format_sql" value="${hibernate.journal.format_sql}" />
