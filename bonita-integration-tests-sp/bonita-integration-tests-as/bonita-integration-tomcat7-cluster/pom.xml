@@ -216,6 +216,9 @@
 
 										<copy file="${basedir}/client/bonita-client-custom.properties"
                                               todir="${bonita.home}/engine-client/conf" overwrite="true"/>
+
+										<copy file="${basedir}/server/bonita-platform-custom.properties"
+											  todir="${bonita.home}/engine-server/conf/platform" overwrite="true"/>
 									</target>
 								</configuration>
 							</execution>

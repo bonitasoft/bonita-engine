@@ -22,6 +22,7 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.core.IQueue;
 import com.hazelcast.monitor.LocalMapStats;
 import com.hazelcast.monitor.LocalQueueStats;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 
 public class HazelcastStatExtractor implements Runnable {
@@ -82,7 +83,7 @@ public class HazelcastStatExtractor implements Runnable {
 
     private final ArrayList<String> statsList;
 
-    public HazelcastStatExtractor(final HazelcastInstance hazelcastInstance, final long statsPrintInterval) throws IOException {
+    public HazelcastStatExtractor(final HazelcastInstance hazelcastInstance, final long statsPrintInterval) throws IOException, BonitaHomeNotSetException {
         this.hazelcastInstance = hazelcastInstance;
         this.statsPrintInterval = statsPrintInterval;
         final String fileName = "hazelcast-stats-" + hazelcastInstance.getCluster().getLocalMember().getUuid() + ".csv";

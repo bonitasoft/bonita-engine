@@ -25,6 +25,7 @@ import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 
 /**
  * @author Baptiste Mesta
@@ -38,7 +39,7 @@ public class BonitaHazelcastInstanceFactory implements PlatformLifecycleService 
     }
 
     public synchronized HazelcastInstance newHazelcastInstance(final Config config, final CacheConfigurations cacheConfigurations, final boolean enableStats,
-            final long statsPrintInterval) throws IOException {
+            final long statsPrintInterval) throws IOException, BonitaHomeNotSetException {
         if (hazelcastInstance == null) {
             hazelcastInstance = createNewInstance(config, cacheConfigurations);
             if (enableStats) {
@@ -48,7 +49,7 @@ public class BonitaHazelcastInstanceFactory implements PlatformLifecycleService 
         return hazelcastInstance;
     }
 
-    private void initThreadThatDumpStats(final HazelcastInstance hazelcastInstance, final long statsPrintInterval) throws IOException {
+    private void initThreadThatDumpStats(final HazelcastInstance hazelcastInstance, final long statsPrintInterval) throws IOException, BonitaHomeNotSetException {
         final Thread thread = new Thread(new HazelcastStatExtractor(hazelcastInstance, statsPrintInterval));
         thread.start();
     }
