@@ -20,7 +20,6 @@ import static org.mockito.Mockito.doThrow;
 
 import java.io.ByteArrayInputStream;
 
-import org.eclipse.jdt.internal.compiler.batch.CompilationUnit;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,16 +34,10 @@ public class ClassLoaderEnvironmentTest {
     public ClassLoader classloader;
 
     public ClassLoaderEnvironment classLoaderEnvironment;
-    private CompilationUnit[] compilationUnits;
-    private CompilationUnit compilationUnit1;
-    private CompilationUnit compilationUnit2;
 
     @Before
     public void before(){
-        compilationUnit1 = new CompilationUnit("/** plop1 **/".toCharArray(), "a/b/c/MyClass1.java", "UTF-8");
-        compilationUnit2 = new CompilationUnit("/** plop2 **/".toCharArray(), "a/b/d/MyClass2.java", "UTF-8");
-        compilationUnits = new CompilationUnit[]{compilationUnit1,compilationUnit2};
-        classLoaderEnvironment = new ClassLoaderEnvironment(classloader,compilationUnits);
+        classLoaderEnvironment = new ClassLoaderEnvironment(classloader);
     }
 
 
@@ -108,13 +101,6 @@ public class ClassLoaderEnvironmentTest {
     }
 
     @Test
-    public void should_getQualifiedName_return_the_class_name_of_a_file() throws ClassNotFoundException {
-        String qualifiedName = classLoaderEnvironment.getQualifiedName(compilationUnit1);
-
-        assertThat(qualifiedName).isEqualTo("a.b.c.MyClass1");
-    }
-
-    @Test
     public void should_find_type_return_type_from_classloader() throws ClassNotFoundException {
         doReturn(Thread.currentThread().getContextClassLoader().getResourceAsStream("java/lang/String.class")).when(classloader).getResourceAsStream("java/lang/String.class");
 
@@ -153,22 +139,6 @@ public class ClassLoaderEnvironmentTest {
         NameEnvironmentAnswer type = classLoaderEnvironment.findType(charsArray("java.lang.String"));
 
         assertThat(type).isNull();
-    }
-    @Test
-    public void should_find_type_return_compilation_unit() throws ClassNotFoundException {
-
-        NameEnvironmentAnswer type = classLoaderEnvironment.findType(charsArray("a.b.c.MyClass1"));
-
-        assertThat(type).isNotNull();
-        assertThat(type.getCompilationUnit()).isEqualTo(compilationUnit1);
-    }
-    @Test
-    public void should_find_type2_return_compilation_unit() throws ClassNotFoundException {
-
-        NameEnvironmentAnswer type = classLoaderEnvironment.findType("MyClass2".toCharArray(),charsArray("a.b.d"));
-
-        assertThat(type).isNotNull();
-        assertThat(type.getCompilationUnit()).isEqualTo(compilationUnit2);
     }
 
 

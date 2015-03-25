@@ -15,19 +15,15 @@
 package org.bonitasoft.engine.compiler;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jdt.core.compiler.CharOperation;
-import org.eclipse.jdt.internal.compiler.batch.CompilationUnit;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.IBinaryType;
-import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 
 /**
@@ -41,23 +37,12 @@ import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 public class ClassLoaderEnvironment extends FileSystem {
 
     private final ClassLoader classLoader;
-    private final Map<String, CompilationUnit> compilationUnits;
     private final Map<String, IBinaryType> loadedClassFiles;
 
-    public ClassLoaderEnvironment(ClassLoader classLoader, CompilationUnit[] compilationUnits) {
+    public ClassLoaderEnvironment(ClassLoader classLoader) {
         super(new String[] {}, null, "UTF-8");
         this.classLoader = classLoader;
-        this.compilationUnits = new HashMap<>(compilationUnits.length);
-        for (CompilationUnit compilationUnit : compilationUnits) {
-            this.compilationUnits.put(getQualifiedName(compilationUnit), compilationUnit);
-        }
         loadedClassFiles = new HashMap<>();
-    }
-
-    String getQualifiedName(CompilationUnit compilationUnit) {
-        String fileName = new String(compilationUnit.getFileName());
-        fileName = fileName.replaceAll(File.separator, ".");
-        return fileName.substring(0,fileName.lastIndexOf("."));
     }
 
     @Override
@@ -72,11 +57,6 @@ public class ClassLoaderEnvironment extends FileSystem {
 
 
     private NameEnvironmentAnswer findType(String className) {
-        //It's a class we compile
-        if (compilationUnits.containsKey(className)) {
-            ICompilationUnit compilationUnit = compilationUnits.get(className);
-            return new NameEnvironmentAnswer(compilationUnit, null);
-        }
         //load from cache
         if(loadedClassFiles.containsKey(className)){
             return new NameEnvironmentAnswer(loadedClassFiles.get(className),null);
@@ -110,9 +90,6 @@ public class ClassLoaderEnvironment extends FileSystem {
     private boolean isPackage(String result) {
         if(result.isEmpty()){
             return true;
-        }
-        if (compilationUnits.containsKey(result)) {
-            return false;
         }
         try {
             return classLoader.loadClass(result) == null;
