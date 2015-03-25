@@ -21,7 +21,6 @@
             </activation>
             <modules>
                 <module>bonita-transaction</module>
-                <module>bonita-archive</module>
                 <module>bonita-cache</module>
                 <module>bonita-classloader</module>
                 <module>bonita-events</module>

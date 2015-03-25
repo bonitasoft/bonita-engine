@@ -56,13 +56,6 @@
 			</exclusions>
     </dependency>
 
-    <!-- Archive -->
-    <dependency>
-      <groupId>com.bonitasoft.engine.archive</groupId>
-      <artifactId>bonita-archive-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
     <!-- Authentication -->
     <dependency>
       <groupId>org.bonitasoft.engine.authentication</groupId>
@@ -753,7 +746,6 @@
                                     <!-- Archive -->
                                     <include>org.bonitasoft.engine.archive:bonita-archive-api</include>
                                     <include>org.bonitasoft.engine.archive:bonita-archive-impl</include>
-                                    <include>com.bonitasoft.engine.archive:bonita-archive-impl</include>
                                     <!-- Authentication -->
                                     <include>org.bonitasoft.engine.authentication:bonita-authentication-api</include>
                                     <include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl
