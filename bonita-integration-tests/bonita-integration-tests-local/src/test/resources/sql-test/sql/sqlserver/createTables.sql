@@ -1,4 +1,4 @@
-CREATE TABLE employee (
+CREATE TABLE p_employee (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(50) NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE laptop (
 )
 GO
 
-CREATE TABLE address (
+CREATE TABLE p_address (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   address NVARCHAR(50) NOT NULL,

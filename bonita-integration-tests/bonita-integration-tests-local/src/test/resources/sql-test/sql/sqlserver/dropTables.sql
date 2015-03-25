@@ -1,10 +1,10 @@
-DROP TABLE employee
+DROP TABLE p_employee
 GO
 
 DROP TABLE laptop
 GO
 
-DROP TABLE address
+DROP TABLE p_address
 GO
 
 DROP TABLE project

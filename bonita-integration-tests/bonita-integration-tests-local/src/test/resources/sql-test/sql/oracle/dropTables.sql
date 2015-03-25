@@ -1,8 +1,8 @@
-DROP TABLE employee cascade constraints purge;
+DROP TABLE p_employee cascade constraints purge;
 
 DROP TABLE laptop cascade constraints purge;
 
-DROP TABLE address cascade constraints purge;
+DROP TABLE p_address cascade constraints purge;
 
 DROP TABLE project cascade constraints purge;
 

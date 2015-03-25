@@ -1,4 +1,4 @@
-CREATE TABLE employee (
+CREATE TABLE p_employee (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   name VARCHAR2(50 CHAR) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE laptop (
   PRIMARY KEY (tenantid, id)
 );
 
-CREATE TABLE address (
+CREATE TABLE p_address (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   address VARCHAR2(50 CHAR) NOT NULL,

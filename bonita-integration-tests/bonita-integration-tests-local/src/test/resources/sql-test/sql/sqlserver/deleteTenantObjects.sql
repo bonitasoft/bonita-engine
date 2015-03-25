@@ -1,10 +1,10 @@
-DELETE FROM employee WHERE tenantid = ${tenantid}
+DELETE FROM p_employee WHERE tenantid = ${tenantid}
 GO
 
 DELETE FROM laptop WHERE tenantid = ${tenantid}
 GO
 
-DELETE FROM address WHERE tenantid = ${tenantid}
+DELETE FROM p_address WHERE tenantid = ${tenantid}
 GO
 
 DELETE FROM project WHERE tenantid = ${tenantid}

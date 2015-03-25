@@ -1,8 +1,8 @@
-DROP TABLE employee;
+DROP TABLE p_employee;
 
 DROP TABLE laptop;
 
-DROP TABLE address;
+DROP TABLE p_address;
 
 DROP TABLE project;
 
