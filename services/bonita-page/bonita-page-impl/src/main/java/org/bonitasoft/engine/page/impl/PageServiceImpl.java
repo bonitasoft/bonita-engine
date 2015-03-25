@@ -574,13 +574,10 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public void start() throws SBonitaException {
-        try {
-            importProvidedPage("bonita-html-page-example.zip");
-            importProvidedPage("bonita-groovy-page-example.zip");
-            importProvidedPage("bonita-home-page.zip");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        importProvidedPage("bonita-html-page-example.zip");
+        importProvidedPage("bonita-groovy-page-example.zip");
+        importProvidedPage("bonita-home-page.zip");
+
     }
 
     private void importProvidedPage(final String zipName) throws SBonitaReadException, SObjectCreationException, SObjectAlreadyExistsException,
