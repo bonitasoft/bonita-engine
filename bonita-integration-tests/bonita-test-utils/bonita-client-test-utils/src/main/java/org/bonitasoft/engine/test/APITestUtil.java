@@ -1369,7 +1369,7 @@ public class APITestUtil extends PlatformTestUtil {
             final StringBuilder stb = new StringBuilder("Archived process instances are still present: ");
             for (final ArchivedProcessInstance archivedProcessInstance : archivedProcessInstances) {
                 stb.append(archivedProcessInstance).append(", ");
-                getProcessAPI().deleteProcessInstance(archivedProcessInstance.getId());
+                getProcessAPI().deleteArchivedProcessInstancesInAllStates(archivedProcessInstance.getSourceObjectId());
             }
             messages.add(stb.toString());
         }
