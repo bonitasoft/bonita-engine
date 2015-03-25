@@ -41,6 +41,8 @@ import org.junit.runners.Suite.SuiteClasses;
         APIMethodLocalIT.class,
         TenantMaintenanceLocalIT.class,
         BDRepositoryLocalIT.class,
+        //last because it kind of f*** up the platform
+        AllBPMTests.class,
 })
 @Initializer(LocalServerTestsInitializer.class)
 public class LocalIntegrationTests {

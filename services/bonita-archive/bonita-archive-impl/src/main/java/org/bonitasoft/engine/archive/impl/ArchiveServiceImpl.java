@@ -43,7 +43,7 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     private final TechnicalLoggerService logger;
 
-    private final ArchivingStrategy archivingStrategy;
+    private ArchivingStrategy archivingStrategy;
 
     public ArchiveServiceImpl(final PersistenceService definitiveArchivePersistenceService,
             final TechnicalLoggerService logger, final ArchivingStrategy archivingStrategy, final TransactionService transactionService) {

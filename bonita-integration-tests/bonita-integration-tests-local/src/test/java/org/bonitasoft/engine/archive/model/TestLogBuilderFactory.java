@@ -10,19 +10,25 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.archive.model;
+
+import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilderFactory;
+import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderFactory;
+
+/**
+ * @author Elias Ricken de Medeiros
  */
-package org.bonitasoft.engine.data.instance.api;
+public class TestLogBuilderFactory extends CRUDELogBuilderFactory implements SPersistenceLogBuilderFactory {
 
-import java.util.List;
+    @Override
+    public TestLogBuilder createNewInstance() {
+        return new TestLogBuilder();
+    }
 
-import org.bonitasoft.engine.commons.Pair;
-import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
-
-public interface ParentContainerResolver {
-
-    List<Pair<Long, String>> getContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException;
-
-    List<Pair<Long, String>> getArchivedContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException;
+    @Override
+    public String getObjectIdKey() {
+        return "numericIndex1";
+    }
 
 }

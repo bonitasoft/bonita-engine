@@ -1,0 +1,86 @@
+<beans
+		xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:util="http://www.springframework.org/schema/util"
+		xsi:schemaLocation="
+	http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+	">
+
+	<bean id="sequenceMappings" parent="communitySequenceMappings" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass">
+			<value>java.util.HashMap</value>
+		</property>
+		<property name="sourceMap">
+			<map merge="true">
+				<entry key="org.bonitasoft.engine.persistence.model.Human" value="1000" />
+				<entry key="org.bonitasoft.engine.persistence.model.Child" value="1000" />
+				<entry key="org.bonitasoft.engine.persistence.model.Parent" value="1000" />
+				<entry key="org.bonitasoft.engine.persistence.model.Car" value="1001" />
+				<entry key="org.bonitasoft.engine.archive.model.Employee" value="60" />
+				<entry key="org.bonitasoft.engine.archive.model.Laptop" value="61" />
+				<entry key="org.bonitasoft.engine.archive.model.Address" value="62" />
+				<entry key="org.bonitasoft.engine.archive.model.Project" value="63" />
+				<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" value="64" />
+				<entry key="org.bonitasoft.engine.archive.model.SAEmployee" value="65" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="hbm-bonita-persistence-test" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+		<property name="resources">
+			<set>
+				<value>org/bonitasoft/engine/persistence/hibernate/parent-child.hbm.xml</value>
+				<value>org/bonitasoft/engine/persistence/hibernate/parent-child.queries.hbm.xml</value>
+				<value>org/bonitasoft/engine/persistence/hibernate/car.hbm.xml</value>
+				<value>org/bonitasoft/engine/persistence/hibernate/car.queries.hbm.xml</value>
+			</set>
+		</property>
+		<property name="classAliasMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.persistence.model.Human" value="human" />
+				<entry key="org.bonitasoft.engine.persistence.model.Child" value="child" />
+				<entry key="org.bonitasoft.engine.persistence.model.Parent" value="parent" />
+				<entry key="org.bonitasoft.engine.persistence.model.Car" value="car" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="hbm-bonita-archive-test" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+		<property name="resources">
+			<set>
+				<value>org/bonitasoft/engine/archive/model/hibernate/archive.hbm.xml</value>
+				<value>org/bonitasoft/engine/archive/model/hibernate/archive.queries.hbm.xml</value>
+			</set>
+		</property>
+		<property name="classAliasMappings">
+			<map>
+				<entry key="org.bonitasoft.engine.archive.model.Employee" value="employee" />
+				<entry key="org.bonitasoft.engine.archive.model.Laptop" value="laptop" />
+				<entry key="org.bonitasoft.engine.archive.model.Address" value="address" />
+				<entry key="org.bonitasoft.engine.archive.model.Project" value="project" />
+				<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" value="employeeprojectmapping" />
+				<entry key="org.bonitasoft.engine.archive.model.SAEmployee" value="saemployee" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="sqlFolders" parent="communitySqlFolders" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list merge="true">
+				<value>/sql-test/sql/${db.vendor}</value>
+			</list>
+		</property>
+	</bean>
+
+	<util:map id="archivingStrategyAdditionalConfiguration">
+		<entry key="org.bonitasoft.engine.archive.model.Employee" value="true"/>
+		<entry key="org.bonitasoft.engine.archive.model.Laptop" value="true"/>
+		<entry key="org.bonitasoft.engine.archive.model.Address" value="true"/>
+		<entry key="org.bonitasoft.engine.archive.model.Project" value="true"/>
+		<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" value="true"/>
+	</util:map>
+</beans>

@@ -10,19 +10,24 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine;
+
+import org.bonitasoft.engine.services.QueriableLogSessionProvider;
+
+/**
+ * @author Elias Ricken de Medeiros
  */
-package org.bonitasoft.engine.data.instance.api;
+public class MockQueriableLogSessionProviderImpl implements QueriableLogSessionProvider {
 
-import java.util.List;
+    @Override
+    public String getUserId() {
+        return "admin";
+    }
 
-import org.bonitasoft.engine.commons.Pair;
-import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
-
-public interface ParentContainerResolver {
-
-    List<Pair<Long, String>> getContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException;
-
-    List<Pair<Long, String>> getArchivedContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException;
+    @Override
+    public String getClusterNode() {
+        return "node1";
+    }
 
 }

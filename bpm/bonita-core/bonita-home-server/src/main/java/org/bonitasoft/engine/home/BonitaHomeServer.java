@@ -71,9 +71,7 @@ public class BonitaHomeServer extends BonitaHome {
     private String getBonitaHomeProperty(final String propertyName) throws IllegalStateException {
         try {
             return getPlatformProperties().getProperty(propertyName);
-        } catch (BonitaHomeNotSetException e) {
-            throw new IllegalStateException(e);
-        } catch (IOException e) {
+        } catch (BonitaHomeNotSetException | IOException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -100,8 +98,7 @@ public class BonitaHomeServer extends BonitaHome {
         //System.err.println(this.getClass().getName() + "-" + "getResourcesFromFiles" + ":" + "resources=" + resources);
         final String[] strings = resources.toArray(new String[resources.size()]);
         //System.err.println(this.getClass().getName() + "-" + "getResourcesFromFiles" + ":" + "strings=" + strings);
-        return strings
-                ;
+        return strings;
     }
 
     public FileHandler getIncidentFileHandler(long tenantId) throws BonitaHomeNotSetException, IOException {

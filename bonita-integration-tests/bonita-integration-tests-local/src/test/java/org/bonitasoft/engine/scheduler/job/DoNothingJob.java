@@ -10,19 +10,37 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.scheduler.job;
+
+import java.io.Serializable;
+import java.util.Map;
+
+import org.bonitasoft.engine.scheduler.StatelessJob;
+
+/**
+ * @author Elias Ricken de Medeiros
  */
-package org.bonitasoft.engine.data.instance.api;
+public class DoNothingJob implements StatelessJob {
 
-import java.util.List;
+    private static final long serialVersionUID = 5253574298401130601L;
 
-import org.bonitasoft.engine.commons.Pair;
-import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
+    @Override
+    public String getName() {
+        return "doNothing";
+    }
 
-public interface ParentContainerResolver {
+    @Override
+    public String getDescription() {
+        return "DoNothing";
+    }
 
-    List<Pair<Long, String>> getContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException;
+    @Override
+    public void execute() {
+    }
 
-    List<Pair<Long, String>> getArchivedContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException;
+    @Override
+    public void setAttributes(final Map<String, Serializable> attributes) {
+    }
 
 }

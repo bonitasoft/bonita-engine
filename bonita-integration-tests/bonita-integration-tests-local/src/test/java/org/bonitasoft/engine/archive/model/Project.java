@@ -10,19 +10,45 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
-package org.bonitasoft.engine.data.instance.api;
+ **/
+package org.bonitasoft.engine.archive.model;
 
-import java.util.List;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
-import org.bonitasoft.engine.commons.Pair;
-import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
+public class Project extends SPersistentObjectImpl {
 
-public interface ParentContainerResolver {
+    private static final long serialVersionUID = 1L;
 
-    List<Pair<Long, String>> getContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException;
+    private String name;
 
-    List<Pair<Long, String>> getArchivedContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException;
+    public Project(final String name) {
+        this.name = name;
+    }
+
+    public Project() {
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getDiscriminator() {
+        return Project.class.getName();
+    }
+
+    @Override
+    public long getSourceObjectId() {
+        return 0;
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return Project.class;
+    }
 
 }

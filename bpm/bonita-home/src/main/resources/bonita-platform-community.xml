@@ -1,9 +1,15 @@
 <beans
         xmlns="http://www.springframework.org/schema/beans"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-    <bean id="archivingStrategy" class="org.bonitasoft.engine.archive.impl.DefaultArchivingStrategy" />
+    <bean id="archivingStrategy" class="org.bonitasoft.engine.archive.impl.DefaultArchivingStrategy">
+        <constructor-arg name="additionalConfiguration" ref="archivingStrategyAdditionalConfiguration"/>
+    </bean>
+
+    <util:map id="archivingStrategyAdditionalConfiguration">
+    </util:map>
 
     <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl">
         <constructor-arg name="initialCapacity" value="50" />
@@ -205,7 +211,7 @@
     <bean id="incidentService" class="org.bonitasoft.engine.incident.IncidentServiceImpl">
         <constructor-arg name="handlers">
             <list>
-                <bean class="org.bonitasoft.engine.incident.FileLoggerIncidentHandler"/>
+                <bean class="org.bonitasoft.engine.incident.FileLoggerIncidentHandler" />
             </list>
         </constructor-arg>
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
@@ -1068,7 +1074,7 @@
         <constructor-arg ref="hbmResourcesConfigurationProvider" />
     </bean>
 
-    <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType"/>
+    <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType" />
 
     <bean id="hbm-bos-page-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
         <property name="resources">
