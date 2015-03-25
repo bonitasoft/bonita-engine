@@ -241,6 +241,7 @@
                 <ref bean="canStartProcessDefinition" />
                 <ref bean="isInvolvedInHumanTask" />
                 <ref bean="importProfiles" />
+                <ref bean="exportDefaultProfiles" />
                 <ref bean="isUserProcessSupervisor" />
                 <ref bean="createSupervisor" />
                 <ref bean="getSupervisor" />
@@ -386,6 +387,18 @@
         </constructor-arg>
         <constructor-arg name="implementation">
             <value>org.bonitasoft.engine.external.web.profile.command.ImportProfilesCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="exportDefaultProfiles" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>exportDefaultProfilesCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Export default profiles</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.web.profile.command.ExportDefaultProfilesCommand</value>
         </constructor-arg>
     </bean>
 
