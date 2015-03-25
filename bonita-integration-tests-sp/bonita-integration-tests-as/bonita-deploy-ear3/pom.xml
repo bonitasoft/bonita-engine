@@ -70,6 +70,10 @@
                             <artifactId>bonita-server-sp</artifactId>
                         </jarModule>
                         <jarModule>
+                            <groupId>com.bonitasoft.engine</groupId>
+                            <artifactId>bonita-client-sp</artifactId>
+                        </jarModule>
+                        <jarModule>
                             <groupId>org.slf4j</groupId>
                             <artifactId>slf4j-log4j12</artifactId>
                         </jarModule>
