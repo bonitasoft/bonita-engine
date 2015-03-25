@@ -33,7 +33,7 @@ import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -49,9 +49,19 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
     private final TransactionService transactionService;
 
-    @After
-    public void tearDown() throws SBonitaReadException, SObjectModificationException, STransactionCreationException,
-            STransactionCommitException, STransactionRollbackException {
+//    @After
+//    public void tearDown() throws SBonitaReadException, SObjectModificationException, STransactionCreationException,
+//            STransactionCommitException, STransactionRollbackException {
+//        cleanAllFormMapping();
+//    }
+
+    @Before
+    public void before() throws Exception {
+        cleanAllFormMapping();
+    }
+
+    protected void cleanAllFormMapping() throws STransactionCreationException, SBonitaReadException, SObjectModificationException, STransactionCommitException,
+            STransactionRollbackException {
         transactionService.begin();
         for (SFormMapping sFormMapping : formMappingService.list(0, 1000)) {
             formMappingService.delete(sFormMapping);
@@ -85,8 +95,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         assertThat(list).extracting("type").containsExactly("TASK", "PROCESS_START", "PROCESS_OVERVIEW");
         assertThat(list).extracting("form").containsExactly("form_page1", "form_page2", "form_page_url");
         assertThat(listAll).extracting("type").containsExactly("TASK", "PROCESS_START", "PROCESS_OVERVIEW", "PROCESS_OVERVIEW");
-        assertThat(listAll).extracting("form").containsExactly("form_page1", "form_page2", "form_page_url","form_page_other");
-        assertThat(listAll).extracting("processDefinitionId").containsExactly(15l, 15l, 15l,16l);
+        assertThat(listAll).extracting("form").containsExactly("form_page1", "form_page2", "form_page_url", "form_page_other");
+        assertThat(listAll).extracting("processDefinitionId").containsExactly(15l, 15l, 15l, 16l);
     }
 
     @Test
@@ -97,10 +107,11 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
         transactionService.begin();
         SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
-        SFormMapping sFormMappingByProperties = formMappingService.get(15l,"TASK","step1");
+        SFormMapping sFormMappingByProperties = formMappingService.get(15l, "TASK", "step1");
         transactionService.complete();
         assertThat(sFormMapping).isEqualTo(taskForm).isEqualTo(sFormMappingByProperties);
     }
+
     @Test
     public void create_and_get_FormMapping_with_no_task() throws Exception {
         transactionService.begin();
@@ -109,7 +120,7 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
         transactionService.begin();
         SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
-        SFormMapping sFormMappingByProperties = formMappingService.get(15l,"TASK");
+        SFormMapping sFormMappingByProperties = formMappingService.get(15l, "TASK");
         List<SFormMapping> list = formMappingService.list(0, 100);
         transactionService.complete();
         assertThat(sFormMapping).isEqualTo(taskForm);
@@ -127,10 +138,10 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         transactionService.complete();
 
         transactionService.begin();
-        try{
+        try {
             formMappingService.get(taskForm.getId());
             fail("should have thrown a not found");
-        }catch(SObjectNotFoundException e){
+        } catch (SObjectNotFoundException e) {
             //ok
         }
         transactionService.complete();
@@ -164,7 +175,6 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         SFormMapping reupdated = formMappingService.get(taskForm.getId());
         formMappingService.update(reupdated, "newFormName2", FormMappingTarget.INTERNAL.name());
         transactionService.complete();
-
 
         assertThat(reupdated.getForm()).isEqualTo("newFormName2");
         assertThat(reupdated.getTarget()).isEqualTo(FormMappingTarget.INTERNAL.name());
