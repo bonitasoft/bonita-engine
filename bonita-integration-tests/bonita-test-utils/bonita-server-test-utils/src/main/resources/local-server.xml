@@ -6,11 +6,11 @@
 
     <bean id="bonitaDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
         <property name="className" value="${${sysprop.bonita.db.vendor}.db.datasource.class}" />
-        <property name="uniqueName" value="java:comp/env/bonitaDS" />
-        <property name="minPoolSize" value="1" />
-        <property name="maxPoolSize" value="7" />
-		<property name="acquireIncrement" value="1" />
-        <property name="allowLocalTransactions" value="true" /> <!--  For hibernate : see if we can set it to false --> 
+        <property name="uniqueName" value="${local.journal.xads.uniqueName}" />
+        <property name="minPoolSize" value="${local.journal.xads.minPoolSize}" />
+        <property name="maxPoolSize" value="${local.journal.xads.maxPoolSize}" />
+		<property name="acquireIncrement" value="${local.journal.xads.acquireIncrement}" />
+        <property name="allowLocalTransactions" value="${local.journal.xads.allowLocalTransactions}" /> <!--  For hibernate : see if we can set it to false -->
         <property name="driverProperties" ref="${sysprop.bonita.db.vendor}.properties">
         </property>
     </bean>  
@@ -21,23 +21,23 @@
 		<property name="username" value="${${sysprop.bonita.db.vendor}.db.user}"/>
 		<property name="password" value="${${sysprop.bonita.db.vendor}.db.password}"/>
 
-		<property name="idleConnectionTestPeriodInMinutes" value="60"/>
-		<property name="idleMaxAgeInMinutes" value="30"/>
-		<property name="maxConnectionsPerPartition" value="3"/>
-		<property name="minConnectionsPerPartition" value="1"/>
-		<property name="partitionCount" value="3"/>
-		<property name="acquireIncrement" value="1"/>
-		<property name="statementsCacheSize" value="100"/>
-		<property name="releaseHelperThreads" value="3"/>
+		<property name="idleConnectionTestPeriodInMinutes" value="${local.journal.nonxads.idleConnectionTestPeriodInMinutes}"/>
+		<property name="idleMaxAgeInMinutes" value="${local.journal.nonxads.idleMaxAgeInMinutes}"/>
+		<property name="maxConnectionsPerPartition" value="${local.journal.nonxads.maxConnectionsPerPartition}"/>
+		<property name="minConnectionsPerPartition" value="${local.journal.nonxads.minConnectionsPerPartition}"/>
+		<property name="partitionCount" value="${local.journal.nonxads.partitionCount}"/>
+		<property name="acquireIncrement" value="${local.journal.nonxads.acquireIncrement}"/>
+		<property name="statementsCacheSize" value="${local.journal.nonxads.statementsCacheSize}"/>
+		<property name="releaseHelperThreads" value="${local.journal.nonxads.releaseHelperThreads}"/>
 	</bean>
 
     <bean id="businessDataDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
         <property name="className" value="${${sysprop.bonita.db.vendor}.db.datasource.class}" />
-        <property name="uniqueName" value="java:comp/env/BusinessDataDS" />
-        <property name="minPoolSize" value="1" />
-        <property name="maxPoolSize" value="3" />
-        <property name="acquireIncrement" value="1" />
-        <property name="allowLocalTransactions" value="true" /> <!--  For hibernate : see if we can set it to false -->
+        <property name="uniqueName" value="${local.bdm.xads.uniqueName}" />
+        <property name="minPoolSize" value="${local.bdm.xads.minPoolSize}" />
+        <property name="maxPoolSize" value="${local.bdm.xads.maxPoolSize}" />
+        <property name="acquireIncrement" value="${local.bdm.xads.acquireIncrement}" />
+        <property name="allowLocalTransactions" value="${local.bdm.xads.allowLocalTransactions}" /> <!--  For hibernate : see if we can set it to false -->
         <property name="driverProperties" ref="${sysprop.bonita.db.vendor}.properties">
         </property>
     </bean>
@@ -47,14 +47,14 @@
         <property name="jdbcUrl" value="${${sysprop.bonita.db.vendor}.db.url}" />
         <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
         <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
-        <property name="idleConnectionTestPeriodInMinutes" value="60" />
-        <property name="idleMaxAgeInMinutes" value="30" />
-        <property name="maxConnectionsPerPartition" value="3" />
-        <property name="minConnectionsPerPartition" value="1" />
-        <property name="partitionCount" value="3" />
-        <property name="acquireIncrement" value="1" />
-        <property name="statementsCacheSize" value="100" />
-        <property name="releaseHelperThreads" value="3" />
+        <property name="idleConnectionTestPeriodInMinutes" value="${local.bdm.nonxads.idleConnectionTestPeriodInMinutes}" />
+        <property name="idleMaxAgeInMinutes" value="${local.bdm.nonxads.idleMaxAgeInMinutes}" />
+        <property name="maxConnectionsPerPartition" value="${local.bdm.nonxads.maxConnectionsPerPartition}" />
+        <property name="minConnectionsPerPartition" value="${local.bdm.nonxads.minConnectionsPerPartition}" />
+        <property name="partitionCount" value="${local.bdm.nonxads.partitionCount}" />
+        <property name="acquireIncrement" value="${local.bdm.nonxads.acquireIncrement}" />
+        <property name="statementsCacheSize" value="${local.bdm.nonxads.statementsCacheSize}" />
+        <property name="releaseHelperThreads" value="${local.bdm.nonxads.releaseHelperThreads}" />
     </bean>
 
     <!-- H2 -->
@@ -119,12 +119,11 @@
     <!--  Bitronix Transaction Manager embedded configuration -->
     <bean id="btmConfig" factory-method="getConfiguration" class="bitronix.tm.TransactionManagerServices">
         <property name="serverId" value="btm-bonita" />
-        <property name="logPart1Filename" value="target/btm1.tlog" />
-        <property name="logPart2Filename" value="target/btm2.tlog" />
-
-        <property name="debugZeroResourceTransaction" value="false" />
-        <property name="warnAboutZeroResourceTransaction" value="false" />
-        <!-- 		<property name="defultTransactionTimeout" value="90" /> -->
+        <property name="logPart1Filename" value="${btm.logPart1Filename}" />
+        <property name="logPart2Filename" value="${btm.logPart2Filename}" />
+        <property name="debugZeroResourceTransaction" value="${btm.debugZeroResourceTransaction}" />
+        <property name="warnAboutZeroResourceTransaction" value="${btm.warnAboutZeroResourceTransaction}" />
+        <property name="defaultTransactionTimeout" value="${btm.defaultTransactionTimeout}" />
     </bean>
 
     <!-- create BTM transaction manager -->
