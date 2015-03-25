@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 
 /**
@@ -35,7 +36,7 @@ public class FormMappingDefinition implements Serializable {
     private String form;
 
     @XmlAttribute(required = true)
-    private boolean external;
+    private FormMappingTarget target;
 
     @XmlAttribute
     private FormMappingType type;
@@ -49,14 +50,14 @@ public class FormMappingDefinition implements Serializable {
     protected FormMappingDefinition() {
     }
 
-    public FormMappingDefinition(final String form, final FormMappingType type, final boolean external) {
+    public FormMappingDefinition(final String form, final FormMappingType type, final FormMappingTarget target) {
         this.form = form;
         this.type = type;
-        this.external = external;
+        this.target = target;
     }
 
-    public FormMappingDefinition(final String form, final FormMappingType type, final boolean external, final String taskname) {
-        this(form, type, external);
+    public FormMappingDefinition(final String form, final FormMappingType type, final FormMappingTarget target, final String taskname) {
+        this(form, type, target);
         setTaskname(taskname);
     }
 
@@ -72,8 +73,8 @@ public class FormMappingDefinition implements Serializable {
         return form;
     }
 
-    public boolean isExternal() {
-        return external;
+    public FormMappingTarget getTarget() {
+        return target;
     }
 
     public FormMappingType getType() {
@@ -82,14 +83,14 @@ public class FormMappingDefinition implements Serializable {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(11, 43).append(form).append(external).append(type).toHashCode();
+        return new HashCodeBuilder(11, 43).append(form).append(target).append(type).toHashCode();
     }
 
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof FormMappingDefinition) {
             final FormMappingDefinition other = (FormMappingDefinition) obj;
-            return new EqualsBuilder().append(form, other.form).append(external, other.external).append(type, other.type).isEquals();
+            return new EqualsBuilder().append(form, other.form).append(target, other.target).append(type, other.type).isEquals();
         }
         return false;
     }
@@ -97,7 +98,7 @@ public class FormMappingDefinition implements Serializable {
     @Override
     public String toString() {
         final ToStringBuilder builder = new ToStringBuilder(this);
-        builder.append("page", form).append("external", external).append("type", type).append("taskname", taskname);
+        builder.append("page", form).append("target", target).append("type", type).append("taskname", taskname);
         return builder.toString();
     }
 

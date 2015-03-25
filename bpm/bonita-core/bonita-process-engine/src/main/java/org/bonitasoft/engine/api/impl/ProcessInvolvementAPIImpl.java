@@ -17,6 +17,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.actor.mapping.ActorMappingService;
+import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
+import org.bonitasoft.engine.actor.mapping.model.SActor;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -24,12 +28,16 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
@@ -106,6 +114,38 @@ public class ProcessInvolvementAPIImpl {
         } catch (final SBonitaException e) {
             // no rollback, read only method
             throw new BonitaRuntimeException(e);// TODO refactor Exceptions!
+        }
+    }
+
+
+
+    public boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId)  throws ActivityInstanceNotFoundException {
+        try {
+            return isInvolvedInHumanTaskInstance(userId, humanTaskInstanceId, processAPI.getTenantAccessor());
+        } catch (SActivityInstanceNotFoundException e) {
+            throw new ActivityInstanceNotFoundException(humanTaskInstanceId);
+        } catch (SBonitaReadException e) {
+            throw new RetrieveException(e);
+        } catch (SActivityReadException e) {
+            throw new RetrieveException(e);
+        } catch (SActorNotFoundException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+
+    private Boolean isInvolvedInHumanTaskInstance(final long userId, final long humanTaskInstanceId, final TenantServiceAccessor serviceAccessor)
+            throws SActivityInstanceNotFoundException, SActorNotFoundException, SBonitaReadException, SActivityReadException {
+        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        long assigneeId;
+        final SHumanTaskInstance humanTaskInstance = activityInstanceService.getHumanTaskInstance(humanTaskInstanceId);
+        assigneeId = humanTaskInstance.getAssigneeId();
+        if (assigneeId > 0) {
+            //check if the user is the assigned user
+            return userId == assigneeId;
+        } else {
+            //if the task is not assigned check if the user is mapped to the actor of the task
+            return activityInstanceService.isTaskPendingForUser(humanTaskInstanceId, userId);
         }
     }
 
@@ -247,5 +287,4 @@ public class ProcessInvolvementAPIImpl {
         }
         return false;
     }
-
 }

@@ -89,6 +89,12 @@
             <artifactId>bonita-business-data-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.data</groupId>
+			<artifactId>bonita-business-data-client-resources</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 
 		<!-- Cache -->
 		<dependency>
@@ -594,6 +600,7 @@
                             	      			      <!-- Business Data -->
 			                                         <inlude>org.bonitasoft.engine.data:bonita-business-data-api</inlude>
 								      <inlude>org.bonitasoft.engine.data:bonita-business-data-impl</inlude>
+                                    <inlude>org.bonitasoft.engine.data:bonita-business-data-client-resources</inlude>
 									<!-- Cache -->
 									<include>org.bonitasoft.engine.cache:bonita-cache-api</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>

@@ -1129,7 +1129,7 @@ CREATE TABLE form_mapping (
   process NUMERIC(19, 0) NOT NULL,
   task NVARCHAR(255) NULL,
   form NVARCHAR(1024) NULL,
-  isexternal BIT NOT NULL,
+  target NVARCHAR(16) NOT NULL,
   type NVARCHAR(16) NOT NULL,
   lastUpdateDate NUMERIC(19, 0) NULL,
   lastUpdatedBy NUMERIC(19, 0) NULL,

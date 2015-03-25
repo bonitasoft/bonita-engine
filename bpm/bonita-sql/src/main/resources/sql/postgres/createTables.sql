@@ -998,7 +998,7 @@ CREATE TABLE form_mapping (
   process INT8 NOT NULL,
   task VARCHAR(255) NULL,
   form VARCHAR(1024) NULL,
-  isexternal BOOLEAN NOT NULL,
+  target VARCHAR(16) NOT NULL,
   type VARCHAR(16) NOT NULL,
   lastUpdateDate INT8 NULL,
   lastUpdatedBy INT8 NULL,

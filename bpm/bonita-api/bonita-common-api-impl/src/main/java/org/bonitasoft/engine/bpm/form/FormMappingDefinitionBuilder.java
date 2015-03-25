@@ -14,18 +14,19 @@
 package org.bonitasoft.engine.bpm.form;
 
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 
 public class FormMappingDefinitionBuilder {
 
     private final FormMappingDefinition formMapping;
 
-    public FormMappingDefinitionBuilder(final String page, final FormMappingType type, final boolean external) {
-        formMapping = new FormMappingDefinition(page, type, external);
+    public FormMappingDefinitionBuilder(final String page, final FormMappingType type, final FormMappingTarget target) {
+        formMapping = new FormMappingDefinition(page, type, target);
     }
 
-    public static FormMappingDefinitionBuilder buildFormMapping(final String form, final FormMappingType type, final boolean external) {
-        return new FormMappingDefinitionBuilder(form, type, external);
+    public static FormMappingDefinitionBuilder buildFormMapping(final String form, final FormMappingType type, final FormMappingTarget target) {
+        return new FormMappingDefinitionBuilder(form, type, target);
     }
 
     public FormMappingDefinitionBuilder withTaskname(final String taskname) {

@@ -991,7 +991,7 @@ CREATE TABLE form_mapping (
   process NUMBER(19, 0) NOT NULL,
   task VARCHAR2(255 CHAR) NULL,
   form VARCHAR2(1024 CHAR) NULL,
-  isexternal NUMBER(1) NOT NULL,
+  target VARCHAR2(16) NOT NULL,
   type VARCHAR2(16 CHAR) NOT NULL,
   lastUpdateDate NUMBER(19, 0) NULL,
   lastUpdatedBy NUMBER(19, 0) NULL,
