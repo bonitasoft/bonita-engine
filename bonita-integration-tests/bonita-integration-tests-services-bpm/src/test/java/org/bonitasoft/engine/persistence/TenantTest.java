@@ -95,7 +95,7 @@ public class TenantTest extends CommonBPMServicesTest {
         getTransactionService().complete();
     }
 
-    //CHARLES @Test
+    @Test
     public void sequence() throws Exception {
 
         // Sequence id must be reinitialized.

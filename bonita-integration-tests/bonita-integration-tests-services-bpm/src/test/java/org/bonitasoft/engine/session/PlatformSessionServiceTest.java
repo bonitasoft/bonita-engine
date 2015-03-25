@@ -75,13 +75,18 @@ public class PlatformSessionServiceTest extends CommonBPMServicesTest {
     @Test
     public void testIsValid() throws Exception {
         final String username = "platformAdmin";
-        sessionService.setSessionDuration(1000);
-        final SPlatformSession session = sessionService.createSession(username);
-        assertNotNull(session);
-        assertEquals(1000, session.getDuration());
-        assertTrue(sessionService.isValid(session.getId()));
-        Thread.sleep(session.getDuration() + 1);
-        assertFalse(sessionService.isValid(session.getId()));
+        long sessionsDuration = sessionService.getSessionsDuration();
+        try{
+            sessionService.setSessionDuration(1000);
+            final SPlatformSession session = sessionService.createSession(username);
+            assertNotNull(session);
+            assertEquals(1000, session.getDuration());
+            assertTrue(sessionService.isValid(session.getId()));
+            Thread.sleep(session.getDuration() + 1);
+            assertFalse(sessionService.isValid(session.getId()));
+        } finally {
+            sessionService.setSessionDuration(sessionsDuration);
+        }
     }
 
     @Test

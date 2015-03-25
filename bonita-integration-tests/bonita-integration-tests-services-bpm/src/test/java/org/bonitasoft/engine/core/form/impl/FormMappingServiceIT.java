@@ -153,8 +153,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         assertThat(updatedInDatabase.isExternal()).isTrue();
         assertThat(updatedInDatabase.getLastUpdateDate()).isGreaterThan(taskForm.getLastUpdateDate());
 
-        SSession john = sessionService.createSession(1, 12, "john", false);
-        sessionAccessor.setSessionInfo(john.getId(), 1);
+        SSession john = sessionService.createSession(getDefaultTenantId(), 12, "john", false);
+        sessionAccessor.setSessionInfo(john.getId(), getDefaultTenantId());
 
         transactionService.begin();
         SFormMapping reupdated = formMappingService.get(taskForm.getId());

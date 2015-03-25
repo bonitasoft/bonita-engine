@@ -17,6 +17,7 @@ import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -34,6 +35,8 @@ public class PlatformUtil {
 
     public static final String DEFAULT_TENANT_STATUS = "DEACTIVATED";
 
+    public static final String TENANT_STATUS_ACTIVATED = "ACTIVATED";
+
     public static long createTenant(final TransactionService transactionService, final PlatformService platformService,
             final String tenantName, final String createdBy, final String status) throws Exception {
         try {
@@ -44,6 +47,7 @@ public class PlatformUtil {
                     false);
             final STenant tenant = tenantBuilder.done();
             platformService.createTenant(tenant);
+            BonitaHomeServer.getInstance().createTenant(tenant.getId());
             platformService.activateTenant(tenant.getId());
             return tenant.getId();
         } finally {
@@ -61,6 +65,7 @@ public class PlatformUtil {
                     .createNewInstance(tenantName, createdBy, created, status, true);
             final STenant tenant = tenantBuilder.done();
             platformService.createTenant(tenant);
+            BonitaHomeServer.getInstance().createTenant(tenant.getId());
             platformService.activateTenant(tenant.getId());
             return tenant.getId();
         } finally {

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.actor.mapping.SActorCreationException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorBuilderFactory;
@@ -71,6 +72,9 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
+import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
@@ -84,6 +88,7 @@ import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +97,8 @@ import org.slf4j.LoggerFactory;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@RunWith(BonitaTestRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class CommonBPMServicesTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonBPMServicesTest.class);
@@ -103,57 +110,22 @@ public class CommonBPMServicesTest {
     protected static PlatformServiceAccessor platformServiceAccessor;
 
     protected static Map<Long, TenantServiceAccessor> tenantServiceAccessors;
+    private static long tenantId;
 
     protected ServiceAccessorFactory getServiceAccessorFactory() {
         return ServiceAccessorFactory.getInstance();
     }
 
     @Rule
-    public TestRule testWatcher = new TestWatcher() {
-
-        @Override
-        public void starting(final Description d) {
-            LOGGER.info("Starting test: " + d.getClassName() + "." + d.getMethodName());
-        }
-
-        @Override
-        public void failed(final Throwable e, final Description d) {
-            LOGGER.warn("Failed test: " + d.getClassName() + "." + d.getMethodName(), e);
-            try {
-                clean();
-            } catch (final Exception be) {
-                LOGGER.error("unable to clean db", be);
-            } finally {
-                LOGGER.info("-----------------------------------------------------------------------------------------------");
-            }
-        }
-
-        @Override
-        public void succeeded(final Description d) {
-            try {
-                List<String> clean;
-                try {
-                    clean = clean();
-                } catch (final Exception e) {
-                    throw new BonitaRuntimeException(e);
-                }
-                LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
-                if (!clean.isEmpty()) {
-                    throw new BonitaRuntimeException(clean.toString());
-                }
-            } finally {
-                LOGGER.info("-----------------------------------------------------------------------------------------------");
-            }
-        }
-    };
+    public TestRule testWatcher = new PrintTestsStatusRule();
 
     protected long getDefaultTenantId() {
-        return 1;
+        return tenantId;
     }
 
 
     protected APISession getAPISession() {
-    return this.apiSession;
+        return this.apiSession;
     }
     protected SessionAccessor getSessionAccessor() {
         return sessionAccessor;
@@ -161,7 +133,9 @@ public class CommonBPMServicesTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        tenantServiceAccessors = new HashMap<Long, TenantServiceAccessor>();
+        tenantServiceAccessors = new HashMap<>();
+        APISession apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
+        tenantId = apiSession.getTenantId();
     }
 
     protected TenantServiceAccessor getAccessor(final long tenantId) throws Exception {
@@ -200,7 +174,8 @@ public class CommonBPMServicesTest {
     @Before
     public void before() throws Exception {
         apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
-        sessionAccessor.setSessionInfo(apiSession.getId(), apiSession.getTenantId());
+        tenantId = apiSession.getTenantId();
+        sessionAccessor.setSessionInfo(apiSession.getId(), tenantId);
     }
 
 
@@ -646,5 +621,54 @@ public class CommonBPMServicesTest {
         platformServiceAccessor.getTransactionService().complete();
 
         return flowNodes;
+    }
+
+    protected long createTenant(String tenantName) throws Exception {
+        return PlatformUtil.createTenant(getTransactionService(), getPlatformAccessor().getPlatformService(), tenantName,
+                PlatformUtil.DEFAULT_CREATED_BY, PlatformUtil.TENANT_STATUS_ACTIVATED);
+    }
+
+    protected void changeTenant(final long tenantId) throws  Exception {
+        getTransactionService().begin();
+        TestUtil.createSessionOn(getSessionAccessor(), getTenantAccessor().getSessionService(), tenantId);
+        getTransactionService().complete();
+    }
+
+    private class PrintTestsStatusRule extends TestWatcher {
+
+        @Override
+        public void starting(final Description d) {
+            LOGGER.info("Starting test: " + d.getClassName() + "." + d.getMethodName());
+        }
+
+        @Override
+        public void failed(final Throwable e, final Description d) {
+            LOGGER.warn("Failed test: " + d.getClassName() + "." + d.getMethodName(), e);
+            try {
+                clean();
+            } catch (final Exception be) {
+                LOGGER.error("unable to clean db", be);
+            } finally {
+                LOGGER.info("-----------------------------------------------------------------------------------------------");
+            }
+        }
+
+        @Override
+        public void succeeded(final Description d) {
+            try {
+                List<String> clean;
+                try {
+                    clean = clean();
+                } catch (final Exception e) {
+                    throw new BonitaRuntimeException(e);
+                }
+                LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
+                if (!clean.isEmpty()) {
+                    throw new BonitaRuntimeException(clean.toString());
+                }
+            } finally {
+                LOGGER.info("-----------------------------------------------------------------------------------------------");
+            }
+        }
     }
 }

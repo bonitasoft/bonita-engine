@@ -13,8 +13,10 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,11 +27,11 @@ import org.bonitasoft.engine.persistence.model.Parent;
 public class PersistenceTestUtil {
 
     protected static void checkHuman(final Human expected, final Human actual) {
-        assertNotNull(actual);
-        assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected.getFirstName(), actual.getFirstName());
-        assertEquals(expected.getLastName(), actual.getLastName());
-        assertEquals(expected.getAge(), actual.getAge());
+        assertThat(actual).as("Human").isNotNull();
+        assertThat(actual.getId()).isEqualTo(expected.getId());
+        assertThat(actual.getFirstName()).isEqualTo(expected.getFirstName());
+        assertThat(actual.getLastName()).isEqualTo(expected.getLastName());
+        assertThat(actual.getAge()).isEqualTo(expected.getAge());
     }
 
     protected static Human buildHuman(final Human src) {

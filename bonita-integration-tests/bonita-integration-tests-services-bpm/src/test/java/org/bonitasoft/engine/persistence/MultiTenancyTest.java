@@ -41,6 +41,15 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
         recorder = getTenantAccessor().getRecorder();
     }
 
+    @Override
+    public void before() throws Exception {
+    }
+
+    @Override
+    public void after() throws Exception {
+        changeTenant(getDefaultTenantId());
+    }
+
     @Test
     public void testMultiSchema() throws Exception {
         final String firstName = "firstName";
@@ -78,13 +87,13 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
         getTransactionService().complete();
     }
 
-    //CHARLES   @Test
+    @Test
     public void testIfOneFailAllFail() throws Exception {
         // Initialize
-        TestUtil.deleteDefaultTenantAndPlatForm(getTransactionService(), getPlatformAccessor().getPlatformService(), getSessionAccessor(), getTenantAccessor().getSessionService());
-        TestUtil.createPlatformAndDefaultTenant(getTransactionService(), getPlatformAccessor().getPlatformService(), getSessionAccessor(),
-                getTenantAccessor().getSessionService());
 
+        String tenantName = "testIfOneFailAllFail";
+        final long tenant1Id = createTenant(tenantName);
+        changeTenant(tenant1Id);
         getTransactionService().begin();
 
         final Parent parent = PersistenceTestUtil.buildParent("parent1FN", "parent1LN", 45);
@@ -107,17 +116,14 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
         }
     }
 
-    private void changeTenant(final long tenantId) throws SSessionException, SessionIdNotSetException, Exception {
-        getTransactionService().begin();
-        TestUtil.createSessionOn(getSessionAccessor(), getTenantAccessor().getSessionService(), tenantId);
-        getTransactionService().complete();
-    }
-
-    //CHARLES @Test
+    @Test
     public void testMultiTenant() throws Exception {
-        final long tenant1Id = PlatformUtil.createTenant(getTransactionService(), getPlatformAccessor().getPlatformService(), "tenant1",
-                PlatformUtil.DEFAULT_CREATED_BY, DEFAULT_TENANT_STATUS);
+        final long tenant1Id = createTenant("tenant1");
+        final long tenant2Id = createTenant("tenant2");
         try {
+            changeTenant(tenant1Id);
+
+
             final String firstName = "firstName";
             final String lastName = "lastName";
             final int age = 12;
@@ -126,14 +132,14 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
             final Human human2 = PersistenceTestUtil.buildHuman(firstName, lastName, age);
             getTransactionService().begin();
             recorder.recordInsert(new InsertRecord(human1), null);
-            PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
+            PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<>("getHumanById", Human.class, human1.getId())));
             getTransactionService().complete();
 
-            changeTenant(tenant1Id);
+            changeTenant(tenant2Id);
             getTransactionService().begin();
             try {
                 PersistenceTestUtil.checkHuman(human1,
-                        persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
+                        persistenceService.selectById(new SelectByIdDescriptor<>("getHumanById", Human.class, human1.getId())));
                 fail("human1 must not be found in tenant1");
             } catch (final AssertionError e) {
                 // OK
@@ -141,15 +147,12 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
             recorder.recordInsert(new InsertRecord(human2), null);
             getTransactionService().complete();
 
-            // getTransactionService().begin();
-            final long defaultTenantId = getDefaultTenantId();
-            // getTransactionService().complete();
-            changeTenant(defaultTenantId);
+            changeTenant(tenant1Id);
             getTransactionService().begin();
-            PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
+            PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<>("getHumanById", Human.class, human1.getId())));
             try {
                 PersistenceTestUtil.checkHuman(human2,
-                        persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human2.getId())));
+                        persistenceService.selectById(new SelectByIdDescriptor<>("getHumanById", Human.class, human2.getId())));
                 fail("human1 must not be found in default");
             } catch (final AssertionError e) {
                 // OK
@@ -161,29 +164,25 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
         }
     }
 
-    //CHARLES @Test
+    @Test
     public void testSearchWith3Tenants() throws Exception {
-        final long tenant1Id = PlatformUtil.createTenant(getTransactionService(), getPlatformAccessor().getPlatformService(), "tenant2",
-                PlatformUtil.DEFAULT_CREATED_BY, DEFAULT_TENANT_STATUS);
-        final long tenant2Id = PlatformUtil.createTenant(getTransactionService(), getPlatformAccessor().getPlatformService(), "tenant1",
-                PlatformUtil.DEFAULT_CREATED_BY, DEFAULT_TENANT_STATUS);
+        final long tenant1Id = createTenant("testSearchWith3Tenants1");
+        final long tenant2Id = createTenant("testSearchWith3Tenants2");
+        final long tenant3Id = createTenant("testSearchWith3Tenants3");
         try {
-            // getTransactionService().begin();
-            final long defaultTenantId = getDefaultTenantId();
-            // getTransactionService().complete();
-            changeTenant(defaultTenantId);
+            changeTenant(tenant1Id);
             getTransactionService().begin();
             final Human human1 = PersistenceTestUtil.buildHuman("default", "lastName", 45);
             recorder.recordInsert(new InsertRecord(human1), null);
             getTransactionService().complete();
 
-            changeTenant(tenant1Id);
+            changeTenant(tenant2Id);
             getTransactionService().begin();
             final Human human2 = PersistenceTestUtil.buildHuman("tenant1", "lastName", 32);
             recorder.recordInsert(new InsertRecord(human2), null);
             getTransactionService().complete();
 
-            changeTenant(tenant2Id);
+            changeTenant(tenant3Id);
             getTransactionService().begin();
             final Human human3 = PersistenceTestUtil.buildHuman("tenant2", "lastName", 12);
             recorder.recordInsert(new InsertRecord(human3), null);
@@ -195,17 +194,14 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
         }
     }
 
-    //CHARLES @Test
+    @Test
     public void sequenceWithMultiTenancy() throws Exception {
 
-        // Initialize
-        TestUtil.deleteDefaultTenantAndPlatForm(getTransactionService(), getPlatformAccessor().getPlatformService(), getSessionAccessor(), getTenantAccessor().getSessionService());
-        TestUtil.createPlatformAndDefaultTenant(getTransactionService(), getPlatformAccessor().getPlatformService(), getSessionAccessor(),
-                getTenantAccessor().getSessionService());
+        final long tenant1Id = createTenant("sequenceWithMultiTenancy1");
+        final long tenant2Id = createTenant("sequenceWithMultiTenancy2");
 
-        final long tenant1Id = PlatformUtil.createTenant(getTransactionService(), getPlatformAccessor().getPlatformService(), "tenant1",
-                PlatformUtil.DEFAULT_CREATED_BY, DEFAULT_TENANT_STATUS);
         try {
+            changeTenant(tenant1Id);
             final String firstName = "firstName";
             final String lastName = "lastName";
             final int age = 12;
@@ -215,7 +211,7 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
             recorder.recordInsert(new InsertRecord(human1), null);
             assertEquals(1, human1.getId());
             getTransactionService().complete();
-            changeTenant(tenant1Id);
+            changeTenant(tenant2Id);
 
             getTransactionService().begin();
             final Long nbOfHuman = persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfHumans", null, Human.class, Long.class));

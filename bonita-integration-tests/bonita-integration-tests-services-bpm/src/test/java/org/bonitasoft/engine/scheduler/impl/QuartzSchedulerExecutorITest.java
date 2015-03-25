@@ -36,6 +36,7 @@ import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTriggerForTest;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -102,16 +103,6 @@ public class QuartzSchedulerExecutorITest extends CommonBPMServicesTest {
         assertFalse(deleted);
     }
 
-    private void changeToTenant1() throws STenantNotFoundException, Exception {
-        final long tenant1 = platformService.getTenantByName("tenant1").getId();
-        TestUtil.createSessionOn(getSessionAccessor(), getTenantAccessor().getSessionService(), tenant1);
-    }
-
-    protected void changeToDefaultTenant() throws STenantNotFoundException, Exception {
-        final long defaultTenant = platformService.getTenantByName("default").getId();
-        TestUtil.createSessionOn(getSessionAccessor(), getTenantAccessor().getSessionService(), defaultTenant);
-    }
-
     /*
      * We must ensure that:
      * * pause only jobs of the current tenant
@@ -119,8 +110,12 @@ public class QuartzSchedulerExecutorITest extends CommonBPMServicesTest {
      * * resume the jobs resume it really
      * *
      */
-    //CHARLES @Test
+    @Test
     public void pause_and_resume_jobs_of_a_tenant() throws Exception {
+        long tenantForJobTest1 = createTenant("tenantForJobTest1");
+        long tenantForJobTest2 = createTenant("tenantForJobTest2");
+
+        changeTenant(tenantForJobTest1);
         final String jobName = "ReleaseWaitersJob";
         Date now = new Date();
         SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
@@ -138,47 +133,22 @@ public class QuartzSchedulerExecutorITest extends CommonBPMServicesTest {
 
         // pause
         getTransactionService().begin();
-        schedulerService.pauseJobs(getDefaultTenantId());
+        schedulerService.pauseJobs(sessionAccessor.getTenantId());
         getTransactionService().complete();
         Thread.sleep(100);
         ReleaseWaitersJob.checkNotExecutedDuring(1500);
 
         // trigger the job in an other tenant
-        getTransactionService().begin();
-        changeToTenant1();
-        getTransactionService().complete();
+        changeTenant(tenantForJobTest2);
         now = new Date(System.currentTimeMillis() + 100);
         jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(ReleaseWaitersJob.class.getName(), jobName + "2").done();
-        parameters = new ArrayList<SJobParameter>();
+        parameters = new ArrayList<>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName3", jobName).done());
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobKey", "3").done());
         trigger = new OneShotTrigger("events3", now, 10);
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
-        ReleaseWaitersJob.waitForJobToExecuteOnce();
-
-        getTransactionService().begin();
-        changeToDefaultTenant();
-        getTransactionService().complete();
-        // schedule on same group
-        now = new Date(System.currentTimeMillis() + 100);
-        jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(ReleaseWaitersJob.class.getName(), jobName + "2").done();
-        parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName2", jobName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobKey", "2").done());
-        trigger = new OneShotTrigger("events2", now, 10);
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-
-        ReleaseWaitersJob.checkNotExecutedDuring(1500);
-
-        // resume
-        getTransactionService().begin();
-        schedulerService.resumeJobs(getDefaultTenantId());
-        getTransactionService().complete();
-
         ReleaseWaitersJob.waitForJobToExecuteOnce();
     }
 

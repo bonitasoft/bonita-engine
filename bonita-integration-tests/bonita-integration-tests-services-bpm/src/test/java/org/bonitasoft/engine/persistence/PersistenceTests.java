@@ -13,11 +13,14 @@
  **/
 package org.bonitasoft.engine.persistence;
 
+import org.bonitasoft.engine.LocalServerTestsInitializer;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(Suite.class)
+@RunWith(BonitaSuiteRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 @SuiteClasses({
     TenantTest.class,
     MultiTenancyTest.class

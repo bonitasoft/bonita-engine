@@ -17,11 +17,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -88,7 +91,7 @@ public class TenantManagementTest extends CommonBPMServicesTest {
 
     @Test
     public void newlyCreatedTenantShouldBeAvailableForRetrieve() throws Exception {
-        final String name = "tenant1";
+        final String name = "newlyCreatedTenant1";
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
@@ -130,7 +133,7 @@ public class TenantManagementTest extends CommonBPMServicesTest {
 
     @Test
     public void updateTenantShouldUpdateAllFields() throws Exception {
-        final String name = "tenant1";
+        final String name = "updateTenant1";
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
@@ -162,16 +165,9 @@ public class TenantManagementTest extends CommonBPMServicesTest {
 
     @Test(expected = STenantUpdateException.class)
     public void updateInexistantTenantShouldFail() throws Exception {
-        final String name = "tenant1";
-        final String createdBy = "mycreatedBy";
-        final long created = System.currentTimeMillis();
-
-        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance("tenant1", "mycreatedBy", System.currentTimeMillis(), STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
-        long createdTenant = platformService.createTenant(tenant);
-        platformService.deleteTenant(createdTenant);
-
         final STenantUpdateBuilderFactory updateBuilderFactory = BuilderFactory.get(STenantUpdateBuilderFactory.class);
         final STenantUpdateBuilder updateDescriptor = updateBuilderFactory.createNewInstance();
         try {
@@ -184,8 +180,8 @@ public class TenantManagementTest extends CommonBPMServicesTest {
 
     @Test(expected = STenantUpdateException.class)
     public void updatingTenantNameWithAlreadyExistingShouldFail() throws Exception {
-        final String tenant1Name = "tenant1";
-        final String tenant2Name = "tenant2";
+        final String tenant1Name = "updatingTenantName1";
+        final String tenant2Name = "updatingTenantName2";
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
@@ -249,8 +245,8 @@ public class TenantManagementTest extends CommonBPMServicesTest {
 
     @Test
     public void getTenantsShouldFilterOnSearchCriteria() throws Exception {
-        final String tenant1Name = "tenant1";
-        final String tenant2Name = "tenant2";
+        final String tenant1Name = "tTenantsShouldFilter1";
+        final String tenant2Name = "tTenantsShouldFilter2";
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
@@ -265,16 +261,17 @@ public class TenantManagementTest extends CommonBPMServicesTest {
         getTransactionService().complete();
 
         try {
-            final List<OrderByOption> orderbyOptions = new ArrayList<OrderByOption>();
-            orderbyOptions.add(new OrderByOption(STenant.class, BuilderFactory.get(STenantBuilderFactory.class).getIdKey(), OrderByType.DESC));
-            final QueryOptions queryOptions = new QueryOptions(0, 20, orderbyOptions);
+            final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>();
+            orderByOptions.add(new OrderByOption(STenant.class, BuilderFactory.get(STenantBuilderFactory.class).getIdKey(), OrderByType.DESC));
+            final QueryOptions queryOptions = new QueryOptions(0, 20, orderByOptions, Collections.singletonList(new FilterOption(STenant.class, "name").like("tTenantsShouldFilter")),null);
+
 
             getTransactionService().begin();
             List<STenant> readTenants = platformService.getTenants(queryOptions);
             getTransactionService().complete();
 
             // count also default tenant:
-            assertThat(readTenants.size()).isEqualTo(3);
+            assertThat(readTenants.size()).isEqualTo(2);
             assertThat(readTenants.get(0).getId()).isEqualTo(tenant2.getId());
             assertThat(readTenants.get(1).getId()).isEqualTo(tenant1.getId());
 
@@ -322,8 +319,8 @@ public class TenantManagementTest extends CommonBPMServicesTest {
 
     @Test
     public void searchTenants() throws Exception {
-        final String tenant1Name = "tenant1";
-        final String tenant2Name = "tenant2";
+        final String tenant1Name = "searchTenants1";
+        final String tenant2Name = "searchTenants2";
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
@@ -340,11 +337,11 @@ public class TenantManagementTest extends CommonBPMServicesTest {
         // sort
         final List<OrderByOption> orderbyOptions = new ArrayList<OrderByOption>();
         orderbyOptions.add(new OrderByOption(STenant.class, BuilderFactory.get(STenantBuilderFactory.class).getIdKey(), OrderByType.DESC));
-        final QueryOptions queryOptions = new QueryOptions(0, 10, orderbyOptions);
+        final QueryOptions queryOptions = new QueryOptions(0, 10, orderbyOptions, Collections.singletonList(new FilterOption(STenant.class,"name").like("searchTenants")),null);
 
         final List<STenant> readTenants = platformService.searchTenants(queryOptions);
         // count also default tenant:
-        assertThat(readTenants.size()).isEqualTo(3);
+        assertThat(readTenants.size()).isEqualTo(2);
         assertThat(readTenants.get(0).getId()).isEqualTo(tenant2.getId());
         assertThat(readTenants.get(1).getId()).isEqualTo(tenant1.getId());
         getTransactionService().complete();
