@@ -31,7 +31,7 @@ import org.junit.runners.Suite.SuiteClasses;
         // Last test suite in order to check the correct begin/complete transactions
         MonitoringTests.class
 })
-public class AllBPMSPTestsWithJNDI {
+public class AllBPMSPTests {
 
         @BeforeClass
         public static void beforeClass() throws Exception {

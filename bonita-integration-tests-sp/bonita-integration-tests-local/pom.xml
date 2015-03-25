@@ -42,6 +42,22 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.bonitasoft.engine.test</groupId>
+            <artifactId>bonita-integration-tests-local</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.hazelcast</groupId>
+                    <artifactId>hazelcast-hibernate</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>compile</scope>

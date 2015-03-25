@@ -30,7 +30,8 @@ import org.junit.runners.Suite.SuiteClasses;
         TenantMaintenanceLocalIT.class,
         PageAPILocalIT.class,
         TenantLocalIT.class,
-        BDRepositoryLocalIT.class
+        BDRepositoryLocalIT.class,
+        AllBPMSPTests.class
 })
 @Initializer(LocalServerTestsInitializerSP.class)
 public class LocalIntegrationTestsSP {

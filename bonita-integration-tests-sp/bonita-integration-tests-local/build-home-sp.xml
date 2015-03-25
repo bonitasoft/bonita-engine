@@ -4,6 +4,7 @@
 	<property name="resources.dir" value="${basedir}/src/test/resources"/>
 	<property name="bh.source.dir" value="${basedir}/../../bpm/bonita-home/target/bonita-home"/>
 	<property name="local.test.resources.dir" value="${basedir}/../../../bonita-engine/bonita-integration-tests/bonita-test-utils/bonita-server-test-utils/src/main/resources"/>
+	<property name="community.test.override.dir" value="${basedir}/../../../bonita-engine/bonita-integration-tests/bonita-integration-tests-local/src/test/resources"/>
 	<property name="bh.target.dir" value="${target.dir}/bonita-home"/>
 	<property name="bh.target.conf.platform.dir" value="${bh.target.dir}/engine-server/conf/platform"/>
 	<property name="bh.target.conf.tenant.dir" value="${bh.target.dir}/engine-server/conf/tenants/template"/>
@@ -21,9 +22,24 @@
 				<include name="*"/>
 			</fileset>
 		</copy>
+		<copy description="copy community services-bpm platform resources into bonita home" todir="${bh.target.conf.platform.dir}" overwrite="true">
+			<fileset dir="${community.test.override.dir}">
+				<include name="bonita-platform-custom.xml"/>
+			</fileset>
+		</copy>
+		<copy description="copy community services-bpm tenants resources into bonita home" todir="${bh.target.conf.tenant.dir}" overwrite="true">
+			<fileset dir="${community.test.override.dir}">
+				<include name="bonita-tenants-custom.xml"/>
+			</fileset>
+		</copy>
 		<copy todir="${bh.target.conf.tenant.dir}" overwrite="true">
 			<fileset dir="${resources.dir}">
 				<include name="bonita-tenants-sp1-custom.xml"/>
+			</fileset>
+		</copy>
+		<copy todir="${bh.target.conf.platform.dir}" overwrite="true">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-platform-sp1-custom.xml"/>
 			</fileset>
 		</copy>
 		<ant antfile="../../bpm/bonita-home/install-license.xml"/>
