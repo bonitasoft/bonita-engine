@@ -56,7 +56,13 @@
 			</exclusions>
     </dependency>
 
-    <!-- Authentication -->
+      <dependency>
+          <groupId>org.bonitasoft.engine.archive</groupId>
+          <artifactId>bonita-archive-impl</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+
+      <!-- Authentication -->
     <dependency>
       <groupId>org.bonitasoft.engine.authentication</groupId>
       <artifactId>bonita-authentication-api-impl</artifactId>
