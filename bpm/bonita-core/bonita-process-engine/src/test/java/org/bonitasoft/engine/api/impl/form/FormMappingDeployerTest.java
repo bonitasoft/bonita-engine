@@ -28,6 +28,7 @@ import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.core.form.FormMappingService;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,17 +60,16 @@ public class FormMappingDeployerTest {
         final long processDefinitionId = 3L;
         final String startForm = "startPage";
         final String overviewForm = "overviewPage";
-        final boolean isExternal = false;
         deployer.deployFormMappings(
                 barBuilder.setFormMappings(
                         FormMappingModelBuilder.buildFormMappingModel()
-                                .addProcessStartForm(startForm, isExternal)
-                                .addProcessOverviewForm(overviewForm, isExternal)
+                                .addProcessStartForm(startForm, FormMappingTarget.INTERNAL)
+                                .addProcessOverviewForm(overviewForm, FormMappingTarget.INTERNAL)
                                 .build()).done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, null, startForm, isExternal, FormMappingType.PROCESS_START.name());
-        verify(formMappingService, times(1)).create(processDefinitionId, null, overviewForm, isExternal, FormMappingType.PROCESS_OVERVIEW.name());
+        verify(formMappingService, times(1)).create(processDefinitionId, null, startForm, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_START.name());
+        verify(formMappingService, times(1)).create(processDefinitionId, null, overviewForm, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_OVERVIEW.name());
     }
 
     @Test
@@ -81,8 +81,8 @@ public class FormMappingDeployerTest {
         deployer.deployFormMappings(barBuilder.done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, null, null, false, FormMappingType.PROCESS_OVERVIEW.name());
-        verify(formMappingService, times(1)).create(processDefinitionId, null, null, false, FormMappingType.PROCESS_START.name());
+        verify(formMappingService, times(1)).create(processDefinitionId, null, null, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_OVERVIEW.name());
+        verify(formMappingService, times(1)).create(processDefinitionId, null, null, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_START.name());
     }
 
     @Test
@@ -95,15 +95,14 @@ public class FormMappingDeployerTest {
         final long processDefinitionId = 3L;
         final String form = "pagename";
         final String type = FormMappingType.TASK.name();
-        final boolean isExternal = false;
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 processDefBuilder.done());
         businessArchiveBuilder.setFormMappings(buildFormMappingModel().withFormMapping(
-                buildFormMapping(form, FormMappingType.valueOf(type), isExternal).withTaskname(taskname).build()).build());
+                buildFormMapping(form, FormMappingType.valueOf(type), FormMappingTarget.INTERNAL).withTaskname(taskname).build()).build());
         deployer.deployFormMappings(businessArchiveBuilder.done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, taskname, form, isExternal, type);
+        verify(formMappingService, times(1)).create(processDefinitionId, taskname, form, FormMappingTarget.INTERNAL.name(), type);
     }
 
     @Test
@@ -116,16 +115,15 @@ public class FormMappingDeployerTest {
         final long processDefinitionId = 3L;
         final String form = "pagename";
         final String type = FormMappingType.TASK.name();
-        final boolean isExternal = false;
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 processDefBuilder.done());
         businessArchiveBuilder.setFormMappings(buildFormMappingModel().withFormMapping(
-                buildFormMapping(form, FormMappingType.valueOf(type), isExternal).withTaskname(taskname).build()).build());
+                buildFormMapping(form, FormMappingType.valueOf(type), FormMappingTarget.INTERNAL).withTaskname(taskname).build()).build());
         deployer.deployFormMappings(businessArchiveBuilder.done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, null, null, false, FormMappingType.PROCESS_START.name());
-        verify(formMappingService, times(1)).create(processDefinitionId, null, null, false, FormMappingType.PROCESS_OVERVIEW.name());
+        verify(formMappingService, times(1)).create(processDefinitionId, null, null, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_START.name());
+        verify(formMappingService, times(1)).create(processDefinitionId, null, null, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_OVERVIEW.name());
         verifyNoMoreInteractions(formMappingService);
     }
 
@@ -134,7 +132,6 @@ public class FormMappingDeployerTest {
         // Given:
         final long processDefinitionId = 5L;
         final String taskName = "taskname";
-        final boolean isExternal = false;
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("proc", "5");
         processDefBuilder.addUserTask(taskName, null);
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefBuilder.done()).done();
@@ -143,7 +140,7 @@ public class FormMappingDeployerTest {
         deployer.deployFormMappings(businessArchive, processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, taskName, null, isExternal, FormMappingType.TASK.name());
+        verify(formMappingService, times(1)).create(processDefinitionId, taskName, null, FormMappingTarget.INTERNAL.name(), FormMappingType.TASK.name());
     }
 
     @Test
@@ -156,14 +153,14 @@ public class FormMappingDeployerTest {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 processDefBuilder.done());
         final String unknownTaskName = "Unknown__Task__Name";
-        businessArchiveBuilder.setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addTaskForm("someForm", false, unknownTaskName).build());
+        businessArchiveBuilder.setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addTaskForm("someForm", FormMappingTarget.INTERNAL, unknownTaskName).build());
         final BusinessArchive businessArchive = businessArchiveBuilder.done();
 
         // when:
         deployer.deployFormMappings(businessArchive, processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(eq(processDefinitionId), eq(declaredTaskName), anyString(), anyBoolean(), eq(FormMappingType.TASK.name()));
-        verify(formMappingService, times(0)).create(eq(processDefinitionId), eq(unknownTaskName), anyString(), anyBoolean(), eq(FormMappingType.TASK.name()));
+        verify(formMappingService, times(1)).create(eq(processDefinitionId), eq(declaredTaskName), anyString(), anyString(), eq(FormMappingType.TASK.name()));
+        verify(formMappingService, times(0)).create(eq(processDefinitionId), eq(unknownTaskName), anyString(), anyString(), eq(FormMappingType.TASK.name()));
     }
 }

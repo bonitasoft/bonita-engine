@@ -11,26 +11,36 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.flownode;
+package org.bonitasoft.engine.core.contract.data;
 
-import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
+import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
- * A User Task is a typical “workflow” Task where a human performer performs the Task with the assistance of a
- * software application and is scheduled through a task list manager of some sort
- *
- * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface UserTaskDefinition extends HumanTaskDefinition {
+public class SATaskContractData extends SAContractData implements ArchivedPersistentObject {
 
-    /**
-     * Contract that must be respected when executing an instance of this user task
-     *
-     * @return
-     *         the user task execution contract
-     */
-    ContractDefinition getContract();
+    private static final long serialVersionUID = 5105634271134688723L;
 
+    public SATaskContractData() {
+        super();
+    }
+
+    public SATaskContractData(final SContractData contractData) {
+        super(contractData);
+    }
+
+    public SATaskContractData(final STaskContractData taskContractData) {
+        super(taskContractData);
+    }
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SATaskContractData.class;
+    }
+
+    public long getUserTaskId() {
+        return scopeId;
+    }
 }

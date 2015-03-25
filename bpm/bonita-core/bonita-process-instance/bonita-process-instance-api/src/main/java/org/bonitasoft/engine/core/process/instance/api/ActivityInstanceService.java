@@ -678,6 +678,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     /**
      * @param flowNodeInstanceId
+     *     delete pending mapping of this flow node
      */
     void deleteArchivedPendingMappings(long flowNodeInstanceId) throws SActivityModificationException;
 
@@ -714,6 +715,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     long getNumberOfArchivedActivityInstancesSupervisedBy(long supervisorId, Class<? extends SAActivityInstance> entityClass, QueryOptions queryOptions)
             throws SBonitaReadException;
 
+    boolean isTaskPendingForUser(long humanTaskInstanceId, long userId) throws SBonitaReadException;
     /**
      * Retrieve the total number of the archived Activities matching the given search criteria, for a specific supervisor.
      *

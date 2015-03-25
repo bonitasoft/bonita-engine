@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
 import org.bonitasoft.engine.form.FormMapping;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
@@ -60,7 +61,7 @@ public class ProcessConfigurationAPIImplTest {
     @Test
     public void testGetProcessStartForm() throws Exception {
         //given
-        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, false, "myForm", PROCESS_DEF_ID);
+        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, FormMappingTarget.INTERNAL.name(), "myForm", PROCESS_DEF_ID);
         doReturn(sFormMapping).when(formMappingService).get(PROCESS_DEF_ID, FormMappingType.PROCESS_START.name());
         //when
         FormMapping processStartForm = processConfigurationAPI.getProcessStartForm(PROCESS_DEF_ID);
@@ -68,17 +69,17 @@ public class ProcessConfigurationAPIImplTest {
         verify(formMappingService, times(1)).get(PROCESS_DEF_ID, FormMappingType.PROCESS_START.name());
         assertThat(processStartForm.getProcessDefinitionId()).isEqualTo(PROCESS_DEF_ID);
         assertThat(processStartForm.getType()).isEqualTo(FormMappingType.PROCESS_START);
-        assertThat(processStartForm.isExternal()).isFalse();
+        assertThat(processStartForm.getTarget()).isEqualToIgnoringGivenFields(FormMappingTarget.INTERNAL);
         assertThat(processStartForm.getForm()).isEqualTo("myForm");
         assertThat(processStartForm.getId()).isEqualTo(FORM_MAPPING_ID);
     }
 
-    SFormMappingImpl createSFormMapping(String name, long formMappingId, boolean isExternal, String myForm1, long processDefinitionId) {
+    SFormMappingImpl createSFormMapping(String name, long formMappingId, String target, String myForm1, long processDefinitionId) {
         SFormMappingImpl sFormMapping = new SFormMappingImpl();
         sFormMapping.setId(formMappingId);
         sFormMapping.setProcessDefinitionId(processDefinitionId);
         sFormMapping.setType(name);
-        sFormMapping.setIsExternal(isExternal);
+        sFormMapping.setTarget(target);
         sFormMapping.setForm(myForm1);
         return sFormMapping;
     }
@@ -86,7 +87,7 @@ public class ProcessConfigurationAPIImplTest {
     @Test
     public void testGetProcessOverviewForm() throws Exception {
         //given
-        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, false, "myForm", PROCESS_DEF_ID);
+        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, FormMappingTarget.INTERNAL.name(), "myForm", PROCESS_DEF_ID);
         doReturn(sFormMapping).when(formMappingService).get(PROCESS_DEF_ID, FormMappingType.PROCESS_OVERVIEW.name());
         //when
         FormMapping processStartForm = processConfigurationAPI.getProcessOverviewForm(PROCESS_DEF_ID);
@@ -99,7 +100,7 @@ public class ProcessConfigurationAPIImplTest {
     @Test
     public void testGetHumanTaskForm() throws Exception {
         //given
-        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, false, "myForm", PROCESS_DEF_ID);
+        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, FormMappingTarget.INTERNAL.name(), "myForm", PROCESS_DEF_ID);
         doReturn(sFormMapping).when(formMappingService).get(PROCESS_DEF_ID, FormMappingType.TASK.name(), "myTask");
         //when
         FormMapping processStartForm = processConfigurationAPI.getTaskForm(PROCESS_DEF_ID, "myTask");
@@ -111,12 +112,12 @@ public class ProcessConfigurationAPIImplTest {
     @Test
     public void testUpdateFormMapping() throws Exception {
         //given
-        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, false, "myForm", PROCESS_DEF_ID);
+        SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START.name(), FORM_MAPPING_ID, FormMappingTarget.INTERNAL.name(), "myForm", PROCESS_DEF_ID);
         doReturn(sFormMapping).when(formMappingService).get(FORM_MAPPING_ID);
         //when
-        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", true);
+        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", FormMappingTarget.INTERNAL);
         //then
-        verify(formMappingService, times(1)).update(sFormMapping,"theNewForm",true);
+        verify(formMappingService, times(1)).update(sFormMapping,"theNewForm",FormMappingTarget.INTERNAL.name());
 
     }
 }

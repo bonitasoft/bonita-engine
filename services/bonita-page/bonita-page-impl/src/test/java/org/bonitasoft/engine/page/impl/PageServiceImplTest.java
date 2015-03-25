@@ -186,7 +186,7 @@ public class PageServiceImplTest {
     }
 
     @Test(expected = SObjectAlreadyExistsException.class)
-    public void addPage_should_throw_exception_when_badContent() throws Exception {
+    public void addPage_should_throw_exception_when_already_exist() throws Exception {
 
         // given
         final SPageImpl newPage = new SPageImpl(PAGE_NAME, INSTALLATION_DATE_AS_LONG, INSTALLED_BY_ID, PROVIDED_TRUE, CONTENT_NAME);
@@ -596,6 +596,17 @@ public class PageServiceImplTest {
 
         // then
         // exception
+    }
+
+    @Test
+    public void zipTest_Content_7_0_With_index_html_in_resources_folder() throws Exception {
+        // given
+        Map<String, byte[]> zipContent = Collections.singletonMap("resources/index.html", "hello".getBytes());
+
+        // when
+        pageServiceImpl.checkZipContainsRequiredEntries(zipContent);
+
+        // then
     }
 
     @Test

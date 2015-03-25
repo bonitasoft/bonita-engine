@@ -25,6 +25,7 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -99,11 +100,11 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     }
 
     @Override
-    public void updateFormMapping(final long formMappingId, final String form, final boolean external) throws FormMappingNotFoundException, UpdateException {
+    public void updateFormMapping(final long formMappingId, final String form, FormMappingTarget target) throws FormMappingNotFoundException, UpdateException {
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {
             SFormMapping sFormMapping = formMappingService.get(formMappingId);
-            formMappingService.update(sFormMapping, form, external);
+            formMappingService.update(sFormMapping, form, target.name());
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (SObjectNotFoundException e) {

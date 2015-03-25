@@ -240,10 +240,10 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    private void checkZipContainsRequiredEntries(final Map<String, byte[]> zipContent) throws SInvalidPageZipMissingIndexException {
+    void checkZipContainsRequiredEntries(final Map<String, byte[]> zipContent) throws SInvalidPageZipMissingIndexException {
         final Set<String> entrySet = zipContent.keySet();
         for (final String entry : entrySet) {
-            if (entry.equals("Index.groovy") || entry.equalsIgnoreCase("index.html")) {
+            if (entry.equals("Index.groovy") || entry.equalsIgnoreCase("index.html")|| entry.equalsIgnoreCase("resources/index.html")) {
                 return;
             }
         }

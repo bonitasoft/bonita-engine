@@ -52,6 +52,7 @@ import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
@@ -799,6 +800,11 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      */
     public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
         return new ParameterDefinitionBuilder(this, process, parameterName, type);
+    }
+
+
+    public ContractDefinitionBuilder addContract() {
+        return new ContractDefinitionBuilder(this, process);
     }
 
 }
