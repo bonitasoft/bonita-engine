@@ -6,15 +6,5 @@
 
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-    <bean id="archivingStrategyMap" parent="archivingStrategyMapBase" class="org.springframework.beans.factory.config.MapFactoryBean">
-        <property name="sourceMap">
-            <map merge="true">
-                <entry key="org.bonitasoft.engine.archive.model.Employee" value="true" />
-                <entry key="org.bonitasoft.engine.archive.model.Laptop" value="true" />
-                <entry key="org.bonitasoft.engine.archive.model.Address" value="true" />
-                <entry key="org.bonitasoft.engine.archive.model.Project" value="true" />
-                <entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" value="true" />
-            </map>
-        </property>
-    </bean>
+
 </beans>
