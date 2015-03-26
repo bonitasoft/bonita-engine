@@ -1,0 +1,96 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="queriableLoggerStrategy" class="com.bonitasoft.engine.log.api.impl.MapQueriableLoggerStrategy">
+        <constructor-arg name="loggableLevels">
+            <map>
+                <entry key="ACTOR_CREATED:INTERNAL" value="true" />
+                <entry key="ACTOR_DELETED:INTERNAL" value="true" />
+                <entry key="ACTOR_UPDATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_CREATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_DELETED:INTERNAL" value="true" />
+                <entry key="APPLICATION_UPDATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_CREATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_DELETED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_UPDATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_CREATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_DELETED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_UPDATED:INTERNAL" value="true" />
+                <entry key="BREAKPOINT_CREATED:INTERNAL" value="true" />
+                <entry key="BREAKPOINT_DELETED:INTERNAL" value="true" />
+                <entry key="CATEGORY_CREATED:INTERNAL" value="true" />
+                <entry key="CATEGORY_DELETED:INTERNAL" value="true" />
+                <entry key="CATEGORY_UPDATED:INTERNAL" value="true" />
+                <entry key="COMMAND_CREATED:INTERNAL" value="true" />
+                <entry key="COMMAND_DELETED:INTERNAL" value="true" />
+                <entry key="COMMAND_UPDATED:INTERNAL" value="true" />
+                <entry key="COMMENT_CREATED:INTERNAL" value="true" />
+                <entry key="COMMENT_DELETED:INTERNAL" value="true" />
+                <entry key="USERTASK_CONTRACT_DATA_CREATED:INTERNAL" value="true" />
+                <entry key="PROCESS_CONTRACT_DATA_CREATED:INTERNAL" value="true" />
+                <entry key="DEPENDENCY_CREATED:INTERNAL" value="true" />
+                <entry key="DEPENDENCY_DELETED:INTERNAL" value="true" />
+                <entry key="DEPENDENCY_UPDATED:INTERNAL" value="true" />
+                <entry key="DEPENDENCY_MAPPING_CREATED:INTERNAL" value="true" />
+                <entry key="DEPENDENCY_MAPPING_DELETED:INTERNAL" value="true" />
+                <entry key="EXTERNAL_IDENTITY_MAPPING_CREATED:INTERNAL" value="true" />
+                <entry key="EXTERNAL_IDENTITY_MAPPING_DELETED:INTERNAL" value="true" />
+                <entry key="IDENTITY_GROUP_CREATED:INTERNAL" value="false" />
+                <entry key="IDENTITY_GROUP_DELETED:INTERNAL" value="false" />
+                <entry key="IDENTITY_GROUP_UPDATED:INTERNAL" value="false" />
+                <entry key="IDENTITY_ROLE_CREATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_ROLE_DELETED:INTERNAL" value="true" />
+                <entry key="IDENTITY_ROLE_UPDATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_CREATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_DELETED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_UPDATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_CONTACT_INFO_CREATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_CONTACT_INFO_UPDATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_MEMBERSHIP_CREATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_MEMBERSHIP_DELETED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_MEMBERSHIP_UPDATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_CREATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_DELETED:INTERNAL" value="true" />
+                <entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_UPDATED:INTERNAL" value="true" />
+                <entry key="PAGE_CREATED:INTERNAL" value="true" />
+                <entry key="PAGE_DELETED:INTERNAL" value="true" />
+                <entry key="PAGE_UPDATED:INTERNAL" value="true" />
+                <entry key="PROCESS_DEFINITION_CREATED:INTERNAL" value="true" />
+                <entry key="PROCESS_DEFINITION_DELETED:INTERNAL" value="true" />
+                <entry key="PROCESS_DEFINITION_UPDATED:INTERNAL" value="true" />
+                <entry key="PROFILE_CREATED:INTERNAL" value="true" />
+                <entry key="PROFILE_DELETED:INTERNAL" value="true" />
+                <entry key="PROFILE_UPDATED:INTERNAL" value="true" />
+                <entry key="PROFILE_MEMBER_CREATED:INTERNAL" value="true" />
+                <entry key="PROFILE_MEMBER_DELETED:INTERNAL" value="true" />
+                <entry key="PROFILE_MEMBER_UPDATED:INTERNAL" value="true" />
+                <entry key="REF_BUSINESS_DATA_INSTANCE_CREATED:INTERNAL" value="true" />
+                <entry key="REF_BUSINESS_DATA_INSTANCE_UPDATED:INTERNAL" value="true" />
+                <entry key="REF_BUSINESS_DATA_INSTANCE_DELETED:INTERNAL" value="true" />
+                <entry key="REPORT_CREATED:INTERNAL" value="true" />
+                <entry key="REPORT_DELETED:INTERNAL" value="true" />
+                <entry key="REPORT_UPDATED:INTERNAL" value="true" />
+                <entry key="SUPERVISOR_CREATED:INTERNAL" value="true" />
+                <entry key="SUPERVISOR_DELETED:INTERNAL" value="true" />
+                <entry key="THEME_CREATED:INTERNAL" value="true" />
+                <entry key="THEME_DELETED:INTERNAL" value="true" />
+                <entry key="THEME_UPDATED:INTERNAL" value="true" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="syncQueriableLoggerService" class="com.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="transactionService" ref="transactionService" />
+        <constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
+        <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="platformService" ref="platformService" />
+        <constructor-arg name="delayable" value="false" />
+    </bean>
+
+    <bean id="batchLogRegister" class="com.bonitasoft.engine.log.api.impl.InsertBatchLogsJobRegister">
+        <constructor-arg name="cronExpression" value="0/5 * * * * ?" />
+    </bean>
+
+</beans>
