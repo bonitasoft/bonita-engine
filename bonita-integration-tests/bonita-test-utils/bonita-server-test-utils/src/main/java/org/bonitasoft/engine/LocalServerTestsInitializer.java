@@ -11,8 +11,10 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,12 +23,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import javax.naming.Context;
 
+import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.io.IOUtils;
 import org.bonitasoft.engine.test.APITestUtil;
 
 public class LocalServerTestsInitializer {
@@ -60,8 +63,14 @@ public class LocalServerTestsInitializer {
         System.out.println("=====================================================");
 
         final long startTime = System.currentTimeMillis();
-        setSystemPropertyIfNotSet(BONITA_HOME_PROPERTY, BONITA_HOME_DEFAULT_PATH);
+        String bonitaHome = setSystemPropertyIfNotSet(BONITA_HOME_PROPERTY, BONITA_HOME_DEFAULT_PATH);
         final String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
+
+        // paste the default local server properties
+        // TODO do not handle the default local server like this
+        File platformInit = new File(bonitaHome, "engine-server/conf/platform-init");
+        FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.xml"),new File(platformInit,"local-server.xml"));
+        FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.properties"),new File(platformInit,"local-server.properties"));
 
         // Force these system properties
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
