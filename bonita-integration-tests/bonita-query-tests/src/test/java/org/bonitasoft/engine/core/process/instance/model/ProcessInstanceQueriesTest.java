@@ -31,6 +31,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
+import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
@@ -72,6 +73,90 @@ public class ProcessInstanceQueriesTest {
         final List<Long> userIds = repository.getPossibleUserIdsOfPendingTasks(pendingActivity.getActivityId());
 
         assertThat(userIds).containsOnly(expectedUser.getId());
+    }
+
+    @Test
+    public void isTaskPendingForUser_should_be_true_when_mapped_using_pending_mapping() {
+        final SUser expectedUser = repository.add(aUser().withId(1L).build());
+        repository.add(aUser().withId(2L).build()); // not expected user
+        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
+
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+
+        assertThat(taskPendingForUser).isTrue();
+    }
+
+
+    @Test
+    public void isTaskPendingForUser_should_be_true_when_mapped_using_actor() {
+        final SUser expectedUser = repository.add(aUser().build());
+        SActor actor = repository.add(anActor().build());
+        SActorMember actorMember = repository.add(anActorMember().withUserId(expectedUser.getId()).forActor(actor).build());
+        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+
+        assertThat(taskPendingForUser).isTrue();
+    }
+
+
+    @Test
+    public void isTaskPendingForUser_should_be_true_when_mapped_using_actor_having_role() {
+        final SUser expectedUser = repository.add(aUser().build());
+        repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId,aRoleId).build());
+        SActor actor = repository.add(anActor().build());
+        repository.add(anActorMember().withRoleId(aRoleId).forActor(actor).build());
+        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+
+        assertThat(taskPendingForUser).isTrue();
+    }
+    @Test
+    public void isTaskPendingForUser_should_be_true_when_mapped_using_actor_having_group() {
+        final SUser expectedUser = repository.add(aUser().build());
+        repository.add(aUserMembership().forUser(expectedUser).memberOf(aGroupId,aRoleId).build());
+        SActor actor = repository.add(anActor().build());
+        repository.add(anActorMember().withGroupId(aGroupId).forActor(actor).build());
+        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+
+        assertThat(taskPendingForUser).isTrue();
+    }
+    @Test
+    public void isTaskPendingForUser_should_be_true_when_mapped_using_actor_having_membership() {
+        final SUser expectedUser = repository.add(aUser().build());
+        repository.add(aUserMembership().forUser(expectedUser).memberOf(anotherGroupId,anotherRoleId).build());
+        SActor actor = repository.add(anActor().build());
+        repository.add(anActorMember().withGroupId(anotherGroupId).withRoleId(anotherRoleId).forActor(actor).build());
+        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withActorId(actor.getId()).build());
+
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+
+        assertThat(taskPendingForUser).isTrue();
+    }
+
+    @Test
+    public void isTaskPendingForUser_should_be_false_when_not_pending() {
+        final SUser expectedUser = repository.add(aUser().withId(1L).build());
+        SUser notPendingUser = repository.add(aUser().withId(2L).build());// not expected user
+        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
+
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), notPendingUser.getId());
+
+        assertThat(taskPendingForUser).isFalse();
+    }
+
+    @Test
+    public void isTaskPendingForUser() {
+        final SUser expectedUser = repository.add(aUser().withId(1L).build());
+        repository.add(aUser().withId(2L).build()); // not expected user
+        final SPendingActivityMapping pendingActivity = repository.add(aPendingActivityMapping().withUserId(expectedUser.getId()).build());
+
+        boolean taskPendingForUser = repository.isTaskPendingForUser(pendingActivity.getActivityId(), expectedUser.getId());
+
+        assertThat(taskPendingForUser).isTrue();
     }
 
     @Test

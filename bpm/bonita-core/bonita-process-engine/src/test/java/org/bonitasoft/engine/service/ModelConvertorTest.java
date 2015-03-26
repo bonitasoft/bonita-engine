@@ -61,8 +61,6 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDef
 import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
-import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
@@ -77,6 +75,7 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.form.FormMapping;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.User;
@@ -383,7 +382,7 @@ public class ModelConvertorTest {
         // Given
         SFormMappingImpl sFormMapping = new SFormMappingImpl();
         sFormMapping.setId(555l);
-        sFormMapping.setIsExternal(true);
+        sFormMapping.setTarget(FormMappingTarget.LEGACY.name());
         sFormMapping.setForm("myForm1");
         sFormMapping.setType(FormMappingType.TASK.name());
         sFormMapping.setTask("myTask");
@@ -396,7 +395,7 @@ public class ModelConvertorTest {
         assertThat(formMapping).isNotNull();
         assertThat(formMapping.getId()).isEqualTo(555l);
         assertThat(formMapping.getType()).isEqualTo(FormMappingType.TASK);
-        assertThat(formMapping.isExternal()).isTrue();
+        assertThat(formMapping.getTarget()).isEqualTo(FormMappingTarget.LEGACY);
         assertThat(formMapping.getForm()).isEqualTo("myForm1");
         assertThat(formMapping.getTask()).isEqualTo("myTask");
         assertThat(formMapping.getProcessDefinitionId()).isEqualTo(666l);
@@ -408,7 +407,7 @@ public class ModelConvertorTest {
         // Given
         SFormMappingImpl sFormMapping = new SFormMappingImpl();
         sFormMapping.setId(555l);
-        sFormMapping.setIsExternal(true);
+        sFormMapping.setTarget(FormMappingTarget.URL.name());
         sFormMapping.setForm("myForm1");
         sFormMapping.setType(FormMappingType.TASK.name());
         sFormMapping.setTask("myTask");
@@ -421,7 +420,7 @@ public class ModelConvertorTest {
         assertThat(formMapping).hasSize(1);
         assertThat(formMapping.get(0).getId()).isEqualTo(555l);
         assertThat(formMapping.get(0).getType()).isEqualTo(FormMappingType.TASK);
-        assertThat(formMapping.get(0).isExternal()).isTrue();
+        assertThat(formMapping.get(0).getTarget()).isEqualTo(FormMappingTarget.URL);
         assertThat(formMapping.get(0).getForm()).isEqualTo("myForm1");
         assertThat(formMapping.get(0).getTask()).isEqualTo("myTask");
         assertThat(formMapping.get(0).getProcessDefinitionId()).isEqualTo(666l);

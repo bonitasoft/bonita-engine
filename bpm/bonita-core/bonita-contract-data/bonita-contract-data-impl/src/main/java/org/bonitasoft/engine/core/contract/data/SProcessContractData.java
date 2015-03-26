@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,28 +10,20 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
+package org.bonitasoft.engine.core.contract.data;
 
-package org.bonitasoft.engine.form;
+import java.io.Serializable;
 
 /**
- * @author Baptiste Mesta
+ * author Emmanuel Duchastenier
  */
-public final class FormMappingSearchDescriptor {
+public class SProcessContractData extends SContractData {
 
-    public static final String ID = "id";
+    public SProcessContractData() {
+    }
 
-    public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
-
-    /**
-     * @see org.bonitasoft.engine.form.FormMappingType
-     */
-    public static final String TYPE = "type";
-
-    public static final String FORM = "form";
-
-    public static final String TARGET  = "target";
-
-    public static final String TASK  = "task";
-
+    public SProcessContractData(final long processInstanceId, final String name, final Serializable value) {
+        super(name, value, processInstanceId);
+    }
 }

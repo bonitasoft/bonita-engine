@@ -11,27 +11,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+package org.bonitasoft.engine.core.contract.data;
 
-package org.bonitasoft.engine.form;
+import java.io.Serializable;
+
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
- * @author Baptiste Mesta
+ * @author Nicolas Tith
+ * @author Emmanuel Duchastenier
  */
-public final class FormMappingSearchDescriptor {
+public class STaskContractData extends SContractData implements PersistentObject {
 
-    public static final String ID = "id";
+    public STaskContractData() {
+    }
 
-    public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
-
-    /**
-     * @see org.bonitasoft.engine.form.FormMappingType
-     */
-    public static final String TYPE = "type";
-
-    public static final String FORM = "form";
-
-    public static final String TARGET  = "target";
-
-    public static final String TASK  = "task";
+    public STaskContractData(final long userTaskId, final String name, final Serializable value) {
+        super(name, value, userTaskId);
+    }
 
 }

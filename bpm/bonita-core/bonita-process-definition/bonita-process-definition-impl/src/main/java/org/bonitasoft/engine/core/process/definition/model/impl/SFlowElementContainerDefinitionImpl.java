@@ -37,6 +37,7 @@ import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
+import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.AutomaticTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.HumanTaskDefinitionImpl;
@@ -236,7 +237,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
                 activity = new SAutomaticTaskDefinitionImpl(activityDefinition, transitionsMap);
             } else if (activityDefinition instanceof HumanTaskDefinitionImpl) {
                 if (activityDefinition instanceof UserTaskDefinitionImpl) {
-                    activity = initializeUserTask((UserTaskDefinitionImpl) activityDefinition);
+                    activity = new SUserTaskDefinitionImpl((UserTaskDefinition) activityDefinition, transitionsMap);
                 } else {
                     activity = new SManualTaskDefinitionImpl((ManualTaskDefinitionImpl) activityDefinition, transitionsMap);
                 }
@@ -261,15 +262,6 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
             }
             addActivity(activity);
         }
-    }
-
-    private SUserTaskDefinitionImpl initializeUserTask(final UserTaskDefinitionImpl userTaskDefinition) {
-        final SUserTaskDefinitionImpl userTask = new SUserTaskDefinitionImpl(userTaskDefinition, transitionsMap);
-        final ContractDefinition contract = userTaskDefinition.getContract();
-        if (contract != null) {
-            userTask.setContract(new SContractDefinitionImpl(contract));
-        }
-        return userTask;
     }
 
     private List<SEndEventDefinition> initializeEndEvents(final List<EndEventDefinition> endEvents, final Map<String, STransitionDefinition> transitionsMap) {

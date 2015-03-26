@@ -29,6 +29,7 @@ import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,6 +65,17 @@ public class ContractDefinitionBuilderTest {
     public void before() throws Exception {
         activity = new UserTaskDefinitionImpl(name, actorName);
         contractDefinitionBuilder = new ContractDefinitionBuilder(processDefinitionBuilder, container, activity);
+
+    }
+
+    @Test
+    public void addContractOnProcess() throws Exception {
+        //when
+        ProcessDefinitionBuilder myProcess = new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0");
+        myProcess.addContract();
+
+        //then
+        assertThat(myProcess.getProcess().getContract()).isNotNull();
 
     }
 

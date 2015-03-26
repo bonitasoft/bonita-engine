@@ -59,6 +59,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.ContractDataNotFoundException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
@@ -417,7 +418,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      */
     ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables) throws ProcessDefinitionNotFoundException,
-    ProcessActivationException, ProcessExecutionException;
+            ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations.
@@ -459,7 +460,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     ProcessInstance startProcess(long userId, long processDefinitionId) throws UserNotFoundException, ProcessDefinitionNotFoundException,
-    ProcessActivationException, ProcessExecutionException;
+            ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
@@ -512,6 +513,55 @@ public interface ProcessRuntimeAPI {
      */
     ProcessInstance startProcess(final long userId, final long processDefinitionId, final Map<String, Serializable> initialVariables)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException;
+
+    /**
+     * Start an instance of the process with the specified process definition id, and provides inputs to fullfill Process Contract.
+     * See {@link org.bonitasoft.engine.bpm.contract.ContractDefinition} for details on contracts.
+     *
+     * @param processDefinitionId
+     *        The identifier of the process definition for which an instance will be started.
+     * @param instantiationInputs
+     *        The couples of input name/value that allows to start a process with an instantiation contract.
+     * @return An instance of the process.
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid, e.g. the session has expired.
+     * @throws ProcessDefinitionNotFoundException
+     *         If no matching process definition is found.
+     * @throws ProcessActivationException
+     *         If an exception occurs during activation.
+     * @throws ProcessExecutionException
+     *         If a problem occurs when starting the process.
+     * @throws ContractViolationException
+     *         If inputs don't fit with task contract
+     * @since 7.0.0
+     */
+    ProcessInstance startProcessWithInputs(final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException;
+
+    /**
+     * Start an instance of the process with the specified process definition id on behalf of a given user, and provides inputs to fullfill Process Contract.
+     * See {@link org.bonitasoft.engine.bpm.contract.ContractDefinition} for details on contracts.
+     *
+     * @param userId The identifier of the user in the name of whom the process is started.
+     * @param processDefinitionId
+     *        The identifier of the process definition for which an instance will be started.
+     * @param instantiationInputs
+     *        The couples of input name/value that allows to start a process with an instantiation contract.
+     * @return An instance of the process.
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid, e.g. the session has expired.
+     * @throws ProcessDefinitionNotFoundException
+     *         If no matching process definition is found.
+     * @throws ProcessActivationException
+     *         If an exception occurs during activation.
+     * @throws ProcessExecutionException
+     *         If a problem occurs when starting the process.
+     * @throws ContractViolationException
+     *         If inputs don't fit with process contract
+     * @since 7.0.0
+     */
+    ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
+            throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException;
 
     /**
      * Executes a flow node that is in a stable state.
@@ -1018,7 +1068,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     long getOneAssignedUserTaskInstanceOfProcessDefinition(long processDefinitionId, long userId) throws ProcessDefinitionNotFoundException,
-    UserNotFoundException;
+            UserNotFoundException;
 
     /**
      * Get the state of a specified activity instance.
@@ -1188,7 +1238,7 @@ public interface ProcessRuntimeAPI {
      */
     Map<String, Serializable> executeConnectorOnProcessDefinition(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processDefinitionId)
-                    throws ConnectorExecutionException, ConnectorNotFoundException;
+            throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute a connector in a specified processDefinition with operations.
@@ -1224,7 +1274,8 @@ public interface ProcessRuntimeAPI {
      * Search the archived human tasks for tasks that match the search options.
      *
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
      *        fields
      *        for searching and sorting.
      * @return The archived human tasks that match the search conditions.
@@ -1810,6 +1861,28 @@ public interface ProcessRuntimeAPI {
      * @see #isManagerOfUserInvolvedInProcessInstance(long, long)
      */
     boolean isInvolvedInProcessInstance(long userId, long processInstanceId) throws ProcessInstanceNotFoundException, UserNotFoundException;
+
+    /**
+     * Check whether a specific user is involved in a given human task instance.<br/>
+     * User A is involved with a  human task  instance if any of the following is true:
+     * <ul>
+     * <li>the human task instance is assigned to user A</li>
+     * <li>the human task instance is pending for user A</li>
+     * </ul>
+     *
+     * @param userId
+     *        The identifier of the user.
+     * @param humanTaskInstanceId
+     *        The identifier of the human task instance.
+     * @return True if the user is involved with the human task instance.
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
+     *         If the session is invalid, e.g. the session has expired.
+     * @throws ActivityInstanceNotFoundException
+     *         If there is no the human task instance with the specified identifier.
+     * @since 6.5.1
+     * @see #isManagerOfUserInvolvedInProcessInstance(long, long)
+     */
+    boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId) throws ActivityInstanceNotFoundException, UserNotFoundException;
 
     /**
      * Check whether a specific user has at least one subordinate (person he / she is the manager of) involved in a given process instance.<br/>
@@ -2406,6 +2479,16 @@ public interface ProcessRuntimeAPI {
     ContractDefinition getUserTaskContract(long userTaskId) throws UserTaskNotFoundException;
 
     /**
+     * Gets the process instantiation contract for a given process definition.
+     *
+     * @param processDefinitionId the identifier of the process definition.
+     * @return the contract of the given process
+     * @throws ProcessDefinitionNotFoundException
+     *         if identifier does not refer to an existing process definition.
+     */
+    ContractDefinition getProcessContract(long processDefinitionId) throws ProcessDefinitionNotFoundException;
+
+    /**
      * Executes a user task that is in a stable state.
      * Will move the activity to the next stable state and then continue the execution of the process.
      *
@@ -2455,9 +2538,28 @@ public interface ProcessRuntimeAPI {
      * @param name
      *        The name of the variable
      * @return The identifier of the user task
-     * @throws UserTaskNotFoundException
-     *         if identifier does not refer to a real user task.
+     * @throws ContractDataNotFoundException if no data found for the given user task instance and name.
      */
-    Serializable getUserTaskContractVariableValue(long userTaskInstanceId, String name) throws UserTaskNotFoundException;
+    Serializable getUserTaskContractVariableValue(long userTaskInstanceId, String name) throws ContractDataNotFoundException;
 
+    /**
+     * Gets the value of a process instantiation input, during the phase of initializing. For instance, if a connector on_enter fails, this method can be called
+     * to check the current value.
+     *
+     * @param processInstanceId The identifier of the process instance
+     * @param name The name of the process input to retrieve
+     * @return The identifier of the user task
+     * @throws ContractDataNotFoundException if no data found for the given process instance and name.
+     */
+    Serializable getProcessInputValueDuringInitialization(long processInstanceId, String name) throws ContractDataNotFoundException;
+
+    /**
+     * Gets the value of a process instantiation input, after initialization has finished. Requires Archiving feature to be enabled (default behaviour).
+     *
+     * @param processInstanceId The identifier of the process instance
+     * @param name The name of the process input to retrieve
+     * @return The identifier of the user task
+     * @throws ContractDataNotFoundException if identifier does not refer to an existing process instance.
+     */
+    Serializable getProcessInputValueAfterInitialization(long processInstanceId, String name) throws ContractDataNotFoundException;
 }

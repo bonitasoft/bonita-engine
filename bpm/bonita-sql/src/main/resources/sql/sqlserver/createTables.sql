@@ -1,21 +1,23 @@
 CREATE TABLE contract_data (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
+  kind NVARCHAR(20) NOT NULL,
   scopeId NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(50) NOT NULL,
   val VARBINARY(MAX)
 )
 GO
-ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id)
+ALTER TABLE contract_data ADD CONSTRAINT pk_contract_data PRIMARY KEY (tenantid, id, scopeId)
 GO
-ALTER TABLE contract_data ADD CONSTRAINT uc_cd_scope_name UNIQUE (scopeId, name, tenantid)
+ALTER TABLE contract_data ADD CONSTRAINT uc_cd_scope_name UNIQUE (kind, scopeId, name, tenantid)
 GO
-CREATE INDEX idx_cd_scope_name ON contract_data (scopeId, name, tenantid)
+CREATE INDEX idx_cd_scope_name ON contract_data (kind, scopeId, name, tenantid)
 GO
 
 CREATE TABLE arch_contract_data (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
+  kind NVARCHAR(20) NOT NULL,
   scopeId NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(50) NOT NULL,
   val VARBINARY(MAX),
@@ -23,11 +25,11 @@ CREATE TABLE arch_contract_data (
   sourceObjectId NUMERIC(19, 0) NOT NULL
 )
 GO
-ALTER TABLE arch_contract_data ADD CONSTRAINT pk_arch_contract_data PRIMARY KEY (tenantid, id)
+ALTER TABLE arch_contract_data ADD CONSTRAINT pk_arch_contract_data PRIMARY KEY (tenantid, id, scopeId)
 GO
-ALTER TABLE arch_contract_data ADD CONSTRAINT uc_acd_scope_name UNIQUE (scopeId, name, tenantid)
+ALTER TABLE arch_contract_data ADD CONSTRAINT uc_acd_scope_name UNIQUE (kind, scopeId, name, tenantid)
 GO
-CREATE INDEX idx_acd_scope_name ON arch_contract_data (scopeId, name, tenantid)
+CREATE INDEX idx_acd_scope_name ON arch_contract_data (kind, scopeId, name, tenantid)
 GO
 
 CREATE TABLE actor (
@@ -1125,7 +1127,7 @@ CREATE TABLE form_mapping (
   process NUMERIC(19, 0) NOT NULL,
   task NVARCHAR(255) NULL,
   form NVARCHAR(1024) NULL,
-  isexternal BIT NOT NULL,
+  target NVARCHAR(16) NOT NULL,
   type NVARCHAR(16) NOT NULL,
   lastUpdateDate NUMERIC(19, 0) NULL,
   lastUpdatedBy NUMERIC(19, 0) NULL,

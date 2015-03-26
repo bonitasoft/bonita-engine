@@ -20,7 +20,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
@@ -49,6 +51,7 @@ public class ProcessDefinitionBinding extends NamedElementBinding {
     private FlowElementContainerDefinition processContainer;
 
     private final List<StringIndex> stringIndexes = new ArrayList<StringIndex>(5);
+    private ContractDefinition contract;
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
@@ -74,6 +77,8 @@ public class ProcessDefinitionBinding extends NamedElementBinding {
             processContainer = (FlowElementContainerDefinition) value;
         } else if (XMLProcessDefinition.STRING_INDEX.equals(name)) {
             stringIndexes.add((StringIndex) value);
+        } else if (XMLProcessDefinition.CONTRACT_NODE.equals(name)) {
+            contract = (ContractDefinition) value;
         }
     }
 
@@ -99,6 +104,9 @@ public class ProcessDefinitionBinding extends NamedElementBinding {
             }
             if (processContainer != null) {
                 processDefinitionImpl.setProcessContainer(processContainer);
+            }
+            if (contract != null) {
+                processDefinitionImpl.setContract(contract);
             }
         }
         return processDefinitionImpl;

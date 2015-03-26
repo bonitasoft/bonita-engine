@@ -103,7 +103,7 @@ public class JDTCompiler {
             @Override
             public FileSystem getLibraryAccess() {
                 ClassLoader contextClassLoader = classLoader;
-                return new ClassLoaderEnvironment(contextClassLoader, getCompilationUnits());
+                return new ClassLoaderEnvironment(contextClassLoader);
             }
         };
         final boolean succeeded = mainCompiler.compile(commandLine);

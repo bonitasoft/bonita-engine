@@ -15,11 +15,13 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
+import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 
 /**
  * @author Baptiste Mesta
@@ -35,6 +37,10 @@ public class SUserTaskDefinitionImpl extends SHumanTaskDefinitionImpl implements
     public SUserTaskDefinitionImpl(final UserTaskDefinition userTaskDefinition,
             final Map<String, STransitionDefinition> transitionsMap) {
         super(userTaskDefinition, transitionsMap);
+        final ContractDefinition contract = userTaskDefinition.getContract();
+        if (contract != null) {
+            setContract(new SContractDefinitionImpl(contract));
+        }
     }
 
     public SUserTaskDefinitionImpl(final long id, final String name, final String actorName) {

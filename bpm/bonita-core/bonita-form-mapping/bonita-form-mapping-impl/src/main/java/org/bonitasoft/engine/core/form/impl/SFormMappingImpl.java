@@ -23,7 +23,7 @@ public class SFormMappingImpl implements SFormMapping {
     private long processDefinitionId;
     private String task;
     private String form;
-    private boolean isExternal;
+    private String target;
     private String type;
     private long id;
     private long tenantId;
@@ -33,11 +33,11 @@ public class SFormMappingImpl implements SFormMapping {
     public SFormMappingImpl() {
     }
 
-    public SFormMappingImpl(long processDefinitionId, String task, String form, boolean isExternal, String type) {
+    public SFormMappingImpl(long processDefinitionId, String task, String form, String target, String type) {
         this.processDefinitionId = processDefinitionId;
         this.task = task;
         this.form = form;
-        this.isExternal = isExternal;
+        this.target = target;
         this.type = type;
     }
 
@@ -73,12 +73,12 @@ public class SFormMappingImpl implements SFormMapping {
         this.form = form;
     }
 
-    public boolean isExternal() {
-        return isExternal;
+    public String getTarget() {
+        return target;
     }
 
-    public void setIsExternal(boolean isExternal) {
-        this.isExternal = isExternal;
+    public void setTarget(String target) {
+        this.target = target;
     }
 
     public String getType() {
@@ -136,8 +136,6 @@ public class SFormMappingImpl implements SFormMapping {
 
         if (id != that.id)
             return false;
-        if (isExternal != that.isExternal)
-            return false;
         if (lastUpdateDate != that.lastUpdateDate)
             return false;
         if (lastUpdatedBy != that.lastUpdatedBy)
@@ -152,6 +150,8 @@ public class SFormMappingImpl implements SFormMapping {
             return false;
         if (type != null ? !type.equals(that.type) : that.type != null)
             return false;
+        if (target != null ? !target.equals(that.target) : that.target != null)
+            return false;
 
         return true;
     }
@@ -161,7 +161,7 @@ public class SFormMappingImpl implements SFormMapping {
         int result = (int) (processDefinitionId ^ (processDefinitionId >>> 32));
         result = 31 * result + (task != null ? task.hashCode() : 0);
         result = 31 * result + (form != null ? form.hashCode() : 0);
-        result = 31 * result + (isExternal ? 1 : 0);
+        result = 31 * result + (target != null ? target.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (int) (id ^ (id >>> 32));
         result = 31 * result + (int) (tenantId ^ (tenantId >>> 32));
@@ -176,7 +176,7 @@ public class SFormMappingImpl implements SFormMapping {
                 "processDefinitionId=" + processDefinitionId +
                 ", task='" + task + '\'' +
                 ", form='" + form + '\'' +
-                ", isExternal=" + isExternal +
+                ", target='" + target + '\'' +
                 ", type='" + type + '\'' +
                 ", id=" + id +
                 ", tenantId=" + tenantId +

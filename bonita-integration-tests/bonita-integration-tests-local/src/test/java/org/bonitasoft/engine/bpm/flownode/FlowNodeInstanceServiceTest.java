@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.flownode;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
@@ -27,8 +28,11 @@ import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SStartEventInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -141,5 +145,30 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
         createSAutomaticTaskInstance("autoTask", 9, procInst2.getId(), 5, procInst2.getId());
         createSEndEventInstance("endEvent", 10, procInst2.getId(), 5, procInst2.getId());
     }
+
+    @Test
+    public void isTaskPendingForUser() throws Exception {
+        long flowNodeDefinitionId = 12355467l;
+        long processDefinitionId = 123445566l;
+        long rootProcessInstanceID = 7754l;
+        long actorId = 5589l;
+        SUserTaskInstance step1 = createSUserTaskInstance("step1", flowNodeDefinitionId, -1, processDefinitionId, rootProcessInstanceID, actorId);
+        long userId = 4411l;
+        //given
+        getTransactionService().begin();
+        final SPendingActivityMapping mapping = BuilderFactory.get(SPendingActivityMappingBuilderFactory.class)
+                .createNewInstanceForUser(step1.getId(), userId).done();
+        activityInstanceService.addPendingActivityMappings(mapping);
+        getTransactionService().complete();
+        //
+        //when
+        getTransactionService().begin();
+        boolean taskPendingForUser = activityInstanceService.isTaskPendingForUser(step1.getId(), userId);
+        getTransactionService().complete();
+        //then
+        assertTrue("task should be pending",taskPendingForUser);
+
+    }
+
 
 }

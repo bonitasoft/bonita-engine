@@ -61,7 +61,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
-import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
@@ -236,7 +235,7 @@ public class EventsHandler {
     }
 
     public boolean handlePostThrowEvent(final SProcessDefinition sProcessDefinition, final SEndEventDefinition sEndEventDefinition,
-                                        final SThrowEventInstance sThrowEventInstance, final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
+            final SThrowEventInstance sThrowEventInstance, final SFlowNodeInstance sFlowNodeInstance) throws SBonitaException {
         boolean hasActionsToExecute = false;
         if (sEndEventDefinition == null) {
             /*
@@ -369,7 +368,7 @@ public class EventsHandler {
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
         processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
-                null, null, subProcflowNodeInstance.getId(), subProcessId);
+                null, null, subProcflowNodeInstance.getId(), subProcessId, null); // Should we support process contract inputs on EventSubProcess?
         unregisterEventSubProcess(processDefinition, parentProcessInstance);
     }
 
@@ -398,7 +397,7 @@ public class EventsHandler {
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)
             throws SProcessInstanceCreationException {
         processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
-                null, null, -1, -1);
+                null, null, -1, -1, null);
     }
 
     public EventHandlerStrategy getHandler(final SEventTriggerType triggerType) {
