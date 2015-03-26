@@ -31,6 +31,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -49,7 +50,8 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
 
     private static String documentNameKey;
 
-    public DocumentServiceTest() {
+    @Before
+    public void before(){
         documentService = getTenantAccessor().getDocumentService();
         transactionService = getTransactionService();
         documentNameKey = BuilderFactory.get(SDocumentBuilderFactory.class).getNameKey();
@@ -68,7 +70,7 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         assertEquals(document.getMimeType(), result.getMimeType());
         assertEquals(document.getCreationDate(), result.getCreationDate());
         assertEquals(document.getUrl(), result.getUrl());
-        assertEquals(document.getId(), result.getId());
+        assertEquals(document.getId(), result.getDocumentId());
         assertEquals("documentName", result.getName());
         assertEquals("the description", result.getDescription());
         assertEquals(processInstanceId, result.getProcessInstanceId());

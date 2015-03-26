@@ -75,7 +75,6 @@ import org.junit.runners.Suite.SuiteClasses;
         QuartzSchedulerExecutorITest.class,
         // JobTest.class, ignored as this was the last test method in that class
         CommandServiceIntegrationTest.class,
-        // DocumentServiceTest.class,
         PlatformCommandServiceIntegrationTest.class,
         ProfileServiceTest.class,
         TenantManagementTest.class,
