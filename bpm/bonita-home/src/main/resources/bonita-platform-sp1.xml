@@ -150,16 +150,13 @@
 		<constructor-arg name="jobHandler" ref="jobHandler" />
 	</bean>
 
-	<bean id="sequenceMappings" parent="communitySequenceMappings" class="org.springframework.beans.factory.config.MapFactoryBean">
-		<property name="targetMapClass">
-			<value>java.util.HashMap</value>
-		</property>
-		<property name="sourceMap">
-			<map merge="true">
-				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" value="10019" />
-				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" value="500" />
-			</map>
-		</property>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
+		<constructor-arg name="sequenceId" value="10019" />
+	</bean>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" />
+		<constructor-arg name="sequenceId" value="500" />
 	</bean>
 
 	<bean id="transactionService" class="com.bonitasoft.engine.transaction.JTATransactionServiceExt" scope="singleton">
