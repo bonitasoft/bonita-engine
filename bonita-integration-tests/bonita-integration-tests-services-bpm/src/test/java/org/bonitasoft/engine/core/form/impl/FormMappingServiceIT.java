@@ -33,7 +33,7 @@ import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -49,18 +49,13 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
     private final TransactionService transactionService;
 
-//    @After
-//    public void tearDown() throws SBonitaReadException, SObjectModificationException, STransactionCreationException,
-//            STransactionCommitException, STransactionRollbackException {
-//        cleanAllFormMapping();
-//    }
-
-    @Before
-    public void before() throws Exception {
-        cleanAllFormMapping();
+    @After
+    public void tearDown() throws SBonitaReadException, SObjectModificationException, STransactionCreationException,
+            STransactionCommitException, STransactionRollbackException {
+        clearFormMapping();
     }
 
-    protected void cleanAllFormMapping() throws STransactionCreationException, SBonitaReadException, SObjectModificationException, STransactionCommitException,
+    protected void clearFormMapping() throws STransactionCreationException, SBonitaReadException, SObjectModificationException, STransactionCommitException,
             STransactionRollbackException {
         transactionService.begin();
         for (SFormMapping sFormMapping : formMappingService.list(0, 1000)) {
@@ -80,6 +75,9 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
     @Test
     public void createAndListFormMapping() throws Exception {
+        //given
+        clearFormMapping();
+
         transactionService.begin();
         SFormMapping taskForm = formMappingService.create(15l, "step1", "form_page1", FormMappingTarget.INTERNAL.name(), "TASK");
         SFormMapping processStartForm = formMappingService.create(15l, null, "form_page2", FormMappingTarget.INTERNAL.name(), "PROCESS_START");
@@ -87,13 +85,16 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         SFormMapping otherProcess = formMappingService.create(16l, null, "form_page_other", FormMappingTarget.LEGACY.name(), "PROCESS_OVERVIEW");
         transactionService.complete();
 
+        //when
         transactionService.begin();
         List<SFormMapping> list = formMappingService.list(15l, 0, 10);
         List<SFormMapping> listAll = formMappingService.list(0, 10);
-
         transactionService.complete();
+
+        //then
         assertThat(list).extracting("type").containsExactly("TASK", "PROCESS_START", "PROCESS_OVERVIEW");
         assertThat(list).extracting("form").containsExactly("form_page1", "form_page2", "form_page_url");
+
         assertThat(listAll).extracting("type").containsExactly("TASK", "PROCESS_START", "PROCESS_OVERVIEW", "PROCESS_OVERVIEW");
         assertThat(listAll).extracting("form").containsExactly("form_page1", "form_page2", "form_page_url", "form_page_other");
         assertThat(listAll).extracting("processDefinitionId").containsExactly(15l, 15l, 15l, 16l);
