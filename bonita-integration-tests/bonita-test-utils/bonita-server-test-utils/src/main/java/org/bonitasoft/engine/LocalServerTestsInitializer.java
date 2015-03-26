@@ -70,7 +70,7 @@ public class LocalServerTestsInitializer {
         // TODO do not handle the default local server like this
         File platformInit = new File(bonitaHome, "engine-server/conf/platform-init");
         FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.xml"),new File(platformInit,"local-server.xml"));
-        FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.properties"),new File(platformInit,"local-server.properties"));
+        FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.properties"), new File(platformInit, "local-server.properties"));
 
         // Force these system properties
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
@@ -145,7 +145,9 @@ public class LocalServerTestsInitializer {
         if (!list.isEmpty()) {
             for (final Thread thread : list) {
                 System.out.println("thread is still alive:" + thread.getName());
-                System.err.println(thread.getStackTrace());
+                for (StackTraceElement stackTraceElement : thread.getStackTrace()) {
+                    System.out.println(stackTraceElement.toString());
+                }
             }
             throw new IllegalStateException("Some threads are still active : " + list);
         }
@@ -166,7 +168,8 @@ public class LocalServerTestsInitializer {
                 return false;
             }
         }
-        return true;
+        //ehcache
+        return !thread.getName().matches("[0-9]+_[A-Z_]+.data");
     }
 
     protected void initPlatformAndTenant() throws Exception {
