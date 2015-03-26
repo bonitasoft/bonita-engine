@@ -103,12 +103,12 @@ public class LocalServerTestsInitializer {
 
         try {
             deleteTenantAndPlatform();
-            checkThreadsAreStopped();
         } finally {
             if (this.h2Server != null) {
                 stopH2Server(this.h2Server);
             }
         }
+        checkThreadsAreStopped();
     }
 
     protected void deleteTenantAndPlatform() throws BonitaException {

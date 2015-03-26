@@ -99,8 +99,8 @@ public class TenantTest extends CommonBPMServicesTest {
     public void sequence() throws Exception {
 
         // Sequence id must be reinitialized.
-        TestUtil.deleteDefaultTenantAndPlatForm(getTransactionService(), getPlatformAccessor().getPlatformService(), getSessionAccessor(), getTenantAccessor().getSessionService());
-        TestUtil.createPlatformAndDefaultTenant(getTransactionService(), getPlatformAccessor().getPlatformService(), getSessionAccessor(), getTenantAccessor().getSessionService());
+        long myTenant = createTenant("myTenant");
+        changeTenant(myTenant);
 
         getTransactionService().begin();
 
