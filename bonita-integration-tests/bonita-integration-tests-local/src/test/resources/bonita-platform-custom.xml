@@ -10,24 +10,45 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
 	">
 
-	<bean id="sequenceMappings" parent="communitySequenceMappings" class="org.springframework.beans.factory.config.MapFactoryBean">
-		<property name="targetMapClass">
-			<value>java.util.HashMap</value>
-		</property>
-		<property name="sourceMap">
-			<map merge="true">
-				<entry key="org.bonitasoft.engine.persistence.model.Human" value="1000" />
-				<entry key="org.bonitasoft.engine.persistence.model.Child" value="1000" />
-				<entry key="org.bonitasoft.engine.persistence.model.Parent" value="1000" />
-				<entry key="org.bonitasoft.engine.persistence.model.Car" value="1001" />
-				<entry key="org.bonitasoft.engine.archive.model.Employee" value="60" />
-				<entry key="org.bonitasoft.engine.archive.model.Laptop" value="61" />
-				<entry key="org.bonitasoft.engine.archive.model.Address" value="62" />
-				<entry key="org.bonitasoft.engine.archive.model.Project" value="63" />
-				<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" value="64" />
-				<entry key="org.bonitasoft.engine.archive.model.SAEmployee" value="65" />
-			</map>
-		</property>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="org.bonitasoft.engine.persistence.model.Human" />
+		<constructor-arg name="sequenceId" value="1000" />
+	</bean>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="org.bonitasoft.engine.persistence.model.Child" />
+		<constructor-arg name="sequenceId" value="1000" />
+	</bean>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="org.bonitasoft.engine.persistence.model.Parent" />
+		<constructor-arg name="sequenceId" value="1000" />
+	</bean>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="org.bonitasoft.engine.persistence.model.Car" />
+		<constructor-arg name="sequenceId" value="1001" />
+	</bean>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.Employee" />
+		<constructor-arg name="sequenceId" value="60" />
+	</bean>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.Laptop" />
+		<constructor-arg name="sequenceId" value="61" />
+	</bean>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.Address" />
+		<constructor-arg name="sequenceId" value="62" />
+	</bean>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.Project" />
+		<constructor-arg name="sequenceId" value="63" />
+	</bean>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" />
+		<constructor-arg name="sequenceId" value="64" />
+	</bean>
+	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.SAEmployee" />
+		<constructor-arg name="sequenceId" value="65" />
 	</bean>
 
 	<bean id="hbm-bonita-persistence-test" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
