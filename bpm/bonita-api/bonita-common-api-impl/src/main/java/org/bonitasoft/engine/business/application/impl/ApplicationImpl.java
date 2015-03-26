@@ -137,6 +137,12 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
         return profileId;
     }
 
+    @Override
+    public Long getLayoutId() {
+        //TODO: add missing implementation
+        return null;
+    }
+
     public void setProfileId(final Long profileId) {
         this.profileId = profileId;
     }

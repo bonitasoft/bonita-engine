@@ -35,7 +35,7 @@ public class ApplicationUpdater implements Serializable {
      * Creates an instance of <code>ApplicationUpdater</code>
      */
     public ApplicationUpdater() {
-        fields = new HashMap<ApplicationField, Serializable>(8);
+        fields = new HashMap<>(8);
     }
 
     /**
@@ -144,6 +144,20 @@ public class ApplicationUpdater implements Serializable {
      */
     public ApplicationUpdater setHomePageId(final Long applicationPageId) {
         fields.put(ApplicationField.HOME_PAGE_ID, applicationPageId);
+        return this;
+    }
+
+    /**
+     * Defines the identifier of the new {@link org.bonitasoft.engine.page.Page} used as the {@link Application} layout.
+     * 
+     * @param layoutId the identifier of {@link org.bonitasoft.engine.page.Page} used as layout
+     * @return the current {@code ApplicationUpdater}
+     * @see org.bonitasoft.engine.page.Page
+     * @see org.bonitasoft.engine.business.application.Application
+     * @since 7.0.0
+     */
+    public ApplicationUpdater setLayoutId(final Long layoutId) {
+        //TODO: add missing implementation
         return this;
     }
 

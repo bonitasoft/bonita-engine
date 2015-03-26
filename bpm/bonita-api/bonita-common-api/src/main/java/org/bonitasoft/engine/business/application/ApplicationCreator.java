@@ -42,7 +42,7 @@ public class ApplicationCreator implements Serializable {
      * @see Application
      */
     public ApplicationCreator(final String token, final String displayName, final String version) {
-        fields = new HashMap<ApplicationField, Serializable>(2);
+        fields = new HashMap<>(3);
         fields.put(ApplicationField.TOKEN, token);
         fields.put(ApplicationField.VERSION, version);
         fields.put(ApplicationField.DISPLAY_NAME, displayName);
@@ -92,6 +92,20 @@ public class ApplicationCreator implements Serializable {
      */
     public ApplicationCreator setProfileId(final Long profileId) {
         fields.put(ApplicationField.PROFILE_ID, profileId);
+        return this;
+    }
+
+    /**
+     * Defines the identifier of the {@link org.bonitasoft.engine.page.Page} used as the {@link Application} layout.
+     *
+     * @param layoutId the identifier of {@link org.bonitasoft.engine.page.Page} used as layout
+     * @return the current {@code ApplicationUpdater}
+     * @see org.bonitasoft.engine.page.Page
+     * @see org.bonitasoft.engine.business.application.Application
+     * @since 7.0.0
+     */
+    public ApplicationCreator setLayoutId(final Long layoutId) {
+        //TODO: add missing implementation
         return this;
     }
 
