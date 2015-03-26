@@ -28,7 +28,7 @@ class BarResourceVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-        if (dir.endsWith(Paths.get(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER))) {
+        if (dir.equals(Paths.get(barRootFolder + "/" + ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER))) {
             this.barResourceFolder = dir;
             return FileVisitResult.CONTINUE;
         }
