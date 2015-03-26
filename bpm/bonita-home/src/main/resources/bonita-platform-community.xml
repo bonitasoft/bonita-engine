@@ -704,16 +704,16 @@
         <constructor-arg name="sequenceId" value="10202" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.SContractData" />
-        <constructor-arg name="sequenceId" value="10210" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.STaskContractData" />
         <constructor-arg name="sequenceId" value="10210" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.SProcessContractData" />
         <constructor-arg name="sequenceId" value="10220" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" />
+        <constructor-arg name="sequenceId" value="10300" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl" />
