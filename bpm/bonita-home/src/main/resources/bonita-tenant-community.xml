@@ -1,5 +1,11 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="
+        http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+        ">
 
     <bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
         <constructor-arg name="sessionService" ref="sessionService" />
@@ -1325,6 +1331,13 @@
         <constructor-arg name="identityService" ref="identityService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
+
+    <bean id="archivingStrategy" class="org.bonitasoft.engine.archive.impl.DefaultArchivingStrategy">
+        <constructor-arg name="additionalConfiguration" ref="archivingStrategyAdditionalConfiguration"/>
+    </bean>
+
+    <util:map id="archivingStrategyAdditionalConfiguration">
+    </util:map>
 
     <bean id="archiveService" class="org.bonitasoft.engine.archive.impl.ArchiveServiceImpl">
         <constructor-arg name="definitiveArchivePersistenceService" ref="persistenceService" />
