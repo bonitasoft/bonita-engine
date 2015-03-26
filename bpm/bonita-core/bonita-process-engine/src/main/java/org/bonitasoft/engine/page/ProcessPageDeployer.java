@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.page;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +42,10 @@ public class ProcessPageDeployer {
             if (sPage != null) {
                 pageService.updatePageContent(sPage.getId(), pageContent, contentName);
             } else {
-                final PageCreator pageCreator = new PageCreator(pageName, contentName, ContentType.FORM, processDefinitionId);
+                final Properties pageProperties = pageService.readPageZip(pageContent);
+                final PageCreator pageCreator = new PageCreator(pageName, contentName, ContentType.FORM, processDefinitionId)
+                        .setDisplayName(pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME))
+                        .setDescription(pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION));
                 final SPage newPage = new PageModelConverter().constructSPage(pageCreator, userId);
                 pageService.addPage(newPage, pageContent);
             }

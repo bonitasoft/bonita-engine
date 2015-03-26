@@ -12,14 +12,18 @@ import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
+import org.bonitasoft.engine.api.impl.converter.SPageAssert;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessPageDeployerTest {
@@ -31,6 +35,8 @@ public class ProcessPageDeployerTest {
     public static final long PAGE_ID = 45L;
     public static final String CUSTOMPAGE_STEP1_ZIP = "custompage_step1.zip";
     public static final String CUSTOMPAGE_STEP2_ZIP = "custompage_step2.zip";
+    public static final String DISPLAY_NAME = "display name";
+    public static final String DESCRIPTION = "description";
     @Mock
     private PageService pageService;
 
@@ -41,6 +47,8 @@ public class ProcessPageDeployerTest {
     private SPage sPage;
 
     private java.util.Map<java.lang.String, byte[]> ressources;
+    @Mock
+    private Properties properties;
 
     @Before
     public void setUp() throws Exception {
@@ -62,9 +70,26 @@ public class ProcessPageDeployerTest {
     public void should_deploy_process_insert_pages() throws Exception {
         //given
         doReturn(null).when(pageService).getPageByNameAndProcessDefinitionId(anyString(), anyLong());
-        ProcessPageDeployer processPageDeployer = new ProcessPageDeployer(pageService);
+        doReturn(properties).when(pageService).readPageZip(any(byte[].class));
+
+        doReturn(DISPLAY_NAME).when(properties).getProperty(PageService.PROPERTIES_DISPLAY_NAME);
+        doReturn(DESCRIPTION).when(properties).getProperty(PageService.PROPERTIES_DESCRIPTION);
+
+        Answer<SPage> answer = new Answer<SPage>() {
+
+            @Override
+            public SPage answer(InvocationOnMock invocation) throws Throwable {
+                final SPage pageToAdd = (SPage) invocation.getArguments()[0];
+                SPageAssert.assertThat(pageToAdd).hasDisplayName(DISPLAY_NAME);
+                SPageAssert.assertThat(pageToAdd).hasDescription(DESCRIPTION);
+
+                return pageToAdd;
+            }
+        };
+        when(pageService.addPage(any(sPage.getClass()), any(byte[].class))).then(answer);
 
         //when
+        ProcessPageDeployer processPageDeployer = new ProcessPageDeployer(pageService);
         processPageDeployer.deployProcessPages(businessArchive, PROCESS_DEFINITION_ID, USER_ID);
 
         //then
