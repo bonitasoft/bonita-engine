@@ -190,6 +190,7 @@
         <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
         <constructor-arg name="transitionEvaluator" ref="transitionEvaluator" />
+        <constructor-arg name="contractDataService" ref="contractDataService" />
     </bean>
 
     <bean id="transactionalProcessInstanceInterruptor"
