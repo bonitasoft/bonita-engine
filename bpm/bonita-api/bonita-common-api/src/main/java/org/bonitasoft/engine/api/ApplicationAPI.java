@@ -33,6 +33,8 @@ import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.page.Page;
+import org.bonitasoft.engine.page.PageNotFoundException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -197,6 +199,15 @@ public interface ApplicationAPI {
      * @see ApplicationPage
      */
     ApplicationPage getApplicationHomePage(long applicationId) throws ApplicationPageNotFoundException;
+
+    /**
+     * Retrieves the {@link org.bonitasoft.engine.page.Page} defining the {@link org.bonitasoft.engine.business.application.Application} layout.
+     * @param applicationId the {@code Application} identifier.
+     * @return the {@code Page} defining the {@code Application} layout.
+     * @throws PageNotFoundException if no layout is defined for the given {@code Application}
+     * @since 7.0.0
+     */
+    Page getApplicationLayout(long applicationId) throws PageNotFoundException;
 
     /**
      * Creates a {@link ApplicationMenu} based on the supplied {@link ApplicationMenuCreator}. The new created {@code ApplicationMenu} will be ordered at the

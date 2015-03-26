@@ -23,8 +23,8 @@ import org.bonitasoft.engine.profile.Profile;
  * Describes the information about an {@link Application} to be created
  *
  * @author Elias Ricken de Medeiros
- * @since 6.4
  * @see Application
+ * @since 6.4
  */
 public class ApplicationCreator implements Serializable {
 
@@ -33,19 +33,39 @@ public class ApplicationCreator implements Serializable {
     private final Map<ApplicationField, Serializable> fields;
 
     /**
-     * Creates an instance of <code>ApplicationCreator</code> containing mandatory information
+     * Creates an instance of <code>ApplicationCreator</code> containing the essential information. You will need to set {@link Application} layout in order to
+     * get it working correctly. Prefer to create an {@code Application} using {@link #ApplicationCreator(String, String, String, Long)}.
      *
      * @param token the {@link Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
      *        characters and the following special characters '-', '.', '_' or '~'.
      * @param displayName the <code>Application</code> display name. It cannot be null or empty
      * @param version the <code>Application</code> version
      * @see Application
+     * @see #ApplicationCreator(String, String, String, Long)
      */
     public ApplicationCreator(final String token, final String displayName, final String version) {
         fields = new HashMap<>(3);
         fields.put(ApplicationField.TOKEN, token);
         fields.put(ApplicationField.VERSION, version);
         fields.put(ApplicationField.DISPLAY_NAME, displayName);
+    }
+
+    /**
+     * Creates an instance of <code>ApplicationCreator</code> containing mandatory information
+     *
+     * @param token the {@link Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
+     *        characters and the following special characters '-', '.', '_' or '~'.
+     * @param displayName the <code>Application</code> display name. It cannot be null or empty
+     * @param version the <code>Application</code> version
+     * @param layoutId the identifier of the {@link org.bonitasoft.engine.page.Page} defining the {@code Application} layout.
+     * @see Application
+     */
+    public ApplicationCreator(final String token, final String displayName, final String version, Long layoutId) {
+        fields = new HashMap<>(3);
+        fields.put(ApplicationField.TOKEN, token);
+        fields.put(ApplicationField.VERSION, version);
+        fields.put(ApplicationField.DISPLAY_NAME, displayName);
+        fields.put(ApplicationField.LAYOUT_ID, layoutId);
     }
 
     /**
@@ -92,20 +112,6 @@ public class ApplicationCreator implements Serializable {
      */
     public ApplicationCreator setProfileId(final Long profileId) {
         fields.put(ApplicationField.PROFILE_ID, profileId);
-        return this;
-    }
-
-    /**
-     * Defines the identifier of the {@link org.bonitasoft.engine.page.Page} used as the {@link Application} layout.
-     *
-     * @param layoutId the identifier of {@link org.bonitasoft.engine.page.Page} used as layout
-     * @return the current {@code ApplicationUpdater}
-     * @see org.bonitasoft.engine.page.Page
-     * @see org.bonitasoft.engine.business.application.Application
-     * @since 7.0.0
-     */
-    public ApplicationCreator setLayoutId(final Long layoutId) {
-        //TODO: add missing implementation
         return this;
     }
 
