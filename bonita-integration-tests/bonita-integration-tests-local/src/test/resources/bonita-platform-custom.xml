@@ -97,11 +97,4 @@
 		</property>
 	</bean>
 
-	<util:map id="archivingStrategyAdditionalConfiguration">
-		<entry key="org.bonitasoft.engine.archive.model.Employee" value="true"/>
-		<entry key="org.bonitasoft.engine.archive.model.Laptop" value="true"/>
-		<entry key="org.bonitasoft.engine.archive.model.Address" value="true"/>
-		<entry key="org.bonitasoft.engine.archive.model.Project" value="true"/>
-		<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" value="true"/>
-	</util:map>
 </beans>
