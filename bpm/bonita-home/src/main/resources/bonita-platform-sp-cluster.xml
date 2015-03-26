@@ -171,7 +171,7 @@
 		<property name="maxElementsInMemory" value="100000" />
 	</bean>
 
-	<bean id="hibernateCacheProperties" parent="sp1HibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean" depends-on="hazelcastInstance">
+	<bean id="hibernateCacheProperties" parent="spHibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean" depends-on="hazelcastInstance">
 		<property name="map">
 			<map merge="true">
 				<!-- 				Hazelcast second level cache configuration, more details here : http://www.hazelcast.com/docs/3.0/manual/multi_html/ch13.html -->

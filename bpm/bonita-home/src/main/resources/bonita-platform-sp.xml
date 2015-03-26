@@ -199,7 +199,7 @@
 		</property>
 	</bean>
 
-	<bean id="sp1HibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+	<bean id="spHibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
 		<property name="map">
 			<map>
 				<entry key="hibernate.cache.use_second_level_cache" value="true" />
@@ -209,7 +209,7 @@
 		</property>
 	</bean>
 
-	<bean id="hibernateCacheProperties" parent="sp1HibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+	<bean id="hibernateCacheProperties" parent="spHibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
 		<property name="map">
 			<map merge="true">
 			</map>

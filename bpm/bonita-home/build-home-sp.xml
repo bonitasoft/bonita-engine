@@ -20,25 +20,51 @@
 			<fileset dir="${resources.dir}">
 				<include name="bonita-platform-private-sp.properties"/>
 				<include name="bonita-platform-sp.properties"/>
-				<include name="bonita-platform-sp1.xml"/>
-				<include name="bonita-platform-sp3-cluster.xml"/>
+				<include name="bonita-platform-sp.xml"/>
+				<include name="bonita-platform-sp-cluster.xml"/>
 			</fileset>
 		</copy>
 
 		<copy todir="${bh.dir}/engine-server/work/tenants/template">
 			<fileset dir="${resources.dir}">
-				<include name="bonita-tenant-sp1.properties"/>
-				<include name="bonita-tenant-sp1.xml"/>
-				<include name="bonita-tenant-sp3-cluster.xml"/>
+				<include name="bonita-tenant-sp.properties"/>
+				<include name="bonita-tenant-sp.xml"/>
+				<include name="bonita-tenant-sp-cluster.xml"/>
 			</fileset>
 		</copy>
 
+		<!-- ENGINE SERVER CONF -->
 		<copy todir="${bh.dir}/engine-server/conf/platform">
 			<fileset dir="${resources.dir}">
 				<include name="bonita-platform-hibernate-cache.xml"/>
 				<include name="bonita-tenant-hibernate-cache.xml"/>
 			</fileset>
 		</copy>
+
+		<copy file="${resources.dir}/bonita-tenant-sp.properties" tofile="${bh.dir}/engine-server/conf/tenants/template/bonita-tenant-sp-custom.properties">
+			<filterchain>
+				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+					<param name="prefix" value="#"/>
+				</filterreader>
+			</filterchain>
+		</copy>
+
+		<copy file="${resources.dir}/bonita-tenant-sp-cluster.properties" tofile="${bh.dir}/engine-server/conf/tenants/template/bonita-tenant-sp-cluster-custom.properties">
+			<filterchain>
+				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+					<param name="prefix" value="#"/>
+				</filterreader>
+			</filterchain>
+		</copy>
+
+		<copy file="${resources.dir}/bonita-platform-sp-cluster.properties" tofile="${bh.dir}/engine-server/conf/platform/bonita-platform-sp-cluster-custom.properties">
+			<filterchain>
+				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+					<param name="prefix" value="#"/>
+				</filterreader>
+			</filterchain>
+		</copy>
+
 
 	</target>
 
