@@ -21,8 +21,8 @@ import org.bonitasoft.engine.api.impl.application.ApplicationAPIDelegate;
 import org.bonitasoft.engine.api.impl.application.ApplicationExporterDelegate;
 import org.bonitasoft.engine.api.impl.application.ApplicationMenuAPIDelegate;
 import org.bonitasoft.engine.api.impl.application.ApplicationPageAPIDelegate;
-import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
+import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
@@ -60,8 +60,6 @@ import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.page.Page;
-import org.bonitasoft.engine.page.PageNotFoundException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
@@ -209,11 +207,6 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public ApplicationPage getApplicationHomePage(final long applicationId) throws ApplicationPageNotFoundException {
         return getApplicationPageAPIDelegate().getApplicationHomePage(applicationId);
-    }
-
-    @Override
-    public Page getApplicationLayout(final long applicationId) throws PageNotFoundException {
-        return null;
     }
 
     @Override
