@@ -13,12 +13,21 @@
         <constructor-arg name="defaultCacheConfiguration" ref="defaultTenantCacheConfiguration" />
         <constructor-arg name="diskStorePath" value="java.io.tmpdir/tenant.cache" />
     </bean>
-    
-    <bean id="defaultTenantCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="DEFAULT_TENANT" />
-        <property name="maxElementsInMemory" value="1000" />
-        <property name="inMemoryOnly" value="true" />
-        <property name="eternal" value="true" />
+
+	<bean id="cacheConfigurations" parent="communityTenantCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list merge="true">
+				<ref bean="sessionCache" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="sessionCache" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<!-- do not put the first letter because it will need to match the pattern *ESSION... -->
+		<property name="name" value="ESSION_MAP" />
+		<property name="inMemoryOnly" value="true" />
+		<property name="timeToLiveSeconds" value="4000" />
+		<property name="maxElementsInMemory" value="100000" />
 	</bean>
 
 	<bean id="distributedCacheService" class="com.bonitasoft.engine.cache.impl.ClusteredCacheService">

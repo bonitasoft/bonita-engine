@@ -2,13 +2,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	
-	<bean id="sessionCache" class="org.bonitasoft.engine.cache.CacheConfiguration">
-		<!-- do not put the first letter because it will need to match the pattern *ESSION... -->
-		<property name="name" value="ESSION_MAP" />
-		<property name="inMemoryOnly" value="true" />
-		<property name="timeToLiveSeconds" value="4000" />
-		<property name="maxElementsInMemory" value="100000" />
+
+	<bean id="platformCacheConfigurations" parent="communityPlatformCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list merge="true">
+				<ref bean="platformSessionCache" />
+			</list>
+		</property>
 	</bean>
 
 	<bean id="broadcastService" class="com.bonitasoft.engine.service.impl.BroadcastServiceCluster">
@@ -94,7 +94,7 @@
 				<!-- </property> -->
 			</bean>
 		</constructor-arg>
-		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
+		<constructor-arg name="cacheConfigurations" ref="platformCacheConfigurations" />
 		<constructor-arg name="enableStats" value="false" />
 		<constructor-arg name="statsPrintInterval" value="10000" />
 	</bean>
