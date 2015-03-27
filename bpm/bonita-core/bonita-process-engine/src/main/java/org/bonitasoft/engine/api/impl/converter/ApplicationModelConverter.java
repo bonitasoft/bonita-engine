@@ -70,7 +70,7 @@ public class ApplicationModelConverter {
     }
 
     public List<Application> toApplication(final List<SApplication> sApplications) {
-        final List<Application> applications = new ArrayList<Application>(sApplications.size());
+        final List<Application> applications = new ArrayList<>(sApplications.size());
         for (final SApplication sApplication : sApplications) {
             applications.add(toApplication(sApplication));
         }
@@ -110,6 +110,9 @@ public class ApplicationModelConverter {
                     break;
                 case HOME_PAGE_ID:
                     builder.updateHomePageId((Long) entry.getValue());
+                    break;
+                case LAYOUT_ID:
+                    builder.updateLayoutId((Long) entry.getValue());
                     break;
                 default:
                     break;

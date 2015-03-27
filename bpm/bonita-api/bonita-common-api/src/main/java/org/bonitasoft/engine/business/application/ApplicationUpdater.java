@@ -157,7 +157,7 @@ public class ApplicationUpdater implements Serializable {
      * @since 7.0.0
      */
     public ApplicationUpdater setLayoutId(final Long layoutId) {
-        //TODO: add missing implementation
+        fields.put(ApplicationField.LAYOUT_ID, layoutId);
         return this;
     }
 

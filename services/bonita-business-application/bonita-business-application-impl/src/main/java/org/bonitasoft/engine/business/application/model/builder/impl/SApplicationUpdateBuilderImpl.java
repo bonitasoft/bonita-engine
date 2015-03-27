@@ -83,4 +83,9 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
         return this;
     }
 
+    @Override
+    public SApplicationUpdateBuilder updateLayoutId(final Long layoutId) {
+        descriptor.addField(SApplicationFields.LAYOUT_ID, layoutId);
+        return this;
+    }
 }

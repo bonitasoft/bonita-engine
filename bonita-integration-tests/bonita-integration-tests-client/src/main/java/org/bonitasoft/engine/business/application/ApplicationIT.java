@@ -84,6 +84,7 @@ public class ApplicationIT extends TestWithApplication {
     public void updateApplication_should_return_application_up_to_date() throws Exception {
         //given
         final Profile profile = getProfileUser();
+        Page layout = createPage("custompage_layout");
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
         final Application application = getApplicationAPI().createApplication(creator);
 
@@ -95,6 +96,7 @@ public class ApplicationIT extends TestWithApplication {
         updater.setIconPath("/newIcon.jpg");
         updater.setProfileId(profile.getId());
         updater.setState(ApplicationState.ACTIVATED.name());
+        updater.setLayoutId(layout.getId());
 
         //when
         final Application updatedApplication = getApplicationAPI().updateApplication(application.getId(), updater);
@@ -108,9 +110,11 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(updatedApplication.getIconPath()).isEqualTo("/newIcon.jpg");
         assertThat(updatedApplication.getProfileId()).isEqualTo(profile.getId());
         assertThat(updatedApplication.getState()).isEqualTo(ApplicationState.ACTIVATED.name());
+        assertThat(updatedApplication.getLayoutId()).isEqualTo(layout.getId());
         assertThat(updatedApplication).isEqualTo(getApplicationAPI().getApplication(application.getId()));
 
         getApplicationAPI().deleteApplication(application.getId());
+        getPageAPI().deletePage(layout.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "get" })
@@ -303,8 +307,7 @@ public class ApplicationIT extends TestWithApplication {
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
-        final SearchOptions options = builder.done();
-        return options;
+        return builder.done();
     }
 
     private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {

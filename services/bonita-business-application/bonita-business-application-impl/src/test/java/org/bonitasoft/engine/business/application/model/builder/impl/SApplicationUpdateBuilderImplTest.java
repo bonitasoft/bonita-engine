@@ -13,23 +13,51 @@
  **/
 package org.bonitasoft.engine.business.application.model.builder.impl;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
-import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationUpdateBuilderImpl;
+import org.bonitasoft.engine.business.application.model.SApplicationState;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 
 public class SApplicationUpdateBuilderImplTest {
 
     @Test
-    public void constructorShoulUpdateUpdatedByAndLastUpdateDateFields() throws Exception {
-        final EntityUpdateDescriptor desc = new SApplicationUpdateBuilderImpl(17L).done();
+    public void constructorShouldUpdateUpdatedByAndLastUpdateDateFields() throws Exception {
+        //given
+        long homePageId = 4L;
+        long updaterUserId = 17L;
+        long profileId = 20L;
+        long layoutId = 25L;
+
+        //when
+        SApplicationUpdateBuilderImpl builder = new SApplicationUpdateBuilderImpl(updaterUserId);
+        builder.updateDescription("new desc");
+        builder.updateHomePageId(homePageId);
+        builder.updateDisplayName("new display name");
+        builder.updateIconPath("/icon.jpg");
+        builder.updateProfileId(profileId);
+        builder.updateState(SApplicationState.DEACTIVATED.name());
+        builder.updateToken("newToken");
+        builder.updateVersion("2.0");
+        builder.updateLayoutId(layoutId);
+
+        //then
+        final EntityUpdateDescriptor desc = builder.done();
         final Map<String, Object> fields = desc.getFields();
-        assertThat(fields.size()).isEqualTo(2);
-        assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(17L);
+        assertThat(fields).hasSize(11);
+        assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(updaterUserId);
         assertThat(fields.get(SApplicationFields.LAST_UPDATE_DATE)).isNotNull();
+        assertThat(fields.get(SApplicationFields.DESCRIPTION)).isEqualTo("new desc");
+        assertThat(fields.get(SApplicationFields.HOME_PAGE_ID)).isEqualTo(homePageId);
+        assertThat(fields.get(SApplicationFields.DISPLAY_NAME)).isEqualTo("new display name");
+        assertThat(fields.get(SApplicationFields.ICON_PATH)).isEqualTo("/icon.jpg");
+        assertThat(fields.get(SApplicationFields.PROFILE_ID)).isEqualTo(profileId);
+        assertThat(fields.get(SApplicationFields.STATE)).isEqualTo(SApplicationState.DEACTIVATED.name());
+        assertThat(fields.get(SApplicationFields.TOKEN)).isEqualTo("newToken");
+        assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("2.0");
+        assertThat(fields.get(SApplicationFields.LAYOUT_ID)).isEqualTo(layoutId);
     }
 }

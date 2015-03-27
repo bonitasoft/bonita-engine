@@ -177,6 +177,10 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         this.displayName = displayName;
     }
 
+    public void setLayoutId(final Long layoutId) {
+        this.layoutId = layoutId;
+    }
+
     @Override
     public String toString() {
         return "SApplicationImpl [token=" + token + ", description=" + description + ", version=" + version + ", iconPath=" + iconPath

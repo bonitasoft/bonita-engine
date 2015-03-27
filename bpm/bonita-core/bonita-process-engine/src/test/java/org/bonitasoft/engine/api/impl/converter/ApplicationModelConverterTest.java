@@ -139,6 +139,7 @@ public class ApplicationModelConverterTest {
         updater.setProfileId(10L);
         updater.setState(ApplicationState.ACTIVATED.name());
         updater.setHomePageId(11L);
+        updater.setLayoutId(20L);
 
         //when
         final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
@@ -146,7 +147,7 @@ public class ApplicationModelConverterTest {
         //then
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
-        assertThat(fields).hasSize(10); // field lastUpdateDate cannot be checked:
+        assertThat(fields).hasSize(11); // field lastUpdateDate cannot be checked:
         assertThat(fields.get(SApplicationFields.TOKEN)).isEqualTo("My-updated-app");
         assertThat(fields.get(SApplicationFields.DISPLAY_NAME)).isEqualTo("Updated display name");
         assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("1.1");
@@ -156,6 +157,7 @@ public class ApplicationModelConverterTest {
         assertThat(fields.get(SApplicationFields.STATE)).isEqualTo(ApplicationState.ACTIVATED.name());
         assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(LOGGED_USER_ID);
         assertThat(fields.get(SApplicationFields.HOME_PAGE_ID)).isEqualTo(11L);
+        assertThat(fields.get(SApplicationFields.LAYOUT_ID)).isEqualTo(20L);
     }
 
     @Test
