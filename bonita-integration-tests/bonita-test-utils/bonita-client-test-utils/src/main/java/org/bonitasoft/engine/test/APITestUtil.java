@@ -14,7 +14,10 @@
 package org.bonitasoft.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -105,6 +108,9 @@ import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.form.FormMapping;
+import org.bonitasoft.engine.form.FormMappingSearchDescriptor;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCriterion;
@@ -135,6 +141,7 @@ import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
+import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -185,10 +192,12 @@ public class APITestUtil extends PlatformTestUtil {
     private ApplicationAPI applicationAPI;
 
     private TenantAdministrationAPI tenantManagementCommunityAPI;
-    
+
     private ProcessConfigurationAPI processConfigurationAPI;
 
     private BusinessDataAPI businessDataAPI;
+
+    private boolean forceToNonBlockingFormMappingToDefaultValue;
 
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
@@ -199,6 +208,10 @@ public class APITestUtil extends PlatformTestUtil {
         }
     }
 
+    @Before
+    public final void apiTestUtilBeforeClass() {
+        setForceToNonBlockingFormMappingToDefaultValue(true);
+    }
 
     @After
     public void clearSynchroRepository() {
@@ -486,6 +499,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActor(final BusinessArchive businessArchive, final List<String> actorsName, final List<User> users)
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
+        replaceFormMappingToNonBlockingValue(processDefinition.getId());
         for (int i = 0; i < users.size(); i++) {
             getProcessAPI().addUserToActor(actorsName.get(i), processDefinition, users.get(i).getId());
         }
@@ -589,6 +603,7 @@ public class APITestUtil extends PlatformTestUtil {
             throws BonitaException {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
+        replaceFormMappingToNonBlockingValue(processDefinition.getId());
         getProcessAPI().addUserToActor(actorName, processDefinition, userId);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
@@ -597,13 +612,14 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder,
             final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies) throws BonitaException {
         final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                connectorImplementations, generateConnectorDependencies, Collections.<BarResource>emptyList());
+                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
         return deployAndEnableProcess(businessArchiveBuilder.done());
     }
 
     public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder, final String connectorImplName,
             final Class<? extends AbstractConnector> clazz, final String jarName) throws BonitaException, IOException {
-        return deployAndEnableProcessWithConnector(processDefinitionBuilder, Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(connectorImplName, clazz)),
+        return deployAndEnableProcessWithConnector(processDefinitionBuilder,
+                Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(connectorImplName, clazz)),
                 Arrays.asList(BuildTestUtil.generateJarAndBuildBarResource(clazz, jarName)));
     }
 
@@ -650,7 +666,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
             throws BonitaException {
-        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource>emptyList(),
+        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
                 generateFilterDependencies, userFilters);
     }
 
@@ -1615,5 +1631,32 @@ public class APITestUtil extends PlatformTestUtil {
         } finally {
             stream.close();
         }
+    }
+
+    /**
+     * use this method to bypass pageProcessDependencyResolver since default value "internal" with a null page is not allowed
+     * URL value is not a criteria for see PageProcessDependencyResolver
+     *
+     * @param processDefinitionId
+     * @throws BonitaException
+     */
+    public void replaceFormMappingToNonBlockingValue(final long processDefinitionId) throws BonitaException {
+        if (isForceToNonBlockingFormMappingToDefaultValue()) {
+            final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1000);
+            searchOptionsBuilder.filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId);
+            final SearchResult<FormMapping> searchResult = getProcessConfigurationAPI().searchFormMappings(searchOptionsBuilder.done());
+            final List<FormMapping> formMappings = searchResult.getResult();
+            for (final FormMapping formMapping : formMappings) {
+                getProcessConfigurationAPI().updateFormMapping(formMapping.getId(), "", FormMappingTarget.URL);
+            }
+        }
+    }
+
+    public boolean isForceToNonBlockingFormMappingToDefaultValue() {
+        return forceToNonBlockingFormMappingToDefaultValue;
+    }
+
+    public void setForceToNonBlockingFormMappingToDefaultValue(boolean forceToNonBlockingFormMappingToDefaultValue) {
+        this.forceToNonBlockingFormMappingToDefaultValue = forceToNonBlockingFormMappingToDefaultValue;
     }
 }
