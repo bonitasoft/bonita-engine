@@ -324,7 +324,7 @@
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
         <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="platformService" ref="platformService" />
         <constructor-arg name="delayable" value="false" />
     </bean>

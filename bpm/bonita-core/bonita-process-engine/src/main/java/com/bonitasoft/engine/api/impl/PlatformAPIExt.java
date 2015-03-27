@@ -208,7 +208,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             BonitaHomeServer.getInstance().modifyTechnicalUser(tenant.getId(), userName, password);
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final SessionService sessionService = platformAccessor.getSessionService();
+            final SessionService sessionService = tenantServiceAccessor.getSessionService();
             final Long finalTenantId = tenantId;
             final Callable<Long> initializeTenant = new Callable<Long>() {
 
@@ -329,7 +329,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final SessionService sessionService = platformAccessor.getSessionService();
+            final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
 
             final NodeConfiguration nodeConfiguration = platformAccessor.getPlatformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -402,7 +402,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final SessionService sessionService = platformAccessor.getSessionService();
+            final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
 

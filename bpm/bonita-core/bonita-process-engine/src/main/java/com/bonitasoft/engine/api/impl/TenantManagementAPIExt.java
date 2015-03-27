@@ -145,7 +145,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     private void deleteSessionsOfTenantExceptTechnicalUser(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) {
-        final SessionService sessionService = platformServiceAccessor.getSessionService();
+        final SessionService sessionService = platformServiceAccessor.getTenantServiceAccessor(tenantId).getSessionService();
         sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
     }
 
@@ -186,7 +186,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         } catch (STenantNotFoundException e) {
             throw new RestartException("Unable to restart tenant", e);
         }
-        new StarterThread(platformServiceAccessor, platformServiceAccessor.getSessionService(), nodeConfiguration, Arrays.asList(tenant),
+        new StarterThread(platformServiceAccessor, nodeConfiguration, Arrays.asList(tenant),
                 tenantServiceAccessor.getSessionAccessor(), tenantServiceAccessor.getTechnicalLoggerService()).start();
     }
 

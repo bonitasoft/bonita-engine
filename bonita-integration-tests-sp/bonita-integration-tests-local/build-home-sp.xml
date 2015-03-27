@@ -42,7 +42,7 @@
 				<include name="bonita-platform-sp-custom.xml"/>
 			</fileset>
 		</copy>
-		<ant antfile="../../bpm/bonita-home/install-license.xml"/>
+		<ant antfile="${basedir}/install-license.xml"/>
 	</target>
 
 </project>
