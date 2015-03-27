@@ -26,7 +26,6 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
 
-import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.LogUtil;
@@ -52,16 +51,19 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
     private final String diskStorePath;
 
     public CommonEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-            final CacheConfigurations cacheConfigurations, final org.bonitasoft.engine.cache.CacheConfiguration defaultCacheConfiguration,
+            final List<org.bonitasoft.engine.cache.CacheConfiguration> cacheConfigurations, final org.bonitasoft.engine.cache.CacheConfiguration defaultCacheConfiguration,
             final String diskStorePath) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.diskStorePath = diskStorePath;
         this.defaultCacheConfiguration = getEhCacheConfiguration(defaultCacheConfiguration);
-        final List<org.bonitasoft.engine.cache.CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
-        this.cacheConfigurations = new HashMap<String, CacheConfiguration>(configurations.size());
-        for (final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig : configurations) {
-            this.cacheConfigurations.put(cacheConfig.getName(), getEhCacheConfiguration(cacheConfig));
+        if (cacheConfigurations != null && cacheConfigurations.size() > 0) {
+            this.cacheConfigurations = new HashMap<String, CacheConfiguration>(cacheConfigurations.size());
+            for (final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig : cacheConfigurations) {
+                this.cacheConfigurations.put(cacheConfig.getName(), getEhCacheConfiguration(cacheConfig));
+            }
+        } else {
+            this.cacheConfigurations = Collections.emptyMap();
         }
     }
 

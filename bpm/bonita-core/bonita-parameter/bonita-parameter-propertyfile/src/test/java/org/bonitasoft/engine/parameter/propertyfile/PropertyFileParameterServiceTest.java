@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.bonitasoft.engine.cache.PlatformCacheService;
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -67,7 +67,7 @@ public class PropertyFileParameterServiceTest {
 
     // here the mock will always return null when get is called: it's like the cache store nothing
     @Mock
-    private PlatformCacheService cacheService;
+    private CacheService cacheService;
 
     @InjectMocks
     private PropertyFileParameterService propertyFileParameterService;

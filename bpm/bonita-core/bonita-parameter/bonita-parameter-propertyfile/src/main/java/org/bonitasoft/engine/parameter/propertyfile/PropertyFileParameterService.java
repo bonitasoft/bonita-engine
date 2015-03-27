@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -49,9 +50,9 @@ public class PropertyFileParameterService implements ParameterService {
 
     private final ReadSessionAccessor sessionAccessor;
 
-    private final PlatformCacheService cacheService;
+    private final CacheService cacheService;
 
-    public PropertyFileParameterService(final ReadSessionAccessor sessionAccessor, final PlatformCacheService cacheService) {
+    public PropertyFileParameterService(final ReadSessionAccessor sessionAccessor, final CacheService cacheService) {
         this.sessionAccessor = sessionAccessor;
         this.cacheService = cacheService;
     }

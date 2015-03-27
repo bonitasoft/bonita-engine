@@ -111,8 +111,6 @@ public class CacheServiceTest {
         final CacheConfiguration cacheWithOneElementInMemoryOnly = createOneElementInMemoryOnlyCacheConfiguration();
         configurationsList.add(cacheWithOneElementInMemoryOnly);
 
-        final CacheConfigurations cacheConfigurations = new CacheConfigurations();
-        cacheConfigurations.setConfigurations(configurationsList);
         return new EhCacheCacheService(new TechnicalLoggerService() {
 
             @Override
@@ -142,7 +140,7 @@ public class CacheServiceTest {
             public long getSessionId() {
                 return 1;
             }
-        }, cacheConfigurations, new CacheConfiguration(), "target");
+        }, configurationsList, new CacheConfiguration(), "target");
     }
 
 	private CacheConfiguration createOneElementInMemoryCacheConfiguration() {

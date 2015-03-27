@@ -786,7 +786,7 @@
 
     <bean id="parameterService" class="org.bonitasoft.engine.parameter.propertyfile.PropertyFileParameterService">
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="cacheService" ref="platformCacheService" />
+        <constructor-arg name="cacheService" ref="cacheService" />
     </bean>
 
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
@@ -1242,11 +1242,36 @@
         <property name="eternal" value="true" />
     </bean>
 
-    <bean id="cacheConfigurations" class="org.bonitasoft.engine.cache.CacheConfigurations" autowire="byType" />
+    <bean id="cacheConfigurations" parent="communityCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="communityCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+                <ref bean="connectorCacheConfig" />
+                <ref bean="parameterCacheConfig" />
+                <ref bean="processDefCacheConfig" />
+                <ref bean="userFilterCacheConfig" />
+                <ref bean="migrationPlanCacheConfig" />
+                <ref bean="breakpointCacheConfig" />
+                <ref bean="groovyScriptCacheConfig" />
+                <ref bean="transientDataCacheConfig" />
+            </list>
+        </property>
+    </bean>
 
     <bean id="connectorCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
         <property name="name" value="CONNECTOR" />
         <property name="readIntensive" value="true" />
+    </bean>
+
+
+    <bean id="parameterCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="parameters" />
     </bean>
 
     <bean id="processDefCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
@@ -1272,23 +1297,9 @@
         <property name="eternal" value="true" />
     </bean>
 
-    <bean id="synchroServiceCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="SYNCHRO_SERVICE_CACHE" />
-        <property name="timeToLiveSeconds" value="120" />
-        <property name="maxElementsInMemory" value="10000" />
-        <property name="inMemoryOnly" value="true" />
-    </bean>
-
     <bean id="transientDataCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
         <property name="name" value="transient_data" />
         <property name="maxElementsInMemory" value="10000" />
-        <property name="inMemoryOnly" value="true" />
-        <property name="eternal" value="true" />
-    </bean>
-
-    <bean id="platformCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="PLATFORM" />
-        <property name="maxElementsInMemory" value="100" />
         <property name="inMemoryOnly" value="true" />
         <property name="eternal" value="true" />
     </bean>
