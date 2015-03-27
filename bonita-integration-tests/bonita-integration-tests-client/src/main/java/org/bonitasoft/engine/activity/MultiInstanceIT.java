@@ -950,7 +950,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
             businessArchiveBuilder.addClasspathResource(barResource);
         }
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
+        final ProcessDefinition processDefinition = deployProcess(businessArchiveBuilder.done());
         getProcessAPI().addUserToActor(actorName, processDefinition, john.getId());
         getProcessAPI().addUserToActor(actorName, processDefinition, jack.getId());
         getProcessAPI().addUserToActor(actorName, processDefinition, jenny.getId());

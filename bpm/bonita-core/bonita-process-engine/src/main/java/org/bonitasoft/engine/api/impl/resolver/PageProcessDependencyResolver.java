@@ -23,7 +23,6 @@ import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.form.FormMappingTarget;
-import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -32,8 +31,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class PageProcessDependencyResolver implements ProcessDependencyResolver {
 
-    public static final String ERROR_MESSAGE_PAGE_IS_NOT_PRESENT = "page %s is not present";
-    public static final String ERROR_MESSAGE_FORM_MAPPING_PAGE_IS_NULL = "form mapping provided page name is null";
+    public static final String ERROR_MESSAGE = "error while resolving form mapping %s";
 
     @Override
     public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition) {
@@ -68,19 +66,18 @@ public class PageProcessDependencyResolver implements ProcessDependencyResolver 
             throws SBonitaReadException {
         if (isMappingRelatedToCustomPage(formMapping)) {
             final String pageName = formMapping.getForm();
-            addProblemIfPageIsNotFound(tenantAccessor, processDefinitionId, problems, pageName);
+            addProblemIfPageIsNotFound(tenantAccessor, formMapping, processDefinitionId, problems, pageName);
         }
     }
 
-    private void addProblemIfPageIsNotFound(TenantServiceAccessor tenantAccessor, long processDefinitionId, List<Problem> problems, String pageName) throws SBonitaReadException {
-        if (pageName == null) {
-            problems.add(new ProblemImpl(Problem.Level.ERROR, processDefinitionId, null, ERROR_MESSAGE_FORM_MAPPING_PAGE_IS_NULL));
-            return;
+    private void addProblemIfPageIsNotFound(TenantServiceAccessor tenantAccessor, SFormMapping formMapping, long processDefinitionId, List<Problem> problems, String pageName) throws SBonitaReadException {
+        if (pageName == null || tenantAccessor.getPageService().getPageByNameAndProcessDefinitionId(pageName, processDefinitionId) == null) {
+            addProblem(formMapping, processDefinitionId, problems);
         }
-        final SPage sPage = tenantAccessor.getPageService().getPageByNameAndProcessDefinitionId(pageName, processDefinitionId);
-        if (sPage == null) {
-            problems.add(new ProblemImpl(Problem.Level.ERROR, processDefinitionId, pageName, String.format(ERROR_MESSAGE_PAGE_IS_NOT_PRESENT, pageName)));
-        }
+    }
+
+    private void addProblem(SFormMapping formMapping, long processDefinitionId, List<Problem> problems) {
+        problems.add(new ProblemImpl(Problem.Level.ERROR, processDefinitionId, "form mapping", String.format(ERROR_MESSAGE, formMapping.toString())));
     }
 
     private boolean isMappingRelatedToCustomPage(SFormMapping formMapping) {

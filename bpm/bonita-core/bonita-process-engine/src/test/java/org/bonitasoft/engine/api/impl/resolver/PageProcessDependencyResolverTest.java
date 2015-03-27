@@ -81,7 +81,8 @@ public class PageProcessDependencyResolverTest {
     @Test
     public void should_check_resolution_report_problem_when_page_is_missing() throws Exception {
         //given
-        formMappings.add(new SFormMappingImpl(PROCESS_DEFINITION_ID, "task", PAGE, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_OVERVIEW.name()));
+        final SFormMappingImpl sFormMapping = new SFormMappingImpl(PROCESS_DEFINITION_ID, "task", PAGE, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_OVERVIEW.name());
+        formMappings.add(sFormMapping);
         doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
         doReturn(null).when(pageService).getPageByNameAndProcessDefinitionId(PAGE, PROCESS_DEFINITION_ID);
 
@@ -90,7 +91,7 @@ public class PageProcessDependencyResolverTest {
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
-        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(PageProcessDependencyResolver.ERROR_MESSAGE_PAGE_IS_NOT_PRESENT, PAGE))
+        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(PageProcessDependencyResolver.ERROR_MESSAGE, sFormMapping))
                 .hasLevel(Problem.Level.ERROR);
 
     }
@@ -98,7 +99,8 @@ public class PageProcessDependencyResolverTest {
     @Test
     public void should_format_message_when_form_mapping_page_is_null() throws Exception {
         //given
-        formMappings.add(new SFormMappingImpl(PROCESS_DEFINITION_ID, "task", null, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_OVERVIEW.name()));
+        final SFormMappingImpl sFormMapping = new SFormMappingImpl(PROCESS_DEFINITION_ID, "task", null, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_OVERVIEW.name());
+        formMappings.add(sFormMapping);
         doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
 
         //when
@@ -106,7 +108,7 @@ public class PageProcessDependencyResolverTest {
 
         // then
         assertThat(problems).as("should return a problem").hasSize(1);
-        ProblemAssert.assertThat(problems.get(0)).hasDescription(PageProcessDependencyResolver.ERROR_MESSAGE_FORM_MAPPING_PAGE_IS_NULL)
+        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(PageProcessDependencyResolver.ERROR_MESSAGE, sFormMapping))
                 .hasLevel(Problem.Level.ERROR);
 
     }
