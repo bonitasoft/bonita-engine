@@ -46,7 +46,8 @@ public class ApplicationModelConverter {
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
         final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
-        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, displayName, version, creatorUserId);
+        final Long layoutId = (Long) fields.get(ApplicationField.LAYOUT_ID);
+        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, displayName, version, creatorUserId, layoutId);
         builder.setDescription(description);
         builder.setIconPath(iconPath);
         builder.setProfileId(profileId);
@@ -54,7 +55,7 @@ public class ApplicationModelConverter {
     }
 
     public Application toApplication(final SApplication sApplication) {
-        final ApplicationImpl application = new ApplicationImpl(sApplication.getToken(), sApplication.getVersion(), sApplication.getDescription());
+        final ApplicationImpl application = new ApplicationImpl(sApplication.getToken(), sApplication.getVersion(), sApplication.getDescription(), sApplication.getLayoutId());
         application.setId(sApplication.getId());
         application.setDisplayName(sApplication.getDisplayName());
         application.setCreatedBy(sApplication.getCreatedBy());

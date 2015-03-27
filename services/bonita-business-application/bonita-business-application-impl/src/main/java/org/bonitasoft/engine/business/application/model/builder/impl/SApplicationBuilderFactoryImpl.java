@@ -26,9 +26,9 @@ import org.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
 public class SApplicationBuilderFactoryImpl implements SApplicationBuilderFactory {
 
     @Override
-    public SApplicationBuilder createNewInstance(final String token, final String displayName, final String version, final long createdBy) {
+    public SApplicationBuilder createNewInstance(final String token, final String displayName, final String version, final long createdBy, final Long layoutId) {
         final long currentDate = System.currentTimeMillis();
-        return new SApplicationBuilderImpl(new SApplicationImpl(token, displayName, version, currentDate, createdBy, SApplicationState.ACTIVATED.name()));
+        return new SApplicationBuilderImpl(new SApplicationImpl(token, displayName, version, currentDate, createdBy, SApplicationState.ACTIVATED.name(), layoutId));
     }
 
     @Override

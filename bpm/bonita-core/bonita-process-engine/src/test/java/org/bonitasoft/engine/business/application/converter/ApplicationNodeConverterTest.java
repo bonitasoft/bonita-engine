@@ -73,7 +73,7 @@ public class ApplicationNodeConverterTest {
     @Test
     public void toNode_should_return_convert_all_string_fields() throws Exception {
         //given
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 11L, "enabled");
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 11L, "enabled", 40L);
         application.setDescription("this is my app");
         application.setIconPath("/icon.jpg");
 

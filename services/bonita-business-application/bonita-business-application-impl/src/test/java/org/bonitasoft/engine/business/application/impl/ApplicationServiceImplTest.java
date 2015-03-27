@@ -36,9 +36,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.impl.ApplicationServiceImpl;
-import org.bonitasoft.engine.business.application.impl.IndexManager;
-import org.bonitasoft.engine.business.application.impl.MenuIndex;
 import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationDestructor;
 import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuDestructor;
 import org.bonitasoft.engine.business.application.impl.cleaner.ApplicationPageDestructor;
@@ -100,6 +97,8 @@ public class ApplicationServiceImplTest {
 
     public static final int MAX_RESULTS = 2;
 
+    public static final long LAYOUT_ID = 15L;
+
     @Mock
     private Recorder recorder;
 
@@ -139,7 +138,7 @@ public class ApplicationServiceImplTest {
     }
 
     private SApplication buildApplication(final String applicationName, final String applicationDisplayName) {
-        return new SApplicationBuilderFactoryImpl().createNewInstance(applicationName, applicationDisplayName, "1.0", CREATED_BY).done();
+        return new SApplicationBuilderFactoryImpl().createNewInstance(applicationName, applicationDisplayName, "1.0", CREATED_BY, LAYOUT_ID).done();
     }
 
     @Test

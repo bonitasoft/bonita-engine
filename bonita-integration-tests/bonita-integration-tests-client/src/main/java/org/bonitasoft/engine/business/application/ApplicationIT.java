@@ -18,6 +18,7 @@ import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -37,7 +38,8 @@ public class ApplicationIT extends TestWithApplication {
     public void createApplication_returns_application_based_on_ApplicationCreator_information() throws Exception {
         //given
         final Profile profile = getProfileUser();
-        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
+        Page layout = createPage("custompage_layout");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0", layout.getId());
         creator.setDescription("This is my application");
         creator.setIconPath("/icon.jpg");
         creator.setProfileId(profile.getId());
@@ -57,8 +59,10 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(application.getUpdatedBy()).isEqualTo(getUser().getId());
         assertThat(application.getHomePageId()).isNull();
         assertThat(application.getProfileId()).isEqualTo(profile.getId());
+        assertThat(application.getLayoutId()).isEqualTo(layout.getId());
 
         getApplicationAPI().deleteApplication(application.getId());
+        getPageAPI().deletePage(layout.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create", "no profile" })

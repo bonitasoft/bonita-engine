@@ -20,7 +20,7 @@ package org.bonitasoft.engine.business.application.model.builder;
  */
 public interface SApplicationBuilderFactory {
 
-    SApplicationBuilder createNewInstance(String token, String displayName, String version, final long createdBy);
+    SApplicationBuilder createNewInstance(String token, String displayName, String version, final long createdBy, final Long layoutId);
 
     String getIdKey();
 

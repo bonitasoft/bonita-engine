@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.api.impl.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -26,7 +24,6 @@ import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationState;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
-import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
@@ -47,12 +44,14 @@ public class ApplicationModelConverterTest {
     private static final String APP_NAME = "app";
     private static final String APP_DISPLAY_NAME = "My application";
     private static final long LOGGED_USER_ID = 10;
-    private final ApplicationModelConverter convertor = new ApplicationModelConverter();
+    public static final long LAYOUT_ID = 55L;
+    public static final String APP_NAME2 = "app2";
+    private final ApplicationModelConverter converter = new ApplicationModelConverter();
 
     @Test
     public void buildSApplication_should_map_all_information_from_creator_and_initialize_mandatory_fields() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, LAYOUT_ID);
         creator.setDescription(APP_DESC);
         creator.setIconPath(ICON_PATH);
         creator.setProfileId(PROFILE_ID);
@@ -60,7 +59,7 @@ public class ApplicationModelConverterTest {
         final long before = System.currentTimeMillis();
 
         //when
-        final SApplication application = convertor.buildSApplication(creator, userId);
+        final SApplication application = converter.buildSApplication(creator, userId);
 
         //then
         assertThat(application).isNotNull();
@@ -75,6 +74,7 @@ public class ApplicationModelConverterTest {
         assertThat(application.getLastUpdateDate()).isEqualTo(application.getCreationDate());
         assertThat(application.getState()).isEqualTo(SApplicationState.ACTIVATED.name());
         assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
+        assertThat(application.getLayoutId()).isEqualTo(LAYOUT_ID);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ApplicationModelConverterTest {
         final long currentDate = System.currentTimeMillis();
         final String state = SApplicationState.DEACTIVATED.name();
         final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID,
-                state);
+                state, LAYOUT_ID);
         sApp.setDescription(APP_DESC);
         sApp.setId(ID);
         sApp.setTenantId(TENANT_ID);
@@ -92,7 +92,7 @@ public class ApplicationModelConverterTest {
         sApp.setProfileId(PROFILE_ID);
 
         //when
-        final Application application = convertor.toApplication(sApp);
+        final Application application = converter.toApplication(sApp);
 
         //then
         assertThat(application).isNotNull();
@@ -109,26 +109,22 @@ public class ApplicationModelConverterTest {
         assertThat(application.getState()).isEqualTo(state);
         assertThat(application.getHomePageId()).isEqualTo(HOME_PAGE_ID);
         assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
+        assertThat(application.getLayoutId()).isEqualTo(LAYOUT_ID);
     }
 
     @Test
-    public void toApplicationList_should_call_toApplition_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
+    public void toApplicationList_should_call_toApplication_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
         //given
         final SApplicationImpl sApp1 = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
-                SApplicationState.DEACTIVATED.name());
-        final SApplicationImpl sApp2 = new SApplicationImpl("app2", " my app2", APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
-                SApplicationState.DEACTIVATED.name());
-        final ApplicationImpl app1 = new ApplicationImpl(APP_NAME, APP_VERSION, APP_DESC);
-        final ApplicationImpl app2 = new ApplicationImpl("app2", APP_VERSION, APP_DESC);
-        final ApplicationModelConverter convertorMock = spy(convertor);
-        doReturn(app1).when(convertorMock).toApplication(sApp1);
-        doReturn(app2).when(convertorMock).toApplication(sApp2);
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID);
+        final SApplicationImpl sApp2 = new SApplicationImpl(APP_NAME2, " my app2", APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID);
 
         //when
-        final List<Application> applications = convertorMock.toApplication(Arrays.<SApplication> asList(sApp1, sApp2));
+        final List<Application> applications = converter.toApplication(Arrays.<SApplication> asList(sApp1, sApp2));
 
         //then
-        assertThat(applications).containsExactly(app1, app2);
+        assertThat(applications).extracting("token").containsExactly(APP_NAME, APP_NAME2);
     }
 
     @Test
@@ -145,7 +141,7 @@ public class ApplicationModelConverterTest {
         updater.setHomePageId(11L);
 
         //when
-        final EntityUpdateDescriptor updateDescriptor = convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
+        final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
 
         //then
         assertThat(updateDescriptor).isNotNull();
@@ -168,7 +164,7 @@ public class ApplicationModelConverterTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
 
         //when
-        final EntityUpdateDescriptor updateDescriptor = convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
+        final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
 
         //then
         assertThat(updateDescriptor).isNotNull();

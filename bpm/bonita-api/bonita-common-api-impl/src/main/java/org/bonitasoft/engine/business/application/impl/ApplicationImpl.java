@@ -27,6 +27,7 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
 
     private static final long serialVersionUID = -5393587887795907117L;
     private final String version;
+    private Long layoutId;
     private String iconPath;
     private Date creationDate;
     private long createdBy;
@@ -43,6 +44,11 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
         this.token = token;
         this.version = version;
         this.description = description;
+    }
+
+    public ApplicationImpl(final String token, final String version, final String description, Long layoutId) {
+        this(token, version, description);
+        this.layoutId = layoutId;
     }
 
     @Override
@@ -139,8 +145,7 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
 
     @Override
     public Long getLayoutId() {
-        //TODO: add missing implementation
-        return null;
+        return layoutId;
     }
 
     public void setProfileId(final Long profileId) {
