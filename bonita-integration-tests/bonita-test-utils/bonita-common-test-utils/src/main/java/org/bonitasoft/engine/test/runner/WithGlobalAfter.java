@@ -13,38 +13,25 @@
  **/
 package org.bonitasoft.engine.test.runner;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
+import org.junit.runner.Runner;
 import org.junit.runners.model.Statement;
 
 final class WithGlobalAfter extends Statement {
 
     private final Statement classBlock;
 
-    private final BonitaRunner testRunner;
+    private final Runner testRunner;
 
-    private final Class<?> initializer;
 
-    WithGlobalAfter(final Statement classBlock, final BonitaRunner testRunner, final Class<?> initializer) {
+    WithGlobalAfter(final Statement classBlock, final Runner testRunner) {
         this.classBlock = classBlock;
         this.testRunner = testRunner;
-        this.initializer = initializer;
     }
 
     @Override
     public void evaluate() throws Throwable {
         classBlock.evaluate();
-        if (testRunner.isRoot()) {
-            try {
-                if(initializer == null){
-                    throw new IllegalStateException("Unable to run the suite as a root suite because it does not have a @Initialize set");
-                }
-                Method declaredMethod = initializer.getDeclaredMethod("afterAll");
-                declaredMethod.invoke(null);
-            } catch (final InvocationTargetException e) {
-                throw e.getCause();
-            }
-        }
+        BonitaTestContext.removeRunner(testRunner);
+        BonitaTestContext.shutdownEngine();
     }
 }

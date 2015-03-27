@@ -169,7 +169,7 @@ public class LocalServerTestsInitializer {
             }
         }
         //ehcache
-        return !thread.getName().matches("[0-9]+_[A-Z_]+.data");
+        return !thread.getName().matches("[0-9]+_[A-Za-z_]+.data");
     }
 
     protected void initPlatformAndTenant() throws Exception {

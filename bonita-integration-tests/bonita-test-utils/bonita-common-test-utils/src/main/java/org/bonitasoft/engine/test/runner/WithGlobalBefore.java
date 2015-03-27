@@ -13,33 +13,20 @@
  **/
 package org.bonitasoft.engine.test.runner;
 
-import java.lang.reflect.Method;
-
+import org.junit.runner.Runner;
 import org.junit.runners.model.Statement;
 
 final class WithGlobalBefore extends Statement {
 
     private final Statement classBlock;
 
-    private final BonitaRunner testRunner;
-
-    private final Class<?> initializer;
-
-    WithGlobalBefore(final Statement classBlock, final BonitaRunner testRunner, final Class<?> annotatedInitializer) {
+    WithGlobalBefore(final Statement classBlock, final Runner testRunner) {
         this.classBlock = classBlock;
-        this.testRunner = testRunner;
-        this.initializer = annotatedInitializer;
     }
 
     @Override
     public void evaluate() throws Throwable {
-        if (testRunner.isRoot()) {
-            if(initializer == null){
-                throw new IllegalStateException("Unable to run the suite as a root suite because it does not have a @Initialize set");
-            }
-            Method declaredMethod = initializer.getDeclaredMethod("beforeAll");
-            declaredMethod.invoke(null);
-        }
+            BonitaTestContext.initializeEngine();
         classBlock.evaluate();
     }
 }
