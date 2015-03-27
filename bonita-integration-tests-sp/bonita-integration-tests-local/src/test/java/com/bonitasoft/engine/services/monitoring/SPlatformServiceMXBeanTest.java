@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -99,7 +100,7 @@ public class SPlatformServiceMXBeanTest extends CommonBPMServicesSPTest {
                 .createNewInstance(IncrementAVariable.class.getName(), "IncrementAVariable").setDescription("increment a variable").done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", theResponse).done());
-        final Trigger trigger = new OneShotTrigger("events", now, 10);
+        final Trigger trigger = new OneShotTrigger("events-" + UUID.randomUUID().toString(), now, 10);
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
 
