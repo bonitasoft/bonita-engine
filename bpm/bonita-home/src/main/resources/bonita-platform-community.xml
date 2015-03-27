@@ -120,16 +120,6 @@
 
     <bean id="platformProperties" class="org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl" />
 
-    <bean id="parameterService" class="org.bonitasoft.engine.parameter.propertyfile.PropertyFileParameterService">
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="cacheService" ref="platformCacheService" />
-    </bean>
-
-    <bean id="parameterExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
-        <constructor-arg name="parameterService" ref="parameterService" />
-    </bean>
-
-
     <bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
         <property name="shouldStartScheduler" value="true" />
         <property name="shouldRestartElements" value="true" />
@@ -303,20 +293,6 @@
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="eventService" ref="platformEventService" />
     </bean>
-
-    <bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
-        <constructor-arg name="validatorFactory" ref="xmlValidatorFactory" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-    </bean>
-
-    <bean id="xmlValidatorFactory" class="org.bonitasoft.engine.xml.SAXValidatorFactory" />
-
-    <bean id="xmlValidator" class="org.bonitasoft.engine.xml.SAXValidator" />
-
-    <bean id="xmlWriter" class="org.bonitasoft.engine.xml.DOMWriter">
-        <constructor-arg name="validator" ref="xmlValidator" />
-    </bean>
-
 
     <bean id="transactionExecutor" class="org.bonitasoft.engine.execution.TransactionExecutorImpl">
         <constructor-arg name="transactionService" ref="transactionService" />

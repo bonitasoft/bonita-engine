@@ -784,6 +784,11 @@
         <constructor-arg name="parameterService" ref="parameterService" />
     </bean>
 
+    <bean id="parameterService" class="org.bonitasoft.engine.parameter.propertyfile.PropertyFileParameterService">
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="cacheService" ref="platformCacheService" />
+    </bean>
+
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
 
     <bean id="workSynchronizationFactory" class="org.bonitasoft.engine.work.SequenceWorkSynchronizationFactory" />
@@ -1043,6 +1048,18 @@
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
     </bean>
 
+    <bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
+        <constructor-arg name="validatorFactory" ref="xmlValidatorFactory" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="xmlValidatorFactory" class="org.bonitasoft.engine.xml.SAXValidatorFactory" />
+
+    <bean id="xmlValidator" class="org.bonitasoft.engine.xml.SAXValidator" />
+
+    <bean id="xmlWriter" class="org.bonitasoft.engine.xml.DOMWriter">
+        <constructor-arg name="validator" ref="xmlValidator" />
+    </bean>
 
     <bean id="processDefinitionManager" class="org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl">
         <constructor-arg name="cacheService" ref="cacheService" />
