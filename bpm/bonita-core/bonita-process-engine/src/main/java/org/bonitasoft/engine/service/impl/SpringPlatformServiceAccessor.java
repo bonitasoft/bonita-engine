@@ -51,8 +51,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
     private TransactionExecutor transactionExecutor;
 
-    private SessionService sessionService;
-
     private ClassLoaderService classLoaderService;
 
     private DependencyService dependencyService;
@@ -118,14 +116,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
             transactionExecutor = SpringPlatformFileSystemBeanAccessor.getService(TransactionExecutor.class);
         }
         return transactionExecutor;
-    }
-
-    @Override
-    public SessionService getSessionService() {
-        if (sessionService == null) {
-            sessionService = SpringPlatformFileSystemBeanAccessor.getService(SessionService.class);
-        }
-        return sessionService;
     }
 
     @Override

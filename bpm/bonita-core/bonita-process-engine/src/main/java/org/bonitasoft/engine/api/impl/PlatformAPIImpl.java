@@ -288,7 +288,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     void afterServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
             final List<STenant> tenants) {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
-        final SessionService sessionService = platformAccessor.getSessionService();
         final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
 
         if (platformConfiguration.shouldResumeElements()) {
@@ -298,7 +297,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             // * transitions that are in state created: call execute on them
             // * flow node that are completed and not deleted : call execute to make it create transitions and so on
             // * all element that are in not stable state
-            new StarterThread(platformAccessor, sessionService, platformConfiguration, tenants, sessionAccessor, technicalLoggerService)
+            new StarterThread(platformAccessor, platformConfiguration, tenants, sessionAccessor, technicalLoggerService)
                     .start();
 
         }
@@ -307,7 +306,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     void beforeServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
             final List<STenant> tenants) throws Exception {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
-        final SessionService sessionService = platformAccessor.getSessionService();
 
         if (platformConfiguration.shouldResumeElements()) {
             // Here get all elements that are not "finished"
@@ -319,6 +317,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             for (final STenant tenant : tenants) {
                 if (!tenant.isPaused()) {
                     final long tenantId = tenant.getId();
+                    final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
                     long sessionId = -1;
                     long platformSessionId = -1;
                     try {
@@ -387,11 +386,11 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     void startServicesOfTenants(final PlatformServiceAccessor platformAccessor,
             final SessionAccessor sessionAccessor, final List<STenant> tenants) throws Exception {
-        final SessionService sessionService = platformAccessor.getSessionService();
 
         for (final STenant tenant : tenants) {
             final long tenantId = tenant.getId();
             if (!tenant.isPaused()) {
+                final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
                 long sessionId = -1;
                 long platformSessionId = -1;
                 try {
@@ -476,11 +475,11 @@ public class PlatformAPIImpl implements PlatformAPI {
                 // we shutdown the scheduler only if we are also responsible of starting it
                 shutdownScheduler(platformAccessor);
             }
-            if (nodeConfiguration.shouldClearSessions()) {
-                platformAccessor.getSessionService().deleteSessions();
-            }
             final List<STenant> tenantIds = getTenants(platformAccessor);
             for (final STenant tenant : tenantIds) {
+                if (nodeConfiguration.shouldClearSessions()) {
+                    platformAccessor.getTenantServiceAccessor(tenant.getId()).getSessionService().deleteSessions();
+                }
                 // stop the tenant services:
                 platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), new StopServiceStrategy()));
             }
@@ -660,7 +659,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             // Create session
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final SessionService sessionService = platformAccessor.getSessionService();
+            final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
             sessionAccessor = createSessionAccessor();
             final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
             platformSessionId = sessionAccessor.getSessionId();
@@ -789,7 +788,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             final long tenantId = defaultTenant.getId();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final SessionService sessionService = platformAccessor.getSessionService();
+            final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlatformConfiguration();
 
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
@@ -840,7 +839,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private long createSessionAndMakeItActive(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor, final long tenantId)
             throws SBonitaException {
-        final SessionService sessionService = platformAccessor.getSessionService();
+        final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
 
         final long sessionId = createSession(tenantId, sessionService);
         sessionAccessor.setSessionInfo(sessionId, tenantId);

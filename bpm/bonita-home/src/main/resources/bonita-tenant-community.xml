@@ -7,6 +7,14 @@
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
         ">
 
+    <bean id="sessionService" class="org.bonitasoft.engine.session.impl.SessionServiceImpl">
+        <constructor-arg name="sessionProvider" ref="sessionProvider" />
+        <constructor-arg name="applicationName" value="BPM" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <!-- set Engine session duration (in ms) : -->
+        <property name="sessionDuration" value="3600000" />
+    </bean>
+
     <bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -274,6 +282,7 @@
                 <ref bean="getBusinessDataByIdCommand" />
                 <ref bean="getBusinessDataByQueryCommand" />
                 <ref bean="multipleStartPointsProcessCommand" />
+                <ref bean="deleteSessionCommand" />
             </list>
         </property>
     </bean>
@@ -283,6 +292,18 @@
             <list merge="true">
             </list>
         </property>
+    </bean>
+
+    <bean id="deleteSessionCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>deleteSessionCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Deletes a tenant session based on its sessionId</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.command.DeleteSessionCommand</value>
+        </constructor-arg>
     </bean>
 
     <bean id="defaultCommandProvider" class="org.bonitasoft.engine.command.api.impl.CommandProvider">
@@ -764,14 +785,6 @@
     </bean>
 
     <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
-
-    <bean id="syncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.SyncQueriableLoggerServiceImpl">
-        <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
-        <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="platformService" ref="platformService" />
-    </bean>
 
     <bean id="workSynchronizationFactory" class="org.bonitasoft.engine.work.SequenceWorkSynchronizationFactory" />
 
@@ -1366,5 +1379,15 @@
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
     </bean>
+
+    <bean id="syncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.SyncQueriableLoggerServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
+        <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="platformService" ref="platformService" />
+    </bean>
+
+    <bean id="sessionProvider" class="org.bonitasoft.engine.session.impl.SessionProviderImpl"/>
 
 </beans>

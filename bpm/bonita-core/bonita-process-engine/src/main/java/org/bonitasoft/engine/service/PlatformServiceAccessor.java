@@ -57,8 +57,6 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
 
     PlatformSessionService getPlatformSessionService();
 
-    SessionService getSessionService();
-
     ClassLoaderService getClassLoaderService();
 
     DependencyService getDependencyService();

@@ -229,13 +229,14 @@ public class ServerAPIImpl implements ServerAPI {
     private ClassLoader beforeInvokeMethodForAPISession(final SessionAccessor sessionAccessor, final ServiceAccessorFactory serviceAccessorFactory,
             final PlatformServiceAccessor platformServiceAccessor, final Session session) throws  SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        final SessionService sessionService = platformServiceAccessor.getSessionService();
 
         checkTenantSession(platformServiceAccessor, session);
+        final long tenantId = ((APISession) session).getTenantId();
+        final SessionService sessionService = platformServiceAccessor.getTenantServiceAccessor(tenantId).getSessionService();
         sessionService.renewSession(session.getId());
-        sessionAccessor.setSessionInfo(session.getId(), ((APISession) session).getTenantId());
+        sessionAccessor.setSessionInfo(session.getId(), tenantId);
         final ClassLoader serverClassLoader = getTenantClassLoader(platformServiceAccessor, session);
-        setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(((APISession) session).getTenantId()).getTechnicalLoggerService());
+        setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(tenantId).getTechnicalLoggerService());
         return serverClassLoader;
     }
 

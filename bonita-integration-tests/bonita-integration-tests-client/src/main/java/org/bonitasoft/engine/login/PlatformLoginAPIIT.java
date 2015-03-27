@@ -38,9 +38,7 @@ import org.junit.Test;
  */
 public class PlatformLoginAPIIT extends CommonAPIIT {
 
-    private static final String COMMAND_NAME = "deletePlatformSession";
-
-    private static final String COMMAND_DEPENDENCY_NAME = "deletePlatformSessionCommand";
+    private static final String COMMAND_NAME = "deletePlatformSessionCommand";
 
     private static PlatformLoginAPI platformLoginAPI;
 
@@ -66,18 +64,12 @@ public class PlatformLoginAPIIT extends CommonAPIIT {
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
         final PlatformCommandAPI platformCommandAPI = PlatformAPIAccessor.getPlatformCommandAPI(session);
 
-        // deploy and execute a command to delete a session
-        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/session-commands.jar.bak");
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
-        platformCommandAPI.addDependency(COMMAND_DEPENDENCY_NAME, byteArray);
-        platformCommandAPI.register(COMMAND_NAME, "Delete a platform session", "org.bonitasoft.engine.command.DeletePlatformSessionCommand");
+        // register and execute a command to delete a session
+        platformCommandAPI.register(COMMAND_NAME, "Deletes a platform session based on its sessionId", "org.bonitasoft.engine.command.DeletePlatformSessionCommand");
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("sessionId", sessionId);
         platformCommandAPI.execute(COMMAND_NAME, parameters);
         platformCommandAPI.unregister(COMMAND_NAME);
-        platformCommandAPI.removeDependency(COMMAND_DEPENDENCY_NAME);
 
         // logout
         platformLoginAPI.logout(session);

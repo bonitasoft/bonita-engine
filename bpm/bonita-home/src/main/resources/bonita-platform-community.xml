@@ -13,17 +13,6 @@
         <constructor-arg name="cacheService" ref="platformCacheService" />
     </bean>
 
-    <bean id="sessionProvider" class="org.bonitasoft.engine.session.impl.SessionProviderImpl">
-    </bean>
-
-    <bean id="sessionService" class="org.bonitasoft.engine.session.impl.SessionServiceImpl">
-        <constructor-arg name="sessionProvider" ref="sessionProvider" />
-        <constructor-arg name="applicationName" value="BPM" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <!-- set Engine session duration (in ms) : -->
-        <property name="sessionDuration" value="3600000" />
-    </bean>
-
     <bean id="quartzProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="properties">
             <props>
@@ -303,12 +292,6 @@
 
     <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal" />
 
-    <bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
-        <constructor-arg name="sessionService" ref="sessionService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="technicalLoggerService" ref="platformTechnicalLoggerService" />
-    </bean>
-
     <bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
         <constructor-arg name="persistenceService" ref="platformPersistenceService" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
@@ -341,16 +324,6 @@
 
     <bean id="platformEventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-    </bean>
-
-    <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
-
-    <bean id="syncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.SyncQueriableLoggerServiceImpl">
-        <constructor-arg name="persistenceService" ref="persistenceService" />
-        <constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
-        <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="platformService" ref="platformService" />
     </bean>
 
     <bean id="sequenceMappingProvider" class="org.bonitasoft.engine.sequence.SequenceMappingProvider" autowire="byType" />
