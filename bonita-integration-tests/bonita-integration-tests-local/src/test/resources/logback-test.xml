@@ -8,7 +8,9 @@
     </encoder>
   </appender>
 
- <logger name="org.bonitasoft" level="INFO"/>
+    <logger name="org.bonitasoft" level="WARN"/>
+    <logger name="org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork" level="OFF" />
+
  <!--  <logger name="org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl" level="ERROR"/>-->
 <!--  <logger name="org.bonitasoft.engine.classloader" level="DEBUG"/> -->
 
