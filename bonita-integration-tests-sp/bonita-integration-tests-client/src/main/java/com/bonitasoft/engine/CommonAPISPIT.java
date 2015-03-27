@@ -39,7 +39,7 @@ public abstract class CommonAPISPIT extends APITestSPUtil {
 
         @Override
         public void starting(final Description d) {
-            LOGGER.info("Starting test: " + d.getClassName() + "." + d.getMethodName());
+            LOGGER.warn("Starting test: " + d.getClassName() + "." + d.getMethodName());
         }
 
         @Override
@@ -50,7 +50,7 @@ public abstract class CommonAPISPIT extends APITestSPUtil {
             } catch (final Exception be) {
                 LOGGER.error("Unable to clean db", be);
             } finally {
-                LOGGER.info("-----------------------------------------------------------------------------------------------");
+                LOGGER.warn("-----------------------------------------------------------------------------------------------");
             }
         }
 
@@ -63,12 +63,12 @@ public abstract class CommonAPISPIT extends APITestSPUtil {
                 } catch (final BonitaException e) {
                     throw new BonitaRuntimeException(e);
                 }
-                LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
+                LOGGER.warn("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
                 if (!clean.isEmpty()) {
                     throw new BonitaRuntimeException(clean.toString());
                 }
             } finally {
-                LOGGER.info("-----------------------------------------------------------------------------------------------");
+                LOGGER.warn("-----------------------------------------------------------------------------------------------");
             }
         }
     };
