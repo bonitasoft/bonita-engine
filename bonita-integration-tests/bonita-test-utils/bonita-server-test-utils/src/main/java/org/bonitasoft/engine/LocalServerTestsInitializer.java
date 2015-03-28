@@ -14,6 +14,7 @@
 
 package org.bonitasoft.engine;
 
+import javax.naming.Context;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -23,13 +24,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.naming.Context;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.io.IOUtils;
 import org.bonitasoft.engine.test.APITestUtil;
 
 public class LocalServerTestsInitializer {
@@ -41,7 +40,7 @@ public class LocalServerTestsInitializer {
     private static LocalServerTestsInitializer INSTANCE;
     private Object h2Server;
 
-    private static LocalServerTestsInitializer getInstance() {
+    public static LocalServerTestsInitializer getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new LocalServerTestsInitializer();
         }
@@ -90,7 +89,7 @@ public class LocalServerTestsInitializer {
         final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
 
         final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
-        final Method createTcpServer = h2ServerClass.getMethod("createTcpServer", new Class[] {String[].class});
+        final Method createTcpServer = h2ServerClass.getMethod("createTcpServer", String[].class);
         final Object server = createTcpServer.invoke(createTcpServer, new Object[]{args});
         final Method start = server.getClass().getMethod("start");
         start.invoke(server);
@@ -110,6 +109,11 @@ public class LocalServerTestsInitializer {
         System.out.println("============ CLEANING OF TEST ENVIRONMENT ===========");
         System.out.println("=====================================================");
 
+        shutdown();
+        checkThreadsAreStopped();
+    }
+
+    public void shutdown() throws BonitaException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
         try {
             deleteTenantAndPlatform();
         } finally {
@@ -117,7 +121,6 @@ public class LocalServerTestsInitializer {
                 stopH2Server(this.h2Server);
             }
         }
-        checkThreadsAreStopped();
     }
 
     protected void deleteTenantAndPlatform() throws BonitaException {
