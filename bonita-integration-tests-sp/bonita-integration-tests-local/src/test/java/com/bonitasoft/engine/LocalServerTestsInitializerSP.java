@@ -29,7 +29,7 @@ public class LocalServerTestsInitializerSP extends LocalServerTestsInitializer {
         LocalServerTestsInitializerSP.getInstance().before();
     }
 
-    private static LocalServerTestsInitializerSP getInstance() {
+    public static LocalServerTestsInitializerSP getInstance() {
         if (_INSTANCE == null) {
             _INSTANCE = new LocalServerTestsInitializerSP();
         }
