@@ -68,7 +68,7 @@ public class LocalServerTestsInitializer {
         // paste the default local server properties
         // TODO do not handle the default local server like this
         File platformInit = new File(bonitaHome, "engine-server/conf/platform-init");
-        FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.xml"),new File(platformInit,"local-server.xml"));
+        FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.xml"), new File(platformInit, "local-server.xml"));
         FileUtils.copyInputStreamToFile(this.getClass().getResourceAsStream("/local-server.properties"), new File(platformInit, "local-server.properties"));
 
         // Force these system properties
@@ -84,16 +84,36 @@ public class LocalServerTestsInitializer {
         System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
-    private Object startH2Server() throws ClassNotFoundException, NoSuchMethodException, IOException, BonitaHomeNotSetException, InvocationTargetException, IllegalAccessException {
-        final String h2Port = (String) BonitaHomeServer.getInstance().getPrePlatformInitProperties().get("h2.db.server.port");
-        final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
+    private Object startH2Server() throws ClassNotFoundException, NoSuchMethodException, IOException, BonitaHomeNotSetException, IllegalAccessException, InvocationTargetException {
+        final int h2Port = 6666;
+//        final String h2Port = (String) BonitaHomeServer.getInstance().getPrePlatformInitProperties().get("h2.db.server.port");
 
         final Class<?> h2ServerClass = Class.forName("org.h2.tools.Server");
         final Method createTcpServer = h2ServerClass.getMethod("createTcpServer", String[].class);
+
+        int nbTry = -1;
+        Object server;
+        do {
+            nbTry++;
+            server = startH2OnPort(String.valueOf(h2Port + nbTry), createTcpServer);
+        } while (server == null && nbTry <= 10);
+        if (nbTry > 10) {
+            throw new IOException("h2 server not started, all ports occupied");
+        }
+        System.setProperty("sysprop.h2.db.server.port",String.valueOf(h2Port + nbTry));
+        System.err.println("--- H2 Server started on port " + h2Port + " ---");
+        return server;
+    }
+
+    private Object startH2OnPort(String h2Port, Method createTcpServer) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        final String[] args = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", h2Port};
         final Object server = createTcpServer.invoke(createTcpServer, new Object[]{args});
         final Method start = server.getClass().getMethod("start");
-        start.invoke(server);
-        System.err.println("--- H2 Server started on port " + h2Port + " ---");
+        try {
+            start.invoke(server);
+        } catch (InvocationTargetException e) {
+            return null;
+        }
         return server;
     }
 
