@@ -50,6 +50,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -70,20 +72,29 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
     protected CacheService cacheService;
 
     protected TransientDataService dataInstanceService;
-
-    public TransientDataInstanceServiceIT() {
+    
+    @Before
+    public void setup() {
         expressionService = getTenantAccessor().getExpressionService();
         cacheService = getTenantAccessor().getCacheService();
+        if (cacheService.isStopped()) {
+            try {
+                cacheService.start();
+            } catch (SBonitaException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        dataInstanceService = new TransientDataServiceImpl(cacheService);
+    }
+
+    @After
+    public void after() {
         try {
+            cacheService.stop();
             cacheService.start();
         } catch (SBonitaException e) {
             throw new RuntimeException(e);
         }
-    }
-    
-    @Before
-    public void setup() {
-        dataInstanceService = new TransientDataServiceImpl(cacheService);
     }
 
     private SDataInstance buildDataInstance(final String instanceName, final String className, final String description, final String content,
@@ -227,27 +238,31 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
 
     private void insertDataInstance(final SDataInstance dataInstance) throws SBonitaException {
         getTransactionService().begin();
+        try {
         // create data instance
         dataInstanceService.createDataInstance(dataInstance);
+    } finally {
         getTransactionService().complete();
+    }
     }
 
     private SDataInstance getDataInstance(final long dataInstanceId) throws SBonitaException {
         getTransactionService().begin();
-
-        final SDataInstance dataInstanceRes = dataInstanceService.getDataInstance(dataInstanceId);
-        getTransactionService().complete();
-
-        return dataInstanceRes;
+        try {
+            return dataInstanceService.getDataInstance(dataInstanceId);
+        } finally {
+            getTransactionService().complete();
+        }
     }
 
     private SDataInstance getDataInstanceByNameAndContainer(final String dataName, final long containerId, final String containerType) throws SBonitaException {
         getTransactionService().begin();
-        // get the data instance by several conditions
-        final SDataInstance dataInstanceRes = dataInstanceService.getDataInstance(dataName, containerId, containerType);
-        getTransactionService().complete();
-
-        return dataInstanceRes;
+        try {
+            // get the data instance by several conditions
+            return dataInstanceService.getDataInstance(dataName, containerId, containerType);
+        } finally {
+            getTransactionService().complete();
+        }
     }
 
     private String getLongText() {
@@ -260,19 +275,25 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
 
     private void deleteDataInstance(final SDataInstance dataInstance) throws SBonitaException {
         getTransactionService().begin();
-        dataInstanceService.deleteDataInstance(dataInstance);
-        getTransactionService().complete();
+        try {
+            dataInstanceService.deleteDataInstance(dataInstance);
+        } finally {
+            getTransactionService().complete();
+        }
     }
 
     private void updateDataInstance(final String dataName, final Long containerId, final String containerType, final String newDescription,
             final Serializable value) throws SBonitaException {
         getTransactionService().begin();
-        // retrieve the data instance
-        final SDataInstance dataInstanceRes = dataInstanceService.getDataInstance(dataName, containerId, containerType);
-        // update the data instance and this step must be with an activity data Instance in same transaction.
-        final EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(newDescription, value);
-        dataInstanceService.updateDataInstance(dataInstanceRes, updateDescriptor);
-        getTransactionService().complete();
+        try {
+            // retrieve the data instance
+            final SDataInstance dataInstanceRes = dataInstanceService.getDataInstance(dataName, containerId, containerType);
+            // update the data instance and this step must be with an activity data Instance in same transaction.
+            final EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(newDescription, value);
+            dataInstanceService.updateDataInstance(dataInstanceRes, updateDescriptor);
+        } finally {
+            getTransactionService().complete();
+        }
     }
 
     private void verifyCreateAndRetrieveDataInstance(final String name, final String classType, final String description, final String content,
@@ -326,8 +347,12 @@ public class TransientDataInstanceServiceIT extends CommonBPMServicesTest {
         dataNames.add(instance1Name);
         dataNames.add(instance2Name);
         getTransactionService().begin();
-        final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(dataNames, containerId, containerType);
-        getTransactionService().complete();
+        List<SDataInstance> dataInstances = null;
+        try {
+            dataInstances = dataInstanceService.getDataInstances(dataNames, containerId, containerType);
+        } finally {
+            getTransactionService().complete();
+        }
         assertEquals(2, dataInstances.size());
         assertThat("Not all data instances have been found", Arrays.asList(dataInstances.get(0), dataInstances.get(1)),
                 namesContain(instance1Name, instance2Name));

@@ -23,6 +23,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,7 +31,9 @@ public class WorkServiceTest extends CommonBPMServicesTest {
 
     @Before
     public void before() throws SBonitaException {
-        getWorkService().start();
+        if (getWorkService().isStopped()) {
+            getWorkService().start();
+        }
     }
 
     private WorkService getWorkService() {
@@ -40,6 +43,7 @@ public class WorkServiceTest extends CommonBPMServicesTest {
     @After
     public void after() throws SBonitaException {
         getWorkService().stop();
+        getWorkService().start();
     }
 
     @Test(expected = SWorkRegisterException.class)

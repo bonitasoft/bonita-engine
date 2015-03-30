@@ -48,6 +48,7 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,7 +73,19 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
         expressionService = getTenantAccessor().getExpressionService();
         dataInstanceService = getTenantAccessor().getDataInstanceService();
         cacheService = getTenantAccessor().getCacheService();
+        if (cacheService.isStopped()) {
+            try {
+                cacheService.start();
+            } catch (final SBonitaException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @After
+    public void tearDown() throws NoSuchFieldException, IllegalAccessException {
         try {
+            cacheService.stop();
             cacheService.start();
         } catch (final SBonitaException e) {
             throw new RuntimeException(e);

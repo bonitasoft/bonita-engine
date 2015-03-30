@@ -57,6 +57,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -92,7 +93,20 @@ public class DataInstanceServiceTest extends CommonBPMServicesTest {
         dataInstanceService = new DataInstanceServiceImpl(recorder, persistenceService, archiveService,
                 technicalLoggerService);
         final CacheService cacheService = getTenantAccessor().getCacheService();
+        if (cacheService.isStopped()) {
+            try {
+                cacheService.start();
+            } catch (final SBonitaException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @After
+    public void tearDown() {
+        final CacheService cacheService = getTenantAccessor().getCacheService();
         try {
+            cacheService.stop();
             cacheService.start();
         } catch (final SBonitaException e) {
             throw new RuntimeException(e);
