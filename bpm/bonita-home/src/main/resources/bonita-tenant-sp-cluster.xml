@@ -14,7 +14,7 @@
         <constructor-arg name="diskStorePath" value="java.io.tmpdir/tenant.cache" />
     </bean>
 
-	<bean id="cacheConfigurations" parent="communityTenantCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
+	<bean id="cacheConfigurations" parent="communityCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
 		<property name="sourceList">
 			<list merge="true">
 				<ref bean="sessionCache" />
