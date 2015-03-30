@@ -32,6 +32,7 @@ import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -49,6 +50,8 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
     private final CacheConfiguration defaultCacheConfiguration;
 
     private final String diskStorePath;
+
+    private String cacheManagerLastCreation;
 
     public CommonEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
             final List<org.bonitasoft.engine.cache.CacheConfiguration> cacheConfigurations, final org.bonitasoft.engine.cache.CacheConfiguration defaultCacheConfiguration,
@@ -81,16 +84,40 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         return ehCacheConfig;
     }
 
-    protected void buildCacheManagerWithDefaultConfiguration() {
+    protected void buildCacheManagerWithDefaultConfiguration() throws SCacheException {
+        if (cacheManager != null) {
+            String message = "Unable to build a new Cache Manager as the existing one is still alive: " + cacheManager + ". ";
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                message += ". Last creation was: \n" + cacheManagerLastCreation;
+            }
+            throw new SCacheException(message);
+        }
         final Configuration configuration = new Configuration();
         configuration.setDefaultCacheConfiguration(defaultCacheConfiguration);
         configuration.diskStore(new DiskStoreConfiguration().path(diskStorePath));
         cacheManager = new CacheManager(configuration);
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            final StringBuilder sb = new StringBuilder();
+            String tenantId = "--UNKNOWN TENANT ID--";
+            try {
+                tenantId = Long.toString(this.sessionAccessor.getTenantId());
+            } catch (STenantIdNotSetException e) {
+                e.printStackTrace();
+            }
+            sb.append("CacheManager (" + cacheManager + ") built for tenant " + tenantId);
+            sb.append("\n");
+            final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+            for (final StackTraceElement stackTraceElement : stackTraceElements) {
+                sb.append("\n        at ");
+                sb.append(stackTraceElement);
+            }
+            cacheManagerLastCreation = sb.toString();
+        }
     }
 
     protected synchronized Cache createCache(final String cacheName, final String internalCacheName) throws SCacheException {
         if (cacheManager == null) {
-            throw new SCacheException("The cache is not stated, call start() on the cache service");
+            throw new SCacheException("The cache is not started, call start() on the cache service");
         }
         Cache cache = cacheManager.getCache(internalCacheName);
         if (cache == null) {
@@ -323,5 +350,10 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             cacheManager.shutdown();
             cacheManager = null;
         }
+    }
+
+    @Override
+    public boolean isStopped() {
+        return cacheManager == null;
     }
 }

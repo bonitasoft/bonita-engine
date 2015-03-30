@@ -58,7 +58,7 @@ public class PlatformEhCacheCacheService extends CommonEhCacheCacheService imple
     }
 
     @Override
-    public synchronized void start() {
+    public synchronized void start() throws SCacheException {
         buildCacheManagerWithDefaultConfiguration();
     }
 
@@ -77,7 +77,7 @@ public class PlatformEhCacheCacheService extends CommonEhCacheCacheService imple
     }
 
     @Override
-    public void resume() {
+    public void resume() throws SCacheException {
         if (cacheManager == null) {
             start();
         }

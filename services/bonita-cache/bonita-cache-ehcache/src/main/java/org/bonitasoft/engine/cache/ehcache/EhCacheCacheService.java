@@ -72,7 +72,7 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
     }
 
     @Override
-    public synchronized void start() {
+    public synchronized void start() throws SCacheException {
         buildCacheManagerWithDefaultConfiguration();
     }
 
@@ -91,7 +91,7 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
     }
 
     @Override
-    public void resume() {
+    public void resume() throws SCacheException {
         if (cacheManager == null) {
             start();
         }

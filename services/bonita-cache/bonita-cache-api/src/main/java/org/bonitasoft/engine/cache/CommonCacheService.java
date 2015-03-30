@@ -108,4 +108,6 @@ public interface CommonCacheService {
      * @return a list of caches names
      */
     List<String> getCachesNames();
+
+    boolean isStopped();
 }
