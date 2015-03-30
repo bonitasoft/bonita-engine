@@ -161,6 +161,7 @@ public class LocalServerTestsInitializer {
                 thread.join(10000);
                 // if still alive print it
                 if (thread.isAlive()) {
+                    list.add(thread);
                     System.out.println("thread is still alive:" + thread.getName());
                     for (StackTraceElement stackTraceElement : thread.getStackTrace()) {
                         System.out.println(stackTraceElement.toString());
