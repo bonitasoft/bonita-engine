@@ -11,22 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.persistence;
 
-import java.util.Map;
+package org.bonitasoft.engine.page;
+
+import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
- * @author Charles Souillard
+ * @author Baptiste Mesta
  */
-public final class SelectOneDescriptor<T> extends AbstractSelectWithParametersDescriptor<T> {
+public interface SPageMapping extends PersistentObject {
 
-    public SelectOneDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType) {
-        super(queryName, inputParameters, entityType, (Class<T>) entityType);
-    }
 
-    public SelectOneDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType,
-            final Class<T> returnType) {
-        super(queryName, inputParameters, entityType, returnType);
-    }
+    String getKey();
 
+    String getUrlAdapter();
+
+    Long getPageId();
+
+    String getUrl();
 }

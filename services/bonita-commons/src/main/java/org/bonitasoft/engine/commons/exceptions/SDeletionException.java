@@ -11,22 +11,36 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.persistence;
 
-import java.util.Map;
+package org.bonitasoft.engine.commons.exceptions;
 
 /**
- * @author Charles Souillard
+ * @author Baptiste Mesta
  */
-public final class SelectOneDescriptor<T> extends AbstractSelectWithParametersDescriptor<T> {
+public class SDeletionException extends SBonitaException {
 
-    public SelectOneDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType) {
-        super(queryName, inputParameters, entityType, (Class<T>) entityType);
+    private static final long serialVersionUID = 1L;
+
+    public SDeletionException() {
     }
 
-    public SelectOneDescriptor(final String queryName, final Map<String, Object> inputParameters, final Class<? extends PersistentObject> entityType,
-            final Class<T> returnType) {
-        super(queryName, inputParameters, entityType, returnType);
+    public SDeletionException(Object... arguments) {
+        super(arguments);
     }
 
+    public SDeletionException(String message) {
+        super(message);
+    }
+
+    public SDeletionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public SDeletionException(Throwable cause) {
+        super(cause);
+    }
+
+    public SDeletionException(Throwable cause, Object... arguments) {
+        super(cause, arguments);
+    }
 }
