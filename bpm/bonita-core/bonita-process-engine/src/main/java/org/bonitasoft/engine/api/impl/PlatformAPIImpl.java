@@ -478,7 +478,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             final List<STenant> tenantIds = getTenants(platformAccessor);
             for (final STenant tenant : tenantIds) {
                 if (nodeConfiguration.shouldClearSessions()) {
-                    platformAccessor.getTenantServiceAccessor(tenant.getId()).getSessionService().deleteSessions();
+                    final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenant.getId());
+                    tenantServiceAccessor.getSessionService().deleteSessions();
                 }
                 // stop the tenant services:
                 platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), new StopServiceStrategy()));
