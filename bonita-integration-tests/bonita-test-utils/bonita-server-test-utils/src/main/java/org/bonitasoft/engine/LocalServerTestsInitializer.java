@@ -61,6 +61,16 @@ public class LocalServerTestsInitializer {
         System.out.println("=====================================================");
 
         final long startTime = System.currentTimeMillis();
+        prepareEnvironment();
+
+        initPlatformAndTenant();
+
+        System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
+    }
+
+    public void prepareEnvironment() throws IOException, ClassNotFoundException, NoSuchMethodException, BonitaHomeNotSetException, IllegalAccessException, InvocationTargetException {
+
+        System.out.println("=========  PREPARE ENVIRONMENT =======");
         String bonitaHome = setSystemPropertyIfNotSet(BONITA_HOME_PROPERTY, BONITA_HOME_DEFAULT_PATH);
         final String dbVendor = setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
 
@@ -77,10 +87,6 @@ public class LocalServerTestsInitializer {
         if ("h2".equals(dbVendor)) {
             this.h2Server = startH2Server();
         }
-
-        initPlatformAndTenant();
-
-        System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
     private Object startH2Server() throws ClassNotFoundException, NoSuchMethodException, IOException, BonitaHomeNotSetException, IllegalAccessException, InvocationTargetException {
@@ -136,20 +142,26 @@ public class LocalServerTestsInitializer {
         try {
             deleteTenantAndPlatform();
         } finally {
-            if (this.h2Server != null) {
-                stopH2Server(this.h2Server);
-            }
+            cleanupEnvironment();
         }
     }
 
-    protected void deleteTenantAndPlatform() throws BonitaException {
+    public void cleanupEnvironment() throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, IllegalAccessException {
+        System.out.println("=========  CLEAN ENVIRONMENT =======");
+        if (this.h2Server != null) {
+            stopH2Server(this.h2Server);
+        }
+    }
+
+    public void deleteTenantAndPlatform() throws BonitaException {
+        System.out.println("=========  CLEAN PLATFORM =======");
         final APITestUtil apiTestUtil = new APITestUtil();
         apiTestUtil.stopAndCleanPlatformAndTenant(true);
         apiTestUtil.deletePlatformStructure();
     }
 
     private void checkThreadsAreStopped() throws InterruptedException {
-        System.out.println("Checking if all Threads are stopped");
+        System.out.println("=========  CHECK ENGINE IS SHUTDOWN =======");
         final Set<Thread> keySet = Thread.getAllStackTraces().keySet();
         List<Thread> expectedThreads = new ArrayList<>();
         List<Thread> cacheManagerThreads = new ArrayList<>();
@@ -226,7 +238,8 @@ public class LocalServerTestsInitializer {
         return false;
     }
 
-    protected void initPlatformAndTenant() throws Exception {
+    public void initPlatformAndTenant() throws Exception {
+        System.out.println("=========  INIT PLATFORM =======");
         new APITestUtil().createPlatformStructure();
         new APITestUtil().initializeAndStartPlatformWithDefaultTenant(true);
     }
