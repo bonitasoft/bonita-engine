@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
@@ -192,24 +191,12 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final TechnicalLoggerService logger, final DocumentMappingService documentMappingService, final SCommentService commentService,
             final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
             final WorkService workService, final TokenService tokenService, final IdentityService identityService) {
+        bpmInstancesCreator.setStateManager(this);
         initStates(connectorInstanceService, classLoaderService, expressionResolverService, schedulerService, dataInstanceService, eventInstanceService,
                 operationService, activityInstanceService, bpmInstancesCreator, containerRegistry, processDefinitionService, processInstanceService,
                 archiveService, logger, documentMappingService, commentService, eventsHandler, userFilterService, actorMappingService, workService,
                 tokenService, identityService);
         defineTransitionsForAllNodesType();
-        initializeFirstStatesIdsOnBPMInstanceCreator(bpmInstancesCreator);
-    }
-
-    private void initializeFirstStatesIdsOnBPMInstanceCreator(final BPMInstancesCreator bpmInstancesCreator) {
-        final Set<Entry<SFlowNodeType, Map<Integer, FlowNodeState>>> entrySet = normalTransitions.entrySet();
-        final HashMap<SFlowNodeType, Integer> firstStateIds = new HashMap<SFlowNodeType, Integer>(entrySet.size());
-        final HashMap<SFlowNodeType, String> firstStateNames = new HashMap<SFlowNodeType, String>(entrySet.size());
-        for (final Entry<SFlowNodeType, Map<Integer, FlowNodeState>> entry : entrySet) {
-            firstStateIds.put(entry.getKey(), entry.getValue().get(-1).getId());
-            firstStateNames.put(entry.getKey(), entry.getValue().get(-1).getName());
-        }
-        bpmInstancesCreator.setFirstStateIds(firstStateIds);
-        bpmInstancesCreator.setFirstStateNames(firstStateNames);
     }
 
     @Override
@@ -539,6 +526,10 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             stateNames.add(state.getName());
         }
         return stateNames;
+    }
+
+    public FlowNodeState getFirstState(SFlowNodeType nodeType) {
+        return normalTransitions.get(nodeType).get(-1);
     }
 
 }

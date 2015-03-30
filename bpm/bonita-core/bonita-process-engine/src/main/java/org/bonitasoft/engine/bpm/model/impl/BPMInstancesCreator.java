@@ -115,6 +115,7 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
@@ -143,10 +144,6 @@ public class BPMInstancesCreator {
 
     private final ConnectorInstanceService connectorInstanceService;
 
-    private Map<SFlowNodeType, Integer> firstStateIds;
-
-    private Map<SFlowNodeType, String> firstStateNames;
-
     private final ExpressionResolverService expressionResolverService;
 
     private final DataInstanceService dataInstanceService;
@@ -156,6 +153,12 @@ public class BPMInstancesCreator {
     private final ArchiveService archiveService;
 
     private final TechnicalLoggerService logger;
+
+    private FlowNodeStateManager stateManager;
+
+    public void setStateManager(final FlowNodeStateManager stateManager) {
+        this.stateManager = stateManager;
+    }
 
     public BPMInstancesCreator(final ActivityInstanceService activityInstanceService,
             final ActorMappingService actorMappingService, final GatewayInstanceService gatewayInstanceService,
@@ -237,7 +240,7 @@ public class BPMInstancesCreator {
                     builder = createMultiInstanceActivityInstance(processDefinitionId, rootContainerId, parentContainerId, rootProcessInstanceId,
                             parentProcessInstanceId, activityDefinition, (SMultiInstanceLoopCharacteristics) loopCharacteristics);
                 }
-                builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
+                builder.setState(stateManager.getFirstState(builder.getFlowNodeType()));
                 builder.setStateCategory(stateCategory);
                 builder.setTokenRefId(tokenRefId);
                 return builder.done();
@@ -302,7 +305,7 @@ public class BPMInstancesCreator {
                 throw new SActivityReadException("Activity type not found : " + sFlowNodeDefinition.getType());
         }
         builder.setLoopCounter(loopCounter);
-        builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
+        builder.setState(stateManager.getFirstState(builder.getFlowNodeType()));
         builder.setStateCategory(stateCategory);
         builder.setTokenRefId(tokenRefId);
         return builder.done();
@@ -386,7 +389,7 @@ public class BPMInstancesCreator {
         builder.setDisplayDescription(description);
         builder.setDisplayName(displayName);
         builder.setPriority(priority);
-        builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
+        builder.setState(stateManager.getFirstState(builder.getFlowNodeType()));
         return builder.done();
     }
 
@@ -397,8 +400,7 @@ public class BPMInstancesCreator {
         } catch (final SBonitaException sbe) {
             throw new SActorNotFoundException(sbe);
         }
-        final SActor actor = getSActor.getResult();
-        return actor;
+        return getSActor.getResult();
     }
 
     private SIntermediateThrowEventInstanceBuilder createIntermediateThrowEventInstance(final long processDefinitionId, final long rootContainerId,
@@ -561,14 +563,6 @@ public class BPMInstancesCreator {
         }
         final CreateConnectorInstances transaction = new CreateConnectorInstances(connectorInstances, connectorInstanceService);
         transaction.execute();
-    }
-
-    public void setFirstStateIds(final Map<SFlowNodeType, Integer> firstStateIds) {
-        this.firstStateIds = firstStateIds;
-    }
-
-    public void setFirstStateNames(final Map<SFlowNodeType, String> firstStateNames) {
-        this.firstStateNames = firstStateNames;
     }
 
     public void createDataInstances(final SProcessInstance processInstance, final SFlowElementContainerDefinition processContainer,
