@@ -28,7 +28,6 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.test.APITestUtil;
 
 public class LocalServerTestsInitializer {
@@ -100,7 +99,7 @@ public class LocalServerTestsInitializer {
         if (nbTry > 10) {
             throw new IOException("h2 server not started, all ports occupied");
         }
-        System.setProperty("sysprop.h2.db.server.port",String.valueOf(h2Port + nbTry));
+        System.setProperty("sysprop.h2.db.server.port", String.valueOf(h2Port + nbTry));
         System.err.println("--- H2 Server started on port " + h2Port + " ---");
         return server;
     }
@@ -152,44 +151,79 @@ public class LocalServerTestsInitializer {
     private void checkThreadsAreStopped() throws InterruptedException {
         System.out.println("Checking if all Threads are stopped");
         final Set<Thread> keySet = Thread.getAllStackTraces().keySet();
+        List<Thread> expectedThreads = new ArrayList<>();
+        List<Thread> cacheManagerThreads = new ArrayList<>();
+        List<Thread> unexpectedThreads = new ArrayList<>();
         final Iterator<Thread> iterator = keySet.iterator();
-        final ArrayList<Thread> list = new ArrayList<Thread>();
         while (iterator.hasNext()) {
             final Thread thread = iterator.next();
-            if (isEngine(thread)) {
-                // wait for the thread to die
-                thread.join(10000);
-                // if still alive print it
-                if (thread.isAlive()) {
-                    list.add(thread);
-                    System.out.println("thread is still alive:" + thread.getName());
-                    for (StackTraceElement stackTraceElement : thread.getStackTrace()) {
-                        System.out.println(stackTraceElement.toString());
-                    }
+            if (isExpectedThread(thread)) {
+                expectedThreads.add(thread);
+            } else {
+                if (isCacheManager(thread)) {
+                    cacheManagerThreads.add(thread);
+                } else {
+                    unexpectedThreads.add(thread);
                 }
             }
         }
-        if (!list.isEmpty()) {
-            throw new IllegalStateException("Some threads are still active : " + list);
+        //2 cache manager threads are allowed
+        // one for PlatformHibernatePersistenceService
+        // one for TenantHibernatePersistenceService
+        // there is no clean way to kill them, a shutdownhook is doing this
+        // killing them using hibernate implementation classes is causing weird behaviours
+        int nbOfThreads = keySet.size();
+        int nbOfExpectedThreads = expectedThreads.size() + 2;
+        boolean fail = nbOfThreads > nbOfExpectedThreads;
+        System.out.println(nbOfThreads + " are alive. " + nbOfExpectedThreads + " are expected.");
+        if (cacheManagerThreads.size() > 2) {
+            System.out.println("Only 2 CacheManager threads are expected (PlatformHibernatePersistenceService + TenantHibernatePersistenceService) but " + cacheManagerThreads.size() + " are found:");
+            for (Thread thread : cacheManagerThreads) {
+                printThread(thread);
+            }
+        }
+        if (unexpectedThreads.size() > 0) {
+            System.out.println("The following list of threads is not expected:");
+            for (Thread thread : unexpectedThreads) {
+                printThread(thread);
+            }
+        }
+        if (fail) {
+            throw new IllegalStateException("Some threads are still active : \nCacheManager potential issues:" + cacheManagerThreads + "\nOther threads:" + unexpectedThreads);
         }
         System.out.println("All engine threads are stopped properly");
     }
 
-    private boolean isEngine(final Thread thread) {
+
+    private boolean isCacheManager(Thread thread) {
+        return thread.getName().startsWith("net.sf.ehcache.CacheManager");
+    }
+
+
+    private void printThread(final Thread thread) {
+        System.out.println("\n");
+        System.out.println("Thread is still alive:" + thread.getName());
+        for (StackTraceElement stackTraceElement : thread.getStackTrace()) {
+            System.out.println("        at " + stackTraceElement.toString());
+        }
+    }
+
+
+    private boolean isExpectedThread(final Thread thread) {
         final String name = thread.getName();
         final ThreadGroup threadGroup = thread.getThreadGroup();
         if (threadGroup != null && threadGroup.getName().equals("system")) {
-            return false;
+            return true;
         }
         final List<String> startWithFilter = Arrays.asList("H2 ", "Timer-0" /* postgres driver related */, "BoneCP", "bitronix", "main", "Reference Handler",
                 "Signal Dispatcher", "Finalizer", "com.google.common.base.internal.Finalizer"/* guava, used by bonecp */, "process reaper", "ReaderThread",
                 "Abandoned connection cleanup thread", "AWT-AppKit"/* bonecp related */, "Monitor Ctrl-Break"/* Intellij */);
         for (final String prefix : startWithFilter) {
             if (name.startsWith(prefix)) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     protected void initPlatformAndTenant() throws Exception {
