@@ -97,22 +97,27 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         configuration.diskStore(new DiskStoreConfiguration().path(diskStorePath));
         cacheManager = new CacheManager(configuration);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            final StringBuilder sb = new StringBuilder();
-            String tenantId = "--UNKNOWN TENANT ID--";
-            try {
-                tenantId = Long.toString(this.sessionAccessor.getTenantId());
-            } catch (STenantIdNotSetException e) {
-                e.printStackTrace();
-            }
-            sb.append("CacheManager (" + cacheManager + ") built for tenant " + tenantId);
-            sb.append("\n");
-            final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-            for (final StackTraceElement stackTraceElement : stackTraceElements) {
-                sb.append("\n        at ");
-                sb.append(stackTraceElement);
-            }
-            cacheManagerLastCreation = sb.toString();
+            cacheManagerLastCreation = getCacheManagerCreationDetails();
         }
+        //System.err.println("\n\nCREATING CACHE MANAGER: " + cacheManager + "\n\n" + getCacheManagerCreationDetails());
+    }
+
+    private String getCacheManagerCreationDetails() {
+        final StringBuilder sb = new StringBuilder();
+        String tenantId = "--UNKNOWN TENANT ID--";
+        try {
+            tenantId = Long.toString(this.sessionAccessor.getTenantId());
+        } catch (STenantIdNotSetException e) {
+            e.printStackTrace();
+        }
+        sb.append("CacheManager (" + cacheManager + ") built for tenant " + tenantId);
+        sb.append("\n");
+        final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        for (final StackTraceElement stackTraceElement : stackTraceElements) {
+            sb.append("\n        at ");
+            sb.append(stackTraceElement);
+        }
+        return sb.toString();
     }
 
     protected synchronized Cache createCache(final String cacheName, final String internalCacheName) throws SCacheException {
