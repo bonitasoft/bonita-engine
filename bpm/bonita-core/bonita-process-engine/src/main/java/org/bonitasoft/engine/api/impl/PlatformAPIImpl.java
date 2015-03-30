@@ -469,7 +469,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             final NodeConfiguration nodeConfiguration = platformAccessor.getPlatformConfiguration();
-            final List<PlatformLifecycleService> otherServicesToStart = nodeConfiguration.getLifecycleServices();
+            final List<PlatformLifecycleService> otherServicesToStop = nodeConfiguration.getLifecycleServices();
             final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
             if (nodeConfiguration.shouldStartScheduler()) {
                 // we shutdown the scheduler only if we are also responsible of starting it
@@ -484,8 +484,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                 // stop the tenant services:
                 platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), new StopServiceStrategy()));
             }
-            for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStart) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
+            for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStop) {
+                logger.log(getClass(), TechnicalLogSeverity.ERROR, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
                 serviceWithLifecycle.stop();
             }
             isNodeStarted = false;
