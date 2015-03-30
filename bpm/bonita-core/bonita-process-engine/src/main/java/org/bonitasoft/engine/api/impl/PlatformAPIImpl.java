@@ -485,7 +485,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 platformAccessor.getTransactionService().executeInTransaction(new SetServiceState(tenant.getId(), new StopServiceStrategy()));
             }
             for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStop) {
-                logger.log(getClass(), TechnicalLogSeverity.ERROR, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
                 serviceWithLifecycle.stop();
             }
             isNodeStarted = false;
