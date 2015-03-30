@@ -156,22 +156,19 @@ public class LocalServerTestsInitializer {
         final ArrayList<Thread> list = new ArrayList<Thread>();
         while (iterator.hasNext()) {
             final Thread thread = iterator.next();
-            if (isEngine(thread) && !thread.getName().startsWith("net.sf.ehcache.CacheManager")) {
+            if (isEngine(thread)) {
                 // wait for the thread to die
                 thread.join(10000);
                 // if still alive print it
                 if (thread.isAlive()) {
-                    list.add(thread);
+                    System.out.println("thread is still alive:" + thread.getName());
+                    for (StackTraceElement stackTraceElement : thread.getStackTrace()) {
+                        System.out.println(stackTraceElement.toString());
+                    }
                 }
             }
         }
         if (!list.isEmpty()) {
-            for (final Thread thread : list) {
-                System.out.println("thread is still alive:" + thread.getName());
-                for (StackTraceElement stackTraceElement : thread.getStackTrace()) {
-                    System.out.println(stackTraceElement.toString());
-                }
-            }
             throw new IllegalStateException("Some threads are still active : " + list);
         }
         System.out.println("All engine threads are stopped properly");
@@ -191,8 +188,7 @@ public class LocalServerTestsInitializer {
                 return false;
             }
         }
-        //ehcache
-        return !thread.getName().matches("[0-9]+_[A-Za-z_]+.data");
+        return true;
     }
 
     protected void initPlatformAndTenant() throws Exception {
