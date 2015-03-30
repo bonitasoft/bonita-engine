@@ -16,7 +16,7 @@
 		</copy>
 
 		<!-- ENGINE CLIENT CONF -->
-		<copy file="${resources.dir}/bonita-client-community.properties" tofile="${bh.dir}/engine-client/conf/bonita-client-community-custom.properties">
+		<copy file="${resources.dir}/bonita-client-community.properties" tofile="${bh.dir}/engine-client/conf/bonita-client-custom.properties">
 			<filterchain>
 				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
 					<param name="prefix" value="#"/>
