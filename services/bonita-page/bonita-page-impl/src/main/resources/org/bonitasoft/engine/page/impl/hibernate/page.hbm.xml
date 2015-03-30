@@ -60,8 +60,8 @@
 		<property name="pageId" column="pageid" />
 		<property name="url" column="url" />
 		<property name="urlAdapter" column="urlAdapter" />
-		<property name="lastModificationDate" column="lastModificationDate" />
-		<property name="lastUpdatedBy" column="lastUpdatedBy" />
+		<property name="lastUpdateDate" column="lastupdatedate" />
+		<property name="lastUpdatedBy" column="lastupdatedby" />
 		<filter name="tenantFilter" />
 	</class>
 
