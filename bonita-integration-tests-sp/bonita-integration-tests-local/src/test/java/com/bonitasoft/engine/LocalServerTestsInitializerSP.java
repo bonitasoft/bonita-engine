@@ -40,13 +40,13 @@ public class LocalServerTestsInitializerSP extends LocalServerTestsInitializer {
     }
 
     @Override
-    protected void deleteTenantAndPlatform() throws BonitaException {
+    public void deleteTenantAndPlatform() throws BonitaException {
         BPMTestSPUtil.destroyPlatformAndTenants();
         testUtil.deletePlatformStructure();
     }
 
     @Override
-    protected void initPlatformAndTenant() throws Exception {
+    public void initPlatformAndTenant() throws Exception {
         try {
             testUtil.createPlatformStructure();
         } catch (final Exception e) {
