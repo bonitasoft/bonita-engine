@@ -286,7 +286,7 @@ public class ServerAPIImpl implements ServerAPI {
 
     protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session, boolean isInTransaction) {
         if (!isNodeInAValidStateFor(method)) {
-            logNodeNotStartedMessage(apiInterfaceName, method.getName());
+            logNodeNotStartedMessage(apiInterfaceName, method);
             throw new NodeNotStartedException();
         }
         // we don't check if tenant is in pause mode at platform level and when there is no session
@@ -391,9 +391,9 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
 
-    protected void logNodeNotStartedMessage(final String apiInterfaceName, final String methodName) {
-        logTechnicalErrorMessage("Node not started. Method '" + apiInterfaceName + "." + methodName
-                + "' cannot be called until node has been started (PlatformAPI.startNode())");
+    protected void logNodeNotStartedMessage(final String apiInterfaceName, final Method method) {
+        logTechnicalErrorMessage("Node not started. Method '" + apiInterfaceName + "." + method.getName()
+                + "' cannot be called until node has been started (PlatformAPI.startNode()). Exact class: " + method.getDeclaringClass().getName());
     }
 
     protected void logTechnicalErrorMessage(final String message) {
