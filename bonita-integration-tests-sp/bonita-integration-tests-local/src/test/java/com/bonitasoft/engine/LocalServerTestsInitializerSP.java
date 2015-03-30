@@ -16,7 +16,6 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ConfigurableApplicationContext;
 
 public class LocalServerTestsInitializerSP extends LocalServerTestsInitializer {
 
