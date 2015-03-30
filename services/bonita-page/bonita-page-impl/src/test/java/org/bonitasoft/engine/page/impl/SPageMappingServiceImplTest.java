@@ -36,6 +36,8 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -60,6 +62,12 @@ public class SPageMappingServiceImplTest {
 
     @Mock
     private ReadPersistenceService persistenceService;
+
+    @Mock
+    private SessionService sessionService;
+
+    @Mock
+    private ReadSessionAccessor readSessionAccessor;
 
     @InjectMocks
     private PageMappingServiceImpl pageMappingService;
@@ -178,9 +186,10 @@ public class SPageMappingServiceImplTest {
         assertThat(updateEvent.getValue().getObject()).isEqualTo(pageMapping);
         assertThat(updateEvent.getValue().getType()).isEqualTo("PAGE_MAPPING_UPDATED");
         assertThat(updateRecord.getValue().getEntity()).isEqualTo(pageMapping);
-        assertThat(updateRecord.getValue().getFields()).containsOnly(entry("pageId", 124l), entry("url", null), entry("urlAdapter", null));
+        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", 124l), entry("url", null), entry("urlAdapter", null), entry("lastUpdatedBy", 0L));
 
     }
+
     @Test
     public void should_update_throw_exception() throws Exception {
         //given
@@ -210,6 +219,6 @@ public class SPageMappingServiceImplTest {
         assertThat(updateEvent.getValue().getObject()).isEqualTo(pageMapping);
         assertThat(updateEvent.getValue().getType()).isEqualTo("PAGE_MAPPING_UPDATED");
         assertThat(updateRecord.getValue().getEntity()).isEqualTo(pageMapping);
-        assertThat(updateRecord.getValue().getFields()).containsOnly(entry("pageId", null), entry("url", "myNewUrl"), entry("urlAdapter", "urlAdapter"));
+        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", null), entry("url", "myNewUrl"), entry("urlAdapter", "urlAdapter"), entry("lastUpdatedBy",0L));
     }
 }

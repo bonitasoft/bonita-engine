@@ -22,12 +22,11 @@ import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
-import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.PageMappingService;
+import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -37,6 +36,10 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * @author Baptiste Mesta
@@ -46,10 +49,14 @@ public class PageMappingServiceImpl implements PageMappingService {
     public static final String PAGE_MAPPING = "PAGE_MAPPING";
     private Recorder recorder;
     private ReadPersistenceService persistenceService;
+    private SessionService sessionService;
+    private ReadSessionAccessor sessionAccessor;
 
-    public PageMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService) {
+    public PageMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService, ReadSessionAccessor sessionAccessor) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
+        this.sessionService = sessionService;
+        this.sessionAccessor = sessionAccessor;
     }
 
     @Override
@@ -109,34 +116,44 @@ public class PageMappingServiceImpl implements PageMappingService {
 
     @Override
     public void update(String key, Long pageId) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException {
-        final EntityUpdateDescriptor descriptor = getEntityUpdateDescriptor(pageId, null, null);
-        update(key, descriptor);
+        update(key, pageId, null, null);
 
+    }
+
+    void update(String key, Long pageId, String url, String urlAdapter) throws SObjectNotFoundException, SBonitaReadException, SObjectModificationException {
+        try {
+            update(key, getEntityUpdateDescriptor(pageId, url, urlAdapter));
+        } catch (SSessionNotFoundException | SessionIdNotSetException | SRecorderException e) {
+            throw new SObjectModificationException(e);
+        }
     }
 
     @Override
     public void update(String key, String url, String urlAdapter) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException {
-        final EntityUpdateDescriptor descriptor = getEntityUpdateDescriptor(null, url, urlAdapter);
-        update(key, descriptor);
+        update(key, null, url, urlAdapter);
 
     }
 
-    EntityUpdateDescriptor getEntityUpdateDescriptor(Long pageId, String url, String urlAdapter) {
+    EntityUpdateDescriptor getEntityUpdateDescriptor(Long pageId, String url, String urlAdapter) throws SSessionNotFoundException, SessionIdNotSetException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField("pageId", pageId);
         descriptor.addField("url", url);
         descriptor.addField("urlAdapter", urlAdapter);
+        descriptor.addField("lastUpdatedBy", getSessionUserId());
+        descriptor.addField("lastUpdateDate", System.currentTimeMillis());
         return descriptor;
     }
 
-    void update(String key, EntityUpdateDescriptor descriptor) throws SObjectNotFoundException, SBonitaReadException, SObjectModificationException {
-        try {
-            SPageMapping sPageMapping = get(key);
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPageMapping, descriptor);
-            recorder.recordUpdate(updateRecord, getUpdateEvent(sPageMapping));
-        } catch (SRecorderException e) {
-            throw new SObjectModificationException(e);
-        }
+    private long getSessionUserId() throws SSessionNotFoundException, SessionIdNotSetException {
+        return sessionService.getLoggedUserFromSession(sessionAccessor);
+    }
+
+
+    void update(String key, EntityUpdateDescriptor descriptor) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
+        SPageMapping sPageMapping = get(key);
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPageMapping, descriptor);
+        recorder.recordUpdate(updateRecord, getUpdateEvent(sPageMapping));
+
     }
 
     SUpdateEvent getUpdateEvent(SPageMapping sPageMapping) {

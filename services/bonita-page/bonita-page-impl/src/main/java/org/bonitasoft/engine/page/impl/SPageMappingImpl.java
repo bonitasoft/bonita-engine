@@ -28,6 +28,8 @@ public class SPageMappingImpl extends  PersistentObjectId implements SPageMappin
     private Long pageId;
     private String url;
     private String urlAdapter;
+    private long lastUpdateDate;
+    private long lastUpdatedBy;
 
     public SPageMappingImpl() {
     }
@@ -73,13 +75,31 @@ public class SPageMappingImpl extends  PersistentObjectId implements SPageMappin
         return this.getClass().getName();
     }
 
+    public long getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(long lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public long getLastUpdatedBy() {
+        return lastUpdatedBy;
+    }
+
+    public void setLastUpdatedBy(long lastUpdatedBy) {
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SPageMappingImpl)) return false;
         if (!super.equals(o)) return false;
         SPageMappingImpl that = (SPageMappingImpl) o;
-        return Objects.equals(key, that.key) &&
+        return Objects.equals(lastUpdateDate, that.lastUpdateDate) &&
+                Objects.equals(lastUpdatedBy, that.lastUpdatedBy) &&
+                Objects.equals(key, that.key) &&
                 Objects.equals(pageId, that.pageId) &&
                 Objects.equals(url, that.url) &&
                 Objects.equals(urlAdapter, that.urlAdapter);
@@ -87,7 +107,7 @@ public class SPageMappingImpl extends  PersistentObjectId implements SPageMappin
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), key, pageId, url, urlAdapter);
+        return Objects.hash(super.hashCode(), key, pageId, url, urlAdapter, lastUpdateDate, lastUpdatedBy);
     }
 
     @Override
@@ -97,6 +117,8 @@ public class SPageMappingImpl extends  PersistentObjectId implements SPageMappin
                 ", pageId=" + pageId +
                 ", url='" + url + '\'' +
                 ", urlAdapter='" + urlAdapter + '\'' +
+                ", lastUpdateDate=" + lastUpdateDate +
+                ", lastUpdatedBy=" + lastUpdatedBy +
                 "} " + super.toString();
     }
 }
