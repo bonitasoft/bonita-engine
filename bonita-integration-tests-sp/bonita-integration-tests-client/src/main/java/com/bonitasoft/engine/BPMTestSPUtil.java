@@ -99,11 +99,15 @@ public class BPMTestSPUtil {
         }
         for (final Tenant tenant : tenants) {
             try {
-                platformAPI.deactiveTenant(tenant.getId());
+                if (!tenant.isDefaultTenant()) {
+                    platformAPI.deactiveTenant(tenant.getId());
+                }
             } catch (final TenantDeactivationException tde) {
                 // Nothing to do
             }
-            platformAPI.deleteTenant(tenant.getId());
+            if (!tenant.isDefaultTenant()) {
+                platformAPI.deleteTenant(tenant.getId());
+            }
         }
         platformAPI.stopNode();
         platformAPI.cleanPlatform();
