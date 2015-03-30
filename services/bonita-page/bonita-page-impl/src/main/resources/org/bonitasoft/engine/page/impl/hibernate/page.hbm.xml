@@ -57,6 +57,7 @@
 			<key-property name="tenantId" column="tenantId" type="long" />
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
+		<property name="key" column="key" />
 		<property name="pageId" column="pageid" />
 		<property name="url" column="url" />
 		<property name="urlAdapter" column="urlAdapter" />

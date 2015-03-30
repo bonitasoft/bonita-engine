@@ -31,7 +31,7 @@
 	</query>
 
 	<query name="getPageMappingByKey">
-		SELECT page
+		SELECT pagemapping
 		FROM org.bonitasoft.engine.page.impl.SPageMappingImpl AS pagemapping
 		WHERE pagemapping.key = :key
 	</query>
