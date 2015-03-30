@@ -129,7 +129,7 @@ public class FormMappingIT extends TestWithUser {
         formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC)
                 .filter(FormMappingSearchDescriptor.TARGET, "URL").done());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(3);
-        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p1.getId());
+        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").contains(p1.getId(),p2.getId());
 
         //update
         processConfigurationAPI.updateFormMapping(step2Form1.getId(), "newFormUrlForStep2", FormMappingTarget.LEGACY);
