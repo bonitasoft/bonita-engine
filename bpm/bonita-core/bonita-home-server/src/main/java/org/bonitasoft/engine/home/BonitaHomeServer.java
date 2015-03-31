@@ -139,17 +139,24 @@ public class BonitaHomeServer extends BonitaHome {
         return file;
     }
 
-    private static class AllXmlFilesFilter implements FileFilter {
+    private static class XmlFilesFilter implements FileFilter {
         @Override
         public boolean accept(final File pathname) {
             return pathname.isFile() && pathname.getName().endsWith(".xml") && !pathname.getName().endsWith("-cache.xml");
         }
     }
 
-    private static class NonClusterXmlFilesFilter extends AllXmlFilesFilter {
+    private static class NonClusterXmlFilesFilter extends XmlFilesFilter {
         @Override
         public boolean accept(final File pathname) {
             return super.accept(pathname) && !pathname.getName().contains("cluster");
+        }
+    }
+
+    private static class ClusterXmlFilesFilter extends XmlFilesFilter {
+        @Override
+        public boolean accept(final File pathname) {
+            return super.accept(pathname) && pathname.getName().contains("cluster");
         }
     }
 
@@ -163,17 +170,19 @@ public class BonitaHomeServer extends BonitaHome {
 
     private String[] getConfigurationFiles(final Folder... folders) throws BonitaHomeNotSetException, IOException {
         final Properties platformProperties = getPlatformProperties();
-        final boolean cluster = Boolean.valueOf(platformProperties.getProperty("bonita.cluster", "false"));
-        FileFilter filter;
-        if (cluster) {
-            filter = new AllXmlFilesFilter();
-        } else {
-            filter = new NonClusterXmlFilesFilter();
-        }
         final List<File> files = new ArrayList<File>();
         for (Folder folder : folders) {
-            files.addAll(getXmlResourcesOfFolder(folder, filter));
+            files.addAll(getXmlResourcesOfFolder(folder, new NonClusterXmlFilesFilter()));
         }
+        //if cluster is activated, add cluster files at the end. We have to ensure cluster files are loaded "last"
+        final boolean cluster = Boolean.valueOf(platformProperties.getProperty("bonita.cluster", "false"));
+        if (cluster) {
+            for (Folder folder : folders) {
+                files.addAll(getXmlResourcesOfFolder(folder, new ClusterXmlFilesFilter()));
+            }
+        }
+
+
         return getResourcesFromFiles(files);
     }
     public String[] getPrePlatformInitConfigurationFiles() throws BonitaHomeNotSetException, IOException {
