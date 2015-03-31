@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -186,22 +185,10 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
                                     WaitingEventsInterrupter waitingEventsInterrupter, ClassLoaderService classLoaderService) {
         this.waitingEventsInterrupter = waitingEventsInterrupter;
         this.stateBehaviors = stateBehaviors;
+        bpmInstancesCreator.setStateManager(this);
         initStates(connectorInstanceService, expressionResolverService, dataInstanceService, operationService, activityInstanceService, bpmInstancesCreator,
                 containerRegistry, processDefinitionService, processInstanceService, archiveService, logger, documentService, commentService, classLoaderService);
         defineTransitionsForAllNodesType();
-        initializeFirstStatesIdsOnBPMInstanceCreator(bpmInstancesCreator);
-    }
-
-    private void initializeFirstStatesIdsOnBPMInstanceCreator(final BPMInstancesCreator bpmInstancesCreator) {
-        final Set<Entry<SFlowNodeType, Map<Integer, FlowNodeState>>> entrySet = normalTransitions.entrySet();
-        final Map<SFlowNodeType, Integer> firstStateIds = new HashMap<SFlowNodeType, Integer>(entrySet.size());
-        final Map<SFlowNodeType, String> firstStateNames = new HashMap<SFlowNodeType, String>(entrySet.size());
-        for (final Entry<SFlowNodeType, Map<Integer, FlowNodeState>> entry : entrySet) {
-            firstStateIds.put(entry.getKey(), entry.getValue().get(-1).getId());
-            firstStateNames.put(entry.getKey(), entry.getValue().get(-1).getName());
-        }
-        bpmInstancesCreator.setFirstStateIds(firstStateIds);
-        bpmInstancesCreator.setFirstStateNames(firstStateNames);
     }
 
     @Override
@@ -480,7 +467,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     private FlowNodeState getNextStateToHandle(final SFlowNodeInstance flowNodeInstance, final FlowNodeState flowNodeStateToExecute)
             throws SActivityExecutionException {
-        FlowNodeState nextStateToHandle = null;
+        FlowNodeState nextStateToHandle;
         switch (flowNodeInstance.getStateCategory()) {
             case ABORTING:
                 final ExceptionalStateTransitionsManager abortStateTransitionsManager = new ExceptionalStateTransitionsManager(
@@ -527,5 +514,10 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         }
         return stateNames;
     }
+
+    public FlowNodeState getFirstState(SFlowNodeType nodeType) {
+        return normalTransitions.get(nodeType).get(-1);
+    }
+
 
 }

@@ -88,7 +88,7 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         // then
         checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 0);
         activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
-        assertThat(activities).as("should have 2 avtivities").hasSize(2);
+        assertThat(activities).as("should have 2 activities: sub-process flow node and user task").hasSize(2);
         assertEquals(SUB_PROCESS_NAME, activities.get(0).getName());
         assertEquals(SUB_PROCESS_USER_TASK_NAME, activities.get(1).getName());
 

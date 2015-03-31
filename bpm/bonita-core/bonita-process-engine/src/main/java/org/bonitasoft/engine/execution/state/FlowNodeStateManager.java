@@ -16,6 +16,7 @@ package org.bonitasoft.engine.execution.state;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
@@ -44,4 +45,7 @@ public interface FlowNodeStateManager {
     void setProcessExecutor(ProcessExecutor processExecutor);
 
     StateBehaviors getStateBehaviors();
+
+    public FlowNodeState getFirstState(SFlowNodeType nodeType);
+
 }
