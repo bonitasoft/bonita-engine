@@ -73,15 +73,17 @@ public class ClusterTests extends CommonAPISPIT {
         changeToNode2();
         final PlatformSession platformSession = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
-        platformAPI.startNode();
+        if (!platformAPI.isNodeStarted()) {
+            platformAPI.startNode();
+        }
         changeToNode1();
-        loginOnDefaultTenantWith(USERNAME, PASSWORD);
+                    loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @After
-    public void afterTest() throws Exception {
-        deleteUser(user);
-        changeToNode1();
+    public void afterTest () throws Exception {
+            deleteUser(user);
+            changeToNode1();
         logoutOnTenant();
     }
 
