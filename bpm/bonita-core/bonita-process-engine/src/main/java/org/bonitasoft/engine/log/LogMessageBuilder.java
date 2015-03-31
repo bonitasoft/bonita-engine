@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.log;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.session.model.SSession;
 
@@ -26,8 +29,6 @@ public class LogMessageBuilder {
      * process definition id)
      * 
      * @param flowNodeInstance
-     * @param initialMessage
-     *            the initial message
      * @return the message log built using the flow node's context.
      */
     public static String buildFlowNodeContextMessage(final SFlowNodeInstance flowNodeInstance) {
@@ -53,7 +54,7 @@ public class LogMessageBuilder {
     }
 
     public static String buildExecuteTaskContextMessage(final SFlowNodeInstance flowNodeInstance, final String username, final long executerUserId,
-            final long executerSubstituteId) {
+            final long executerSubstituteId, Map<String, Serializable> inputs) {
         final StringBuilder stb = new StringBuilder();
         stb.append("The user <" + username + "> ");
         if (executerUserId != executerSubstituteId) {
@@ -61,6 +62,9 @@ public class LogMessageBuilder {
         }
         stb.append("has executed the task");
         stb.append(LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance));
+        if (inputs != null) {
+            stb.append(" with task inputs: " + inputs);
+        }
         return stb.toString();
     }
 

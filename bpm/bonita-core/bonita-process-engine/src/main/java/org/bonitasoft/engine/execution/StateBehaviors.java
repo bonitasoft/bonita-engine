@@ -274,9 +274,9 @@ public class StateBehaviors {
     public void mapDataOutputOfMultiInstance(final SFlowNodeInstance flowNodeInstance, final SMultiInstanceLoopCharacteristics miLoop)
             throws SActivityExecutionException, SBonitaException {
         final SDataInstance outputData = dataInstanceService.getDataInstance(miLoop.getDataOutputItemRef(), flowNodeInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name(),parentContainerResolver);
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         final SDataInstance loopData = dataInstanceService.getDataInstance(miLoop.getLoopDataOutputRef(), flowNodeInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name(),parentContainerResolver);
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         if (outputData != null && loopData != null) {
             final Serializable value = loopData.getValue();
             final int index = flowNodeInstance.getLoopCounter();
@@ -444,7 +444,8 @@ public class StateBehaviors {
     }
 
     private BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorToExecuteOnFinish(final SFlowNodeDefinition flowNodeDefinition,
-            final SFlowNodeInstance flowNodeInstance, final boolean executeConnectorsOnFinish, final boolean onEnterExecuted) throws SConnectorInstanceReadException,
+            final SFlowNodeInstance flowNodeInstance, final boolean executeConnectorsOnFinish, final boolean onEnterExecuted)
+            throws SConnectorInstanceReadException,
             SActivityStateExecutionException {
         final List<SConnectorDefinition> connectorsOnFinish = flowNodeDefinition.getConnectors(ConnectorEvent.ON_FINISH);
         if (connectorsOnFinish.size() > 0 && executeConnectorsOnFinish) {
@@ -576,7 +577,7 @@ public class StateBehaviors {
         final List<SOperation> operationList = callActivityDefinition.getDataInputOperations();
         final SExpressionContext context = new SExpressionContext(callerId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
         final OperationsWithContext operations = new OperationsWithContext(context, operationList);
-        processExecutor.start(targetProcessDefinitionId, -1, 0, 0, operations.getContext(), operations.getOperations(), null, null, callerId, -1);
+        processExecutor.start(targetProcessDefinitionId, -1, 0, 0, operations.getContext(), operations.getOperations(), null, null, callerId, -1, null); // Change this last NULL when inputs are supported in CallActivity
     }
 
     public void updateDisplayNameAndDescription(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)

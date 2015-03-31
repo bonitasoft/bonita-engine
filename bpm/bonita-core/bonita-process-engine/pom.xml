@@ -431,6 +431,12 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
+            <artifactId>bonita-actor-mapping-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.bonitasoft.engine.profile</groupId>

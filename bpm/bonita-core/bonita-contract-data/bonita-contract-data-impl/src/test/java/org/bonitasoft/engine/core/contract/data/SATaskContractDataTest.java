@@ -17,23 +17,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class SAContractDataTest {
+public class SATaskContractDataTest {
 
     @Test
     public void create_should_copy_values() throws Exception {
-        final SContractData contractData = new SContractData("id", 15124245748545L, 1983L);
-        contractData.setId(7548463269L);
-        contractData.setTenantId(1L);
+        long userTaskId = 14444L;
+        final STaskContractData taskContractData = new STaskContractData(userTaskId, "id", 15124245748545L);
+        taskContractData.setId(7548463269L);
+        taskContractData.setTenantId(1L);
 
-        final SAContractData saContractData = new SAContractData(contractData);
+        final SATaskContractData saTaskContractData = new SATaskContractData(taskContractData);
 
-        assertThat(saContractData.getTenantId()).isEqualTo(0L);
-        assertThat(saContractData.getId()).isEqualTo(0L);
-        assertThat(saContractData.getName()).isEqualTo("id");
-        assertThat(saContractData.getArchiveDate()).isEqualTo(0L);
-        assertThat(saContractData.getScopeId()).isEqualTo(1983L);
-        assertThat(saContractData.getSourceObjectId()).isEqualTo(7548463269L);
-        assertThat(saContractData.getValue()).isEqualTo(15124245748545L);
+        assertThat(saTaskContractData.getTenantId()).isEqualTo(0L);
+        assertThat(saTaskContractData.getId()).isEqualTo(0L);
+        assertThat(saTaskContractData.getName()).isEqualTo("id");
+        assertThat(saTaskContractData.getUserTaskId()).isEqualTo(userTaskId);
+        assertThat(saTaskContractData.getArchiveDate()).isEqualTo(0L);
+        assertThat(saTaskContractData.getSourceObjectId()).isEqualTo(7548463269L);
+        assertThat(saTaskContractData.getValue()).isEqualTo(15124245748545L);
     }
 
 }

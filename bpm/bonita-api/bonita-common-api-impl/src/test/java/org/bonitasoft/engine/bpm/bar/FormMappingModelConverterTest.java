@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBException;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.form.FormMappingDefinitionBuilder;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.junit.Test;
 
@@ -64,11 +65,11 @@ public class FormMappingModelConverterTest {
     }
 
     private FormMappingDefinition buildFormMapping() {
-        return new FormMappingDefinitionBuilder("/FormMapping.html", FormMappingType.TASK, false).withTaskname("aTask").build();
+        return new FormMappingDefinitionBuilder("/FormMapping.html", FormMappingType.TASK, FormMappingTarget.INTERNAL).withTaskname("aTask").build();
     }
 
     private FormMappingDefinition buildMyFormMappingWithTaskName() {
-        return new FormMappingDefinitionBuilder("/FormMapping.html", FormMappingType.TASK, false).withTaskname("aTask").build();
+        return new FormMappingDefinitionBuilder("/FormMapping.html", FormMappingType.TASK, FormMappingTarget.INTERNAL).withTaskname("aTask").build();
     }
 
     public FormMappingModel buildDefaultModelWithOneFormMapping() {

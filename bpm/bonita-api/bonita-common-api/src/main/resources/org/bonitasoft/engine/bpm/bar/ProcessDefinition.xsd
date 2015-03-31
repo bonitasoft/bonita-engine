@@ -50,6 +50,7 @@
                             <xs:attribute name="name" type="xs:string" use="required" />
                         </xs:complexType>
                     </xs:element>
+                    <xs:element name="contract" type="definition:ContractDefinition" minOccurs="0" maxOccurs="1" />
                 </xs:all>
                 <xs:attribute type="xs:string" name="version" use="required" />
                 <xs:attribute type="xs:string" name="bos_version" use="required" />

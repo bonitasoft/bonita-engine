@@ -29,7 +29,7 @@
         <property name="processDefinitionId" type="long" column="process" />
         <property name="task" type="java.lang.String" column="task" />
         <property name="form" type="java.lang.String" column="form" />
-        <property name="isExternal" type="boolean" column="isexternal" />
+        <property name="target" type="java.lang.String" column="target" />
         <property name="type" type="java.lang.String" column="type" />
         <property name="lastUpdateDate" type="long" column="lastupdatedate" />
         <property name="lastUpdatedBy" type="long" column="lastupdatedby" />

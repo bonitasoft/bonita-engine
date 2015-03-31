@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.SANamedElement;
+import org.bonitasoft.engine.persistence.SAPersistenceObjectImpl;
 
 /**
  * @author Baptiste Mesta

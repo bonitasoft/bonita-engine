@@ -86,7 +86,7 @@ public class ExecuteFlowNode implements TransactionContent {
                     executerSubstituteUserId);
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
                 final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUserName(), executerUserId,
-                        executerSubstituteUserId);
+                        executerSubstituteUserId, inputs);
                 logger.log(getClass(), TechnicalLogSeverity.INFO, message);
             }
             addSystemCommentOnProcessInstanceWhenExecutingTaskFor(flowNodeInstance, executerUserId, executerSubstituteUserId);
