@@ -177,7 +177,7 @@ public class SPageMappingServiceImplTest {
         doReturn(pageMapping).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         //when
-        pageMappingService.update("myKey", 124l);
+        pageMappingService.update(pageMapping, 124l);
 
         //then
         ArgumentCaptor<SUpdateEvent> updateEvent = ArgumentCaptor.forClass(SUpdateEvent.class);
@@ -195,11 +195,10 @@ public class SPageMappingServiceImplTest {
         //given
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         pageMapping.setKey("myKey");
-        doReturn(pageMapping).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
         doThrow(SRecorderException.class).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
         //when
         expectedException.expect(SObjectModificationException.class);
-        pageMappingService.update("myKey", 124l);
+        pageMappingService.update(pageMapping, 124l);
     }
 
     @Test
@@ -207,10 +206,9 @@ public class SPageMappingServiceImplTest {
         //given
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         pageMapping.setKey("myKey");
-        doReturn(pageMapping).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
 
         //when
-        pageMappingService.update("myKey", "myNewUrl", "urlAdapter");
+        pageMappingService.update(pageMapping, "myNewUrl", "urlAdapter");
 
         //then
         ArgumentCaptor<SUpdateEvent> updateEvent = ArgumentCaptor.forClass(SUpdateEvent.class);

@@ -115,22 +115,22 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public void update(String key, Long pageId) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException {
-        update(key, pageId, null, null);
+    public void update(SPageMapping pageMapping, Long pageId) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException {
+        update(pageMapping, pageId, null, null);
 
     }
 
-    void update(String key, Long pageId, String url, String urlAdapter) throws SObjectNotFoundException, SBonitaReadException, SObjectModificationException {
+    void update(SPageMapping pageMapping, Long pageId, String url, String urlAdapter) throws SObjectNotFoundException, SBonitaReadException, SObjectModificationException {
         try {
-            update(key, getEntityUpdateDescriptor(pageId, url, urlAdapter));
+            update(pageMapping, getEntityUpdateDescriptor(pageId, url, urlAdapter));
         } catch (SSessionNotFoundException | SessionIdNotSetException | SRecorderException e) {
             throw new SObjectModificationException(e);
         }
     }
 
     @Override
-    public void update(String key, String url, String urlAdapter) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException {
-        update(key, null, url, urlAdapter);
+    public void update(SPageMapping pageMapping, String url, String urlAdapter) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException {
+        update(pageMapping, null, url, urlAdapter);
 
     }
 
@@ -149,10 +149,9 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
 
-    void update(String key, EntityUpdateDescriptor descriptor) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
-        SPageMapping sPageMapping = get(key);
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPageMapping, descriptor);
-        recorder.recordUpdate(updateRecord, getUpdateEvent(sPageMapping));
+    void update(SPageMapping pageMapping, EntityUpdateDescriptor descriptor) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(pageMapping, descriptor);
+        recorder.recordUpdate(updateRecord, getUpdateEvent(pageMapping));
 
     }
 

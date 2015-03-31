@@ -62,19 +62,19 @@ public interface PageMappingService {
     /**
      * update the given page mapping
      *
-     * @param key        the key of the page mapping to update
+     * @param pageMapping        the pageMapping to update
      * @param pageId     the id of the page or null
      * @throws SObjectModificationException
      */
-    void update(String key, Long pageId) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException;
+    void update(SPageMapping pageMapping, Long pageId) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException;
 
     /**
      * update the given page mapping
      *
-     * @param key        the key of the page mapping to update
+     * @param pageMapping        the pageMapping to update
      * @param url        the url or null
      * @param urlAdapter the new url adapter to use
      * @throws SObjectModificationException
      */
-    void update(String key, String url, String urlAdapter) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException;
+    void update(SPageMapping pageMapping, String url, String urlAdapter) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException;
 }

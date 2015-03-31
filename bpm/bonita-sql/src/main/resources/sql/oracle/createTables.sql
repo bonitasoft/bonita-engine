@@ -995,3 +995,14 @@ CREATE TABLE form_mapping (
   lastUpdatedBy NUMBER(19, 0) NULL,
   PRIMARY KEY (tenantId, id)
 );
+CREATE TABLE page_mapping (
+  tenantId NUMBER(19, 0) NOT NULL,
+  id NUMBER(19, 0) NOT NULL,
+  key_ VARCHAR2(255 CHAR) NOT NULL,
+  pageId NUMBER(19, 0) NULL,
+  url VARCHAR2(1024 CHAR) NULL,
+  urladapter VARCHAR2(255 CHAR)) NULL,
+  lastUpdateDate NUMBER(19, 0) NULL,
+  lastUpdatedBy NUMBER(19, 0) NULL,
+  PRIMARY KEY (tenantId, id)
+);

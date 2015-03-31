@@ -29,4 +29,8 @@ public interface SPageMapping extends PersistentObject {
     Long getPageId();
 
     String getUrl();
+
+    long getLastUpdateDate();
+
+    long getLastUpdatedBy();
 }

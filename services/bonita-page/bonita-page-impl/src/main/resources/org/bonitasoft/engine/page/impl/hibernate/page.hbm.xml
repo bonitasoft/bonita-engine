@@ -52,15 +52,15 @@
 
 
 
-	<class name="SPageMappingImpl" table="pagemapping" >
+	<class name="SPageMappingImpl" table="page_mapping" >
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantId" type="long" />
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
-		<property name="key" column="key" />
+		<property name="key" column="key_" />
 		<property name="pageId" column="pageid" />
 		<property name="url" column="url" />
-		<property name="urlAdapter" column="urlAdapter" />
+		<property name="urlAdapter" column="urladapter" />
 		<property name="lastUpdateDate" column="lastupdatedate" />
 		<property name="lastUpdatedBy" column="lastupdatedby" />
 		<filter name="tenantFilter" />

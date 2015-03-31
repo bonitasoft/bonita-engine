@@ -1134,3 +1134,15 @@ CREATE TABLE form_mapping (
   PRIMARY KEY (tenantId, id)
 )
 GO
+CREATE TABLE page_mapping (
+  tenantId NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  key_ NVARCHAR(255) NOT NULL,
+  pageId NUMERIC(19, 0) NULL,
+  url NVARCHAR(1024) NULL,
+  urladapter NVARCHAR(255) NULL,
+  lastUpdateDate NUMERIC(19, 0) NULL,
+  lastUpdatedBy NUMERIC(19, 0) NULL,
+  PRIMARY KEY (tenantId, id)
+)
+GO

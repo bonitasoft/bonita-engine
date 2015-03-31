@@ -75,6 +75,7 @@ public class SPageMappingImpl extends  PersistentObjectId implements SPageMappin
         return this.getClass().getName();
     }
 
+    @Override
     public long getLastUpdateDate() {
         return lastUpdateDate;
     }
@@ -83,6 +84,7 @@ public class SPageMappingImpl extends  PersistentObjectId implements SPageMappin
         this.lastUpdateDate = lastUpdateDate;
     }
 
+    @Override
     public long getLastUpdatedBy() {
         return lastUpdatedBy;
     }
