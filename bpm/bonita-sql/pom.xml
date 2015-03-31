@@ -5,7 +5,7 @@
     <parent>
         <artifactId>bpm</artifactId>
         <groupId>org.bonitasoft.engine</groupId>
-        <version>6.5.1-SNAPSHOT</version>
+        <version>6.5.1</version>
     </parent>
 
     <artifactId>bonita-sql</artifactId>
