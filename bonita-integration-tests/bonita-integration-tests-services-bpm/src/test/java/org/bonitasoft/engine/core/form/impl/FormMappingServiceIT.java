@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.form.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,6 +25,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.form.FormMappingTarget;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
@@ -71,10 +72,13 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void createAndListFormMapping() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(15l, "step1", "form_page1", FormMappingTarget.INTERNAL.name(), "TASK");
-        SFormMapping processStartForm = formMappingService.create(15l, null, "form_page2", FormMappingTarget.INTERNAL.name(), "PROCESS_START");
-        SFormMapping processOverviewForm = formMappingService.create(15l, null, "form_page_url", FormMappingTarget.URL.name(), "PROCESS_OVERVIEW");
-        SFormMapping otherProcess = formMappingService.create(16l, null, "form_page_other", FormMappingTarget.LEGACY.name(), "PROCESS_OVERVIEW");
+        String pageMappingKeyForTask = "someKey";
+        String pageMappingKeyForProcessStart = "keyForProcessStart";
+        String pageMappingKeyForProcessInstanceOverview = "someKeyForProcessInstanceOverview";
+        formMappingService.create(15l, "step1", FormMappingType.TASK.getId(), pageMappingKeyForTask);
+        formMappingService.create(15l, null, FormMappingType.PROCESS_START.getId(), pageMappingKeyForProcessStart);
+        formMappingService.create(15l, null, FormMappingType.PROCESS_OVERVIEW.getId(), pageMappingKeyForProcessInstanceOverview);
+        formMappingService.create(16l, null, FormMappingType.PROCESS_OVERVIEW.getId(), "someOtherKey");
         transactionService.complete();
 
         transactionService.begin();
@@ -82,35 +86,42 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         List<SFormMapping> listAll = formMappingService.list(0, 10);
 
         transactionService.complete();
-        assertThat(list).extracting("type").containsExactly("TASK", "PROCESS_START", "PROCESS_OVERVIEW");
-        assertThat(list).extracting("form").containsExactly("form_page1", "form_page2", "form_page_url");
-        assertThat(listAll).extracting("type").containsExactly("TASK", "PROCESS_START", "PROCESS_OVERVIEW", "PROCESS_OVERVIEW");
-        assertThat(listAll).extracting("form").containsExactly("form_page1", "form_page2", "form_page_url","form_page_other");
-        assertThat(listAll).extracting("processDefinitionId").containsExactly(15l, 15l, 15l,16l);
+        assertThat(list).extracting("type").containsExactly(FormMappingType.TASK.getId(), FormMappingType.PROCESS_START.getId(),
+                FormMappingType.PROCESS_OVERVIEW.getId());
+        assertThat(list).extracting("pageMappingKey").containsExactly(pageMappingKeyForTask, pageMappingKeyForProcessStart,
+                pageMappingKeyForProcessInstanceOverview);
+        assertThat(listAll).extracting("type").containsExactly(FormMappingType.TASK.getId(), FormMappingType.PROCESS_START.getId(),
+                FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingType.PROCESS_OVERVIEW.getId());
+        assertThat(listAll).extracting("pageMappingKey").containsExactly(pageMappingKeyForTask, pageMappingKeyForProcessStart,
+                pageMappingKeyForProcessInstanceOverview, "someOtherKey");
+        assertThat(listAll).extracting("processDefinitionId").containsExactly(15l, 15l, 15l, 16l);
     }
 
     @Test
     public void create_and_get_FormMapping() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(15l, "step1", "form_page1", FormMappingTarget.INTERNAL.name(), "TASK");
+        String pageMappingKey = "someKey";
+        SFormMapping taskForm = formMappingService.create(15l, "step1", FormMappingType.TASK.getId(), pageMappingKey);
         transactionService.complete();
 
         transactionService.begin();
         SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
-        SFormMapping sFormMappingByProperties = formMappingService.get(15l,"TASK","step1");
+        SFormMapping sFormMappingByProperties = formMappingService.get(15l, FormMappingType.TASK.getId(), "step1");
         transactionService.complete();
         assertThat(sFormMapping).isEqualTo(taskForm).isEqualTo(sFormMappingByProperties);
     }
+
     @Test
     public void create_and_get_FormMapping_with_no_task() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(15l, null, "form_page1", FormMappingTarget.INTERNAL.name(), "TASK");
+        String pageMappingKey = "someKey";
+        SFormMapping taskForm = formMappingService.create(15l, null, FormMappingType.TASK.getId(), pageMappingKey);
         transactionService.complete();
 
         transactionService.begin();
         SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
-        SFormMapping sFormMappingByProperties = formMappingService.get(15l,"TASK");
-        List<SFormMapping> list = formMappingService.list(0, 100);
+        SFormMapping sFormMappingByProperties = formMappingService.get(15l, FormMappingType.TASK.getId());
+        //        List<SFormMapping> list = formMappingService.list(0, 100);
         transactionService.complete();
         assertThat(sFormMapping).isEqualTo(taskForm);
         assertThat(sFormMappingByProperties).isEqualTo(sFormMapping);
@@ -119,7 +130,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void delete_FormMapping() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(15l, "step1", "form_page1", FormMappingTarget.INTERNAL.name(), "TASK");
+        String pageMappingKey = "someKey";
+        SFormMapping taskForm = formMappingService.create(15l, "step1", FormMappingType.TASK.getId(), pageMappingKey);
         transactionService.complete();
 
         transactionService.begin();
@@ -127,25 +139,25 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         transactionService.complete();
 
         transactionService.begin();
-        try{
+        try {
             formMappingService.get(taskForm.getId());
-            fail("should have thrown a not found");
-        }catch(SObjectNotFoundException e){
+            fail("should have thrown a not found Exception");
+        } catch (SObjectNotFoundException e) {
             //ok
         }
         transactionService.complete();
-
     }
 
     @Test
     public void update_FormMapping() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(15l, "step1", "form_page1", FormMappingTarget.INTERNAL.name(), "TASK");
+        String pageMappingKey = "someKey";
+        SFormMapping taskForm = formMappingService.create(15l, "step1", FormMappingType.TASK.getId(), pageMappingKey);
         transactionService.complete();
 
         transactionService.begin();
         SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
-        formMappingService.update(sFormMapping, "newFormName", FormMappingTarget.URL.name());
+        formMappingService.update(sFormMapping, FormMappingTarget.URL.name());
         transactionService.complete();
 
         transactionService.begin();
@@ -153,8 +165,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         transactionService.complete();
 
         assertThat(sFormMapping).isEqualTo(updatedInDatabase);
-        assertThat(updatedInDatabase.getForm()).isEqualTo("newFormName");
-        assertThat(updatedInDatabase.getTarget()).isEqualTo(FormMappingTarget.URL.name());
+        //        assertThat(updatedInDatabase.getForm()).isEqualTo("newFormName");
+        assertThat(updatedInDatabase.getPageMappingKey()).isEqualTo(FormMappingTarget.URL.name());
         assertThat(updatedInDatabase.getLastUpdateDate()).isGreaterThan(taskForm.getLastUpdateDate());
 
         SSession john = sessionService.createSession(1, 12, "john", false);
@@ -162,12 +174,11 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
         transactionService.begin();
         SFormMapping reupdated = formMappingService.get(taskForm.getId());
-        formMappingService.update(reupdated, "newFormName2", FormMappingTarget.INTERNAL.name());
+        formMappingService.update(reupdated, FormMappingTarget.INTERNAL.name());
         transactionService.complete();
 
-
-        assertThat(reupdated.getForm()).isEqualTo("newFormName2");
-        assertThat(reupdated.getTarget()).isEqualTo(FormMappingTarget.INTERNAL.name());
+        //        assertThat(reupdated.getForm()).isEqualTo("newFormName2");
+        assertThat(reupdated.getPageMappingKey()).isEqualTo(FormMappingTarget.INTERNAL.name());
         assertThat(reupdated.getLastUpdateDate()).isGreaterThan(updatedInDatabase.getLastUpdateDate());
         assertThat(reupdated.getLastUpdatedBy()).isEqualTo(12);
 

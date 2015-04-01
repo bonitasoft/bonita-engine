@@ -983,6 +983,7 @@ CREATE TABLE theme (
   CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
   PRIMARY KEY (tenantId, id)
 );
+
 CREATE TABLE form_mapping (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
@@ -995,6 +996,7 @@ CREATE TABLE form_mapping (
   lastUpdatedBy NUMBER(19, 0) NULL,
   PRIMARY KEY (tenantId, id)
 );
+
 CREATE TABLE page_mapping (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
@@ -1006,3 +1008,9 @@ CREATE TABLE page_mapping (
   lastUpdatedBy NUMBER(19, 0) NULL,
   PRIMARY KEY (tenantId, id)
 );
+
+CREATE TABLE form_mapping_type (
+  id NUMBER(19, 0) NOT NULL,
+  type_name VARCHAR2(16 CHAR) NOT NULL,
+  PRIMARY KEY (id)
+)

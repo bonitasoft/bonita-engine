@@ -25,8 +25,6 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.core.form.FormMappingService;
-import org.bonitasoft.engine.form.FormMapping;
-import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 
 /**
@@ -50,29 +48,26 @@ public class FormMappingDeployer {
                     final FormMappingDefinition formMappingForHumanTask = getFormMappingForHumanTask(activity.getName(), formMappings);
                     // create mapping as declared in form mapping:
                     if (formMappingForHumanTask != null) {
-                        formMappingService.create(processDefinitionId, formMappingForHumanTask.getTaskname(), formMappingForHumanTask.getForm(),
-                                formMappingForHumanTask.getTarget().name(), formMappingForHumanTask.getType().name());
+                        formMappingService.create(processDefinitionId, formMappingForHumanTask.getTaskname(), formMappingForHumanTask.getType().getId(), null); // FIXME
                     }
                     // create empty mapping for human task with no form declared:
                     else {
-                        formMappingService.create(processDefinitionId, activity.getName(), null, FormMappingTarget.INTERNAL.name(), FormMappingType.TASK.name());
+                        formMappingService.create(processDefinitionId, activity.getName(), FormMappingType.TASK.getId(), null); // FIXME
                     }
                 }
             }
             // Deals with the process start / process overview forms:
             final FormMappingDefinition processStartformMapping = getFormMappingForType(formMappings, PROCESS_START);
             if (processStartformMapping != null) {
-                formMappingService.create(processDefinitionId, null, processStartformMapping.getForm(), processStartformMapping.getTarget().name(),
-                        PROCESS_START.name());
+                formMappingService.create(processDefinitionId, null, PROCESS_START.getId(), null); // FIXME
             } else {
-                formMappingService.create(processDefinitionId, null, null, FormMappingTarget.INTERNAL.name(), PROCESS_START.name());
+                formMappingService.create(processDefinitionId, null, PROCESS_START.getId(), null); // FIXME
             }
             final FormMappingDefinition processOverviewformMapping = getFormMappingForType(formMappings, PROCESS_OVERVIEW);
             if (processOverviewformMapping != null) {
-                formMappingService.create(processDefinitionId, null, processOverviewformMapping.getForm(), processOverviewformMapping.getTarget().name(),
-                        PROCESS_OVERVIEW.name());
+                formMappingService.create(processDefinitionId, null, PROCESS_OVERVIEW.getId(), null); // FIXME
             } else {
-                formMappingService.create(processDefinitionId, null, null, FormMappingTarget.INTERNAL.name(), PROCESS_OVERVIEW.name());
+                formMappingService.create(processDefinitionId, null, PROCESS_OVERVIEW.getId(), null); // FIXME
             }
         } catch (final SObjectCreationException e) {
             throw new ProcessDeployException(e);

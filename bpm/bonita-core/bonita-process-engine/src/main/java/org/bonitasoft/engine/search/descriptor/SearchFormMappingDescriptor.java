@@ -34,7 +34,7 @@ public class SearchFormMappingDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> profileAllFields;
 
     public SearchFormMappingDescriptor() {
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(1);
+        searchEntityKeys = new HashMap<>(6);
         searchEntityKeys.put(FormMappingSearchDescriptor.ID, new FieldDescriptor(SFormMapping.class, "id"));
         searchEntityKeys.put(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SFormMapping.class, "processDefinitionId"));
         searchEntityKeys.put(FormMappingSearchDescriptor.TYPE, new FieldDescriptor(SFormMapping.class, "type"));
@@ -42,7 +42,7 @@ public class SearchFormMappingDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(FormMappingSearchDescriptor.TASK, new FieldDescriptor(SFormMapping.class, "task"));
         searchEntityKeys.put(FormMappingSearchDescriptor.TARGET, new FieldDescriptor(SFormMapping.class, "target"));
 
-        profileAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
+        profileAllFields = new HashMap<>(1);
         final Set<String> fields = new HashSet<String>(0);
         profileAllFields.put(SProfile.class, fields);
     }

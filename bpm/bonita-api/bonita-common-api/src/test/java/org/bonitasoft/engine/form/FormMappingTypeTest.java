@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,14 +10,22 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.events;
+ */
+package org.bonitasoft.engine.form;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.Test;
 
 /**
- * @author Baptiste Mesta
+ * author Emmanuel Duchastenier
  */
-public enum EventActionType {
+public class FormMappingTypeTest {
 
-    CREATED, UPDATED, DELETED
-
+    @Test
+    public void getTypeFromIdShouldReturnProperEnumValue() {
+        assertThat(FormMappingType.getTypeFromId(1)).isEqualTo(FormMappingType.PROCESS_START);
+        assertThat(FormMappingType.getTypeFromId(2)).isEqualTo(FormMappingType.PROCESS_OVERVIEW);
+        assertThat(FormMappingType.getTypeFromId(3)).isEqualTo(FormMappingType.TASK);
+    }
 }

@@ -14,10 +14,12 @@
 package org.bonitasoft.engine.api;
 
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.form.FormMappingTarget;
+import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -42,45 +44,14 @@ public interface ProcessConfigurationAPI {
     SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Get the form mapping that contains the link to the process start form
+     * Resolves a Page URL from a specific key.
      * 
-     * @param processDefinitionId
-     *        the process
-     * @return
-     *         the form mapping of the process start form
-     * @throws org.bonitasoft.engine.exception.FormMappingNotFoundException
-     *         when the form mapping with these properties is not found
-     * @since 7.0.0
+     * @param key the key of the page to resolve.
+     * @return the <code>PageURL</code> containing the pageId or the complete
+     * @throws NotFoundException if the key does not match anything.
+     * @see PageURL the structured PageURL that points to the Page or URL
      */
-    FormMapping getProcessStartForm(long processDefinitionId) throws FormMappingNotFoundException;
-
-    /**
-     * Get the form mapping that contains the link to the process overview form
-     * 
-     * @param processDefinitionId
-     *        the process
-     * @return
-     *         the form mapping of the process overview form
-     * @throws org.bonitasoft.engine.exception.FormMappingNotFoundException
-     *         when the form mapping with these properties is not found
-     * @since 7.0.0
-     */
-    FormMapping getProcessOverviewForm(long processDefinitionId) throws FormMappingNotFoundException;
-
-    /**
-     * Get the form mapping that contains the link to the task form
-     * 
-     * @param processDefinitionId
-     *        the process
-     * @param taskName
-     *        the name of the task
-     * @return
-     *         the form mapping of the task form
-     * @throws org.bonitasoft.engine.exception.FormMappingNotFoundException
-     *         when the form mapping with these properties is not found
-     * @since 7.0.0
-     */
-    FormMapping getTaskForm(long processDefinitionId, String taskName) throws FormMappingNotFoundException;
+    PageURL resolvePageURL(String key) throws NotFoundException;
 
     /**
      * Update a form mapping with the given values

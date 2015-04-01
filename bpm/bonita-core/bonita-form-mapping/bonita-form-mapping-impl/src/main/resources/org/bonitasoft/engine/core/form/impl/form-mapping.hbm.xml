@@ -27,10 +27,9 @@
             <key-property name="id" column="id" type="long" />
         </composite-id>
         <property name="processDefinitionId" type="long" column="process" />
+        <property name="type" type="integer" column="type" />
         <property name="task" type="java.lang.String" column="task" />
-        <property name="form" type="java.lang.String" column="form" />
-        <property name="target" type="java.lang.String" column="target" />
-        <property name="type" type="java.lang.String" column="type" />
+        <property name="pageMappingKey" type="java.lang.String" column="page_mapping_key" />
         <property name="lastUpdateDate" type="long" column="lastupdatedate" />
         <property name="lastUpdatedBy" type="long" column="lastupdatedby" />
         <filter name="tenantFilter"></filter>

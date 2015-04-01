@@ -27,6 +27,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.SPageMapping;
+import org.bonitasoft.engine.page.SPageURL;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -52,7 +53,8 @@ public class PageMappingServiceImpl implements PageMappingService {
     private SessionService sessionService;
     private ReadSessionAccessor sessionAccessor;
 
-    public PageMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService, ReadSessionAccessor sessionAccessor) {
+    public PageMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
+            ReadSessionAccessor sessionAccessor) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
@@ -93,11 +95,17 @@ public class PageMappingServiceImpl implements PageMappingService {
 
     @Override
     public SPageMapping get(String key) throws SObjectNotFoundException, SBonitaReadException {
-        SPageMapping sPageMapping = persistenceService.selectOne(new SelectOneDescriptor<SPageMapping>("getPageMappingByKey", Collections.<String, Object>singletonMap("key", key), SPageMapping.class));
+        SPageMapping sPageMapping = persistenceService.selectOne(new SelectOneDescriptor<SPageMapping>("getPageMappingByKey", Collections
+                .<String, Object> singletonMap("key", key), SPageMapping.class));
         if (sPageMapping == null) {
             throw new SObjectNotFoundException("No page mapping found with key " + key);
         }
         return sPageMapping;
+    }
+
+    @Override
+    public SPageURL resolvePageURL(SPageMapping pageMapping) {
+        return new SPageURL(pageMapping.getUrl(), pageMapping.getPageId());
     }
 
     @Override
@@ -120,7 +128,8 @@ public class PageMappingServiceImpl implements PageMappingService {
 
     }
 
-    void update(SPageMapping pageMapping, Long pageId, String url, String urlAdapter) throws SObjectNotFoundException, SBonitaReadException, SObjectModificationException {
+    void update(SPageMapping pageMapping, Long pageId, String url, String urlAdapter) throws SObjectNotFoundException, SBonitaReadException,
+            SObjectModificationException {
         try {
             update(pageMapping, getEntityUpdateDescriptor(pageId, url, urlAdapter));
         } catch (SSessionNotFoundException | SessionIdNotSetException | SRecorderException e) {
@@ -129,7 +138,8 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public void update(SPageMapping pageMapping, String url, String urlAdapter) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException {
+    public void update(SPageMapping pageMapping, String url, String urlAdapter) throws SObjectModificationException, SObjectNotFoundException,
+            SBonitaReadException {
         update(pageMapping, null, url, urlAdapter);
 
     }
@@ -147,7 +157,6 @@ public class PageMappingServiceImpl implements PageMappingService {
     private long getSessionUserId() throws SSessionNotFoundException, SessionIdNotSetException {
         return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
-
 
     void update(SPageMapping pageMapping, EntityUpdateDescriptor descriptor) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(pageMapping, descriptor);

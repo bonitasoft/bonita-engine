@@ -991,18 +991,27 @@ CREATE TABLE theme (
   CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
   PRIMARY KEY (tenantId, id)
 );
+
+--CREATE TABLE form_mapping_type (
+--  id BIGINT NOT NULL,
+--  type_name VARCHAR(16) NOT NULL,
+--  PRIMARY KEY (tenantId, id)
+--);
+
+--ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_type FOREIGN KEY (type) REFERENCES form_mapping_type(id) ON DELETE CASCADE;
+
 CREATE TABLE form_mapping (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
   process BIGINT NOT NULL,
-  task VARCHAR(255) NULL,
-  form VARCHAR(1024) NULL,
-  target VARCHAR(16) NOT NULL,
-  type VARCHAR(16) NOT NULL,
+  type INT NOT NULL,
+  task VARCHAR(255),
+  page_mapping_key VARCHAR(255) NOT NULL,
   lastUpdateDate BIGINT NULL,
   lastUpdatedBy BIGINT NULL,
   PRIMARY KEY (tenantId, id)
 );
+
 CREATE TABLE page_mapping (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -1015,3 +1024,4 @@ CREATE TABLE page_mapping (
   PRIMARY KEY (tenantId, id)
 );
 
+--ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_key) REFERENCES page_mapping(key);

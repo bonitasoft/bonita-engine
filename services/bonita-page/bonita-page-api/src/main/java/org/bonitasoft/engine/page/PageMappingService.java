@@ -27,7 +27,7 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 public interface PageMappingService {
 
     /**
-     * @param key    the key used to retrieve the mapping
+     * @param key the key used to retrieve the mapping
      * @param pageId the id of the custom page
      * @return the created page mapping
      * @throws SObjectCreationException when there is an issue while creating this object
@@ -36,8 +36,8 @@ public interface PageMappingService {
     SPageMapping create(String key, Long pageId) throws SObjectCreationException, SRecorderException;
 
     /**
-     * @param key        the key used to retrieve the mapping
-     * @param url        the external url the mapping points to
+     * @param key the key used to retrieve the mapping
+     * @param url the external url the mapping points to
      * @param urlAdapter the name of the url adapter that transform the url in case of an external url. i.e. it can add parameters
      * @return the created page mapping
      * @throws SObjectCreationException when there is an issue while creating this object
@@ -52,6 +52,8 @@ public interface PageMappingService {
      */
     SPageMapping get(String key) throws SObjectNotFoundException, SBonitaReadException;
 
+    SPageURL resolvePageURL(SPageMapping pageMapping);
+
     /**
      * delete this page mapping
      *
@@ -62,8 +64,8 @@ public interface PageMappingService {
     /**
      * update the given page mapping
      *
-     * @param pageMapping        the pageMapping to update
-     * @param pageId     the id of the page or null
+     * @param pageMapping the pageMapping to update
+     * @param pageId the id of the page or null
      * @throws SObjectModificationException
      */
     void update(SPageMapping pageMapping, Long pageId) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException;
@@ -71,8 +73,8 @@ public interface PageMappingService {
     /**
      * update the given page mapping
      *
-     * @param pageMapping        the pageMapping to update
-     * @param url        the url or null
+     * @param pageMapping the pageMapping to update
+     * @param url the url or null
      * @param urlAdapter the new url adapter to use
      * @throws SObjectModificationException
      */

@@ -18,6 +18,7 @@ import static org.bonitasoft.engine.bpm.CommonBPMServicesTest.getServicesBuilder
 import javax.naming.Context;
 
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
+import org.bonitasoft.engine.core.form.impl.FormMappingServiceIT;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.util.TestUtil;
@@ -32,7 +33,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        AllBPMTests.class
+        FormMappingServiceIT.class
 })
 public class AllBPMTestsWithJNDI {
 

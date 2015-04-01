@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,47 +10,28 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.form;
+ */
+package org.bonitasoft.engine.page;
 
 /**
- * @author Baptiste Mesta
+ * author Emmanuel Duchastenier
  */
-public enum FormMappingType {
+public class SPageURL {
 
-    /**
-     * form used as process start form
-     */
-    PROCESS_START(1),
+    private String url;
 
-    /**
-     * form used as process overview form
-     */
-    PROCESS_OVERVIEW(2),
+    private Long pageId;
 
-    /**
-     * form of a task
-     */
-    TASK(3);
-
-    private Integer id;
-
-    public Integer getId() {
-        return id;
+    public String getUrl() {
+        return url;
     }
 
-    FormMappingType(Integer id) {
-        this.id = id;
+    public Long getPageId() {
+        return pageId;
     }
 
-    public static FormMappingType getTypeFromId(Integer type) {
-        if (type != null) {
-            for (FormMappingType formMappingType : values()) {
-                if (formMappingType.getId() == type.intValue()) {
-                    return formMappingType;
-                }
-            }
-        }
-        return null;
+    public SPageURL(String url, Long pageId) {
+        this.url = url;
+        this.pageId = pageId;
     }
 }

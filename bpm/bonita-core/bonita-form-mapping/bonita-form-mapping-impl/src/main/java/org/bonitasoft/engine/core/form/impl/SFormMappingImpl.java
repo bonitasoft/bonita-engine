@@ -13,37 +13,31 @@
  **/
 package org.bonitasoft.engine.core.form.impl;
 
+import java.util.Objects;
+
 import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
  * @author Baptiste Mesta
  */
-public class SFormMappingImpl implements SFormMapping {
+public class SFormMappingImpl extends PersistentObjectId implements SFormMapping {
 
     private long processDefinitionId;
     private String task;
-    private String form;
-    private String target;
-    private String type;
-    private long id;
-    private long tenantId;
+    private String pageMappingKey;
+    private Integer type = null;
     private long lastUpdateDate;
     private long lastUpdatedBy;
 
     public SFormMappingImpl() {
     }
 
-    public SFormMappingImpl(long processDefinitionId, String task, String form, String target, String type) {
+    public SFormMappingImpl(long processDefinitionId, Integer type, String task, String pageMappingKey) {
         this.processDefinitionId = processDefinitionId;
         this.task = task;
-        this.form = form;
-        this.target = target;
+        this.pageMappingKey = pageMappingKey;
         this.type = type;
-    }
-
-    @Override
-    public long getId() {
-        return id;
     }
 
     @Override
@@ -51,41 +45,19 @@ public class SFormMappingImpl implements SFormMapping {
         return getClass().getName();
     }
 
-    @Override
-    public void setId(long id) {
-        this.id = id;
+    public String getPageMappingKey() {
+        return pageMappingKey;
     }
 
-    @Override
-    public void setTenantId(long tenantId) {
-        this.tenantId = tenantId;
+    public void setPageMappingKey(String pageMappingKey) {
+        this.pageMappingKey = pageMappingKey;
     }
 
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    public String getForm() {
-        return form;
-    }
-
-    public void setForm(String form) {
-        this.form = form;
-    }
-
-    public String getTarget() {
-        return target;
-    }
-
-    public void setTarget(String target) {
-        this.target = target;
-    }
-
-    public String getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
@@ -131,57 +103,31 @@ public class SFormMappingImpl implements SFormMapping {
             return true;
         if (!(o instanceof SFormMappingImpl))
             return false;
-
+        if (!super.equals(o))
+            return false;
         SFormMappingImpl that = (SFormMappingImpl) o;
-
-        if (id != that.id)
-            return false;
-        if (lastUpdateDate != that.lastUpdateDate)
-            return false;
-        if (lastUpdatedBy != that.lastUpdatedBy)
-            return false;
-        if (processDefinitionId != that.processDefinitionId)
-            return false;
-        if (tenantId != that.tenantId)
-            return false;
-        if (form != null ? !form.equals(that.form) : that.form != null)
-            return false;
-        if (task != null ? !task.equals(that.task) : that.task != null)
-            return false;
-        if (type != null ? !type.equals(that.type) : that.type != null)
-            return false;
-        if (target != null ? !target.equals(that.target) : that.target != null)
-            return false;
-
-        return true;
+        return Objects.equals(processDefinitionId, that.processDefinitionId) &&
+                Objects.equals(lastUpdateDate, that.lastUpdateDate) &&
+                Objects.equals(lastUpdatedBy, that.lastUpdatedBy) &&
+                Objects.equals(task, that.task) &&
+                Objects.equals(pageMappingKey, that.pageMappingKey) &&
+                Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (processDefinitionId ^ (processDefinitionId >>> 32));
-        result = 31 * result + (task != null ? task.hashCode() : 0);
-        result = 31 * result + (form != null ? form.hashCode() : 0);
-        result = 31 * result + (target != null ? target.hashCode() : 0);
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (int) (id ^ (id >>> 32));
-        result = 31 * result + (int) (tenantId ^ (tenantId >>> 32));
-        result = 31 * result + (int) (lastUpdateDate ^ (lastUpdateDate >>> 32));
-        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
-        return result;
+        return Objects.hash(super.hashCode(), processDefinitionId, task, pageMappingKey, type, lastUpdateDate, lastUpdatedBy);
     }
 
     @Override
     public String toString() {
-        return "SFormMappingImpl{" +
+        return "SFormMappingImpl(" +
                 "processDefinitionId=" + processDefinitionId +
                 ", task='" + task + '\'' +
-                ", form='" + form + '\'' +
-                ", target='" + target + '\'' +
+                ", pageMappingKey='" + pageMappingKey + '\'' +
                 ", type='" + type + '\'' +
-                ", id=" + id +
-                ", tenantId=" + tenantId +
                 ", lastUpdateDate=" + lastUpdateDate +
                 ", lastUpdatedBy=" + lastUpdatedBy +
-                '}';
+                ") " + super.toString();
     }
 }

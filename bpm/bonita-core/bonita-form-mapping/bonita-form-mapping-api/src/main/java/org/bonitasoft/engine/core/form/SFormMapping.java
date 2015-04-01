@@ -20,19 +20,17 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 public interface SFormMapping extends PersistentObject {
 
-    public long getTenantId();
+    long getTenantId();
 
-    public long getProcessDefinitionId();
+    long getProcessDefinitionId();
 
-    public String getTask();
+    String getTask();
 
-    public String getForm();
+    String getPageMappingKey();
 
-    public String getTarget();
+    Integer getType();
 
-    public String getType();
+    long getLastUpdateDate();
 
-    public long getLastUpdateDate();
-
-    public long getLastUpdatedBy();
+    long getLastUpdatedBy();
 }
