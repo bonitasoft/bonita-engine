@@ -13,10 +13,6 @@ import org.bonitasoft.engine.tracking.FlushEventListener;
 import org.bonitasoft.engine.tracking.FlushResult;
 import org.bonitasoft.engine.tracking.Record;
 
-/**
- * this flush event keep in memory all the different record for one day. At 24:00, a new day starts and all records are cleared
- *
- */
 public class CollectorFlushEventListener implements FlushEventListener {
 
 		private static CollectorFlushEventListener collectorFlushEventListener =new CollectorFlushEventListener();
@@ -42,7 +38,7 @@ public class CollectorFlushEventListener implements FlushEventListener {
 				if (flushEvent.getRecords().size()==0)
 						return new FlushResult(flushEvent);
 				
-				logger.debug("Receive a FlushEvent [" + flushEvent.getRecords().size()+"]");
+				// logger.info("org.bonitasoft.engine.tracking.collector.CollectorFlushEvent.flush : ____________________________"+this+" Receive a FlushEvent [" + flushEvent.getRecords().size()+"]");
 				// keep all theses new event
 				final List<Record> records = flushEvent.getRecords();
 				Calendar currentDate = Calendar.getInstance();
@@ -58,7 +54,7 @@ public class CollectorFlushEventListener implements FlushEventListener {
 						collectors.put(key, listOfDay);
 				}
 
-				logger.info("Collector ["+collectors.size()+"] Day["+key+"] nbInDay["+collectors.get(key).size()+"]");
+				logger.info("org.bonitasoft.engine.tracking.collector.CollectorFlushEvent.flush :________________  Collects [" + flushEvent.getRecords().size()+"] tank:["+collectors.size()+"] Day["+key+"] nbInDay["+collectors.get(key).size()+"]");
 				return new FlushResult(flushEvent);
 		}
 
@@ -72,7 +68,7 @@ public class CollectorFlushEventListener implements FlushEventListener {
 				Calendar currentDate = Calendar.getInstance();
 				String key = String.valueOf(currentDate.get(Calendar.YEAR)) + String.valueOf(currentDate.get(Calendar.DAY_OF_YEAR));
 				List<Record> listRecord = collectors.get(key);
-				logger.info("Collector ["+collectors.size()+"] key["+key+"] nbInDay["
+				logger.info("org.bonitasoft.engine.tracking.collector.CollectorFlushEvent.getRecords: ________________: "+this+" Collector ["+collectors.size()+"] key["+key+"] nbInDay["
 								+ (collectors.get(key) == null ? "null": collectors.get(key).size())+"]");
 				
 				return listRecord == null ? new ArrayList<Record>() : listRecord;
