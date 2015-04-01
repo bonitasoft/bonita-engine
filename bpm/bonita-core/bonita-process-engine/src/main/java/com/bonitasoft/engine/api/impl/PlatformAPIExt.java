@@ -247,11 +247,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         // Create default profiles
                         createDefaultProfiles(tenantServiceAccessor);
 
-                        // Create customPage examples
-                        createCustomPageExamples(tenantServiceAccessor);
-
-                        // Create default themes
-                        getDelegate().createDefaultThemes(tenantServiceAccessor);
+                        // Create custom page examples: done by page service start
+                        // Create default themes: done by theme service start
 
                         registerTenantJobListeners(platformAccessor, tenantId);
 
@@ -280,14 +277,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final org.bonitasoft.engine.service.TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
         final PageService pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
         new ProfilesImporterExt(profileService, identityService, pageService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
-    }
-
-    private void createCustomPageExamples(final TenantServiceAccessor tenantServiceAccessor) throws CreationException {
-        try {
-            tenantServiceAccessor.getPageService().start();
-        } catch (final SBonitaException e) {
-            throw new CreationException(e);
-        }
     }
 
     // modify user name and password
