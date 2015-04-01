@@ -74,7 +74,7 @@ public class ProcessConfigurationAPIImplTest {
         sFormMapping.setId(formMappingId);
         sFormMapping.setProcessDefinitionId(processDefinitionId);
         sFormMapping.setType(type.getId());
-        sFormMapping.setPageMappingKey(target);
+        //sFormMapping.setPageMappingKey(target);
         //        sFormMapping.setForm(myForm1);
         return sFormMapping;
     }

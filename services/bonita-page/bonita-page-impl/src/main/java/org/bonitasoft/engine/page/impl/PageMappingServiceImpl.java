@@ -80,7 +80,7 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public SPageMapping create(String key, String url, String urlAdapter) throws SObjectCreationException, SRecorderException {
+    public SPageMapping create(String key, String url, String urlAdapter) throws SObjectCreationException {
         SPageMappingImpl entity = new SPageMappingImpl();
         entity.setUrl(url);
         entity.setUrlAdapter(urlAdapter);
@@ -115,7 +115,6 @@ public class PageMappingServiceImpl implements PageMappingService {
         } catch (SRecorderException e) {
             throw new SDeletionException("Unable to delete the page mapping with key " + sPageMapping.getKey(), e);
         }
-
     }
 
     SDeleteEvent getDeleteRecord(SPageMapping sPageMapping) {

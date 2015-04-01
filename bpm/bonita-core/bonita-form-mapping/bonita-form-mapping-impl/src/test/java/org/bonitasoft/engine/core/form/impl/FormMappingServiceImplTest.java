@@ -66,7 +66,6 @@ public class FormMappingServiceImplTest {
     @Test
     public void testGetNumberOfFormMappings() throws Exception {
         QueryOptions queryOptions = mock(QueryOptions.class);
-        //        when(persistenceService.getNumberOfEntities(SFormMapping.class, queryOptions))
         formMappingService.getNumberOfFormMappings(queryOptions);
 
         verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
@@ -74,6 +73,9 @@ public class FormMappingServiceImplTest {
 
     @Test
     public void testSearchFormMappings() throws Exception {
+        QueryOptions queryOptions = mock(QueryOptions.class);
+        formMappingService.searchFormMappings(queryOptions);
 
+        verify(persistenceService).searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
     }
 }

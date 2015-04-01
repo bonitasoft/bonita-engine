@@ -26,9 +26,9 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  */
 public interface FormMappingService {
 
-    SFormMapping create(long processDefinitionId, String task, Integer type, String pageMappingKey) throws SObjectCreationException;
+    SFormMapping create(long processDefinitionId, String task, Integer type, String target, String form) throws SObjectCreationException, SBonitaReadException;
 
-    void update(SFormMapping formMapping, String pageMappingKey) throws SObjectModificationException;
+    void update(SFormMapping formMapping, String target, String form) throws SObjectModificationException;
 
     void delete(SFormMapping formMapping) throws SObjectModificationException;
 

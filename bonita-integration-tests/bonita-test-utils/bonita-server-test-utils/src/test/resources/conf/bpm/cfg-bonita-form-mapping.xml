@@ -6,6 +6,8 @@
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="pageMappingService" ref="pageMappingService" />
+        <constructor-arg name="pageService" ref="pageService" />
     </bean>
 
 </beans>

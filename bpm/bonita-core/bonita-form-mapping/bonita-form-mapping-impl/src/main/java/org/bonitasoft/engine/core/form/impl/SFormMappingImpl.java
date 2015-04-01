@@ -10,12 +10,13 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.form.impl;
 
 import java.util.Objects;
 
 import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 
 /**
@@ -25,7 +26,7 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
 
     private long processDefinitionId;
     private String task;
-    private String pageMappingKey;
+    private SPageMapping pageMapping;
     private Integer type = null;
     private long lastUpdateDate;
     private long lastUpdatedBy;
@@ -33,24 +34,15 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
     public SFormMappingImpl() {
     }
 
-    public SFormMappingImpl(long processDefinitionId, Integer type, String task, String pageMappingKey) {
+    public SFormMappingImpl(long processDefinitionId, Integer type, String task) {
         this.processDefinitionId = processDefinitionId;
         this.task = task;
-        this.pageMappingKey = pageMappingKey;
         this.type = type;
     }
 
     @Override
     public String getDiscriminator() {
         return getClass().getName();
-    }
-
-    public String getPageMappingKey() {
-        return pageMappingKey;
-    }
-
-    public void setPageMappingKey(String pageMappingKey) {
-        this.pageMappingKey = pageMappingKey;
     }
 
     public Integer getType() {
@@ -93,8 +85,31 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
         return task;
     }
 
+    @Override
+    public SPageMapping getPageMapping() {
+        return pageMapping;
+    }
+
+    public void setPageMapping(SPageMapping pageMapping) {
+        this.pageMapping = pageMapping;
+    }
+
     public void setTask(String task) {
         this.task = task;
+    }
+
+    @Override
+    public String getTarget() {
+        if (getPageMapping().getPageId() != null) {
+            return TARGET_INTERNAL;
+        }
+        if (getPageMapping().getUrl() != null) {
+            return TARGET_URL;
+        }
+        if (getPageMapping().getUrlAdapter() != null) {
+            return TARGET_LEGACY;
+        }
+        return null;
     }
 
     @Override
@@ -110,24 +125,12 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
                 Objects.equals(lastUpdateDate, that.lastUpdateDate) &&
                 Objects.equals(lastUpdatedBy, that.lastUpdatedBy) &&
                 Objects.equals(task, that.task) &&
-                Objects.equals(pageMappingKey, that.pageMappingKey) &&
+                Objects.equals(pageMapping, that.pageMapping) &&
                 Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), processDefinitionId, task, pageMappingKey, type, lastUpdateDate, lastUpdatedBy);
-    }
-
-    @Override
-    public String toString() {
-        return "SFormMappingImpl(" +
-                "processDefinitionId=" + processDefinitionId +
-                ", task='" + task + '\'' +
-                ", pageMappingKey='" + pageMappingKey + '\'' +
-                ", type='" + type + '\'' +
-                ", lastUpdateDate=" + lastUpdateDate +
-                ", lastUpdatedBy=" + lastUpdatedBy +
-                ") " + super.toString();
+        return Objects.hash(super.hashCode(), processDefinitionId, task, pageMapping, type, lastUpdateDate, lastUpdatedBy);
     }
 }

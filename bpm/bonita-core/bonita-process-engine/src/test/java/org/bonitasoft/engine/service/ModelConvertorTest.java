@@ -373,7 +373,6 @@ public class ModelConvertorTest {
         // Given
         SFormMappingImpl sFormMapping = new SFormMappingImpl();
         sFormMapping.setId(555l);
-        sFormMapping.setPageMappingKey(FormMappingTarget.LEGACY.name());
         //        sFormMapping.setForm("myForm1");
         sFormMapping.setType(FormMappingType.TASK.getId());
         sFormMapping.setTask("myTask");
@@ -398,7 +397,6 @@ public class ModelConvertorTest {
         // Given
         SFormMappingImpl sFormMapping = new SFormMappingImpl();
         sFormMapping.setId(555l);
-        sFormMapping.setPageMappingKey(FormMappingTarget.URL.name());
         //        sFormMapping.setForm("myForm1");
         sFormMapping.setType(FormMappingType.TASK.getId());
         sFormMapping.setTask("myTask");

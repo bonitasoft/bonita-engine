@@ -19,7 +19,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.recorder.SRecorderException;
 
 /**
  * @author Baptiste Mesta
@@ -33,7 +32,7 @@ public interface PageMappingService {
      * @throws SObjectCreationException when there is an issue while creating this object
      * @since 7.0.0
      */
-    SPageMapping create(String key, Long pageId) throws SObjectCreationException, SRecorderException;
+    SPageMapping create(String key, Long pageId) throws SObjectCreationException;
 
     /**
      * @param key the key used to retrieve the mapping
@@ -43,7 +42,7 @@ public interface PageMappingService {
      * @throws SObjectCreationException when there is an issue while creating this object
      * @since 7.0.0
      */
-    SPageMapping create(String key, String url, String urlAdapter) throws SObjectCreationException, SRecorderException;
+    SPageMapping create(String key, String url, String urlAdapter) throws SObjectCreationException;
 
     /**
      * @param key the key of the page mapping to retrieve

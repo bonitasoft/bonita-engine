@@ -10,13 +10,14 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.form.impl;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -29,6 +30,9 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.page.PageMappingService;
+import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -57,38 +61,73 @@ public class FormMappingServiceImpl implements FormMappingService {
     private ReadPersistenceService persistenceService;
     private SessionService sessionService;
     private ReadSessionAccessor sessionAccessor;
+    private PageMappingService pageMappingService;
+    private PageService pageService;
 
     public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
-            ReadSessionAccessor sessionAccessor) {
+            ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
+        this.pageMappingService = pageMappingService;
+        this.pageService = pageService;
     }
 
     @Override
-    public SFormMapping create(long processDefinitionId, String task, Integer type, String pageMappingKey) throws SObjectCreationException {
-        SFormMappingImpl sFormMapping = new SFormMappingImpl(processDefinitionId, type, task, pageMappingKey);
-        InsertRecord record = new InsertRecord(sFormMapping);
+    public SFormMapping create(long processDefinitionId, String task, Integer type, String target, String form) throws SBonitaReadException,
+            SObjectCreationException {
+        SPageMapping sPageMapping;
+        String key = generateKey();
+        if (target == null) {
+            sPageMapping = pageMappingService.create(key, null);
+        }
+        else {
+            switch (target) {
+                case SFormMapping.TARGET_INTERNAL:
+                    sPageMapping = pageMappingService.create(key, pageService.getPageByName(form).getId());
+                    break;
+                case SFormMapping.TARGET_URL:
+                    sPageMapping = pageMappingService.create(key, form, null); //FIXME
+                    break;
+                case SFormMapping.TARGET_LEGACY:
+                    sPageMapping = pageMappingService.create(key, null, "LegacyURLAdapter"); //FIXME
+                    break;
+                default:
+                    throw new IllegalArgumentException("Illegal form target " + target);
 
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(FORM_MAPPING).setObject(sFormMapping)
+            }
+        }
+        SFormMappingImpl sFormMapping = new SFormMappingImpl(processDefinitionId, type, task);
+        insertFormMapping(sFormMapping, sPageMapping);
+        return sFormMapping;
+    }
+
+    private String generateKey() {
+        // FIXME
+        return UUID.randomUUID().toString();
+    }
+
+    private void insertFormMapping(SFormMappingImpl sFormMapping, SPageMapping sPageMapping) throws SObjectCreationException {
+        InsertRecord record = new InsertRecord(sFormMapping);
+        sFormMapping.setPageMapping(sPageMapping);
+        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(FORM_MAPPING)
+                .setObject(sFormMapping)
                 .done();
         try {
             recorder.recordInsert(record, insertEvent);
         } catch (SRecorderException e) {
             throw new SObjectCreationException(e);
         }
-        return sFormMapping;
     }
 
     @Override
-    public void update(SFormMapping formMapping, String pageMappingKey) throws SObjectModificationException {
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class)
-                .createUpdateEvent(FORM_MAPPING)
-                .setObject(formMapping).done();
+    public void update(SFormMapping formMapping, String target, String form) throws SObjectModificationException {
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(FORM_MAPPING).setObject(formMapping)
+                .done();
         try {
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-            entityUpdateDescriptor.addField("pageMappingKey", pageMappingKey);
+            entityUpdateDescriptor.addField("pageMapping.url", "toto");
             entityUpdateDescriptor.addField("lastUpdatedBy", getSessionUserId());
             entityUpdateDescriptor.addField("lastUpdateDate", System.currentTimeMillis());
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(formMapping, entityUpdateDescriptor);

@@ -104,9 +104,9 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     public void updateFormMapping(final long formMappingId, final String form, FormMappingTarget target) throws FormMappingNotFoundException, UpdateException {
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {
+            getTenantAccessor().getPageMappingService();
             SFormMapping sFormMapping = formMappingService.get(formMappingId);
-            String pageMappingKey = null;
-            formMappingService.update(sFormMapping, pageMappingKey);
+            formMappingService.update(sFormMapping, target.name(), form);
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (SObjectNotFoundException e) {

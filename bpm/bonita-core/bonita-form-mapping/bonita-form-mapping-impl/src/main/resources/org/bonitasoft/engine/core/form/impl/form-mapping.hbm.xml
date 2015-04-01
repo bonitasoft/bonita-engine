@@ -29,10 +29,15 @@
         <property name="processDefinitionId" type="long" column="process" />
         <property name="type" type="integer" column="type" />
         <property name="task" type="java.lang.String" column="task" />
-        <property name="pageMappingKey" type="java.lang.String" column="page_mapping_key" />
         <property name="lastUpdateDate" type="long" column="lastupdatedate" />
         <property name="lastUpdatedBy" type="long" column="lastupdatedby" />
-        <filter name="tenantFilter"></filter>
+
+        <many-to-one name="pageMapping" class="org.bonitasoft.engine.page.impl.SPageMappingImpl" update="true" fetch="join" lazy="false">
+            <column name="page_mapping_tenant_id" />
+            <column name="page_mapping_id" />
+        </many-to-one>
+
+        <filter name="tenantFilter" />
     </class>
 
 </hibernate-mapping>

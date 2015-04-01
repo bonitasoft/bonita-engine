@@ -28,7 +28,10 @@ public class FormMapping implements BaseElement {
     private long id;
     private long processDefinitionId;
     private FormMappingType type;
+    private FormMappingTarget target;
     private String task;
+    private Long pageId;
+    private String pageURL;
     private String pageMappingKey;
     private long lastUpdatedBy;
     private Date lastUpdateDate;
@@ -82,6 +85,22 @@ public class FormMapping implements BaseElement {
         this.task = task;
     }
 
+    public Long getPageId() {
+        return pageId;
+    }
+
+    public void setPageId(Long pageId) {
+        this.pageId = pageId;
+    }
+
+    public String getURL() {
+        return pageURL;
+    }
+
+    public void setPageURL(String pageURL) {
+        this.pageURL = pageURL;
+    }
+
     public FormMappingType getType() {
         return type;
     }
@@ -108,8 +127,10 @@ public class FormMapping implements BaseElement {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FormMapping)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof FormMapping))
+            return false;
         FormMapping that = (FormMapping) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(processDefinitionId, that.processDefinitionId) &&

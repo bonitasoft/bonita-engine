@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.form;
 
+import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -20,17 +21,23 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 public interface SFormMapping extends PersistentObject {
 
+    String TARGET_INTERNAL = "INTERNAL";
+    String TARGET_URL = "URL";
+    String TARGET_LEGACY = "LEGACY";
+
     long getTenantId();
 
     long getProcessDefinitionId();
 
     String getTask();
 
-    String getPageMappingKey();
+    SPageMapping getPageMapping();
 
     Integer getType();
 
     long getLastUpdateDate();
 
     long getLastUpdatedBy();
+
+    String getTarget();
 }

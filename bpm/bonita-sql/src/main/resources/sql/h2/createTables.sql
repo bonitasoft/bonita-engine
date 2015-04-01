@@ -992,21 +992,14 @@ CREATE TABLE theme (
   PRIMARY KEY (tenantId, id)
 );
 
---CREATE TABLE form_mapping_type (
---  id BIGINT NOT NULL,
---  type_name VARCHAR(16) NOT NULL,
---  PRIMARY KEY (tenantId, id)
---);
-
---ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_type FOREIGN KEY (type) REFERENCES form_mapping_type(id) ON DELETE CASCADE;
-
 CREATE TABLE form_mapping (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
   process BIGINT NOT NULL,
   type INT NOT NULL,
   task VARCHAR(255),
-  page_mapping_key VARCHAR(255) NOT NULL,
+  page_mapping_tenant_id BIGINT NOT NULL,
+  page_mapping_id BIGINT NOT NULL,
   lastUpdateDate BIGINT NULL,
   lastUpdatedBy BIGINT NULL,
   PRIMARY KEY (tenantId, id)
@@ -1021,7 +1014,8 @@ CREATE TABLE page_mapping (
   urladapter VARCHAR(255) NULL,
   lastUpdateDate BIGINT NULL,
   lastUpdatedBy BIGINT NULL,
-  PRIMARY KEY (tenantId, id)
+  PRIMARY KEY (tenantId, id),
+  UNIQUE (tenantId, key_)
 );
 
---ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_key) REFERENCES page_mapping(key);
+ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_tenant_id, page_mapping_id) REFERENCES page_mapping(tenantId, id);

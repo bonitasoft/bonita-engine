@@ -2116,7 +2116,7 @@ public class ModelConvertor {
         FormMapping formMapping = new FormMapping();
         formMapping.setId(sFormMapping.getId());
         formMapping.setTask(sFormMapping.getTask());
-        formMapping.setPageMappingKey(sFormMapping.getPageMappingKey());
+        formMapping.setPageMappingKey(sFormMapping.getPageMapping().getKey());
         formMapping.setType(FormMappingType.getTypeFromId(sFormMapping.getType()));
         formMapping.setProcessDefinitionId(sFormMapping.getProcessDefinitionId());
         long lastUpdateDate = sFormMapping.getLastUpdateDate();
