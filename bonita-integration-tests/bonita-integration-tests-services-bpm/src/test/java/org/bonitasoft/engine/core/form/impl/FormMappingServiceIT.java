@@ -176,9 +176,6 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         assertThat(updatedInDatabase.getTarget()).isEqualTo(FormMappingTarget.URL.name());
         assertThat(updatedInDatabase.getLastUpdateDate()).isGreaterThan(taskForm.getLastUpdateDate());
 
-        SSession john = sessionService.createSession(1, 12, "john", false);
-        sessionAccessor.setSessionInfo(john.getId(), 1);
-
         transactionService.begin();
         SFormMapping reupdated = formMappingService.get(taskForm.getId());
         formMappingService.update(reupdated, SFormMapping.TARGET_INTERNAL, PAGE_NAME);
@@ -188,7 +185,6 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         assertThat(reupdated.getPageMapping().getPageId()).isEqualTo(page.getId());
         assertThat(reupdated.getTarget()).isEqualTo(FormMappingTarget.INTERNAL.name());
         assertThat(reupdated.getLastUpdateDate()).isGreaterThan(updatedInDatabase.getLastUpdateDate());
-        assertThat(reupdated.getLastUpdatedBy()).isEqualTo(12);
 
     }
 }

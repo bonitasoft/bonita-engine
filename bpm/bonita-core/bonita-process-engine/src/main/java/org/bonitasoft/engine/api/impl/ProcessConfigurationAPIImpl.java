@@ -72,7 +72,7 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     }
 
     @Override
-    public PageURL resolvePageURL(String key) throws NotFoundException {
+    public PageURL resolvePageOrURL(String key) throws NotFoundException {
         PageMappingService pageMappingService = getTenantAccessor().getPageMappingService();
         try {
             return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key)));

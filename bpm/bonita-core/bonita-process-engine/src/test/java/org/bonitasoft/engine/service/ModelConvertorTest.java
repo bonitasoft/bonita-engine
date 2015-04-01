@@ -74,6 +74,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.page.impl.SPageMappingImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -377,6 +378,7 @@ public class ModelConvertorTest {
         sFormMapping.setType(FormMappingType.TASK.getId());
         sFormMapping.setTask("myTask");
         sFormMapping.setProcessDefinitionId(666l);
+        sFormMapping.setPageMapping(new SPageMappingImpl());
 
         // Then
         FormMapping formMapping = ModelConvertor.toFormMapping(sFormMapping);
@@ -401,6 +403,7 @@ public class ModelConvertorTest {
         sFormMapping.setType(FormMappingType.TASK.getId());
         sFormMapping.setTask("myTask");
         sFormMapping.setProcessDefinitionId(666l);
+        sFormMapping.setPageMapping(new SPageMappingImpl());
 
         // Then
         List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping> asList(sFormMapping));

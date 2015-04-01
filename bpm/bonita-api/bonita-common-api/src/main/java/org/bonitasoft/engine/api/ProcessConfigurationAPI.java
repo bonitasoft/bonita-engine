@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api;
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.form.FormMappingTarget;
@@ -51,7 +52,8 @@ public interface ProcessConfigurationAPI {
      * @throws NotFoundException if the key does not match anything.
      * @see PageURL the structured PageURL that points to the Page or URL
      */
-    PageURL resolvePageURL(String key) throws NotFoundException;
+    //TODO add something like a boolean to ask if we check for secu or not if we get only web resources
+    PageURL resolvePageOrURL(String key) throws NotFoundException, UnauthorizedAccessException;
 
     /**
      * Update a form mapping with the given values

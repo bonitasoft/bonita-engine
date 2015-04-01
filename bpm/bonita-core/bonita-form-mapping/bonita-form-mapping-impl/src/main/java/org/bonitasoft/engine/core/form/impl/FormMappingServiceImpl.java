@@ -56,6 +56,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 public class FormMappingServiceImpl implements FormMappingService {
 
     public static final String FORM_MAPPING = "FORM_MAPPING";
+    public static final String LEGACY_URL_ADAPTER = "LegacyURLAdapter";
 
     private Recorder recorder;
     private ReadPersistenceService persistenceService;
@@ -65,7 +66,7 @@ public class FormMappingServiceImpl implements FormMappingService {
     private PageService pageService;
 
     public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
-            ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService) {
+                                  ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
@@ -81,8 +82,7 @@ public class FormMappingServiceImpl implements FormMappingService {
         String key = generateKey();
         if (target == null) {
             sPageMapping = pageMappingService.create(key, null);
-        }
-        else {
+        } else {
             switch (target) {
                 case SFormMapping.TARGET_INTERNAL:
                     sPageMapping = pageMappingService.create(key, pageService.getPageByName(form).getId());
@@ -91,7 +91,7 @@ public class FormMappingServiceImpl implements FormMappingService {
                     sPageMapping = pageMappingService.create(key, form, null); //FIXME
                     break;
                 case SFormMapping.TARGET_LEGACY:
-                    sPageMapping = pageMappingService.create(key, null, "LegacyURLAdapter"); //FIXME
+                    sPageMapping = pageMappingService.create(key, null, LEGACY_URL_ADAPTER); //FIXME
                     break;
                 default:
                     throw new IllegalArgumentException("Illegal form target " + target);
@@ -127,13 +127,42 @@ public class FormMappingServiceImpl implements FormMappingService {
                 .done();
         try {
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-            entityUpdateDescriptor.addField("pageMapping.url", "toto");
+            addFieldToUpdate(target, form, entityUpdateDescriptor);
             entityUpdateDescriptor.addField("lastUpdatedBy", getSessionUserId());
             entityUpdateDescriptor.addField("lastUpdateDate", System.currentTimeMillis());
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(formMapping, entityUpdateDescriptor);
             recorder.recordUpdate(updateRecord, updateEvent);
         } catch (SBonitaException e) {
             throw new SObjectModificationException(e);
+        }
+    }
+
+    void addFieldToUpdate(String target, String form, EntityUpdateDescriptor entityUpdateDescriptor) throws SBonitaReadException {
+        if (target == null) {
+            entityUpdateDescriptor.addField("pageMapping.url", null);
+            entityUpdateDescriptor.addField("pageMapping.urlAdapter", null);
+            entityUpdateDescriptor.addField("pageMapping.pageId", null);
+        } else {
+            switch (target) {
+                case SFormMapping.TARGET_INTERNAL:
+                    entityUpdateDescriptor.addField("pageMapping.url", null);
+                    entityUpdateDescriptor.addField("pageMapping.urlAdapter", null);
+                    entityUpdateDescriptor.addField("pageMapping.pageId", pageService.getPageByName(form).getId());//FIXME
+                    break;
+                case SFormMapping.TARGET_URL:
+                    entityUpdateDescriptor.addField("pageMapping.url", form);
+                    entityUpdateDescriptor.addField("pageMapping.urlAdapter", null);
+                    entityUpdateDescriptor.addField("pageMapping.pageId", null);
+                    break;
+                case SFormMapping.TARGET_LEGACY:
+                    entityUpdateDescriptor.addField("pageMapping.url", null);
+                    entityUpdateDescriptor.addField("pageMapping.urlAdapter", LEGACY_URL_ADAPTER);
+                    entityUpdateDescriptor.addField("pageMapping.pageId", null);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Illegal form target " + target);
+
+            }
         }
     }
 
@@ -197,12 +226,12 @@ public class FormMappingServiceImpl implements FormMappingService {
 
     @Override
     public long getNumberOfFormMappings(QueryOptions queryOptions) throws SBonitaReadException {
-        return persistenceService.getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
+        return persistenceService.getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
     }
 
     @Override
     public List<SFormMapping> searchFormMappings(QueryOptions queryOptions) throws SBonitaReadException {
-        return persistenceService.searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
+        return persistenceService.searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
     }
 
 }
