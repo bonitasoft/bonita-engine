@@ -110,20 +110,8 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private static boolean isNodeStarted = false;
 
-    private final PlatformAPIImplDelegate delegate;
-
     public PlatformAPIImpl() {
         super();
-        delegate = new PlatformAPIImplDelegate();
-    }
-
-    public PlatformAPIImpl(final PlatformAPIImplDelegate delegate) {
-        super();
-        this.delegate = delegate;
-    }
-
-    protected PlatformAPIImplDelegate getDelegate() {
-        return delegate;
     }
 
     @Override
@@ -660,8 +648,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             // Create default profiles
             createDefaultProfiles(tenantServiceAccessor);
 
-            // Create default themes : Portal and Mobile
-            getDelegate().createDefaultThemes(tenantServiceAccessor);
+            // Create custom page examples: done by page service start
+            // Create default themes: done by theme service start
 
             sessionService.deleteSession(session.getId());
         } catch (final STenantCreationException e) {
