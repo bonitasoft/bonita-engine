@@ -13,21 +13,35 @@
  */
 package org.bonitasoft.engine.core.form.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.util.Collections;
 
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.page.PageMappingService;
+import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.impl.SPageImpl;
+import org.bonitasoft.engine.page.impl.SPageMappingImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -39,6 +53,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class FormMappingServiceImplTest {
 
     private static final long PROCESS_DEFINITION_ID = 456123l;
+    private static final long ID = 154l;
+    private static final Long PAGE_ID = 554l;
     @Mock
     private Recorder recorder;
     @Mock
@@ -51,9 +67,22 @@ public class FormMappingServiceImplTest {
     private FormMappingKeyGenerator formMappingKeyGenerator;
     @Mock
     private PageMappingService pageMappingService;
+    @Mock
+    private PageService pageService;
+    @Captor
+    private ArgumentCaptor<SUpdateEvent> updateEventCaptor;
+    @Captor
+    private ArgumentCaptor<UpdateRecord> updateRecordCaptor;
 
     @InjectMocks
     private FormMappingServiceImpl formMappingService;
+
+
+    @Before
+    public void before() throws Exception {
+        doThrow(SObjectNotFoundException.class).when(pageService).getPage(anyLong());
+        doReturn(new SPageImpl("myPage", 0, 0, false, "page.zip")).when(pageService).getPage(PAGE_ID);
+    }
 
 
     @Test
@@ -79,5 +108,65 @@ public class FormMappingServiceImplTest {
         formMappingService.searchFormMappings(queryOptions);
 
         verify(persistenceService).searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
+    }
+
+    @Test
+    public void test_update_with_url() throws Exception {
+        SFormMapping formMapping = createFormMapping(ID);
+
+        formMappingService.update(formMapping, "http://fake.url", null);
+
+        verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", "http://fake.url"), entry("pageMapping.pageId", null), entry("pageMapping.urlAdapter", null));
+    }
+
+    private SFormMapping createFormMapping(long id) {
+        SFormMappingImpl sFormMapping = new SFormMappingImpl();
+        sFormMapping.setId(id);
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        sFormMapping.setPageMapping(pageMapping);
+        return sFormMapping;
+    }
+
+    @Test
+    public void test_update_with_page() throws Exception {
+        SFormMapping formMapping = createFormMapping(ID);
+
+        formMappingService.update(formMapping,null,PAGE_ID);
+
+        verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", null), entry("pageMapping.pageId", PAGE_ID), entry("pageMapping.urlAdapter", null));
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void test_update_with_page_that_does_not_exists() throws Exception {
+        SFormMapping formMapping = createFormMapping(ID);
+
+        formMappingService.update(formMapping, null, 557441l);
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void test_update_with_invalid_parameters1() throws Exception {
+        SFormMapping formMapping = createFormMapping(ID);
+
+        formMappingService.update(formMapping,"plop",PAGE_ID);
+    }
+    @Test(expected = SObjectModificationException.class)
+    public void test_update_with_invalid_parameters2() throws Exception {
+        SFormMapping formMapping = createFormMapping(ID);
+
+        formMappingService.update(formMapping,"",PAGE_ID);
+    }
+    @Test(expected = SObjectModificationException.class)
+    public void test_update_with_invalid_parameters3() throws Exception {
+        SFormMapping formMapping = createFormMapping(ID);
+
+        formMappingService.update(formMapping,"",null);
+    }
+    @Test(expected = SObjectModificationException.class)
+    public void test_update_with_invalid_parameters4() throws Exception {
+        SFormMapping formMapping = createFormMapping(ID);
+
+        formMappingService.update(formMapping,null,null);
     }
 }

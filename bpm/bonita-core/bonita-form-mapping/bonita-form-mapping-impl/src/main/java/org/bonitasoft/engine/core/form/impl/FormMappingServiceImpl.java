@@ -133,6 +133,19 @@ public class FormMappingServiceImpl implements FormMappingService {
     public void update(SFormMapping formMapping, String url, Long pageId) throws SObjectModificationException {
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(FORM_MAPPING).setObject(formMapping)
                 .done();
+        if (!((url != null) ^ (pageId != null))) {
+            throw new SObjectModificationException("Can't update the form mapping with both url and pageId");
+        }
+        if (url != null && url.isEmpty()) {
+            throw new SObjectModificationException("Can't have an empty url");
+        }
+        if (pageId != null) {
+            try {
+                pageService.getPage(pageId);
+            } catch (SBonitaReadException | SObjectNotFoundException e) {
+                throw new SObjectModificationException("the page with id " + pageId + " does not exists");
+            }
+        }
         try {
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField("pageMapping.url", url);
