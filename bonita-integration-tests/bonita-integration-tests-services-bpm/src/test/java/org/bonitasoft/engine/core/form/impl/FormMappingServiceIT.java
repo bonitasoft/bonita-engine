@@ -23,6 +23,9 @@ import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.PageService;
@@ -44,11 +47,17 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     private final TransactionService transactionService;
     public static final String PAGE_NAME = "custompage_coucou";
     private SPage page;
+    private ProcessDefinitionService processDefinitionService;
+    private SProcessDefinition p1;
+    private SProcessDefinition p2;
 
 
     @Before
     public void setup() throws Exception {
+        processDefinitionService = getServicesBuilder().getProcessDefinitionService();
         transactionService.begin();
+        p1 = processDefinitionService.store(new SProcessDefinitionImpl("P1", "1.0"), "diplsay", "display");
+        p2 = processDefinitionService.store(new SProcessDefinitionImpl("P2", "1.0"), "diplsay", "display");
         page = pageService.addPage(
                 CommonTestUtil.createTestPageContent(PAGE_NAME, "coucou depuis la page", "C'était juste pour dire coucou"), "mySuperPage.zip",
                 54L);
@@ -62,6 +71,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
             formMappingService.delete(sFormMapping);
         }
         pageService.deletePage(page.getId());
+        processDefinitionService.delete(p1.getId());
+        processDefinitionService.delete(p2.getId());
         transactionService.complete();
     }
 
@@ -77,14 +88,14 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     public void createAndListFormMapping() throws Exception {
         transactionService.begin();
 
-        formMappingService.create(15l, "step1", FormMappingType.TASK.getId(), "INTERNAL", PAGE_NAME);
-        formMappingService.create(15l, null, FormMappingType.PROCESS_START.getId(), "URL", "http://bit.coin");
-        formMappingService.create(15l, null, FormMappingType.PROCESS_OVERVIEW.getId(), "LEGACY", null);
-        formMappingService.create(16l, null, FormMappingType.PROCESS_OVERVIEW.getId(), null, null);
+        formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "INTERNAL", PAGE_NAME);
+        formMappingService.create(p1.getId(), null, FormMappingType.PROCESS_START.getId(), "URL", "http://bit.coin");
+        formMappingService.create(p1.getId(), null, FormMappingType.PROCESS_OVERVIEW.getId(), "LEGACY", null);
+        formMappingService.create(p2.getId(), null, FormMappingType.PROCESS_OVERVIEW.getId(), null, null);
         transactionService.complete();
 
         transactionService.begin();
-        List<SFormMapping> list = formMappingService.list(15l, 0, 10);
+        List<SFormMapping> list = formMappingService.list(p1.getId(), 0, 10);
         List<SFormMapping> listAll = formMappingService.list(0, 10);
 
         transactionService.complete();
@@ -92,23 +103,23 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
                 FormMappingType.PROCESS_OVERVIEW.getId());
         assertThat(list).extracting("task").containsExactly("step1", null, null);
         assertThat(list).extracting("pageMapping.url").containsExactly(null, "http://bit.coin", null);
-        assertThat(list).extracting("pageMapping.urlAdapter").containsExactly(null, null, "LegacyURLAdapter");
+        assertThat(list).extracting("pageMapping.urlAdapter").containsExactly(null, FormMappingServiceImpl.EXTERNAL_URL_ADAPTER, FormMappingServiceImpl.LEGACY_URL_ADAPTER);
         assertThat(list).extracting("pageMapping.pageId").containsExactly(page.getId(), null, null);
         //        assertThat(list).extracting("pageMapping.key").containsExactly();
         assertThat(listAll).extracting("type").containsExactly(FormMappingType.TASK.getId(), FormMappingType.PROCESS_START.getId(),
                 FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingType.PROCESS_OVERVIEW.getId());
-        assertThat(listAll).extracting("processDefinitionId").containsExactly(15l, 15l, 15l, 16l);
+        assertThat(listAll).extracting("processDefinitionId").containsExactly(p1.getId(), p1.getId(), p1.getId(), p2.getId());
     }
 
     @Test
     public void create_and_get_FormMapping() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(15l, "step1", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
+        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
         transactionService.complete();
 
         transactionService.begin();
         SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
-        SFormMapping sFormMappingByProperties = formMappingService.get(15l, FormMappingType.TASK.getId(), "step1");
+        SFormMapping sFormMappingByProperties = formMappingService.get(p1.getId(), FormMappingType.TASK.getId(), "step1");
         transactionService.complete();
         assertThat(sFormMapping).isEqualTo(taskForm).isEqualTo(sFormMappingByProperties);
     }
@@ -116,12 +127,12 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void create_and_get_FormMapping_with_no_task() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(15l, null, FormMappingType.TASK.getId(), "URL", "http://bit.coin");
+        SFormMapping taskForm = formMappingService.create(p1.getId(), "task", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
         transactionService.complete();
 
         transactionService.begin();
         SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
-        SFormMapping sFormMappingByProperties = formMappingService.get(15l, FormMappingType.TASK.getId());
+        SFormMapping sFormMappingByProperties = formMappingService.get(p1.getId(), FormMappingType.TASK.getId());
         transactionService.complete();
         assertThat(sFormMapping).isEqualTo(taskForm);
         assertThat(sFormMappingByProperties).isEqualTo(sFormMapping);
@@ -130,7 +141,7 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void delete_FormMapping() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(15l, "step1", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
+        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
         transactionService.complete();
 
         transactionService.begin();
@@ -150,7 +161,7 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void update_FormMapping() throws Exception {
         transactionService.begin();
-        SFormMapping taskForm = formMappingService.create(15l, "step1", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
+        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
         transactionService.complete();
 
         transactionService.begin();

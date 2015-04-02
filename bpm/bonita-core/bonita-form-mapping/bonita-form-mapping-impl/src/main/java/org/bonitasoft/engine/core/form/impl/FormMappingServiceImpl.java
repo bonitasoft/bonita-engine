@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -178,7 +179,8 @@ public class FormMappingServiceImpl implements FormMappingService {
                 .done();
         try {
             recorder.recordDelete(new DeleteRecord(formMapping), deleteEvent);
-        } catch (SRecorderException e) {
+            pageMappingService.delete(formMapping.getPageMapping());
+        } catch (SRecorderException | SDeletionException e) {
             throw new SObjectModificationException(e);
         }
     }
