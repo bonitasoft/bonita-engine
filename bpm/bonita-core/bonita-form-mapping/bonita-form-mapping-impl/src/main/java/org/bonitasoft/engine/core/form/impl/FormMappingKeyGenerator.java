@@ -11,37 +11,17 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.form;
 
-import org.bonitasoft.engine.page.SPageMapping;
-import org.bonitasoft.engine.persistence.PersistentObject;
+package org.bonitasoft.engine.core.form.impl;
+
+import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 
 /**
  * @author Baptiste Mesta
  */
-public interface SFormMapping extends PersistentObject {
+public interface FormMappingKeyGenerator {
 
-    String TARGET_INTERNAL = "INTERNAL";
-    String TARGET_URL = "URL";
-    String TARGET_LEGACY = "LEGACY";
 
-    int TYPE_PROCESS_START = 1;
-    int TYPE_PROCESS_OVERVIEW = 2;
-    int TYPE_TASK = 3;
+    String generateKey(long processDefinitionId, String task, Integer type) throws SObjectCreationException;
 
-    long getTenantId();
-
-    long getProcessDefinitionId();
-
-    String getTask();
-
-    SPageMapping getPageMapping();
-
-    Integer getType();
-
-    long getLastUpdateDate();
-
-    long getLastUpdatedBy();
-
-    String getTarget();
 }

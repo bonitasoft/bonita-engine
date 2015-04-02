@@ -59,28 +59,30 @@ public class FormMappingServiceImpl implements FormMappingService {
     public static final String FORM_MAPPING = "FORM_MAPPING";
     public static final String LEGACY_URL_ADAPTER = "LegacyURLAdapter";
 
-    private Recorder recorder;
-    private ReadPersistenceService persistenceService;
-    private SessionService sessionService;
-    private ReadSessionAccessor sessionAccessor;
-    private PageMappingService pageMappingService;
-    private PageService pageService;
+    private final Recorder recorder;
+    private final ReadPersistenceService persistenceService;
+    private final SessionService sessionService;
+    private final ReadSessionAccessor sessionAccessor;
+    private final PageMappingService pageMappingService;
+    private final PageService pageService;
+    private final FormMappingKeyGenerator formMappingKeyGenerator;
 
     public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
-                                  ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService) {
+                                  ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService, FormMappingKeyGenerator formMappingKeyGenerator) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.pageMappingService = pageMappingService;
         this.pageService = pageService;
+        this.formMappingKeyGenerator = formMappingKeyGenerator;
     }
 
     @Override
     public SFormMapping create(long processDefinitionId, String task, Integer type, String target, String form) throws SBonitaReadException,
             SObjectCreationException {
         SPageMapping sPageMapping;
-        String key = generateKey();
+        String key = formMappingKeyGenerator.generateKey(processDefinitionId, task, type);
         if (target == null) {
             sPageMapping = pageMappingService.create(key, null);
         } else {

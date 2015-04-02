@@ -13,12 +13,14 @@
  */
 package org.bonitasoft.engine.core.form.impl;
 
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.util.Collections;
 
 import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -36,6 +38,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class FormMappingServiceImplTest {
 
+    private static final long PROCESS_DEFINITION_ID = 456123l;
     @Mock
     private Recorder recorder;
     @Mock
@@ -44,23 +47,22 @@ public class FormMappingServiceImplTest {
     private SessionService sessionService;
     @Mock
     private ReadSessionAccessor sessionAccessor;
+    @Mock
+    private FormMappingKeyGenerator formMappingKeyGenerator;
+    @Mock
+    private PageMappingService pageMappingService;
 
     @InjectMocks
     private FormMappingServiceImpl formMappingService;
 
+
     @Test
     public void testCreate() throws Exception {
+        doReturn("theKey").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, "step1", 2);
 
-    }
+        formMappingService.create(PROCESS_DEFINITION_ID, "step1", 2, null, null);
 
-    @Test
-    public void testUpdate() throws Exception {
-
-    }
-
-    @Test
-    public void testDelete() throws Exception {
-
+        verify(pageMappingService).create("theKey", null);
     }
 
     @Test
@@ -68,7 +70,7 @@ public class FormMappingServiceImplTest {
         QueryOptions queryOptions = mock(QueryOptions.class);
         formMappingService.getNumberOfFormMappings(queryOptions);
 
-        verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
+        verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
     }
 
     @Test
@@ -76,6 +78,6 @@ public class FormMappingServiceImplTest {
         QueryOptions queryOptions = mock(QueryOptions.class);
         formMappingService.searchFormMappings(queryOptions);
 
-        verify(persistenceService).searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
+        verify(persistenceService).searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
     }
 }
