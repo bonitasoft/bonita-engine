@@ -33,7 +33,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        FormMappingServiceIT.class
+        AllBPMTests.class
 })
 public class AllBPMTestsWithJNDI {
 
