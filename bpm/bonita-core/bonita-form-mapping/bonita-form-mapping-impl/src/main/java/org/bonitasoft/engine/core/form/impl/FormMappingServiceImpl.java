@@ -128,12 +128,14 @@ public class FormMappingServiceImpl implements FormMappingService {
     }
 
     @Override
-    public void update(SFormMapping formMapping, String target, String form) throws SObjectModificationException {
+    public void update(SFormMapping formMapping, String url, Long pageId) throws SObjectModificationException {
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(FORM_MAPPING).setObject(formMapping)
                 .done();
         try {
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-            addFieldToUpdate(target, form, entityUpdateDescriptor);
+            entityUpdateDescriptor.addField("pageMapping.url", url);
+            entityUpdateDescriptor.addField("pageMapping.urlAdapter", null);
+            entityUpdateDescriptor.addField("pageMapping.pageId", pageId);
             entityUpdateDescriptor.addField("lastUpdatedBy", getSessionUserId());
             entityUpdateDescriptor.addField("lastUpdateDate", System.currentTimeMillis());
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(formMapping, entityUpdateDescriptor);
@@ -143,34 +145,6 @@ public class FormMappingServiceImpl implements FormMappingService {
         }
     }
 
-    void addFieldToUpdate(String target, String form, EntityUpdateDescriptor entityUpdateDescriptor) throws SBonitaReadException {
-        if (target == null) {
-            entityUpdateDescriptor.addField("pageMapping.url", null);
-            entityUpdateDescriptor.addField("pageMapping.urlAdapter", null);
-            entityUpdateDescriptor.addField("pageMapping.pageId", null);
-        } else {
-            switch (target) {
-                case SFormMapping.TARGET_INTERNAL:
-                    entityUpdateDescriptor.addField("pageMapping.url", null);
-                    entityUpdateDescriptor.addField("pageMapping.urlAdapter", null);
-                    entityUpdateDescriptor.addField("pageMapping.pageId", getPageIdOrNull(form));
-                    break;
-                case SFormMapping.TARGET_URL:
-                    entityUpdateDescriptor.addField("pageMapping.url", form);
-                    entityUpdateDescriptor.addField("pageMapping.urlAdapter", null);
-                    entityUpdateDescriptor.addField("pageMapping.pageId", null);
-                    break;
-                case SFormMapping.TARGET_LEGACY:
-                    entityUpdateDescriptor.addField("pageMapping.url", null);
-                    entityUpdateDescriptor.addField("pageMapping.urlAdapter", LEGACY_URL_ADAPTER);
-                    entityUpdateDescriptor.addField("pageMapping.pageId", null);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Illegal form target " + target);
-
-            }
-        }
-    }
 
     private long getSessionUserId() throws SSessionNotFoundException, SessionIdNotSetException {
         return sessionService.getLoggedUserFromSession(sessionAccessor);

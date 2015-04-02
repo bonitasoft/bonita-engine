@@ -20,13 +20,10 @@ import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
-import org.bonitasoft.engine.form.FormMapping;
-import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.impl.SPageMappingImpl;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -72,9 +69,9 @@ public class ProcessConfigurationAPIImplTest {
         SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START, FORM_MAPPING_ID, "theUrl", null, null, PROCESS_DEF_ID);
         doReturn(sFormMapping).when(formMappingService).get(FORM_MAPPING_ID);
         //when
-        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", FormMappingTarget.INTERNAL);
+        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", null);
         //then
-        verify(formMappingService, times(1)).update(sFormMapping, FormMappingTarget.INTERNAL.name(), "theNewForm");
+        verify(formMappingService, times(1)).update(sFormMapping, "theNewForm", null);
 
     }
 }

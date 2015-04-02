@@ -28,7 +28,7 @@ public interface FormMappingService {
 
     SFormMapping create(long processDefinitionId, String task, Integer type, String target, String form) throws SObjectCreationException, SBonitaReadException;
 
-    void update(SFormMapping formMapping, String target, String form) throws SObjectModificationException;
+    void update(SFormMapping formMapping, String url, Long pageId) throws SObjectModificationException;
 
     void delete(SFormMapping formMapping) throws SObjectModificationException;
 

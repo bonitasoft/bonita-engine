@@ -138,7 +138,7 @@ public class FormMappingIT extends TestWithUser {
         assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(), p1.getId());
 
         //update
-        processConfigurationAPI.updateFormMapping(step2Form1.getId(), "newFormUrlForStep2", FormMappingTarget.URL);
+        processConfigurationAPI.updateFormMapping(step2Form1.getId(), "newFormUrlForStep2", null);
         FormMapping updatedStep2Form1 = processConfigurationAPI.getFormMapping(step2Form1.getId());
         assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1, "form", "target", "lastUpdateDate", "lastUpdatedBy");
         assertThat(updatedStep2Form1.getURL()).isEqualTo("newFormUrlForStep2");

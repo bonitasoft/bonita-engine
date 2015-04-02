@@ -28,7 +28,6 @@ import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.CommonTestUtil;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -164,7 +163,7 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
         transactionService.begin();
         SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
-        formMappingService.update(sFormMapping, SFormMapping.TARGET_URL, "newFormName");
+        formMappingService.update(sFormMapping, "newFormName", null);
         transactionService.complete();
 
         transactionService.begin();
@@ -178,7 +177,7 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
         transactionService.begin();
         SFormMapping reupdated = formMappingService.get(taskForm.getId());
-        formMappingService.update(reupdated, SFormMapping.TARGET_INTERNAL, PAGE_NAME);
+        formMappingService.update(reupdated, PAGE_NAME, null);
         transactionService.complete();
 
         assertThat(reupdated.getPageMapping().getUrl()).isNull();
