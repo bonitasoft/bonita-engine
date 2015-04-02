@@ -27,7 +27,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ApplicationIT.class,
         ApplicationPageIT.class,
         ApplicationMenuIT.class,
-        ImportExportIT.class
+        ApplicationImportExportIT.class
 })
 @Initializer(TestsInitializer.class)
 public class ApplicationAPIITs {
