@@ -27,8 +27,6 @@ import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.CommonTestUtil;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
@@ -40,12 +38,8 @@ import org.junit.Test;
  */
 public class FormMappingServiceIT extends CommonBPMServicesTest {
 
-    private final SessionService sessionService;
-    private final SessionAccessor sessionAccessor;
     private final PageService pageService;
     public FormMappingService formMappingService;
-
-    private final BPMServicesBuilder servicesBuilder;
 
     private final TransactionService transactionService;
     public static final String PAGE_NAME = "custompage_coucou";
@@ -73,12 +67,10 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
     public FormMappingServiceIT() {
         super();
-        servicesBuilder = getServicesBuilder();
+        BPMServicesBuilder servicesBuilder = getServicesBuilder();
         transactionService = servicesBuilder.getTransactionService();
         formMappingService = servicesBuilder.getFormMappingService();
         pageService = servicesBuilder.getPageService();
-        sessionService = servicesBuilder.getSessionService();
-        sessionAccessor = servicesBuilder.getSessionAccessor();
     }
 
     @Test
