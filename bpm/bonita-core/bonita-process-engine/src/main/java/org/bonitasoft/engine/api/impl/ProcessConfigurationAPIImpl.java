@@ -83,30 +83,26 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         }
     }
 
-    FormMapping getFormMapping(long processDefinitionId, FormMappingType type, String taskName) throws FormMappingNotFoundException {
+    @Override
+    public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {
-            SFormMapping sFormMapping;
-            if (taskName == null) {
-                sFormMapping = formMappingService.get(processDefinitionId, type.getId());
-            } else {
-                sFormMapping = formMappingService.get(processDefinitionId, type.getId(), taskName);
-            }
-            return ModelConvertor.toFormMapping(sFormMapping);
+            return ModelConvertor.toFormMapping(formMappingService.get(formMappingId));
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (SObjectNotFoundException e) {
-            throw new FormMappingNotFoundException("Form mapping not found for " + type.name() + " on process " + processDefinitionId);
+            throw new FormMappingNotFoundException("no form mapping found with id" + formMappingId);
         }
     }
 
     @Override
-    public void updateFormMapping(final long formMappingId, final String form, FormMappingTarget target) throws FormMappingNotFoundException, UpdateException {
+    public FormMapping updateFormMapping(final long formMappingId, final String form, FormMappingTarget target) throws FormMappingNotFoundException, UpdateException {
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {
             getTenantAccessor().getPageMappingService();
             SFormMapping sFormMapping = formMappingService.get(formMappingId);
             formMappingService.update(sFormMapping, target.name(), form);
+            return ModelConvertor.toFormMapping(sFormMapping);
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (SObjectNotFoundException e) {

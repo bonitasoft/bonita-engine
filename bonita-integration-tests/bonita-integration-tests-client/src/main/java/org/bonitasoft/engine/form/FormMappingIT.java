@@ -16,6 +16,8 @@ package org.bonitasoft.engine.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Date;
+
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -52,8 +54,8 @@ public class FormMappingIT extends TestWithUser {
                 .createNewBusinessArchive()
                 .setProcessDefinition(p2Builder.done())
                 .setFormMappings(
-                        FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.INTERNAL)
-                                .addTaskForm("task2Form", FormMappingTarget.INTERNAL, "step1")
+                        FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
+                                .addTaskForm("task2Form", FormMappingTarget.URL, "step1")
                                 .addProcessOverviewForm("process2OverviewForm", FormMappingTarget.LEGACY).build());
 
         ProcessDefinition p1 = getProcessAPI().deploy(bar1.done());
@@ -96,21 +98,24 @@ public class FormMappingIT extends TestWithUser {
         assertThat(processStartForm1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(processStartForm1.getPageId()).isNull();
         assertThat(processStartForm1.getURL()).isEqualTo("processStartForm");
+        assertThat(processStartForm1.getTarget()).isEqualTo(FormMappingTarget.URL);
         assertThat(processOverviewForm1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(processOverviewForm1.getPageId()).isNull();
+        assertThat(processOverviewForm1.getTarget()).isEqualTo(FormMappingTarget.INTERNAL);
         assertThat(step1Form1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(step1Form1.getPageId()).isNull();
         assertThat(step2Form1.getProcessDefinitionId()).isEqualTo(p1.getId());
-        //assertThat(step2Form1.getForm()).isEqualTo(null);
+        assertThat(step2Form1.getURL()).isNull();
 
         assertThat(processStartForm2.getProcessDefinitionId()).isEqualTo(p2.getId());
-        //assertThat(processStartForm2.getForm()).isEqualTo("processStartForm");
+        assertThat(processStartForm2.getURL()).isEqualTo("processStartForm");
         assertThat(processOverviewForm2.getProcessDefinitionId()).isEqualTo(p2.getId());
-        //assertThat(processOverviewForm2.getForm()).isEqualTo("process2OverviewForm");
+        assertThat(processOverviewForm2.getURL()).isNull();
+        assertThat(processOverviewForm2.getTarget()).isEqualTo(FormMappingTarget.LEGACY);
         assertThat(step1Form2.getProcessDefinitionId()).isEqualTo(p2.getId());
-        //assertThat(step1Form2.getForm()).isEqualTo("task2Form");
+        assertThat(step1Form2.getURL()).isEqualTo("task2Form");
         assertThat(step2Form2.getProcessDefinitionId()).isEqualTo(p2.getId());
-        //assertThat(step2Form2.getForm()).isEqualTo(null);
+        assertThat(step2Form2.getURL()).isNull();
 
         //search
         SearchResult<FormMapping> formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(
@@ -141,13 +146,13 @@ public class FormMappingIT extends TestWithUser {
 
         //update
         processConfigurationAPI.updateFormMapping(step2Form1.getId(), "newFormUrlForStep2", FormMappingTarget.URL);
-        //FormMapping updatedStep2Form1 = processConfigurationAPI.getTaskForm(p1.getId(), "step2");
-//        assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1, "form", "target", "lastUpdateDate", "lastUpdatedBy");
-//        assertThat(updatedStep2Form1.getForm()).isEqualTo("newFormUrlForStep2");
-//        assertThat(updatedStep2Form1.getTarget()).isEqualTo(FormMappingTarget.URL);
-//        assertThat(updatedStep2Form1.getLastUpdateDate()).isAfter(new Date(afterDeploy));
-//        assertThat(updatedStep2Form1.getLastUpdatedBy()).isEqualTo(user.getId());
-//        assertThat(step2Form1.getLastUpdateDate()).isNull();
+        FormMapping updatedStep2Form1 = processConfigurationAPI.getFormMapping(step2Form1.getId());
+        assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1, "form", "target", "lastUpdateDate", "lastUpdatedBy");
+        assertThat(updatedStep2Form1.getURL()).isEqualTo("newFormUrlForStep2");
+       assertThat(updatedStep2Form1.getTarget()).isEqualTo(FormMappingTarget.URL);
+        assertThat(updatedStep2Form1.getLastUpdateDate()).isAfter(new Date(afterDeploy));
+        assertThat(updatedStep2Form1.getLastUpdatedBy()).isEqualTo(user.getId());
+        assertThat(step2Form1.getLastUpdateDate()).isNull();
 
         disableAndDeleteProcess(p1, p2);
         assertThat(

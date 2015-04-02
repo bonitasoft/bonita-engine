@@ -70,5 +70,6 @@ public interface ProcessConfigurationAPI {
      *         when there is an issue when updating the form mapping
      * @since 7.0.0
      */
-    void updateFormMapping(final long formMappingId, final String form, FormMappingTarget target) throws FormMappingNotFoundException, UpdateException;
+    FormMapping updateFormMapping(final long formMappingId, final String form, FormMappingTarget target) throws FormMappingNotFoundException, UpdateException;
+    FormMapping getFormMapping(final long formMappingId) throws FormMappingNotFoundException;
 }

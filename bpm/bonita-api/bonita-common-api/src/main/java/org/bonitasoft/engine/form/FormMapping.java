@@ -125,25 +125,34 @@ public class FormMapping implements BaseElement {
         this.lastUpdateDate = lastUpdateDate;
     }
 
+       public FormMappingTarget getTarget() {
+        return target;
+    }
+
+    public void setTarget(FormMappingTarget target) {
+        this.target = target;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof FormMapping))
-            return false;
+        if (this == o) return true;
+        if (!(o instanceof FormMapping)) return false;
         FormMapping that = (FormMapping) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(processDefinitionId, that.processDefinitionId) &&
                 Objects.equals(lastUpdatedBy, that.lastUpdatedBy) &&
                 Objects.equals(type, that.type) &&
+                Objects.equals(target, that.target) &&
                 Objects.equals(task, that.task) &&
+                Objects.equals(pageId, that.pageId) &&
+                Objects.equals(pageURL, that.pageURL) &&
                 Objects.equals(pageMappingKey, that.pageMappingKey) &&
                 Objects.equals(lastUpdateDate, that.lastUpdateDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, processDefinitionId, type, task, pageMappingKey, lastUpdatedBy, lastUpdateDate);
+        return Objects.hash(id, processDefinitionId, type, target, task, pageId, pageURL, pageMappingKey, lastUpdatedBy, lastUpdateDate);
     }
 
     @Override
@@ -152,7 +161,10 @@ public class FormMapping implements BaseElement {
                 "id=" + id +
                 ", processDefinitionId=" + processDefinitionId +
                 ", type=" + type +
+                ", target=" + target +
                 ", task='" + task + '\'' +
+                ", pageId=" + pageId +
+                ", pageURL='" + pageURL + '\'' +
                 ", pageMappingKey='" + pageMappingKey + '\'' +
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 ", lastUpdateDate=" + lastUpdateDate +
