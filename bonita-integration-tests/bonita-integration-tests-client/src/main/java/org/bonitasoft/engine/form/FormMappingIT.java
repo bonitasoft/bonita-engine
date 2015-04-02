@@ -101,7 +101,8 @@ public class FormMappingIT extends TestWithUser {
         assertThat(processStartForm1.getTarget()).isEqualTo(FormMappingTarget.URL);
         assertThat(processOverviewForm1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(processOverviewForm1.getPageId()).isNull();
-        assertThat(processOverviewForm1.getTarget()).isEqualTo(FormMappingTarget.INTERNAL);
+        assertThat(processOverviewForm1.getURL()).isNull();
+        assertThat(processOverviewForm1.getTarget()).isNull();//page does not exists
         assertThat(step1Form1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(step1Form1.getPageId()).isNull();
         assertThat(step2Form1.getProcessDefinitionId()).isEqualTo(p1.getId());
@@ -132,17 +133,9 @@ public class FormMappingIT extends TestWithUser {
         assertThat(formMappingSearchResult.getCount()).isEqualTo(2);
         assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(), p1.getId());
         formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC)
-                .filter(FormMappingSearchDescriptor.FORM, "process1OverviewForm").done());
-        assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
-        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p1.getId());
-        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC)
-                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.PROCESS_START.name()).done());
+                .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.PROCESS_START).done());
         assertThat(formMappingSearchResult.getCount()).isEqualTo(2);
         assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(), p1.getId());
-        formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC)
-                .filter(FormMappingSearchDescriptor.TARGET, "URL").done());
-        assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
-        assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p1.getId());
 
         //update
         processConfigurationAPI.updateFormMapping(step2Form1.getId(), "newFormUrlForStep2", FormMappingTarget.URL);
@@ -154,7 +147,8 @@ public class FormMappingIT extends TestWithUser {
         assertThat(updatedStep2Form1.getLastUpdatedBy()).isEqualTo(user.getId());
         assertThat(step2Form1.getLastUpdateDate()).isNull();
 
-        disableAndDeleteProcess(p1, p2);
+        getProcessAPI().deleteProcessDefinition(p1.getId());
+        getProcessAPI().deleteProcessDefinition(p2.getId());
         assertThat(
                 processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).done())
                         .getResult()).isEmpty();

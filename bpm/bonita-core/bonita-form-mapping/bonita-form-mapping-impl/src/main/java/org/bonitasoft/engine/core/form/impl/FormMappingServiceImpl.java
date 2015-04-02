@@ -32,6 +32,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -85,7 +86,7 @@ public class FormMappingServiceImpl implements FormMappingService {
         } else {
             switch (target) {
                 case SFormMapping.TARGET_INTERNAL:
-                    sPageMapping = pageMappingService.create(key, pageService.getPageByName(form).getId());
+                    sPageMapping = pageMappingService.create(key, getPageIdOrNull(form));
                     break;
                 case SFormMapping.TARGET_URL:
                     sPageMapping = pageMappingService.create(key, form, null); //FIXME
@@ -101,6 +102,11 @@ public class FormMappingServiceImpl implements FormMappingService {
         SFormMappingImpl sFormMapping = new SFormMappingImpl(processDefinitionId, type, task);
         insertFormMapping(sFormMapping, sPageMapping);
         return sFormMapping;
+    }
+
+    Long getPageIdOrNull(String form) throws SBonitaReadException {
+        SPage pageByName = pageService.getPageByName(form);
+        return pageByName == null ? null : pageByName.getId();
     }
 
     private String generateKey() {
@@ -147,7 +153,7 @@ public class FormMappingServiceImpl implements FormMappingService {
                 case SFormMapping.TARGET_INTERNAL:
                     entityUpdateDescriptor.addField("pageMapping.url", null);
                     entityUpdateDescriptor.addField("pageMapping.urlAdapter", null);
-                    entityUpdateDescriptor.addField("pageMapping.pageId", pageService.getPageByName(form).getId());//FIXME
+                    entityUpdateDescriptor.addField("pageMapping.pageId", getPageIdOrNull(form));
                     break;
                 case SFormMapping.TARGET_URL:
                     entityUpdateDescriptor.addField("pageMapping.url", form);
