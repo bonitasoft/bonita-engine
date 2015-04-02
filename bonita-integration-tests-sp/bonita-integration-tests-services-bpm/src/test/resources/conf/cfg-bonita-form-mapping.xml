@@ -15,4 +15,8 @@
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
     </bean>
 
+    <!-- auto wired by the page mapping service -->
+    <bean class="org.bonitasoft.engine.core.form.impl.LegacyURLAdapter" />
+    <bean class="org.bonitasoft.engine.core.form.impl.ExternalURLAdapter" />
+
 </beans>
