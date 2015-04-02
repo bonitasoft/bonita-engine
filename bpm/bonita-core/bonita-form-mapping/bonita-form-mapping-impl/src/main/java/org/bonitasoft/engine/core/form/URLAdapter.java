@@ -12,16 +12,32 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-package org.bonitasoft.engine.core.form.impl;
+package org.bonitasoft.engine.core.form;
 
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * @author Baptiste Mesta
  */
-public interface FormMappingKeyGenerator {
+public interface URLAdapter {
 
 
-    String generateKey(long processDefinitionId, String task, Integer type) throws SObjectCreationException;
+    /**
+     *  adapt an url based on a context
+     * @param url
+     *      the base url
+     * @param context
+     *      the provided context
+     * @return
+     *      the new url
+     */
+    String adapt(String url, Map<String, Serializable> context);
+
+    /**
+     *
+     * @return the identifier for this url adapter
+     */
+    String getId();
 
 }

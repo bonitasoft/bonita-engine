@@ -14,10 +14,15 @@
 
 package org.bonitasoft.engine.page.impl;
 
+import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -28,6 +33,7 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.SPageURL;
+import org.bonitasoft.engine.page.URLAdapter;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -48,17 +54,22 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 public class PageMappingServiceImpl implements PageMappingService {
 
     public static final String PAGE_MAPPING = "PAGE_MAPPING";
-    private Recorder recorder;
-    private ReadPersistenceService persistenceService;
-    private SessionService sessionService;
-    private ReadSessionAccessor sessionAccessor;
+    private final Recorder recorder;
+    private final ReadPersistenceService persistenceService;
+    private final SessionService sessionService;
+    private final ReadSessionAccessor sessionAccessor;
+    private final Map<String, URLAdapter> urlAdapterMap;
 
     public PageMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
-            ReadSessionAccessor sessionAccessor) {
+                                  ReadSessionAccessor sessionAccessor, List<URLAdapter> urlAdapters) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
+        urlAdapterMap = new HashMap<>();
+        for (URLAdapter urlAdapter : urlAdapters) {
+            urlAdapterMap.put(urlAdapter.getId(), urlAdapter);
+        }
     }
 
     @Override
@@ -96,7 +107,7 @@ public class PageMappingServiceImpl implements PageMappingService {
     @Override
     public SPageMapping get(String key) throws SObjectNotFoundException, SBonitaReadException {
         SPageMapping sPageMapping = persistenceService.selectOne(new SelectOneDescriptor<SPageMapping>("getPageMappingByKey", Collections
-                .<String, Object> singletonMap("key", key), SPageMapping.class));
+                .<String, Object>singletonMap("key", key), SPageMapping.class));
         if (sPageMapping == null) {
             throw new SObjectNotFoundException("No page mapping found with key " + key);
         }
@@ -104,8 +115,21 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public SPageURL resolvePageURL(SPageMapping pageMapping) {
-        return new SPageURL(pageMapping.getUrl(), pageMapping.getPageId());
+    public SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context) throws SExecutionException {
+        String url = pageMapping.getUrl();
+        String urlAdapter = pageMapping.getUrlAdapter();
+        if (url != null && urlAdapter != null) {
+            url = getUrlAdapter(urlAdapter).adapt(url, context);
+        }
+        return new SPageURL(url, pageMapping.getPageId());
+    }
+
+    private URLAdapter getUrlAdapter(String urlAdapterName) throws SExecutionException {
+        URLAdapter urlAdapter = urlAdapterMap.get(urlAdapterName);
+        if (urlAdapter == null) {
+            throw new SExecutionException("unable to execute the url adapter " + urlAdapterName + " because it does not exists");
+        }
+        return urlAdapter;
     }
 
     @Override

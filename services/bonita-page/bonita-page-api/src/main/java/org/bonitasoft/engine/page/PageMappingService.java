@@ -14,7 +14,11 @@
 
 package org.bonitasoft.engine.page;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -51,7 +55,7 @@ public interface PageMappingService {
      */
     SPageMapping get(String key) throws SObjectNotFoundException, SBonitaReadException;
 
-    SPageURL resolvePageURL(SPageMapping pageMapping);
+    SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context) throws SExecutionException;
 
     /**
      * delete this page mapping

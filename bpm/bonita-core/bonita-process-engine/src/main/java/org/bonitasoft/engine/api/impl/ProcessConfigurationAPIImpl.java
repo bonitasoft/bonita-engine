@@ -13,8 +13,12 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.io.Serializable;
+import java.util.Collections;
+
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
@@ -73,11 +77,13 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     public PageURL resolvePageOrURL(String key) throws NotFoundException {
         PageMappingService pageMappingService = getTenantAccessor().getPageMappingService();
         try {
-            return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key)));
+            return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), Collections.<String, Serializable>emptyMap()));//TODO add context
         } catch (SObjectNotFoundException e) {
             throw new NotFoundException(e);
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
+        } catch (SExecutionException e) {
+            throw new RetrieveException(e);//TODO add exception
         }
     }
 

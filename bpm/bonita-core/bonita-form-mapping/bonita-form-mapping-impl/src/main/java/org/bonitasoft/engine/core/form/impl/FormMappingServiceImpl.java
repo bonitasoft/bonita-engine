@@ -24,8 +24,10 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.core.form.FormMappingKeyGenerator;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.core.form.URLAdapter;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
@@ -57,7 +59,8 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 public class FormMappingServiceImpl implements FormMappingService {
 
     public static final String FORM_MAPPING = "FORM_MAPPING";
-    public static final String LEGACY_URL_ADAPTER = "LegacyURLAdapter";
+    public static final String LEGACY_URL_ADAPTER = "legacy";
+    public static final String EXTERNAL_URL_ADAPTER = "external";
 
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
@@ -91,10 +94,10 @@ public class FormMappingServiceImpl implements FormMappingService {
                     sPageMapping = pageMappingService.create(key, getPageIdOrNull(form));
                     break;
                 case SFormMapping.TARGET_URL:
-                    sPageMapping = pageMappingService.create(key, form, null); //FIXME
+                    sPageMapping = pageMappingService.create(key, form, EXTERNAL_URL_ADAPTER);
                     break;
                 case SFormMapping.TARGET_LEGACY:
-                    sPageMapping = pageMappingService.create(key, null, LEGACY_URL_ADAPTER); //FIXME
+                    sPageMapping = pageMappingService.create(key, null, LEGACY_URL_ADAPTER);
                     break;
                 default:
                     throw new IllegalArgumentException("Illegal form target " + target);
@@ -131,13 +134,17 @@ public class FormMappingServiceImpl implements FormMappingService {
 
     @Override
     public void update(SFormMapping formMapping, String url, Long pageId) throws SObjectModificationException {
+        String urlAdapter = null;
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(FORM_MAPPING).setObject(formMapping)
                 .done();
         if (!((url != null) ^ (pageId != null))) {
             throw new SObjectModificationException("Can't update the form mapping with both url and pageId");
         }
-        if (url != null && url.isEmpty()) {
-            throw new SObjectModificationException("Can't have an empty url");
+        if (url != null) {
+            if (url.isEmpty()) {
+                throw new SObjectModificationException("Can't have an empty url");
+            }
+            urlAdapter = EXTERNAL_URL_ADAPTER;
         }
         if (pageId != null) {
             try {
@@ -149,7 +156,7 @@ public class FormMappingServiceImpl implements FormMappingService {
         try {
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField("pageMapping.url", url);
-            entityUpdateDescriptor.addField("pageMapping.urlAdapter", null);
+            entityUpdateDescriptor.addField("pageMapping.urlAdapter", urlAdapter);
             entityUpdateDescriptor.addField("pageMapping.pageId", pageId);
             entityUpdateDescriptor.addField("lastUpdatedBy", getSessionUserId());
             entityUpdateDescriptor.addField("lastUpdateDate", System.currentTimeMillis());

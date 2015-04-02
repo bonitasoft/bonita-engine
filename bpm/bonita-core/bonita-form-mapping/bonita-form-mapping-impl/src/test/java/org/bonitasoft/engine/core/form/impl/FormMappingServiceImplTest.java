@@ -25,6 +25,7 @@ import java.util.Collections;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.core.form.FormMappingKeyGenerator;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.page.PageMappingService;
@@ -117,7 +118,7 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, "http://fake.url", null);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", "http://fake.url"), entry("pageMapping.pageId", null), entry("pageMapping.urlAdapter", null));
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", "http://fake.url"), entry("pageMapping.pageId", null), entry("pageMapping.urlAdapter", FormMappingServiceImpl.EXTERNAL_URL_ADAPTER));
     }
 
     private SFormMapping createFormMapping(long id) {

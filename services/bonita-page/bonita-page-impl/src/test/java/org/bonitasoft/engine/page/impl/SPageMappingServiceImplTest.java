@@ -21,7 +21,13 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -29,6 +35,8 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.page.SPageMapping;
+import org.bonitasoft.engine.page.SPageURL;
+import org.bonitasoft.engine.page.URLAdapter;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -38,12 +46,12 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -69,8 +77,23 @@ public class SPageMappingServiceImplTest {
     @Mock
     private ReadSessionAccessor readSessionAccessor;
 
-    @InjectMocks
+
     private PageMappingServiceImpl pageMappingService;
+
+    @Before
+    public void before() {
+        pageMappingService = new PageMappingServiceImpl(recorder, persistenceService, sessionService, readSessionAccessor, Collections.<URLAdapter>singletonList(new URLAdapter() {
+            @Override
+            public String adapt(String url, Map<String, Serializable> context) {
+                return url + "_adapted_" + context.size();
+            }
+
+            @Override
+            public String getId() {
+                return "testAdapter";
+            }
+        }));
+    }
 
 
     @Test
@@ -159,6 +182,7 @@ public class SPageMappingServiceImplTest {
         assertThat(deleteEvent.getValue().getType()).isEqualTo("PAGE_MAPPING_DELETED");
         assertThat(deleteRecord.getValue().getEntity()).isEqualTo(sPageMapping);
     }
+
     @Test
     public void should_delete_throw_exception() throws Exception {
         //given
@@ -217,6 +241,48 @@ public class SPageMappingServiceImplTest {
         assertThat(updateEvent.getValue().getObject()).isEqualTo(pageMapping);
         assertThat(updateEvent.getValue().getType()).isEqualTo("PAGE_MAPPING_UPDATED");
         assertThat(updateRecord.getValue().getEntity()).isEqualTo(pageMapping);
-        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", null), entry("url", "myNewUrl"), entry("urlAdapter", "urlAdapter"), entry("lastUpdatedBy",0L));
+        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", null), entry("url", "myNewUrl"), entry("urlAdapter", "urlAdapter"), entry("lastUpdatedBy", 0L));
+    }
+
+    @Test
+    public void should_resolveUrl_return_page_id() throws Exception {
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        pageMapping.setPageId(56l);
+
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable>emptyMap());
+
+        assertThat(sPageURL.getPageId()).isEqualTo(56l);
+        assertThat(sPageURL.getUrl()).isEqualTo(null);
+    }
+
+    @Test
+    public void should_resolveUrl_return_url_with_no_adapter() throws Exception {
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        pageMapping.setUrl("theUrl");
+
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable>emptyMap());
+
+        assertThat(sPageURL.getPageId()).isEqualTo(null);
+        assertThat(sPageURL.getUrl()).isEqualTo("theUrl");
+    }
+
+    @Test
+    public void should_resolveUrl_return_url_should_execute_adapter() throws Exception {
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        pageMapping.setUrl("theUrl");
+        pageMapping.setUrlAdapter("testAdapter");
+
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable>singletonMap("test", "test"));
+
+        assertThat(sPageURL.getPageId()).isEqualTo(null);
+        assertThat(sPageURL.getUrl()).isEqualTo("theUrl_adapted_1");/* 1 is the map size */
+    }
+    @Test(expected = SExecutionException.class)
+    public void should_resolveUrl_with_unknown_adapter() throws Exception {
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        pageMapping.setUrl("theUrl");
+        pageMapping.setUrlAdapter("unknown");
+
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable>singletonMap("test", "test"));
     }
 }
