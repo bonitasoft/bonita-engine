@@ -115,6 +115,10 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" />
+				<entry key="org.bonitasoft.engine.page.SPage" value="org.bonitasoft.engine.page.impl.SPageImpl" />
+				<entry key="org.bonitasoft.engine.page.SPageContent" value="org.bonitasoft.engine.page.impl.SPageContentImpl" />
+				<entry key="org.bonitasoft.engine.page.SPageWithContent" value="org.bonitasoft.engine.page.impl.SPageWithContentImpl" />
+				<entry key="org.bonitasoft.engine.page.SPageMapping" value="org.bonitasoft.engine.page.impl.SPageMappingImpl" />
 
 				<!-- bpm -->
 				<entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" />
@@ -290,6 +294,7 @@
 				<ref bean="hbm-bos-supervisor-mapping" />
 				<ref bean="hbm-bos-external-identity-mapping" />
 				<ref bean="hbm-bos-form-mapping-model" />
+				<ref bean="hbm-bos-page-model" />
 			</list>
 		</property>
 		<!-- L2 cache -->
