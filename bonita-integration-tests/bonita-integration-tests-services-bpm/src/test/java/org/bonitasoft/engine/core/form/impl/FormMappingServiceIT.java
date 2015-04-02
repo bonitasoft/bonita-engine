@@ -177,7 +177,7 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
         transactionService.begin();
         SFormMapping reupdated = formMappingService.get(taskForm.getId());
-        formMappingService.update(reupdated, PAGE_NAME, null);
+        formMappingService.update(reupdated, null, page.getId());
         transactionService.complete();
 
         assertThat(reupdated.getPageMapping().getUrl()).isNull();
