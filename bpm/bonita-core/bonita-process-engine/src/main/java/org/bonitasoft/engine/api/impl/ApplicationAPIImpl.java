@@ -60,6 +60,7 @@ import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
@@ -81,33 +82,25 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     private ApplicationAPIDelegate getApplicationAPIDelegate() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationModelConverter converter = new ApplicationModelConverter();
-        final ApplicationAPIDelegate delegate = new ApplicationAPIDelegate(tenantAccessor, converter,
+        return new ApplicationAPIDelegate(getTenantAccessor(), new ApplicationModelConverter(),
                 SessionInfos.getUserIdFromSession());
-        return delegate;
     }
 
     private ApplicationPageAPIDelegate getApplicationPageAPIDelegate() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationPageModelConverter converter = new ApplicationPageModelConverter();
-        return new ApplicationPageAPIDelegate(tenantAccessor, converter, SessionInfos.getUserIdFromSession());
+        return new ApplicationPageAPIDelegate(getTenantAccessor(), new ApplicationPageModelConverter(), SessionInfos.getUserIdFromSession());
     }
 
     private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationMenuModelConverter converter = new ApplicationMenuModelConverter();
-        final ApplicationMenuCreatorValidator validator = new ApplicationMenuCreatorValidator();
-        final ApplicationMenuAPIDelegate delegate = new ApplicationMenuAPIDelegate(tenantAccessor, converter, validator,
+        return new ApplicationMenuAPIDelegate(getTenantAccessor(), new ApplicationMenuModelConverter(), new ApplicationMenuCreatorValidator(),
                 SessionInfos.getUserIdFromSession());
-        return delegate;
     }
 
     private ApplicationExporterDelegate getApplicationExporterDelegate() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        final PageService pageService = tenantAccessor.getPageService();
         final ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(),
-                applicationService, new ApplicationPageNodeConverter(tenantAccessor.getPageService()), new ApplicationMenuNodeConverter(applicationService));
+                applicationService, new ApplicationPageNodeConverter(pageService), new ApplicationMenuNodeConverter(applicationService), pageService);
         final ApplicationContainerConverter applicationContainerConverter = new ApplicationContainerConverter(applicationNodeConverter);
         final ApplicationContainerExporter applicationContainerExporter = new ApplicationContainerExporter();
         final ApplicationExporter applicationExporter = new ApplicationExporter(applicationContainerConverter, applicationContainerExporter);
@@ -116,20 +109,18 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     private ApplicationsImporter getApplicationImporter(final ApplicationImportPolicy policy) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final StrategySelector strategySelector = new StrategySelector();
-        final ApplicationContainerImporter containerImporter = new ApplicationContainerImporter();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final ApplicationPageNodeConverter applicationPageNodeConverter = new ApplicationPageNodeConverter(tenantAccessor.getPageService());
         final ApplicationMenuNodeConverter applicationMenuNodeConverter = new ApplicationMenuNodeConverter(applicationService);
-        final ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(),
-                applicationService, applicationPageNodeConverter, applicationMenuNodeConverter);
         final ApplicationPageImporter applicationPageImporter = new ApplicationPageImporter(tenantAccessor.getApplicationService(),
                 applicationPageNodeConverter);
         final ApplicationMenuImporter applicationMenuImporter = new ApplicationMenuImporter(tenantAccessor.getApplicationService(),
                 applicationMenuNodeConverter);
         final ApplicationImporter applicationImporter = new ApplicationImporter(tenantAccessor.getApplicationService(),
-                strategySelector.selectStrategy(policy), applicationNodeConverter, applicationPageImporter, applicationMenuImporter);
-        return new ApplicationsImporter(containerImporter, applicationImporter);
+                new StrategySelector().selectStrategy(policy), new ApplicationNodeConverter(tenantAccessor.getProfileService(),
+                        applicationService, applicationPageNodeConverter, applicationMenuNodeConverter, tenantAccessor.getPageService()),
+                applicationPageImporter, applicationMenuImporter);
+        return new ApplicationsImporter(new ApplicationContainerImporter(), applicationImporter);
     }
 
     @Override

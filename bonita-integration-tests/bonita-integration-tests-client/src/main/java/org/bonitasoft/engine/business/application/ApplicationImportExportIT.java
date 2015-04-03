@@ -52,12 +52,12 @@ public class ApplicationImportExportIT extends TestWithApplication {
     public void exportApplications_should_return_the_byte_content_of_xml_file_containing_selected_applications() throws Exception {
         //given
         Profile userProfile = getProfileUser();
+        Page layout = createPage("custompage_mainLayout");
 
-        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class
-                .getResourceAsStream("applications.xml"));
+        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("applications.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
 
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0");
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0", layout.getId());
         hrCreator.setDescription("This is the HR dashboard.");
         hrCreator.setIconPath("/icon.jpg");
         hrCreator.setProfileId(userProfile.getId());
