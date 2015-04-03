@@ -969,7 +969,7 @@ GO
 CREATE TABLE page (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(50) NOT NULL,
+  name NVARCHAR(512) NOT NULL,
   displayName NVARCHAR(255) NOT NULL,
   description NVARCHAR(MAX),
   installationDate NUMERIC(19, 0) NOT NULL,
@@ -979,7 +979,9 @@ CREATE TABLE page (
   lastUpdatedBy NUMERIC(19, 0) NOT NULL,
   contentName NVARCHAR(50) NOT NULL,
   content VARBINARY(MAX),
-  UNIQUE (tenantId, name),
+  contentType NVARCHAR(50) NOT NULL,
+  processDefinitionId NUMERIC(19,0),
+  UNIQUE (tenantId, name,processDefinitionId),
   PRIMARY KEY (tenantId, id)
 )
 GO

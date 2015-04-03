@@ -222,6 +222,7 @@
                 <bean class="org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver" />
                 <bean class="org.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver" />
                 <bean class="org.bonitasoft.engine.api.impl.resolver.BusinessDataProcessDependencyResolver" />
+                <bean class="org.bonitasoft.engine.api.impl.resolver.PageProcessDependencyResolver" />
             </list>
         </constructor-arg>
     </bean>

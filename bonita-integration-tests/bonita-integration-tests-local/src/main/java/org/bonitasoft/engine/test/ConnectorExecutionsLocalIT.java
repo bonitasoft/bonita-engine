@@ -13,8 +13,10 @@
  **/
 package org.bonitasoft.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -556,9 +558,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
         final List<Problem> processResolutionProblems = getProcessAPI().getProcessResolutionProblems(processDefinition.getId());
-        assertEquals(1, processResolutionProblems.size());
-        final Problem problem = processResolutionProblems.get(0);
-        assertEquals("connector", problem.getResource());
+        assertThat(processResolutionProblems).extracting("resource").contains("connector");
 
         deleteProcess(processDefinition);
     }

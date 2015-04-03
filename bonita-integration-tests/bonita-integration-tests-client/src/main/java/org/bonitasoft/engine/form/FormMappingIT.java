@@ -30,12 +30,22 @@ import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Baptiste Mesta
  */
 public class FormMappingIT extends TestWithUser {
+
+    public static final String PROCESS1_OVERVIEW_FORM = "process1OverviewForm";
+    public static final String PROCESS_2_OVERVIEW_FORM = "process2OverviewForm";
+
+    @Override
+    @Before
+    public void apiTestUtilBeforeClass() {
+        setForceToNonBlockingFormMappingToDefaultValue(false);
+    }
 
     @Test
     public void deployProcessesWithFormMappingAndUpdateThem() throws Exception {

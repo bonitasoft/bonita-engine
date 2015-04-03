@@ -66,7 +66,13 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() throws SBonitaReadException, SObjectModificationException, STransactionCreationException,
+            STransactionCommitException, STransactionRollbackException {
+        clearFormMapping();
+    }
+
+    protected void clearFormMapping() throws STransactionCreationException, SBonitaReadException, SObjectModificationException, STransactionCommitException,
+            STransactionRollbackException {
         transactionService.begin();
         for (SFormMapping sFormMapping : formMappingService.list(0, 1000)) {
             formMappingService.delete(sFormMapping);
@@ -87,6 +93,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
     @Test
     public void createAndListFormMapping() throws Exception {
+        //given
+        clearFormMapping();
         transactionService.begin();
 
         formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "INTERNAL", PAGE_NAME);

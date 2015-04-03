@@ -36,6 +36,18 @@ public class SPageBuilderImpl implements SPageBuilder {
     }
 
     @Override
+    public SPageBuilder setContentType(String contentType) {
+        page.setContentType(contentType);
+        return this;
+    }
+
+    @Override
+    public SPageBuilder setProcessDefinitionId(Long processDefinitionId) {
+        page.setProcessDefinitionId(processDefinitionId);
+        return this;
+    }
+
+    @Override
     public SPage done() {
         return page;
     }

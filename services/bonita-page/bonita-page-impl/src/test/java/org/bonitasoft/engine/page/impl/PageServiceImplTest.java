@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.page.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,11 +19,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,6 +50,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SInvalidPageTokenException;
 import org.bonitasoft.engine.page.SInvalidPageZipException;
 import org.bonitasoft.engine.page.SInvalidPageZipInconsistentException;
@@ -100,6 +103,8 @@ public class PageServiceImplTest {
     private static final int INSTALLATION_DATE_AS_LONG = 123456;
 
     private static final String PAGE_NAME = "pageName";
+    public static final long PROCESS_DEFINITION_ID = 846L;
+    public static final long USER_ID = 98989L;
 
     @Mock
     private EventService eventService;
@@ -215,6 +220,24 @@ public class PageServiceImplTest {
 
     }
 
+    @Test(expected = SObjectAlreadyExistsException.class)
+    public void should_create_page_with_processDefinitionId_throw_exception_when_name_exists() throws Exception {
+
+        // given
+        final SPageImpl newPage = new SPageImpl(PAGE_NAME, 123456, 45, true, CONTENT_NAME);
+        newPage.setContentType(SContentType.FORM);
+        newPage.setProcessDefinitionId(PROCESS_DEFINITION_ID);
+        newPage.setDisplayName("display Name");
+
+        // when
+        when(pageServiceImpl.getPageByNameAndProcessDefinitionId(PAGE_NAME, PROCESS_DEFINITION_ID)).thenReturn(newPage);
+        final byte[] validContent = validPageContent(PAGE_NAME);
+        pageServiceImpl.addPage(newPage, validContent);
+
+        // then exception
+
+    }
+
     @SuppressWarnings("unchecked")
     private byte[] validPageContent(final String pageName) throws IOException {
         return IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
@@ -323,9 +346,9 @@ public class PageServiceImplTest {
         doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
         doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
         doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_home");
-        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(12);
-        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(13);
-        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(14);
+        doReturn(new byte[]{1, 2, 3}).when(pageServiceImpl).getPageContent(12);
+        doReturn(new byte[]{1, 2, 3}).when(pageServiceImpl).getPageContent(13);
+        doReturn(new byte[]{1, 2, 3}).when(pageServiceImpl).getPageContent(14);
 
         doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
         doReturn(null).when(pageServiceImpl).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
@@ -599,6 +622,22 @@ public class PageServiceImplTest {
     }
 
     @Test
+    public void zipTest_Throws_exception() throws Exception {
+        // given
+        final byte[] content = IOUtil.zip(Collections.singletonMap("aFile.txt", "hello".getBytes()));
+        doThrow(IOException.class).when(pageServiceImpl).checkZipContainsRequiredEntries(anyMapOf(String.class, byte[].class));
+
+        //then
+        exception.expect(SInvalidPageZipInconsistentException.class);
+        exception.expectMessage("Error while reading zip file");
+
+        // when
+        pageServiceImpl.readPageZip(content, false);
+
+
+    }
+
+    @Test
     public void zipTest_Content_7_0_With_index_html_in_resources_folder() throws Exception {
         // given
         Map<String, byte[]> zipContent = Collections.singletonMap("resources/index.html", "hello".getBytes());
@@ -749,7 +788,6 @@ public class PageServiceImplTest {
 
     @Test
     public void checkPageContentIsValid_validZip() throws Exception {
-
         // given
         @SuppressWarnings("unchecked")
         final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
@@ -764,7 +802,7 @@ public class PageServiceImplTest {
     @Test
     public void should_redPageZip_call_the_internal_with_provided_false() throws SInvalidPageTokenException, SInvalidPageZipInconsistentException,
             SInvalidPageZipMissingAPropertyException, SInvalidPageZipMissingPropertiesException, SInvalidPageZipMissingIndexException {
-        byte[] content = { 0, 1, 2 };
+        byte[] content = {0, 1, 2};
         doReturn(null).when(pageServiceImpl).readPageZip(content, false);
 
         //when
@@ -774,4 +812,47 @@ public class PageServiceImplTest {
         verify(pageServiceImpl).readPageZip(content, false);
     }
 
+    @Test
+    public void should_add_page_throw_exception_when_invalid_zip() throws Exception {
+        //given
+        final SPage sPage = new SPageImpl("page", 123456, 45, true, CONTENT_NAME);
+        final byte[] badContent = "not_a_zip".getBytes();
+        doThrow(IOException.class).when(pageServiceImpl).checkZipContainsRequiredEntries(anyMapOf(String.class, byte[].class));
+
+        //then
+        exception.expect(SInvalidPageZipInconsistentException.class);
+        exception.expectMessage("Error while reading zip file");
+
+        //when
+        pageServiceImpl.addPage(sPage, badContent);
+    }
+
+    @Test
+    public void should_add_page_insertPage() throws Exception {
+        //given
+        final SPageImpl sPage = new SPageImpl("page", 123456, 45, true, CONTENT_NAME);
+        sPage.setDisplayName("displayName1");
+        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+
+        //when
+        pageServiceImpl.addPage(sPage, content);
+
+        //then
+        verify(pageServiceImpl).insertPage(sPage, content);
+    }
+
+    @Test
+    public void add_page_with_content_should_not_add_provided_page() throws Exception {
+        //given
+        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+
+        //when
+        pageServiceImpl.addPage(content, CONTENT_NAME, USER_ID);
+
+        //then
+        SPage sPage;
+        verify(pageServiceImpl).insertPage(any(SPage.class), eq(content));
+    }
 }

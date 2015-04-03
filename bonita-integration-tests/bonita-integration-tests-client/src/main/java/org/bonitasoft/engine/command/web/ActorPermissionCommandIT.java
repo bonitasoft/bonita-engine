@@ -116,8 +116,8 @@ public class ActorPermissionCommandIT extends TestWithUser {
 
             // one process has only one actorInitiator.
             final DesignProcessDefinition processDef = processDefinitionBuilder.done();
-            final ProcessDefinition processDefinition = getProcessAPI().deploy(
-                    new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef).done());
+            final ProcessDefinition processDefinition = deployProcess(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef)
+                    .done());
             getProcessAPI().addUserToActor(ACTOR_NAME1, processDefinition, user.getId());
             getProcessAPI().addUserToActor(ACTOR_NAME2, processDefinition, user.getId());
             getProcessAPI().addUserToActor(ACTOR_NAME3, processDefinition, user.getId());
@@ -156,8 +156,8 @@ public class ActorPermissionCommandIT extends TestWithUser {
         // one process has only one actorInitiator.
         final DesignProcessDefinition processDef = processDefinitionBuilder.done();
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef).done());
+        final ProcessDefinition processDefinition = deployProcess(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef)
+                .done());
         getProcessAPI().addUserToActor(ACTOR_NAME1, processDefinition, user.getId());
         getProcessAPI().addUserToActor(ACTOR_NAME2, processDefinition, user.getId());
         getProcessAPI().addUserToActor(ACTOR_NAME3, processDefinition, user.getId());

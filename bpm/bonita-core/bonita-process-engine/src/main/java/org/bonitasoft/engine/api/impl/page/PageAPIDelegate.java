@@ -182,21 +182,28 @@ public class PageAPIDelegate {
         if (pageUpdater == null || pageUpdater.getFields().isEmpty()) {
             throw new UpdateException("The pageUpdater descriptor does not contain field updates");
         }
+        final SPage sPage = constructPage(pageUpdater, userIdFromSession);
         final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
         final Map<PageUpdater.PageUpdateField, Serializable> fields = pageUpdater.getFields();
         for (final Entry<PageUpdater.PageUpdateField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {
                 case NAME:
-                    pageUpdateBuilder.updateName((String) field.getValue());
+                    pageUpdateBuilder.updateName(sPage.getName());
                     break;
                 case DISPLAY_NAME:
-                    pageUpdateBuilder.updateDisplayName((String) field.getValue());
+                    pageUpdateBuilder.updateDisplayName(sPage.getDisplayName());
                     break;
                 case DESCRIPTION:
-                    pageUpdateBuilder.updateDescription((String) field.getValue());
+                    pageUpdateBuilder.updateDescription(sPage.getDescription());
                     break;
                 case CONTENT_NAME:
-                    pageUpdateBuilder.updateContentName((String) field.getValue());
+                    pageUpdateBuilder.updateContentName(sPage.getContentName());
+                    break;
+                case CONTENT_TYPE:
+                    pageUpdateBuilder.updateContentType(sPage.getContentType());
+                    break;
+                case PROCESS_DEFINITION_ID:
+                    pageUpdateBuilder.updateProcessDefinitionId(sPage.getProcessDefinitionId());
                     break;
                 default:
                     break;
@@ -308,4 +315,15 @@ public class PageAPIDelegate {
         return new InvalidPageZipContentException(e.getMessage(), e);
     }
 
+    public Page getPageByNameAndProcessDefinition(String name, long processDefinitionId) throws PageNotFoundException {
+        try {
+            final SPage sPage = pageService.getPageByNameAndProcessDefinitionId(name,processDefinitionId);
+            if (sPage == null) {
+                throw new PageNotFoundException(name);
+            }
+            return convertToPage(sPage);
+        } catch (final SBonitaReadException e) {
+            throw new PageNotFoundException(e);
+        }
+    }
 }

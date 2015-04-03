@@ -6,40 +6,44 @@
         <filter-param name="tenantId" type="long" />
     </filter-def>
 
-    <class name="SPageImpl" table="page" polymorphism="explicit">
-        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-            <key-property name="tenantId" column="tenantId" type="long" />
-            <key-property name="id" column="id" type="long" />
-        </composite-id>
-        <property name="name" column="name" />
-        <property name="displayName" column="displayName" />
-        <property name="description" column="description" />
-        <property name="installationDate" column="installationDate" />
-        <property name="installedBy" column="installedBy" />
-        <property name="provided" column="provided" />
-        <property name="lastModificationDate" column="lastModificationDate" />
-        <property name="lastUpdatedBy" column="lastUpdatedBy" />
-        <property name="contentName" column="contentName" />
+	<class name="SPageImpl" table="page" polymorphism="explicit">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="name" column="name" />
+		<property name="displayName" column="displayName" />
+		<property name="description" column="description" />
+		<property name="installationDate" column="installationDate" />
+		<property name="installedBy" column="installedBy" />
+		<property name="provided" column="provided" />
+		<property name="lastModificationDate" column="lastModificationDate" />
+		<property name="lastUpdatedBy" column="lastUpdatedBy" />
+		<property name="contentName" column="contentName" />
+        <property name="contentType" column="contentType" />
+        <property name="processDefinitionId" column="processDefinitionId" />
         <filter name="tenantFilter" />
-    </class>
+	</class>
 
-    <class name="SPageWithContentImpl" table="page" polymorphism="explicit">
-        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-            <key-property name="tenantId" column="tenantId" type="long" />
-            <key-property name="id" column="id" type="long" />
-        </composite-id>
-        <property name="name" column="name" />
-        <property name="displayName" column="displayName" />
-        <property name="description" column="description" />
-        <property name="installationDate" column="installationDate" />
-        <property name="installedBy" column="installedBy" />
-        <property name="provided" column="provided" />
-        <property name="lastModificationDate" column="lastModificationDate" />
-        <property name="lastUpdatedBy" column="lastUpdatedBy" />
-        <property name="contentName" column="contentName" />
-        <property name="content" column="content" />
-        <filter name="tenantFilter" />
-    </class>
+	<class name="SPageWithContentImpl" table="page" polymorphism="explicit">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="name" column="name" />
+		<property name="displayName" column="displayName" />
+		<property name="description" column="description" />
+		<property name="installationDate" column="installationDate" />
+		<property name="installedBy" column="installedBy" />
+		<property name="provided" column="provided" />
+		<property name="lastModificationDate" column="lastModificationDate" />
+		<property name="lastUpdatedBy" column="lastUpdatedBy" />
+		<property name="contentName" column="contentName" />
+		<property name="content" column="content" />
+        <property name="contentType" column="contentType" />
+        <property name="processDefinitionId" column="processDefinitionId" />
+		<filter name="tenantFilter" />
+	</class>
 
     <class name="SPageContentImpl" table="page">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
