@@ -84,7 +84,7 @@ public class SPageMappingServiceImplTest {
     public void before() {
         pageMappingService = new PageMappingServiceImpl(recorder, persistenceService, sessionService, readSessionAccessor, Collections.<URLAdapter>singletonList(new URLAdapter() {
             @Override
-            public String adapt(String url, Map<String, Serializable> context) {
+            public String adapt(String url, String key, Map<String, Serializable> context) {
                 return url + "_adapted_" + context.size();
             }
 
