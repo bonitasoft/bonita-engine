@@ -158,7 +158,7 @@ public class FormMappingIT extends TestWithUser {
         PageURL p1step1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/P1/1.0/step1", Collections.<String, Serializable>emptyMap());
         assertThat(p1Instanciation.getUrl()).isEqualTo("processStartForm");
         assertThat(p1Overview.getPageId()).isNull();
-        assertThat(p1step1Instanciation.getUrl()).isEqualTo("null");
+        assertThat(p1step1Instanciation.getUrl()).isEqualTo(null);
 
 
 
