@@ -109,7 +109,6 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.form.FormMappingSearchDescriptor;
-import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCriterion;
@@ -1653,7 +1652,7 @@ public class APITestUtil extends PlatformTestUtil {
             final SearchResult<FormMapping> searchResult = getProcessConfigurationAPI().searchFormMappings(searchOptionsBuilder.done());
             final List<FormMapping> formMappings = searchResult.getResult();
             for (final FormMapping formMapping : formMappings) {
-                getProcessConfigurationAPI().updateFormMapping(formMapping.getId(), "", FormMappingTarget.URL);
+                getProcessConfigurationAPI().updateFormMapping(formMapping.getId(), "http://url.com", null);
             }
         }
     }

@@ -28,9 +28,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
@@ -86,7 +88,7 @@ public class PageAPIIT extends CommonAPIIT {
     public void should_getPage_return_the_page() throws Exception {
         // given
         final String name = generateUniquePageName(0);
-        final byte[] pageContent = createTestPageContent(INDEX_GROOVY, name, DISPLAY_NAME, PAGE_DESCRIPTION);
+        final byte[] pageContent = createTestPageContent(name, DISPLAY_NAME, PAGE_DESCRIPTION);
         final Page page = getPageAPI().createPage(
                 new PageCreator(name, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setContentType(ContentType.FORM)
                         .setProcessDefinitionId(PROCESS_DEFINITION_ID),
@@ -418,7 +420,7 @@ public class PageAPIIT extends CommonAPIIT {
     public void should_duplicates_with_same_name_and_process_definitionId_throw_exception() throws Exception {
         // given
         final String pageName = generateUniquePageName(0);
-        final byte[] bytes = createTestPageContent(INDEX_GROOVY, pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
+        final byte[] bytes = createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
         final Page page = getPageAPI().createPage(
                 new PageCreator(pageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 bytes);
@@ -523,7 +525,7 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     @Test
-    public void should_search_by_content_type() throws BonitaException {
+    public void should_search_by_content_type() throws Exception {
         // given
         final String description = PAGE_DESCRIPTION;
         final String matchingDisplayName = DISPLAY_NAME;
@@ -533,7 +535,7 @@ public class PageAPIIT extends CommonAPIIT {
         final int expectedMatchingResults = 3;
         for (int i = 0; i < expectedMatchingResults; i++) {
             final String generateUniquePageName = generateUniquePageName(i);
-            final byte[] pageContent = createTestPageContent(INDEX_GROOVY, generateUniquePageName, matchingDisplayName, description);
+            final byte[] pageContent = createTestPageContent(generateUniquePageName, matchingDisplayName, description);
             getPageAPI().createPage(
                     new PageCreator(generateUniquePageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID + i).setDescription(
                             "should be excluded from results")
@@ -547,7 +549,7 @@ public class PageAPIIT extends CommonAPIIT {
         final String anOtherName = generateUniquePageName(4);
         getPageAPI().createPage(
                 new PageCreator(anOtherName, CONTENT_NAME).setDescription("should be excluded from results").setDisplayName(noneMatchingDisplayName),
-                createTestPageContent(INDEX_GROOVY, anOtherName, noneMatchingDisplayName, "an awesome page!!!!!!!"));
+                createTestPageContent( anOtherName, noneMatchingDisplayName, "an awesome page!!!!!!!"));
 
         // when
         final SearchResult<Page> searchPages = getPageAPI().searchPages(
@@ -561,7 +563,7 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     @Test
-    public void should_search_work_on_desc_order() throws BonitaException {
+    public void should_search_work_on_desc_order() throws Exception {
         final String displayName = DISPLAY_NAME;
         final String description = PAGE_DESCRIPTION;
         final String firstPageNameInDescOrder = "custompage_zPageName";
@@ -587,5 +589,31 @@ public class PageAPIIT extends CommonAPIIT {
         assertThat(results.get(0)).isEqualToComparingFieldByField(expectedMatchingPage);
 
     }
+    private byte[] createTestPageContent(final String pageName, final String displayName, final String description)
+            throws Exception {
+        try {
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            final ZipOutputStream zos = new ZipOutputStream(baos);
+            zos.putNextEntry(new ZipEntry("Index.groovy"));
+            zos.write("return \"\";".getBytes());
 
+            zos.putNextEntry(new ZipEntry("page.properties"));
+            final StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("name=");
+            stringBuilder.append(pageName);
+            stringBuilder.append("\n");
+            stringBuilder.append("displayName=");
+            stringBuilder.append(displayName);
+            stringBuilder.append("\n");
+            stringBuilder.append("description=");
+            stringBuilder.append(description);
+            stringBuilder.append("\n");
+            zos.write(stringBuilder.toString().getBytes());
+
+            zos.closeEntry();
+            return baos.toByteArray();
+        } catch (final IOException e) {
+            throw new BonitaException(e);
+        }
+    }
 }

@@ -19,6 +19,7 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProblemImpl;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -43,13 +44,13 @@ public class PageProcessDependencyResolver implements ProcessDependencyResolver 
         List<Problem> problems = new ArrayList<>();
         try {
             problems = checkPageProcesResolution(tenantAccessor, processDefinition);
-        } catch (SBonitaReadException e) {
+        } catch (SBonitaReadException | SObjectNotFoundException e) {
             problems.add(new ProblemImpl(Problem.Level.ERROR, null, null, "unable to resolve form mapping dependencies"));
         }
         return problems;
     }
 
-    protected List<Problem> checkPageProcesResolution(TenantServiceAccessor tenantAccessor, SProcessDefinition sProcessDefinition) throws SBonitaReadException {
+    protected List<Problem> checkPageProcesResolution(TenantServiceAccessor tenantAccessor, SProcessDefinition sProcessDefinition) throws SBonitaReadException, SObjectNotFoundException {
         final List<Problem> problems = new ArrayList<>();
         final FormMappingService formMappingService = tenantAccessor.getFormMappingService();
         List<SFormMapping> formMappings;
@@ -63,15 +64,15 @@ public class PageProcessDependencyResolver implements ProcessDependencyResolver 
     }
 
     private void checkFormMappingResolution(TenantServiceAccessor tenantAccessor, SFormMapping formMapping, long processDefinitionId, List<Problem> problems)
-            throws SBonitaReadException {
+            throws SBonitaReadException, SObjectNotFoundException {
         if (isMappingRelatedToCustomPage(formMapping)) {
-            final String pageName = formMapping.getForm();
-            addProblemIfPageIsNotFound(tenantAccessor, formMapping, processDefinitionId, problems, pageName);
+            final Long pageId = formMapping.getPageMapping().getPageId();
+            addProblemIfPageIsNotFound(tenantAccessor, formMapping, processDefinitionId, problems, pageId);
         }
     }
 
-    private void addProblemIfPageIsNotFound(TenantServiceAccessor tenantAccessor, SFormMapping formMapping, long processDefinitionId, List<Problem> problems, String pageName) throws SBonitaReadException {
-        if (pageName == null || tenantAccessor.getPageService().getPageByNameAndProcessDefinitionId(pageName, processDefinitionId) == null) {
+    private void addProblemIfPageIsNotFound(TenantServiceAccessor tenantAccessor, SFormMapping formMapping, long processDefinitionId, List<Problem> problems, Long pageId) throws SBonitaReadException, SObjectNotFoundException {
+        if (pageId == null || tenantAccessor.getPageService().getPage(pageId) == null) {
             addProblem(formMapping, processDefinitionId, problems);
         }
     }
