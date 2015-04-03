@@ -13,9 +13,8 @@
  **/
 package org.bonitasoft.engine.business.application.xml;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
+import static org.bonitasoft.engine.business.application.xml.ApplicationNodeContainerAssert.assertThat;
 
 import org.junit.Test;
 
@@ -26,10 +25,27 @@ public class ApplicationNodeContainerTest {
         //given
         ApplicationNodeContainer container = new ApplicationNodeContainer();
 
+        //then
+        assertThat(container).hasNoApplications();
+    }
+
+    @Test
+    public void addApplication_should_add_new_entry_to_application_list() throws Exception {
+        //given
+        ApplicationNode app1 = new ApplicationNode();
+        app1.setToken("app1");
+
+        ApplicationNode app2 = new ApplicationNode();
+        app2.setToken("app2");
+
+        ApplicationNodeContainer container = new ApplicationNodeContainer();
+
         //when
-        List<ApplicationNode> applications = container.getApplications();
+        container.addApplication(app1);
+        container.addApplication(app2);
 
         //then
-        assertThat(applications).isEmpty();
+        assertThat(container).hasApplications(app1, app2);
+
     }
 }
