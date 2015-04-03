@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Map;
 
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -24,6 +25,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -74,16 +76,16 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     }
 
     @Override
-    public PageURL resolvePageOrURL(String key) throws NotFoundException {
+    public PageURL resolvePageOrURL(String key, Map<String,Serializable> context) throws NotFoundException, ExecutionException {
         PageMappingService pageMappingService = getTenantAccessor().getPageMappingService();
         try {
-            return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), Collections.<String, Serializable>emptyMap()));//TODO add context
+            return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context));
         } catch (SObjectNotFoundException e) {
             throw new NotFoundException(e);
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (SExecutionException e) {
-            throw new RetrieveException(e);//TODO add exception
+            throw new ExecutionException(e);
         }
     }
 

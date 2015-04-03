@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -28,7 +27,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingKeyGenerator;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
-import org.bonitasoft.engine.core.form.URLAdapter;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
@@ -37,6 +35,7 @@ import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
+import org.bonitasoft.engine.page.URLAdapter;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -72,7 +71,7 @@ public class FormMappingServiceImpl implements FormMappingService {
     private final FormMappingKeyGenerator formMappingKeyGenerator;
 
     public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
-                                  ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService, FormMappingKeyGenerator formMappingKeyGenerator) {
+                                  ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService, FormMappingKeyGenerator formMappingKeyGenerator, List<URLAdapter> urlAdapters) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
@@ -80,6 +79,9 @@ public class FormMappingServiceImpl implements FormMappingService {
         this.pageMappingService = pageMappingService;
         this.pageService = pageService;
         this.formMappingKeyGenerator = formMappingKeyGenerator;
+        for (URLAdapter urlAdapter : urlAdapters) {
+            this.pageMappingService.addUrlAdapter(urlAdapter);
+        }
     }
 
     @Override
@@ -113,11 +115,6 @@ public class FormMappingServiceImpl implements FormMappingService {
     Long getPageIdOrNull(String form) throws SBonitaReadException {
         SPage pageByName = pageService.getPageByName(form);
         return pageByName == null ? null : pageByName.getId();
-    }
-
-    private String generateKey() {
-        // FIXME
-        return UUID.randomUUID().toString();
     }
 
     private void insertFormMapping(SFormMappingImpl sFormMapping, SPageMapping sPageMapping) throws SObjectCreationException {

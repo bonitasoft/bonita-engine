@@ -29,6 +29,8 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  */
 public interface PageMappingService {
 
+    void addUrlAdapter(URLAdapter urlAdapter);
+
     /**
      * @param key the key used to retrieve the mapping
      * @param pageId the id of the custom page

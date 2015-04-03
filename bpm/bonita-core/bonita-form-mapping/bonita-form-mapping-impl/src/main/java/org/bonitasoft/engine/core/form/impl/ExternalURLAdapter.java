@@ -17,7 +17,8 @@ package org.bonitasoft.engine.core.form.impl;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.core.form.URLAdapter;
+import org.bonitasoft.engine.page.URLAdapter;
+
 
 /**
  * @author Baptiste Mesta

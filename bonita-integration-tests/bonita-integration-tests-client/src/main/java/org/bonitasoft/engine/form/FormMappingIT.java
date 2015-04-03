@@ -16,6 +16,8 @@ package org.bonitasoft.engine.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 
 import org.bonitasoft.engine.TestWithUser;
@@ -24,6 +26,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -147,10 +150,23 @@ public class FormMappingIT extends TestWithUser {
         assertThat(updatedStep2Form1.getLastUpdatedBy()).isEqualTo(user.getId());
         assertThat(step2Form1.getLastUpdateDate()).isNull();
 
+
+
+        //resolve urls:
+        PageURL p1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("process/P1/1.0", Collections.<String, Serializable>emptyMap());
+        PageURL p1Overview= getProcessConfigurationAPI().resolvePageOrURL("processInstance/P1/1.0", Collections.<String, Serializable>emptyMap());
+        PageURL p1step1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/P1/1.0/step1", Collections.<String, Serializable>emptyMap());
+        assertThat(p1Instanciation.getUrl()).isEqualTo("processStartForm");
+        assertThat(p1Overview.getPageId()).isNull();
+        assertThat(p1step1Instanciation.getUrl()).isEqualTo("null");
+
+
+
         getProcessAPI().deleteProcessDefinition(p1.getId());
         getProcessAPI().deleteProcessDefinition(p2.getId());
         assertThat(
                 processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).done())
                         .getResult()).isEmpty();
+
     }
 }

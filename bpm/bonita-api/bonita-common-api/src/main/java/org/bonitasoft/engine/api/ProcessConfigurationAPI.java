@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.io.Serializable;
+import java.util.Map;
+
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
@@ -52,7 +56,7 @@ public interface ProcessConfigurationAPI {
      * @see PageURL the structured PageURL that points to the Page or URL
      */
     //TODO add something like a boolean to ask if we check for secu or not if we get only web resources
-    PageURL resolvePageOrURL(String key) throws NotFoundException, UnauthorizedAccessException;
+    PageURL resolvePageOrURL(String key, Map<String,Serializable> context) throws NotFoundException, UnauthorizedAccessException, ExecutionException;
 
     /**
      * Update a form mapping with the given values

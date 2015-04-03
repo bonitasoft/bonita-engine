@@ -61,6 +61,11 @@ public class PageMappingServiceImpl implements PageMappingService {
     private final Map<String, URLAdapter> urlAdapterMap;
 
     public PageMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
+                                  ReadSessionAccessor sessionAccessor) {
+        this(recorder, persistenceService, sessionService, sessionAccessor, Collections.<URLAdapter>emptyList());
+    }
+
+    public PageMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
                                   ReadSessionAccessor sessionAccessor, List<URLAdapter> urlAdapters) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
@@ -70,6 +75,11 @@ public class PageMappingServiceImpl implements PageMappingService {
         for (URLAdapter urlAdapter : urlAdapters) {
             urlAdapterMap.put(urlAdapter.getId(), urlAdapter);
         }
+    }
+
+    @Override
+    public void addUrlAdapter(URLAdapter urlAdapter) {
+        urlAdapterMap.put(urlAdapter.getId(), urlAdapter);
     }
 
     @Override
