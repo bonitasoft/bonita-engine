@@ -12,17 +12,17 @@ import com.bonitasoft.engine.page.Page;
 
 /**
  * @author laurent Leseigneur
- * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.impl.PageImpl} instead.
- * @see org.bonitasoft.engine.impl.PageImpl
+ * @deprecated from version 7.0 on, use {@link org.bonitasoft.engine.page.impl.PageImpl} instead.
+ * @see org.bonitasoft.engine.page.impl.PageImpl
  */
 @Deprecated
-public class PageImpl extends org.bonitasoft.engine.impl.PageImpl implements Page {
+public class PageImpl extends org.bonitasoft.engine.page.impl.PageImpl implements Page {
 
     private static final long serialVersionUID = 5785414687043871169L;
 
     public PageImpl(org.bonitasoft.engine.page.Page page) {
         super(page.getId(), page.getName(), page.getDisplayName(), page.isProvided(), page.getDescription(), page.getInstallationDate().getTime(), page
-                .getInstalledBy(), page.getLastModificationDate().getTime(), page.getLastUpdatedBy(), page.getContentName());
+                .getInstalledBy(), page.getLastModificationDate().getTime(), page.getLastUpdatedBy(), page.getContentName(), page.getContentType(), page.getProcessDefinitionId());
     }
 
 }
