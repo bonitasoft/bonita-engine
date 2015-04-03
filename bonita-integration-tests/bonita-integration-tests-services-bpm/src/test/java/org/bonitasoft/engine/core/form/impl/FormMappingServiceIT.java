@@ -30,6 +30,7 @@ import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.page.URLAdapterConstants;
 import org.bonitasoft.engine.test.CommonTestUtil;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
@@ -103,7 +104,7 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
                 FormMappingType.PROCESS_OVERVIEW.getId());
         assertThat(list).extracting("task").containsExactly("step1", null, null);
         assertThat(list).extracting("pageMapping.url").containsExactly(null, "http://bit.coin", null);
-        assertThat(list).extracting("pageMapping.urlAdapter").containsExactly(null, FormMappingServiceImpl.EXTERNAL_URL_ADAPTER, FormMappingServiceImpl.LEGACY_URL_ADAPTER);
+        assertThat(list).extracting("pageMapping.urlAdapter").containsExactly(null, URLAdapterConstants.EXTERNAL_URL_ADAPTER, URLAdapterConstants.LEGACY_URL_ADAPTER);
         assertThat(list).extracting("pageMapping.pageId").containsExactly(page.getId(), null, null);
         //        assertThat(list).extracting("pageMapping.key").containsExactly();
         assertThat(listAll).extracting("type").containsExactly(FormMappingType.TASK.getId(), FormMappingType.PROCESS_START.getId(),

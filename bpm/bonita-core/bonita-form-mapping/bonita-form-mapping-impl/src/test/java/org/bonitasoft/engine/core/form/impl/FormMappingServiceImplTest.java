@@ -56,6 +56,8 @@ public class FormMappingServiceImplTest {
     private static final long PROCESS_DEFINITION_ID = 456123l;
     private static final long ID = 154l;
     private static final Long PAGE_ID = 554l;
+    public static final String EXTERNAL = "external";
+    private static final String LEGACY = "legacy";
     @Mock
     private Recorder recorder;
     @Mock
@@ -81,6 +83,7 @@ public class FormMappingServiceImplTest {
 
     @Before
     public void before() throws Exception {
+        formMappingService = new FormMappingServiceImpl(recorder,persistenceService,sessionService, sessionAccessor, pageMappingService, pageService, formMappingKeyGenerator, EXTERNAL, LEGACY);
         doThrow(SObjectNotFoundException.class).when(pageService).getPage(anyLong());
         doReturn(new SPageImpl("myPage", 0, 0, false, "page.zip")).when(pageService).getPage(PAGE_ID);
     }
@@ -118,7 +121,7 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, "http://fake.url", null);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", "http://fake.url"), entry("pageMapping.pageId", null), entry("pageMapping.urlAdapter", FormMappingServiceImpl.EXTERNAL_URL_ADAPTER));
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", "http://fake.url"), entry("pageMapping.pageId", null), entry("pageMapping.urlAdapter", EXTERNAL));
     }
 
     private SFormMapping createFormMapping(long id) {

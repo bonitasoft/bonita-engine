@@ -12,18 +12,18 @@
  * Floor, Boston, MA 02110-1301, USA.
  **/
 
-package org.bonitasoft.engine.core.form.impl;
+package org.bonitasoft.engine.core.form;
 
 import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.page.URLAdapter;
-
+import org.bonitasoft.engine.page.URLAdapterConstants;
 
 /**
  * @author Baptiste Mesta
  */
-public class ExternalURLAdapter implements URLAdapter {
+public class LegacyURLAdapter implements URLAdapter {
     @Override
     public String adapt(String url, String key, Map<String, Serializable> context) {
         return url;
@@ -31,6 +31,6 @@ public class ExternalURLAdapter implements URLAdapter {
 
     @Override
     public String getId() {
-        return FormMappingServiceImpl.EXTERNAL_URL_ADAPTER;
+        return URLAdapterConstants.LEGACY_URL_ADAPTER;
     }
 }

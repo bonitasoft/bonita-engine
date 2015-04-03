@@ -35,7 +35,6 @@ import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.page.SPageMapping;
-import org.bonitasoft.engine.page.URLAdapter;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -59,8 +58,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 public class FormMappingServiceImpl implements FormMappingService {
 
     public static final String FORM_MAPPING = "FORM_MAPPING";
-    public static final String LEGACY_URL_ADAPTER = "legacy";
-    public static final String EXTERNAL_URL_ADAPTER = "external";
 
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
@@ -69,9 +66,12 @@ public class FormMappingServiceImpl implements FormMappingService {
     private final PageMappingService pageMappingService;
     private final PageService pageService;
     private final FormMappingKeyGenerator formMappingKeyGenerator;
+    private final String externalUrlAdapter;
+    private final String legacyUrlAdapter;
 
     public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
-                                  ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService, FormMappingKeyGenerator formMappingKeyGenerator) {
+                                  ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService,
+                                  FormMappingKeyGenerator formMappingKeyGenerator, String externalUrlAdapter, String legacyUrlAdapter) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
@@ -79,6 +79,8 @@ public class FormMappingServiceImpl implements FormMappingService {
         this.pageMappingService = pageMappingService;
         this.pageService = pageService;
         this.formMappingKeyGenerator = formMappingKeyGenerator;
+        this.externalUrlAdapter = externalUrlAdapter;
+        this.legacyUrlAdapter = legacyUrlAdapter;
     }
 
     @Override
@@ -94,10 +96,10 @@ public class FormMappingServiceImpl implements FormMappingService {
                     sPageMapping = pageMappingService.create(key, getPageIdOrNull(form));
                     break;
                 case SFormMapping.TARGET_URL:
-                    sPageMapping = pageMappingService.create(key, form, EXTERNAL_URL_ADAPTER);
+                    sPageMapping = pageMappingService.create(key, form, externalUrlAdapter);
                     break;
                 case SFormMapping.TARGET_LEGACY:
-                    sPageMapping = pageMappingService.create(key, null, LEGACY_URL_ADAPTER);
+                    sPageMapping = pageMappingService.create(key, null, legacyUrlAdapter);
                     break;
                 default:
                     throw new IllegalArgumentException("Illegal form target " + target);
@@ -139,7 +141,7 @@ public class FormMappingServiceImpl implements FormMappingService {
             if (url.isEmpty()) {
                 throw new SObjectModificationException("Can't have an empty url");
             }
-            urlAdapter = EXTERNAL_URL_ADAPTER;
+            urlAdapter = externalUrlAdapter;
         }
         if (pageId != null) {
             try {
