@@ -24,7 +24,7 @@ import org.bonitasoft.engine.page.URLAdapter;
  */
 public class LegacyURLAdapter implements URLAdapter {
     @Override
-    public String adapt(String url, Map<String, Serializable> context) {
+    public String adapt(String url, String key, Map<String, Serializable> context) {
         return url;
     }
 

@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 
 package org.bonitasoft.engine.page;
 
@@ -24,18 +24,16 @@ public interface URLAdapter {
 
 
     /**
-     *  adapt an url based on a context
-     * @param url
-     *      the base url
-     * @param context
-     *      the provided context
-     * @return
-     *      the new url
+     * adapt an url based on a context
+     *
+     * @param url     the base url
+     * @param key     the url key
+     * @param context the provided context
+     * @return the new url
      */
-    String adapt(String url, Map<String, Serializable> context);
+    String adapt(String url, String key, Map<String, Serializable> context);
 
     /**
-     *
      * @return the identifier for this url adapter
      */
     String getId();
