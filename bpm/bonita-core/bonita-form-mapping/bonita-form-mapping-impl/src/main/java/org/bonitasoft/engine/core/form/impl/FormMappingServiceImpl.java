@@ -71,7 +71,7 @@ public class FormMappingServiceImpl implements FormMappingService {
     private final FormMappingKeyGenerator formMappingKeyGenerator;
 
     public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
-                                  ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService, FormMappingKeyGenerator formMappingKeyGenerator, List<URLAdapter> urlAdapters) {
+                                  ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService, FormMappingKeyGenerator formMappingKeyGenerator) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
@@ -79,9 +79,6 @@ public class FormMappingServiceImpl implements FormMappingService {
         this.pageMappingService = pageMappingService;
         this.pageService = pageService;
         this.formMappingKeyGenerator = formMappingKeyGenerator;
-        for (URLAdapter urlAdapter : urlAdapters) {
-            this.pageMappingService.addUrlAdapter(urlAdapter);
-        }
     }
 
     @Override

@@ -52,6 +52,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -78,11 +79,12 @@ public class SPageMappingServiceImplTest {
     private ReadSessionAccessor readSessionAccessor;
 
 
+    @InjectMocks
     private PageMappingServiceImpl pageMappingService;
 
     @Before
     public void before() {
-        pageMappingService = new PageMappingServiceImpl(recorder, persistenceService, sessionService, readSessionAccessor, Collections.<URLAdapter>singletonList(new URLAdapter() {
+        URLAdapter urlAdapter = new URLAdapter() {
             @Override
             public String adapt(String url, String key, Map<String, Serializable> context) {
                 return url + "_adapted_" + context.size();
@@ -92,7 +94,8 @@ public class SPageMappingServiceImplTest {
             public String getId() {
                 return "testAdapter";
             }
-        }));
+        };
+        pageMappingService.setURLAdapters(Collections.singletonList(urlAdapter));
     }
 
 

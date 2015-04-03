@@ -59,27 +59,22 @@ public class PageMappingServiceImpl implements PageMappingService {
     private final SessionService sessionService;
     private final ReadSessionAccessor sessionAccessor;
     private final Map<String, URLAdapter> urlAdapterMap;
+    private List<URLAdapter> urlAdapters;
 
     public PageMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
                                   ReadSessionAccessor sessionAccessor) {
-        this(recorder, persistenceService, sessionService, sessionAccessor, Collections.<URLAdapter>emptyList());
-    }
-
-    public PageMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
-                                  ReadSessionAccessor sessionAccessor, List<URLAdapter> urlAdapters) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         urlAdapterMap = new HashMap<>();
+    }
+
+    public void setURLAdapters(List<URLAdapter> urlAdapters) {
+        this.urlAdapters = urlAdapters;
         for (URLAdapter urlAdapter : urlAdapters) {
             urlAdapterMap.put(urlAdapter.getId(), urlAdapter);
         }
-    }
-
-    @Override
-    public void addUrlAdapter(URLAdapter urlAdapter) {
-        urlAdapterMap.put(urlAdapter.getId(), urlAdapter);
     }
 
     @Override

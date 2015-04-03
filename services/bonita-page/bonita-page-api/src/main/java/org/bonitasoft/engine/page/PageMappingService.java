@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.page;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
@@ -29,7 +30,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  */
 public interface PageMappingService {
 
-    void addUrlAdapter(URLAdapter urlAdapter);
+
 
     /**
      * @param key the key used to retrieve the mapping
