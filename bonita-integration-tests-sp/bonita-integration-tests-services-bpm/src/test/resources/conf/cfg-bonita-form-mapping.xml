@@ -18,10 +18,10 @@
     <!-- auto wired by the page mapping service -->
     <bean class="org.bonitasoft.engine.core.form.LegacyURLAdapter">
         <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
-		<constructor-arg name="processInstanceService" ref="processInstanceService" />
-		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
-		<constructor-arg name="formMappingService" ref="formMappingService" />
+        <constructor-arg name="formMappingService" ref="formMappingService" />
     </bean>
-    <bean class="org.bonitasoft.engine.core.form.ExternalURLAdapter" />
+    <bean class="com.bonitasoft.engine.core.form.ExternalURLAdapterExt">
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+    </bean>
 
 </beans>

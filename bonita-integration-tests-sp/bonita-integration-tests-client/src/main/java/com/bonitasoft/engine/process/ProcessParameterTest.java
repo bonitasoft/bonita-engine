@@ -8,31 +8,32 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.bonitasoft.engine.CommonAPISPIT;
+import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
+import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
+import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
+import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.process.impl.ParameterDefinitionBuilder;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
-import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -42,7 +43,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -52,13 +52,6 @@ import org.bonitasoft.engine.process.ProcessManagementIT;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.bonitasoft.engine.CommonAPISPIT;
-import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
-import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
-import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
-import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 public class ProcessParameterTest extends CommonAPISPIT {
 
@@ -134,7 +127,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         params.put("bee", "busy");
         businessArchive.setParameters(params);
 
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
+        final ProcessDefinition definition = deployProcess(businessArchive.done());
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
         getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", "sleepy");
@@ -155,7 +148,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
+        final ProcessDefinition definition = deployProcess(businessArchive.done());
         getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", "sleepy");
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
@@ -217,7 +210,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         params.put("bear", "bos");
         businessArchive.setParameters(params);
 
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
+        final ProcessDefinition definition = deployProcess(businessArchive.done());
         ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ConfigurationState.RESOLVED, deploymentInfo.getConfigurationState());
 
@@ -245,7 +238,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         processDefinitionBuilder.addParameter(paraName1, String.class.getCanonicalName());
         processDefinitionBuilder.addParameter(paraName2, Integer.class.getCanonicalName());
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
         final long pDefinitionId = processDefinition.getId();
         getProcessAPI().importParameters(pDefinitionId, parametersXML);
@@ -311,7 +304,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         disableAndDeleteProcess(processDefinition);
 
         final BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(baiStream);
-        final ProcessDefinition processDef = getProcessAPI().deploy(businessArchive);
+        final ProcessDefinition processDef = deployProcess(businessArchive);
         final long processDefinitionId = processDef.getId();
         getProcessAPI().enableProcess(processDefinitionId);
         processInstance = getProcessAPI().startProcess(processDefinitionId);
