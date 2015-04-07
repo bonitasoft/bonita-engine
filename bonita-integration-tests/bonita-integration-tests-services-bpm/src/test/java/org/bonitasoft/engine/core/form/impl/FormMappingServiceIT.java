@@ -57,8 +57,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     public void setup() throws Exception {
         processDefinitionService = getServicesBuilder().getProcessDefinitionService();
         transactionService.begin();
-        p1 = processDefinitionService.store(new SProcessDefinitionImpl("P1", "1.0"), "diplsay", "display");
-        p2 = processDefinitionService.store(new SProcessDefinitionImpl("P2", "1.0"), "diplsay", "display");
+        p1 = processDefinitionService.store(new SProcessDefinitionImpl("P1", "1.0"), "display", "display");
+        p2 = processDefinitionService.store(new SProcessDefinitionImpl("P2", "1.0"), "display", "display");
         page = pageService.addPage(
                 CommonTestUtil.createTestPageContent(PAGE_NAME, "coucou depuis la page", "C'était juste pour dire coucou"), "mySuperPage.zip",
                 54L);
@@ -92,7 +92,6 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void createAndListFormMapping() throws Exception {
         //given
-        clearFormMapping();
         transactionService.begin();
 
         formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "INTERNAL", PAGE_NAME);
@@ -126,6 +125,19 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
 
         transactionService.begin();
         SFormMapping sFormMapping = formMappingService.get(taskForm.getId());
+        SFormMapping sFormMappingByProperties = formMappingService.get(p1.getId(), FormMappingType.TASK.getId(), "step1");
+        transactionService.complete();
+        assertThat(sFormMapping).isEqualTo(taskForm).isEqualTo(sFormMappingByProperties);
+    }
+
+    @Test
+    public void create_and_get_by_key_FormMapping() throws Exception {
+        transactionService.begin();
+        SFormMapping taskForm = formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "URL", "http://bit.coin");
+        transactionService.complete();
+
+        transactionService.begin();
+        SFormMapping sFormMapping = formMappingService.get(taskForm.getPageMapping().getKey());
         SFormMapping sFormMappingByProperties = formMappingService.get(p1.getId(), FormMappingType.TASK.getId(), "step1");
         transactionService.complete();
         assertThat(sFormMapping).isEqualTo(taskForm).isEqualTo(sFormMappingByProperties);

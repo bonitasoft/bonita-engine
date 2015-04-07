@@ -16,18 +16,63 @@ package org.bonitasoft.engine.core.form;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.page.URLAdapter;
 import org.bonitasoft.engine.page.URLAdapterConstants;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 
 /**
- * @author Baptiste Mesta
+ * @author Baptiste Mesta, Anthony Birembaut
  */
 public class ExternalURLAdapter implements URLAdapter {
+	
+    private static final String PARAM_TAG = "?";
+
+    private static final String HASH_TAG = "#";
+    
     @Override
-    public String adapt(String url, String key, Map<String, Serializable> context) {
-        return url;
+    public String adapt(String url, String key, Map<String, Serializable> context) throws SExecutionException {
+		@SuppressWarnings("unchecked")
+		final Map<String, String[]> queryParameters = (Map<String, String[]>) context.get(URLAdapterConstants.QUERY_PARAMETERS);
+        final String[] split = url.split(HASH_TAG);
+        StringBuffer newURL = new StringBuffer(split[0]);
+        final StringBuffer hashParameters = new StringBuffer();
+        if (url.contains(HASH_TAG)) {
+            hashParameters.append(HASH_TAG);
+            hashParameters.append(split[1]);
+        }
+        appendParameters(newURL, queryParameters);
+        newURL.append(hashParameters);
+        return newURL.toString();
+    }
+    
+    protected void appendParameters(StringBuffer newURL, final Map<String, String[]> parameters) throws SExecutionException {
+    	for (Entry<String, String[]> parameterEntry : parameters.entrySet()) {
+            appendParameter(newURL, parameterEntry.getKey(), parameterEntry.getValue());
+		}
+    }
+    
+    protected void appendParameter(final StringBuffer newURL, final String key, final String[] value) {
+        appendSeparator(newURL, PARAM_TAG);
+        newURL.append(key).append("=");
+        for (int i = 0; i < value.length; i++) {
+			if (i > 0) {
+				newURL.append(",");
+			}
+			newURL.append(value[i]);
+		}
+    }
+    
+    protected void appendSeparator(final StringBuffer buffer, final String initialSeparator) {
+        if (buffer.indexOf(initialSeparator) != -1) {
+            buffer.append("&");
+        } else {
+            buffer.append(initialSeparator);
+        }
     }
 
     @Override

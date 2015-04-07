@@ -34,6 +34,8 @@ public interface FormMappingService {
 
     SFormMapping get(long formMappingId) throws SBonitaReadException, SObjectNotFoundException;
 
+    SFormMapping get(String key) throws SBonitaReadException, SObjectNotFoundException;
+
     SFormMapping get(long processDefinitionId, Integer type, String task) throws SBonitaReadException, SObjectNotFoundException;
 
     SFormMapping get(long processDefinitionId, Integer type) throws SBonitaReadException, SObjectNotFoundException;

@@ -23,7 +23,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -50,7 +49,8 @@ public class PageProcessDependencyResolver implements ProcessDependencyResolver 
         return problems;
     }
 
-    protected List<Problem> checkPageProcesResolution(TenantServiceAccessor tenantAccessor, SProcessDefinition sProcessDefinition) throws SBonitaReadException, SObjectNotFoundException {
+    protected List<Problem> checkPageProcesResolution(TenantServiceAccessor tenantAccessor, SProcessDefinition sProcessDefinition) throws SBonitaReadException,
+            SObjectNotFoundException {
         final List<Problem> problems = new ArrayList<>();
         final FormMappingService formMappingService = tenantAccessor.getFormMappingService();
         List<SFormMapping> formMappings;
@@ -71,7 +71,8 @@ public class PageProcessDependencyResolver implements ProcessDependencyResolver 
         }
     }
 
-    private void addProblemIfPageIsNotFound(TenantServiceAccessor tenantAccessor, SFormMapping formMapping, long processDefinitionId, List<Problem> problems, Long pageId) throws SBonitaReadException, SObjectNotFoundException {
+    private void addProblemIfPageIsNotFound(TenantServiceAccessor tenantAccessor, SFormMapping formMapping, long processDefinitionId, List<Problem> problems,
+            Long pageId) throws SBonitaReadException, SObjectNotFoundException {
         if (pageId == null || tenantAccessor.getPageService().getPage(pageId) == null) {
             addProblem(formMapping, processDefinitionId, problems);
         }
@@ -82,6 +83,6 @@ public class PageProcessDependencyResolver implements ProcessDependencyResolver 
     }
 
     private boolean isMappingRelatedToCustomPage(SFormMapping formMapping) {
-        return FormMappingTarget.INTERNAL.name().equals(formMapping.getTarget());
+        return (formMapping.getPageMapping()!=null);
     }
 }

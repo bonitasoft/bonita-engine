@@ -17,6 +17,8 @@ package org.bonitasoft.engine.page;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+
 /**
  * @author Baptiste Mesta
  */
@@ -30,8 +32,9 @@ public interface URLAdapter {
      * @param key     the url key
      * @param context the provided context
      * @return the new url
+     * @throws SExecutionException when the URL rewriting fails
      */
-    String adapt(String url, String key, Map<String, Serializable> context);
+    String adapt(String url, String key, Map<String, Serializable> context) throws SExecutionException;
 
     /**
      * @return the identifier for this url adapter

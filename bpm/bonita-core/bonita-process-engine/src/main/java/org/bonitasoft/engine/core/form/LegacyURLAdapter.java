@@ -15,84 +15,105 @@
 package org.bonitasoft.engine.core.form;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.URLAdapter;
 import org.bonitasoft.engine.page.URLAdapterConstants;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.search.impl.SearchFilter;
 
 /**
  * @author Baptiste Mesta, Anthony Birembaut
  */
 public class LegacyURLAdapter implements URLAdapter {
+	
+	private static final String UUID_SEPERATOR = "--";
 
 	ProcessDefinitionService processDefinitionService;
-
-	FlowNodeInstanceService flowNodeInstanceService;
-
-	ProcessInstanceService processInstanceService;
 	
 	FormMappingService formMappingService;
 
-	public LegacyURLAdapter(ProcessDefinitionService processDefinitionService,
-			ProcessInstanceService processInstanceService,
-			FlowNodeInstanceService flowNodeInstanceService, FormMappingService formMappingService) {
+	public LegacyURLAdapter(final ProcessDefinitionService processDefinitionService, final FormMappingService formMappingService) {
 		this.processDefinitionService = processDefinitionService;
-		this.processInstanceService = processInstanceService;
-		this.flowNodeInstanceService = flowNodeInstanceService;
 		this.formMappingService = formMappingService;
 	}
 
 	@Override
-	public String adapt(String url, String key,
-			Map<String, Serializable> context) {
+	public String adapt(final String url, final String key, final Map<String, Serializable> context) throws SExecutionException {
 		@SuppressWarnings("unchecked")
-		Map<String, String[]> queryParameters = (Map<String, String[]>) context.get(URLAdapterConstants.QUERY_PARAMETERS);
-//		QueryOptions queryOptions = new QueryOptions(0, 1);
-//        final List<FilterOption> filterOptions = new ArrayList<FilterOption>();
-//        filterOptions.add(arg0)
-//		formMappingService.searchFormMappings(queryOptions);
-//		
-//		final StringBuilder legacyFormURL = new StringBuilder(
-//				(String) context.get(URLAdapterConstants.CONTEXT_PATH));
-//		legacyFormURL
-//				.append("/portal/homepage?ui=form&locale=")
-//
-//				.append((String) context.get(URLAdapterConstants.LOCALE))
-//				.append("&theme=")
-//				.append(processDefinitionId)
-//				.append("#mode=form&form=")
-//				.append(URLEncoder.encode(processFormService
-//						.getProcessDefinitionUUID(apiSession,
-//								processDefinitionId), "UTF-8"));
-//		if (taskInstanceId != -1L) {
-//			legacyFormURL.append(ProcessFormService.UUID_SEPERATOR)
-//					.append(URLEncoder.encode(taskName + "$", "UTF-8"))
-//					.append("entry&task=").append(taskInstanceId);
-//			if ("true".equals(request.getParameter(ASSIGN_TASK_PARAM))) {
-//				legacyFormURL.append("&assignTask=true");
-//			}
-//		} else if (processInstanceId != -1L) {
-//			legacyFormURL.append(URLEncoder.encode("$", "UTF-8"))
-//					.append("recap&instance=").append(processInstanceId)
-//					.append("&recap=true");
-//		} else {
-//			legacyFormURL.append(URLEncoder.encode("$", "UTF-8"))
-//					.append("entry&process=").append(processDefinitionId)
-//					.append("&autoInstantiate=false");
-//		}
-//		if (userId != -1L) {
-//			legacyFormURL.append("&userId=").append(userId);
-//		}
-//		return legacyFormURL.toString();
-		return url;
+		final Map<String, String[]> queryParameters = (Map<String, String[]>) context.get(URLAdapterConstants.QUERY_PARAMETERS);
+		final String[] idParamValue = queryParameters.get(URLAdapterConstants.ID_QUERY_PARAM);
+		String bpmId;
+		if (idParamValue == null || idParamValue.length == 0) {
+			throw new IllegalArgumentException("The parameter \"id\" is missing from the original URL");
+		} else {
+			bpmId = idParamValue[0];
+			try {
+				final SFormMapping formMapping = formMappingService.get(key);
+				final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(formMapping.getProcessDefinitionId());
+				final String locale = (String) context.get(URLAdapterConstants.LOCALE);
+				final String contextPath = (String) context.get(URLAdapterConstants.CONTEXT_PATH);
+				boolean assignTask = false;
+				final String[] assignTaskValue = queryParameters.get(URLAdapterConstants.ASSIGN_TASK_QUERY_PARAM);
+				if (assignTaskValue != null && assignTaskValue.length > 0 && "true".equals(assignTaskValue[0])) {
+					assignTask = true;
+				}
+				String user = null;
+				final String[] userParamValue = queryParameters.get(URLAdapterConstants.USER_QUERY_PARAM);
+				if (userParamValue != null && userParamValue.length > 0) {
+					user = userParamValue[0];
+				}
+				return generateLegacyURL(contextPath, locale, bpmId, formMapping, processDefinition, user, assignTask);
+			} catch (final SBonitaException e) {
+				throw new SExecutionException("Unable to generate the legacy form URL for key " + key + "(id: " + bpmId + ")", e);
+			}
+		}
+	}
+
+	protected String generateLegacyURL(final String contextPath, final String locale, final String bpmId, final SFormMapping formMapping, final SProcessDefinition processDefinition, final String user, final boolean assignTask) {
+		final StringBuilder legacyFormURL = new StringBuilder(contextPath);
+		legacyFormURL.append("/portal/homepage?ui=form&locale=")
+				.append(locale)
+				.append("&theme=")
+				.append(formMapping.getProcessDefinitionId())
+				.append("#mode=form&form=")
+				.append(urlEncode(processDefinition.getName()))
+				.append(UUID_SEPERATOR)
+				.append(urlEncode(processDefinition.getVersion()));
+		if (FormMappingType.TASK.getId().equals(formMapping.getType())) {
+			legacyFormURL.append(UUID_SEPERATOR).append(urlEncode(formMapping.getTask() + "$"))
+				.append("entry&task=")
+				.append(bpmId);
+			if (assignTask) {
+				legacyFormURL.append("&assignTask=true");
+			}
+		} else if (FormMappingType.PROCESS_OVERVIEW.getId().equals(formMapping.getType())) {
+			legacyFormURL.append(urlEncode("$"))
+					.append("recap&instance=").append(bpmId)
+					.append("&recap=true");
+		} else {
+			legacyFormURL.append(urlEncode("$"))
+					.append("entry&process=").append(bpmId)
+					.append("&autoInstantiate=false");
+		}
+		if (user != null) {
+			legacyFormURL.append("&userId=").append(user);
+		}
+		return legacyFormURL.toString();
+	}
+
+	protected String urlEncode(final String stringToEncode) {
+		try {
+			return URLEncoder.encode(stringToEncode, "UTF-8");
+		} catch (final UnsupportedEncodingException e) {
+			throw new BonitaRuntimeException(e);
+		}
 	}
 
 	@Override

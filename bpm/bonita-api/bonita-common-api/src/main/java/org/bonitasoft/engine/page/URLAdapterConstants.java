@@ -26,5 +26,7 @@ public interface URLAdapterConstants {
     String LOCALE = "locale";
     String QUERY_PARAMETERS = "queryParameters";
     String ID_QUERY_PARAM = "id";
+    String ASSIGN_TASK_QUERY_PARAM = "assignTask";
     String USER_QUERY_PARAM = "user";
+    String TENANT_QUERY_PARAM = "tenant";
 }
