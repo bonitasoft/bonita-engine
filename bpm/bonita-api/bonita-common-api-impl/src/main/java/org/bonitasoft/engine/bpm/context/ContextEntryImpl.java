@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 
 package org.bonitasoft.engine.bpm.context;
 
@@ -24,8 +24,11 @@ import org.bonitasoft.engine.expression.Expression;
 public class ContextEntryImpl implements ContextEntry {
 
 
-    private final String key;
-    private final Expression expression;
+    private String key;
+    private Expression expression;
+
+    public ContextEntryImpl() {
+    }
 
     public ContextEntryImpl(String key, Expression expression) {
         this.key = key;
@@ -37,9 +40,17 @@ public class ContextEntryImpl implements ContextEntry {
         return key;
     }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     @Override
     public Expression getExpression() {
         return expression;
+    }
+
+    public void setExpression(Expression expression) {
+        this.expression = expression;
     }
 
     @Override
