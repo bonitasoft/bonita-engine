@@ -34,6 +34,7 @@ import org.bonitasoft.engine.page.impl.SPageImpl;
 import org.bonitasoft.engine.page.impl.SPageMappingImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.session.SessionService;
@@ -104,6 +105,13 @@ public class FormMappingServiceImplTest {
         formMappingService.getNumberOfFormMappings(queryOptions);
 
         verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
+    }
+
+    @Test
+    public void testGetByKey() throws Exception {
+        formMappingService.get("theKey");
+
+        verify(persistenceService).selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingByKey", Collections.<String, Object>singletonMap("key", "theKey"), SFormMapping.class));
     }
 
     @Test

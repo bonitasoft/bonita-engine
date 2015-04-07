@@ -36,6 +36,12 @@
         AND formmap.task = :task
     </query>
 
+    <query name="getFormMappingByKey">
+        SELECT formmap
+        FROM org.bonitasoft.engine.core.form.impl.SFormMappingImpl AS formmap
+        WHERE formmap.pageMapping.key = :key
+    </query>
+
     <query name="getFormMappingOfProcessDefinition">
         SELECT formmap
         FROM org.bonitasoft.engine.core.form.impl.SFormMappingImpl AS formmap
