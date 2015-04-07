@@ -278,19 +278,7 @@
     </build>
     <profiles>
         <profile>
-            <id>hibernate</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <bonita.home.classifier>performance</bonita.home.classifier>
-            </properties>
-        </profile>
-        <profile>
             <id>slow</id>
-            <properties>
-                <bonita.home.classifier>performance</bonita.home.classifier>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
