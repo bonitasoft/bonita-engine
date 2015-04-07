@@ -85,6 +85,7 @@ public class PageProcessDependencyResolverTest {
     @Test
     public void should_check_resolution_report_problem_when_page_is_missing() throws Exception {
         //given
+        doReturn(1L).when(sPageMapping).getPageId();
         final SFormMappingImpl sFormMapping = new SFormMappingImpl(PROCESS_DEFINITION_ID, FormMappingType.TASK.getId(), null);
         sFormMapping.setPageMapping(sPageMapping);
         formMappings.add(sFormMapping);
@@ -100,6 +101,25 @@ public class PageProcessDependencyResolverTest {
                 .hasLevel(Problem.Level.ERROR);
 
     }
+
+    @Test
+    public void should_check_resolution_report_no_problem_when_mapping_has_no_pages() throws Exception {
+        //given
+        doReturn(null).when(sPageMapping).getPageId();
+        final SFormMappingImpl sFormMapping = new SFormMappingImpl(PROCESS_DEFINITION_ID, FormMappingType.TASK.getId(), null);
+        sFormMapping.setPageMapping(sPageMapping);
+        formMappings.add(sFormMapping);
+        doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
+        doReturn(null).when(pageService).getPage(anyLong());
+
+        //when
+        final List<Problem> problems = pageProcessDependencyResolver.checkResolution(tenantServiceAccessor, sDefinition);
+
+        // then
+        assertThat(problems).as("should not return a problem").isEmpty();
+
+    }
+
 
     @Test
     public void should_format_message_when_form_mapping_page_is_null() throws Exception {
