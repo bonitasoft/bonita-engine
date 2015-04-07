@@ -57,7 +57,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("applications.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
 
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0", layout.getId());
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0", layout.getId(), null);
         hrCreator.setDescription("This is the HR dashboard.");
         hrCreator.setIconPath("/icon.jpg");
         hrCreator.setProfileId(userProfile.getId());

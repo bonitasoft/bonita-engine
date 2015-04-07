@@ -86,7 +86,16 @@ public enum ApplicationField {
      * References the identifier of the {@link org.bonitasoft.engine.page.Page} defined as the {@link Application} layout.
      * @see org.bonitasoft.engine.page.Page
      * @see org.bonitasoft.engine.business.application.Application
+     * @since 7.0.0
      */
-    LAYOUT_ID
+    LAYOUT_ID,
+
+    /**
+     * References the identifier of the {@link org.bonitasoft.engine.page.Page} defined as the {@link Application} theme.
+     * @see org.bonitasoft.engine.page.Page
+     * @see org.bonitasoft.engine.business.application.Application
+     * @since 7.0.0
+     */
+    THEME_ID
 
 }

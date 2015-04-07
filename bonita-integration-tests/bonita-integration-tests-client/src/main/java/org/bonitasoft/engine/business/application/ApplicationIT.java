@@ -39,7 +39,7 @@ public class ApplicationIT extends TestWithApplication {
         //given
         final Profile profile = getProfileUser();
         Page layout = createPage("custompage_layout");
-        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0", layout.getId());
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0", layout.getId(), null);
         creator.setDescription("This is my application");
         creator.setIconPath("/icon.jpg");
         creator.setProfileId(profile.getId());
@@ -289,7 +289,7 @@ public class ApplicationIT extends TestWithApplication {
         //given
         Page layout = createPage("custompage_layout");
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0", layout.getId());
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0", layout.getId(), null);
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
         final Application hr = getApplicationAPI().createApplication(hrCreator);

@@ -51,7 +51,7 @@ public class ApplicationModelConverterTest {
     @Test
     public void buildSApplication_should_map_all_information_from_creator_and_initialize_mandatory_fields() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, LAYOUT_ID);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, LAYOUT_ID, null);
         creator.setDescription(APP_DESC);
         creator.setIconPath(ICON_PATH);
         creator.setProfileId(PROFILE_ID);
