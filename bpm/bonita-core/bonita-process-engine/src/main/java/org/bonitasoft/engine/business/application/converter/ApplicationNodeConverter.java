@@ -123,11 +123,12 @@ public class ApplicationNodeConverter {
         }
     }
 
-    public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) {
+    public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) throws SBonitaReadException {
         final ImportStatus importStatus = new ImportStatus(applicationNode.getToken());
+        Long layoutId = getLayoutId(applicationNode, importStatus);
 
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
-                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, null);
+                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, layoutId);
         builder.setIconPath(applicationNode.getIconPath());
         builder.setDescription(applicationNode.getDescription());
         builder.setState(applicationNode.getState());
@@ -139,6 +140,18 @@ public class ApplicationNodeConverter {
 
         final SApplication application = builder.done();
         return new ImportResult(application, importStatus);
+    }
+
+    private Long getLayoutId(final ApplicationNode applicationNode, final ImportStatus importStatus) throws SBonitaReadException {
+        if (applicationNode.getLayout() == null) {
+            return null;
+        }
+        SPage layout = pageService.getPageByName(applicationNode.getLayout());
+        if (layout == null) {
+            importStatus.addError(new ImportError(applicationNode.getLayout(), ImportError.Type.PAGE));
+            return null;
+        }
+        return layout.getId();
     }
 
     private ImportError setProfile(final ApplicationNode applicationNode, final SApplicationBuilder builder) {

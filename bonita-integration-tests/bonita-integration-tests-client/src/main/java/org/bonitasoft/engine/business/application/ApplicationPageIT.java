@@ -288,7 +288,9 @@ public class ApplicationPageIT extends TestWithCustomPage {
         assertThat(searchResult.getCount()).isEqualTo(2);
         assertThat(searchResult.getResult()).containsExactly(appPage2, appPage3);
 
+        //clean
         getApplicationAPI().deleteApplication(application.getId());
+        getPageAPI().deletePage(page2.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
@@ -357,9 +359,15 @@ public class ApplicationPageIT extends TestWithCustomPage {
         assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_page1", "custompage_page2", "custompage_page3"));
         assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_page4"));
 
+        //clean
         getApplicationAPI().deleteApplication(app1.getId());
         getApplicationAPI().deleteApplication(app2.getId());
         getApplicationAPI().deleteApplication(app3.getId());
+        getPageAPI().deletePage(page1.getId());
+        getPageAPI().deletePage(page2.getId());
+        getPageAPI().deletePage(page3.getId());
+        getPageAPI().deletePage(page4.getId());
+
     }
 
 }

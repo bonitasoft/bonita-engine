@@ -255,14 +255,21 @@ public class ApplicationNodeConverterTest {
         node.setIconPath("/icon.jpg");
         node.setProfile("admin");
         node.setState("ENABLED");
+        node.setLayout("custompage_mainLayout");
 
+        long profileId = 8L;
         final SProfile profile = mock(SProfile.class);
-        given(profile.getId()).willReturn(8L);
-
+        given(profile.getId()).willReturn(profileId);
         given(profileService.getProfileByName("admin")).willReturn(profile);
 
+        long layoutId = 15L;
+        SPage layout = mock(SPage.class);
+        given(layout.getId()).willReturn(layoutId);
+        given(pageService.getPageByName("custompage_mainLayout")).willReturn(layout);
+
         //when
-        final ImportResult importResult = converter.toSApplication(node, 1L);
+        long createdBy = 1L;
+        final ImportResult importResult = converter.toSApplication(node, createdBy);
 
         //then
         assertThat(importResult).isNotNull();
@@ -274,9 +281,10 @@ public class ApplicationNodeConverterTest {
         assertThat(application.getVersion()).isEqualTo("1.0");
         assertThat(application.getToken()).isEqualTo("app");
         assertThat(application.getIconPath()).isEqualTo("/icon.jpg");
-        assertThat(application.getProfileId()).isEqualTo(8L);
+        assertThat(application.getProfileId()).isEqualTo(profileId);
         assertThat(application.getState()).isEqualTo("ENABLED");
-        assertThat(application.getCreatedBy()).isEqualTo(1L);
+        assertThat(application.getCreatedBy()).isEqualTo(createdBy);
+        assertThat(application.getLayoutId()).isEqualTo(layoutId);
 
         final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");
@@ -300,7 +308,7 @@ public class ApplicationNodeConverterTest {
     }
 
     @Test
-    public void toSApplication_should_return_Import_result_with_errors_and_profile_not_set_when_profile_is_not_found() throws Exception {
+    public void toSApplication_should_return_Import_result_with_errors_when_profile_is_not_found() throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setProfile("admin");
@@ -321,5 +329,44 @@ public class ApplicationNodeConverterTest {
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         assertThat(importStatus.getErrors()).containsExactly(new ImportError("admin", ImportError.Type.PROFILE));
     }
+
+    @Test
+    public void toSApplication_should_return_application_with_null_layout_id_when_node_has_no_layout() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        node.setLayout(null);
+
+        //when
+        final ImportResult importResult = converter.toSApplication(node, 1L);
+
+        //then
+        assertThat(importResult).isNotNull();
+        assertThat(importResult.getApplication().getLayoutId()).isNull();
+        assertThat(importResult.getImportStatus().getErrors()).isEmpty();
+    }
+
+    @Test
+    public void toSApplication_should_return_Import_result_with_errors_when_layout_is_not_found() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        node.setLayout("notAvailableLayout");
+        node.setVersion("1.0");
+        node.setToken("app");
+        node.setState("ENABLED");
+
+        given(pageService.getPageByName("notAvailableLayout")).willReturn(null);
+
+        //when
+        final ImportResult importResult = converter.toSApplication(node, 1L);
+
+        //then
+        assertThat(importResult.getApplication().getLayoutId()).isNull();
+
+        final ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).containsExactly(new ImportError("notAvailableLayout", ImportError.Type.PAGE));
+    }
+
 
 }
