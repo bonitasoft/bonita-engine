@@ -42,6 +42,11 @@
 				<include name="bonita-platform-sp-custom.xml"/>
 			</fileset>
 		</copy>
+		<copy todir="${bh.target.conf.platforminit.dir}">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-platform-init-community-custom.properties"/>
+			</fileset>
+		</copy>
 		<ant antfile="${basedir}/install-license.xml"/>
 	</target>
 
