@@ -23,6 +23,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -83,6 +84,7 @@ public class PageProcessDependencyResolver implements ProcessDependencyResolver 
     }
 
     private boolean isMappingRelatedToCustomPage(SFormMapping formMapping) {
-        return (formMapping.getPageMapping()!=null);
+        final SPageMapping pageMapping = formMapping.getPageMapping();
+        return (pageMapping !=null && pageMapping.getPageId()!=null);
     }
 }
