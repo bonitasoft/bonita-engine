@@ -2814,7 +2814,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         return new ProcessInvolvementAPIImpl(this).isInvolvedInProcessInstance(userId, processInstanceId);
     }
 
-
     public boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId) throws ActivityInstanceNotFoundException, UserNotFoundException {
         return new ProcessInvolvementAPIImpl(this).isInvolvedInHumanTaskInstance(userId, humanTaskInstanceId);
     }
@@ -6107,14 +6106,53 @@ public class ProcessAPIImpl implements ProcessAPI {
         return processManagementAPIImplDelegate.getParameterInstances(processDefinitionId, startIndex, maxResults, sort);
     }
 
-
     @Override
-    public Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) {
-        return Collections.emptyMap();
+    public Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        //        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        try {
+            SActivityInstance activityInstance = activityInstanceService.getActivityInstance(userTaskInstanceId);
+            //            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(activityInstance.getProcessDefinitionId());
+            List<SExpression> expressions = null; //processDefinition.getProcessContainer().getDataDefinitions().get(0).getDefaultValueExpression();
+            Map<Expression, Map<String, Serializable>> expressionsWithContext = buildMapOfExpressionWithInputs(expressions);
+            return evaluateExpressionsInstanceLevel(expressionsWithContext, userTaskInstanceId, CONTAINER_TYPE_ACTIVITY_INSTANCE,
+                    activityInstance.getProcessDefinitionId());
+        } catch (SActivityInstanceNotFoundException e) {
+            throw new UserTaskNotFoundException(e);
+        } catch (SBonitaException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+    private Map<Expression, Map<String, Serializable>> buildMapOfExpressionWithInputs(List<SExpression> expressions) {
+        if (expressions == null) {
+            return Collections.emptyMap();
+        }
+        Map<Expression, Map<String, Serializable>> expressionsWithContext = new HashMap<>(expressions.size());
+        for (SExpression expression : expressions) {
+            expressionsWithContext.put(ModelConvertor.toExpression(expression), null); // no need for a expression input context here.
+        }
+        return expressionsWithContext;
     }
 
     @Override
-    public Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) {
+    public Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        try {
+            SProcessInstance processInstance = tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
+            //            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
+            List<SExpression> expressions = null;
+            Map<Expression, Map<String, Serializable>> expressionsWithContext = buildMapOfExpressionWithInputs(expressions);
+            evaluateExpressionsInstanceLevel(expressionsWithContext, processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE,
+                    processInstance.getProcessDefinitionId());
+        } catch (SProcessInstanceNotFoundException e) {
+            throw new ProcessInstanceNotFoundException(e);
+        } catch (SBonitaException e) {
+            throw new RetrieveException(e);
+        }
+
         return Collections.emptyMap();
     }
 

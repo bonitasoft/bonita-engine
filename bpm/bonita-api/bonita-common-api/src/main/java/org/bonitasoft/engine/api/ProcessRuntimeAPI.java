@@ -1864,7 +1864,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Check whether a specific user is involved in a given human task instance.<br/>
-     * User A is involved with a  human task  instance if any of the following is true:
+     * User A is involved with a human task instance if any of the following is true:
      * <ul>
      * <li>the human task instance is assigned to user A</li>
      * <li>the human task instance is pending for user A</li>
@@ -2563,20 +2563,21 @@ public interface ProcessRuntimeAPI {
      */
     Serializable getProcessInputValueAfterInitialization(long processInstanceId, String name) throws ContractDataNotFoundException;
 
-
     /**
      * return the context defined in the process definition for this user task instance
      *
      * @param userTaskInstanceId the is of the user task instance
      * @return a map containing the evaluated context
+     * @throws UserTaskNotFoundException if <code>userTaskInstanceId</code> does not reference any existing task.
      */
-    Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId);
+    Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException;
 
     /**
      * return the context defined in the process definition for this process instance
      *
      * @param processInstanceId the is of the process instance
      * @return a map containing the evaluated context
+     * @throws ProcessInstanceNotFoundException if <code>processInstanceId</code> does not reference any existing task.
      */
-    Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId);
+    Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException;
 }
