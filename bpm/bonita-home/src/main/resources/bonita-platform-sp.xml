@@ -7,6 +7,21 @@
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
         ">
 
+	<bean id="tenantRestartHandlers" parent="spTenantRestartHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list merge="true">
+			</list>
+		</property>
+	</bean>
+
+	<bean id="spTenantRestartHandlers" parent="commonTenantRestartHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list merge="true">
+				<bean class="com.bonitasoft.engine.profile.ProfilesUpdaterRestartHandlerExt" />
+			</list>
+		</property>
+	</bean>
+
 	<bean id="platformEventService" class="com.bonitasoft.engine.events.impl.ConfigurableEventServiceImpl">
 		<constructor-arg name="handlers">
 			<map>
