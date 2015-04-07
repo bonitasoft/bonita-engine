@@ -282,6 +282,37 @@ public class ApplicationIT extends TestWithApplication {
         getApplicationAPI().deleteApplication(marketing.getId());
     }
 
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-12833", keywords = { "Application", "search",
+            "filter on layoutId", "no search term" })
+    @Test
+    public void searchApplications_can_filter_on_layoutId() throws Exception {
+        //given
+        Page layout = createPage("custompage_layout");
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0", layout.getId());
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
+
+        final Application hr = getApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationSearchDescriptor.LAYOUT_ID, layout.getId());
+
+        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        assertThat(applications).isNotNull();
+        assertThat(applications.getCount()).isEqualTo(1);
+        assertThat(applications.getResult()).containsExactly(engineering);
+
+        //clean
+        getApplicationAPI().deleteApplication(hr.getId());
+        getApplicationAPI().deleteApplication(engineering.getId());
+        getApplicationAPI().deleteApplication(marketing.getId());
+
+        getPageAPI().deletePage(layout.getId());
+    }
+
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "no filter",
             "search term" })
     @Test

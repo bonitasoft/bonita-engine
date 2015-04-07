@@ -91,4 +91,8 @@ public class SApplicationBuilderFactoryImpl implements SApplicationBuilderFactor
         return SApplicationFields.PROFILE_ID;
     }
 
+    @Override
+    public String getLayoutIdKey() {
+        return SApplicationFields.LAYOUT_ID;
+    }
 }
