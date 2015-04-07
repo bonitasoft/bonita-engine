@@ -104,8 +104,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     SessionService getSessionService();
 
-    ReadSessionAccessor getReadSessionAccessor();
-
     IdentityService getIdentityService();
 
     LoginService getLoginService();

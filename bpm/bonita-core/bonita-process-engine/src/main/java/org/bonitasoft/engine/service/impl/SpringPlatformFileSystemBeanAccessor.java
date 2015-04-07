@@ -24,67 +24,24 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Charles Souillard
  * @author Celine Souchet
  */
-public class SpringPlatformFileSystemBeanAccessor {
+public class SpringPlatformFileSystemBeanAccessor extends SpringFileSystemBeanAccessor {
 
-    private static AbsoluteFileSystemXmlApplicationContext context;
 
-    private static String[] getResources() {
-        final BonitaHomeServer homeServer = BonitaHomeServer.getInstance();
-        try {
-            return homeServer.getPlatformConfigurationFiles();
-        } catch (final BonitaHomeNotSetException e) {
-            throw new RuntimeException("Bonita home not set");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public SpringPlatformFileSystemBeanAccessor(SpringFileSystemBeanAccessor parent) throws IOException, BonitaHomeNotSetException {
+        super(parent);
     }
 
-    public static <T> T getService(final Class<T> serviceClass) {
-        return getContext().getBean(serviceClass);
+    @Override
+    protected Properties getProperties() throws BonitaHomeNotSetException, IOException {
+        return BonitaHomeServer.getInstance().getPlatformProperties();
     }
 
-    protected static FileSystemXmlApplicationContext getContext() {
-        if (context == null) {
-            initializeContext(null);
-        }
-        return context;
-    }
-
-    public static synchronized void initializeContext(final ClassLoader classLoader) {
-        if (context == null) {// synchronized null check
-            SpringPlatformInitFileSystemBeanAcessor.initializeContext(classLoader);
-            final FileSystemXmlApplicationContext sessionContext = SpringPlatformInitFileSystemBeanAcessor.getContext();
-            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), sessionContext);
-
-            PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
-            Properties properties = null;
-            try {
-                properties = BonitaHomeServer.getInstance().getPlatformProperties();
-            } catch (BonitaHomeNotSetException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            configurer.setProperties(properties);
-            context.addBeanFactoryPostProcessor(configurer);
-
-            //context.getEnvironment().getPropertySources().addFirst(getPropertySource());
-            context.refresh();
-
-        }
-    }
-
-    protected static <T> T getService(final String name, final Class<T> serviceClass) {
-        return getContext().getBean(name, serviceClass);
-    }
-
-    public static void destroy() {
-        if (context != null) {
-            context.close();
-            context = null;
-        }
+    @Override
+    protected String[] getResources() throws BonitaHomeNotSetException, IOException {
+        return BonitaHomeServer.getInstance().getPlatformConfigurationFiles();
     }
 
 }

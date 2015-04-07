@@ -35,14 +35,14 @@ public class SpringPlatformInitServiceAccessor implements SessionAccessorAccesso
     @Override
     public SessionAccessor getSessionAccessor() {
         if (sessionAccessor == null) {
-            sessionAccessor = SpringPlatformInitFileSystemBeanAcessor.getSessionAccessor();
+            sessionAccessor = SpringFileSystemBeanAccessorFactory.getPlatformInitAccessor().getService(SessionAccessor.class);
         }
         return sessionAccessor;
     }
 
     @Override
     public void destroy() {
-        SpringPlatformInitFileSystemBeanAcessor.destroy();
+        SpringFileSystemBeanAccessorFactory.getPlatformInitAccessor().destroy();
 
     }
 

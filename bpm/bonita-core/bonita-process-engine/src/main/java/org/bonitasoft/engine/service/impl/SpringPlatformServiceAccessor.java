@@ -29,7 +29,6 @@ import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -38,6 +37,8 @@ import org.bonitasoft.engine.transaction.TransactionService;
  * @author Zhao Na
  */
 public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
+
+    private final SpringPlatformFileSystemBeanAccessor beanAccessor;
 
     private PlatformService platformService;
 
@@ -65,10 +66,14 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     private BroadcastService broadcastService;
     private PlatformAuthenticationService platformAuthenticationService;
 
+    public SpringPlatformServiceAccessor() {
+        beanAccessor = SpringFileSystemBeanAccessorFactory.getPlatformAccessor();
+    }
+    
     @Override
     public TransactionService getTransactionService() {
         if (transactionService == null) {
-            transactionService = SpringPlatformFileSystemBeanAccessor.getService(TransactionService.class);
+            transactionService = beanAccessor.getService(TransactionService.class);
         }
         return transactionService;
     }
@@ -76,7 +81,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public TechnicalLoggerService getTechnicalLoggerService() {
         if (technicalLoggerService == null) {
-            technicalLoggerService = SpringPlatformFileSystemBeanAccessor.getService("platformTechnicalLoggerService", TechnicalLoggerService.class);
+            technicalLoggerService = beanAccessor.getService("platformTechnicalLoggerService", TechnicalLoggerService.class);
         }
         return technicalLoggerService;
     }
@@ -84,7 +89,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public PlatformLoginService getPlatformLoginService() {
         if (platformLoginService == null) {
-            platformLoginService = SpringPlatformFileSystemBeanAccessor.getService(PlatformLoginService.class);
+            platformLoginService = beanAccessor.getService(PlatformLoginService.class);
         }
         return platformLoginService;
     }
@@ -92,7 +97,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public SchedulerService getSchedulerService() {
         if (schedulerService == null) {
-            schedulerService = SpringPlatformFileSystemBeanAccessor.getService(SchedulerService.class);
+            schedulerService = beanAccessor.getService(SchedulerService.class);
         }
         return schedulerService;
     }
@@ -100,7 +105,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public PlatformService getPlatformService() {
         if (platformService == null) {
-            platformService = SpringPlatformFileSystemBeanAccessor.getService(PlatformService.class);
+            platformService = beanAccessor.getService(PlatformService.class);
         }
         return platformService;
     }
@@ -113,7 +118,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public TransactionExecutor getTransactionExecutor() {
         if (transactionExecutor == null) {
-            transactionExecutor = SpringPlatformFileSystemBeanAccessor.getService(TransactionExecutor.class);
+            transactionExecutor = beanAccessor.getService(TransactionExecutor.class);
         }
         return transactionExecutor;
     }
@@ -121,7 +126,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public ClassLoaderService getClassLoaderService() {
         if (classLoaderService == null) {
-            classLoaderService = SpringPlatformFileSystemBeanAccessor.getService("classLoaderService", ClassLoaderService.class);
+            classLoaderService = beanAccessor.getService("classLoaderService", ClassLoaderService.class);
         }
         return classLoaderService;
     }
@@ -129,7 +134,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public DependencyService getDependencyService() {
         if (dependencyService == null) {
-            dependencyService = SpringPlatformFileSystemBeanAccessor.getService("platformDependencyService", DependencyService.class);
+            dependencyService = beanAccessor.getService("platformDependencyService", DependencyService.class);
         }
         return dependencyService;
     }
@@ -137,7 +142,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public PlatformCommandService getPlatformCommandService() {
         if (platformCommandService == null) {
-            platformCommandService = SpringPlatformFileSystemBeanAccessor.getService("platformCommandService", PlatformCommandService.class);
+            platformCommandService = beanAccessor.getService("platformCommandService", PlatformCommandService.class);
         }
         return platformCommandService;
     }
@@ -145,20 +150,15 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public PlatformSessionService getPlatformSessionService() {
         if (platformSessionService == null) {
-            platformSessionService = SpringPlatformFileSystemBeanAccessor.getService(PlatformSessionService.class);
+            platformSessionService = beanAccessor.getService(PlatformSessionService.class);
         }
         return platformSessionService;
     }
 
     @Override
-    public void initializeServiceAccessor(final ClassLoader classLoader) {
-        SpringPlatformFileSystemBeanAccessor.initializeContext(classLoader);
-    }
-
-    @Override
     public NodeConfiguration getPlatformConfiguration() {
         if (platformConfguration == null) {
-            platformConfguration = SpringPlatformFileSystemBeanAccessor.getService(NodeConfiguration.class);
+            platformConfguration = beanAccessor.getService(NodeConfiguration.class);
         }
         return platformConfguration;
     }
@@ -166,20 +166,20 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public PlatformCacheService getPlatformCacheService() {
         if (platformCacheService == null) {
-            platformCacheService = SpringPlatformFileSystemBeanAccessor.getService(PlatformCacheService.class);
+            platformCacheService = beanAccessor.getService(PlatformCacheService.class);
         }
         return platformCacheService;
     }
 
     @Override
     public void destroy() {
-        SpringPlatformFileSystemBeanAccessor.destroy();
+        beanAccessor.destroy();
     }
 
     @Override
     public BroadcastService getBroadcastService() {
         if (broadcastService == null) {
-            broadcastService = SpringPlatformFileSystemBeanAccessor.getService(BroadcastService.class);
+            broadcastService = beanAccessor.getService(BroadcastService.class);
         }
         return broadcastService;
     }
@@ -187,7 +187,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     @Override
     public PlatformAuthenticationService getPlatformAuthenticationService() {
         if (platformAuthenticationService == null) {
-            platformAuthenticationService = SpringPlatformFileSystemBeanAccessor.getService(PlatformAuthenticationService.class);
+            platformAuthenticationService = beanAccessor.getService(PlatformAuthenticationService.class);
         }
         return platformAuthenticationService;
     }

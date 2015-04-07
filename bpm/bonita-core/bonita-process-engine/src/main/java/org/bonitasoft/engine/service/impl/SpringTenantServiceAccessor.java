@@ -271,16 +271,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     public SpringTenantServiceAccessor(final Long tenantId) {
-        beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
+        beanAccessor = SpringFileSystemBeanAccessorFactory.getTenantAccessor(tenantId);
         this.tenantId = tenantId;
-    }
-
-    @Override
-    public ReadSessionAccessor getReadSessionAccessor() {
-        if (readSessionAccessor == null) {
-            readSessionAccessor = beanAccessor.getService(ReadSessionAccessor.class);
-        }
-        return readSessionAccessor;
     }
 
     @Override
@@ -706,11 +698,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             eventService = beanAccessor.getService(EventService.class);
         }
         return eventService;
-    }
-
-    @Override
-    public void initializeServiceAccessor(final ClassLoader classLoader) {
-        beanAccessor.initializeContext(classLoader);
     }
 
     public SpringTenantFileSystemBeanAccessor getBeanAccessor() {

@@ -18,55 +18,24 @@
 
     import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
     import org.bonitasoft.engine.home.BonitaHomeServer;
-    import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-    import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-    import org.springframework.context.support.FileSystemXmlApplicationContext;
 
     /**
      * @author Matthieu Chaffotte
+     * @author Charles Souillard
      */
-    public class SpringPlatformInitFileSystemBeanAcessor {
+    public class SpringPlatformInitFileSystemBeanAcessor extends SpringFileSystemBeanAccessor {
 
-        private static AbsoluteFileSystemXmlApplicationContext context;
-
-        protected static SessionAccessor getSessionAccessor() {
-            return getContext().getBean(SessionAccessor.class);
+        public SpringPlatformInitFileSystemBeanAcessor(SpringFileSystemBeanAccessor parent) throws IOException, BonitaHomeNotSetException {
+            super(parent);
         }
 
-        protected static FileSystemXmlApplicationContext getContext() {
-            if (context == null) {
-                initializeContext(null);
-            }
-            return context;
+        @Override
+        protected Properties getProperties() throws BonitaHomeNotSetException, IOException {
+            return BonitaHomeServer.getInstance().getPrePlatformInitProperties();
         }
 
-        public static synchronized void initializeContext(final ClassLoader classLoader) {
-            if (context == null) {// synchronized null check
-                try {
-                    final BonitaHomeServer homeServer = BonitaHomeServer.getInstance();
-
-                    final String[] resources = homeServer.getPrePlatformInitConfigurationFiles();
-                    context = new AbsoluteFileSystemXmlApplicationContext(resources, null);
-                    if (classLoader != null) {
-                        context.setClassLoader(classLoader);
-                    }
-                    final PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
-                    final Properties properties = BonitaHomeServer.getInstance().getPrePlatformInitProperties();
-                    configurer.setProperties(properties);
-                    context.addBeanFactoryPostProcessor(configurer);
-                    context.refresh();
-                } catch (BonitaHomeNotSetException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        public static void destroy() {
-            if (context != null) {
-                context.close();
-                context = null;
-            }
+        @Override
+        protected String[] getResources() throws BonitaHomeNotSetException, IOException {
+            return BonitaHomeServer.getInstance().getPrePlatformInitConfigurationFiles();
         }
     }

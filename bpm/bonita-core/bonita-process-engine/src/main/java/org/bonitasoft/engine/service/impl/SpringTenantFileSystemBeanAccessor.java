@@ -26,80 +26,25 @@ import org.springframework.core.env.PropertiesPropertySource;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Charles Souillard
  */
-public class SpringTenantFileSystemBeanAccessor {
-
-    protected static final String TENANT_ID = "tenantId";
-
-    protected AbsoluteFileSystemXmlApplicationContext context;
-
+public class SpringTenantFileSystemBeanAccessor extends SpringFileSystemBeanAccessor {
     private final long tenantId;
 
-    public SpringTenantFileSystemBeanAccessor(final long tenantId) {
+    public SpringTenantFileSystemBeanAccessor(final SpringFileSystemBeanAccessor parent, final long tenantId) throws IOException, BonitaHomeNotSetException {
+        super(parent);
         this.tenantId = tenantId;
     }
 
-    private String[] getResources() {
-        final BonitaHomeServer homeServer = BonitaHomeServer.getInstance();
-        try {
-            return homeServer.getTenantConfigurationFiles(tenantId);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new RuntimeException("Bonita home not set");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+    @Override
+    protected String[] getResources() throws IOException, BonitaHomeNotSetException {
+        return BonitaHomeServer.getInstance().getTenantConfigurationFiles(tenantId);
     }
 
-    public <T> T getService(final Class<T> serviceClass) {
-        try {
-
-            return getContext().getBean(serviceClass);
-        } catch (NoSuchBeanDefinitionException e) {
-            throw new MissingServiceException("Service not found: " + serviceClass.getName());
-        }
-    }
-
-    protected <T> T getService(final String name, final Class<T> serviceClass) {
-        return getContext().getBean(name, serviceClass);
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T> T getService(final String name) {
-        return (T) getContext().getBean(name);
-    }
-
-    protected FileSystemXmlApplicationContext getContext() {
-        if (context == null) {
-            initializeContext(null);
-        }
-        return context;
-    }
-
-    public synchronized void initializeContext(final ClassLoader classLoader) {
-        if (context == null) {// synchronized null check
-            SpringPlatformFileSystemBeanAccessor.initializeContext(classLoader);
-            final FileSystemXmlApplicationContext platformContext = SpringPlatformFileSystemBeanAccessor.getContext();
-            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), platformContext);
-            PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
-            Properties properties = null;
-            try {
-                properties = BonitaHomeServer.getInstance().getTenantProperties(tenantId);
-            } catch (BonitaHomeNotSetException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            configurer.setProperties(properties);
-            context.addBeanFactoryPostProcessor(configurer);
-            context.refresh();
-        }
-    }
-
-    public void destroy() {
-        if (context != null) {
-            context.close();
-            context = null;
-        }
+    @Override
+    protected Properties getProperties() throws BonitaHomeNotSetException, IOException {
+        return BonitaHomeServer.getInstance().getTenantProperties(tenantId);
     }
 
 }
