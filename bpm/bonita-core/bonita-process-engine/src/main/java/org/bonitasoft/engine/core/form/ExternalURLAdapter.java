@@ -21,8 +21,6 @@ import java.util.Map.Entry;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.page.URLAdapter;
 import org.bonitasoft.engine.page.URLAdapterConstants;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 
 /**
