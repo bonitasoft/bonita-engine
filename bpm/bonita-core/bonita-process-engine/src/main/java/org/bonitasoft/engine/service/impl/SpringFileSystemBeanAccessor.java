@@ -18,6 +18,7 @@
 
     import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
     import org.bonitasoft.engine.exception.BonitaRuntimeException;
+    import org.bonitasoft.engine.home.BonitaHomeServer;
     import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
     import org.springframework.context.ApplicationContext;
 
@@ -72,6 +73,8 @@
                     final Properties properties = getProperties();
                     configurer.setProperties(properties);
                     context.addBeanFactoryPostProcessor(configurer);
+                    final String[] activeProfiles = getActiveProfiles();
+                    context.getEnvironment().setActiveProfiles(activeProfiles);
                     context.refresh();
                 } catch (IOException | BonitaHomeNotSetException e) {
                     throw new BonitaRuntimeException(e);
@@ -80,4 +83,9 @@
             return context;
         }
 
+        private String[] getActiveProfiles() throws IOException, BonitaHomeNotSetException {
+            final Properties properties = BonitaHomeServer.getInstance().getPrePlatformInitProperties();
+            final String activeProfiles = (String) properties.get("activeProfiles");
+            return activeProfiles.split(",");
+        }
     }

@@ -30,6 +30,7 @@
 		<copy todir="${bh.dir}/engine-server/work/platform-init">
 			<fileset dir="${resources.dir}">
 				<include name="bonita-platform-init-community.xml"/>
+				<include name="bonita-platform-init-community.properties"/>
 			</fileset>
 		</copy>
 
@@ -62,6 +63,7 @@
 				<include name="bonita-platform-init-custom.xml"/>
 			</fileset>
 		</copy>
+
 
 		<copy file="${resources.dir}/bonita-platform-init-community.properties" tofile="${bh.dir}/engine-server/conf/platform-init/bonita-platform-init-community-custom.properties">
 			<filterchain>
