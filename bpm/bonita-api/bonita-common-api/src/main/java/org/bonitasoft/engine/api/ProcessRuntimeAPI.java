@@ -2562,4 +2562,21 @@ public interface ProcessRuntimeAPI {
      * @throws ContractDataNotFoundException if identifier does not refer to an existing process instance.
      */
     Serializable getProcessInputValueAfterInitialization(long processInstanceId, String name) throws ContractDataNotFoundException;
+
+
+    /**
+     * return the context defined in the process definition for this user task instance
+     *
+     * @param userTaskInstanceId the is of the user task instance
+     * @return a map containing the evaluated context
+     */
+    Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId);
+
+    /**
+     * return the context defined in the process definition for this process instance
+     *
+     * @param processInstanceId the is of the process instance
+     * @return a map containing the evaluated context
+     */
+    Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId);
 }

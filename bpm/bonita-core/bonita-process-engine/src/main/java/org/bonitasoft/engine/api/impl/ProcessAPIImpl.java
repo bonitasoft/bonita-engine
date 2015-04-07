@@ -6107,4 +6107,15 @@ public class ProcessAPIImpl implements ProcessAPI {
         return processManagementAPIImplDelegate.getParameterInstances(processDefinitionId, startIndex, maxResults, sort);
     }
 
+
+    @Override
+    public Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) {
+        return Collections.emptyMap();
+    }
+
 }
