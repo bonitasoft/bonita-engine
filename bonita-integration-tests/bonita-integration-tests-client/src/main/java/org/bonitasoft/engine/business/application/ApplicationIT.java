@@ -89,6 +89,7 @@ public class ApplicationIT extends TestWithApplication {
         //given
         final Profile profile = getProfileUser();
         Page layout = createPage("custompage_layout");
+        Page theme = createPage("custompage_theme");
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
         final Application application = getApplicationAPI().createApplication(creator);
 
@@ -101,6 +102,7 @@ public class ApplicationIT extends TestWithApplication {
         updater.setProfileId(profile.getId());
         updater.setState(ApplicationState.ACTIVATED.name());
         updater.setLayoutId(layout.getId());
+        updater.setThemeId(theme.getId());
 
         //when
         final Application updatedApplication = getApplicationAPI().updateApplication(application.getId(), updater);
@@ -115,10 +117,12 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(updatedApplication.getProfileId()).isEqualTo(profile.getId());
         assertThat(updatedApplication.getState()).isEqualTo(ApplicationState.ACTIVATED.name());
         assertThat(updatedApplication.getLayoutId()).isEqualTo(layout.getId());
+        assertThat(updatedApplication.getThemeId()).isEqualTo(theme.getId());
         assertThat(updatedApplication).isEqualTo(getApplicationAPI().getApplication(application.getId()));
 
         getApplicationAPI().deleteApplication(application.getId());
         getPageAPI().deletePage(layout.getId());
+        getPageAPI().deletePage(theme.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "get" })

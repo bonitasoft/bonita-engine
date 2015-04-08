@@ -49,7 +49,7 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     private Long layoutId;
 
-    protected Long themeId;
+    private Long themeId;
 
     public SApplicationImpl() {
         super();
@@ -187,6 +187,10 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     public void setLayoutId(final Long layoutId) {
         this.layoutId = layoutId;
+    }
+
+    public void setThemeId(final Long themeId) {
+        this.themeId = themeId;
     }
 
     @Override

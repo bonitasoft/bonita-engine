@@ -88,4 +88,10 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
         descriptor.addField(SApplicationFields.LAYOUT_ID, layoutId);
         return this;
     }
+
+    @Override
+    public SApplicationUpdateBuilder updateThemeId(final Long themeId) {
+        descriptor.addField(SApplicationFields.THEME_ID, themeId);
+        return this;
+    }
 }

@@ -117,6 +117,9 @@ public class ApplicationModelConverter {
                 case LAYOUT_ID:
                     builder.updateLayoutId((Long) entry.getValue());
                     break;
+                case THEME_ID:
+                    builder.updateThemeId((Long) entry.getValue());
+                    break;
                 default:
                     break;
             }

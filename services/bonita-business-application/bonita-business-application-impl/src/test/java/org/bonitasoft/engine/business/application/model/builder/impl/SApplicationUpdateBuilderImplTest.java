@@ -31,6 +31,7 @@ public class SApplicationUpdateBuilderImplTest {
         long updaterUserId = 17L;
         long profileId = 20L;
         long layoutId = 25L;
+        long themeId = 26L;
 
         //when
         SApplicationUpdateBuilderImpl builder = new SApplicationUpdateBuilderImpl(updaterUserId);
@@ -43,11 +44,12 @@ public class SApplicationUpdateBuilderImplTest {
         builder.updateToken("newToken");
         builder.updateVersion("2.0");
         builder.updateLayoutId(layoutId);
+        builder.updateThemeId(themeId);
 
         //then
         final EntityUpdateDescriptor desc = builder.done();
         final Map<String, Object> fields = desc.getFields();
-        assertThat(fields).hasSize(11);
+        assertThat(fields).hasSize(12);
         assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(updaterUserId);
         assertThat(fields.get(SApplicationFields.LAST_UPDATE_DATE)).isNotNull();
         assertThat(fields.get(SApplicationFields.DESCRIPTION)).isEqualTo("new desc");
@@ -59,5 +61,6 @@ public class SApplicationUpdateBuilderImplTest {
         assertThat(fields.get(SApplicationFields.TOKEN)).isEqualTo("newToken");
         assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("2.0");
         assertThat(fields.get(SApplicationFields.LAYOUT_ID)).isEqualTo(layoutId);
+        assertThat(fields.get(SApplicationFields.THEME_ID)).isEqualTo(themeId);
     }
 }

@@ -46,4 +46,6 @@ public class SApplicationFields {
 
     public static final String LAYOUT_ID = "layoutId";
 
+    public static final String THEME_ID = "themeId";
+
 }
