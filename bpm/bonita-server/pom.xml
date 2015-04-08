@@ -262,19 +262,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- Home Server -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.core</groupId>
-      <artifactId>bonita-home-server</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.bonitasoft.engine.api</groupId>
-          <artifactId>bonita-common-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- Incident -->
     <dependency>
       <groupId>org.bonitasoft.engine.incident</groupId>
