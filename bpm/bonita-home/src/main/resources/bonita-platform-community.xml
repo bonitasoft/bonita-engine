@@ -148,7 +148,7 @@
     <bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
         <property name="shouldStartScheduler" value="true" />
         <property name="shouldRestartElements" value="true" />
-        <property name="TenantRestartHandlers" ref="tenantRestartHandlers"/>
+        <property name="tenantRestartHandlers" ref="tenantRestartHandlers"/>
         <property name="restartHandlers">
             <list>
                 <ref bean="schedulerServiceRestartHandler" />
