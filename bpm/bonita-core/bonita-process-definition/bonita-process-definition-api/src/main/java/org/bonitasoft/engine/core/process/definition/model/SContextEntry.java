@@ -11,41 +11,17 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  */
-package org.bonitasoft.engine.core.process.definition.model;
 
-import java.util.List;
-import java.util.Set;
+package org.bonitasoft.engine.core.process.definition.model;
 
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
- * @author Elias Ricken de Medeiros
- * @author Matthieu Chaffotte
- * @author Celine Souchet
+ * @author Baptiste Mesta
  */
-public interface SProcessDefinition extends SNamedElement {
+public interface SContextEntry {
 
-    String getVersion();
+    String getKey();
 
-    String getDescription();
-
-    SFlowElementContainerDefinition getProcessContainer();
-
-    SActorDefinition getActorInitiator();
-
-    Set<SActorDefinition> getActors();
-
-    String getStringIndexLabel(int index);
-
-    SExpression getStringIndexValue(int index);
-
-    Set<SParameterDefinition> getParameters();
-
-    SParameterDefinition getParameter(String parameterName);
-
-    boolean hasConnectors();
-
-    SContractDefinition getContract();
-
-    List<SContextEntry> getContext();
+    SExpression getExpression();
 }

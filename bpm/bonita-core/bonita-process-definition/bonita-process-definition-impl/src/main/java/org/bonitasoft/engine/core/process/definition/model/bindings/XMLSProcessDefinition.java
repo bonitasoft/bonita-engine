@@ -20,6 +20,8 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bonitasoft.engine.bpm.connector.FailAction;
+import org.bonitasoft.engine.bpm.context.ContextEntry;
+import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -30,6 +32,7 @@ import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefiniti
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContextEntry;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
@@ -372,9 +375,15 @@ public class XMLSProcessDefinition {
 
     public static final String INPUT_NAME = "inputDefinitionName";
 
-    private final Map<Object, String> objectToId = new HashMap<Object, String>();
+    public static final String CONTEXT_NODE = "context";
 
-    static final class BEntry<K, V> implements Map.Entry<K, V> {
+    public static final String CONTEXT_ENTRY_NODE = "contextEntry";
+
+    public static final String CONTEXT_ENTRY_KEY = "key";
+
+    public Map<Object, String> objectToId = new HashMap<Object, String>();
+
+    public static final class BEntry<K, V> implements Map.Entry<K, V> {
 
         private final K k;
 
@@ -456,6 +465,7 @@ public class XMLSProcessDefinition {
         if (contract != null) {
             rootNode.addChild(createContractNode(contract));
         }
+        rootNode.addChild(createContextNode(definition.getContext()));
         return rootNode;
     }
 
@@ -561,8 +571,11 @@ public class XMLSProcessDefinition {
                     fillUserFilterNode(userFilterNode, humanTaskDefinition.getSUserFilterDefinition());
                     activityNode.addChild(userFilterNode);
                 }
-                if (humanTaskDefinition instanceof SUserTaskDefinition && ((SUserTaskDefinition) humanTaskDefinition).getContract() != null) {
-                    activityNode.addChild(createContractNode(((SUserTaskDefinition) humanTaskDefinition).getContract()));
+                if (humanTaskDefinition instanceof SUserTaskDefinition) {
+                    if (((SUserTaskDefinition) humanTaskDefinition).getContract() != null) {
+                        activityNode.addChild(createContractNode(((SUserTaskDefinition) humanTaskDefinition).getContract()));
+                    }
+                    activityNode.addChild(createContextNode(((SUserTaskDefinition) humanTaskDefinition).getContext()));
                 }
             } else if (activity instanceof SCallActivityDefinition) {
                 fillCallActivity((SCallActivityDefinition) activity, activityNode);
@@ -609,6 +622,18 @@ public class XMLSProcessDefinition {
             }
         }
         return contractNode;
+    }
+
+
+    private XMLNode createContextNode(List<SContextEntry> context) {
+        XMLNode contextNode = new XMLNode(CONTEXT_NODE);
+        for (SContextEntry contextEntry : context) {
+            XMLNode node = new XMLNode(CONTEXT_ENTRY_NODE);
+            node.addAttribute(CONTEXT_ENTRY_KEY, contextEntry.getKey());
+            addExpressionNode(node, EXPRESSION_NODE, contextEntry.getExpression());
+            contextNode.addChild(node);
+        }
+        return contextNode;
     }
 
     private XMLNode createContractConstraintNode(final SConstraintDefinition constraintDefinition) {
