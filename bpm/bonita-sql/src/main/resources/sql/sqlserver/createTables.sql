@@ -980,11 +980,16 @@ CREATE TABLE page (
   contentName NVARCHAR(50) NOT NULL,
   content VARBINARY(MAX),
   contentType NVARCHAR(50) NOT NULL,
-  processDefinitionId NUMERIC(19,0),
-  UNIQUE (tenantId, name,processDefinitionId),
-  PRIMARY KEY (tenantId, id)
+  processDefinitionId NUMERIC(19,0)
 )
 GO
+
+ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id)
+GO
+
+ALTER TABLE page ADD CONSTRAINT  uk_page UNIQUE  (tenantId, name, processDefinitionId)
+GO
+
 CREATE TABLE sequence (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,

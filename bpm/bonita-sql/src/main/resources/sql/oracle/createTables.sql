@@ -844,6 +844,7 @@ CREATE TABLE queriablelog_p (
 
 CREATE INDEX idx_queriablelog ON queriablelog_p (queriableLogId);
 ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenantid, queriableLogId) REFERENCES queriable_log(tenantid, id);
+
 CREATE TABLE page (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
@@ -858,10 +859,13 @@ CREATE TABLE page (
   contentName VARCHAR2(50 CHAR) NOT NULL,
   content BLOB,
   contentType VARCHAR(50 CHAR),
-  processDefinitionId BIGINT,
-  CONSTRAINT UK_Page UNIQUE (tenantId, name, processDefinitionId),
-  PRIMARY KEY (tenantId, id)
+  processDefinitionId BIGINT
 );
+
+ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);
+
+ALTER TABLE page ADD CONSTRAINT uk_page UNIQUE (tenantId, name, processDefinitionId);
+
 CREATE TABLE sequence (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,

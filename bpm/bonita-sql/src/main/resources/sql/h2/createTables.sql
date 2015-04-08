@@ -869,7 +869,7 @@ CREATE TABLE page (
   processDefinitionId BIGINT
 );
 ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);
-ALTER TABLE page ADD CONSTRAINT uk_page1 UNIQUE (tenantId, name, processDefinitionId);
+ALTER TABLE page ADD CONSTRAINT uk_page UNIQUE (tenantId, name, processDefinitionId);
 
 CREATE TABLE sequence (
   tenantid BIGINT NOT NULL,

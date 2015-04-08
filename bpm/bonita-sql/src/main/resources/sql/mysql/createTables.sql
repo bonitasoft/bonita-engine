@@ -873,10 +873,13 @@ CREATE TABLE page (
   contentName VARCHAR(50) NOT NULL,
   content LONGBLOB,
   contentType VARCHAR(50) NOT NULL,
-  processDefinitionId BIGINT,
-  UNIQUE (tenantId, name, processDefinitionId),
-  PRIMARY KEY (tenantId, id)
+  processDefinitionId BIGINT
 ) ENGINE = INNODB;
+
+ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);
+ALTER TABLE page ADD CONSTRAINT uk_page UNIQUE (tenantid, name, processDefinitionId);
+
+
 CREATE TABLE sequence (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,

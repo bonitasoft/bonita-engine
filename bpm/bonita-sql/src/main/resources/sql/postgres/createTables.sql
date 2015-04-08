@@ -866,10 +866,13 @@ CREATE TABLE page (
   contentName VARCHAR(50) NOT NULL,
   content BYTEA,
   contentType VARCHAR(50) NOT NULL,
-  processDefinitionId INT8,
-  UNIQUE (tenantId, name,processDefinitionId),
-  PRIMARY KEY (tenantId, id)
+  processDefinitionId INT8
 );
+
+ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);
+
+ALTER TABLE page ADD CONSTRAINT uk_page UNIQUE (tenantId, name, processDefinitionId);
+
 CREATE TABLE sequence (
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
