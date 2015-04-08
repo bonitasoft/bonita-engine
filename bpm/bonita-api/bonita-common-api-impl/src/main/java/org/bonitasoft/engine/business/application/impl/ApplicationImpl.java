@@ -47,9 +47,10 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
         this.description = description;
     }
 
-    public ApplicationImpl(final String token, final String version, final String description, Long layoutId) {
+    public ApplicationImpl(final String token, final String version, final String description, Long layoutId, final Long themeId) {
         this(token, version, description);
         this.layoutId = layoutId;
+        this.themeId = themeId;
     }
 
     @Override

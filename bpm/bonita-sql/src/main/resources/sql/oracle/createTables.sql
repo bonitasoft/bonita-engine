@@ -535,6 +535,7 @@ CREATE TABLE business_app (
   homePageId NUMBER(19, 0),
   profileId NUMBER(19, 0),
   layoutId NUMBER(19, 0),
+  themeId NUMBER(19, 0),
   displayName VARCHAR2(255 CHAR) NOT NULL
 );
 

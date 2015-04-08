@@ -537,6 +537,7 @@ CREATE TABLE business_app (
   homePageId INT8,
   profileId INT8,
   layoutId INT8,
+  themeId INT8,
   displayName VARCHAR(255) NOT NULL
 );
 

@@ -45,13 +45,14 @@ public class ApplicationModelConverterTest {
     private static final String APP_DISPLAY_NAME = "My application";
     private static final long LOGGED_USER_ID = 10;
     public static final long LAYOUT_ID = 55L;
+    public static final long THEME_ID = 56L;
     public static final String APP_NAME2 = "app2";
     private final ApplicationModelConverter converter = new ApplicationModelConverter();
 
     @Test
     public void buildSApplication_should_map_all_information_from_creator_and_initialize_mandatory_fields() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, LAYOUT_ID, null);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, LAYOUT_ID, THEME_ID);
         creator.setDescription(APP_DESC);
         creator.setIconPath(ICON_PATH);
         creator.setProfileId(PROFILE_ID);
@@ -75,6 +76,7 @@ public class ApplicationModelConverterTest {
         assertThat(application.getState()).isEqualTo(SApplicationState.ACTIVATED.name());
         assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
         assertThat(application.getLayoutId()).isEqualTo(LAYOUT_ID);
+        assertThat(application.getThemeId()).isEqualTo(THEME_ID);
     }
 
     @Test
@@ -82,8 +84,7 @@ public class ApplicationModelConverterTest {
         //given
         final long currentDate = System.currentTimeMillis();
         final String state = SApplicationState.DEACTIVATED.name();
-        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID,
-                state, LAYOUT_ID);
+        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID, state, LAYOUT_ID, THEME_ID);
         sApp.setDescription(APP_DESC);
         sApp.setId(ID);
         sApp.setTenantId(TENANT_ID);
@@ -110,15 +111,16 @@ public class ApplicationModelConverterTest {
         assertThat(application.getHomePageId()).isEqualTo(HOME_PAGE_ID);
         assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
         assertThat(application.getLayoutId()).isEqualTo(LAYOUT_ID);
+        assertThat(application.getThemeId()).isEqualTo(THEME_ID);
     }
 
     @Test
     public void toApplicationList_should_call_toApplication_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
         //given
         final SApplicationImpl sApp1 = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
-                SApplicationState.DEACTIVATED.name(), LAYOUT_ID);
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
         final SApplicationImpl sApp2 = new SApplicationImpl(APP_NAME2, " my app2", APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
-                SApplicationState.DEACTIVATED.name(), LAYOUT_ID);
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
 
         //when
         final List<Application> applications = converter.toApplication(Arrays.<SApplication> asList(sApp1, sApp2));

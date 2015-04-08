@@ -49,12 +49,14 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     private Long layoutId;
 
+    protected Long themeId;
+
     public SApplicationImpl() {
         super();
     }
 
     public SApplicationImpl(final String token, final String displayName, final String version, final long creationDate, final long createdBy,
-                            final String state, final Long layoutId) {
+                            final String state, final Long layoutId, final Long themeId) {
         super();
         this.token = token;
         this.displayName = displayName;
@@ -65,6 +67,7 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         updatedBy = createdBy;
         this.state = state;
         this.layoutId = layoutId;
+        this.themeId = themeId;
     }
 
     @Override
@@ -147,6 +150,11 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     @Override
     public Long getLayoutId() {
         return layoutId;
+    }
+
+    @Override
+    public Long getThemeId() {
+        return themeId;
     }
 
     public void setProfileId(final Long profileId) {

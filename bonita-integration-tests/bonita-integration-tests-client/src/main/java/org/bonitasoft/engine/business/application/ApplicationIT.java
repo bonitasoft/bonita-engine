@@ -39,7 +39,8 @@ public class ApplicationIT extends TestWithApplication {
         //given
         final Profile profile = getProfileUser();
         Page layout = createPage("custompage_layout");
-        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0", layout.getId(), null);
+        Page theme = createPage("custompage_theme");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0", layout.getId(), theme.getId());
         creator.setDescription("This is my application");
         creator.setIconPath("/icon.jpg");
         creator.setProfileId(profile.getId());
@@ -60,14 +61,16 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(application.getHomePageId()).isNull();
         assertThat(application.getProfileId()).isEqualTo(profile.getId());
         assertThat(application.getLayoutId()).isEqualTo(layout.getId());
+        assertThat(application.getThemeId()).isEqualTo(theme.getId());
 
         getApplicationAPI().deleteApplication(application.getId());
         getPageAPI().deletePage(layout.getId());
+        getPageAPI().deletePage(theme.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create", "no profile" })
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create", "no profile", "no theme"})
     @Test
-    public void createApplication_without_profile_should_have_null_profileId() throws Exception {
+    public void createApplication_without_profile_and_theme_should_have_null_profileId_and_null_themeId() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
 
@@ -77,6 +80,7 @@ public class ApplicationIT extends TestWithApplication {
         //then
         assertThat(application).isNotNull();
         assertThat(application.getProfileId()).isNull();
+        assertThat(application.getThemeId()).isNull();
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "update" })

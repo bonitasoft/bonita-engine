@@ -326,6 +326,29 @@ public class SApplicationImplAssert extends AbstractAssert<SApplicationImplAsser
   }
 
   /**
+   * Verifies that the actual SApplicationImpl's themeId is equal to the given one.
+   * @param themeId the given themeId to compare the actual SApplicationImpl's themeId to.
+   * @return this assertion object.
+   * @throws AssertionError - if the actual SApplicationImpl's themeId is not equal to the given one.
+   */
+  public SApplicationImplAssert hasThemeId(Long themeId) {
+    // check that actual SApplicationImpl we want to make assertions on is not null.
+    isNotNull();
+
+    // overrides the default error message with a more explicit one
+    String assertjErrorMessage = "\nExpected themeId of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
+    
+    // null safe check
+    Long actualThemeId = actual.getThemeId();
+    if (!Objects.areEqual(actualThemeId, themeId)) {
+      failWithMessage(assertjErrorMessage, actual, themeId, actualThemeId);
+    }
+
+    // return the current assertion for method chaining
+    return this;
+  }
+
+  /**
    * Verifies that the actual SApplicationImpl's token is equal to the given one.
    * @param token the given token to compare the actual SApplicationImpl's token to.
    * @return this assertion object.

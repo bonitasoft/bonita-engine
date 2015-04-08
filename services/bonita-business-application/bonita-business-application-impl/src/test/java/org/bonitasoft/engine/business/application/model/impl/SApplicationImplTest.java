@@ -31,9 +31,10 @@ public class SApplicationImplTest {
         long profileId = 10L;
         long updatedBy = 2L;
         long layoutId = 20L;
+        long themeId = 21L;
 
         //when
-        SApplicationImpl application = new SApplicationImpl("token", "Name to display", "1.0", creationDate, createdBy, state, layoutId);
+        SApplicationImpl application = new SApplicationImpl("token", "Name to display", "1.0", creationDate, createdBy, state, layoutId, themeId);
         application.setDescription("This is my application");
         application.setHomePageId(homePageId);
         application.setIconPath("/icon.jpg");
@@ -44,7 +45,7 @@ public class SApplicationImplTest {
         //then
         assertThat(application).hasToken("token").hasDisplayName("Name to display").hasVersion("1.0").hasCreationDate(creationDate).hasCreatedBy(createdBy)
                 .hasState(state).hasDescription("This is my application").hasHomePageId(homePageId).hasIconPath("/icon.jpg")
-                .hasLastUpdateDate(creationDate + 1).hasProfileId(profileId).hasUpdatedBy(updatedBy).hasLayoutId(layoutId);
+                .hasLastUpdateDate(creationDate + 1).hasProfileId(profileId).hasUpdatedBy(updatedBy).hasLayoutId(layoutId).hasThemeId(themeId);
     }
 
 }

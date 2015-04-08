@@ -128,7 +128,7 @@ public class ApplicationNodeConverter {
         Long layoutId = getLayoutId(applicationNode, importStatus);
 
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
-                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, layoutId);
+                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, layoutId, null);
         builder.setIconPath(applicationNode.getIconPath());
         builder.setDescription(applicationNode.getDescription());
         builder.setState(applicationNode.getState());
