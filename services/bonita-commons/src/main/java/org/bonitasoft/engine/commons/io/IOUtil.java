@@ -780,4 +780,37 @@ public class IOUtil {
             return false;
         }
     }
+
+    public static void updatePropertyValue(File propertiesFile, final Map<String, String> pairs) throws IOException {
+        final BufferedReader br = new BufferedReader(new FileReader(propertiesFile));
+        try {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                String lineToWrite = line;
+                if (!line.startsWith("#")) {
+                    //it is not a comment
+                    final int splitCharIndex = line.indexOf("=");
+                    if (splitCharIndex >= 0) {
+                        final String key = line.substring(0, splitCharIndex);
+                        //this is a key-value pair
+                        if (pairs.containsKey(key.trim())) {
+                            String value = pairs.get(key.trim());
+                            value = value.replace("\\", "\\\\");
+                            lineToWrite = key + "=" + value;
+                        }
+                    }
+                }
+                sb.append(lineToWrite);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+            IOUtil.writeFile(propertiesFile, sb.toString());
+        } finally {
+            if (br != null) {
+                br.close();
+            }
+        }
+    }
 }

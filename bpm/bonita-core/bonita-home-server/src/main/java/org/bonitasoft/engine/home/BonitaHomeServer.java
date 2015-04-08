@@ -435,37 +435,17 @@ public class BonitaHomeServer extends BonitaHome {
     public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException, BonitaHomeNotSetException {
         final Folder workFolder = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId);
         final File propertiesFile = workFolder.getFile("bonita-tenant-community.properties");
-
-        final BufferedReader br = new BufferedReader(new FileReader(propertiesFile));
-        try {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-
-            while (line != null) {
-                String lineToWrite = line;
-                if (!line.startsWith("#")) {
-                    //it is not a comment
-                    final String[] splittedLine = line.split("=");
-                    if (splittedLine.length == 2) {
-                        //this is a key-value pair
-                        if ("userName".equals(splittedLine[0].trim())) {
-                            lineToWrite = "userName=" + userName;
-                        } else if ("userPassword".equals(splittedLine[0].trim())) {
-                            lineToWrite = "userPassword=" + password;
-                        }
-                    }
-                }
-                sb.append(lineToWrite);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
-            }
-            IOUtil.writeContentToFile(sb.toString(), propertiesFile);
-        } finally {
-            if (br != null) {
-                br.close();
-            }
+        final Map<String, String> pairs = new HashMap<>();
+        if (userName != null) {
+            pairs.put("userName", userName);
         }
+        if (password != null) {
+            pairs.put("userPassword", password);
+        }
+        org.bonitasoft.engine.commons.io.IOUtil.updatePropertyValue(propertiesFile, pairs);
     }
+
+
 
     public byte[] exportBarProcessContentUnderHome(long tenantId, long processId, final String actorMappingContent) throws IOException, BonitaHomeNotSetException {
         final FileOutputStream actorMappingOS = getProcessDefinitionFileOutputstream(tenantId, processId, "actorMapping.xml");

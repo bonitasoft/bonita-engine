@@ -389,7 +389,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
         for (final STenant tenant : tenants) {
             final long tenantId = tenant.getId();
-            if (!tenant.isPaused()) {
+            if (!tenant.isPaused() && tenant.isActivated()) {
                 final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
                 long sessionId = -1;
                 long platformSessionId = -1;
