@@ -59,7 +59,6 @@ public class PageMappingServiceImpl implements PageMappingService {
     private final SessionService sessionService;
     private final ReadSessionAccessor sessionAccessor;
     private final Map<String, URLAdapter> urlAdapterMap;
-    private List<URLAdapter> urlAdapters;
 
     public PageMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
                                   ReadSessionAccessor sessionAccessor) {
@@ -71,7 +70,6 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     public void setURLAdapters(List<URLAdapter> urlAdapters) {
-        this.urlAdapters = urlAdapters;
         for (URLAdapter urlAdapter : urlAdapters) {
             urlAdapterMap.put(urlAdapter.getId(), urlAdapter);
         }
