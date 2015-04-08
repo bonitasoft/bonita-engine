@@ -202,6 +202,9 @@ public class SJvmMXBeanTest extends CommonBPMServicesSPTest {
         final int threadNumber2 = (Integer) mbserver.getAttribute(jvmMB, "ThreadCount");
         assertNotSame(threadNumber1, threadNumber2);
         jvmMXB.stop();
+        t1.interrupt();
+        t2.interrupt();
+        t3.interrupt();
     }
 
 }
