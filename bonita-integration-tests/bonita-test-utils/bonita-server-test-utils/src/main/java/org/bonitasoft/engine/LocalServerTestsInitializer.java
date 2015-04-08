@@ -105,7 +105,7 @@ public class LocalServerTestsInitializer {
         if (nbTry > 10) {
             throw new IOException("h2 server not started, all ports occupied");
         }
-        System.setProperty("sysprop.h2.db.server.port", String.valueOf(h2Port + nbTry));
+        System.setProperty("db.server.port", String.valueOf(h2Port + nbTry));
         System.err.println("--- H2 Server started on port " + h2Port + " ---");
         return server;
     }
