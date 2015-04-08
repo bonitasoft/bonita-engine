@@ -95,4 +95,9 @@ public class SApplicationBuilderFactoryImpl implements SApplicationBuilderFactor
     public String getLayoutIdKey() {
         return SApplicationFields.LAYOUT_ID;
     }
+
+    @Override
+    public String getThemeIdKey() {
+        return SApplicationFields.THEME_ID;
+    }
 }

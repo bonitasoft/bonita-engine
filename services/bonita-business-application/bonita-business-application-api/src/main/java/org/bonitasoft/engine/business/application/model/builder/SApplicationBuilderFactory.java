@@ -48,4 +48,6 @@ public interface SApplicationBuilderFactory {
 
     String getLayoutIdKey();
 
+    String getThemeIdKey();
+
 }

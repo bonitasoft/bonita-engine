@@ -97,4 +97,13 @@ public class ApplicationSearchDescriptor {
      * @see Application
      */
     public static final String LAYOUT_ID = "layoutId";
+
+    /**
+     * Used to filter or order by the identifier of {@link Page} set as {@link Application} theme.
+     *
+     * @since 7.0.0
+     * @see Page
+     * @see Application
+     */
+    public static final String THEME_ID = "themeId";
 }
