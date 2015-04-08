@@ -33,8 +33,6 @@ import com.bonitasoft.engine.tenant.TenantMaintenanceIT;
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         TestShadesSP.class,
-        LocalIntegrationTestsSP.class,
-
         // Specific slow test suites below:
         NonInterruptingTimerBoundaryEventIT.class,
         InterruptingTimerBoundaryEventIT.class,
@@ -54,6 +52,7 @@ import com.bonitasoft.engine.tenant.TenantMaintenanceIT;
         SPIdentityTests.class,
         TenantMaintenanceIT.class,
         SPProcessManagementTest.class,
+        LocalIntegrationTestsSP.class,
 })
 @Initializer(LocalServerTestsInitializerSP.class)
 public class SlowExecutionLocalIntegrationTestsSP {
