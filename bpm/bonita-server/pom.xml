@@ -96,6 +96,12 @@
             <groupId>org.bonitasoft.engine.data</groupId>
             <artifactId>bonita-business-data-impl</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.core</groupId>
+                    <artifactId>bonita-home-server</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
       <dependency>
           <groupId>org.bonitasoft.engine.data</groupId>
