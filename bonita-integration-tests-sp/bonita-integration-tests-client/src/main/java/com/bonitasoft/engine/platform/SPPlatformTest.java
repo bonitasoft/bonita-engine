@@ -35,6 +35,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -631,14 +632,14 @@ public class SPPlatformTest {
                 }
             }.getBonitaHomeFolderPath());
             path.append(File.separatorChar);
-            path.append("server");
+            path.append("engine-server");
+            path.append(File.separatorChar);
+            path.append("work");
             path.append(File.separatorChar);
             path.append("tenants");
             path.append(File.separatorChar);
             path.append(tenantId1);
-            path.append(File.separatorChar);
-            path.append("conf");
-            final String tenantPath = path.toString() + File.separator + "bonita-tenant.properties";
+            final String tenantPath = path.toString() + File.separator + "bonita-tenant-community.properties";
             final File file = new File(tenantPath);
             final Properties properties = PropertiesManager.getProperties(file);
             assertEquals("@\\[||sfgf23465", properties.getProperty("userPassword"));
