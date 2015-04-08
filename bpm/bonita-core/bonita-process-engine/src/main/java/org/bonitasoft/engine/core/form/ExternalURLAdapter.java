@@ -49,6 +49,9 @@ public class ExternalURLAdapter implements URLAdapter {
     }
     
     protected void appendParameters(StringBuffer newURL, final Map<String, String[]> parameters) throws SExecutionException {
+        if(parameters == null){
+            return;
+        }
     	for (Entry<String, String[]> parameterEntry : parameters.entrySet()) {
             appendParameter(newURL, parameterEntry.getKey(), parameterEntry.getValue());
 		}

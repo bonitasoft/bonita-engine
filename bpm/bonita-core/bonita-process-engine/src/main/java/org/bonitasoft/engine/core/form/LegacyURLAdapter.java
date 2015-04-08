@@ -48,7 +48,11 @@ public class LegacyURLAdapter implements URLAdapter {
 	public String adapt(final String url, final String key, final Map<String, Serializable> context) throws SExecutionException {
 		@SuppressWarnings("unchecked")
 		final Map<String, String[]> queryParameters = (Map<String, String[]>) context.get(URLAdapterConstants.QUERY_PARAMETERS);
-		final String[] idParamValue = queryParameters.get(URLAdapterConstants.ID_QUERY_PARAM);
+
+		String[] idParamValue = new String[0];
+		if(queryParameters != null){
+			idParamValue = queryParameters.get(URLAdapterConstants.ID_QUERY_PARAM);
+		}
 		String bpmId;
 		if (idParamValue == null || idParamValue.length == 0) {
 			throw new IllegalArgumentException("The parameter \"id\" is missing from the original URL");
