@@ -29,10 +29,10 @@ public class ExternalURLAdapterExt extends ExternalURLAdapter {
 	}
 	
 	@Override
-    protected void appendParameters(StringBuffer newURL, final Map<String, String[]> parameters) throws SExecutionException {
-    	super.appendParameters(newURL, parameters);
+    protected void appendParametersToURL(StringBuffer url, final Map<String, String[]> parameters) throws SExecutionException {
+    	super.appendParametersToURL(url, parameters);
         try {
-        	appendParameter(newURL, URLAdapterConstants.TENANT_QUERY_PARAM, new String[] {String.valueOf(sessionAccessor.getTenantId())});
+        	appendParameterToURL(url, URLAdapterConstants.TENANT_QUERY_PARAM, new String[]{String.valueOf(sessionAccessor.getTenantId())});
         } catch (STenantIdNotSetException e) {
         	throw new SExecutionException("Unable to retrieve the tenant Id", e);
         }
