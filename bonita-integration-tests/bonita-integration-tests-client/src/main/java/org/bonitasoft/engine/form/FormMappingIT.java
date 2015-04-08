@@ -155,22 +155,19 @@ public class FormMappingIT extends TestWithUser {
         FormMapping updatedStep2Form1 = processConfigurationAPI.getFormMapping(step2Form1.getId());
         assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1, "form", "target", "lastUpdateDate", "lastUpdatedBy");
         assertThat(updatedStep2Form1.getURL()).isEqualTo("newFormUrlForStep2");
-       assertThat(updatedStep2Form1.getTarget()).isEqualTo(FormMappingTarget.URL);
+        assertThat(updatedStep2Form1.getTarget()).isEqualTo(FormMappingTarget.URL);
         assertThat(updatedStep2Form1.getLastUpdateDate()).isAfter(new Date(afterDeploy));
         assertThat(updatedStep2Form1.getLastUpdatedBy()).isEqualTo(user.getId());
         assertThat(step2Form1.getLastUpdateDate()).isNull();
 
-
-
         //resolve urls:
-        PageURL p1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("process/P1/1.0", Collections.<String, Serializable>emptyMap());
-        PageURL p1Overview= getProcessConfigurationAPI().resolvePageOrURL("processInstance/P1/1.0", Collections.<String, Serializable>emptyMap());
-        PageURL p1step1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/P1/1.0/step1", Collections.<String, Serializable>emptyMap());
-        assertThat(p1Instanciation.getUrl()).isEqualTo("processStartForm");
+        PageURL p1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("process/P1/1.0", Collections.<String, Serializable> emptyMap());
+        PageURL p1Overview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/P1/1.0", Collections.<String, Serializable> emptyMap());
+        PageURL p1step1Instanciation = getProcessConfigurationAPI()
+                .resolvePageOrURL("taskInstance/P1/1.0/step1", Collections.<String, Serializable> emptyMap());
+        assertThat(p1Instanciation.getUrl()).isEqualTo(buildUrlForExternal("processStartForm"));
         assertThat(p1Overview.getPageId()).isNull();
         assertThat(p1step1Instanciation.getUrl()).isEqualTo(null);
-
-
 
         getProcessAPI().deleteProcessDefinition(p1.getId());
         getProcessAPI().deleteProcessDefinition(p2.getId());
@@ -178,5 +175,9 @@ public class FormMappingIT extends TestWithUser {
                 processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).done())
                         .getResult()).isEmpty();
 
+    }
+
+    protected String buildUrlForExternal(String url) {
+        return url;
     }
 }
