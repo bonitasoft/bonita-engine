@@ -40,9 +40,9 @@ import org.junit.runner.RunWith;
 public class TenantMaintenanceLocalIT extends TestWithUser {
 
     @Test
-    public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
+    public void should_pause_tenant_then_stop_start_node_dont_restart_elements_but_resume_restart_them() throws Exception {
         // given: tenant is paused
-        int tenantId = 1;
+        long tenantId = getSession().getTenantId();
         WorkService workService = getTenantAccessor(tenantId).getWorkService();
         assertFalse(workService.isStopped());
 
