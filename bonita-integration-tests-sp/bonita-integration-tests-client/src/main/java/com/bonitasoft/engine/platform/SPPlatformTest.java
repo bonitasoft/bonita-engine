@@ -74,37 +74,81 @@ public class SPPlatformTest {
     private static APITestSPUtil apiTestSpUtil = new APITestSPUtil();
 
     @BeforeClass
-    public static void beforeClass() throws Exception {
+    public static void beforeClass() throws BonitaException, InterruptedException {
         session = apiTestSpUtil.loginOnPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        createTenants(); // create tenants in before class because this actions takes a lot of time
-    }
-
-    @AfterClass
-    public static void afterClass() throws BonitaException {
-        platformAPI.deleteTenant(tenantId1);
-        platformAPI.deleteTenant(tenantId2);
-        platformAPI.deleteTenant(tenantId3);
-        BPMTestSPUtil.setDefaultTenantId(platformAPI.getDefaultTenant().getId());
-        apiTestSpUtil.logoutOnPlatform(session);
-    }
-
-    private static void createTenants() throws Exception {
+        // create tenants in before class because this actions takes a lot of time
         tenantId1 = platformAPI.createTenant(new TenantCreator(tenantName1, "Tenant", "testIconName1", "testIconPath1", "username1", "testpassword1"));
         Thread.sleep(10);// avoid conflict in creation date
         tenantId2 = platformAPI.createTenant(new TenantCreator(tenantName2, "Tenant", "testIconName2", "testIconPath2", "username2", "testpassword2"));
         tenantId3 = platformAPI.createTenant(new TenantCreator(tenantName3, "Tenant", "testIconName", "testIconPath", "testname3", "testpassword3"));
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @AfterClass
+    public static void afterClass() throws Exception {
+        session = apiTestSpUtil.loginOnPlatform();
+        platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         if (!platformAPI.isPlatformCreated()) {
             platformAPI.createPlatform();
             BPMTestSPUtil.createEnvironmentWithDefaultTenant();
-            createTenants();
         }
+
+        deleteTenantSilently("tenantId1", tenantId1);
+        deleteTenantSilently("tenantId2", tenantId2);
+        deleteTenantSilently("tenantId3", tenantId3);
+
+        apiTestSpUtil.logoutOnPlatform(session);
     }
 
+    //platform créée et active, 3 tenants, activés en before et after
+    @Before
+    public void before() throws BonitaException, InterruptedException {
+        session = apiTestSpUtil.loginOnPlatform();
+        platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        if (!platformAPI.isPlatformCreated()) {
+            platformAPI.createPlatform();
+            BPMTestSPUtil.createEnvironmentWithDefaultTenant();
+        }
+        tenantId1 = createOrDeactivateTenant(tenantName1, new TenantCreator(tenantName1, "Tenant", "testIconName1", "testIconPath1", "username1", "testpassword1"));
+        Thread.sleep(10);// avoid conflict in creation date
+        tenantId2 = createOrDeactivateTenant(tenantName2, new TenantCreator(tenantName2, "Tenant", "testIconName2", "testIconPath2", "username2", "testpassword2"));
+        Thread.sleep(10);// avoid conflict in creation date
+        tenantId3 = createOrDeactivateTenant(tenantName3, new TenantCreator(tenantName3, "Tenant", "testIconName", "testIconPath", "testname3", "testpassword3"));
+    }
+
+    private long createOrDeactivateTenant(final String tenantName, final TenantCreator tenantCreator) throws CreationException, TenantNotFoundException, TenantDeactivationException {
+        Tenant tenant = null;
+        try {
+            tenant = platformAPI.getTenantByName(tenantName);
+        } catch (TenantNotFoundException e) {
+            return platformAPI.createTenant(tenantCreator);
+        }
+        if(!tenant.getState().equals(DEACTIVATED)) {
+            platformAPI.deactiveTenant(tenant.getId());
+        }
+        return tenant.getId();
+    }
+
+    @After
+    public void after() throws Exception {
+        apiTestSpUtil.logoutOnPlatform(session);
+    }
+
+    private static void deleteTenantSilently(final String tenantName, final long tenantId) {
+        try {
+            platformAPI.deactiveTenant(tenantId);
+        } catch (TenantDeactivationException e) {
+            System.err.println("Unable to deactivate tenant " + tenantName + ": " + tenantId);
+        } catch (TenantNotFoundException e) {
+            System.err.println("Unable to deactivate tenant " + tenantName + ": " + tenantId);
+            return;
+        }
+        try {
+            platformAPI.deleteTenant(tenantId);
+        } catch (DeletionException e) {
+            System.err.println("Unable to delete tenant " + tenantName + ": " + tenantId);
+        }
+    }
     private long createATenant(final String tenantName) throws BonitaException {
         return platformAPI.createTenant(new TenantCreator(tenantName, "", "testIconName", "testIconPath", "default_tenant", "default_password"));
     }
@@ -685,7 +729,6 @@ public class SPPlatformTest {
 
         platformAPI.createPlatform();
         apiTestSpUtil.initializeAndStartPlatformWithDefaultTenant(platformAPI, true);
-        createTenants();
     }
 
 }
