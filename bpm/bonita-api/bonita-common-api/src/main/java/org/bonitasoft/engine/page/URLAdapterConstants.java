@@ -22,7 +22,7 @@ public interface URLAdapterConstants {
     String LEGACY_URL_ADAPTER = "legacy";
     String EXTERNAL_URL_ADAPTER = "external";
     String CONTEXT_PATH = "contextPath";
-    String IS_ADMIN = "isAmin";
+    //    String IS_ADMIN = "isAmin";
     String LOCALE = "locale";
     String QUERY_PARAMETERS = "queryParameters";
     String ID_QUERY_PARAM = "id";
