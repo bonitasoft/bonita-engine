@@ -34,11 +34,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         TestShades.class,
-        // // Same suites as in LocalIntegrationTests below:
-        BPMLocalSuiteTests.class,
-        BPMRemoteTestsLocal.class,
-        APIMethodLocalIT.class,
-
         // Specific slow test suites below:
         NonInterruptingTimerBoundaryEventIT.class,
         InterruptingTimerBoundaryEventIT.class,
@@ -50,7 +45,10 @@ import org.junit.runners.Suite.SuiteClasses;
         MessageEventSubProcessIT.class,
         PlatformLoginIT.class,
         PlatformIT.class,
-        TenantMaintenanceIT.class
+        TenantMaintenanceIT.class,
+
+        // Same suites as in LocalIntegrationTests below:
+        LocalIntegrationTests.class,
 
 })
 @Initializer(LocalServerTestsInitializer.class)
