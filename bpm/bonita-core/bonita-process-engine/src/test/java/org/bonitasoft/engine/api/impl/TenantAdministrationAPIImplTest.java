@@ -57,6 +57,7 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.SWorkException;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,6 +76,9 @@ public class TenantAdministrationAPIImplTest {
     @Spy
     @InjectMocks
     private TenantAdministrationAPIImpl tenantManagementAPI;
+
+    @Mock
+    private TransactionService transactionService;
 
     @Mock
     private PlatformService platformService;
@@ -113,6 +117,7 @@ public class TenantAdministrationAPIImplTest {
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
         doReturn(tenantServiceAccessor).when(tenantManagementAPI).getTenantAccessor();
 
+        when(platformServiceAccessor.getTransactionService()).thenReturn(transactionService);
         when(platformServiceAccessor.getBroadcastService()).thenReturn(broadcastService);
         when(platformServiceAccessor.getSchedulerService()).thenReturn(schedulerService);
         when(platformServiceAccessor.getPlatformService()).thenReturn(platformService);
