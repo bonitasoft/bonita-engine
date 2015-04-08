@@ -2570,7 +2570,7 @@ public interface ProcessRuntimeAPI {
      * @return a map containing the evaluated context
      * @throws UserTaskNotFoundException if <code>userTaskInstanceId</code> does not reference any existing task.
      */
-    Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException;
+    Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException;
 
     /**
      * return the context defined in the process definition for this process instance
@@ -2579,5 +2579,5 @@ public interface ProcessRuntimeAPI {
      * @return a map containing the evaluated context
      * @throws ProcessInstanceNotFoundException if <code>processInstanceId</code> does not reference any existing task.
      */
-    Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException;
+    Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
 }

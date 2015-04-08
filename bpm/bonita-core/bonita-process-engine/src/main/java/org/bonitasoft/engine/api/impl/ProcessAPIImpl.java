@@ -247,6 +247,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContextEntry;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
@@ -340,7 +341,9 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -5280,9 +5283,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         SProcessDefinition processDefinition;
         try {
             processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SProcessDefinitionReadException e) {
+        } catch (final SProcessDefinitionNotFoundException | SProcessDefinitionReadException e) {
             throw new ProcessDefinitionNotFoundException(e);
         }
         final List<Problem> problems = new ArrayList<Problem>();
@@ -6064,7 +6065,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public Serializable getUserTaskContractVariableValue(final long userTaskInstanceId, final String name) throws ContractDataNotFoundException {
         final ContractDataService contractDataService = getTenantAccessor().getContractDataService();
         try {
-            return (Serializable) contractDataService.getArchivedUserTaskDataValue(userTaskInstanceId, name);
+            return contractDataService.getArchivedUserTaskDataValue(userTaskInstanceId, name);
         } catch (final SContractDataNotFoundException scdnfe) {
             throw new ContractDataNotFoundException(scdnfe);
         } catch (final SBonitaReadException sbe) {
@@ -6107,53 +6108,79 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        //        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+    public Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
         ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        ExpressionResolverService expressionResolverService = tenantAccessor.getExpressionResolverService();
         try {
-            SActivityInstance activityInstance = activityInstanceService.getActivityInstance(userTaskInstanceId);
-            //            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(activityInstance.getProcessDefinitionId());
-            List<SExpression> expressions = null; //processDefinition.getProcessContainer().getDataDefinitions().get(0).getDefaultValueExpression();
-            Map<Expression, Map<String, Serializable>> expressionsWithContext = buildMapOfExpressionWithInputs(expressions);
-            return evaluateExpressionsInstanceLevel(expressionsWithContext, userTaskInstanceId, CONTAINER_TYPE_ACTIVITY_INSTANCE,
-                    activityInstance.getProcessDefinitionId());
-        } catch (SActivityInstanceNotFoundException e) {
+            SFlowNodeInstance activityInstance = activityInstanceService.getFlowNodeInstance(userTaskInstanceId);
+            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(activityInstance.getProcessDefinitionId());
+            final SExpressionContext expressionContext = createProcessInstanceExpressionContext(userTaskInstanceId, processDefinition, CONTAINER_TYPE_ACTIVITY_INSTANCE);
+            SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(activityInstance.getFlowNodeDefinitionId());
+            List<SContextEntry> context = ((SUserTaskDefinition) flowNode).getContext();
+            return evaluateContext(expressionResolverService, expressionContext, context);
+        } catch (SFlowNodeNotFoundException | SProcessDefinitionReadException | SFlowNodeReadException | SProcessDefinitionNotFoundException e) {
             throw new UserTaskNotFoundException(e);
-        } catch (SBonitaException e) {
-            throw new RetrieveException(e);
+        } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
+            throw new ExpressionEvaluationException(e);
         }
-    }
-
-    private Map<Expression, Map<String, Serializable>> buildMapOfExpressionWithInputs(List<SExpression> expressions) {
-        if (expressions == null) {
-            return Collections.emptyMap();
-        }
-        Map<Expression, Map<String, Serializable>> expressionsWithContext = new HashMap<>(expressions.size());
-        for (SExpression expression : expressions) {
-            expressionsWithContext.put(ModelConvertor.toExpression(expression), null); // no need for a expression input context here.
-        }
-        return expressionsWithContext;
     }
 
     @Override
-    public Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+    public Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        ExpressionResolverService expressionResolverService = tenantAccessor.getExpressionResolverService();
+        ProcessInstanceService processInstanceService = getProcessInstanceService(tenantAccessor);
         try {
-            SProcessInstance processInstance = tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
-            //            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
-            List<SExpression> expressions = null;
-            Map<Expression, Map<String, Serializable>> expressionsWithContext = buildMapOfExpressionWithInputs(expressions);
-            evaluateExpressionsInstanceLevel(expressionsWithContext, processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE,
-                    processInstance.getProcessDefinitionId());
-        } catch (SProcessInstanceNotFoundException e) {
+            SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
+            final SExpressionContext expressionContext = createProcessInstanceExpressionContext(processInstanceId, processDefinition, CONTAINER_TYPE_PROCESS_INSTANCE);
+            List<SContextEntry> context = processDefinition.getContext();
+            return evaluateContext(expressionResolverService, expressionContext, context);
+        } catch (SProcessInstanceNotFoundException | SProcessDefinitionReadException | SProcessInstanceReadException | SProcessDefinitionNotFoundException e) {
             throw new ProcessInstanceNotFoundException(e);
-        } catch (SBonitaException e) {
-            throw new RetrieveException(e);
+        } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
+            throw new ExpressionEvaluationException(e);
         }
+    }
 
-        return Collections.emptyMap();
+    Map<String, Serializable> evaluateContext(ExpressionResolverService expressionResolverService, SExpressionContext expressionContext, List<SContextEntry> context) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+        if(context.isEmpty()){
+            return Collections.emptyMap();
+        }
+        List<SExpression> expressions = toExpressionList(context);
+        List<Object> evaluate = expressionResolverService.evaluate(expressions, expressionContext);
+        return toResultMap(context, evaluate);
+    }
+
+    List<SExpression> toExpressionList(List<SContextEntry> context) {
+        List<SExpression> expressions = new ArrayList<>();
+        for (SContextEntry sContextEntry : context) {
+            expressions.add(sContextEntry.getExpression());
+        }
+        return expressions;
+    }
+
+    HashMap<String, Serializable> toResultMap(List<SContextEntry> context, List<Object> evaluate) {
+        HashMap<String, Serializable> result = new HashMap<>(evaluate.size());
+        for (int i = 0; i < evaluate.size(); i++) {
+            result.put(context.get(i).getKey(), (Serializable) evaluate.get(i));
+        }
+        return result;
+    }
+
+    ProcessInstanceService getProcessInstanceService(TenantServiceAccessor tenantAccessor) {
+        return tenantAccessor.getProcessInstanceService();
+    }
+
+    SExpressionContext createProcessInstanceExpressionContext(long processInstanceId, SProcessDefinition processDefinition, String type) {
+        final SExpressionContext expressionContext = new SExpressionContext();
+        expressionContext.setContainerId(processInstanceId);
+        expressionContext.setContainerType(type);
+        expressionContext.setProcessDefinitionId(processDefinition.getId());
+        return expressionContext;
     }
 
 }
