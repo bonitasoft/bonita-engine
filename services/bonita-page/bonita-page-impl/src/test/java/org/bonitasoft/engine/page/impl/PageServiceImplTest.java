@@ -102,8 +102,10 @@ public class PageServiceImplTest {
 
     private static final int INSTALLATION_DATE_AS_LONG = 123456;
 
-    private static final String PAGE_NAME = "pageName";
+    private static final String PAGE_NAME = "custompage_pageName";
+
     public static final long PROCESS_DEFINITION_ID = 846L;
+
     public static final long USER_ID = 98989L;
 
     @Mock
@@ -217,6 +219,29 @@ public class PageServiceImplTest {
         pageServiceImpl.addPage(newPage, validContent);
 
         // then exception
+
+    }
+
+    @Test
+    public void should_create_page_with_process_scope_when_name_exists() throws Exception {
+
+        // given
+        final SPageImpl newPage = new SPageImpl(PAGE_NAME, 123456, 45, false, CONTENT_NAME);
+        newPage.setDisplayName("display Name");
+        final byte[] validContent = validPageContent(PAGE_NAME);
+        when(pageServiceImpl.getPageByName(PAGE_NAME)).thenReturn(null);
+        pageServiceImpl.addPage(newPage, validContent);
+        when(pageServiceImpl.getPageByName(PAGE_NAME)).thenReturn(newPage);
+
+        // when
+        final SPageImpl newProcessPage = new SPageImpl(PAGE_NAME, 123456, 45, false, CONTENT_NAME);
+        newProcessPage.setContentType(SContentType.FORM);
+        newProcessPage.setProcessDefinitionId(PROCESS_DEFINITION_ID);
+        newProcessPage.setDisplayName("display Name");
+        final SPage insertedPage = pageServiceImpl.addPage(newProcessPage, validContent);
+
+        //then
+        assertThat(insertedPage).isNotNull().isEqualToComparingFieldByField(newProcessPage);
 
     }
 

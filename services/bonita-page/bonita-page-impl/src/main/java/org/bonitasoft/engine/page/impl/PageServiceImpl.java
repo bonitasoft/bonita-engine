@@ -234,14 +234,13 @@ public class PageServiceImpl implements PageService {
     }
 
     private SPage checkIfPageAlreadyExists(SPage page) throws SBonitaReadException {
-        final SPage pageByName = getPageByName(page.getName());
-        if (pageByName != null) {
-            return pageByName;
-        }
+        SPage existingPage;
         if (page.getProcessDefinitionId() != null) {
-            return getPageByNameAndProcessDefinitionId(page.getName(), page.getProcessDefinitionId());
+            existingPage = getPageByNameAndProcessDefinitionId(page.getName(), page.getProcessDefinitionId());
+        } else {
+            existingPage = getPageByName(page.getName());
         }
-        return null;
+        return existingPage;
     }
 
     /**
