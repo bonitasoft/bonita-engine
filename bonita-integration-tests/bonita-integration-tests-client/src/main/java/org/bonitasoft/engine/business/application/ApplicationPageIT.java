@@ -317,9 +317,7 @@ public class ApplicationPageIT extends TestWithCustomPage {
     }
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
-        final SearchOptions options = builder.done();
-        return options;
+        return getDefaultBuilder(startIndex, maxResults).done();
     }
 
     private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
@@ -334,7 +332,8 @@ public class ApplicationPageIT extends TestWithCustomPage {
         //profile1
         Profile profile1 = getProfileUser();
         //app1
-        final Application app1 = getApplicationAPI().createApplication(new ApplicationCreator("app1", "My app1", "1.0").setProfileId(profile1.getId()));
+        final Page layout = createPage("custompage_layout");
+        final Application app1 = getApplicationAPI().createApplication(new ApplicationCreator("app1", "My app1", "1.0", layout.getId()).setProfileId(profile1.getId()));
         final Page page1 = createPage("custompage_page1");
         getApplicationAPI().createApplicationPage(app1.getId(), page1.getId(), "appPage1");
         final Page page2 = createPage("custompage_page2");
@@ -356,13 +355,14 @@ public class ApplicationPageIT extends TestWithCustomPage {
         List<String> allPagesForProfile2 = getApplicationAPI().getAllPagesForProfile(profile2.getId());
 
         //then
-        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_page1", "custompage_page2", "custompage_page3"));
+        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_layout", "custompage_page1", "custompage_page2", "custompage_page3"));
         assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_page4"));
 
         //clean
         getApplicationAPI().deleteApplication(app1.getId());
         getApplicationAPI().deleteApplication(app2.getId());
         getApplicationAPI().deleteApplication(app3.getId());
+        getPageAPI().deletePage(layout.getId());
         getPageAPI().deletePage(page1.getId());
         getPageAPI().deletePage(page2.getId());
         getPageAPI().deletePage(page3.getId());
