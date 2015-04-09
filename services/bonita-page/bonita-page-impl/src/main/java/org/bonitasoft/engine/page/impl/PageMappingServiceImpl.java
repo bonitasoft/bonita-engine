@@ -121,7 +121,7 @@ public class PageMappingServiceImpl implements PageMappingService {
     public SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context) throws SExecutionException {
         String url = pageMapping.getUrl();
         String urlAdapter = pageMapping.getUrlAdapter();
-        if (url != null && urlAdapter != null) {
+        if (urlAdapter != null) {
             url = getUrlAdapter(urlAdapter).adapt(url, pageMapping.getKey(), context);
         }
         return new SPageURL(url, pageMapping.getPageId());

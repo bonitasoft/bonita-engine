@@ -270,6 +270,18 @@ public class SPageMappingServiceImplTest {
     }
 
     @Test
+    public void should_resolveUrl_return_call_adapter_with_no_url() throws Exception {
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        pageMapping.setUrl(null);
+        pageMapping.setUrlAdapter("testAdapter");
+
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable>emptyMap());
+
+        assertThat(sPageURL.getPageId()).isEqualTo(null);
+        assertThat(sPageURL.getUrl()).isEqualTo("null_adapted_0");
+    }
+
+    @Test
     public void should_resolveUrl_return_url_should_execute_adapter() throws Exception {
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         pageMapping.setUrl("theUrl");
@@ -280,6 +292,7 @@ public class SPageMappingServiceImplTest {
         assertThat(sPageURL.getPageId()).isEqualTo(null);
         assertThat(sPageURL.getUrl()).isEqualTo("theUrl_adapted_1");/* 1 is the map size */
     }
+
     @Test(expected = SExecutionException.class)
     public void should_resolveUrl_with_unknown_adapter() throws Exception {
         SPageMappingImpl pageMapping = new SPageMappingImpl();
