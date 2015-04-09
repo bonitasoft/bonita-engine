@@ -855,7 +855,7 @@ ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenanti
 CREATE TABLE page (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  name VARCHAR(512) NOT NULL,
+  name VARCHAR(50) NOT NULL,
   displayName VARCHAR(255) NOT NULL,
   description LONGVARCHAR,
   installationDate BIGINT NOT NULL,
