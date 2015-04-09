@@ -355,6 +355,7 @@
                                     <sysprop.bonita.hibernate.transaction.jta_platform>org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</sysprop.bonita.hibernate.transaction.jta_platform>
                                     <hibernate.transaction.manager_lookup_class>org.bonitasoft.JBoss7TransactionManagerLookup</hibernate.transaction.manager_lookup_class>
                                     <sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
+                                    <sysprop.bonita.bdm.db.vendor>${db.vendor}</sysprop.bonita.bdm.db.vendor>
 									<jboss.server.log.threshold>WARN</jboss.server.log.threshold>
 								</systemProperties>
                                 <timeout>360000</timeout>
