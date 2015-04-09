@@ -26,6 +26,7 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
     private String path;
     private String displayName;
     private Long layoutId;
+    private Long profileId;
 
     public static ApplicationBuilder anApplication() {
         return new ApplicationBuilder();
@@ -35,6 +36,7 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
     SApplicationImpl _build() {
         SApplicationImpl application = new SApplicationImpl(name, displayName, version, System.currentTimeMillis(), 21, SApplicationState.DEACTIVATED.name(), layoutId, null);
         application.setIconPath(path);
+        application.setProfileId(profileId);
         return application;
     }
 
@@ -43,7 +45,7 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
         return this;
     }
 
-    public ApplicationBuilder withDispalyName(final String displayName) {
+    public ApplicationBuilder withDisplayName(final String displayName) {
         this.displayName = displayName;
         return this;
     }
@@ -60,6 +62,11 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
 
     public ApplicationBuilder withLayoutId(final Long layoutId) {
         this.layoutId = layoutId;
+        return this;
+    }
+
+    public ApplicationBuilder withProfile(final long profileId) {
+        this.profileId = profileId;
         return this;
     }
 

@@ -199,10 +199,8 @@ public class PageServiceImpl implements PageService {
             page.setId(pageContent.getId());
 
             return page;
-        } catch (final SRecorderException re) {
-            throw new SObjectCreationException(re);
-        } catch (final SBonitaReadException bre) {
-            throw new SObjectCreationException(bre);
+        } catch (final SRecorderException|SBonitaReadException e) {
+            throw new SObjectCreationException(e);
         }
     }
 
@@ -273,7 +271,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage getPage(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
-        final SPage page = persistenceService.selectById(new SelectByIdDescriptor<SPage>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
+        final SPage page = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
         if (page == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
         }
@@ -315,16 +313,7 @@ public class PageServiceImpl implements PageService {
             final SDeleteEvent deleteEvent = getDeleteEvent(sPage, PAGE);
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
-        } catch (final SRecorderException re) {
-            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
-            throw new SObjectModificationException(re);
-        } catch (final SBonitaReadException e) {
-            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
-            throw new SObjectModificationException(e);
-        } catch (final SProfileEntryNotFoundException e) {
-            initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
-            throw new SObjectModificationException(e);
-        } catch (final SProfileEntryDeletionException e) {
+        } catch (final SRecorderException|SBonitaReadException|SProfileEntryNotFoundException|SProfileEntryDeletionException e ) {
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(e);
         }
@@ -333,7 +322,7 @@ public class PageServiceImpl implements PageService {
     private void deleteProfileEntry(final SPage sPage) throws SBonitaReadException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
         final List<OrderByOption> orderByOptions = Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        final List<FilterOption> filters = new ArrayList<>();
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE, sPage.getName()));
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.CUSTOM, new Boolean(true)));
 
@@ -352,7 +341,7 @@ public class PageServiceImpl implements PageService {
             SProfileEntryDeletionException {
         final List<OrderByOption> orderByOptions = Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        final List<FilterOption> filters = new ArrayList<>();
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PROFILE_ID, sProfileEntry.getProfileId()));
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PARENT_ID, sProfileEntry.getParentId()));
 
@@ -408,7 +397,7 @@ public class PageServiceImpl implements PageService {
     @Override
     public byte[] getPageContent(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
         final SPage page = getPage(pageId);
-        final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>(QUERY_GET_PAGE_CONTENT,
+        final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_CONTENT,
                 SPageContent.class, pageId));
         if (pageContent == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
@@ -449,7 +438,7 @@ public class PageServiceImpl implements PageService {
                 }
             }
 
-            final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<SPage>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
+            final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
             final String oldPageName = sPage.getName();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage,
                     entityUpdateDescriptor);
@@ -465,13 +454,7 @@ public class PageServiceImpl implements PageService {
 
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, logMethodName);
             return sPage;
-        } catch (final SRecorderException re) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
-            throw new SObjectModificationException(re);
-        } catch (final SBonitaReadException e) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
-            throw new SObjectModificationException(e);
-        } catch (final SProfileEntryUpdateException e) {
+        } catch (final SRecorderException|SBonitaReadException|SProfileEntryUpdateException e) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
             throw new SObjectModificationException(e);
         }
@@ -483,7 +466,7 @@ public class PageServiceImpl implements PageService {
         {
             return;
         }
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        final List<FilterOption> filters = new ArrayList<>();
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE, oldPageName));
         final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC)), filters, null);
@@ -511,7 +494,7 @@ public class PageServiceImpl implements PageService {
         final Properties pageProperties = readPageZip(content, false);
         try {
 
-            final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>(QUERY_GET_PAGE_CONTENT,
+            final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_CONTENT,
                     SPageContent.class, pageId));
             final SPageUpdateContentBuilder builder = BuilderFactory.get(SPageUpdateContentBuilderFactory.class)
                     .createNewInstance(new EntityUpdateDescriptor());
@@ -524,10 +507,7 @@ public class PageServiceImpl implements PageService {
 
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, METHOD_UPDATE_PAGE);
 
-        } catch (final SRecorderException re) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
-            throw new SObjectModificationException(re);
-        } catch (final SBonitaReadException e) {
+        } catch (final SRecorderException|SBonitaReadException e) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
             throw new SObjectModificationException(e);
         }
