@@ -1210,7 +1210,7 @@ public class ProcessAPIImplTest {
         doReturn(Arrays.asList("e1", "e2")).when(expressionResolverService).evaluate(eq(Arrays.<SExpression>asList(e1, e2)), any(SExpressionContext.class));
 
 
-        Map<String, Serializable> userTaskExecutionContext = processAPI.getProcessInstanceExecutionContext(PROCESS_DEFINITION_ID);
+        Map<String, Serializable> userTaskExecutionContext = processAPI.getProcessInstanceExecutionContext(PROCESS_INSTANCE_ID);
 
         assertThat(userTaskExecutionContext).containsOnly(entry("key1", "e1"), entry("key2", "e2"));
     }
