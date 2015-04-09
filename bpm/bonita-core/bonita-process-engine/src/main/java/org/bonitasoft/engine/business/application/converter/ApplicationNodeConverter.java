@@ -133,10 +133,11 @@ public class ApplicationNodeConverter {
 
     public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) throws SBonitaReadException {
         final ImportStatus importStatus = new ImportStatus(applicationNode.getToken());
-        Long layoutId = getLayoutId(applicationNode, importStatus);
+        Long layoutId = calculatePageId(applicationNode.getLayout(), importStatus);
+        Long themeId = calculatePageId(applicationNode.getTheme(), importStatus);
 
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
-                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, layoutId, null);
+                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, layoutId, themeId);
         builder.setIconPath(applicationNode.getIconPath());
         builder.setDescription(applicationNode.getDescription());
         builder.setState(applicationNode.getState());
@@ -150,16 +151,16 @@ public class ApplicationNodeConverter {
         return new ImportResult(application, importStatus);
     }
 
-    private Long getLayoutId(final ApplicationNode applicationNode, final ImportStatus importStatus) throws SBonitaReadException {
-        if (applicationNode.getLayout() == null) {
+    private Long calculatePageId(final String pageName, final ImportStatus importStatus) throws SBonitaReadException {
+        if (pageName == null) {
             return null;
         }
-        SPage layout = pageService.getPageByName(applicationNode.getLayout());
-        if (layout == null) {
-            importStatus.addError(new ImportError(applicationNode.getLayout(), ImportError.Type.PAGE));
+        SPage theme = pageService.getPageByName(pageName);
+        if (theme == null) {
+            importStatus.addError(new ImportError(pageName, ImportError.Type.PAGE));
             return null;
         }
-        return layout.getId();
+        return theme.getId();
     }
 
     private ImportError setProfile(final ApplicationNode applicationNode, final SApplicationBuilder builder) {
