@@ -28,6 +28,7 @@ public class ApplicationNodeTest {
         String homePage = "home";
         String iconPath = "/icon.jpg";
         String layout = "leftMenu";
+        String theme = "defaultTheme";
         String profile = "User";
         String token = "myapp";
         String version = "1.0";
@@ -40,6 +41,7 @@ public class ApplicationNodeTest {
         app.setHomePage(homePage);
         app.setIconPath(iconPath);
         app.setLayout(layout);
+        app.setTheme(theme);
         app.setProfile(profile);
         app.setState(state);
         app.setToken(token);
@@ -47,7 +49,7 @@ public class ApplicationNodeTest {
 
         //then
         assertThat(app).hasDisplayName(displayName).hasDescription(description).hasHomePage(homePage).hasIconPath(iconPath).hasLayout(layout)
-                .hasProfile(profile).hasState(state).hasToken(token).hasVersion(version);
+                .hasTheme(theme).hasProfile(profile).hasState(state).hasToken(token).hasVersion(version);
     }
 
     @Test

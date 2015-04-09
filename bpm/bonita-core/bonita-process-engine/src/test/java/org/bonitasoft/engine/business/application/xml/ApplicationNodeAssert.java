@@ -273,6 +273,29 @@ public class ApplicationNodeAssert extends AbstractAssert<ApplicationNodeAssert,
   }
 
   /**
+   * Verifies that the actual ApplicationNode's theme is equal to the given one.
+   * @param theme the given theme to compare the actual ApplicationNode's theme to.
+   * @return this assertion object.
+   * @throws AssertionError - if the actual ApplicationNode's theme is not equal to the given one.
+   */
+  public ApplicationNodeAssert hasTheme(String theme) {
+    // check that actual ApplicationNode we want to make assertions on is not null.
+    isNotNull();
+
+    // overrides the default error message with a more explicit one
+    String assertjErrorMessage = "\nExpected theme of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
+    
+    // null safe check
+    String actualTheme = actual.getTheme();
+    if (!Objects.areEqual(actualTheme, theme)) {
+      failWithMessage(assertjErrorMessage, actual, theme, actualTheme);
+    }
+
+    // return the current assertion for method chaining
+    return this;
+  }
+
+  /**
    * Verifies that the actual ApplicationNode's token is equal to the given one.
    * @param token the given token to compare the actual ApplicationNode's token to.
    * @return this assertion object.

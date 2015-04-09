@@ -53,11 +53,12 @@ public class ApplicationImportExportIT extends TestWithApplication {
         //given
         Profile userProfile = getProfileUser();
         Page layout = createPage("custompage_mainLayout");
+        Page theme = createPage("custompage_theme");
 
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("applications.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
 
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0", layout.getId(), null);
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0", layout.getId(), theme.getId());
         hrCreator.setDescription("This is the HR dashboard.");
         hrCreator.setIconPath("/icon.jpg");
         hrCreator.setProfileId(userProfile.getId());
@@ -95,6 +96,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
         getApplicationAPI().deleteApplication(hr.getId());
         getPageAPI().deletePage(myPage.getId());
         getPageAPI().deletePage(layout.getId());
+        getPageAPI().deletePage(theme.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import" })

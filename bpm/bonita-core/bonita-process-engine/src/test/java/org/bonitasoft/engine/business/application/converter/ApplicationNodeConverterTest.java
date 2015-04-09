@@ -96,6 +96,8 @@ public class ApplicationNodeConverterTest {
         assertThat(applicationNode.getState()).isEqualTo("enabled");
         assertThat(applicationNode.getProfile()).isNull();
         assertThat(applicationNode.getHomePage()).isNull();
+        assertThat(applicationNode.getLayout()).isNull();
+        assertThat(applicationNode.getTheme()).isNull();
 
     }
 
@@ -169,12 +171,12 @@ public class ApplicationNodeConverterTest {
     @Test
     public void toNode_should_replaceLayoutId_by_page_name() throws Exception {
         //given
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, null);
-        application.setLayoutId(9L);
+        long layoutId = 9L;
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", layoutId, null);
         final SPage layout = mock(SPage.class);
         given(layout.getName()).willReturn("mainLayout");
 
-        given(pageService.getPage(9L)).willReturn(layout);
+        given(pageService.getPage(layoutId)).willReturn(layout);
 
         //when
         final ApplicationNode applicationNode = converter.toNode(application);
@@ -182,6 +184,24 @@ public class ApplicationNodeConverterTest {
         //then
         assertThat(applicationNode).isNotNull();
         assertThat(applicationNode.getLayout()).isEqualTo("mainLayout");
+    }
+
+    @Test
+    public void toNode_should_replaceThemeId_by_page_name() throws Exception {
+        //given
+        long themeId = 9L;
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, themeId);
+        final SPage theme = mock(SPage.class);
+        given(theme.getName()).willReturn("defaultTheme");
+
+        given(pageService.getPage(themeId)).willReturn(theme);
+
+        //when
+        final ApplicationNode applicationNode = converter.toNode(application);
+
+        //then
+        assertThat(applicationNode).isNotNull();
+        assertThat(applicationNode.getTheme()).isEqualTo("defaultTheme");
     }
 
     @Test(expected = ExportException.class)
