@@ -36,6 +36,9 @@
                 <value>/org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.hbm.xml</value>
                 <value>/org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.queries.hbm.xml</value>
 
+                <value>/org/bonitasoft/engine/profile/model/impl/hibernate/profile.hbm.xml</value>
+                <value>/org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>
+
                 <!-- GLUPSSSS Needed by process instance queries -->
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
                 <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>

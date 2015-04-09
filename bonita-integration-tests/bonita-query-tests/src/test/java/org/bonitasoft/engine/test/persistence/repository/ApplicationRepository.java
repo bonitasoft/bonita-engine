@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.test.persistence.repository;
 
+import java.util.List;
+
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -81,6 +83,12 @@ public class ApplicationRepository extends TestRepository {
         final Query namedQuery = getNamedQuery("getLastIndexForChildOf");
         namedQuery.setParameter("parentId", parentMenuId);
         return (Integer) namedQuery.uniqueResult();
+    }
+
+    public List<String> getAllPagesForProfile(final long profileId) {
+        final Query namedQuery = getNamedQuery("getAllPagesForProfile");
+        namedQuery.setParameter("profileId", profileId);
+        return namedQuery.list();
     }
 
 }
