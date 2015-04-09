@@ -14,9 +14,6 @@
 
 package org.bonitasoft.engine.core.form.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.core.form.FormMappingKeyGenerator;
 import org.bonitasoft.engine.core.form.SFormMapping;
@@ -29,7 +26,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
  * @author Baptiste Mesta
  */
 public class FormMappingKeyGeneratorImpl implements FormMappingKeyGenerator {
-
 
     public static final String UTF_8 = "UTF-8";
     private final ProcessDefinitionService processDefinitionService;
@@ -52,23 +48,16 @@ public class FormMappingKeyGeneratorImpl implements FormMappingKeyGenerator {
         }
         switch (type) {
             case SFormMapping.TYPE_PROCESS_OVERVIEW:
-                return "processInstance/" + encode(processDefinition.getName()) + "/" + encode(processDefinition.getVersion());
+                return "processInstance/" + processDefinition.getName() + "/" + processDefinition.getVersion();
             case SFormMapping.TYPE_PROCESS_START:
-                return "process/" + encode(processDefinition.getName()) + "/" + encode(processDefinition.getVersion());
+                return "process/" + processDefinition.getName() + "/" + processDefinition.getVersion();
             case SFormMapping.TYPE_TASK:
-                if(task == null || task.isEmpty()){
+                if (task == null || task.isEmpty()) {
                     throw new SObjectCreationException("The task name is not set");
                 }
-                return "taskInstance/" + encode(processDefinition.getName()) + "/" + encode(processDefinition.getVersion()) + "/" + encode(task);
+                return "taskInstance/" + processDefinition.getName() + "/" + processDefinition.getVersion() + "/" + task;
         }
         throw new SObjectCreationException("Unable to generate the key for the unknown type " + type);
     }
 
-    private String encode(String string) {
-        try {
-            return URLEncoder.encode(string, UTF_8);
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("Bad encoding, should not happen");
-        }
-    }
 }
