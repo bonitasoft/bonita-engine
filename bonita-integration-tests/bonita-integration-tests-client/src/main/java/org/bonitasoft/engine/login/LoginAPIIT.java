@@ -63,7 +63,7 @@ import org.junit.Test;
  */
 public class LoginAPIIT extends CommonAPIIT {
 
-    private static final String COMMAND_NAME = "deleteSessionCOmmand";
+    private static final String COMMAND_NAME = "deleteSessionCommand";
 
     private static PlatformSession platformSession;
 
