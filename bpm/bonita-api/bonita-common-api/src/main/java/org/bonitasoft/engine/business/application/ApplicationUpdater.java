@@ -148,20 +148,6 @@ public class ApplicationUpdater implements Serializable {
     }
 
     /**
-     * Defines the identifier of the new {@link org.bonitasoft.engine.page.Page} used as the {@link Application} layout.
-     * 
-     * @param layoutId the identifier of {@link org.bonitasoft.engine.page.Page} used as layout
-     * @return the current {@code ApplicationUpdater}
-     * @see org.bonitasoft.engine.page.Page
-     * @see org.bonitasoft.engine.business.application.Application
-     * @since 7.0.0
-     */
-    public ApplicationUpdater setLayoutId(final Long layoutId) {
-        fields.put(ApplicationField.LAYOUT_ID, layoutId);
-        return this;
-    }
-
-    /**
      * Determines if this updater has at least one field to update
      *
      * @return true if there is at least one field to update; false otherwise

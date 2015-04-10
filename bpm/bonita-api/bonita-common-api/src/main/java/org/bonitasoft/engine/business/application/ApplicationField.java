@@ -82,11 +82,4 @@ public enum ApplicationField {
      */
     HOME_PAGE_ID,
 
-    /**
-     * References the identifier of the {@link org.bonitasoft.engine.page.Page} defined as the {@link Application} layout.
-     * @see org.bonitasoft.engine.page.Page
-     * @see org.bonitasoft.engine.business.application.Application
-     */
-    LAYOUT_ID
-
 }

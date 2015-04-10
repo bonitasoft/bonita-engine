@@ -31,4 +31,13 @@ public class ImportException extends BonitaException {
         super(cause);
     }
 
+    /**
+     * Constructs a new exception with the specified message.
+     *
+     * @param message
+     *        The message (which is saved for later retrieval by the {@link Throwable#getMessage()} method)
+     */
+    public ImportException(final String message) {
+        super(message);
+    }
 }

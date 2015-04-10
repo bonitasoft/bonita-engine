@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.api.impl.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -28,9 +30,17 @@ import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationState;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import org.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ApplicationModelConverterTest {
 
     private static final String ICON_PATH = "/icon.jpg";
@@ -46,17 +56,26 @@ public class ApplicationModelConverterTest {
     private static final long LOGGED_USER_ID = 10;
     public static final long LAYOUT_ID = 55L;
     public static final String APP_NAME2 = "app2";
-    private final ApplicationModelConverter converter = new ApplicationModelConverter();
+
+    @Mock
+    private PageService pageService;
+
+    @InjectMocks
+    private ApplicationModelConverter converter;
 
     @Test
     public void buildSApplication_should_map_all_information_from_creator_and_initialize_mandatory_fields() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, LAYOUT_ID);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
         creator.setDescription(APP_DESC);
         creator.setIconPath(ICON_PATH);
         creator.setProfileId(PROFILE_ID);
         final long userId = 10;
         final long before = System.currentTimeMillis();
+
+        SPage page = mock(SPage.class);
+        given(page.getId()).willReturn(LAYOUT_ID);
+        given(pageService.getPageByName("custompage_layout")).willReturn(page);
 
         //when
         final SApplication application = converter.buildSApplication(creator, userId);
@@ -75,6 +94,20 @@ public class ApplicationModelConverterTest {
         assertThat(application.getState()).isEqualTo(SApplicationState.ACTIVATED.name());
         assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
         assertThat(application.getLayoutId()).isEqualTo(LAYOUT_ID);
+    }
+
+    @Test(expected = CreationException.class)
+    public void buildSApplication_should_throw_CreationException_when_the_default_page_layout_is_not_available() throws Exception {
+        //given
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
+        final long userId = 10;
+
+        given(pageService.getPageByName("custompage_layout")).willReturn(null);
+
+        //when
+        converter.buildSApplication(creator, userId);
+
+        //then exception
     }
 
     @Test
@@ -139,7 +172,6 @@ public class ApplicationModelConverterTest {
         updater.setProfileId(10L);
         updater.setState(ApplicationState.ACTIVATED.name());
         updater.setHomePageId(11L);
-        updater.setLayoutId(20L);
 
         //when
         final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
@@ -147,7 +179,7 @@ public class ApplicationModelConverterTest {
         //then
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
-        assertThat(fields).hasSize(11); // field lastUpdateDate cannot be checked:
+        assertThat(fields).hasSize(10); // field lastUpdateDate cannot be checked:
         assertThat(fields.get(SApplicationFields.TOKEN)).isEqualTo("My-updated-app");
         assertThat(fields.get(SApplicationFields.DISPLAY_NAME)).isEqualTo("Updated display name");
         assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("1.1");
@@ -157,7 +189,6 @@ public class ApplicationModelConverterTest {
         assertThat(fields.get(SApplicationFields.STATE)).isEqualTo(ApplicationState.ACTIVATED.name());
         assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(LOGGED_USER_ID);
         assertThat(fields.get(SApplicationFields.HOME_PAGE_ID)).isEqualTo(11L);
-        assertThat(fields.get(SApplicationFields.LAYOUT_ID)).isEqualTo(20L);
     }
 
     @Test

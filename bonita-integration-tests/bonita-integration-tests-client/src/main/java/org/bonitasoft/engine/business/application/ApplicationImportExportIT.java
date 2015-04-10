@@ -36,6 +36,8 @@ import org.junit.Test;
  */
 public class ApplicationImportExportIT extends TestWithApplication {
 
+    public static final String DEFAULT_LAYOUT_NAME = "custompage_layout";
+
     private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
         builder.sort(ApplicationSearchDescriptor.ID, Order.ASC);
@@ -52,12 +54,11 @@ public class ApplicationImportExportIT extends TestWithApplication {
     public void exportApplications_should_return_the_byte_content_of_xml_file_containing_selected_applications() throws Exception {
         //given
         Profile userProfile = getProfileUser();
-        Page layout = createPage("custompage_mainLayout");
 
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("applications.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
 
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0", layout.getId());
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0");
         hrCreator.setDescription("This is the HR dashboard.");
         hrCreator.setIconPath("/icon.jpg");
         hrCreator.setProfileId(userProfile.getId());
@@ -94,7 +95,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
         getApplicationAPI().deleteApplication(hr.getId());
         getPageAPI().deletePage(myPage.getId());
-        getPageAPI().deletePage(layout.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import" })
@@ -105,7 +105,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used", IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
-        final Page myLayout = getPageAPI().createPage("not_used", IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-layout-page.zip")));
+        final Page defaultLayout = getPageAPI().getPageByName(DEFAULT_LAYOUT_NAME);
 
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("applications.xml"));
 
@@ -121,7 +121,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
         final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
         Application hrApp = searchResult.getResult().get(0);
-        assertIsHRApplication(profile, myLayout, hrApp);
+        assertIsHRApplication(profile, defaultLayout, hrApp);
         assertIsMarketingApplication(searchResult.getResult().get(1));
 
         //check pages were created
@@ -147,7 +147,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
         getApplicationAPI().deleteApplication(hrApp.getId());
         getPageAPI().deletePage(myPage.getId());
-        getPageAPI().deletePage(myLayout.getId());
 
     }
 
@@ -224,12 +223,11 @@ public class ApplicationImportExportIT extends TestWithApplication {
         assertThat(importStatus).hasSize(1);
         assertThat(importStatus.get(0).getName()).isEqualTo("HR-dashboard");
         assertThat(importStatus.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        ImportError layoutError = new ImportError("ThisLayoutDoesNotExist", ImportError.Type.PAGE);
         ImportError profileError = new ImportError("ThisProfileDoesNotExist", ImportError.Type.PROFILE);
         ImportError customPageError = new ImportError("custompage_notexists", ImportError.Type.PAGE);
         ImportError appPageError1 = new ImportError("will-not-be-imported", ImportError.Type.APPLICATION_PAGE);
         ImportError appPageError2 = new ImportError("never-existed", ImportError.Type.APPLICATION_PAGE);
-        assertThat(importStatus.get(0).getErrors()).containsExactly(layoutError, profileError, customPageError, appPageError1, appPageError2);
+        assertThat(importStatus.get(0).getErrors()).containsExactly(profileError, customPageError, appPageError1, appPageError2);
 
         // check applications ware created
         final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(buildSearchOptions(0, 10));
@@ -274,7 +272,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
         //given
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used", IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
-        final Page myLayout = getPageAPI().createPage("not_used", IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-layout-page.zip")));
 
         final byte[] importedByteArray = IOUtils.toByteArray(ApplicationIT.class
                 .getResourceAsStream("applications.xml"));
@@ -294,7 +291,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
         getApplicationAPI().deleteApplication(hrApplication.getId());
         getPageAPI().deletePage(myPage.getId());
-        getPageAPI().deletePage(myLayout.getId());
 
     }
 

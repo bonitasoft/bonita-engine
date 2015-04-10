@@ -41,6 +41,7 @@ import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.ExportException;
+import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -48,6 +49,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -72,8 +74,20 @@ public class ApplicationNodeConverterTest {
     @Mock
     private PageService pageService;
 
+    @Mock
+    private SPage defaultLayout;
+
+    public static final long DEFAULT_LAYOUT_ID = 101;
+
     @InjectMocks
     private ApplicationNodeConverter converter;
+
+    @Before
+    public void setUp() throws Exception {
+        given(defaultLayout.getId()).willReturn(DEFAULT_LAYOUT_ID);
+        given(defaultLayout.getName()).willReturn(ApplicationService.DEFAULT_LAYOUT_NAME);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(defaultLayout);
+    }
 
     @Test
     public void toNode_should_return_convert_all_string_fields() throws Exception {
@@ -255,17 +269,11 @@ public class ApplicationNodeConverterTest {
         node.setIconPath("/icon.jpg");
         node.setProfile("admin");
         node.setState("ENABLED");
-        node.setLayout("custompage_mainLayout");
 
         long profileId = 8L;
         final SProfile profile = mock(SProfile.class);
         given(profile.getId()).willReturn(profileId);
         given(profileService.getProfileByName("admin")).willReturn(profile);
-
-        long layoutId = 15L;
-        SPage layout = mock(SPage.class);
-        given(layout.getId()).willReturn(layoutId);
-        given(pageService.getPageByName("custompage_mainLayout")).willReturn(layout);
 
         //when
         long createdBy = 1L;
@@ -284,7 +292,32 @@ public class ApplicationNodeConverterTest {
         assertThat(application.getProfileId()).isEqualTo(profileId);
         assertThat(application.getState()).isEqualTo("ENABLED");
         assertThat(application.getCreatedBy()).isEqualTo(createdBy);
-        assertThat(application.getLayoutId()).isEqualTo(layoutId);
+
+        final ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).isEmpty();
+
+    }
+
+    @Test
+    public void toSApplication_should_always_use_default_layout() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        node.setToken("app");
+        node.setLayout("dummyLayout"); // will not be used, the layout will be always the default one
+
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(defaultLayout);
+
+        //when
+        long createdBy = 1L;
+        final ImportResult importResult = converter.toSApplication(node, createdBy);
+
+        //then
+        assertThat(importResult).isNotNull();
+
+        final SApplication application = importResult.getApplication();
+        assertThat(application.getLayoutId()).isEqualTo(DEFAULT_LAYOUT_ID);
 
         final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");
@@ -330,42 +363,20 @@ public class ApplicationNodeConverterTest {
         assertThat(importStatus.getErrors()).containsExactly(new ImportError("admin", ImportError.Type.PROFILE));
     }
 
-    @Test
-    public void toSApplication_should_return_application_with_null_layout_id_when_node_has_no_layout() throws Exception {
+    @Test(expected = ImportException.class)
+    public void toSApplication_should_throw_ImportException_when_layout_is_not_found() throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
-        node.setLayout(null);
-
-        //when
-        final ImportResult importResult = converter.toSApplication(node, 1L);
-
-        //then
-        assertThat(importResult).isNotNull();
-        assertThat(importResult.getApplication().getLayoutId()).isNull();
-        assertThat(importResult.getImportStatus().getErrors()).isEmpty();
-    }
-
-    @Test
-    public void toSApplication_should_return_Import_result_with_errors_when_layout_is_not_found() throws Exception {
-        //given
-        final ApplicationNode node = new ApplicationNode();
-        node.setLayout("notAvailableLayout");
         node.setVersion("1.0");
         node.setToken("app");
         node.setState("ENABLED");
 
-        given(pageService.getPageByName("notAvailableLayout")).willReturn(null);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(null);
 
         //when
-        final ImportResult importResult = converter.toSApplication(node, 1L);
+        converter.toSApplication(node, 1L);
 
-        //then
-        assertThat(importResult.getApplication().getLayoutId()).isNull();
-
-        final ImportStatus importStatus = importResult.getImportStatus();
-        assertThat(importStatus.getName()).isEqualTo("app");
-        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        assertThat(importStatus.getErrors()).containsExactly(new ImportError("notAvailableLayout", ImportError.Type.PAGE));
+        //then exception
     }
 
 

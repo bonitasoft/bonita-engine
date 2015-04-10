@@ -82,7 +82,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     private ApplicationAPIDelegate getApplicationAPIDelegate() {
-        return new ApplicationAPIDelegate(getTenantAccessor(), new ApplicationModelConverter(),
+        return new ApplicationAPIDelegate(getTenantAccessor(), new ApplicationModelConverter(getTenantAccessor().getPageService()),
                 SessionInfos.getUserIdFromSession());
     }
 
@@ -153,7 +153,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchApplicationDescriptor appSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationDescriptor();
-        final ApplicationModelConverter converter = new ApplicationModelConverter();
+        final ApplicationModelConverter converter = new ApplicationModelConverter(tenantAccessor.getPageService());
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final SearchApplications searchApplications = new SearchApplications(applicationService, appSearchDescriptor, searchOptions, converter);
         return getApplicationAPIDelegate().searchApplications(searchApplications);
