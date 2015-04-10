@@ -70,8 +70,8 @@ public class FormMappingServiceImpl implements FormMappingService {
     private final String legacyUrlAdapter;
 
     public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
-                                  ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService,
-                                  FormMappingKeyGenerator formMappingKeyGenerator, String externalUrlAdapter, String legacyUrlAdapter) {
+            ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService,
+            FormMappingKeyGenerator formMappingKeyGenerator, String externalUrlAdapter, String legacyUrlAdapter) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
@@ -86,25 +86,27 @@ public class FormMappingServiceImpl implements FormMappingService {
     @Override
     public SFormMapping create(long processDefinitionId, String task, Integer type, String target, String form) throws SBonitaReadException,
             SObjectCreationException {
+        if (target == null) {
+            throw new IllegalArgumentException("Illegal form target " + target);
+        }
         SPageMapping sPageMapping;
         String key = formMappingKeyGenerator.generateKey(processDefinitionId, task, type);
-        if (target == null) {
-            sPageMapping = pageMappingService.create(key, null);
-        } else {
-            switch (target) {
-                case SFormMapping.TARGET_INTERNAL:
-                    sPageMapping = pageMappingService.create(key, getPageIdOrNull(form));
-                    break;
-                case SFormMapping.TARGET_URL:
-                    sPageMapping = pageMappingService.create(key, form, externalUrlAdapter);
-                    break;
-                case SFormMapping.TARGET_LEGACY:
-                    sPageMapping = pageMappingService.create(key, null, legacyUrlAdapter);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Illegal form target " + target);
+        switch (target) {
+            case SFormMapping.TARGET_INTERNAL:
+                sPageMapping = pageMappingService.create(key, getPageIdOrNull(form));
+                break;
+            case SFormMapping.TARGET_URL:
+                sPageMapping = pageMappingService.create(key, form, externalUrlAdapter);
+                break;
+            case SFormMapping.TARGET_LEGACY:
+                sPageMapping = pageMappingService.create(key, null, legacyUrlAdapter);
+                break;
+            case SFormMapping.TARGET_UNDEFINED:
+                sPageMapping = null;
+                break;
+            default:
+                throw new IllegalArgumentException("Illegal form target " + target);
 
-            }
         }
         SFormMappingImpl sFormMapping = new SFormMappingImpl(processDefinitionId, type, task);
         insertFormMapping(sFormMapping, sPageMapping);
@@ -134,29 +136,25 @@ public class FormMappingServiceImpl implements FormMappingService {
         String urlAdapter = null;
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(FORM_MAPPING).setObject(formMapping)
                 .done();
-        if (!((url != null) ^ (pageId != null))) {
-            throw new SObjectModificationException("Can't update the form mapping with both url and pageId");
-        }
-        if (url != null) {
-            if (url.isEmpty()) {
-                throw new SObjectModificationException("Can't have an empty url");
-            }
-            urlAdapter = externalUrlAdapter;
-        }
-        if (pageId != null) {
-            try {
-                pageService.getPage(pageId);
-            } catch (SBonitaReadException | SObjectNotFoundException e) {
-                throw new SObjectModificationException("the page with id " + pageId + " does not exists");
-            }
-        }
+        checkExclusiveUrlOrPageId(url, pageId);
+        urlAdapter = checkAndGetUrlAdapter(url, urlAdapter);
+        checkThatInternalPageExists(pageId);
         try {
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-            entityUpdateDescriptor.addField("pageMapping.url", url);
-            entityUpdateDescriptor.addField("pageMapping.urlAdapter", urlAdapter);
-            entityUpdateDescriptor.addField("pageMapping.pageId", pageId);
             entityUpdateDescriptor.addField("lastUpdatedBy", getSessionUserId());
             entityUpdateDescriptor.addField("lastUpdateDate", System.currentTimeMillis());
+
+            // case where page mapping did not exist already (TARGET == UNDEFINED):
+            if (formMapping.getPageMapping() == null) {
+                SPageMapping sPageMapping = createPageMappingForExistingFormMapping(formMapping, url, pageId);
+                ((SFormMappingImpl) formMapping).setPageMapping(sPageMapping);
+            } else {
+                // Update the existing page mapping:
+                entityUpdateDescriptor.addField("pageMapping.url", url);
+                entityUpdateDescriptor.addField("pageMapping.urlAdapter", urlAdapter);
+                entityUpdateDescriptor.addField("pageMapping.pageId", pageId);
+            }
+
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(formMapping, entityUpdateDescriptor);
             recorder.recordUpdate(updateRecord, updateEvent);
         } catch (SBonitaException e) {
@@ -164,6 +162,45 @@ public class FormMappingServiceImpl implements FormMappingService {
         }
     }
 
+    protected SPageMapping createPageMappingForExistingFormMapping(SFormMapping formMapping, String url, Long pageId) throws SObjectCreationException {
+        String key = formMappingKeyGenerator.generateKey(formMapping.getProcessDefinitionId(), formMapping.getTask(), formMapping.getType());
+        if (url != null) {
+            return pageMappingService.create(key, url, externalUrlAdapter);
+        }
+        else {
+            return pageMappingService.create(key, pageId);
+        }
+    }
+
+    protected void checkThatInternalPageExists(Long pageId) throws SObjectModificationException {
+        if (pageId != null) {
+            try {
+                pageService.getPage(pageId);
+            } catch (SBonitaReadException | SObjectNotFoundException e) {
+                throw new SObjectModificationException("the page with id " + pageId + " does not exists");
+            }
+        }
+    }
+
+    protected String checkAndGetUrlAdapter(String url, String urlAdapter) throws SObjectModificationException {
+        if (url != null) {
+            checkUrlNotEmpty(url);
+            urlAdapter = externalUrlAdapter;
+        }
+        return urlAdapter;
+    }
+
+    protected void checkUrlNotEmpty(String url) throws SObjectModificationException {
+        if (url.isEmpty()) {
+            throw new SObjectModificationException("Can't have an empty url");
+        }
+    }
+
+    protected void checkExclusiveUrlOrPageId(String url, Long pageId) throws SObjectModificationException {
+        if (!((url != null) ^ (pageId != null))) {
+            throw new SObjectModificationException("Can't update the form mapping with both url and pageId");
+        }
+    }
 
     private long getSessionUserId() throws SSessionNotFoundException, SessionIdNotSetException {
         return sessionService.getLoggedUserFromSession(sessionAccessor);
@@ -175,7 +212,9 @@ public class FormMappingServiceImpl implements FormMappingService {
                 .done();
         try {
             recorder.recordDelete(new DeleteRecord(formMapping), deleteEvent);
-            pageMappingService.delete(formMapping.getPageMapping());
+            if (formMapping.getPageMapping() != null) {
+                pageMappingService.delete(formMapping.getPageMapping());
+            }
         } catch (SRecorderException | SDeletionException e) {
             throw new SObjectModificationException(e);
         }
@@ -193,7 +232,8 @@ public class FormMappingServiceImpl implements FormMappingService {
 
     @Override
     public SFormMapping get(String key) throws SBonitaReadException, SObjectNotFoundException {
-        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingByKey", Collections.<String, Object>singletonMap("key", key), SFormMapping.class));
+        return persistenceService.selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingByKey", Collections.<String, Object> singletonMap("key", key),
+                SFormMapping.class));
     }
 
     @Override
@@ -231,12 +271,12 @@ public class FormMappingServiceImpl implements FormMappingService {
 
     @Override
     public long getNumberOfFormMappings(QueryOptions queryOptions) throws SBonitaReadException {
-        return persistenceService.getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
+        return persistenceService.getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
     }
 
     @Override
     public List<SFormMapping> searchFormMappings(QueryOptions queryOptions) throws SBonitaReadException {
-        return persistenceService.searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
+        return persistenceService.searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
     }
 
 }

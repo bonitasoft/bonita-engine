@@ -16,10 +16,7 @@ package org.bonitasoft.engine.core.form.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 
@@ -81,22 +78,35 @@ public class FormMappingServiceImplTest {
     @InjectMocks
     private FormMappingServiceImpl formMappingService;
 
-
     @Before
     public void before() throws Exception {
-        formMappingService = new FormMappingServiceImpl(recorder,persistenceService,sessionService, sessionAccessor, pageMappingService, pageService, formMappingKeyGenerator, EXTERNAL, LEGACY);
+        formMappingService = new FormMappingServiceImpl(recorder, persistenceService, sessionService, sessionAccessor, pageMappingService, pageService,
+                formMappingKeyGenerator, EXTERNAL, LEGACY);
         doThrow(SObjectNotFoundException.class).when(pageService).getPage(anyLong());
         doReturn(new SPageImpl("myPage", 0, 0, false, "page.zip")).when(pageService).getPage(PAGE_ID);
     }
 
+    @Test
+    public void createFormMappingWithUndefinedTargetShouldNotAddPageMapping() throws Exception {
+        doReturn("mockedKey").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, "someHumanTask", 84);
+
+        formMappingService.create(PROCESS_DEFINITION_ID, "someHumanTask", 84, SFormMapping.TARGET_UNDEFINED, null);
+
+        verifyZeroInteractions(pageMappingService);
+    }
 
     @Test
-    public void testCreate() throws Exception {
+    public void createWithInternalPageShouldCallPageMapping_create() throws Exception {
         doReturn("theKey").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, "step1", 2);
 
-        formMappingService.create(PROCESS_DEFINITION_ID, "step1", 2, null, null);
+        formMappingService.create(PROCESS_DEFINITION_ID, "step1", 2, SFormMapping.TARGET_INTERNAL, null);
 
         verify(pageMappingService).create("theKey", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateWithNullTarget() throws Exception {
+        formMappingService.create(1654L, "step1", 1, null, null);
     }
 
     @Test
@@ -104,14 +114,15 @@ public class FormMappingServiceImplTest {
         QueryOptions queryOptions = mock(QueryOptions.class);
         formMappingService.getNumberOfFormMappings(queryOptions);
 
-        verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
+        verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
     }
 
     @Test
     public void testGetByKey() throws Exception {
         formMappingService.get("theKey");
 
-        verify(persistenceService).selectOne(new SelectOneDescriptor<SFormMapping>("getFormMappingByKey", Collections.<String, Object>singletonMap("key", "theKey"), SFormMapping.class));
+        verify(persistenceService).selectOne(
+                new SelectOneDescriptor<SFormMapping>("getFormMappingByKey", Collections.<String, Object> singletonMap("key", "theKey"), SFormMapping.class));
     }
 
     @Test
@@ -119,7 +130,7 @@ public class FormMappingServiceImplTest {
         QueryOptions queryOptions = mock(QueryOptions.class);
         formMappingService.searchFormMappings(queryOptions);
 
-        verify(persistenceService).searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
+        verify(persistenceService).searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
     }
 
     @Test
@@ -129,7 +140,8 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, "http://fake.url", null);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", "http://fake.url"), entry("pageMapping.pageId", null), entry("pageMapping.urlAdapter", EXTERNAL));
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", "http://fake.url"), entry("pageMapping.pageId", null),
+                entry("pageMapping.urlAdapter", EXTERNAL));
     }
 
     private SFormMapping createFormMapping(long id) {
@@ -144,10 +156,11 @@ public class FormMappingServiceImplTest {
     public void test_update_with_page() throws Exception {
         SFormMapping formMapping = createFormMapping(ID);
 
-        formMappingService.update(formMapping,null,PAGE_ID);
+        formMappingService.update(formMapping, null, PAGE_ID);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", null), entry("pageMapping.pageId", PAGE_ID), entry("pageMapping.urlAdapter", null));
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", null), entry("pageMapping.pageId", PAGE_ID),
+                entry("pageMapping.urlAdapter", null));
     }
 
     @Test(expected = SObjectModificationException.class)
@@ -161,24 +174,27 @@ public class FormMappingServiceImplTest {
     public void test_update_with_invalid_parameters1() throws Exception {
         SFormMapping formMapping = createFormMapping(ID);
 
-        formMappingService.update(formMapping,"plop",PAGE_ID);
+        formMappingService.update(formMapping, "plop", PAGE_ID);
     }
+
     @Test(expected = SObjectModificationException.class)
     public void test_update_with_invalid_parameters2() throws Exception {
         SFormMapping formMapping = createFormMapping(ID);
 
-        formMappingService.update(formMapping,"",PAGE_ID);
+        formMappingService.update(formMapping, "", PAGE_ID);
     }
+
     @Test(expected = SObjectModificationException.class)
     public void test_update_with_invalid_parameters3() throws Exception {
         SFormMapping formMapping = createFormMapping(ID);
 
-        formMappingService.update(formMapping,"",null);
+        formMappingService.update(formMapping, "", null);
     }
+
     @Test(expected = SObjectModificationException.class)
     public void test_update_with_invalid_parameters4() throws Exception {
         SFormMapping formMapping = createFormMapping(ID);
 
-        formMappingService.update(formMapping,null,null);
+        formMappingService.update(formMapping, null, null);
     }
 }

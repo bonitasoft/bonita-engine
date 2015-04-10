@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
@@ -76,7 +75,7 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     }
 
     @Override
-    public PageURL resolvePageOrURL(String key, Map<String,Serializable> context) throws NotFoundException, ExecutionException {
+    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context) throws NotFoundException, ExecutionException {
         PageMappingService pageMappingService = getTenantAccessor().getPageMappingService();
         try {
             return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context));
@@ -105,7 +104,6 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     public FormMapping updateFormMapping(final long formMappingId, final String url, Long pageId) throws FormMappingNotFoundException, UpdateException {
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {
-            getTenantAccessor().getPageMappingService();
             SFormMapping sFormMapping = formMappingService.get(formMappingId);
             formMappingService.update(sFormMapping, url, pageId);
             return ModelConvertor.toFormMapping(sFormMapping);

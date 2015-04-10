@@ -32,5 +32,10 @@ public enum FormMappingTarget {
     /**
      * the target form is a legacy
      */
-    LEGACY
+    LEGACY,
+
+    /**
+     * The form mapping is not defined or not necessary
+     */
+    UNDEFINED
 }

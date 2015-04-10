@@ -102,6 +102,27 @@ public class PageProcessDependencyResolverTest {
 
     }
 
+
+    @Test
+    public void should_check_resolution_report_problem_when_formMapping_on_page_has_no_pageMapping() throws Exception {
+        //given
+        doReturn(1L).when(sPageMapping).getPageId();
+        final SFormMappingImpl sFormMapping = new SFormMappingImpl(PROCESS_DEFINITION_ID, FormMappingType.TASK.getId(), null);
+        sFormMapping.setPageMapping(sPageMapping);
+        formMappings.add(sFormMapping);
+        doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
+        doReturn(null).when(pageService).getPage(anyLong());
+
+        //when
+        final List<Problem> problems = pageProcessDependencyResolver.checkResolution(tenantServiceAccessor, sDefinition);
+
+        // then
+        assertThat(problems).as("should return a problem").hasSize(1);
+        ProblemAssert.assertThat(problems.get(0)).hasDescription(String.format(PageProcessDependencyResolver.ERROR_MESSAGE, sFormMapping))
+                .hasLevel(Problem.Level.ERROR);
+
+    }
+
     @Test
     public void should_check_resolution_report_no_problem_when_mapping_has_no_pages() throws Exception {
         //given

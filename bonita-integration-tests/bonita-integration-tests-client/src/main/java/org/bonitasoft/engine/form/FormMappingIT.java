@@ -26,12 +26,15 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Baptiste Mesta
@@ -69,7 +72,7 @@ public class FormMappingIT extends TestWithUser {
                 .setFormMappings(
                         FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
                                 .addTaskForm("task2Form", FormMappingTarget.URL, "step1")
-                                .addProcessOverviewForm("process2OverviewForm", FormMappingTarget.LEGACY).build());
+                                .addProcessOverviewForm(null, FormMappingTarget.LEGACY).build());
 
         ProcessDefinition p1 = getProcessAPI().deploy(bar1.done());
         ProcessDefinition p2 = getProcessAPI().deploy(bar2.done());
@@ -153,8 +156,9 @@ public class FormMappingIT extends TestWithUser {
         //update
         processConfigurationAPI.updateFormMapping(step2Form1.getId(), "newFormUrlForStep2", null);
         FormMapping updatedStep2Form1 = processConfigurationAPI.getFormMapping(step2Form1.getId());
-        assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1, "form", "target", "lastUpdateDate", "lastUpdatedBy");
+        assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1, "pageMappingKey", "pageURL", "target", "lastUpdateDate", "lastUpdatedBy");
         assertThat(updatedStep2Form1.getURL()).isEqualTo("newFormUrlForStep2");
+        assertThat(updatedStep2Form1.getPageMappingKey()).isEqualTo("taskInstance/P1/1.0/step2");
         assertThat(updatedStep2Form1.getTarget()).isEqualTo(FormMappingTarget.URL);
         assertThat(updatedStep2Form1.getLastUpdateDate()).isAfter(new Date(afterDeploy));
         assertThat(updatedStep2Form1.getLastUpdatedBy()).isEqualTo(user.getId());
@@ -180,4 +184,28 @@ public class FormMappingIT extends TestWithUser {
     protected String buildUrlForExternal(String url) {
         return url;
     }
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void resolvePageOrURLThrowsNotFoundExceptionForUndefinedFormMapping() throws Exception {
+        ProcessDefinitionBuilder p1Builder = new ProcessDefinitionBuilder().createNewInstance("CustomerSupport", "1.0");
+        p1Builder.addActor("actor").addUserTask("step", "actor");
+        BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
+                .createNewBusinessArchive().setProcessDefinition(p1Builder.done())
+                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addTaskForm(null, FormMappingTarget.UNDEFINED, "step").build());
+
+        ProcessDefinition processDefinition = deployProcess(bar.done());
+
+        expectedException.expect(NotFoundException.class);
+
+        // try to resolve url:
+        try {
+            getProcessConfigurationAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", Collections.<String, Serializable> emptyMap());
+        } finally {
+            deleteProcess(processDefinition);
+        }
+    }
+
 }

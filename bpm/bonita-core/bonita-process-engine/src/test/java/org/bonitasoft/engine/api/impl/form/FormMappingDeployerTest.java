@@ -78,8 +78,9 @@ public class FormMappingDeployerTest {
         deployer.deployFormMappings(barBuilder.done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(), null, null);
-        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(), null, null);
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingTarget.UNDEFINED.name(),
+                null);
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(), FormMappingTarget.UNDEFINED.name(), null);
     }
 
     @Test
@@ -119,8 +120,9 @@ public class FormMappingDeployerTest {
         deployer.deployFormMappings(businessArchiveBuilder.done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(), null, null);
-        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(), null, null);
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(), FormMappingTarget.UNDEFINED.name(), null);
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingTarget.UNDEFINED.name(),
+                null);
         verifyNoMoreInteractions(formMappingService);
     }
 
@@ -137,7 +139,7 @@ public class FormMappingDeployerTest {
         deployer.deployFormMappings(businessArchive, processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, taskName, FormMappingType.TASK.getId(), null, null);
+        verify(formMappingService, times(1)).create(processDefinitionId, taskName, FormMappingType.TASK.getId(), FormMappingTarget.UNDEFINED.name(), null);
     }
 
     @Test

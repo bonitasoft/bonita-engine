@@ -26,6 +26,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
@@ -48,7 +49,8 @@ public class FormMappingDeployer {
             for (final ActivityDefinition activity : activities) {
                 if (isHumanTask(activity)) {
                     // create mapping as declared in form mapping:
-                    createFormMapping(processDefinitionId, getFormMappingForHumanTask(activity.getName(), formMappings), FormMappingType.TASK.getId(), activity.getName());
+                    createFormMapping(processDefinitionId, getFormMappingForHumanTask(activity.getName(), formMappings), FormMappingType.TASK.getId(),
+                            activity.getName());
                 }
             }
             // Deals with the process start / process overview forms:
@@ -59,11 +61,12 @@ public class FormMappingDeployer {
         }
     }
 
-    private void createFormMapping(long processDefinitionId, FormMappingDefinition processOverviewformMapping, Integer type, String name) throws SObjectCreationException, SBonitaReadException {
-        if (processOverviewformMapping != null) {
-            createSFormMapping(processDefinitionId, processOverviewformMapping);
+    private void createFormMapping(long processDefinitionId, FormMappingDefinition formMappingDefinition, Integer type, String taskName)
+            throws SObjectCreationException, SBonitaReadException {
+        if (formMappingDefinition != null) {
+            createSFormMapping(processDefinitionId, formMappingDefinition);
         } else {
-            formMappingService.create(processDefinitionId, name, type, null, null);
+            formMappingService.create(processDefinitionId, taskName, type, FormMappingTarget.UNDEFINED.name(), null);
         }
     }
 
