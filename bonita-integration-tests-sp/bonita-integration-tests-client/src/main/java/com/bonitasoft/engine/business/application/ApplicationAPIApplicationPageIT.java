@@ -355,8 +355,8 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         List<String> allPagesForProfile2 = getSubscriptionApplicationAPI().getAllPagesForProfile(profile2.getId());
 
         //then
-        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_page1","custompage_page2","custompage_page3"));
-        assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_page4"));
+        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_layout", "custompage_page1","custompage_page2","custompage_page3"));
+        assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_layout", "custompage_page4"));
 
         //clean
         getSubscriptionApplicationAPI().deleteApplication(app1.getId());
