@@ -64,6 +64,8 @@ public enum ExpressionType {
 
     TYPE_BUSINESS_DATA,
 
+    TYPE_BUSINESS_DATA_REFERENCE,
+
     /**
      * Expression of type Business object DAO, that instantiates a business object Server DAO class, used to execute server queries.
      */

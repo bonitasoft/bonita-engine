@@ -150,6 +150,9 @@ import org.bonitasoft.engine.bpm.process.impl.internal.ProcessDeploymentInfoImpl
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.impl.ProcessSupervisorImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.business.data.BusinessDataReference;
+import org.bonitasoft.engine.business.data.impl.MultipleBusinessDataReferenceImpl;
+import org.bonitasoft.engine.business.data.impl.SimpleBusinessDataReferenceImpl;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandDescriptorImpl;
 import org.bonitasoft.engine.command.model.SCommand;
@@ -207,6 +210,9 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskIn
 import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent;
@@ -2120,7 +2126,7 @@ public class ModelConvertor {
         formMapping.setType(FormMappingType.valueOf(sFormMapping.getType()));
         formMapping.setProcessDefinitionId(sFormMapping.getProcessDefinitionId());
         long lastUpdateDate = sFormMapping.getLastUpdateDate();
-        formMapping.setLastUpdateDate(lastUpdateDate > 0 ? new Date(lastUpdateDate): null);
+        formMapping.setLastUpdateDate(lastUpdateDate > 0 ? new Date(lastUpdateDate) : null);
         formMapping.setLastUpdatedBy(sFormMapping.getLastUpdatedBy());
         return formMapping;
     }
@@ -2128,11 +2134,24 @@ public class ModelConvertor {
     public static List<FormMapping> toFormMappings(List<SFormMapping> serverObjects) {
         final List<FormMapping> clientObjects = new ArrayList<FormMapping>(serverObjects.size());
         for (final SFormMapping serverObject : serverObjects) {
-            ;
             clientObjects.add(toFormMapping(serverObject));
         }
         return clientObjects;
     }
+
+    public static BusinessDataReference toBusinessDataReference(SRefBusinessDataInstance sRefBusinessDataInstance) {
+        if (sRefBusinessDataInstance == null) {
+            return null;
+        }
+        if (sRefBusinessDataInstance instanceof SMultiRefBusinessDataInstance) {
+            SMultiRefBusinessDataInstance multi = ((SMultiRefBusinessDataInstance) sRefBusinessDataInstance);
+            return new MultipleBusinessDataReferenceImpl(multi.getName(), multi.getDataClassName(), multi.getDataIds());
+        }
+        SSimpleRefBusinessDataInstance simple = ((SSimpleRefBusinessDataInstance) sRefBusinessDataInstance);
+        return new SimpleBusinessDataReferenceImpl(simple.getName(), simple.getDataClassName(), simple.getDataId());
+
+    }
+
     public static ContractDefinition toContract(final SContractDefinition sContract) {
         final ContractDefinitionImpl contract = new ContractDefinitionImpl();
         for (final SSimpleInputDefinition input : sContract.getSimpleInputs()) {

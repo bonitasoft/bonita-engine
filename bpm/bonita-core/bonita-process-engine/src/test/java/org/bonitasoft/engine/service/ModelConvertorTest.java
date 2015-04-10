@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,6 +44,9 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.EventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.business.data.BusinessDataReference;
+import org.bonitasoft.engine.business.data.impl.MultipleBusinessDataReferenceImpl;
+import org.bonitasoft.engine.business.data.impl.SimpleBusinessDataReferenceImpl;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.form.SFormMapping;
@@ -53,14 +56,16 @@ import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
-import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
+import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
@@ -71,6 +76,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThr
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -496,6 +503,45 @@ public class ModelConvertorTest {
         assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
         assertThat(contract.getSimpleInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput);
         assertThat(contract.getComplexInputs()).as("should convert complex inputs").containsExactly(expectedComplexWithComplexInput);
+    }
+
+    SProcessSimpleRefBusinessDataInstance createProcessSimpleDataReference(String name, long processInstanceId, String type, long businessDataId) {
+        SProcessSimpleRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstanceImpl();
+        sProcessSimpleRefBusinessDataInstance.setName(name);
+        sProcessSimpleRefBusinessDataInstance.setProcessInstanceId(processInstanceId);
+        sProcessSimpleRefBusinessDataInstance.setDataClassName(type);
+        sProcessSimpleRefBusinessDataInstance.setDataId(businessDataId);
+        return sProcessSimpleRefBusinessDataInstance;
+    }
+
+    SProcessMultiRefBusinessDataInstance createProcessMultipleDataReference(String name, long processInstanceId, String type, List<Long> dataIds) {
+        SProcessMultiRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SProcessMultiRefBusinessDataInstanceImpl();
+        sProcessSimpleRefBusinessDataInstance.setName(name);
+        sProcessSimpleRefBusinessDataInstance.setProcessInstanceId(processInstanceId);
+        sProcessSimpleRefBusinessDataInstance.setDataClassName(type);
+        sProcessSimpleRefBusinessDataInstance.setDataIds(dataIds);
+        return sProcessSimpleRefBusinessDataInstance;
+    }
+
+    @Test
+    public void convert_multiple_business_data() {
+        BusinessDataReference businessDataReference = ModelConvertor.toBusinessDataReference(createProcessSimpleDataReference("myBData", 157l, "theType", 5555l));
+
+        assertThat(businessDataReference).isEqualTo(new SimpleBusinessDataReferenceImpl("myBData", "theType", 5555l));
+    }
+
+    @Test
+    public void convert_simple_business_data() {
+        BusinessDataReference businessDataReference = ModelConvertor.toBusinessDataReference(createProcessMultipleDataReference("myBData", 157l, "theType", Arrays.asList(5555l, 5556l, 5557l)));
+
+        assertThat(businessDataReference).isEqualTo(new MultipleBusinessDataReferenceImpl("myBData", "theType", Arrays.asList(5555l, 5556l, 5557l)));
+    }
+
+    @Test
+    public void convert_null_business_data() {
+        BusinessDataReference businessDataReference = ModelConvertor.toBusinessDataReference(null);
+
+        assertThat(businessDataReference).isNull();
     }
 
 }
