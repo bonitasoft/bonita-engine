@@ -28,6 +28,7 @@ import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.data.MapEntry;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -42,6 +43,8 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
+import org.bonitasoft.engine.business.data.impl.MultipleBusinessDataReferenceImpl;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -71,6 +74,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -87,6 +91,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.MapEntry.*;
 
 public class BDRepositoryIT extends CommonAPISPIT {
 
@@ -1174,9 +1179,13 @@ public class BDRepositoryIT extends CommonAPISPIT {
     public void should_return_the_list_of_entities_from_the_multiple_instance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression(
                 "createNewEmployees",
-                new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
-                        .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';")
-                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john]").toString(),
+                "import " + EMPLOYEE_QUALIFIED_NAME + ";" +
+                        " Employee john = new Employee();" +
+                        " john.firstName = 'John';" +
+                        " john.lastName = 'Doe';" +
+                        " Employee jane = new Employee();" +
+                        " jane.firstName = 'Jane'; jane.lastName = 'Doe';" +
+                        " [jane, john]",
                 List.class.getName());
 
         final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("MBIMI", "1.2-beta");
@@ -1195,10 +1204,16 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
-        waitForUserTask(instance, "step2");
+        long step2 = waitForUserTask(instance, "step2");
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("names", instance.getId());
         assertThat(dataInstance.getValue().toString()).isEqualTo("[Doe, Doe]");
+        Map<String, Serializable> employee = getProcessAPI().evaluateExpressionsOnProcessInstance(instance.getId(), Collections.singletonMap(new ExpressionBuilder().createBusinessDataReferenceExpression("myEmployees"), Collections.<String, Serializable>emptyMap()));
+        assertThat(employee).hasSize(1);
+        assertThat(employee.get("employee")).isInstanceOf(MultipleBusinessDataReference.class);
+        assertThat(((MultipleBusinessDataReference)employee.get("employee")).getName()).isEqualTo("employee");
+        assertThat(((MultipleBusinessDataReference)employee.get("employee")).getType()).isEqualTo(EMPLOYEE_QUALIFIED_NAME);
+        assertThat(((MultipleBusinessDataReference)employee.get("employee")).getStorageIds()).hasSize(2);
 
         disableAndDeleteProcess(processDefinition);
     }
