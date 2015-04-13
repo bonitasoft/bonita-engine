@@ -10,8 +10,14 @@
 package com.bonitasoft.engine.api.impl;
 
 import com.bonitasoft.engine.api.impl.converter.ApplicationModelConverterExt;
-import org.bonitasoft.engine.api.impl.SessionInfos;
-import org.bonitasoft.engine.api.impl.application.ApplicationAPIDelegate;
+import com.bonitasoft.engine.api.impl.converter.ApplicationNodeConverterExt;
+import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
+import org.bonitasoft.engine.business.application.ApplicationService;
+import org.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
+import org.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
+import org.bonitasoft.engine.business.application.converter.ApplicationPageNodeConverter;
+import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.profile.ProfileService;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -19,8 +25,12 @@ import org.bonitasoft.engine.api.impl.application.ApplicationAPIDelegate;
 public class ApplicationAPIExt extends org.bonitasoft.engine.api.impl.ApplicationAPIImpl {
 
     @Override
-    protected ApplicationAPIDelegate getApplicationAPIDelegate() {
-        return new ApplicationAPIDelegate(getTenantAccessor(), new ApplicationModelConverterExt(getTenantAccessor().getPageService()),
-                SessionInfos.getUserIdFromSession());
+    protected ApplicationModelConverter getApplicationModelConverter(final PageService pageService) {
+        return new ApplicationModelConverterExt(pageService);
+    }
+
+    @Override
+    protected ApplicationNodeConverter getApplicationNodeConverter(final ApplicationService applicationService, final PageService pageService, final ProfileService profileService, final ApplicationPageNodeConverter applicationPageNodeConverter, final ApplicationMenuNodeConverter applicationMenuNodeConverter) {
+        return new ApplicationNodeConverterExt(profileService, applicationService, applicationPageNodeConverter, applicationMenuNodeConverter, pageService);
     }
 }

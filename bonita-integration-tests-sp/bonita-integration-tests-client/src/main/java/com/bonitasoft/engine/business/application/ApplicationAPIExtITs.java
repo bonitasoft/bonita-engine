@@ -19,7 +19,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(BonitaSuiteRunner.class)
 @Suite.SuiteClasses({
-        ApplicationExtIT.class
+        ApplicationExtIT.class,
+        ApplicationImportExportExtIT.class
 })
 @BonitaSuiteRunner.Initializer(TestsInitializerSP.class)
 public class ApplicationAPIExtITs {
