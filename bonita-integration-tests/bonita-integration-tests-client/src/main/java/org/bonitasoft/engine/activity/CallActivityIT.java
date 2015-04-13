@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,6 +88,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     private User cascao;
 
+
     @Override
     @Before
     public void before() throws Exception {
@@ -130,7 +131,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
     }
 
     private ProcessDefinition buildProcessWithCallActivity(final boolean addInputOperations, final boolean addOutputOperations,
-            final String processName, final String targetProcessName, final int loopNb, final String strTargetVersion) throws BonitaException {
+                                                           final String processName, final String targetProcessName, final int loopNb, final String strTargetVersion) throws BonitaException {
 
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
         Expression targetProcessVersionExpr = null;
@@ -202,7 +203,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
      * No Inputs or Outputs for the callActivity
      * See executeCallAtivityUntilEndOfProcess for details.
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity"}, jira = "")
     @Test
     public void callActivity() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, false, PROCESS_VERSION, false);
@@ -213,7 +214,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
      * Only Inputs for the callActivity
      * See executeCallAtivityUntilEndOfProcess for details.
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "Call Activity" }, jira = "")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.ACTIVITIES, keywords = {"Call Activity"}, jira = "")
     @Test
     public void callActivityWithDataInputOperations() throws Exception {
         executeCallAtivityUntilEndOfProcess(true, false, PROCESS_VERSION, false);
@@ -223,7 +224,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
      * Only Outputs for the callActivity
      * See executeCallAtivityUntilEndOfProcess for details.
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity"}, jira = "")
     @Test
     public void callActivityWithDataOutputOperations() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, true, PROCESS_VERSION, false);
@@ -233,7 +234,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
      * Only Outputs for the callActivity
      * See executeCallAtivityUntilEndOfProcess for details.
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity"}, jira = "")
     @Test
     public void callActivityWithDataOutputOperationsAndTerminateEnd() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, true, PROCESS_VERSION, true);
@@ -243,13 +244,13 @@ public class CallActivityIT extends TestWithTechnicalUser {
      * Only Outputs for the callActivity
      * See executeCallAtivityUntilEndOfProcess for details.
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity"}, jira = "")
     @Test
     public void callActivityWithDataInputAndOutputOperationsAndVersion2() throws Exception {
         executeCallAtivityUntilEndOfProcess(true, true, "2.0", false);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Gateway", "Message" }, jira = "ENGINE-1713")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Gateway", "Message"}, jira = "ENGINE-1713")
     @Test
     public void callActivityAndGatewayAndMessageAndIntermediateEvent() throws Exception {
         ProcessDefinition mainProcessDefinition = null;
@@ -318,8 +319,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Gateway", "Message", "ReceiveTask",
-            "SendTask" }, jira = "ENGINE-1714")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Gateway", "Message", "ReceiveTask",
+            "SendTask"}, jira = "ENGINE-1714")
     @Test
     public void callActivityAndGatewayAndMessageAndTask() throws Exception {
         ProcessDefinition mainProcessDefinition = null;
@@ -388,7 +389,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
      * Execute an operation using one of this data.
      * -> operation must be executed after the data mapping is executed
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, jira = "ENGINE-878", keywords = { "Data mapping with operations execution order" })
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, jira = "ENGINE-878", keywords = {"Data mapping with operations execution order"})
     @Test
     public void callActivityWithDataOutputAndOperationAreExecutedInTheGoodOrder() throws Exception {
 
@@ -437,7 +438,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
      * the one from the callingProcess, calling Process is finished.
      */
     private void executeCallAtivityUntilEndOfProcess(final boolean addInputOperations, final boolean addOutputOperations, final String strTargetVersion,
-            final boolean terminateEnd) throws Exception {
+                                                     final boolean terminateEnd) throws Exception {
         final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, terminateEnd);
         final ProcessDefinition targetProcessDef3 = getSimpleProcess(ACTOR_NAME, "targetProcess", "3.0", terminateEnd);
         final ProcessDefinition targetProcessDef2 = getSimpleProcess(ACTOR_NAME, "targetProcess", "2.0", terminateEnd);
@@ -559,13 +560,13 @@ public class CallActivityIT extends TestWithTechnicalUser {
     /*
      * Tested until 200, works !
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity"}, jira = "")
     @Test
     public void multiLevelCallActivity() throws Exception {
         variableMultiLevelCallActivity(10);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity"}, jira = "")
     @Test
     public void callUndeployedProcess() throws Exception {
 
@@ -589,15 +590,10 @@ public class CallActivityIT extends TestWithTechnicalUser {
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), null, null);
         waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
 
-        final ProcessInstance[] targetPILoopExecs = new ProcessInstance[nbLoop];
-
         for (int i = 0; i < nbLoop; i++) {
-            targetPILoopExecs[i] = getTargetProcessInstance(targetProcessDef);
-            if (i != 0) {
-                assertThat(targetPILoopExecs[i - 1].getId()).isNotEqualTo(targetPILoopExecs[i].getId());
-            }
-            waitForUserTaskAndExecuteIt(callingProcessInstance, "tStep1", cebolinha); // i-th loop execution
-            waitForProcessToFinish(targetPILoopExecs[i]);
+            long stepInCalledProcess = waitForUserTaskAndExecuteIt("tStep1", cebolinha);
+            FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(stepInCalledProcess);
+            waitForProcessToFinish(flowNodeInstance.getParentProcessInstanceId());
         }
 
         waitForUserTaskAndExecuteIt(callingProcessInstance, "step1", cascao);
@@ -610,7 +606,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
      * Tested until 200, works !
      * Don't use 0 as argument though.
      */
-    @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Loop" }, jira = "")
+    @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Loop"}, jira = "")
     @Test
     public void callActivityInALoop() throws Exception {
         callActivityInALoop(10);
@@ -624,7 +620,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         return targetPI;
     }
 
-    @Cover(classes = CallActivityInstance.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Archiving" }, jira = "")
+    @Cover(classes = CallActivityInstance.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Archiving"}, jira = "")
     @Test
     public void getArchivedCallActivityInstance() throws Exception {
         final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
@@ -650,13 +646,13 @@ public class CallActivityIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(callingProcessDef, targetProcessDef);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" }, jira = "")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Process Version"}, jira = "")
     @Test
     public void callActivityUsingLastestVersion() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, false, null, false);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" }, jira = "")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Process Version"}, jira = "")
     @Test
     public void callActivityUsingUndeployedVersion() throws Exception {
         final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", "unexisting_version_4.0");
@@ -668,7 +664,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(callingProcessDef);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Undeployed target" }, jira = "BS-10502")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Undeployed target"}, jira = "BS-10502")
     @Test
     public void callActivityUsingUndeployedProcess() throws Exception {
         final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", null);
@@ -680,7 +676,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(callingProcessDef);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Delete" }, jira = "ENGINE-1132")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Delete"}, jira = "ENGINE-1132")
     @Test
     public void deleteProcessInstanceThatIsCalledByCallActivity() throws Exception {
         final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
@@ -709,7 +705,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Delete" }, jira = "ENGINE-1132")
+    @Cover(classes = {CallActivityDefinition.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Delete"}, jira = "ENGINE-1132")
     @Test(expected = DeletionException.class)
     public void deleteProcessDefinitionWithProcessInstanceThatIsCalledByCallActivity() throws Exception {
         final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
@@ -731,7 +727,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Dependencies" }, jira = "")
+    @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Dependencies"}, jira = "")
     @Test
     public void callActivityWithDependencies() throws Exception {
         ProcessDefinition targetProcessDef = null;
@@ -784,7 +780,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
+    @Cover(classes = {CallActivityInstance.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity"}, jira = "")
     @Test
     public void callActivityCheckAttributes() throws Exception {
         ProcessDefinition targetProcessDef = null;
@@ -836,7 +832,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = { ProcessDefinitionBuilder.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Expression" }, jira = "")
+    @Cover(classes = {ProcessDefinitionBuilder.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Expression"}, jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void callActivityTargetProcessExprIsNull() throws Exception {
         final Expression targetProcessNameExpr = null;
@@ -856,8 +852,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
         deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
     }
 
-    @Cover(classes = { CallActivityInstance.class, HumanTaskInstance.class, ArchivedProcessInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = {
-            "Call Activity", "Human Task", "Search", "Archived Process Instance" }, jira = "ENGINE-922")
+    @Cover(classes = {CallActivityInstance.class, HumanTaskInstance.class, ArchivedProcessInstance.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {
+            "Call Activity", "Human Task", "Search", "Archived Process Instance"}, jira = "ENGINE-922")
     @Test
     public void callActivityTargetProcessWithJustHumanTask() throws Exception {
         ProcessDefinition targetProcessDefinition = null;
@@ -903,7 +899,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
     }
 
     @Test
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "container hierarchy" }, jira = "ENGINE-1899")
+    @Cover(classes = {SubProcessDefinition.class}, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = {"event sub-process", "container hierarchy"}, jira = "ENGINE-1899")
     public void getProcessDefinitionIdFromActivityInstanceId() throws Exception {
         // check that real root process definition is retrieved (taken from parent process instance)
         // Build target process
@@ -938,7 +934,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
     }
 
-    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Engine constant" }, jira = "ENGINE-1009")
+    @Cover(classes = {CallActivityInstance.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Engine constant"}, jira = "ENGINE-1009")
     @Test
     public void callActivityWithTaskUsingEngineExpressions() throws Exception {
         ProcessDefinition targetProcessDefinition = null;
@@ -973,7 +969,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         }
     }
 
-    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Connector", "Data mapping" }, jira = "ENGINE-1243")
+    @Cover(classes = {CallActivityInstance.class}, concept = BPMNConcept.CALL_ACTIVITY, keywords = {"Call Activity", "Connector", "Data mapping"}, jira = "ENGINE-1243")
     @Test
     public void callActivityWithDataMappingAndConnectors() throws Exception {
         ProcessDefinition targetProcessDefinition = null;

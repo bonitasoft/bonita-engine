@@ -27,11 +27,9 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
  */
 public class FormMappingKeyGeneratorImpl implements FormMappingKeyGenerator {
 
-    public static final String UTF_8 = "UTF-8";
     private final ProcessDefinitionService processDefinitionService;
 
     public FormMappingKeyGeneratorImpl(ProcessDefinitionService processDefinitionService) {
-
         this.processDefinitionService = processDefinitionService;
     }
 

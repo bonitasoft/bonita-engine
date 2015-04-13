@@ -1014,10 +1014,10 @@ CREATE TABLE form_mapping (
   process BIGINT NOT NULL,
   type INT NOT NULL,
   task VARCHAR(255),
-  page_mapping_tenant_id BIGINT NOT NULL,
-  page_mapping_id BIGINT NOT NULL,
-  lastUpdateDate BIGINT NULL,
-  lastUpdatedBy BIGINT NULL,
+  page_mapping_tenant_id BIGINT,
+  page_mapping_id BIGINT,
+  lastUpdateDate BIGINT,
+  lastUpdatedBy BIGINT,
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;
 

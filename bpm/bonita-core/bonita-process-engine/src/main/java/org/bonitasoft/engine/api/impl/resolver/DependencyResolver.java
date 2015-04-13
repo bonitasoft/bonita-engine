@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl.resolver;
 
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.ERROR;
+import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.INFO;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +30,7 @@ import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.transaction.dependency.AddSDependency;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -74,6 +76,11 @@ public class DependencyResolver {
         for (final ProcessDependencyResolver resolver : resolvers) {
             try {
                 resolved &= resolver.resolve(tenantAccessor, businessArchive, sDefinition);
+                if (!resolved) {
+                    for (Problem problem : resolver.checkResolution(tenantAccessor, sDefinition)) {
+                        tenantAccessor.getTechnicalLoggerService().log(DependencyResolver.class, INFO, problem.getDescription());
+                    }
+                }
             } catch (final BonitaException e) {
                 // not logged, we will check later why the process is not resolved
                 resolved = false;
@@ -158,13 +165,12 @@ public class DependencyResolver {
      * @param processFolder
      * @param processDefinitionService
      * @param dependencyService
-     * @param dependencyBuilderAccessor
      * @param processDefinitionId
      * @throws SBonitaException
      */
     public void resolveAndCreateDependencies(final File processFolder, final ProcessDefinitionService processDefinitionService,
             final DependencyService dependencyService, final long processDefinitionId) throws SBonitaException {
-        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
+        final Map<String, byte[]> resources = new HashMap<>();
 
         final File file = new File(processFolder, "classpath");
         if (file.exists() && file.isDirectory()) {
@@ -232,7 +238,6 @@ public class DependencyResolver {
      * @param businessArchive
      * @param processDefinitionService
      * @param dependencyService
-     * @param dependencyBuilderAccessor
      * @param sDefinition
      * @throws SBonitaException
      */

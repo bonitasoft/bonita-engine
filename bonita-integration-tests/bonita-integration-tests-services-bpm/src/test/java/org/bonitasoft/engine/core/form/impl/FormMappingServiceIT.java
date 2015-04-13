@@ -97,7 +97,7 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         formMappingService.create(p1.getId(), "step1", FormMappingType.TASK.getId(), "INTERNAL", PAGE_NAME);
         formMappingService.create(p1.getId(), null, FormMappingType.PROCESS_START.getId(), "URL", "http://bit.coin");
         formMappingService.create(p1.getId(), null, FormMappingType.PROCESS_OVERVIEW.getId(), "LEGACY", null);
-        formMappingService.create(p2.getId(), null, FormMappingType.PROCESS_OVERVIEW.getId(), null, null);
+        formMappingService.create(p2.getId(), null, FormMappingType.PROCESS_OVERVIEW.getId(), "UNDEFINED", null);
         transactionService.complete();
 
         transactionService.begin();

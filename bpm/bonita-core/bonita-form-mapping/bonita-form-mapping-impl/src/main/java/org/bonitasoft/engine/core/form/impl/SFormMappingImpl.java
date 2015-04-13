@@ -100,8 +100,8 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
 
     @Override
     public String getTarget() {
-        if(getPageMapping() == null){
-            return null;
+        if (getPageMapping() == null) {
+            return TARGET_UNDEFINED;
         }
         if (getPageMapping().getPageId() != null) {
             return TARGET_INTERNAL;

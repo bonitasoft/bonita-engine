@@ -14,23 +14,19 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
-import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageURL;
@@ -76,7 +72,7 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     }
 
     @Override
-    public PageURL resolvePageOrURL(String key, Map<String,Serializable> context) throws NotFoundException, ExecutionException {
+    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context) throws NotFoundException, ExecutionException {
         PageMappingService pageMappingService = getTenantAccessor().getPageMappingService();
         try {
             return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context));
@@ -99,23 +95,5 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         } catch (SObjectNotFoundException e) {
             throw new FormMappingNotFoundException("no form mapping found with id" + formMappingId);
         }
-    }
-
-    @Override
-    public FormMapping updateFormMapping(final long formMappingId, final String url, Long pageId) throws FormMappingNotFoundException, UpdateException {
-        final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
-        try {
-            getTenantAccessor().getPageMappingService();
-            SFormMapping sFormMapping = formMappingService.get(formMappingId);
-            formMappingService.update(sFormMapping, url, pageId);
-            return ModelConvertor.toFormMapping(sFormMapping);
-        } catch (SBonitaReadException e) {
-            throw new RetrieveException(e);
-        } catch (SObjectNotFoundException e) {
-            throw new FormMappingNotFoundException("Unable to find the form mapping with id " + formMappingId);
-        } catch (SObjectModificationException e) {
-            throw new UpdateException("Unable to update the form mapping " + formMappingId, e);
-        }
-
     }
 }
