@@ -55,6 +55,16 @@ public class SPageBuilderFactoryImpl implements SPageBuilderFactory {
     }
 
     @Override
+    public String getContentTypeKey() {
+        return "contentType";
+    }
+
+    @Override
+    public String getProcessDefinitionIdKey() {
+        return "processDefinitionId";
+    }
+
+    @Override
     public String getIdKey() {
         return "id";
     }

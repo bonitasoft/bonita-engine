@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.service;
 
 import java.io.Serializable;
@@ -271,6 +271,9 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.operation.impl.LeftOperandImpl;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
+import org.bonitasoft.engine.page.PageURL;
+import org.bonitasoft.engine.page.SPageMapping;
+import org.bonitasoft.engine.page.SPageURL;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
 import org.bonitasoft.engine.platform.impl.PlatformImpl;
@@ -2115,24 +2118,29 @@ public class ModelConvertor {
         FormMapping formMapping = new FormMapping();
         formMapping.setId(sFormMapping.getId());
         formMapping.setTask(sFormMapping.getTask());
-        formMapping.setTarget(FormMappingTarget.valueOf(sFormMapping.getTarget()));
-        formMapping.setForm(sFormMapping.getForm());
-        formMapping.setType(FormMappingType.valueOf(sFormMapping.getType()));
+        SPageMapping pageMapping = sFormMapping.getPageMapping();
+        if(pageMapping != null){
+            formMapping.setPageMappingKey(pageMapping.getKey());
+            formMapping.setPageId(pageMapping.getPageId());
+            formMapping.setPageURL(pageMapping.getUrl());
+        }
+        formMapping.setType(FormMappingType.getTypeFromId(sFormMapping.getType()));
+        formMapping.setTarget(sFormMapping.getTarget() == null ? null : FormMappingTarget.valueOf(sFormMapping.getTarget()));
         formMapping.setProcessDefinitionId(sFormMapping.getProcessDefinitionId());
         long lastUpdateDate = sFormMapping.getLastUpdateDate();
-        formMapping.setLastUpdateDate(lastUpdateDate > 0 ? new Date(lastUpdateDate): null);
+        formMapping.setLastUpdateDate(lastUpdateDate > 0 ? new Date(lastUpdateDate) : null);
         formMapping.setLastUpdatedBy(sFormMapping.getLastUpdatedBy());
         return formMapping;
     }
 
     public static List<FormMapping> toFormMappings(List<SFormMapping> serverObjects) {
-        final List<FormMapping> clientObjects = new ArrayList<FormMapping>(serverObjects.size());
+        final List<FormMapping> clientObjects = new ArrayList<>(serverObjects.size());
         for (final SFormMapping serverObject : serverObjects) {
-            ;
             clientObjects.add(toFormMapping(serverObject));
         }
         return clientObjects;
     }
+
     public static ContractDefinition toContract(final SContractDefinition sContract) {
         final ContractDefinitionImpl contract = new ContractDefinitionImpl();
         for (final SSimpleInputDefinition input : sContract.getSimpleInputs()) {
@@ -2167,5 +2175,9 @@ public class ModelConvertor {
         }
         return new ComplexInputDefinitionImpl(input.getName(), input.getDescription(), input.isMultiple(), simpleInputDefinitions, complexInputDefinitions);
 
+    }
+
+    public static PageURL toPageURL(SPageURL sPageURL) {
+        return new PageURL(sPageURL.getUrl(), sPageURL.getPageId());
     }
 }

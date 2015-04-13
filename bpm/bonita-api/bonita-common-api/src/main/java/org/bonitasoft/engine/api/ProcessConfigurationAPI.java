@@ -13,11 +13,17 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.io.Serializable;
+import java.util.Map;
+
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
-import org.bonitasoft.engine.form.FormMappingTarget;
+import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -42,60 +48,30 @@ public interface ProcessConfigurationAPI {
     SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Get the form mapping that contains the link to the process start form
+     * Resolves a Page URL from a specific key.
      * 
-     * @param processDefinitionId
-     *        the process
-     * @return
-     *         the form mapping of the process start form
-     * @throws org.bonitasoft.engine.exception.FormMappingNotFoundException
-     *         when the form mapping with these properties is not found
-     * @since 7.0.0
+     * @param key the key of the page to resolve.
+     * @return the <code>PageURL</code> containing the pageId or the complete
+     * @throws NotFoundException if the key does not match anything.
+     * @see PageURL the structured PageURL that points to the Page or URL
      */
-    FormMapping getProcessStartForm(long processDefinitionId) throws FormMappingNotFoundException;
-
-    /**
-     * Get the form mapping that contains the link to the process overview form
-     * 
-     * @param processDefinitionId
-     *        the process
-     * @return
-     *         the form mapping of the process overview form
-     * @throws org.bonitasoft.engine.exception.FormMappingNotFoundException
-     *         when the form mapping with these properties is not found
-     * @since 7.0.0
-     */
-    FormMapping getProcessOverviewForm(long processDefinitionId) throws FormMappingNotFoundException;
-
-    /**
-     * Get the form mapping that contains the link to the task form
-     * 
-     * @param processDefinitionId
-     *        the process
-     * @param taskName
-     *        the name of the task
-     * @return
-     *         the form mapping of the task form
-     * @throws org.bonitasoft.engine.exception.FormMappingNotFoundException
-     *         when the form mapping with these properties is not found
-     * @since 7.0.0
-     */
-    FormMapping getTaskForm(long processDefinitionId, String taskName) throws FormMappingNotFoundException;
+    //TODO add something like a boolean to ask if we check for secu or not if we get only web resources
+    PageURL resolvePageOrURL(String key, Map<String,Serializable> context) throws NotFoundException, UnauthorizedAccessException, ExecutionException;
 
     /**
      * Update a form mapping with the given values
      * 
      * @param formMappingId
      *        the form mapping to update
-     * @param form
+     * @param url
      *        the name of the form or the url to the form
-     * @param target
-     *        the type of the target form
+     * @param pageId
      * @throws org.bonitasoft.engine.exception.FormMappingNotFoundException
      *         when the formMappingId is not an existing form mapping
      * @throws org.bonitasoft.engine.exception.UpdateException
      *         when there is an issue when updating the form mapping
      * @since 7.0.0
      */
-    void updateFormMapping(final long formMappingId, final String form, FormMappingTarget target) throws FormMappingNotFoundException, UpdateException;
+    FormMapping updateFormMapping(final long formMappingId, final String url, Long pageId) throws FormMappingNotFoundException, UpdateException;
+    FormMapping getFormMapping(final long formMappingId) throws FormMappingNotFoundException;
 }

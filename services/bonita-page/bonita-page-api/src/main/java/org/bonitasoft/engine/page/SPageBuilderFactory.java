@@ -19,7 +19,7 @@ package org.bonitasoft.engine.page;
 public interface SPageBuilderFactory {
 
     SPageBuilder createNewInstance(String name, String description, String displayName, long installationDate, long installedBy, boolean provided,
-            String contentName);
+                                   String contentName);
 
     SPageBuilder createNewInstance(String name, long installationDate, int installedBy, boolean provided, String contentName);
 
@@ -40,5 +40,9 @@ public interface SPageBuilderFactory {
     String getLastUpdatedByKey();
 
     String getInstalledByKey();
+
+    String getContentTypeKey();
+
+    String getProcessDefinitionIdKey();
 
 }

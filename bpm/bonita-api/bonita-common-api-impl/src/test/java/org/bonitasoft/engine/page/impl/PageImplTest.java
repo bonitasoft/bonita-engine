@@ -17,13 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.impl.PageImpl;
-import org.junit.BeforeClass;
+import org.bonitasoft.engine.page.ContentType;
 import org.junit.Test;
 
 public class PageImplTest {
-
-    private static PageImpl pageImpl;
 
     private static final long USER_ID = 1l;
 
@@ -35,58 +32,59 @@ public class PageImplTest {
 
     private static final String DISPLAY_NAME = "display name";
 
-    private static final long PAGE_ID = -1l;
+    public static final long PROCESS_DEFINITION_ID = 456789L;
 
-    private static long installationDate;
+    @Test
+    public void should_set_all_fields() {
 
-    private static long modificationDate;
+        Date date = new Date(1);
+        Date modificationDate = new Date(2);
 
-    @BeforeClass
-    public static void before() {
+        PageImplAssert
+                .assertThat(
+                        new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, DESCRIPTION, date.getTime(), USER_ID, modificationDate.getTime(), USER_ID,
+                                "content.zip", ContentType.PAGE, null))
+                .hasId(-1l)
+                .hasName(NAME)
+                .hasDisplayName(DISPLAY_NAME)
+                .isProvided()
+                .hasDescription(DESCRIPTION).hasInstallationDate(date)
+                .hasLastModificationDate(modificationDate)
+                .hasContentType(ContentType.PAGE);
 
-        installationDate = System.currentTimeMillis();
-        modificationDate = installationDate + 10000;
-
-        pageImpl = new PageImpl(PAGE_ID, NAME, DISPLAY_NAME, PROVIDED, DESCRIPTION, installationDate, USER_ID, modificationDate, USER_ID, "content.zip");
     }
 
     @Test
-    public void testGetId() {
-        assertThat(pageImpl.getId()).isEqualTo(PAGE_ID);
+    public void should_set_all_form_fields() {
+
+        Date date = new Date(1);
+        Date modificationDate = new Date(2);
+
+        PageImplAssert
+                .assertThat(
+                        new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, DESCRIPTION, date.getTime(), USER_ID, modificationDate.getTime(), USER_ID,
+                                "content.zip", ContentType.FORM, PROCESS_DEFINITION_ID))
+                .hasId(-1l)
+                .hasName(NAME)
+                .hasDisplayName(DISPLAY_NAME)
+                .isProvided()
+                .hasDescription(DESCRIPTION).hasInstallationDate(date)
+                .hasLastModificationDate(modificationDate)
+                .hasProcessDefinitionId(PROCESS_DEFINITION_ID)
+                .hasContentType(ContentType.FORM);
+
     }
 
     @Test
-    public void testGetName() {
-        assertThat(pageImpl.getName()).isEqualTo(NAME);
-    }
+    public void should_display_all_fields_in_to_string() {
 
-    @Test
-    public void testIsProvided() {
-        assertThat(pageImpl.isProvided()).isEqualTo(PROVIDED);
-    }
+        Date date = new Date(1);
+        Date modificationDate = new Date(2);
 
-    @Test
-    public void testGetDescription() {
-        assertThat(pageImpl.getDescription()).isEqualTo(DESCRIPTION);
-    }
+        assertThat(
+                new PageImpl(-1l, NAME, DISPLAY_NAME, PROVIDED, DESCRIPTION, date.getTime(), USER_ID, modificationDate.getTime(), USER_ID,
+                        "content.zip", ContentType.FORM, PROCESS_DEFINITION_ID).toString()).contains(String.valueOf(PROCESS_DEFINITION_ID)).contains(
+                ContentType.FORM);
 
-    @Test
-    public void testGetInstallationDate() {
-        assertThat(pageImpl.getInstallationDate()).isEqualTo(new Date(installationDate));
-    }
-
-    @Test
-    public void testGetInstalledBy() {
-        assertThat(pageImpl.getInstalledBy()).isEqualTo(USER_ID);
-    }
-
-    @Test
-    public void testGetLastModificationDate() {
-        assertThat(pageImpl.getLastModificationDate()).isEqualTo(new Date(modificationDate));
-    }
-
-    @Test
-    public void testGetDisplayName() {
-        assertThat(pageImpl.getDisplayName()).isEqualTo(DISPLAY_NAME);
     }
 }

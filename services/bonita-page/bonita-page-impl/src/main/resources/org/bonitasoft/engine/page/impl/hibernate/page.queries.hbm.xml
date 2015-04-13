@@ -12,9 +12,23 @@
 	   SELECT page
 	   FROM org.bonitasoft.engine.page.impl.SPageImpl AS page
 	   WHERE page.name = :pageName
+       AND  page.processDefinitionId is null
    </query>
 
-	<query name="getNumberOfSPage">
+    <query name="getPageByNameAndProcessDefinitionId">
+        SELECT  page
+        FROM    org.bonitasoft.engine.page.impl.SPageImpl AS page
+        WHERE   page.name = :pageName
+        AND     page.processDefinitionId = :processDefinitionId
+    </query>
+
+    <query name="getPageByProcessDefinitionId">
+        SELECT  page
+        FROM    org.bonitasoft.engine.page.impl.SPageImpl AS page
+        WHERE   page.processDefinitionId = :processDefinitionId
+    </query>
+
+    <query name="getNumberOfSPage">
 		SELECT COUNT(page)
 		FROM org.bonitasoft.engine.page.impl.SPageImpl AS page
 	</query>
@@ -28,6 +42,12 @@
 		SELECT pagecontent
 		FROM org.bonitasoft.engine.page.impl.SPageContentImpl AS pagecontent
 		WHERE pagecontent.id = :id
+	</query>
+
+	<query name="getPageMappingByKey">
+		SELECT pagemapping
+		FROM org.bonitasoft.engine.page.impl.SPageMappingImpl AS pagemapping
+		WHERE pagemapping.key = :key
 	</query>
 
 </hibernate-mapping>

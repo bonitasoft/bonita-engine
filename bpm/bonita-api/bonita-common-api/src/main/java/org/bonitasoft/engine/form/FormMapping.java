@@ -10,10 +10,11 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.form;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.bonitasoft.engine.bpm.BaseElement;
 
@@ -26,35 +27,29 @@ public class FormMapping implements BaseElement {
 
     private long id;
     private long processDefinitionId;
-    private String task;
-    private String form;
-    private FormMappingTarget target;
     private FormMappingType type;
+    private FormMappingTarget target;
+    private String task;
+    private Long pageId;
+    private String pageURL;
+    private String pageMappingKey;
     private long lastUpdatedBy;
     private Date lastUpdateDate;
 
     public FormMapping() {
     }
 
-    public FormMapping(long processDefinitionId, FormMappingTarget target, FormMappingType type, String form, String task) {
+    public FormMapping(long processDefinitionId, FormMappingType type, String task, String pageMappingKey) {
         this.processDefinitionId = processDefinitionId;
+        this.type = type;
         this.task = task;
-        this.form = form;
-        this.target = target;
-        this.type = type;
+        this.pageMappingKey = pageMappingKey;
     }
 
-    public FormMapping(long processDefinitionId, FormMappingType type, FormMappingTarget target, String form) {
+    public FormMapping(long processDefinitionId, FormMappingType type, String pageMappingKey) {
         this.type = type;
-        this.target = target;
         this.processDefinitionId = processDefinitionId;
-        this.form = form;
-    }
-
-    public FormMapping(FormMappingType type, FormMappingTarget target, long processDefinitionId) {
-        this.type = type;
-        this.target = target;
-        this.processDefinitionId = processDefinitionId;
+        this.pageMappingKey = pageMappingKey;
     }
 
     public long getProcessDefinitionId() {
@@ -63,6 +58,14 @@ public class FormMapping implements BaseElement {
 
     public void setProcessDefinitionId(long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+    }
+
+    public String getPageMappingKey() {
+        return pageMappingKey;
+    }
+
+    public void setPageMappingKey(String pageMappingKey) {
+        this.pageMappingKey = pageMappingKey;
     }
 
     @Override
@@ -82,20 +85,20 @@ public class FormMapping implements BaseElement {
         this.task = task;
     }
 
-    public String getForm() {
-        return form;
+    public Long getPageId() {
+        return pageId;
     }
 
-    public void setForm(String form) {
-        this.form = form;
+    public void setPageId(Long pageId) {
+        this.pageId = pageId;
     }
 
-    public FormMappingTarget getTarget() {
-        return target;
+    public String getURL() {
+        return pageURL;
     }
 
-    public void setTarget(FormMappingTarget target) {
-        this.target = target;
+    public void setPageURL(String pageURL) {
+        this.pageURL = pageURL;
     }
 
     public FormMappingType getType() {
@@ -122,37 +125,34 @@ public class FormMapping implements BaseElement {
         this.lastUpdateDate = lastUpdateDate;
     }
 
+       public FormMappingTarget getTarget() {
+        return target;
+    }
+
+    public void setTarget(FormMappingTarget target) {
+        this.target = target;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (!(o instanceof FormMapping)) return false;
         FormMapping that = (FormMapping) o;
-
-        if (target != that.target) return false;
-        if (id != that.id) return false;
-        if (lastUpdatedBy != that.lastUpdatedBy) return false;
-        if (processDefinitionId != that.processDefinitionId) return false;
-        if (form != null ? !form.equals(that.form) : that.form != null) return false;
-        if (lastUpdateDate != null ? !lastUpdateDate.equals(that.lastUpdateDate) : that.lastUpdateDate != null)
-            return false;
-        if (task != null ? !task.equals(that.task) : that.task != null) return false;
-        if (type != that.type) return false;
-
-        return true;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(processDefinitionId, that.processDefinitionId) &&
+                Objects.equals(lastUpdatedBy, that.lastUpdatedBy) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(target, that.target) &&
+                Objects.equals(task, that.task) &&
+                Objects.equals(pageId, that.pageId) &&
+                Objects.equals(pageURL, that.pageURL) &&
+                Objects.equals(pageMappingKey, that.pageMappingKey) &&
+                Objects.equals(lastUpdateDate, that.lastUpdateDate);
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (int) (processDefinitionId ^ (processDefinitionId >>> 32));
-        result = 31 * result + (task != null ? task.hashCode() : 0);
-        result = 31 * result + (form != null ? form.hashCode() : 0);
-        result = 31 * result + (target != null ? target.hashCode() : 0);
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (int) (lastUpdatedBy ^ (lastUpdatedBy >>> 32));
-        result = 31 * result + (lastUpdateDate != null ? lastUpdateDate.hashCode() : 0);
-        return result;
+        return Objects.hash(id, processDefinitionId, type, target, task, pageId, pageURL, pageMappingKey, lastUpdatedBy, lastUpdateDate);
     }
 
     @Override
@@ -160,10 +160,12 @@ public class FormMapping implements BaseElement {
         return "FormMapping{" +
                 "id=" + id +
                 ", processDefinitionId=" + processDefinitionId +
-                ", task='" + task + '\'' +
-                ", form='" + form + '\'' +
-                ", target=" + target +
                 ", type=" + type +
+                ", target=" + target +
+                ", task='" + task + '\'' +
+                ", pageId=" + pageId +
+                ", pageURL='" + pageURL + '\'' +
+                ", pageMappingKey='" + pageMappingKey + '\'' +
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 ", lastUpdateDate=" + lastUpdateDate +
                 '}';
