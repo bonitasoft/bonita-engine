@@ -32,7 +32,7 @@ public class FormMappingDefinition implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @XmlAttribute(required = true)
+    @XmlAttribute
     private String form;
 
     @XmlAttribute(required = true)

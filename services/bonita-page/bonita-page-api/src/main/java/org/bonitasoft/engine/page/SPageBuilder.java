@@ -22,4 +22,8 @@ public interface SPageBuilder {
 
     SPageBuilder setDescription(final String description);
 
+    SPageBuilder setContentType(final String pageContent);
+
+    SPageBuilder setProcessDefinitionId(final Long  processDefinitionId);
+
 }

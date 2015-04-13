@@ -21,15 +21,36 @@ public enum FormMappingType {
     /**
      * form used as process start form
      */
-    PROCESS_START,
+    PROCESS_START(1),
 
     /**
      * form used as process overview form
      */
-    PROCESS_OVERVIEW,
+    PROCESS_OVERVIEW(2),
 
     /**
      * form of a task
      */
-    TASK
+    TASK(3);
+
+    private Integer id;
+
+    public Integer getId() {
+        return id;
+    }
+
+    FormMappingType(Integer id) {
+        this.id = id;
+    }
+
+    public static FormMappingType getTypeFromId(Integer type) {
+        if (type != null) {
+            for (FormMappingType formMappingType : values()) {
+                if (formMappingType.getId() == type.intValue()) {
+                    return formMappingType;
+                }
+            }
+        }
+        return null;
+    }
 }

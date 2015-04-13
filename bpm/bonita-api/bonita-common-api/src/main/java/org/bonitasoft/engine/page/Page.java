@@ -22,19 +22,18 @@ import org.bonitasoft.engine.bpm.BaseElement;
  * It is used by Bonita BPM Portal to display specific custom content
  * 
  * @author Laurent Leseigneur
- * 
  */
 public interface Page extends BaseElement {
 
     /**
-     * Gets the name of this <code>Page</code>.
+     * Get the name of this <code>Page</code>.
      * 
      * @return the logical name of this <code>Page</code>.
      */
     String getName();
 
     /**
-     * Gets the display name of this <code>Page</code>.
+     * Get the display name of this <code>Page</code>.
      * 
      * @return the display name of this <code>Page</code>.
      */
@@ -48,7 +47,7 @@ public interface Page extends BaseElement {
     boolean isProvided();
 
     /**
-     * Gets the description of this <code>Page</code>.
+     * Get the description of this <code>Page</code>.
      * 
      * @return the description of this <code>Page</code>.
      */
@@ -62,7 +61,7 @@ public interface Page extends BaseElement {
     Date getInstallationDate();
 
     /**
-     * Gets the ID of the user that installed the page.
+     * Get the ID of the user that installed the page.
      * 
      * @return the ID of the user that installed the page, or -1 if it is a default page.
      */
@@ -83,10 +82,28 @@ public interface Page extends BaseElement {
     long getLastUpdatedBy();
 
     /**
-     * Gets the name of the zip file.
+     * Get the name of the zip file.
      * 
      * @return the name of the zip file of this <code>Page</code>.
      */
     String getContentName();
+
+    /**
+     * Get the type of this <code>Page</code>.
+     *
+     * @return the type of this <code>Page</code>. see {@link ContentType} for available values
+     * @since 7.0
+     */
+    String getContentType();
+
+    /**
+     * Get the process definition ID of this <code>Page</code>.
+     *
+     * @return the process definition ID of this <code>Page</code>, or null if not set.
+     * @since 7.0
+     */
+    Long getProcessDefinitionId();
+
+
 
 }

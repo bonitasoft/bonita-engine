@@ -62,6 +62,18 @@ public class SPageUpdateBuilderImpl implements SPageUpdateBuilder {
     }
 
     @Override
+    public SPageUpdateBuilder updateContentType(String contentType) {
+        descriptor.addField(SPageFields.PAGE_CONTENT_TYPE, contentType);
+        return this;
+    }
+
+    @Override
+    public SPageUpdateBuilder updateProcessDefinitionId(Long processDefinitionId) {
+        descriptor.addField(SPageFields.PAGE_PROCESS_DEFINITION_ID, processDefinitionId);
+        return this;
+    }
+
+    @Override
     public EntityUpdateDescriptor done() {
         return descriptor;
     }
