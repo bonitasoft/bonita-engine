@@ -83,6 +83,11 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
         return new ThemeAPIExt();
     }
 
+    @Override
+    public org.bonitasoft.engine.api.ApplicationAPI getLivingApplicationAPI() {
+        return new ApplicationAPIExt();
+    }
+
     /**
      * @deprecated from version 7.0 on, use {@link #getCustomPageAPI()} instead.
      */
