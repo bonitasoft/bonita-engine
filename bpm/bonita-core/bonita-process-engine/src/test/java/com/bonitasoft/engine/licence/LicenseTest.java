@@ -106,4 +106,9 @@ public class LicenseTest {
         valideFeature(Features.TRACEABILITY);
     }
 
+    @Test
+    public void formMappingUpdate() {
+        valideFeature(Features.LIVE_UPDATE_FORM_MAPPING);
+    }
+
 }
