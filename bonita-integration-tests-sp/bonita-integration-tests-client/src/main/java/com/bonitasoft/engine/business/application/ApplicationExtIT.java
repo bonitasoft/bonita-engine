@@ -12,8 +12,11 @@ package com.bonitasoft.engine.business.application;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
+import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.profile.Profile;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
@@ -94,6 +97,37 @@ public class ApplicationExtIT extends org.bonitasoft.engine.business.application
         assertThat(updatedApplication).isEqualTo(getApplicationAPI().getApplication(application.getId()));
 
         getApplicationAPI().deleteApplication(application.getId());
+        getPageAPI().deletePage(layout.getId());
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "search",
+            "filter on layoutId", "no search term" })
+    @Test
+    public void searchApplications_can_filter_on_layoutId() throws Exception {
+        //given
+        Page layout = createPage("custompage_newLayout");
+        final ApplicationCreatorExt hrCreator = new ApplicationCreatorExt("HR-dashboard", "HR dash board", "1.0");
+        final ApplicationCreatorExt engineeringCreator = new ApplicationCreatorExt("Engineering-dashboard", "Engineering dashboard", "1.0", layout.getId());
+        final ApplicationCreatorExt marketingCreator = new ApplicationCreatorExt("Marketing-dashboard", "Marketing dashboard", "1.0");
+
+        final org.bonitasoft.engine.business.application.Application hr = getApplicationAPI().createApplication(hrCreator);
+        final org.bonitasoft.engine.business.application.Application engineering = getApplicationAPI().createApplication(engineeringCreator);
+        final org.bonitasoft.engine.business.application.Application marketing = getApplicationAPI().createApplication(marketingCreator);
+
+        //when
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
+        builder.filter(org.bonitasoft.engine.business.application.ApplicationSearchDescriptor.LAYOUT_ID, layout.getId());
+
+        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
+        assertThat(applications).isNotNull();
+        assertThat(applications.getCount()).isEqualTo(1);
+        assertThat(applications.getResult()).containsExactly(engineering);
+
+        //clean
+        getApplicationAPI().deleteApplication(hr.getId());
+        getApplicationAPI().deleteApplication(engineering.getId());
+        getApplicationAPI().deleteApplication(marketing.getId());
+
         getPageAPI().deletePage(layout.getId());
     }
 
