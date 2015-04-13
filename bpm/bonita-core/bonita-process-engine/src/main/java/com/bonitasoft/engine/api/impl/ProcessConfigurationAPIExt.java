@@ -24,8 +24,10 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.ProcessConfigurationAPI;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
+import com.bonitasoft.manager.Features;
 
 /**
  * author Emmanuel Duchastenier
@@ -44,6 +46,7 @@ public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl impl
 
     @Override
     public FormMapping updateFormMapping(final long formMappingId, final String url, Long pageId) throws FormMappingNotFoundException, UpdateException {
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.LIVE_UPDATE_FORM_MAPPING);
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {
             SFormMapping sFormMapping = formMappingService.get(formMappingId);
