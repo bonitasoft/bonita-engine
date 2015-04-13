@@ -22,6 +22,7 @@ import org.bonitasoft.engine.profile.Profile;
  * @author Elias Ricken de Medeiros
  * @see ApplicationCreator
  * @see ApplicationUpdater
+ * @since 7.0.0
  */
 public enum ApplicationField {
 
@@ -81,5 +82,12 @@ public enum ApplicationField {
      * @see org.bonitasoft.engine.business.application.Application
      */
     HOME_PAGE_ID,
+
+    /**
+     * References the identifier of the {@link org.bonitasoft.engine.page.Page} defined as the {@link Application} layout.
+     * @see org.bonitasoft.engine.page.Page
+     * @see org.bonitasoft.engine.business.application.Application
+     */
+    LAYOUT_ID
 
 }

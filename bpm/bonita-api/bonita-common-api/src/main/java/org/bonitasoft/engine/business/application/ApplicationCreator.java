@@ -24,7 +24,7 @@ import org.bonitasoft.engine.profile.Profile;
  *
  * @author Elias Ricken de Medeiros
  * @see Application
- * @since 6.4
+ * @since 7.0.0
  */
 public class ApplicationCreator implements Serializable {
 
@@ -34,9 +34,9 @@ public class ApplicationCreator implements Serializable {
 
     /**
      * Creates an instance of <code>ApplicationCreator</code> containing mandatory information.
-     * <p>The created {@code Application} will used the default layout.</p>
+     * <p>The created {@link Application} will used the default layout.</p>
      *
-     * @param token the {@link Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
+     * @param token the {@code Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
      *        characters and the following special characters '-', '.', '_' or '~'.
      * @param displayName the <code>Application</code> display name. It cannot be null or empty
      * @param version the <code>Application</code> version

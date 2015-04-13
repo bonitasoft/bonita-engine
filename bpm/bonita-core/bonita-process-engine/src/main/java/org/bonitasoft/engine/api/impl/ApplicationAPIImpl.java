@@ -81,7 +81,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return getApplicationAPIDelegate().createApplication(applicationCreator);
     }
 
-    private ApplicationAPIDelegate getApplicationAPIDelegate() {
+    protected ApplicationAPIDelegate getApplicationAPIDelegate() {
         return new ApplicationAPIDelegate(getTenantAccessor(), new ApplicationModelConverter(getTenantAccessor().getPageService()),
                 SessionInfos.getUserIdFromSession());
     }
@@ -139,7 +139,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return getApplicationAPIDelegate().updateApplication(applicationId, updater);
     }
 
-    private TenantServiceAccessor getTenantAccessor() {
+    protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();

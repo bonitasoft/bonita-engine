@@ -59,19 +59,20 @@ public class ApplicationModelConverter {
         final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
 
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, displayName, version, creatorUserId,
-                getLayoutId(name));
+                getLayoutId(creator));
         builder.setDescription(description);
         builder.setIconPath(iconPath);
         builder.setProfileId(profileId);
         return builder.done();
     }
 
-    private Long getLayoutId(final String applicationName) throws CreationException {
+    protected Long getLayoutId(ApplicationCreator creator) throws CreationException {
         try {
+            final String applicationToken = (String) creator.getFields().get(ApplicationField.TOKEN);
             SPage defaultLayout = pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME);
             if (defaultLayout == null) {
                 throw new CreationException(String.format("Unable to created application with token '%s' because the default layout '%s' was not found.",
-                        applicationName, ApplicationService.DEFAULT_LAYOUT_NAME));
+                        applicationToken, ApplicationService.DEFAULT_LAYOUT_NAME));
             }
             return defaultLayout.getId();
         } catch (SBonitaReadException e) {
