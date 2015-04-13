@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Date;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
@@ -31,7 +30,6 @@ import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -42,17 +40,9 @@ import org.junit.rules.ExpectedException;
 public class FormMappingIT extends TestWithUser {
 
     public static final String PROCESS1_OVERVIEW_FORM = "process1OverviewForm";
-    public static final String PROCESS_2_OVERVIEW_FORM = "process2OverviewForm";
-
-    @Override
-    @Before
-    public void apiTestUtilBeforeClass() {
-        setForceToNonBlockingFormMappingToDefaultValue(false);
-    }
 
     @Test
-    public void deployProcessesWithFormMappingAndUpdateThem() throws Exception {
-
+    public void deployProcessesWithFormMappings() throws Exception {
         ProcessDefinitionBuilder p1Builder = new ProcessDefinitionBuilder().createNewInstance("P1", "1.0");
         p1Builder.addUserTask("step1", "actor").addUserTask("step2", "actor");
         p1Builder.addActor("actor");
@@ -63,6 +53,7 @@ public class FormMappingIT extends TestWithUser {
                         FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
                                 .addTaskForm("task1Form", FormMappingTarget.INTERNAL, "step1")
                                 .addProcessOverviewForm("process1OverviewForm", FormMappingTarget.INTERNAL).build());
+
         ProcessDefinitionBuilder p2Builder = new ProcessDefinitionBuilder().createNewInstance("P2", "1.0");
         p2Builder.addUserTask("step1", "actor").addUserTask("step2", "actor");
         p2Builder.addActor("actor");
@@ -77,7 +68,6 @@ public class FormMappingIT extends TestWithUser {
         ProcessDefinition p1 = getProcessAPI().deploy(bar1.done());
         ProcessDefinition p2 = getProcessAPI().deploy(bar2.done());
 
-        long afterDeploy = System.currentTimeMillis();
         ProcessConfigurationAPI processConfigurationAPI = getProcessConfigurationAPI();
 
         //get
@@ -118,11 +108,12 @@ public class FormMappingIT extends TestWithUser {
         assertThat(processOverviewForm1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(processOverviewForm1.getPageId()).isNull();
         assertThat(processOverviewForm1.getURL()).isNull();
-        assertThat(processOverviewForm1.getTarget()).isNull();//page does not exists
+        assertThat(processOverviewForm1.getTarget()).isNull(); // referenced page does not exists
         assertThat(step1Form1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(step1Form1.getPageId()).isNull();
         assertThat(step2Form1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(step2Form1.getURL()).isNull();
+        assertThat(step2Form1.getTarget()).isEqualTo(FormMappingTarget.UNDEFINED);
 
         assertThat(processStartForm2.getProcessDefinitionId()).isEqualTo(p2.getId());
         assertThat(processStartForm2.getURL()).isEqualTo("processStartForm");
@@ -133,6 +124,7 @@ public class FormMappingIT extends TestWithUser {
         assertThat(step1Form2.getURL()).isEqualTo("task2Form");
         assertThat(step2Form2.getProcessDefinitionId()).isEqualTo(p2.getId());
         assertThat(step2Form2.getURL()).isNull();
+        assertThat(step2Form2.getTarget()).isEqualTo(FormMappingTarget.UNDEFINED);
 
         //search
         SearchResult<FormMapping> formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(
@@ -153,23 +145,12 @@ public class FormMappingIT extends TestWithUser {
         assertThat(formMappingSearchResult.getCount()).isEqualTo(2);
         assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(), p1.getId());
 
-        //update
-        processConfigurationAPI.updateFormMapping(step2Form1.getId(), "newFormUrlForStep2", null);
-        FormMapping updatedStep2Form1 = processConfigurationAPI.getFormMapping(step2Form1.getId());
-        assertThat(updatedStep2Form1).isEqualToIgnoringGivenFields(step2Form1, "pageMappingKey", "pageURL", "target", "lastUpdateDate", "lastUpdatedBy");
-        assertThat(updatedStep2Form1.getURL()).isEqualTo("newFormUrlForStep2");
-        assertThat(updatedStep2Form1.getPageMappingKey()).isEqualTo("taskInstance/P1/1.0/step2");
-        assertThat(updatedStep2Form1.getTarget()).isEqualTo(FormMappingTarget.URL);
-        assertThat(updatedStep2Form1.getLastUpdateDate()).isAfter(new Date(afterDeploy));
-        assertThat(updatedStep2Form1.getLastUpdatedBy()).isEqualTo(user.getId());
-        assertThat(step2Form1.getLastUpdateDate()).isNull();
-
         //resolve urls:
         PageURL p1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("process/P1/1.0", Collections.<String, Serializable> emptyMap());
         PageURL p1Overview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/P1/1.0", Collections.<String, Serializable> emptyMap());
         PageURL p1step1Instanciation = getProcessConfigurationAPI()
                 .resolvePageOrURL("taskInstance/P1/1.0/step1", Collections.<String, Serializable> emptyMap());
-        assertThat(p1Instanciation.getUrl()).isEqualTo(buildUrlForExternal("processStartForm"));
+        assertThat(p1Instanciation.getUrl()).isEqualTo("processStartForm");
         assertThat(p1Overview.getPageId()).isNull();
         assertThat(p1step1Instanciation.getUrl()).isEqualTo(null);
 
@@ -179,10 +160,6 @@ public class FormMappingIT extends TestWithUser {
                 processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(FormMappingSearchDescriptor.ID, Order.DESC).done())
                         .getResult()).isEmpty();
 
-    }
-
-    protected String buildUrlForExternal(String url) {
-        return url;
     }
 
     @Rule

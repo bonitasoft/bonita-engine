@@ -21,7 +21,6 @@ import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UnauthorizedAccessException;
-import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -56,22 +55,12 @@ public interface ProcessConfigurationAPI {
      * @see PageURL the structured PageURL that points to the Page or URL
      */
     //TODO add something like a boolean to ask if we check for secu or not if we get only web resources
-    PageURL resolvePageOrURL(String key, Map<String,Serializable> context) throws NotFoundException, UnauthorizedAccessException, ExecutionException;
+    PageURL resolvePageOrURL(String key, Map<String, Serializable> context) throws NotFoundException, UnauthorizedAccessException, ExecutionException;
 
     /**
-     * Update a form mapping with the given values
-     * 
      * @param formMappingId
-     *        the form mapping to update
-     * @param url
-     *        the name of the form or the url to the form
-     * @param pageId
-     * @throws org.bonitasoft.engine.exception.FormMappingNotFoundException
-     *         when the formMappingId is not an existing form mapping
-     * @throws org.bonitasoft.engine.exception.UpdateException
-     *         when there is an issue when updating the form mapping
-     * @since 7.0.0
+     * @return
+     * @throws FormMappingNotFoundException
      */
-    FormMapping updateFormMapping(final long formMappingId, final String url, Long pageId) throws FormMappingNotFoundException, UpdateException;
     FormMapping getFormMapping(final long formMappingId) throws FormMappingNotFoundException;
 }

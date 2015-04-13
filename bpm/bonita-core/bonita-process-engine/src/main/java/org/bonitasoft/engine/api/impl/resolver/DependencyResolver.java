@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl.resolver;
 
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.ERROR;
+import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.INFO;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,7 +78,7 @@ public class DependencyResolver {
                 resolved &= resolver.resolve(tenantAccessor, businessArchive, sDefinition);
                 if (!resolved) {
                     for (Problem problem : resolver.checkResolution(tenantAccessor, sDefinition)) {
-                        System.out.println(problem.getDescription());
+                        tenantAccessor.getTechnicalLoggerService().log(DependencyResolver.class, INFO, problem.getDescription());
                     }
                 }
             } catch (final BonitaException e) {
