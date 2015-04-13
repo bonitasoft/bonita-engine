@@ -12,6 +12,8 @@ package com.bonitasoft.engine.api.impl.converter;
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationField;
+import org.bonitasoft.engine.business.application.ApplicationUpdater;
+import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.page.PageService;
 
@@ -31,5 +33,13 @@ public class ApplicationModelConverterExt extends ApplicationModelConverter {
             return super.getLayoutId(creator);
         }
         return layoutId;
+    }
+
+    @Override
+    protected void updateFields(final ApplicationUpdater updater, final SApplicationUpdateBuilder builder) {
+        super.updateFields(updater, builder);
+        if (updater.getFields().containsKey(ApplicationField.LAYOUT_ID)) {
+            builder.updateLayoutId((Long) updater.getFields().get(ApplicationField.LAYOUT_ID));
+        }
     }
 }

@@ -13,15 +13,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-import com.bonitasoft.engine.business.application.ApplicationCreatorExt;
+import java.util.Map;
+
+import com.bonitasoft.engine.business.application.ApplicationUpdaterExt;
 import org.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.bonitasoft.engine.business.application.ApplicationCreatorExt;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationModelConverterExtTest {
@@ -79,4 +85,46 @@ public class ApplicationModelConverterExtTest {
         assertThat(application.getUpdatedBy()).isEqualTo(userId);
         assertThat(application.getLayoutId()).isEqualTo(defaultLayoutId);
     }
+
+    @Test
+    public void toApplicationUpdateDescriptor_should_map_layoutId() throws Exception {
+        //given
+        long userId = 1L;
+        long layoutId = 20L;
+        final ApplicationUpdaterExt updater = new ApplicationUpdaterExt();
+        updater.setLayoutId(layoutId);
+        long before = System.currentTimeMillis();
+
+        //when
+        final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, userId);
+
+        //then
+        assertThat(updateDescriptor).isNotNull();
+        final Map<String, Object> fields = updateDescriptor.getFields();
+        assertThat(fields).hasSize(3); // field lastUpdateDate cannot be checked:
+        assertThat((Long)fields.get(SApplicationFields.LAST_UPDATE_DATE)).isGreaterThanOrEqualTo(before);
+        assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(userId);
+        assertThat(fields.get(SApplicationFields.LAYOUT_ID)).isEqualTo(layoutId);
+    }
+
+    @Test
+    public void toApplicationUpdateDescriptor_should_not_update_layoutId_if_this_field_is_not_set_to_be_updated() throws Exception {
+        //given
+        long userId = 1L;
+        final ApplicationUpdaterExt updater = new ApplicationUpdaterExt();
+        updater.setToken("newToken");
+        long before = System.currentTimeMillis();
+
+        //when
+        final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, userId);
+
+        //then
+        assertThat(updateDescriptor).isNotNull();
+        final Map<String, Object> fields = updateDescriptor.getFields();
+        assertThat(fields).hasSize(3); // field lastUpdateDate cannot be checked:
+        assertThat((Long)fields.get(SApplicationFields.LAST_UPDATE_DATE)).isGreaterThanOrEqualTo(before);
+        assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(userId);
+        assertThat(fields.get(SApplicationFields.TOKEN)).isEqualTo("newToken");
+    }
+
 }
