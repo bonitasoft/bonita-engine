@@ -10,10 +10,16 @@ package com.bonitasoft.engine.api.impl;
 
 import static org.mockito.Mockito.*;
 
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
+import org.bonitasoft.engine.exception.FormMappingNotFoundException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.impl.SPageMappingImpl;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +28,7 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
 
 /**
  * author Emmanuel Duchastenier
@@ -33,6 +40,9 @@ public class ProcessConfigurationAPIExtTest {
     private static final long FORM_MAPPING_ID = 458l;
 
     @Mock
+    private LicenseChecker licenceChecker;
+
+    @Mock
     public FormMappingService formMappingService;
     @Mock
     public TenantServiceAccessor tenantServiceAccessor;
@@ -41,6 +51,7 @@ public class ProcessConfigurationAPIExtTest {
 
     @Before
     public void setUp() throws Exception {
+        doReturn(licenceChecker).when(processConfigurationAPI).getLicenseChecker();
         doReturn(tenantServiceAccessor).when(processConfigurationAPI).getTenantAccessor();
         doReturn(formMappingService).when(tenantServiceAccessor).getFormMappingService();
 
@@ -59,8 +70,26 @@ public class ProcessConfigurationAPIExtTest {
         return sFormMapping;
     }
 
+    @Test(expected = FormMappingNotFoundException.class)
+    public void updateFormMappingShouldThrowFormMappingNotFound() throws Exception {
+        doThrow(SObjectNotFoundException.class).when(formMappingService).get(FORM_MAPPING_ID);
+        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "other", null);
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void updateFormMappingShouldThrowRetrieveException() throws Exception {
+        doThrow(SBonitaReadException.class).when(formMappingService).get(FORM_MAPPING_ID);
+        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "some", null);
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateFormMappingShouldThrowUpdateException() throws Exception {
+        doThrow(SObjectModificationException.class).when(formMappingService).get(FORM_MAPPING_ID);
+        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "someForm", null);
+    }
+
     @Test
-    public void testUpdateFormMapping() throws Exception {
+    public void updateFormMappingShouldCallUpdateOnService() throws Exception {
         //given
         SFormMappingImpl sFormMapping = createSFormMapping(FormMappingType.PROCESS_START, FORM_MAPPING_ID, "theUrl", null, null, PROCESS_DEF_ID);
         doReturn(sFormMapping).when(formMappingService).get(FORM_MAPPING_ID);
@@ -68,6 +97,5 @@ public class ProcessConfigurationAPIExtTest {
         processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", null);
         //then
         verify(formMappingService, times(1)).update(sFormMapping, "theNewForm", null);
-
     }
 }
