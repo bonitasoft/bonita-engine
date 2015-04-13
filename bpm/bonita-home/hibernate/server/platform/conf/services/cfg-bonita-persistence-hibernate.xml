@@ -199,6 +199,7 @@
 				<entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="com.bonitasoft.engine.core.reporting.SReportContentImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContent" value="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" />
 				<entry key="org.bonitasoft.engine.page.SPage" value="org.bonitasoft.engine.page.impl.SPageImpl" />
+				<entry key="org.bonitasoft.engine.page.SPageMapping" value="org.bonitasoft.engine.page.impl.SPageMappingImpl" />
 				<entry key="org.bonitasoft.engine.page.SPageContent" value="org.bonitasoft.engine.page.impl.SPageContentImpl" />
 				<entry key="org.bonitasoft.engine.page.SPageWithContent" value="org.bonitasoft.engine.page.impl.SPageWithContentImpl" />
 
