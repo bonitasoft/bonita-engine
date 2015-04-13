@@ -126,10 +126,9 @@ public class ApplicationNodeConverter {
 
     public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) throws SBonitaReadException, ImportException {
         final ImportStatus importStatus = new ImportStatus(applicationNode.getToken());
-        Long layoutId = getLayoutId(applicationNode);
 
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
-                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, layoutId);
+                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, getLayoutId(applicationNode, importStatus));
         builder.setIconPath(applicationNode.getIconPath());
         builder.setDescription(applicationNode.getDescription());
         builder.setState(applicationNode.getState());
@@ -143,13 +142,21 @@ public class ApplicationNodeConverter {
         return new ImportResult(application, importStatus);
     }
 
-    private Long getLayoutId(final ApplicationNode applicationNode) throws SBonitaReadException, ImportException {
-        SPage layout = pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME);
+    private Long getLayoutId(final ApplicationNode applicationNode, final ImportStatus importStatus) throws SBonitaReadException, ImportException {
+        SPage layout = pageService.getPageByName(getLayoutName(applicationNode));
         if (layout == null) {
-            throw new ImportException(String.format("Unable to import application with token '%s' because the default layout '%s' was not found.",
-                    applicationNode.getToken(), ApplicationService.DEFAULT_LAYOUT_NAME));
+            return handleMissingLayout(applicationNode, importStatus);
         }
         return layout.getId();
+    }
+
+    protected Long handleMissingLayout(final ApplicationNode applicationNode, final ImportStatus importStatus) throws ImportException {
+        throw new ImportException(String.format("Unable to import application with token '%s' because the default layout '%s' was not found.",
+                applicationNode.getToken(), getLayoutName(applicationNode)));
+    }
+
+    protected String getLayoutName(final ApplicationNode applicationNode) {
+        return ApplicationService.DEFAULT_LAYOUT_NAME;
     }
 
     private ImportError setProfile(final ApplicationNode applicationNode, final SApplicationBuilder builder) {

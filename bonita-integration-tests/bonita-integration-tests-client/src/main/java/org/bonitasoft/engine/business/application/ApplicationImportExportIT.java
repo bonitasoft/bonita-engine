@@ -24,7 +24,6 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -38,15 +37,8 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
     public static final String DEFAULT_LAYOUT_NAME = "custompage_layout";
 
-    private SearchOptionsBuilder getBuilderWithOrderById(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationSearchDescriptor.ID, Order.ASC);
-        return builder;
-    }
-
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = getBuilderWithOrderById(startIndex, maxResults);
-        return builder.done();
+        return getAppSearchBuilderOrderById(startIndex, maxResults).done();
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "export" })
@@ -125,7 +117,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
         assertIsMarketingApplication(searchResult.getResult().get(1));
 
         //check pages were created
-        SearchOptionsBuilder builder = getBuilderWithOrderById(0, 10);
+        SearchOptionsBuilder builder = getAppSearchBuilderOrderById(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, hrApp.getId());
         SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
@@ -136,7 +128,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
         assertThat(hrApp.getHomePageId()).isEqualTo(myNewCustomPage.getId());
 
         //check menu is created
-        builder = getBuilderWithOrderById(0, 10);
+        builder = getAppSearchBuilderOrderById(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, hrApp.getId());
         SearchResult<ApplicationMenu> menuSearchResult = getApplicationAPI().searchApplicationMenus(builder.done());
         assertThat(menuSearchResult.getCount()).isEqualTo(3);
@@ -148,60 +140,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
         getApplicationAPI().deleteApplication(hrApp.getId());
         getPageAPI().deletePage(myPage.getId());
 
-    }
-
-    private void assertIsHrFollowUpMenu(final ApplicationMenu applicationMenu) {
-        assertThat(applicationMenu.getIndex()).isEqualTo(1);
-        assertThat(applicationMenu.getParentId()).isNull();
-        assertThat(applicationMenu.getDisplayName()).isEqualTo("HR follow-up");
-        assertThat(applicationMenu.getApplicationPageId()).isNull();
-    }
-
-    private void assertIsDailyHrFollowUpMenu(final ApplicationMenu applicationMenu, ApplicationMenu hrFollowUpMenu, ApplicationPage myNewCustomPage) {
-        assertThat(applicationMenu.getIndex()).isEqualTo(1);
-        assertThat(applicationMenu.getParentId()).isEqualTo(hrFollowUpMenu.getId());
-        assertThat(applicationMenu.getDisplayName()).isEqualTo("Daily HR follow-up");
-        assertThat(applicationMenu.getApplicationPageId()).isEqualTo(myNewCustomPage.getId());
-    }
-
-    private void assertIsEmptyMenu(final ApplicationMenu applicationMenu) {
-        assertThat(applicationMenu.getIndex()).isEqualTo(2);
-        assertThat(applicationMenu.getParentId()).isNull();
-        assertThat(applicationMenu.getDisplayName()).isEqualTo("Empty menu");
-        assertThat(applicationMenu.getApplicationPageId()).isNull();
-    }
-
-    private void assertIsMyNewCustomPage(final Page myPage, final Application hrApp, final ApplicationPage applicationPage) {
-        assertThat(applicationPage.getApplicationId()).isEqualTo(hrApp.getId());
-        assertThat(applicationPage.getToken()).isEqualTo("my-new-custom-page");
-        assertThat(applicationPage.getPageId()).isEqualTo(myPage.getId());
-    }
-
-    private void assertIsMarketingApplication(final Application app) {
-        assertThat(app.getToken()).isEqualTo("My");
-        assertThat(app.getVersion()).isEqualTo("2.0");
-        assertThat(app.getDisplayName()).isEqualTo("Marketing");
-        assertThat(app.getDescription()).isNull();
-        assertThat(app.getIconPath()).isNull();
-        assertThat(app.getState()).isEqualTo("ACTIVATED");
-        assertThat(app.getProfileId()).isNull();
-    }
-
-    private void assertIsHRApplication(final Profile profile, final Page layout, final Application app) {
-        assertThat(app.getToken()).isEqualTo("HR-dashboard");
-        assertThat(app.getVersion()).isEqualTo("2.0");
-        assertThat(app.getDisplayName()).isEqualTo("My HR dashboard");
-        assertThat(app.getDescription()).isEqualTo("This is the HR dashboard.");
-        assertThat(app.getIconPath()).isEqualTo("/icon.jpg");
-        assertThat(app.getState()).isEqualTo("ACTIVATED");
-        assertThat(app.getProfileId()).isEqualTo(profile.getId());
-        assertThat(app.getLayoutId()).isEqualTo(layout.getId());
-    }
-
-    private void assertIsAddOkStatus(final ImportStatus importStatus, String expectedToken) {
-        assertThat(importStatus.getName()).isEqualTo(expectedToken);
-        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        assertThat(importStatus.getErrors()).isEmpty();
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import",
@@ -242,13 +180,13 @@ public class ApplicationImportExportIT extends TestWithApplication {
         assertThat(app1.getProfileId()).isNull();
 
         //check only one application page was created
-        SearchOptionsBuilder builder = getBuilderWithOrderById(0, 10);
+        SearchOptionsBuilder builder = getAppSearchBuilderOrderById(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, app1.getId());
         SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
         assertThat(pageSearchResult.getResult().get(0).getToken()).isEqualTo("my-new-custom-page");
 
-        builder = getBuilderWithOrderById(0, 10);
+        builder = getAppSearchBuilderOrderById(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, app1.getId());
 
         //check three menus were created
