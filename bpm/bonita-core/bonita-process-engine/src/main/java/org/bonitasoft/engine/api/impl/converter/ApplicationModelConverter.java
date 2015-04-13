@@ -106,6 +106,12 @@ public class ApplicationModelConverter {
 
     public EntityUpdateDescriptor toApplicationUpdateDescriptor(final ApplicationUpdater updater, final long updaterUserId) {
         final SApplicationUpdateBuilder builder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(updaterUserId);
+        updateFields(updater, builder);
+
+        return builder.done();
+    }
+
+    protected void updateFields(final ApplicationUpdater updater, final SApplicationUpdateBuilder builder) {
         for (final Entry<ApplicationField, Serializable> entry : updater.getFields().entrySet()) {
             switch (entry.getKey()) {
                 case TOKEN:
@@ -142,8 +148,6 @@ public class ApplicationModelConverter {
                     break;
             }
         }
-
-        return builder.done();
     }
 
 }

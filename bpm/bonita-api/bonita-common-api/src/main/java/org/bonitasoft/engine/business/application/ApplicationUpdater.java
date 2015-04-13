@@ -24,6 +24,7 @@ import org.bonitasoft.engine.profile.Profile;
  *
  * @author Elias Ricken de Medeiros
  * @see Application
+ * @since 7.0.0
  */
 public class ApplicationUpdater implements Serializable {
 
