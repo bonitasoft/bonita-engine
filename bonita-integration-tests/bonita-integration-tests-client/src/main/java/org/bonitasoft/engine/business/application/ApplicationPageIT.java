@@ -23,7 +23,6 @@ import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -231,7 +230,7 @@ public class ApplicationPageIT extends TestWithCustomPage {
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "thirdPage");
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.TOKEN, "secondPage");
         final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
@@ -255,7 +254,7 @@ public class ApplicationPageIT extends TestWithCustomPage {
         final ApplicationPage appPage3 = getApplicationAPI().createApplicationPage(application1.getId(), getPage().getId(), "thirdPage");
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, application1.getId());
         final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
@@ -279,7 +278,7 @@ public class ApplicationPageIT extends TestWithCustomPage {
         final ApplicationPage appPage3 = getApplicationAPI().createApplicationPage(application.getId(), page2.getId(), "thirdPage");
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.PAGE_ID, page2.getId());
         final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
@@ -304,7 +303,7 @@ public class ApplicationPageIT extends TestWithCustomPage {
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "thirdPage");
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.ID, appPage2.getId());
         final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
@@ -317,13 +316,7 @@ public class ApplicationPageIT extends TestWithCustomPage {
     }
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        return getDefaultBuilder(startIndex, maxResults).done();
-    }
-
-    private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationPageSearchDescriptor.TOKEN, Order.ASC);
-        return builder;
+        return getAppSearchBuilderOrderByToken(startIndex, maxResults).done();
     }
 
     @Test

@@ -20,7 +20,6 @@ import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -191,7 +190,7 @@ public class ApplicationIT extends TestWithApplication {
         getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.TOKEN, "Engineering-dashboard");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -215,7 +214,7 @@ public class ApplicationIT extends TestWithApplication {
         getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.DISPLAY_NAME, "HR dashboard");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -238,7 +237,7 @@ public class ApplicationIT extends TestWithApplication {
         final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.VERSION, "2.0");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -264,7 +263,7 @@ public class ApplicationIT extends TestWithApplication {
         final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.PROFILE_ID, profile.getId());
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -291,7 +290,7 @@ public class ApplicationIT extends TestWithApplication {
         final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.searchTerm("My");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -301,14 +300,8 @@ public class ApplicationIT extends TestWithApplication {
     }
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(startIndex, maxResults);
         return builder.done();
-    }
-
-    private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationSearchDescriptor.TOKEN, Order.ASC);
-        return builder;
     }
 
 }

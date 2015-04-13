@@ -38,14 +38,14 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
     public static final String DEFAULT_LAYOUT_NAME = "custompage_layout";
 
-    private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
+    private SearchOptionsBuilder getBuilderWithOrderById(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
         builder.sort(ApplicationSearchDescriptor.ID, Order.ASC);
         return builder;
     }
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
+        final SearchOptionsBuilder builder = getBuilderWithOrderById(startIndex, maxResults);
         return builder.done();
     }
 
@@ -125,7 +125,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
         assertIsMarketingApplication(searchResult.getResult().get(1));
 
         //check pages were created
-        SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        SearchOptionsBuilder builder = getBuilderWithOrderById(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, hrApp.getId());
         SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
@@ -136,7 +136,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
         assertThat(hrApp.getHomePageId()).isEqualTo(myNewCustomPage.getId());
 
         //check menu is created
-        builder = getDefaultBuilder(0, 10);
+        builder = getBuilderWithOrderById(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, hrApp.getId());
         SearchResult<ApplicationMenu> menuSearchResult = getApplicationAPI().searchApplicationMenus(builder.done());
         assertThat(menuSearchResult.getCount()).isEqualTo(3);
@@ -242,13 +242,13 @@ public class ApplicationImportExportIT extends TestWithApplication {
         assertThat(app1.getProfileId()).isNull();
 
         //check only one application page was created
-        SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        SearchOptionsBuilder builder = getBuilderWithOrderById(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, app1.getId());
         SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
         assertThat(pageSearchResult.getResult().get(0).getToken()).isEqualTo("my-new-custom-page");
 
-        builder = getDefaultBuilder(0, 10);
+        builder = getBuilderWithOrderById(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, app1.getId());
 
         //check three menus were created

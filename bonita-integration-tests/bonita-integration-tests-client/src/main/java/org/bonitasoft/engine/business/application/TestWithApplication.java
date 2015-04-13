@@ -28,6 +28,7 @@ import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageCreator;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
+import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.After;
@@ -110,5 +111,11 @@ public class TestWithApplication extends CommonAPIIT {
         } catch (final IOException e) {
             throw new BonitaException(e);
         }
+    }
+
+    protected SearchOptionsBuilder getAppSearchBuilderOrderByToken(final int startIndex, final int maxResults) {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
+        builder.sort(ApplicationSearchDescriptor.TOKEN, Order.ASC);
+        return builder;
     }
 }
