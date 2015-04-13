@@ -1210,10 +1210,11 @@ public class BDRepositoryIT extends CommonAPISPIT {
         assertThat(dataInstance.getValue().toString()).isEqualTo("[Doe, Doe]");
         Map<String, Serializable> employee = getProcessAPI().evaluateExpressionsOnProcessInstance(instance.getId(), Collections.singletonMap(new ExpressionBuilder().createBusinessDataReferenceExpression("myEmployees"), Collections.<String, Serializable>emptyMap()));
         assertThat(employee).hasSize(1);
-        assertThat(employee.get("employee")).isInstanceOf(MultipleBusinessDataReference.class);
-        assertThat(((MultipleBusinessDataReference)employee.get("employee")).getName()).isEqualTo("employee");
-        assertThat(((MultipleBusinessDataReference)employee.get("employee")).getType()).isEqualTo(EMPLOYEE_QUALIFIED_NAME);
-        assertThat(((MultipleBusinessDataReference)employee.get("employee")).getStorageIds()).hasSize(2);
+        assertThat(employee.get("myEmployees")).isInstanceOf(MultipleBusinessDataReference.class);
+        MultipleBusinessDataReference myEmployees = (MultipleBusinessDataReference) employee.get("myEmployees");
+        assertThat(myEmployees.getName()).isEqualTo("myEmployees");
+        assertThat(myEmployees.getType()).isEqualTo(EMPLOYEE_QUALIFIED_NAME);
+        assertThat(myEmployees.getStorageIds()).hasSize(2);
 
         disableAndDeleteProcess(processDefinition);
     }
