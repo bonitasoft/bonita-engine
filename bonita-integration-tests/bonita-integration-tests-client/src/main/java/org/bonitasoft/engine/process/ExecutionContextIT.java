@@ -18,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import org.bonitasoft.engine.TestWithUser;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -45,8 +47,20 @@ public class ExecutionContextIT extends TestWithUser {
         long step2 = waitForUserTask(processInstance1.getId(), "step2");
 
         assertThat(getProcessAPI().getProcessInstanceExecutionContext(processInstance1.getId())).containsOnly(entry("process_key1", "processDataValue"));
-        assertThat(getProcessAPI().getUserTaskExecutionContext(step2)).isEmpty();
         assertThat(getProcessAPI().getUserTaskExecutionContext(step1)).containsOnly(entry("task_key1", "task1DataValue"), entry("task_key2", "constantValue"));
+        assertThat(getProcessAPI().getUserTaskExecutionContext(step2)).isEmpty();
+
+
+        assignAndExecuteStep(step1, user.getId());
+        assignAndExecuteStep(step2, user.getId());
+        waitForProcessToFinish(processInstance1);
+        Thread.sleep(10);
+        ArchivedProcessInstance finalArchivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance1.getId());
+        ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1);
+        ArchivedActivityInstance archivedStep2 = getProcessAPI().getArchivedActivityInstance(step2);
+        assertThat(getProcessAPI().getArchivedProcessInstanceExecutionContext(finalArchivedProcessInstance.getId())).containsOnly(entry("process_key1", "processDataValue"));
+        assertThat(getProcessAPI().getArchivedUserTaskExecutionContext(archivedStep1.getId())).containsOnly(entry("task_key1", "task1DataValue"), entry("task_key2", "constantValue"));
+        assertThat(getProcessAPI().getArchivedUserTaskExecutionContext(archivedStep2.getId())).isEmpty();
 
 
         disableAndDeleteProcess(processDefinition);

@@ -106,6 +106,8 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
@@ -175,7 +177,9 @@ public class ProcessAPIImplTest {
     private static final long ACTOR_ID = 100;
     private static final long PROCESS_DEFINITION_ID = 110;
     private static final long PROCESS_INSTANCE_ID = 45;
+    private static final long ARCHIVED_PROCESS_INSTANCE_ID = 45;
     private static final long FLOW_NODE_INSTANCE_ID = 1674;
+    private static final long ARCHIVED_FLOW_NODE_INSTANCE_ID = 1674;
     private static final long FLOW_NODE_DEFINITION_ID = 1664;
     private static final String ACTOR_NAME = "employee";
     @Mock
@@ -234,9 +238,14 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getExpressionResolverService()).thenReturn(expressionResolverService);
 
         when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
+        SUserTaskInstanceImpl sUserTaskInstance = new SUserTaskInstanceImpl("userTaskName", FLOW_NODE_DEFINITION_ID, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID, ACTOR_ID, STaskPriority.ABOVE_NORMAL,
+                PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID);
         when(activityInstanceService.getFlowNodeInstance(FLOW_NODE_INSTANCE_ID)).thenReturn(
-                new SUserTaskInstanceImpl("userTaskName", FLOW_NODE_DEFINITION_ID, PROCESS_INSTANCE_ID, PROCESS_INSTANCE_ID, ACTOR_ID, STaskPriority.ABOVE_NORMAL,
-                        PROCESS_DEFINITION_ID, PROCESS_INSTANCE_ID));
+                sUserTaskInstance);
+        SAUserTaskInstanceImpl value = new SAUserTaskInstanceImpl(sUserTaskInstance);
+        value.setId(ARCHIVED_FLOW_NODE_INSTANCE_ID);
+        when(activityInstanceService.getArchivedFlowNodeInstance(ARCHIVED_FLOW_NODE_INSTANCE_ID)).thenReturn(
+                value);
         processDefinition = new SProcessDefinitionImpl("myProcess", "1.0");
         SFlowElementContainerDefinitionImpl processContainer = new SFlowElementContainerDefinitionImpl();
         processDefinition.setProcessContainer(processContainer);
@@ -250,7 +259,11 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
 
         when(tenantAccessor.getProcessInstanceService()).thenReturn(processInstanceService);
-        when(processInstanceService.getProcessInstance(PROCESS_INSTANCE_ID)).thenReturn(new SProcessInstanceImpl("processName", PROCESS_DEFINITION_ID));
+        SProcessInstanceImpl sProcessInstance = new SProcessInstanceImpl("processName", PROCESS_DEFINITION_ID);
+        when(processInstanceService.getProcessInstance(PROCESS_INSTANCE_ID)).thenReturn(sProcessInstance);
+        SAProcessInstanceImpl value1 = new SAProcessInstanceImpl(sProcessInstance);
+        value1.setId(ARCHIVED_PROCESS_INSTANCE_ID);
+        when(processInstanceService.getArchivedProcessInstance(PROCESS_INSTANCE_ID)).thenReturn(value1);
 
         when(tenantAccessor.getDataInstanceService()).thenReturn(dataInstanceService);
         when(tenantAccessor.getOperationService()).thenReturn(operationService);
@@ -1202,7 +1215,7 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void should_getUserTaskExecutionContext_evaluate_context_of_process() throws Exception {
+    public void should_getProcessInstanceExecutionContext_evaluate_context_of_process() throws Exception {
         SExpressionImpl e1 = createExpression("e1");
         processDefinition.getContext().add(new SContextEntryImpl("key1", e1));
         SExpressionImpl e2 = createExpression("e2");
@@ -1211,6 +1224,35 @@ public class ProcessAPIImplTest {
 
 
         Map<String, Serializable> userTaskExecutionContext = processAPI.getProcessInstanceExecutionContext(PROCESS_INSTANCE_ID);
+
+        assertThat(userTaskExecutionContext).containsOnly(entry("key1", "e1"), entry("key2", "e2"));
+    }
+
+
+    @Test
+    public void should_getArchivedPExecutionContext_evaluate_context_of_activity() throws Exception {
+        SExpressionImpl e1 = createExpression("e1");
+        userTaskDefinition.getContext().add(new SContextEntryImpl("key1", e1));
+        SExpressionImpl e2 = createExpression("e2");
+        userTaskDefinition.getContext().add(new SContextEntryImpl("key2", e2));
+        doReturn(Arrays.asList("e1", "e2")).when(expressionResolverService).evaluate(eq(Arrays.<SExpression>asList(e1, e2)), any(SExpressionContext.class));
+
+
+        Map<String, Serializable> userTaskExecutionContext = processAPI.getArchivedUserTaskExecutionContext(ARCHIVED_FLOW_NODE_INSTANCE_ID);
+
+        assertThat(userTaskExecutionContext).containsOnly(entry("key1", "e1"), entry("key2", "e2"));
+    }
+
+    @Test
+    public void should_getArchivedProcessInstanceExecutionContext_evaluate_context_of_process() throws Exception {
+        SExpressionImpl e1 = createExpression("e1");
+        processDefinition.getContext().add(new SContextEntryImpl("key1", e1));
+        SExpressionImpl e2 = createExpression("e2");
+        processDefinition.getContext().add(new SContextEntryImpl("key2", e2));
+        doReturn(Arrays.asList("e1", "e2")).when(expressionResolverService).evaluate(eq(Arrays.<SExpression>asList(e1, e2)), any(SExpressionContext.class));
+
+
+        Map<String, Serializable> userTaskExecutionContext = processAPI.getArchivedProcessInstanceExecutionContext(ARCHIVED_PROCESS_INSTANCE_ID);
 
         assertThat(userTaskExecutionContext).containsOnly(entry("key1", "e1"), entry("key2", "e2"));
     }

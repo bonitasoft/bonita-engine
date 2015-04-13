@@ -2566,18 +2566,36 @@ public interface ProcessRuntimeAPI {
     /**
      * return the context defined in the process definition for this user task instance
      *
-     * @param userTaskInstanceId the is of the user task instance
+     * @param userTaskInstanceId the id of the user task instance
      * @return a map containing the evaluated context
      * @throws UserTaskNotFoundException if <code>userTaskInstanceId</code> does not reference any existing task.
      */
     Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException;
 
     /**
+     * return the context defined in the process definition for this user task instance
+     *
+     * @param archivedUserTaskInstanceId the id of the archived version of the user task instance
+     * @return a map containing the evaluated context
+     * @throws UserTaskNotFoundException if <code>archivedUserTaskInstanceId</code> does not reference any existing archived task.
+     */
+    Map<String, Serializable> getArchivedUserTaskExecutionContext(long archivedUserTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException;
+
+    /**
      * return the context defined in the process definition for this process instance
      *
-     * @param processInstanceId the is of the process instance
+     * @param processInstanceId the id of the process instance
      * @return a map containing the evaluated context
-     * @throws ProcessInstanceNotFoundException if <code>processInstanceId</code> does not reference any existing task.
+     * @throws ProcessInstanceNotFoundException if <code>processInstanceId</code> does not reference any existing process.
      */
     Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
+
+    /**
+     * return the context defined in the process definition for this process instance
+     *
+     * @param archivedProcessInstanceId the id of the archived version of a process instance
+     * @return a map containing the evaluated context
+     * @throws ProcessInstanceNotFoundException if <code>archivedProcessInstanceId</code> does not reference any existing process.
+     */
+    Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long archivedProcessInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
 }

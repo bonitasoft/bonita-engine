@@ -6110,16 +6110,27 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        ExpressionResolverService expressionResolverService = tenantAccessor.getExpressionResolverService();
         try {
-            SFlowNodeInstance activityInstance = activityInstanceService.getFlowNodeInstance(userTaskInstanceId);
-            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(activityInstance.getProcessDefinitionId());
-            final SExpressionContext expressionContext = createProcessInstanceExpressionContext(userTaskInstanceId, processDefinition, CONTAINER_TYPE_ACTIVITY_INSTANCE);
+            SFlowNodeInstance activityInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(userTaskInstanceId);
+            SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(activityInstance.getProcessDefinitionId());
+            final SExpressionContext expressionContext = createExpressionContext(userTaskInstanceId, processDefinition, CONTAINER_TYPE_ACTIVITY_INSTANCE, null );
             SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(activityInstance.getFlowNodeDefinitionId());
-            List<SContextEntry> context = ((SUserTaskDefinition) flowNode).getContext();
-            return evaluateContext(expressionResolverService, expressionContext, context);
+            return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, ((SUserTaskDefinition) flowNode).getContext());
+        } catch (SFlowNodeNotFoundException | SProcessDefinitionReadException | SFlowNodeReadException | SProcessDefinitionNotFoundException e) {
+            throw new UserTaskNotFoundException(e);
+        } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
+            throw new ExpressionEvaluationException(e);
+        }
+    }
+    @Override
+    public Map<String, Serializable> getArchivedUserTaskExecutionContext(long archivedUserTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            SAFlowNodeInstance activityInstance = tenantAccessor.getActivityInstanceService().getArchivedFlowNodeInstance(archivedUserTaskInstanceId);
+            SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(activityInstance.getProcessDefinitionId());
+            final SExpressionContext expressionContext = createExpressionContext(activityInstance.getSourceObjectId(), processDefinition, CONTAINER_TYPE_ACTIVITY_INSTANCE, activityInstance.getArchiveDate());
+            SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(activityInstance.getFlowNodeDefinitionId());
+            return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, ((SUserTaskDefinition) flowNode).getContext());
         } catch (SFlowNodeNotFoundException | SProcessDefinitionReadException | SFlowNodeReadException | SProcessDefinitionNotFoundException e) {
             throw new UserTaskNotFoundException(e);
         } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
@@ -6130,16 +6141,27 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        ExpressionResolverService expressionResolverService = tenantAccessor.getExpressionResolverService();
-        ProcessInstanceService processInstanceService = getProcessInstanceService(tenantAccessor);
         try {
-            SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
-            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
-            final SExpressionContext expressionContext = createProcessInstanceExpressionContext(processInstanceId, processDefinition, CONTAINER_TYPE_PROCESS_INSTANCE);
-            List<SContextEntry> context = processDefinition.getContext();
-            return evaluateContext(expressionResolverService, expressionContext, context);
+            SProcessInstance processInstance = getProcessInstanceService(tenantAccessor).getProcessInstance(processInstanceId);
+            SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processInstance.getProcessDefinitionId());
+            final SExpressionContext expressionContext = createExpressionContext(processInstanceId, processDefinition, CONTAINER_TYPE_PROCESS_INSTANCE, null);
+            return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, processDefinition.getContext());
         } catch (SProcessInstanceNotFoundException | SProcessDefinitionReadException | SProcessInstanceReadException | SProcessDefinitionNotFoundException e) {
+            throw new ProcessInstanceNotFoundException(e);
+        } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
+            throw new ExpressionEvaluationException(e);
+        }
+    }
+
+    @Override
+    public Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            SAProcessInstance processInstance = getProcessInstanceService(tenantAccessor).getArchivedProcessInstance(processInstanceId);
+            SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processInstance.getProcessDefinitionId());
+            final SExpressionContext expressionContext = createExpressionContext(processInstance.getSourceObjectId(), processDefinition, CONTAINER_TYPE_PROCESS_INSTANCE, processInstance.getArchiveDate());
+            return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, processDefinition.getContext());
+        } catch ( SProcessDefinitionReadException | SProcessInstanceReadException | SProcessDefinitionNotFoundException e) {
             throw new ProcessInstanceNotFoundException(e);
         } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
             throw new ExpressionEvaluationException(e);
@@ -6175,11 +6197,14 @@ public class ProcessAPIImpl implements ProcessAPI {
         return tenantAccessor.getProcessInstanceService();
     }
 
-    SExpressionContext createProcessInstanceExpressionContext(long processInstanceId, SProcessDefinition processDefinition, String type) {
+    SExpressionContext createExpressionContext(long processInstanceId, SProcessDefinition processDefinition, String type, Long time) {
         final SExpressionContext expressionContext = new SExpressionContext();
         expressionContext.setContainerId(processInstanceId);
         expressionContext.setContainerType(type);
         expressionContext.setProcessDefinitionId(processDefinition.getId());
+        if(time != null){
+            expressionContext.setTime(time);
+        }
         return expressionContext;
     }
 
