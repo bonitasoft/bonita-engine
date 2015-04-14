@@ -8,27 +8,32 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data;
 
-import com.bonitasoft.engine.CommonAPISPIT;
-import com.bonitasoft.engine.bdm.BusinessObjectDAOFactory;
-import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
-import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
-import com.bonitasoft.engine.bdm.model.BusinessObject;
-import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Query;
-import com.bonitasoft.engine.bdm.model.field.FieldType;
-import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
-import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
-import com.bonitasoft.engine.bdm.model.field.SimpleField;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.businessdata.BusinessDataReference;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
-import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
+import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.xml.bind.JAXBException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.data.MapEntry;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -44,7 +49,6 @@ import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
-import org.bonitasoft.engine.business.data.impl.MultipleBusinessDataReferenceImpl;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -69,29 +73,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import javax.xml.bind.JAXBException;
-
-import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
-import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
-import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.data.MapEntry.*;
+import com.bonitasoft.engine.CommonAPISPIT;
+import com.bonitasoft.engine.bdm.BusinessObjectDAOFactory;
+import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
+import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
+import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 
 public class BDRepositoryIT extends CommonAPISPIT {
 
@@ -237,7 +235,6 @@ public class BDRepositoryIT extends CommonAPISPIT {
         employee.addIndex("IDX_LSTNM", "lastName");
         employee.addIndex("IDX_LSTNM", "address");
 
-
         final BusinessObject person = new BusinessObject();
         person.setQualifiedName(PERSON_QUALIFIED_NAME);
         person.addField(hireDate);
@@ -344,7 +341,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final String bizDataName = "myBizData";
         processDefinitionBuilder.addBusinessData(bizDataName, aQualifiedName, null);
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinitionBuilder.done()).done());
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, matti.getId());
         return processDefinition;
@@ -1208,7 +1205,10 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("names", instance.getId());
         assertThat(dataInstance.getValue().toString()).isEqualTo("[Doe, Doe]");
-        Map<String, Serializable> employee = getProcessAPI().evaluateExpressionsOnProcessInstance(instance.getId(), Collections.singletonMap(new ExpressionBuilder().createBusinessDataReferenceExpression("myEmployees"), Collections.<String, Serializable>emptyMap()));
+        Map<String, Serializable> employee = getProcessAPI().evaluateExpressionsOnProcessInstance(
+                instance.getId(),
+                Collections.singletonMap(new ExpressionBuilder().createBusinessDataReferenceExpression("myEmployees"),
+                        Collections.<String, Serializable> emptyMap()));
         assertThat(employee).hasSize(1);
         assertThat(employee.get("myEmployees")).isInstanceOf(MultipleBusinessDataReference.class);
         MultipleBusinessDataReference myEmployees = (MultipleBusinessDataReference) employee.get("myEmployees");
@@ -1515,7 +1515,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
                 .addConnector("myConnector1", "connectorInJar", "1.0.0", ConnectorEvent.ON_ENTER);
         final DesignProcessDefinition done = pBuilder.done();
         final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(done);
-        builder.addConnectorImplementation(getBarResource("/com/bonitasoft/engine/business/data/TestConnectorInJar.impl", "TestConnectorInJar.impl", BDRepositoryIT.class));
+        builder.addConnectorImplementation(getBarResource("/com/bonitasoft/engine/business/data/TestConnectorInJar.impl", "TestConnectorInJar.impl",
+                BDRepositoryIT.class));
         builder.addClasspathResource(getBarResource("/com/bonitasoft/engine/business/data/test-connector-with-bdm-0.0.1-SNAPSHOT.jar.bak",
                 "test-connector-with-bdm-0.0.1-SNAPSHOT.jar", BDRepositoryIT.class));
         final BusinessArchive businessArchive = builder.done();

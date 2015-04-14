@@ -150,6 +150,7 @@
 				<entry key="org.bonitasoft.engine.page.impl.SPageWithContentImpl" value="10120" />
 				<entry key="org.bonitasoft.engine.page.impl.SPageImpl" value="10120" />
 				<entry key="org.bonitasoft.engine.page.impl.SPageContentImpl" value="10120" />
+				<entry key="org.bonitasoft.engine.page.impl.SPageMappingImpl" value="10121" />
                 <entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" value="10200" />
                 <entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" value="10201" />
                 <entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" value="10202" />
