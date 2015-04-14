@@ -912,7 +912,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(designProcessDefinition);
         final BusinessArchive receiveMessageArchive = archiveBuilder.done();
-        final ProcessDefinition receiveMessageProcess = getProcessAPI().deploy(receiveMessageArchive);
+        final ProcessDefinition receiveMessageProcess = deployProcess(receiveMessageArchive);
 
         final List<ActorInstance> actors = getProcessAPI().getActors(receiveMessageProcess.getId(), 0, 1, ActorCriterion.NAME_ASC);
         getProcessAPI().addUserToActor(actors.get(0).getId(), user.getId());

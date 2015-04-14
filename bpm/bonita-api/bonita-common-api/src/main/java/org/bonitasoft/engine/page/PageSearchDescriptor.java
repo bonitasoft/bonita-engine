@@ -32,6 +32,10 @@ public class PageSearchDescriptor {
 
     public static final String LAST_MODIFICATION_DATE = "lastModificationDate";
 
+    public static final String CONTENT_TYPE = "contentType";
+
+    public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
+
 
 
 }

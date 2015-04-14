@@ -24,7 +24,6 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -36,15 +35,10 @@ import org.junit.Test;
  */
 public class ApplicationImportExportIT extends TestWithApplication {
 
-    private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationSearchDescriptor.ID, Order.ASC);
-        return builder;
-    }
+    public static final String DEFAULT_LAYOUT_NAME = "custompage_layout";
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
-        return builder.done();
+        return getAppSearchBuilderOrderById(startIndex, maxResults).done();
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "export" })
@@ -52,13 +46,11 @@ public class ApplicationImportExportIT extends TestWithApplication {
     public void exportApplications_should_return_the_byte_content_of_xml_file_containing_selected_applications() throws Exception {
         //given
         Profile userProfile = getProfileUser();
-        Page layout = createPage("custompage_mainLayout");
-        Page theme = createPage("custompage_theme");
 
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("applications.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
 
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0", layout.getId(), theme.getId());
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0");
         hrCreator.setDescription("This is the HR dashboard.");
         hrCreator.setIconPath("/icon.jpg");
         hrCreator.setProfileId(userProfile.getId());
@@ -95,8 +87,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
         getApplicationAPI().deleteApplication(hr.getId());
         getPageAPI().deletePage(myPage.getId());
-        getPageAPI().deletePage(layout.getId());
-        getPageAPI().deletePage(theme.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import" })
@@ -107,8 +97,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used", IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
-        final Page myLayout = getPageAPI().createPage("not_used", IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-layout-page.zip")));
-        final Page myTheme = getPageAPI().createPage("not_used", IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-theme-page.zip")));
+        final Page defaultLayout = getPageAPI().getPageByName(DEFAULT_LAYOUT_NAME);
 
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("applications.xml"));
 
@@ -124,11 +113,11 @@ public class ApplicationImportExportIT extends TestWithApplication {
         final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
         Application hrApp = searchResult.getResult().get(0);
-        assertIsHRApplication(profile, myLayout, myTheme, hrApp);
+        assertIsHRApplication(profile, defaultLayout, hrApp);
         assertIsMarketingApplication(searchResult.getResult().get(1));
 
         //check pages were created
-        SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        SearchOptionsBuilder builder = getAppSearchBuilderOrderById(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, hrApp.getId());
         SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
@@ -139,7 +128,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
         assertThat(hrApp.getHomePageId()).isEqualTo(myNewCustomPage.getId());
 
         //check menu is created
-        builder = getDefaultBuilder(0, 10);
+        builder = getAppSearchBuilderOrderById(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, hrApp.getId());
         SearchResult<ApplicationMenu> menuSearchResult = getApplicationAPI().searchApplicationMenus(builder.done());
         assertThat(menuSearchResult.getCount()).isEqualTo(3);
@@ -150,64 +139,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
         getApplicationAPI().deleteApplication(hrApp.getId());
         getPageAPI().deletePage(myPage.getId());
-        getPageAPI().deletePage(myLayout.getId());
-        getPageAPI().deletePage(myTheme.getId());
 
-    }
-
-    private void assertIsHrFollowUpMenu(final ApplicationMenu applicationMenu) {
-        assertThat(applicationMenu.getIndex()).isEqualTo(1);
-        assertThat(applicationMenu.getParentId()).isNull();
-        assertThat(applicationMenu.getDisplayName()).isEqualTo("HR follow-up");
-        assertThat(applicationMenu.getApplicationPageId()).isNull();
-    }
-
-    private void assertIsDailyHrFollowUpMenu(final ApplicationMenu applicationMenu, ApplicationMenu hrFollowUpMenu, ApplicationPage myNewCustomPage) {
-        assertThat(applicationMenu.getIndex()).isEqualTo(1);
-        assertThat(applicationMenu.getParentId()).isEqualTo(hrFollowUpMenu.getId());
-        assertThat(applicationMenu.getDisplayName()).isEqualTo("Daily HR follow-up");
-        assertThat(applicationMenu.getApplicationPageId()).isEqualTo(myNewCustomPage.getId());
-    }
-
-    private void assertIsEmptyMenu(final ApplicationMenu applicationMenu) {
-        assertThat(applicationMenu.getIndex()).isEqualTo(2);
-        assertThat(applicationMenu.getParentId()).isNull();
-        assertThat(applicationMenu.getDisplayName()).isEqualTo("Empty menu");
-        assertThat(applicationMenu.getApplicationPageId()).isNull();
-    }
-
-    private void assertIsMyNewCustomPage(final Page myPage, final Application hrApp, final ApplicationPage applicationPage) {
-        assertThat(applicationPage.getApplicationId()).isEqualTo(hrApp.getId());
-        assertThat(applicationPage.getToken()).isEqualTo("my-new-custom-page");
-        assertThat(applicationPage.getPageId()).isEqualTo(myPage.getId());
-    }
-
-    private void assertIsMarketingApplication(final Application app) {
-        assertThat(app.getToken()).isEqualTo("My");
-        assertThat(app.getVersion()).isEqualTo("2.0");
-        assertThat(app.getDisplayName()).isEqualTo("Marketing");
-        assertThat(app.getDescription()).isNull();
-        assertThat(app.getIconPath()).isNull();
-        assertThat(app.getState()).isEqualTo("ACTIVATED");
-        assertThat(app.getProfileId()).isNull();
-    }
-
-    private void assertIsHRApplication(final Profile profile, final Page layout, final Page theme, final Application app) {
-        assertThat(app.getToken()).isEqualTo("HR-dashboard");
-        assertThat(app.getVersion()).isEqualTo("2.0");
-        assertThat(app.getDisplayName()).isEqualTo("My HR dashboard");
-        assertThat(app.getDescription()).isEqualTo("This is the HR dashboard.");
-        assertThat(app.getIconPath()).isEqualTo("/icon.jpg");
-        assertThat(app.getState()).isEqualTo("ACTIVATED");
-        assertThat(app.getProfileId()).isEqualTo(profile.getId());
-        assertThat(app.getLayoutId()).isEqualTo(layout.getId());
-        assertThat(app.getThemeId()).isEqualTo(theme.getId());
-    }
-
-    private void assertIsAddOkStatus(final ImportStatus importStatus, String expectedToken) {
-        assertThat(importStatus.getName()).isEqualTo(expectedToken);
-        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        assertThat(importStatus.getErrors()).isEmpty();
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import",
@@ -229,13 +161,11 @@ public class ApplicationImportExportIT extends TestWithApplication {
         assertThat(importStatus).hasSize(1);
         assertThat(importStatus.get(0).getName()).isEqualTo("HR-dashboard");
         assertThat(importStatus.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        ImportError layoutError = new ImportError("ThisLayoutDoesNotExist", ImportError.Type.PAGE);
-        ImportError themeError = new ImportError("ThisThemeDoesNotExist", ImportError.Type.PAGE);
         ImportError profileError = new ImportError("ThisProfileDoesNotExist", ImportError.Type.PROFILE);
         ImportError customPageError = new ImportError("custompage_notexists", ImportError.Type.PAGE);
         ImportError appPageError1 = new ImportError("will-not-be-imported", ImportError.Type.APPLICATION_PAGE);
         ImportError appPageError2 = new ImportError("never-existed", ImportError.Type.APPLICATION_PAGE);
-        assertThat(importStatus.get(0).getErrors()).containsExactly(layoutError, themeError, profileError, customPageError, appPageError1, appPageError2);
+        assertThat(importStatus.get(0).getErrors()).containsExactly(profileError, customPageError, appPageError1, appPageError2);
 
         // check applications ware created
         final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(buildSearchOptions(0, 10));
@@ -248,17 +178,15 @@ public class ApplicationImportExportIT extends TestWithApplication {
         assertThat(app1.getIconPath()).isEqualTo("/icon.jpg");
         assertThat(app1.getState()).isEqualTo("ACTIVATED");
         assertThat(app1.getProfileId()).isNull();
-        assertThat(app1.getLayoutId()).isNull();
-        assertThat(app1.getThemeId()).isNull();
 
         //check only one application page was created
-        SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        SearchOptionsBuilder builder = getAppSearchBuilderOrderById(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, app1.getId());
         SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
         assertThat(pageSearchResult.getResult().get(0).getToken()).isEqualTo("my-new-custom-page");
 
-        builder = getDefaultBuilder(0, 10);
+        builder = getAppSearchBuilderOrderById(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, app1.getId());
 
         //check three menus were created
@@ -282,8 +210,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
         //given
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used", IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
-        final Page myLayout = getPageAPI().createPage("not_used", IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-layout-page.zip")));
-        final Page myTheme = getPageAPI().createPage("not_used", IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-theme-page.zip")));
 
         final byte[] importedByteArray = IOUtils.toByteArray(ApplicationIT.class
                 .getResourceAsStream("applications.xml"));
@@ -303,8 +229,6 @@ public class ApplicationImportExportIT extends TestWithApplication {
 
         getApplicationAPI().deleteApplication(hrApplication.getId());
         getPageAPI().deletePage(myPage.getId());
-        getPageAPI().deletePage(myLayout.getId());
-        getPageAPI().deletePage(myTheme.getId());
 
     }
 

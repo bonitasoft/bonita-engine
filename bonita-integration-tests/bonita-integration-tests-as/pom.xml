@@ -51,6 +51,7 @@
         <profile>
             <id>package-all</id>
             <modules>
+                <module>bonita-deploy-resources</module>
                 <module>bonita-deploy-ear3</module>
                 <module>bonita-deploy-war</module>
                 <module>bonita-integration-jboss7</module>
@@ -60,6 +61,7 @@
         <profile>
             <id>jboss</id>
             <modules>
+                <module>bonita-deploy-resources</module>
                 <module>bonita-deploy-ear3</module>
                 <module>bonita-integration-jboss7</module>
             </modules>
@@ -67,6 +69,7 @@
         <profile>
             <id>tomcat7</id>
             <modules>
+                <module>bonita-deploy-resources</module>
                 <module>bonita-deploy-war</module>
                 <module>bonita-integration-tomcat7</module>
             </modules>

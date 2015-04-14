@@ -78,7 +78,7 @@ public class InvolvedInProcessInstanceIT extends AbstractProcessInstanceIT {
         final DesignProcessDefinition designProcessDefinition = processBuilder1.addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME)
                 .addTransition("step1", "step2").getProcess();
         final BusinessArchive businessArchive1 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive1);
+        final ProcessDefinition processDefinition = deployProcess(businessArchive1);
 
         // map user, group, role, and membership to that actor
         final ActorInstance actor = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);
@@ -204,7 +204,7 @@ public class InvolvedInProcessInstanceIT extends AbstractProcessInstanceIT {
         final DesignProcessDefinition designProcessDefinition = processBuilder1.addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME)
                 .addTransition("step1", "step2").getProcess();
         final BusinessArchive businessArchive1 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive1);
+        final ProcessDefinition processDefinition = deployProcess(businessArchive1);
 
         // map user, group, role, and membership to that actor
         final ActorInstance actor = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);

@@ -15,7 +15,7 @@
 
 	<properties>
 		<jetty.version>8.1.14.v20131031</jetty.version>
-	</properties>	
+	</properties>
 	
 	<dependencies>
 		<dependency>

@@ -114,6 +114,7 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
         this.version = version;
         actors = new HashSet<SActorDefinition>();
         parameters = new HashSet<SParameterDefinition>();
+        container = new SFlowElementContainerDefinitionImpl();
     }
 
     @Override

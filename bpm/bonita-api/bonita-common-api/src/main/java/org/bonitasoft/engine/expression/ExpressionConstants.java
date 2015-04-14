@@ -36,7 +36,7 @@ public enum ExpressionConstants {
     LOOP_COUNTER("loopCounter", Integer.class.getName()),
 
     API_ACCESSOR("apiAccessor", APIAccessor.class.getName()),
-    
+
     CONNECTOR_API_ACCESSOR("connectorApiAccessor", APIAccessor.class.getName()),
 
     ENGINE_EXECUTION_CONTEXT("engineExecutionContext", EngineExecutionContext.class.getName()),
@@ -57,7 +57,7 @@ public enum ExpressionConstants {
 
     private final String returnType;
 
-    private ExpressionConstants(final String engineName, final String returnType) {
+    ExpressionConstants(final String engineName, final String returnType) {
         engineConstantName = engineName;
         this.returnType = returnType;
         ExpressionConstantsResolver.initMap(this);

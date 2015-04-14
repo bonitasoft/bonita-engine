@@ -31,6 +31,11 @@
 			<artifactId>bonita-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.test</groupId>
+			<artifactId>bonita-deploy-resources</artifactId>
+			<version>${project.version}</version>
+		</dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
@@ -71,6 +76,10 @@
 						<jarModule>
 							<groupId>org.bonitasoft.engine</groupId>
 							<artifactId>bonita-client</artifactId>
+						</jarModule>
+						<jarModule>
+							<groupId>org.bonitasoft.engine.test</groupId>
+							<artifactId>bonita-deploy-resources</artifactId>
 						</jarModule>
 						<jarModule>
                             <groupId>org.slf4j</groupId>

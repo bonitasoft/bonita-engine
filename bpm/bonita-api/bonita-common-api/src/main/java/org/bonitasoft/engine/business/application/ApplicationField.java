@@ -22,6 +22,7 @@ import org.bonitasoft.engine.profile.Profile;
  * @author Elias Ricken de Medeiros
  * @see ApplicationCreator
  * @see ApplicationUpdater
+ * @since 7.0.0
  */
 public enum ApplicationField {
 

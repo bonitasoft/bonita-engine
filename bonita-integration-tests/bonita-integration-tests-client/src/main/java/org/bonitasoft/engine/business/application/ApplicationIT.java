@@ -20,7 +20,6 @@ import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -38,9 +37,8 @@ public class ApplicationIT extends TestWithApplication {
     public void createApplication_returns_application_based_on_ApplicationCreator_information() throws Exception {
         //given
         final Profile profile = getProfileUser();
-        Page layout = createPage("custompage_layout");
-        Page theme = createPage("custompage_theme");
-        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0", layout.getId(), theme.getId());
+        Page defaultLayout = getPageAPI().getPageByName("custompage_layout");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
         creator.setDescription("This is my application");
         creator.setIconPath("/icon.jpg");
         creator.setProfileId(profile.getId());
@@ -60,17 +58,14 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(application.getUpdatedBy()).isEqualTo(getUser().getId());
         assertThat(application.getHomePageId()).isNull();
         assertThat(application.getProfileId()).isEqualTo(profile.getId());
-        assertThat(application.getLayoutId()).isEqualTo(layout.getId());
-        assertThat(application.getThemeId()).isEqualTo(theme.getId());
+        assertThat(application.getLayoutId()).isEqualTo(defaultLayout.getId());
 
         getApplicationAPI().deleteApplication(application.getId());
-        getPageAPI().deletePage(layout.getId());
-        getPageAPI().deletePage(theme.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create", "no profile", "no theme"})
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create", "no profile" })
     @Test
-    public void createApplication_without_profile_and_theme_should_have_null_profileId_and_null_themeId() throws Exception {
+    public void createApplication_without_profile_should_have_null_profileId() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
 
@@ -80,7 +75,6 @@ public class ApplicationIT extends TestWithApplication {
         //then
         assertThat(application).isNotNull();
         assertThat(application.getProfileId()).isNull();
-        assertThat(application.getThemeId()).isNull();
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "update" })
@@ -88,8 +82,6 @@ public class ApplicationIT extends TestWithApplication {
     public void updateApplication_should_return_application_up_to_date() throws Exception {
         //given
         final Profile profile = getProfileUser();
-        Page layout = createPage("custompage_layout");
-        Page theme = createPage("custompage_theme");
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
         final Application application = getApplicationAPI().createApplication(creator);
 
@@ -101,8 +93,6 @@ public class ApplicationIT extends TestWithApplication {
         updater.setIconPath("/newIcon.jpg");
         updater.setProfileId(profile.getId());
         updater.setState(ApplicationState.ACTIVATED.name());
-        updater.setLayoutId(layout.getId());
-        updater.setThemeId(theme.getId());
 
         //when
         final Application updatedApplication = getApplicationAPI().updateApplication(application.getId(), updater);
@@ -116,13 +106,9 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(updatedApplication.getIconPath()).isEqualTo("/newIcon.jpg");
         assertThat(updatedApplication.getProfileId()).isEqualTo(profile.getId());
         assertThat(updatedApplication.getState()).isEqualTo(ApplicationState.ACTIVATED.name());
-        assertThat(updatedApplication.getLayoutId()).isEqualTo(layout.getId());
-        assertThat(updatedApplication.getThemeId()).isEqualTo(theme.getId());
         assertThat(updatedApplication).isEqualTo(getApplicationAPI().getApplication(application.getId()));
 
         getApplicationAPI().deleteApplication(application.getId());
-        getPageAPI().deletePage(layout.getId());
-        getPageAPI().deletePage(theme.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "get" })
@@ -204,7 +190,7 @@ public class ApplicationIT extends TestWithApplication {
         getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.TOKEN, "Engineering-dashboard");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -228,7 +214,7 @@ public class ApplicationIT extends TestWithApplication {
         getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.DISPLAY_NAME, "HR dashboard");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -251,7 +237,7 @@ public class ApplicationIT extends TestWithApplication {
         final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.VERSION, "2.0");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -277,7 +263,7 @@ public class ApplicationIT extends TestWithApplication {
         final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.PROFILE_ID, profile.getId());
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -288,68 +274,6 @@ public class ApplicationIT extends TestWithApplication {
         getApplicationAPI().deleteApplication(hr.getId());
         getApplicationAPI().deleteApplication(engineering.getId());
         getApplicationAPI().deleteApplication(marketing.getId());
-    }
-
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-12833", keywords = { "Application", "search",
-            "filter on layoutId", "no search term" })
-    @Test
-    public void searchApplications_can_filter_on_layoutId() throws Exception {
-        //given
-        Page layout = createPage("custompage_layout");
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0", layout.getId(), null);
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
-
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
-        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
-
-        //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
-        builder.filter(ApplicationSearchDescriptor.LAYOUT_ID, layout.getId());
-
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
-        assertThat(applications).isNotNull();
-        assertThat(applications.getCount()).isEqualTo(1);
-        assertThat(applications.getResult()).containsExactly(engineering);
-
-        //clean
-        getApplicationAPI().deleteApplication(hr.getId());
-        getApplicationAPI().deleteApplication(engineering.getId());
-        getApplicationAPI().deleteApplication(marketing.getId());
-
-        getPageAPI().deletePage(layout.getId());
-    }
-
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-12970", keywords = { "Application", "search",
-            "filter on themeId", "no search term" })
-    @Test
-    public void searchApplications_can_filter_on_themeId() throws Exception {
-        //given
-        Page theme = createPage("custompage_theme");
-        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
-        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0", null, theme.getId());
-        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
-
-        final Application hr = getApplicationAPI().createApplication(hrCreator);
-        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
-        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
-
-        //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
-        builder.filter(ApplicationSearchDescriptor.THEME_ID, theme.getId());
-
-        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
-        assertThat(applications).isNotNull();
-        assertThat(applications.getCount()).isEqualTo(1);
-        assertThat(applications.getResult()).containsExactly(engineering);
-
-        //clean
-        getApplicationAPI().deleteApplication(hr.getId());
-        getApplicationAPI().deleteApplication(engineering.getId());
-        getApplicationAPI().deleteApplication(marketing.getId());
-
-        getPageAPI().deletePage(theme.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "no filter",
@@ -366,7 +290,7 @@ public class ApplicationIT extends TestWithApplication {
         final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.searchTerm("My");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -376,14 +300,8 @@ public class ApplicationIT extends TestWithApplication {
     }
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(startIndex, maxResults);
         return builder.done();
-    }
-
-    private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationSearchDescriptor.TOKEN, Order.ASC);
-        return builder;
     }
 
 }

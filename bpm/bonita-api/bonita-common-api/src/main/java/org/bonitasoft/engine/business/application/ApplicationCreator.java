@@ -24,7 +24,7 @@ import org.bonitasoft.engine.profile.Profile;
  *
  * @author Elias Ricken de Medeiros
  * @see Application
- * @since 6.4
+ * @since 7.0.0
  */
 public class ApplicationCreator implements Serializable {
 
@@ -33,15 +33,14 @@ public class ApplicationCreator implements Serializable {
     private final Map<ApplicationField, Serializable> fields;
 
     /**
-     * Creates an instance of <code>ApplicationCreator</code> containing the essential information. You will need to set {@link Application} layout in order to
-     * get it working correctly. Prefer to create an {@code Application} using {@link #ApplicationCreator(String, String, String, Long, Long)}.
+     * Creates an instance of <code>ApplicationCreator</code> containing mandatory information.
+     * <p>The created {@link Application} will used the default layout.</p>
      *
-     * @param token the {@link Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
+     * @param token the {@code Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
      *        characters and the following special characters '-', '.', '_' or '~'.
      * @param displayName the <code>Application</code> display name. It cannot be null or empty
      * @param version the <code>Application</code> version
      * @see Application
-     * @see #ApplicationCreator(String, String, String, Long, Long)
      */
     public ApplicationCreator(final String token, final String displayName, final String version) {
         fields = new HashMap<>(3);
@@ -50,26 +49,6 @@ public class ApplicationCreator implements Serializable {
         fields.put(ApplicationField.DISPLAY_NAME, displayName);
     }
 
-    /**
-     * Creates an instance of <code>ApplicationCreator</code> containing mandatory information
-     *
-     * @param token the {@link Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
-     *        characters and the following special characters '-', '.', '_' or '~'.
-     * @param displayName the <code>Application</code> display name. It cannot be null or empty
-     * @param version the <code>Application</code> version
-     * @param layoutId the identifier of the {@link org.bonitasoft.engine.page.Page} defining the {@code Application} layout.
-     * @param themeId the identifier of the {@link org.bonitasoft.engine.page.Page} defining the {@code Application} theme.
-     * @see Application
-     * @since 7.0.0
-     */
-    public ApplicationCreator(final String token, final String displayName, final String version, Long layoutId, final Long themeId) {
-        fields = new HashMap<>(5);
-        fields.put(ApplicationField.TOKEN, token);
-        fields.put(ApplicationField.VERSION, version);
-        fields.put(ApplicationField.DISPLAY_NAME, displayName);
-        fields.put(ApplicationField.LAYOUT_ID, layoutId);
-        fields.put(ApplicationField.THEME_ID, themeId);
-    }
 
     /**
      * Retrieves the {@link Application} token

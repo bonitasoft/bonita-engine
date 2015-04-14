@@ -31,4 +31,8 @@ public interface SPageUpdateBuilder {
 
     SPageUpdateBuilder updateContentName(String value);
 
+    SPageUpdateBuilder updateContentType(String contentType);
+
+    SPageUpdateBuilder updateProcessDefinitionId(Long processDedfinitionId);
+
 }

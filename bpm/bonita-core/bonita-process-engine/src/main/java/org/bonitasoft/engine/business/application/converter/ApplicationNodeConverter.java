@@ -30,6 +30,7 @@ import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.ExportException;
+import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -72,7 +73,6 @@ public class ApplicationNodeConverter {
             applicationNode.setState(application.getState());
             applicationNode.setIconPath(application.getIconPath());
             setLayout(application, applicationNode);
-            setTheme(application, applicationNode);
             setProfile(application, applicationNode);
             setHomePage(application, applicationNode);
             setPages(application.getId(), applicationNode);
@@ -80,13 +80,6 @@ public class ApplicationNodeConverter {
             return applicationNode;
         } catch (SBonitaException e) {
             throw new ExportException(e);
-        }
-    }
-
-    private void setTheme(final SApplication application, final ApplicationNode applicationNode) throws SBonitaReadException, SObjectNotFoundException {
-        if (application.getThemeId() != null) {
-            SPage theme = pageService.getPage(application.getThemeId());
-            applicationNode.setTheme(theme.getName());
         }
     }
 
@@ -131,13 +124,11 @@ public class ApplicationNodeConverter {
         }
     }
 
-    public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) throws SBonitaReadException {
+    public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) throws SBonitaReadException, ImportException {
         final ImportStatus importStatus = new ImportStatus(applicationNode.getToken());
-        Long layoutId = calculatePageId(applicationNode.getLayout(), importStatus);
-        Long themeId = calculatePageId(applicationNode.getTheme(), importStatus);
 
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
-                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, layoutId, themeId);
+                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, getLayoutId(applicationNode, importStatus));
         builder.setIconPath(applicationNode.getIconPath());
         builder.setDescription(applicationNode.getDescription());
         builder.setState(applicationNode.getState());
@@ -151,16 +142,21 @@ public class ApplicationNodeConverter {
         return new ImportResult(application, importStatus);
     }
 
-    private Long calculatePageId(final String pageName, final ImportStatus importStatus) throws SBonitaReadException {
-        if (pageName == null) {
-            return null;
+    private Long getLayoutId(final ApplicationNode applicationNode, final ImportStatus importStatus) throws SBonitaReadException, ImportException {
+        SPage layout = pageService.getPageByName(getLayoutName(applicationNode));
+        if (layout == null) {
+            return handleMissingLayout(applicationNode, importStatus);
         }
-        SPage theme = pageService.getPageByName(pageName);
-        if (theme == null) {
-            importStatus.addError(new ImportError(pageName, ImportError.Type.PAGE));
-            return null;
-        }
-        return theme.getId();
+        return layout.getId();
+    }
+
+    protected Long handleMissingLayout(final ApplicationNode applicationNode, final ImportStatus importStatus) throws ImportException {
+        throw new ImportException(String.format("Unable to import application with token '%s' because the default layout '%s' was not found.",
+                applicationNode.getToken(), getLayoutName(applicationNode)));
+    }
+
+    protected String getLayoutName(final ApplicationNode applicationNode) {
+        return ApplicationService.DEFAULT_LAYOUT_NAME;
     }
 
     private ImportError setProfile(final ApplicationNode applicationNode, final SApplicationBuilder builder) {

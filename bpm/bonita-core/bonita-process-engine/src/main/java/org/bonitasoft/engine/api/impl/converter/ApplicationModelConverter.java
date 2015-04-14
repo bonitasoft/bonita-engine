@@ -24,6 +24,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationField;
+import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -31,6 +32,10 @@ import org.bonitasoft.engine.business.application.model.builder.SApplicationBuil
 import org.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -38,7 +43,13 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class ApplicationModelConverter {
 
-    public SApplication buildSApplication(final ApplicationCreator creator, final long creatorUserId) {
+    private final PageService pageService;
+
+    public ApplicationModelConverter(PageService pageService) {
+        this.pageService = pageService;
+    }
+
+    public SApplication buildSApplication(final ApplicationCreator creator, final long creatorUserId) throws CreationException {
         final Map<ApplicationField, Serializable> fields = creator.getFields();
         final String name = (String) fields.get(ApplicationField.TOKEN);
         final String displayName = (String) fields.get(ApplicationField.DISPLAY_NAME);
@@ -46,19 +57,32 @@ public class ApplicationModelConverter {
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
         final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
-        final Long layoutId = (Long) fields.get(ApplicationField.LAYOUT_ID);
-        final Long themeId = (Long) fields.get(ApplicationField.THEME_ID);
+
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, displayName, version, creatorUserId,
-                layoutId, themeId);
+                getLayoutId(creator));
         builder.setDescription(description);
         builder.setIconPath(iconPath);
         builder.setProfileId(profileId);
         return builder.done();
     }
 
+    protected Long getLayoutId(ApplicationCreator creator) throws CreationException {
+        try {
+            final String applicationToken = (String) creator.getFields().get(ApplicationField.TOKEN);
+            SPage defaultLayout = pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME);
+            if (defaultLayout == null) {
+                throw new CreationException(String.format("Unable to created application with token '%s' because the default layout '%s' was not found.",
+                        applicationToken, ApplicationService.DEFAULT_LAYOUT_NAME));
+            }
+            return defaultLayout.getId();
+        } catch (SBonitaReadException e) {
+            throw new CreationException(e);
+        }
+    }
+
     public Application toApplication(final SApplication sApplication) {
         final ApplicationImpl application = new ApplicationImpl(sApplication.getToken(), sApplication.getVersion(), sApplication.getDescription(),
-                sApplication.getLayoutId(), sApplication.getThemeId());
+                sApplication.getLayoutId());
         application.setId(sApplication.getId());
         application.setDisplayName(sApplication.getDisplayName());
         application.setCreatedBy(sApplication.getCreatedBy());
@@ -82,6 +106,12 @@ public class ApplicationModelConverter {
 
     public EntityUpdateDescriptor toApplicationUpdateDescriptor(final ApplicationUpdater updater, final long updaterUserId) {
         final SApplicationUpdateBuilder builder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(updaterUserId);
+        updateFields(updater, builder);
+
+        return builder.done();
+    }
+
+    protected void updateFields(final ApplicationUpdater updater, final SApplicationUpdateBuilder builder) {
         for (final Entry<ApplicationField, Serializable> entry : updater.getFields().entrySet()) {
             switch (entry.getKey()) {
                 case TOKEN:
@@ -114,18 +144,10 @@ public class ApplicationModelConverter {
                 case HOME_PAGE_ID:
                     builder.updateHomePageId((Long) entry.getValue());
                     break;
-                case LAYOUT_ID:
-                    builder.updateLayoutId((Long) entry.getValue());
-                    break;
-                case THEME_ID:
-                    builder.updateThemeId((Long) entry.getValue());
-                    break;
                 default:
                     break;
             }
         }
-
-        return builder.done();
     }
 
 }

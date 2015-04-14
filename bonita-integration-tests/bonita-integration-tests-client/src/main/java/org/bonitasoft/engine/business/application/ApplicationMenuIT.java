@@ -354,7 +354,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.DISPLAY_NAME, "second");
         final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
 
@@ -374,7 +374,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         final ApplicationMenu menu3 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.INDEX, 3);
         final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
 
@@ -395,7 +395,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         final ApplicationMenu menu3 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_PAGE_ID, appPage.getId());
         final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
 
@@ -418,7 +418,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         final ApplicationMenu menu3 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application2.getId(), "third", appPage2.getId()));
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, application2.getId());
         final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
 
@@ -442,7 +442,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.PARENT_ID, parentMenu.getId());
         final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
 
@@ -462,7 +462,7 @@ public class ApplicationMenuIT extends TestWithCustomPage {
         getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "third", appPage.getId()));
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(0, 10);
         builder.searchTerm("second");
         final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
 
@@ -473,12 +473,12 @@ public class ApplicationMenuIT extends TestWithCustomPage {
     }
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
+        final SearchOptionsBuilder builder = getApplicationMenuSearchBuilder(startIndex, maxResults);
         final SearchOptions options = builder.done();
         return options;
     }
 
-    private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
+    private SearchOptionsBuilder getApplicationMenuSearchBuilder(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
         builder.sort(ApplicationMenuSearchDescriptor.INDEX, Order.ASC);
         return builder;
