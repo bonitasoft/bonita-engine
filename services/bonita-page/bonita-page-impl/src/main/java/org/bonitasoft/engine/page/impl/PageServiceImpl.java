@@ -354,6 +354,7 @@ public class PageServiceImpl implements PageService {
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
         } catch (SRecorderException | SBonitaReadException | SProfileEntryNotFoundException | SProfileEntryDeletionException re) {
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
+            throw new SObjectModificationException(re);
         }
     }
 
@@ -554,6 +555,7 @@ public class PageServiceImpl implements PageService {
 
         } catch (SRecorderException | SBonitaReadException re) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
+            throw new SObjectModificationException(re);
         }
         final SPageUpdateBuilder pageBuilder = BuilderFactory.get(SPageUpdateBuilderFactory.class)
                 .createNewInstance(new EntityUpdateDescriptor());
