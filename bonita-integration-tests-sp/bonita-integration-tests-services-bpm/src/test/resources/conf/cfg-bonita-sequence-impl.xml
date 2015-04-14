@@ -148,6 +148,10 @@
 				<entry key="org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanDescriptorImpl" value="10100" />
 				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" value="500" />
 				<entry key="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" value="10300" />
+				<entry key="org.bonitasoft.engine.page.impl.SPageWithContentImpl" value="10120" />
+				<entry key="org.bonitasoft.engine.page.impl.SPageImpl" value="10120" />
+				<entry key="org.bonitasoft.engine.page.impl.SPageContentImpl" value="10120" />
+				<entry key="org.bonitasoft.engine.page.impl.SPageMappingImpl" value="10121" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />
