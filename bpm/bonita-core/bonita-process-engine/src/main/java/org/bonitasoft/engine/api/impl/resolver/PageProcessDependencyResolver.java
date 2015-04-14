@@ -37,7 +37,7 @@ public class PageProcessDependencyResolver implements ProcessDependencyResolver 
 
     @Override
     public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition) {
-        return true;
+        return checkResolution(tenantAccessor, sDefinition).isEmpty();
     }
 
     @Override
