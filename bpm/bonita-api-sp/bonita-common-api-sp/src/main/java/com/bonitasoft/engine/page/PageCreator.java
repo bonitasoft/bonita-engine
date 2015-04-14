@@ -22,7 +22,7 @@ import com.bonitasoft.engine.converter.EnumConverter;
 public class PageCreator implements Serializable {
 
     public enum PageField {
-        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME;
+        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME, CONTENT_TYPE, PROCESS_DEFINITION_ID
     }
 
     private static final long serialVersionUID = 8174091386958635983L;
@@ -31,6 +31,10 @@ public class PageCreator implements Serializable {
 
     public PageCreator(final String name, final String contentName) {
         delegate = new org.bonitasoft.engine.page.PageCreator(name, contentName);
+    }
+
+    public PageCreator(String name, String zipName, String contentType, Long processDefinitionId) {
+        delegate = new org.bonitasoft.engine.page.PageCreator(name, zipName, contentType, processDefinitionId);
     }
 
     public String getName() {

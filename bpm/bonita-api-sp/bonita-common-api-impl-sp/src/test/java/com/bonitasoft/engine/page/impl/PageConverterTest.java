@@ -10,7 +10,8 @@ package com.bonitasoft.engine.page.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.impl.PageImpl;
+import org.bonitasoft.engine.page.impl.PageImpl;
+import org.bonitasoft.engine.page.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,7 +30,7 @@ public class PageConverterTest {
     public void convert_should_map_all_fields() throws Exception {
         //given
         final long now = System.currentTimeMillis();
-        final PageImpl sourcePage = new PageImpl(1, "name", "display", true, "description", now, 2, now + 10, 3, "contentName");
+        final PageImpl sourcePage = new PageImpl(1, "name", "display", true, "description", now, 2, now + 10, 3, "contentName", ContentType.PAGE, 1L);
 
         //when
         final Page convertedPage = converter.convert(sourcePage);
