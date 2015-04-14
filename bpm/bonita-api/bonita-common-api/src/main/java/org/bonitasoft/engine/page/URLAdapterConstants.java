@@ -30,4 +30,5 @@ public interface URLAdapterConstants {
     String USER_QUERY_PARAM = "user";
     String TENANT_QUERY_PARAM = "tenant";
     String MODE_QUERY_PARAM = "mode";
+    String AUTO_INSTANTIATE_QUERY_PARAM = "autoInstantiate";
 }
