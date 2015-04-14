@@ -980,10 +980,17 @@ CREATE TABLE page (
   lastUpdatedBy NUMERIC(19, 0) NOT NULL,
   contentName NVARCHAR(50) NOT NULL,
   content VARBINARY(MAX),
-  UNIQUE (tenantId, name),
-  PRIMARY KEY (tenantId, id)
+  contentType NVARCHAR(50) NOT NULL,
+  processDefinitionId NUMERIC(19,0)
 )
 GO
+
+ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id)
+GO
+
+ALTER TABLE page ADD CONSTRAINT  uk_page UNIQUE  (tenantId, name, processDefinitionId)
+GO
+
 CREATE TABLE sequence (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -1126,12 +1133,27 @@ CREATE TABLE form_mapping (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   process NUMERIC(19, 0) NOT NULL,
-  task NVARCHAR(255) NULL,
-  form NVARCHAR(1024) NULL,
-  target NVARCHAR(16) NOT NULL,
-  type NVARCHAR(16) NOT NULL,
-  lastUpdateDate NUMERIC(19, 0) NULL,
-  lastUpdatedBy NUMERIC(19, 0) NULL,
+  type INT NOT NULL,
+  task NVARCHAR(255),
+  page_mapping_tenant_id NUMERIC(19, 0),
+  page_mapping_id NUMERIC(19, 0),
+  lastUpdateDate NUMERIC(19, 0),
+  lastUpdatedBy NUMERIC(19, 0),
   PRIMARY KEY (tenantId, id)
 )
+GO
+CREATE TABLE page_mapping (
+  tenantId NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  key_ NVARCHAR(255) NOT NULL,
+  pageId NUMERIC(19, 0) NULL,
+  url NVARCHAR(1024) NULL,
+  urladapter NVARCHAR(255) NULL,
+  lastUpdateDate NUMERIC(19, 0) NULL,
+  lastUpdatedBy NUMERIC(19, 0) NULL,
+  CONSTRAINT UK_page_mapping UNIQUE (tenantId, key_),
+  PRIMARY KEY (tenantId, id)
+)
+GO
+ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_tenant_id, page_mapping_id) REFERENCES page_mapping(tenantId, id)
 GO

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.test.persistence.builder;
 
+import org.bonitasoft.engine.page.ContentType;
 import org.bonitasoft.engine.page.impl.SPageImpl;
 import org.bonitasoft.engine.page.impl.SPageWithContentImpl;
 
@@ -36,6 +37,10 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, P
 
     private String contentName;
 
+    private String contentType;
+
+    private Long processDefinitionId;
+
     private byte[] content;
 
     public static PageBuilder aPage() {
@@ -46,6 +51,8 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, P
     public SPageWithContentImpl _build() {
         final SPageImpl sPageImpl = new SPageImpl(name, description, displayName, installationDate, installedBy, provided, lastModificationDate, lastUpdatedBy,
                 contentName);
+        sPageImpl.setProcessDefinitionId(processDefinitionId);
+
         return new SPageWithContentImpl(sPageImpl, content);
     }
 
@@ -96,6 +103,16 @@ public class PageBuilder extends PersistentObjectBuilder<SPageWithContentImpl, P
 
     public PageBuilder withContent(final byte[] content) {
         this.content = content;
+        return this;
+    }
+
+    public PageBuilder withContentType(final String contentType) {
+        this.contentType = contentType;
+        return this;
+    }
+
+    public PageBuilder withProcessDefinitionId(final Long processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
         return this;
     }
 

@@ -114,7 +114,7 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     }
 
     @Override
-    public ProcessConfigurationAPI getProcessConfigurationAPIi() {
+    public ProcessConfigurationAPI getProcessConfigurationAPI() {
         return getAPI(ProcessConfigurationAPI.class, getAPISession());
     }
 

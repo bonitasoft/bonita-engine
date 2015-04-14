@@ -2,7 +2,6 @@ DELETE FROM arch_contract_data
 GO
 DELETE FROM contract_data
 GO
-
 DELETE FROM actormember
 GO
 DELETE FROM actor
@@ -116,6 +115,10 @@ GO
 DELETE FROM tenant
 GO
 DELETE FROM platformCommand
+GO
+DELETE FROM form_mapping
+GO
+DELETE FROM page_mapping
 GO
 
 -- do NOT clear directly PLATFORM table, Hibernate needs to update its cache to know the platform has been deleted

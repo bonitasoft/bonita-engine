@@ -25,13 +25,13 @@ public class PageUpdater implements Serializable {
     private static final long serialVersionUID = 4295108162470507415L;
 
     public enum PageUpdateField {
-        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME;
+        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME, CONTENT_TYPE, PROCESS_DEFINITION_ID
     }
 
     private final Map<PageUpdateField, Serializable> fields;
 
     public PageUpdater() {
-        fields = new HashMap<PageUpdateField, Serializable>(3);
+        fields = new HashMap<>();
     }
 
     public PageUpdater setName(final String name) {
@@ -51,6 +51,16 @@ public class PageUpdater implements Serializable {
 
     public PageUpdater setContentName(final String contentName) {
         fields.put(PageUpdateField.CONTENT_NAME, contentName);
+        return this;
+    }
+
+    public PageUpdater setContentType(final String contentType) {
+        fields.put(PageUpdateField.CONTENT_TYPE, contentType);
+        return this;
+    }
+
+    public PageUpdater setProcessDefinitionId(final Long processDefinitionId) {
+        fields.put(PageUpdateField.PROCESS_DEFINITION_ID, processDefinitionId);
         return this;
     }
 

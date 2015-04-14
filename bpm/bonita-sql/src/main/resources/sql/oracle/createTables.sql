@@ -845,6 +845,7 @@ CREATE TABLE queriablelog_p (
 
 CREATE INDEX idx_queriablelog ON queriablelog_p (queriableLogId);
 ALTER TABLE queriablelog_p ADD CONSTRAINT fk_queriableLogId FOREIGN KEY (tenantid, queriableLogId) REFERENCES queriable_log(tenantid, id);
+
 CREATE TABLE page (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
@@ -858,9 +859,14 @@ CREATE TABLE page (
   lastUpdatedBy NUMBER(19, 0) NOT NULL,
   contentName VARCHAR2(50 CHAR) NOT NULL,
   content BLOB,
-  CONSTRAINT UK_Page UNIQUE (tenantId, name),
-  PRIMARY KEY (tenantId, id)
+  contentType VARCHAR2(50 CHAR),
+  processDefinitionId NUMBER(19, 0)
 );
+
+ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);
+
+ALTER TABLE page ADD CONSTRAINT uk_page UNIQUE (tenantId, name, processDefinitionId);
+
 CREATE TABLE sequence (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
@@ -984,15 +990,31 @@ CREATE TABLE theme (
   CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
   PRIMARY KEY (tenantId, id)
 );
+
 CREATE TABLE form_mapping (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   process NUMBER(19, 0) NOT NULL,
-  task VARCHAR2(255 CHAR) NULL,
-  form VARCHAR2(1024 CHAR) NULL,
-  target VARCHAR2(16) NOT NULL,
-  type VARCHAR2(16 CHAR) NOT NULL,
-  lastUpdateDate NUMBER(19, 0) NULL,
-  lastUpdatedBy NUMBER(19, 0) NULL,
+  type INT NOT NULL,
+  task VARCHAR2(255 CHAR),
+  page_mapping_tenant_id NUMBER(19, 0),
+  page_mapping_id NUMBER(19, 0),
+  lastUpdateDate NUMBER(19, 0),
+  lastUpdatedBy NUMBER(19, 0),
   PRIMARY KEY (tenantId, id)
 );
+
+CREATE TABLE page_mapping (
+  tenantId NUMBER(19, 0) NOT NULL,
+  id NUMBER(19, 0) NOT NULL,
+  key_ VARCHAR2(255 CHAR) NOT NULL,
+  pageId NUMBER(19, 0) NULL,
+  url VARCHAR2(1024 CHAR) NULL,
+  urladapter VARCHAR2(255 CHAR) NULL,
+  lastUpdateDate NUMBER(19, 0) NULL,
+  lastUpdatedBy NUMBER(19, 0) NULL,
+  CONSTRAINT UK_page_mapping UNIQUE (tenantId, key_),
+  PRIMARY KEY (tenantId, id)
+);
+
+ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_tenant_id, page_mapping_id) REFERENCES page_mapping(tenantId, id);

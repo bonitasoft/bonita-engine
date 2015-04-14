@@ -95,7 +95,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance("My_Process_with_branches", "1.0");
         processBuilder1.addActor(ACTOR_NAME).addActor(otherActor);
         processBuilder1.addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).addUserTask("step3", otherActor).addUserTask("step4", otherActor);
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder1.done()).done());
         final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 2, ActorCriterion.NAME_ASC);
         getProcessAPI().addUserToActor(actors.get(0).getId(), user.getId());
@@ -159,8 +159,8 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         final DesignProcessDefinition designProcessDefinition2 = processBuilder2.done();
         final BusinessArchive businessArchive2 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition2).done();
 
-        final ProcessDefinition processDefinition1 = getProcessAPI().deploy(businessArchive);
-        final ProcessDefinition processDefinition2 = getProcessAPI().deploy(businessArchive2);
+        final ProcessDefinition processDefinition1 = deployProcess(businessArchive);
+        final ProcessDefinition processDefinition2 = deployProcess(businessArchive2);
         // 3. assign user 'test' to actor of both processes
         ActorInstance processActor = getProcessAPI().getActors(processDefinition1.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);
         getProcessAPI().addUserToActor(processActor.getId(), test.getId());
@@ -384,7 +384,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
         final BusinessArchive businessArchive = businessArchiveBuilder.setProcessDefinition(designProcessDefinition).done();
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
+        final ProcessDefinition processDefinition = deployProcess(businessArchive);
         // map actor to group
         final ActorInstance processActor = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);
         getProcessAPI().addGroupToActor(processActor.getId(), mainGroup.getId());

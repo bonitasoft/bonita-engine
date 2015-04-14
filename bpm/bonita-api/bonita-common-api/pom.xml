@@ -95,7 +95,11 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin> 
+            </plugin>
+            <plugin>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 
