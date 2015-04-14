@@ -361,6 +361,22 @@
                         </includes>
                     </configuration>
                 </plugin>
+                <plugin>
+					<!-- usage:
+					mvn assertj:generate-assertions -Dassertj.classes=org.bonitasoft.MyClass
+					mvn assertj:generate-assertions -Dassertj.packages=org.bonitasoft.package
+ 					-->
+                    <groupId>org.assertj</groupId>
+                    <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
+                    <version>1.5.0</version>
+                    <configuration>
+                        <targetDir>src/test/java</targetDir>
+                        <generateAssertions>false</generateAssertions>
+                        <generateBddAssertions>false</generateBddAssertions>
+                        <generateSoftAssertions>false</generateSoftAssertions>
+                        <generateJUnitSoftAssertions>false</generateJUnitSoftAssertions>
+                    </configuration>
+                </plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>

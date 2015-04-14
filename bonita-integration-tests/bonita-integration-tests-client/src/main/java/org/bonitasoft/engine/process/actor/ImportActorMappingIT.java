@@ -72,7 +72,7 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
     public void importSimpleActorMapping() throws Exception {
         final User john = createUser(USERNAME, PASSWORD);
         final BusinessArchiveBuilder businessArchive = createAndDeployProcessDefinitionWithImportedActorMapping("simpleActorMapping.xml");
-        processDefinition = getProcessAPI().deploy(businessArchive.done());
+        processDefinition = deployProcess(businessArchive.done());
         getProcessAPI().enableProcess(processDefinition.getId());
 
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -94,7 +94,7 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
         final User john = createUser("john", "bpm");
         final Group rd = createGroup("RD");
         final Role role = createRole("dev");
-        processDefinition = getProcessAPI().deploy(businessArchive.done());
+        processDefinition = deployProcess(businessArchive.done());
         getProcessAPI().enableProcess(processDefinition.getId());
 
         getAndCheckActors(john, rd, role, processDefinition);
@@ -206,7 +206,7 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
         builder.createNewInstance("resolve", "1.0").addActor("Leader", true).addUserTask("step1", "Leader");
         final DesignProcessDefinition processDesignDefinition = builder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDesignDefinition).done();
-        processDefinition = getProcessAPI().deploy(businessArchive);
+        processDefinition = deployProcess(businessArchive);
         ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
 
@@ -272,7 +272,7 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
     }
 
     private void checkProcessNotActivated(final BusinessArchiveBuilder businessArchive) throws Exception {
-        processDefinition = getProcessAPI().deploy(businessArchive.done());
+        processDefinition = deployProcess(businessArchive.done());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
         final List<Problem> processResolutionProblems = getProcessAPI().getProcessResolutionProblems(processDefinition.getId());
@@ -282,7 +282,7 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
     }
 
     private void checkProcessActivated(final BusinessArchiveBuilder businessArchive) throws Exception {
-        processDefinition = getProcessAPI().deploy(businessArchive.done());
+        processDefinition = deployProcess(businessArchive.done());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
     }

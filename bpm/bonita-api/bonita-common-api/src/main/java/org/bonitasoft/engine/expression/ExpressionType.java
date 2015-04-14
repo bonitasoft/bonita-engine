@@ -45,7 +45,6 @@ public enum ExpressionType {
     TYPE_DOCUMENT,
 
     /**
-     *
      * expressions that return a list of document
      *
      * @since 6.4.0
@@ -71,6 +70,6 @@ public enum ExpressionType {
 
     TYPE_QUERY_BUSINESS_DATA,
 
-    TYPE_CONTRACT_INPUT;
+    TYPE_CONTRACT_INPUT
 
 }

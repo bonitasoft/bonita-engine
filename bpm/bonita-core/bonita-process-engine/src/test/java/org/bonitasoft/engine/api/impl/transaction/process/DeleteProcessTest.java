@@ -13,20 +13,30 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.process;
 
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.form.FormMappingService;
+import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-
 
 /**
  * @author Aurelien Pupier
@@ -34,6 +44,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class DeleteProcessTest {
 
+    public static final long PROCESS_DEFINITION_ID = 1L;
+    public static final long PAGE_ID = 2L;
     @Mock
     private TenantServiceAccessor tenantAccessor;
     @Mock
@@ -46,6 +58,22 @@ public class DeleteProcessTest {
     private FormMappingService formMappingService;
     @Mock
     private ProcessInstanceService processInstanceService;
+    @Mock
+    private PageService pageService;
+    @Mock
+    private SPage sPage;
+    @Mock
+    private SFormMapping formMapping;
+
+    @Before
+    public void before() {
+        when(tenantAccessor.getClassLoaderService()).thenReturn(classLoaderService);
+        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
+        when(tenantAccessor.getActorMappingService()).thenReturn(actorMappingService);
+        when(tenantAccessor.getFormMappingService()).thenReturn(formMappingService);
+        when(tenantAccessor.getProcessInstanceService()).thenReturn(processInstanceService);
+        when(tenantAccessor.getPageService()).thenReturn(pageService);
+    }
 
     /**
      * Test method for {@link org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess#execute()}.
@@ -55,17 +83,45 @@ public class DeleteProcessTest {
      */
     @Test
     public void testClassloaderClearedWhenExecuteCalled() throws SBonitaException {
-        final long processDefinitionId = 1;
-        Mockito.when(tenantAccessor.getClassLoaderService()).thenReturn(classLoaderService);
-        Mockito.when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
-        Mockito.when(tenantAccessor.getActorMappingService()).thenReturn(actorMappingService);
-        Mockito.when(tenantAccessor.getFormMappingService()).thenReturn(formMappingService);
-        Mockito.when(tenantAccessor.getProcessInstanceService()).thenReturn(processInstanceService);
+        // given
+        final long processDefinitionId = PROCESS_DEFINITION_ID;
         final DeleteProcess deleteProcess = new DeleteProcess(tenantAccessor, processDefinitionId);
 
+        //when
         deleteProcess.execute();
 
-        Mockito.verify(classLoaderService).removeLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+        //then
+        verify(classLoaderService).removeLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+    }
+
+    @Test
+    public void should_delete_process_delete_pages() throws SBonitaException {
+        //given
+        final long processDefinitionId = PROCESS_DEFINITION_ID;
+        doReturn(PAGE_ID).when(sPage).getId();
+        doReturn(Arrays.asList(sPage)).when(pageService).getPageByProcessDefinitionId(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
+
+        //when
+        final DeleteProcess deleteProcess = new DeleteProcess(tenantAccessor, processDefinitionId);
+        deleteProcess.execute();
+
+        //then
+        verify(pageService).deletePage(PAGE_ID);
+    }
+
+    @Test
+    public void should_delete_process_form_mapping() throws SBonitaException {
+        //given
+        final long processDefinitionId = PROCESS_DEFINITION_ID;
+
+        doReturn(Arrays.asList(formMapping)).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
+
+        //when
+        final DeleteProcess deleteProcess = new DeleteProcess(tenantAccessor, processDefinitionId);
+        deleteProcess.execute();
+
+        //then
+        verify(formMappingService).delete(formMapping);
     }
 
 }

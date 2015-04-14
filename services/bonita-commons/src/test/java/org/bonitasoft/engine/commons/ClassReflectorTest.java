@@ -73,7 +73,7 @@ public class ClassReflectorTest {
         final Collection<Method> accessibleGetters = ClassReflector.getAccessibleGetters(pojo.getClass());
 
         // isChoice, getDate, getClass, getLongs, getBigChoice, getBigChoices
-        assertThat(accessibleGetters).hasSize(6);
+        assertThat(accessibleGetters).hasSize(7);
     }
 
     @Test
@@ -250,7 +250,7 @@ public class ClassReflectorTest {
         final Method[] declaredSetters = ClassReflector.getDeclaredSetters(pojo.getClass());
 
         // setDate,setChoice,setLongs,setBigChoice,setBigChoices
-        assertThat(declaredSetters).hasSize(5);
+        assertThat(declaredSetters).hasSize(6);
 
         for (final Method method : declaredSetters) {
             assertThat(ClassReflector.isAGetterMethod(method)).isFalse();
@@ -265,7 +265,7 @@ public class ClassReflectorTest {
         final Method[] declaredSetters = ClassReflector.getDeclaredGetters(pojo.getClass());
 
         // isChoice, getDate, getLongs, getBigChoice, getBigChoices
-        assertThat(declaredSetters).hasSize(5);
+        assertThat(declaredSetters).hasSize(6);
 
         for (final Method method : declaredSetters) {
             assertThat(ClassReflector.isAGetterMethod(method)).isTrue();
@@ -280,6 +280,21 @@ public class ClassReflectorTest {
         assertThat(ClassReflector.getFieldName("getDate")).isEqualTo("date");
         assertThat(ClassReflector.getFieldName("get")).isEqualTo("");
 
+    }
+
+    @Test
+    public void testSetField_on_sub_object() throws Exception {
+        Date date = new Date();
+        pojo.setChild(new Pojo());
+        ClassReflector.setField(pojo, "child.date", date);
+        assertThat(pojo.getChild().getDate()).isEqualTo(date);
+    }
+
+    @Test
+    public void testSetField_on_object() throws Exception {
+        Pojo parameterValue = new Pojo();
+        ClassReflector.setField(pojo, "child", parameterValue);
+        assertThat(pojo.getChild()).isEqualTo(parameterValue);
     }
 
 }

@@ -179,6 +179,7 @@
 				<entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
 				<entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
 				<entry key="org.bonitasoft.engine.theme.model.STheme" value="org.bonitasoft.engine.theme.model.impl.SThemeImpl" />
+				<entry key="org.bonitasoft.engine.page.SPageMapping" value="org.bonitasoft.engine.page.impl.SPageMappingImpl" />
 
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" />
@@ -216,6 +217,7 @@
 				<ref bean="hbm-bos-platform-command-model" />
 				<ref bean="hbm-bos-profile-model" />
 				<ref bean="hbm-bos-theme-model" />
+				<ref bean="hbm-bos-page-model" />
 			</list>
 		</property>
 	</bean>
