@@ -128,7 +128,7 @@ public class ApplicationNodeConverter {
         final ImportStatus importStatus = new ImportStatus(applicationNode.getToken());
 
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
-                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, getLayoutId(applicationNode, importStatus));
+                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, getLayoutId(applicationNode, importStatus), null);
         builder.setIconPath(applicationNode.getIconPath());
         builder.setDescription(applicationNode.getDescription());
         builder.setState(applicationNode.getState());

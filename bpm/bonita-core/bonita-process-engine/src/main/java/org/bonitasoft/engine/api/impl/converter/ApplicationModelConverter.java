@@ -57,9 +57,8 @@ public class ApplicationModelConverter {
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
         final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
-
-        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, displayName, version, creatorUserId,
-                getLayoutId(creator));
+        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, displayName, version,
+                creatorUserId, getLayoutId(creator), getThemeId(creator));
         builder.setDescription(description);
         builder.setIconPath(iconPath);
         builder.setProfileId(profileId);
@@ -67,12 +66,19 @@ public class ApplicationModelConverter {
     }
 
     protected Long getLayoutId(ApplicationCreator creator) throws CreationException {
+        return getPageId((String) creator.getFields().get(ApplicationField.TOKEN), ApplicationService.DEFAULT_LAYOUT_NAME);
+    }
+
+    protected Long getThemeId(ApplicationCreator creator) throws CreationException {
+        return getPageId((String) creator.getFields().get(ApplicationField.TOKEN), ApplicationService.DEFAULT_THEME_NAME);
+    }
+
+    private Long getPageId(final String applicationToken, final String pageName) throws CreationException {
         try {
-            final String applicationToken = (String) creator.getFields().get(ApplicationField.TOKEN);
-            SPage defaultLayout = pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME);
+            SPage defaultLayout = pageService.getPageByName(pageName);
             if (defaultLayout == null) {
-                throw new CreationException(String.format("Unable to created application with token '%s' because the default layout '%s' was not found.",
-                        applicationToken, ApplicationService.DEFAULT_LAYOUT_NAME));
+                throw new CreationException(String.format("Unable to created application with token '%s' because the page '%s' was not found.",
+                        applicationToken, pageName));
             }
             return defaultLayout.getId();
         } catch (SBonitaReadException e) {
@@ -82,7 +88,7 @@ public class ApplicationModelConverter {
 
     public Application toApplication(final SApplication sApplication) {
         final ApplicationImpl application = new ApplicationImpl(sApplication.getToken(), sApplication.getVersion(), sApplication.getDescription(),
-                sApplication.getLayoutId());
+                sApplication.getLayoutId(), sApplication.getThemeId());
         application.setId(sApplication.getId());
         application.setDisplayName(sApplication.getDisplayName());
         application.setCreatedBy(sApplication.getCreatedBy());

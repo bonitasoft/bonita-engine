@@ -37,7 +37,8 @@ public class ApplicationIT extends TestWithApplication {
     public void createApplication_returns_application_based_on_ApplicationCreator_information() throws Exception {
         //given
         final Profile profile = getProfileUser();
-        Page defaultLayout = getPageAPI().getPageByName("custompage_layout");
+        Page defaultLayout = getPageAPI().getPageByName(DEFAULT_LAYOUT_NAME);
+        Page defaultTheme = getPageAPI().getPageByName(DEFAULT_THEME_NAME);
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
         creator.setDescription("This is my application");
         creator.setIconPath("/icon.jpg");
@@ -59,6 +60,7 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(application.getHomePageId()).isNull();
         assertThat(application.getProfileId()).isEqualTo(profile.getId());
         assertThat(application.getLayoutId()).isEqualTo(defaultLayout.getId());
+        assertThat(application.getThemeId()).isEqualTo(defaultTheme.getId());
 
         getApplicationAPI().deleteApplication(application.getId());
     }

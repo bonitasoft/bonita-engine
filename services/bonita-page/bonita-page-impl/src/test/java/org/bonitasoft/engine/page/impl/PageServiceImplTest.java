@@ -323,7 +323,7 @@ public class PageServiceImplTest {
         pageServiceImpl.start();
 
         // then
-        verify(pageServiceImpl, times(4)).insertPage(any(SPage.class), any(byte[].class));
+        verify(pageServiceImpl, times(5)).insertPage(any(SPage.class), any(byte[].class));
         verify(pageServiceImpl, times(0)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
         verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(byte[].class), anyString());
 
@@ -357,14 +357,22 @@ public class PageServiceImplTest {
                 CONTENT_NAME);
         currentLayoutPage.setId(15);
 
+        final SPageImpl currentThemePage = new SPageImpl("custompage_theme", "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
+                System.currentTimeMillis(),
+                -1,
+                CONTENT_NAME);
+        currentThemePage.setId(16);
+
         doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
         doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
         doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_home");
         doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName("custompage_layout");
+        doReturn(currentThemePage).when(pageServiceImpl).getPageByName("custompage_theme");
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(12);
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(13);
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(14);
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(15);
+        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(16);
 
         doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
         doReturn(null).when(pageServiceImpl).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
@@ -377,6 +385,7 @@ public class PageServiceImplTest {
         verify(pageServiceImpl, times(1)).updatePageContent(eq(12L), any(byte[].class), eq("bonita-groovy-page-example.zip"));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(14L), any(byte[].class), eq("bonita-home-page.zip"));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(15L), any(byte[].class), eq("bonita-layout-page.zip"));
+        verify(pageServiceImpl, times(1)).updatePageContent(eq(16L), any(byte[].class), eq("bonita-theme-page.zip"));
     }
 
     @Test
@@ -472,19 +481,28 @@ public class PageServiceImplTest {
                 CONTENT_NAME);
         currentLayoutPage.setId(15);
 
+        final SPageImpl currentThemePage = new SPageImpl("custompage_theme", "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
+                System.currentTimeMillis(),
+                -1,
+                CONTENT_NAME);
+        currentThemePage.setId(16);
+
         doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
         doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
         doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_home");
         doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName("custompage_layout");
+        doReturn(currentThemePage).when(pageServiceImpl).getPageByName("custompage_theme");
 
         final InputStream resourceGroovyAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-groovy-page-example.zip");
         final InputStream resourceHtmlAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-html-page-example.zip");
         final InputStream resourceHomeAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-home-page.zip");
         final InputStream resourceLayoutAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-layout-page.zip");
+        final InputStream resourceThemeAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-theme-page.zip");
         doReturn(IOUtil.getAllContentFrom(resourceGroovyAsStream)).when(pageServiceImpl).getPageContent(12);
         doReturn(IOUtil.getAllContentFrom(resourceHtmlAsStream)).when(pageServiceImpl).getPageContent(13);
         doReturn(IOUtil.getAllContentFrom(resourceHomeAsStream)).when(pageServiceImpl).getPageContent(14);
         doReturn(IOUtil.getAllContentFrom(resourceLayoutAsStream)).when(pageServiceImpl).getPageContent(15);
+        doReturn(IOUtil.getAllContentFrom(resourceThemeAsStream)).when(pageServiceImpl).getPageContent(16);
         doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
         // when
         pageServiceImpl.start();

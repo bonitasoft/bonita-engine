@@ -149,20 +149,6 @@ public class ApplicationUpdater implements Serializable {
     }
 
     /**
-     * Defines the identifier of the new {@link org.bonitasoft.engine.page.Page} used as the {@link Application} theme.
-     *
-     * @param themeId the identifier of {@link org.bonitasoft.engine.page.Page} used as theme
-     * @return the current {@code ApplicationUpdater}
-     * @see org.bonitasoft.engine.page.Page
-     * @see org.bonitasoft.engine.business.application.Application
-     * @since 7.0.0
-     */
-    public ApplicationUpdater setThemeId(final Long themeId) {
-        fields.put(ApplicationField.THEME_ID, themeId);
-        return this;
-    }
-
-    /**
      * Determines if this updater has at least one field to update
      *
      * @return true if there is at least one field to update; false otherwise

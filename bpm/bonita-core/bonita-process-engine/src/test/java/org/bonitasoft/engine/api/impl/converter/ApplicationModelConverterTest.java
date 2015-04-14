@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
+import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationState;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -74,9 +75,13 @@ public class ApplicationModelConverterTest {
         final long userId = 10;
         final long before = System.currentTimeMillis();
 
-        SPage page = mock(SPage.class);
-        given(page.getId()).willReturn(LAYOUT_ID);
-        given(pageService.getPageByName("custompage_layout")).willReturn(page);
+        SPage layout = mock(SPage.class);
+        given(layout.getId()).willReturn(LAYOUT_ID);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(layout);
+
+        SPage theme = mock(SPage.class);
+        given(theme.getId()).willReturn(THEME_ID);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(theme);
 
         //when
         final SApplication application = converter.buildSApplication(creator, userId);
@@ -104,7 +109,29 @@ public class ApplicationModelConverterTest {
         final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
         final long userId = 10;
 
-        given(pageService.getPageByName("custompage_layout")).willReturn(null);
+        SPage theme = mock(SPage.class);
+        given(theme.getId()).willReturn(THEME_ID);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(theme);
+
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(null);
+
+        //when
+        converter.buildSApplication(creator, userId);
+
+        //then exception
+    }
+
+    @Test(expected = CreationException.class)
+    public void buildSApplication_should_throw_CreationException_when_the_default_theme_is_not_available() throws Exception {
+        //given
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
+        final long userId = 10;
+
+        SPage layout = mock(SPage.class);
+        given(layout.getId()).willReturn(LAYOUT_ID);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(layout);
+
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(null);
 
         //when
         converter.buildSApplication(creator, userId);
@@ -174,7 +201,6 @@ public class ApplicationModelConverterTest {
         updater.setProfileId(10L);
         updater.setState(ApplicationState.ACTIVATED.name());
         updater.setHomePageId(11L);
-        updater.setThemeId(21L);
 
         //when
         final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
@@ -192,7 +218,6 @@ public class ApplicationModelConverterTest {
         assertThat(fields.get(SApplicationFields.STATE)).isEqualTo(ApplicationState.ACTIVATED.name());
         assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(LOGGED_USER_ID);
         assertThat(fields.get(SApplicationFields.HOME_PAGE_ID)).isEqualTo(11L);
-        assertThat(fields.get(SApplicationFields.THEME_ID)).isEqualTo(21L);
     }
 
     @Test

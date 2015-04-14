@@ -573,6 +573,7 @@ public class PageServiceImpl implements PageService {
         importProvidedPage("bonita-groovy-page-example.zip");
         importProvidedPage("bonita-home-page.zip");
         importProvidedPage("bonita-layout-page.zip");
+        importProvidedPage("bonita-theme-page.zip");
     }
 
     private void importProvidedPage(final String zipName) throws SBonitaReadException, SObjectCreationException, SObjectAlreadyExistsException,
