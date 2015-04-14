@@ -34,6 +34,8 @@ import org.bonitasoft.engine.page.URLAdapterConstants;
 public class LegacyURLAdapter implements URLAdapter {
 	
 	private static final String UUID_SEPERATOR = "--";
+	
+	private static final String DEFAULT_FORM_MODE = "form";
 
 	ProcessDefinitionService processDefinitionService;
 	
@@ -73,20 +75,27 @@ public class LegacyURLAdapter implements URLAdapter {
 				if (userParamValue != null && userParamValue.length > 0) {
 					user = userParamValue[0];
 				}
-				return generateLegacyURL(contextPath, locale, bpmId, formMapping, processDefinition, user, assignTask);
+				String mode = DEFAULT_FORM_MODE;
+				final String[] modeParamValue = queryParameters.get(URLAdapterConstants.MODE_QUERY_PARAM);
+				if (modeParamValue != null && modeParamValue.length > 0) {
+					mode = modeParamValue[0];
+				}
+				return generateLegacyURL(contextPath, locale, bpmId, formMapping, processDefinition, user, assignTask, mode);
 			} catch (final SBonitaException e) {
 				throw new SExecutionException("Unable to generate the legacy form URL for key " + key + "(id: " + bpmId + ")", e);
 			}
 		}
 	}
 
-	protected String generateLegacyURL(final String contextPath, final String locale, final String bpmId, final SFormMapping formMapping, final SProcessDefinition processDefinition, final String user, final boolean assignTask) {
+	protected String generateLegacyURL(final String contextPath, final String locale, final String bpmId, final SFormMapping formMapping, final SProcessDefinition processDefinition, final String user, final boolean assignTask, final String mode) {
 		final StringBuilder legacyFormURL = new StringBuilder(contextPath);
 		legacyFormURL.append("/portal/homepage?ui=form&locale=")
 				.append(locale)
 				.append("&theme=")
 				.append(formMapping.getProcessDefinitionId())
-				.append("#mode=form&form=")
+				.append("#mode=")
+				.append(mode)
+				.append("&form=")
 				.append(urlEncode(processDefinition.getName()))
 				.append(UUID_SEPERATOR)
 				.append(urlEncode(processDefinition.getVersion()));

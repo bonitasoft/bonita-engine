@@ -29,4 +29,5 @@ public interface URLAdapterConstants {
     String ASSIGN_TASK_QUERY_PARAM = "assignTask";
     String USER_QUERY_PARAM = "user";
     String TENANT_QUERY_PARAM = "tenant";
+    String MODE_QUERY_PARAM = "mode";
 }

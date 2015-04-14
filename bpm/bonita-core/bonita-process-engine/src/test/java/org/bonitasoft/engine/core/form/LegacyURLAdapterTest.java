@@ -121,6 +121,29 @@ public class LegacyURLAdapterTest {
                 .isEqualTo(
                         "/bonita/portal/homepage?ui=form&locale=en&theme=1#mode=form&form=processName--processVersion--taskName%24entry&task=42&assignTask=true&userId=2");
     }
+    
+    @Test
+    public void should_generate_legacy_URL_when_mapping_on_legacy_with_specific_mode() throws Exception {
+        String mappingKey = "process/processName/processVersion";
+        SFormMappingImpl formMapping = new SFormMappingImpl(1L, FormMappingType.PROCESS_START.getId(), null);
+        when(formMappingService.get(mappingKey)).thenReturn(formMapping);
+        when(processDefinition.getName()).thenReturn("processName");
+        when(processDefinition.getVersion()).thenReturn("processVersion");
+        when(processDefinitionService.getProcessDefinition(1L)).thenReturn(processDefinition);
+
+        Map<String, Serializable> context = new HashMap<>();
+        context.put(URLAdapterConstants.CONTEXT_PATH, "/bonita");
+        context.put(URLAdapterConstants.LOCALE, "en");
+        Map<String, String[]> queryParametersMap = new HashMap<>();
+        queryParametersMap.put(URLAdapterConstants.ID_QUERY_PARAM, new String[] { "1" });
+        queryParametersMap.put(URLAdapterConstants.MODE_QUERY_PARAM, new String[] { "app" });
+        context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParametersMap);
+
+        String legacyURL = legacyURLAdapter.adapt(null, mappingKey, context);
+
+        assertThat(legacyURL).isEqualTo(
+                "/bonita/portal/homepage?ui=form&locale=en&theme=1#mode=app&form=processName--processVersion%24entry&process=1&autoInstantiate=false");
+    }
 
     @Test
     public void adaptShouldThrowIllegalArgumentIf_ID_parameterIsNotPresent() throws SExecutionException {
