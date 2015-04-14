@@ -274,7 +274,7 @@ public class PageServiceImplTest {
         final long pageId = 15;
         final SPage expected = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(expected);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(expected);
         // when
         final SPage page = pageServiceImpl.getPage(pageId);
         // then
@@ -287,7 +287,7 @@ public class PageServiceImplTest {
         final long pageId = 15;
         final SPage expected = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(null);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(null);
 
         pageServiceImpl.getPage(pageId);
     }
@@ -307,7 +307,7 @@ public class PageServiceImplTest {
         final long pageId = 15;
         final SPage expected = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenThrow(
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenThrow(
                 new SBonitaReadException("ouch!"));
 
         pageServiceImpl.getPage(pageId);
@@ -389,7 +389,7 @@ public class PageServiceImplTest {
         page.setId(12);
         final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
         doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
-                new SelectByIdDescriptor<SPageContent>("getPageContent",
+                new SelectByIdDescriptor<>("getPageContent",
                         SPageContent.class, 12));
         doReturn(page).when(pageServiceImpl).getPage(12);
         // when
@@ -419,7 +419,7 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES,
                         "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\naCustomProperty=plop\n".getBytes()));
         doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
-                new SelectByIdDescriptor<SPageContent>("getPageContent",
+                new SelectByIdDescriptor<>("getPageContent",
                         SPageContent.class, 12));
         doReturn(page).when(pageServiceImpl).getPage(12);
         // when
@@ -439,7 +439,7 @@ public class PageServiceImplTest {
     @Test(expected = SObjectNotFoundException.class)
     public void should_getPageContent_throw_not_found() throws SBonitaException, IOException {
         //given
-        doReturn(null).when(readPersistenceService).selectById(new SelectByIdDescriptor<SPageContent>("getPageContent", SPageContent.class, 12));
+        doReturn(null).when(readPersistenceService).selectById(new SelectByIdDescriptor<>("getPageContent", SPageContent.class, 12));
         //when
         pageServiceImpl.getPageContent(12);
     }
@@ -510,7 +510,7 @@ public class PageServiceImplTest {
             }
 
         }).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(expected);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(expected);
         doReturn(expected).when(pageServiceImpl).getPage(pageId);
 
         pageServiceImpl.deletePage(pageId);
@@ -534,7 +534,7 @@ public class PageServiceImplTest {
             }
 
         }).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(expected);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(expected);
 
         pageServiceImpl.deletePage(pageId);
     }
@@ -544,7 +544,7 @@ public class PageServiceImplTest {
         // given
         final long pageId = 15;
         final SPage sPage = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(sPage);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(sPage);
 
         // when
         pageServiceImpl.updatePageContent(pageId, "aaa".getBytes(), CONTENT_NAME);
@@ -565,7 +565,7 @@ public class PageServiceImplTest {
         page2.setDisplayName("displayName2");
 
         final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
-        final Map<String, Object> fields = new HashMap<String, Object>();
+        final Map<String, Object> fields = new HashMap<>();
 
         doReturn(fields).when(entityUpdateDescriptor).getFields();
         doAnswer(new Answer<Object>() {
@@ -576,7 +576,7 @@ public class PageServiceImplTest {
             }
 
         }).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId2))).thenReturn(page2);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId2))).thenReturn(page2);
         when(pageServiceImpl.getPageByName(page1.getName())).thenReturn(page1);
 
         // given
@@ -604,12 +604,12 @@ public class PageServiceImplTest {
 
         // given
         final long pageId = 15;
-        final Map<String, Object> fields = new HashMap<String, Object>();
+        final Map<String, Object> fields = new HashMap<>();
         final SPage sPage = new SPageImpl("page1", 123456, 45, false, CONTENT_NAME);
         sPage.setId(pageId);
         final byte[] content = "invalid content".getBytes();
         fields.put(SPageContentFields.PAGE_CONTENT, content);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(sPage);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(sPage);
         doReturn(fields).when(entityUpdateDescriptor).getFields();
 
         // when
