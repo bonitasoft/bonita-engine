@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
 
 /**
@@ -184,7 +185,7 @@ public class ClassReflector {
         return selectedMethod;
     }
 
-    public static void invokeMethodByName(final Object entity, final String methodName, final Object... parameterValues) throws SReflectException {
+    public static Object invokeMethodByName(final Object entity, final String methodName, final Object... parameterValues) throws SReflectException {
         final Class<?> clazz = entity.getClass();
         // no check on parameters
         final Method methodToInvoke = getMethodByName(clazz, methodName);
@@ -192,7 +193,7 @@ public class ClassReflector {
             throw new SReflectException("unable to find a method with name '" + methodName + "' within class " + clazz.getName());
         }
         try {
-            methodToInvoke.invoke(entity, parameterValues);
+            return methodToInvoke.invoke(entity, parameterValues);
         } catch (final Exception e) {
             throw new SReflectException(e);
         }
@@ -292,19 +293,12 @@ public class ClassReflector {
     }
 
     public static String getGetterName(final String fieldName) {
-        // NOTE: can't work with boolean since field name type is unknown
-        final StringBuilder builder = new StringBuilder(GET);
-        builder.append(String.valueOf(fieldName.charAt(0)).toUpperCase());
-        builder.append(fieldName.substring(1));
-        return builder.toString();
+        return "get" + WordUtils.capitalize(fieldName);
     }
 
+
     public static String getGetterName(final String fieldName, final Class<?> fieldType) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(getGetterPrefix(fieldType));
-        builder.append(String.valueOf(fieldName.charAt(0)).toUpperCase());
-        builder.append(fieldName.substring(1));
-        return builder.toString();
+        return getGetterPrefix(fieldType)+ WordUtils.capitalize(fieldName);
     }
 
     private static String getGetterPrefix(Class<?> fieldType) {
@@ -329,4 +323,25 @@ public class ClassReflector {
         return begin.concat(end);
     }
 
+    /**
+     * call a setter by reflection
+     * support pointed notation like pojo.child.name
+     * @param object
+     * @param fieldName
+     * @param parameterValue
+     * @throws SReflectException
+     */
+    public static void setField(Object object, String fieldName, Object parameterValue) throws SReflectException {
+        String[] getters = fieldName.split("\\.");
+        int i;
+        for (i = 0; i < getters.length -1; i++) {
+            object = invokeMethodByName(object, getGetterName(getters[i]));
+        }
+
+        invokeMethodByName(object, getSetterName(getters[i]), parameterValue);
+    }
+
+    private static String getSetterName(String getter) {
+        return "set" + WordUtils.capitalize(getter);
+    }
 }

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.process.instance;
 
-import org.bonitasoft.engine.form.FormMappingIT;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -23,8 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
         CancelProcessInstanceIT.class,
         AbortProcessInstanceIT.class,
         ProcessInstanceIT.class,
-        InvolvedInProcessInstanceIT.class,
-        FormMappingIT.class
+        InvolvedInProcessInstanceIT.class
 })
 public class ProcessInstanceTests {
 

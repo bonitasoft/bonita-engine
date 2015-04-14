@@ -28,6 +28,8 @@ public class Pojo {
 
     private List<Long> longs;
 
+    private Pojo child;
+
     public Pojo() {
         //
     }
@@ -78,5 +80,13 @@ public class Pojo {
 
     public String twoParamMethod(final String a, final Integer i) {
         return String.format("%s*%d", a, i);
+    }
+
+    public Pojo getChild() {
+        return child;
+    }
+
+    public void setChild(Pojo child) {
+        this.child = child;
     }
 }

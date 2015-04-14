@@ -14,16 +14,8 @@
 package org.bonitasoft.engine.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -82,13 +74,13 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.form.FormMapping;
-import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.page.impl.SPageMappingImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -383,17 +375,16 @@ public class ModelConvertorTest {
         assertEquals(saProcessInstance.getStringIndex5(), archivedProcessInstance.getStringIndexValue(5));
     }
 
-
     @Test
     public void toFormMapping_can_convert() {
         // Given
         SFormMappingImpl sFormMapping = new SFormMappingImpl();
         sFormMapping.setId(555l);
-        sFormMapping.setTarget(FormMappingTarget.LEGACY.name());
-        sFormMapping.setForm("myForm1");
-        sFormMapping.setType(FormMappingType.TASK.name());
+        //        sFormMapping.setForm("myForm1");
+        sFormMapping.setType(FormMappingType.TASK.getId());
         sFormMapping.setTask("myTask");
         sFormMapping.setProcessDefinitionId(666l);
+        sFormMapping.setPageMapping(new SPageMappingImpl());
 
         // Then
         FormMapping formMapping = ModelConvertor.toFormMapping(sFormMapping);
@@ -402,8 +393,8 @@ public class ModelConvertorTest {
         assertThat(formMapping).isNotNull();
         assertThat(formMapping.getId()).isEqualTo(555l);
         assertThat(formMapping.getType()).isEqualTo(FormMappingType.TASK);
-        assertThat(formMapping.getTarget()).isEqualTo(FormMappingTarget.LEGACY);
-        assertThat(formMapping.getForm()).isEqualTo("myForm1");
+        //        assertThat(formMapping.getTarget()).isEqualTo(FormMappingTarget.LEGACY);
+        //        assertThat(formMapping.getForm()).isEqualTo("myForm1");
         assertThat(formMapping.getTask()).isEqualTo("myTask");
         assertThat(formMapping.getProcessDefinitionId()).isEqualTo(666l);
 
@@ -414,21 +405,21 @@ public class ModelConvertorTest {
         // Given
         SFormMappingImpl sFormMapping = new SFormMappingImpl();
         sFormMapping.setId(555l);
-        sFormMapping.setTarget(FormMappingTarget.URL.name());
-        sFormMapping.setForm("myForm1");
-        sFormMapping.setType(FormMappingType.TASK.name());
+        //        sFormMapping.setForm("myForm1");
+        sFormMapping.setType(FormMappingType.TASK.getId());
         sFormMapping.setTask("myTask");
         sFormMapping.setProcessDefinitionId(666l);
+        sFormMapping.setPageMapping(new SPageMappingImpl());
 
         // Then
-        List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping>asList(sFormMapping));
+        List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping> asList(sFormMapping));
 
         // When
         assertThat(formMapping).hasSize(1);
         assertThat(formMapping.get(0).getId()).isEqualTo(555l);
         assertThat(formMapping.get(0).getType()).isEqualTo(FormMappingType.TASK);
-        assertThat(formMapping.get(0).getTarget()).isEqualTo(FormMappingTarget.URL);
-        assertThat(formMapping.get(0).getForm()).isEqualTo("myForm1");
+        //        assertThat(formMapping.get(0).getTarget()).isEqualTo(FormMappingTarget.URL);
+        //        assertThat(formMapping.get(0).getForm()).isEqualTo("myForm1");
         assertThat(formMapping.get(0).getTask()).isEqualTo("myTask");
         assertThat(formMapping.get(0).getProcessDefinitionId()).isEqualTo(666l);
 
@@ -525,14 +516,16 @@ public class ModelConvertorTest {
 
     @Test
     public void convert_multiple_business_data() {
-        BusinessDataReference businessDataReference = ModelConvertor.toBusinessDataReference(createProcessSimpleDataReference("myBData", 157l, "theType", 5555l));
+        BusinessDataReference businessDataReference = ModelConvertor
+                .toBusinessDataReference(createProcessSimpleDataReference("myBData", 157l, "theType", 5555l));
 
         assertThat(businessDataReference).isEqualTo(new SimpleBusinessDataReferenceImpl("myBData", "theType", 5555l));
     }
 
     @Test
     public void convert_simple_business_data() {
-        BusinessDataReference businessDataReference = ModelConvertor.toBusinessDataReference(createProcessMultipleDataReference("myBData", 157l, "theType", Arrays.asList(5555l, 5556l, 5557l)));
+        BusinessDataReference businessDataReference = ModelConvertor.toBusinessDataReference(createProcessMultipleDataReference("myBData", 157l, "theType",
+                Arrays.asList(5555l, 5556l, 5557l)));
 
         assertThat(businessDataReference).isEqualTo(new MultipleBusinessDataReferenceImpl("myBData", "theType", Arrays.asList(5555l, 5556l, 5557l)));
     }

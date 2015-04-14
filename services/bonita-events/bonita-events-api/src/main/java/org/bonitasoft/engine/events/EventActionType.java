@@ -18,6 +18,6 @@ package org.bonitasoft.engine.events;
  */
 public enum EventActionType {
 
-    CREATED, UPDATED, DELETED;
+    CREATED, UPDATED, DELETED
 
 }

@@ -330,7 +330,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String bizDataName = "myBizData";
         processDefinitionBuilder.addBusinessData(bizDataName, aQualifiedName, null);
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinitionBuilder.done()).done());
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, matti.getId());
         return processDefinition;

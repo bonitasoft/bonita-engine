@@ -27,13 +27,17 @@
             <key-property name="id" column="id" type="long" />
         </composite-id>
         <property name="processDefinitionId" type="long" column="process" />
+        <property name="type" type="integer" column="type" />
         <property name="task" type="java.lang.String" column="task" />
-        <property name="form" type="java.lang.String" column="form" />
-        <property name="target" type="java.lang.String" column="target" />
-        <property name="type" type="java.lang.String" column="type" />
         <property name="lastUpdateDate" type="long" column="lastupdatedate" />
         <property name="lastUpdatedBy" type="long" column="lastupdatedby" />
-        <filter name="tenantFilter"></filter>
+
+        <many-to-one name="pageMapping" class="org.bonitasoft.engine.page.impl.SPageMappingImpl" update="true" fetch="join" lazy="false">
+            <column name="page_mapping_tenant_id" />
+            <column name="page_mapping_id" />
+        </many-to-one>
+
+        <filter name="tenantFilter" />
     </class>
 
 </hibernate-mapping>

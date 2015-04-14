@@ -750,6 +750,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             processDefinitionService.store(sProcessDefinition, designProcessDefinition.getDisplayName(), designProcessDefinition.getDisplayDescription());
             unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
             new FormMappingDeployer(getTenantAccessor().getFormMappingService()).deployFormMappings(businessArchive, sProcessDefinition.getId());
+           processManagementAPIImplDelegate.createProcessPageDeployer().deployProcessPages(businessArchive, sProcessDefinition.getId(), SessionInfos.getUserIdFromSession());
             final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(businessArchive, tenantAccessor, sProcessDefinition);
             if (isResolved) {
                 tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
