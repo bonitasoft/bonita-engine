@@ -15,6 +15,7 @@ package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.business.application.ApplicationAPIITs;
 import org.bonitasoft.engine.business.data.BDRepositoryLocalIT;
+import org.bonitasoft.engine.form.FormMappingIT;
 import org.bonitasoft.engine.page.PageAPIIT;
 import org.bonitasoft.engine.tenant.TenantMaintenanceLocalIT;
 import org.bonitasoft.engine.test.APIMethodIT;
@@ -30,6 +31,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         BPMLocalSuiteTests.class,
         BPMRemoteTests.class,
+        FormMappingIT.class,
         PageAPIIT.class,
         ApplicationAPIITs.class,
         APIMethodIT.class,

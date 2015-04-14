@@ -74,7 +74,7 @@ public class APIAccessorImpl implements APIAccessor {
     }
 
     @Override
-    public ProcessConfigurationAPI getProcessConfigurationAPIi() {
+    public ProcessConfigurationAPI getProcessConfigurationAPI() {
         return new ProcessConfigurationAPIImpl();
     }
 

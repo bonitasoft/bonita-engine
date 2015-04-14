@@ -13,20 +13,23 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
-import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
-import org.bonitasoft.engine.form.FormMappingTarget;
-import org.bonitasoft.engine.form.FormMappingType;
+import org.bonitasoft.engine.page.PageMappingService;
+import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -58,7 +61,8 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         FormMappingService formMappingService = tenantAccessor.getFormMappingService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchFormMappings searchFormMappings = new SearchFormMappings(formMappingService, searchEntitiesDescriptor.getSearchFormMappingDescriptor(), searchOptions);
+        final SearchFormMappings searchFormMappings = new SearchFormMappings(formMappingService, searchEntitiesDescriptor.getSearchFormMappingDescriptor(),
+                searchOptions);
         try {
             searchFormMappings.execute();
             return searchFormMappings.getResult();
@@ -68,50 +72,28 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     }
 
     @Override
-    public FormMapping getProcessStartForm(final long processDefinitionId) throws FormMappingNotFoundException {
-        return getFormMapping(processDefinitionId, FormMappingType.PROCESS_START.name(), null);
-    }
-
-    FormMapping getFormMapping(long processDefinitionId, String name, String taskName) throws FormMappingNotFoundException {
-        final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
+    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context) throws NotFoundException, ExecutionException {
+        PageMappingService pageMappingService = getTenantAccessor().getPageMappingService();
         try {
-            SFormMapping sFormMapping;
-            if (taskName == null) {
-                sFormMapping = formMappingService.get(processDefinitionId, name);
-            }else{
-                sFormMapping = formMappingService.get(processDefinitionId, name, taskName);
-            }
-            return ModelConvertor.toFormMapping(sFormMapping);
+            return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context));
+        } catch (SObjectNotFoundException e) {
+            throw new NotFoundException(e);
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
-        } catch (SObjectNotFoundException e) {
-            throw new FormMappingNotFoundException("Form mapping not found for " + name + " on process " + processDefinitionId);
+        } catch (SExecutionException e) {
+            throw new ExecutionException(e);
         }
     }
 
     @Override
-    public FormMapping getProcessOverviewForm(final long processDefinitionId) throws FormMappingNotFoundException {
-        return getFormMapping(processDefinitionId, FormMappingType.PROCESS_OVERVIEW.name(), null);
-    }
-
-    @Override
-    public FormMapping getTaskForm(final long processDefinitionId, final String taskName) throws FormMappingNotFoundException {
-        return getFormMapping(processDefinitionId, FormMappingType.TASK.name(), taskName);
-    }
-
-    @Override
-    public void updateFormMapping(final long formMappingId, final String form, FormMappingTarget target) throws FormMappingNotFoundException, UpdateException {
+    public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {
-            SFormMapping sFormMapping = formMappingService.get(formMappingId);
-            formMappingService.update(sFormMapping, form, target.name());
+            return ModelConvertor.toFormMapping(formMappingService.get(formMappingId));
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (SObjectNotFoundException e) {
-            throw new FormMappingNotFoundException("Unable to find the form mapping with id " + formMappingId);
-        } catch (SObjectModificationException e) {
-            throw new UpdateException("Unable to update the form mapping " + formMappingId, e);
+            throw new FormMappingNotFoundException("no form mapping found with id" + formMappingId);
         }
-
     }
 }

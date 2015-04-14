@@ -126,3 +126,5 @@ DROP TABLE platformCommand
 GO
 DROP TABLE form_mapping
 GO
+DROP TABLE page_mapping
+GO

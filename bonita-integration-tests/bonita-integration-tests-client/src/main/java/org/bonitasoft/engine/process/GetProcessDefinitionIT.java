@@ -744,7 +744,7 @@ public class GetProcessDefinitionIT extends TestWithTechnicalUser {
                 .addClasspathResource(BuildTestUtil
                         .generateJarAndBuildBarResource(TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar"));
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
+        final ProcessDefinition processDefinition = deployProcess(businessArchiveBuilder.done());
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, user.getId());
         getProcessAPI().addUserToActor("actor2", processDefinition, user.getId());
 

@@ -65,9 +65,22 @@ public interface PageAPI {
      *        the name of the page to retrieve
      * @return the found page
      * @throws PageNotFoundException
-     *         if no page can be found with the provided ID.
+     *         if no page can be found with the provided page or is assigned with a process definition.
      */
     Page getPageByName(final String name) throws PageNotFoundException;
+
+    /**
+     * Retrieves a page from its name and processDefinitionId.
+     *
+     * @param name
+     *        the name of the page to retrieve
+     * @param processDefinitionId
+     *        the process definition ID associated to the page
+     * @return the found page
+     * @throws PageNotFoundException
+     *         if no page can be found with the provided name and process definition ID.
+     */
+    Page getPageByNameAndProcessDefinitionId(final String name, long processDefinitionId) throws PageNotFoundException;
 
     /**
      * Retrieves the binary content of a page.

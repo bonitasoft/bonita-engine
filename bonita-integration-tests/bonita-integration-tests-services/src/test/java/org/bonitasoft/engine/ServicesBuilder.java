@@ -25,6 +25,7 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.persistence.TenantHibernatePersistenceService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
@@ -217,4 +218,7 @@ public class ServicesBuilder implements ServicesResolver {
         return getAccessor().lookup(serviceName);
     }
 
+    public PageMappingService buildPageMappingService() {
+        return getInstanceOf(PageMappingService.class);
+    }
 }

@@ -29,4 +29,8 @@ public interface SPageFields {
 
     String PAGE_CONTENT_NAME = "contentName";
 
+    String PAGE_CONTENT_TYPE = "contentType";
+
+    String PAGE_PROCESS_DEFINITION_ID = "processDefinitionId";
+
 }
