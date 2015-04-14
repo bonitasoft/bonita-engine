@@ -5,8 +5,8 @@
 		<artifactId>bonita-integration-tests-as</artifactId>
 		<version>7.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>bonita-deploy-ear-resources</artifactId>
-	<name>ear resources</name>
+	<artifactId>bonita-deploy-resources</artifactId>
+	<name>deploy resources</name>
 	<packaging>jar</packaging>
 
 </project>

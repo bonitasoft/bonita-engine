@@ -33,7 +33,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.test</groupId>
-			<artifactId>bonita-deploy-ear-resources</artifactId>
+			<artifactId>bonita-deploy-resources</artifactId>
 			<version>${project.version}</version>
 		</dependency>
         <dependency>
@@ -79,7 +79,7 @@
 						</jarModule>
 						<jarModule>
 							<groupId>org.bonitasoft.engine.test</groupId>
-							<artifactId>bonita-deploy-ear-resources</artifactId>
+							<artifactId>bonita-deploy-resources</artifactId>
 						</jarModule>
 						<jarModule>
                             <groupId>org.slf4j</groupId>
