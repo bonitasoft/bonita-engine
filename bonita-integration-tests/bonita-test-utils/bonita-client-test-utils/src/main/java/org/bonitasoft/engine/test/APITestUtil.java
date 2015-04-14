@@ -16,6 +16,7 @@ package org.bonitasoft.engine.test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.ApplicationAPI;
@@ -1622,4 +1625,30 @@ public class APITestUtil extends PlatformTestUtil {
         }
     }
 
+    protected byte[] createTestPageContent(final String pageName, final String displayName, final String description) throws Exception {
+        try {
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            final ZipOutputStream zos = new ZipOutputStream(baos);
+            zos.putNextEntry(new ZipEntry("Index.groovy"));
+            zos.write("return \"\";".getBytes());
+
+            zos.putNextEntry(new ZipEntry("page.properties"));
+            final StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("name=");
+            stringBuilder.append(pageName);
+            stringBuilder.append("\n");
+            stringBuilder.append("displayName=");
+            stringBuilder.append(displayName);
+            stringBuilder.append("\n");
+            stringBuilder.append("description=");
+            stringBuilder.append(description);
+            stringBuilder.append("\n");
+            zos.write(stringBuilder.toString().getBytes());
+
+            zos.closeEntry();
+            return baos.toByteArray();
+        } catch (final IOException e) {
+            throw new BonitaException(e);
+        }
+    }
 }

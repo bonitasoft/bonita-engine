@@ -28,11 +28,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
@@ -65,8 +63,6 @@ public class PageAPIIT extends CommonAPIIT {
     private static final String PAGE_NAME2 = "custompage_page2";
 
     private static final String PAGE_NAME1 = "custompage_page1";
-
-    private static final String INDEX_HTML = "index.html";
 
     @Before
     public void before() throws Exception {
@@ -549,7 +545,7 @@ public class PageAPIIT extends CommonAPIIT {
         final String anOtherName = generateUniquePageName(4);
         getPageAPI().createPage(
                 new PageCreator(anOtherName, CONTENT_NAME).setDescription("should be excluded from results").setDisplayName(noneMatchingDisplayName),
-                createTestPageContent( anOtherName, noneMatchingDisplayName, "an awesome page!!!!!!!"));
+                createTestPageContent(anOtherName, noneMatchingDisplayName, "an awesome page!!!!!!!"));
 
         // when
         final SearchResult<Page> searchPages = getPageAPI().searchPages(
@@ -588,32 +584,5 @@ public class PageAPIIT extends CommonAPIIT {
         final List<Page> results = searchPages.getResult();
         assertThat(results.get(0)).isEqualToComparingFieldByField(expectedMatchingPage);
 
-    }
-    private byte[] createTestPageContent(final String pageName, final String displayName, final String description)
-            throws Exception {
-        try {
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            final ZipOutputStream zos = new ZipOutputStream(baos);
-            zos.putNextEntry(new ZipEntry("Index.groovy"));
-            zos.write("return \"\";".getBytes());
-
-            zos.putNextEntry(new ZipEntry("page.properties"));
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("name=");
-            stringBuilder.append(pageName);
-            stringBuilder.append("\n");
-            stringBuilder.append("displayName=");
-            stringBuilder.append(displayName);
-            stringBuilder.append("\n");
-            stringBuilder.append("description=");
-            stringBuilder.append(description);
-            stringBuilder.append("\n");
-            zos.write(stringBuilder.toString().getBytes());
-
-            zos.closeEntry();
-            return baos.toByteArray();
-        } catch (final IOException e) {
-            throw new BonitaException(e);
-        }
     }
 }
