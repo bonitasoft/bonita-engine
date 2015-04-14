@@ -189,11 +189,12 @@ public class FormMappingIT extends TestWithUser {
 
     @Test
     public void deployProcessWithInternalPagesIncludedShouldBeResolved() throws Exception {
+        Page custompage_globalpage = getPageAPI().createPage("globalPage.zip", createTestPageContent("custompage_globalpage", "Global page", "a global page"));
         ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("CustomerSupport", "1.12");
         final String custompage_startProcessForm = "custompage_startProcessForm";
         BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
                 .createNewBusinessArchive().setProcessDefinition(processBuilder.done())
-                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("custompage_startProcessForm", FormMappingTarget.INTERNAL).build())
+                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("custompage_startProcessForm", FormMappingTarget.INTERNAL).addProcessOverviewForm("custompage_globalpage", FormMappingTarget.INTERNAL).build())
                 .addExternalResource(
                         new BarResource("customPages/custompage_startProcessForm.zip", createTestPageContent(custompage_startProcessForm, "kikoo", "LOL")));
 
@@ -207,11 +208,15 @@ public class FormMappingIT extends TestWithUser {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
 
-        final PageURL pageURL = getProcessConfigurationAPI().resolvePageOrURL("process/CustomerSupport/1.12", Collections.<String, Serializable>emptyMap());
-        assertThat(pageURL.getPageId()).isNotNull();
+        final PageURL pageURLStart = getProcessConfigurationAPI().resolvePageOrURL("process/CustomerSupport/1.12", Collections.<String, Serializable>emptyMap());
+        final PageURL pageURLOverview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/CustomerSupport/1.12", Collections.<String, Serializable>emptyMap());
+        assertThat(pageURLStart.getPageId()).isNotNull();
+        assertThat(page.getId()).isEqualTo(pageURLStart.getPageId());
+        assertThat(pageURLOverview.getPageId()).isNotNull();
+        assertThat(custompage_globalpage.getId()).isEqualTo(pageURLOverview.getPageId());
 
-        assertThat(page.getId()).isEqualTo(pageURL.getPageId());
 
+        getPageAPI().deletePage(custompage_globalpage.getId());
         disableAndDeleteProcess(processDefinition);
     }
 
