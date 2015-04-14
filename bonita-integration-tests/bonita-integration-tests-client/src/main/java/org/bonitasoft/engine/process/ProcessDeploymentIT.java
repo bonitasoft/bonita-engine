@@ -52,7 +52,7 @@ public class ProcessDeploymentIT extends TestWithUser {
                 Arrays.asList("step1", "step2"),
                 Arrays.asList(true, true));
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
         addUserToFirstActorOfProcess(user.getId(), processDefinition);
 
@@ -78,7 +78,7 @@ public class ProcessDeploymentIT extends TestWithUser {
         // read from the file
         final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(tempFile);
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(readBusinessArchive);
+        final ProcessDefinition processDefinition = deployProcess(readBusinessArchive);
         addUserToFirstActorOfProcess(user.getId(), processDefinition);
 
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -114,7 +114,7 @@ public class ProcessDeploymentIT extends TestWithUser {
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition1)
                 .addClasspathResource(new BarResource("bigRessource", bigContent)).done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
+        final ProcessDefinition processDefinition = deployProcess(businessArchive);
         getProcessAPI().enableProcess(processDefinition.getId());
         disableAndDeleteProcess(processDefinition);
     }

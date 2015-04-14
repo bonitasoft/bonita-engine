@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.page.impl;
 
+import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SPage;
 
 /**
@@ -44,22 +45,22 @@ public class SPageImpl implements SPage {
 
     private String contentName;
 
+    private String contentType;
+
+    private Long processDefinitionId;
+
     protected SPageImpl() {
 
     }
 
     public SPageImpl(final String name, final String description, final String displayName, final long installationDate, final long installedBy,
             final boolean provided, final long lastModificationDate, final long lastUpdatedBy, final String contentName) {
-        super();
-        this.name = name;
-        this.description = description;
-        this.displayName = displayName;
-        this.installationDate = installationDate;
-        this.installedBy = installedBy;
-        this.provided = provided;
-        this.lastModificationDate = lastModificationDate;
-        this.lastUpdatedBy = lastUpdatedBy;
-        this.contentName = contentName;
+        this(name, installationDate, installedBy, provided, contentName);
+        setDescription(description);
+        setDisplayName(displayName);
+        setProvided(provided);
+        setLastModificationDate(lastModificationDate);
+        setLastUpdatedBy(lastUpdatedBy);
     }
 
     /**
@@ -68,15 +69,18 @@ public class SPageImpl implements SPage {
     public SPageImpl(final SPage sPage) {
         this(sPage.getName(), sPage.getDescription(), sPage.getDisplayName(), sPage.getInstallationDate(), sPage.getInstalledBy(), sPage.isProvided(), sPage
                 .getLastModificationDate(), sPage.getLastUpdatedBy(), sPage.getContentName());
+        setContentType(sPage.getContentType());
+        setProcessDefinitionId(sPage.getProcessDefinitionId());
     }
 
     public SPageImpl(final String name, final long installationDate, final long installedBy, final boolean provided, final String contentName) {
-        this.name = name;
-        this.installationDate = installationDate;
-        this.lastModificationDate = installationDate;
-        this.installedBy = installedBy;
-        this.provided = provided;
-        this.contentName = contentName;
+        setName(name);
+        setInstallationDate(installationDate);
+        setInstalledBy(installedBy);
+        setProvided(provided);
+        setContentName(contentName);
+        setContentType(SContentType.PAGE);
+
     }
 
     @Override
@@ -171,6 +175,16 @@ public class SPageImpl implements SPage {
         return contentName;
     }
 
+    @Override
+    public String getContentType() {
+        return contentType;
+    }
+
+    @Override
+    public Long getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
     public void setContentName(final String contentName) {
         this.contentName = contentName;
     }
@@ -184,93 +198,103 @@ public class SPageImpl implements SPage {
         this.lastUpdatedBy = lastUpdatedBy;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (contentName == null ? 0 : contentName.hashCode());
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
-        result = prime * result + (int) (id ^ id >>> 32);
-        result = prime * result + (int) (installationDate ^ installationDate >>> 32);
-        result = prime * result + (int) (installedBy ^ installedBy >>> 32);
-        result = prime * result + (int) (lastModificationDate ^ lastModificationDate >>> 32);
-        result = prime * result + (int) (lastUpdatedBy ^ lastUpdatedBy >>> 32);
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (provided ? 1231 : 1237);
-        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        SPageImpl other = (SPageImpl) obj;
-        if (contentName == null) {
-            if (other.contentName != null) {
-                return false;
-            }
-        } else if (!contentName.equals(other.contentName)) {
-            return false;
-        }
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
-            return false;
-        }
-        if (id != other.id) {
-            return false;
-        }
-        if (installationDate != other.installationDate) {
-            return false;
-        }
-        if (installedBy != other.installedBy) {
-            return false;
-        }
-        if (lastModificationDate != other.lastModificationDate) {
-            return false;
-        }
-        if (lastUpdatedBy != other.lastUpdatedBy) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (provided != other.provided) {
-            return false;
-        }
-        if (tenantId != other.tenantId) {
-            return false;
-        }
-        return true;
-    }
+    //    @Override
+    //    public int hashCode() {
+    //        final int prime = 31;
+    //        int result = 1;
+    //        result = prime * result + (contentName == null ? 0 : contentName.hashCode());
+    //        result = prime * result + (description == null ? 0 : description.hashCode());
+    //        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
+    //        result = prime * result + (int) (id ^ id >>> 32);
+    //        result = prime * result + (int) (installationDate ^ installationDate >>> 32);
+    //        result = prime * result + (int) (installedBy ^ installedBy >>> 32);
+    //        result = prime * result + (int) (lastModificationDate ^ lastModificationDate >>> 32);
+    //        result = prime * result + (int) (lastUpdatedBy ^ lastUpdatedBy >>> 32);
+    //        result = prime * result + (name == null ? 0 : name.hashCode());
+    //        result = prime * result + (provided ? 1231 : 1237);
+    //        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
+    //        return result;
+    //    }
+    //
+    //    @Override
+    //    public boolean equals(final Object obj) {
+    //        if (this == obj) {
+    //            return true;
+    //        }
+    //        if (obj == null) {
+    //            return false;
+    //        }
+    //        if (getClass() != obj.getClass()) {
+    //            return false;
+    //        }
+    //        SPageImpl other = (SPageImpl) obj;
+    //        if (contentName == null) {
+    //            if (other.contentName != null) {
+    //                return false;
+    //            }
+    //        } else if (!contentName.equals(other.contentName)) {
+    //            return false;
+    //        }
+    //        if (description == null) {
+    //            if (other.description != null) {
+    //                return false;
+    //            }
+    //        } else if (!description.equals(other.description)) {
+    //            return false;
+    //        }
+    //        if (displayName == null) {
+    //            if (other.displayName != null) {
+    //                return false;
+    //            }
+    //        } else if (!displayName.equals(other.displayName)) {
+    //            return false;
+    //        }
+    //        if (id != other.id) {
+    //            return false;
+    //        }
+    //        if (installationDate != other.installationDate) {
+    //            return false;
+    //        }
+    //        if (installedBy != other.installedBy) {
+    //            return false;
+    //        }
+    //        if (lastModificationDate != other.lastModificationDate) {
+    //            return false;
+    //        }
+    //        if (lastUpdatedBy != other.lastUpdatedBy) {
+    //            return false;
+    //        }
+    //        if (name == null) {
+    //            if (other.name != null) {
+    //                return false;
+    //            }
+    //        } else if (!name.equals(other.name)) {
+    //            return false;
+    //        }
+    //        if (provided != other.provided) {
+    //            return false;
+    //        }
+    //        if (tenantId != other.tenantId) {
+    //            return false;
+    //        }
+    //        return true;
+    //    }
 
     @Override
     public String toString() {
-        return "SPageImpl [tenantId=" + tenantId + ", id=" + id + ", name=" + name + ", description=" + description + ", displayName=" + displayName
-                + ", installationDate=" + installationDate + ", installedBy=" + installedBy + ", provided=" + provided + ", lastModificationDate="
-                + lastModificationDate + ", lastUpdatedBy=" + lastUpdatedBy + ", contentName=" + contentName + "]";
+        return new StringBuilder().append("SPageImpl [tenantId=").append(tenantId).append(", id=").append(id).append(", name=").append(name)
+                .append(", description=").append(description).append(", displayName=").append(displayName).append(", installationDate=")
+                .append(installationDate).append(", installedBy=").append(installedBy).append(", provided=").append(provided).append(", lastModificationDate=")
+                .append(lastModificationDate).append(", lastUpdatedBy=").append(lastUpdatedBy).append(", contentName=").append(contentName)
+                .append(", contentType=").append(contentType).append(", processDefinitionId=").append(processDefinitionId).append("]")
+                .toString();
     }
 
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public void setProcessDefinitionId(Long processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
 }

@@ -23,17 +23,24 @@ import java.util.Map;
 public class PageCreator implements Serializable {
 
     public enum PageField {
-        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME;
+        NAME, DISPLAY_NAME, DESCRIPTION, CONTENT_NAME, CONTENT_TYPE, PROCESS_DEFINITION_ID
     }
 
     private static final long serialVersionUID = 8174091386958635983L;
 
     private final Map<PageField, Serializable> fields;
 
-    public PageCreator(final String name, final String contentName) {
-        fields = new HashMap<PageField, Serializable>(2);
+    public PageCreator(final String name, final String zipName) {
+        fields = new HashMap<>();
         fields.put(PageField.NAME, name);
-        fields.put(PageField.CONTENT_NAME, contentName);
+        fields.put(PageField.CONTENT_NAME, zipName);
+        setContentType(ContentType.PAGE);
+    }
+
+    public PageCreator(String name, String zipName, String contentType, Long processDefinitionId) {
+        this(name, zipName);
+        setContentType(contentType);
+        setProcessDefinitionId(processDefinitionId);
     }
 
     public String getName() {
@@ -50,38 +57,18 @@ public class PageCreator implements Serializable {
         return this;
     }
 
+    public PageCreator setContentType(final String contentType) {
+        fields.put(PageField.CONTENT_TYPE, contentType);
+        return this;
+    }
+
+    public PageCreator setProcessDefinitionId(final Long processDefinitionId) {
+        fields.put(PageField.PROCESS_DEFINITION_ID, processDefinitionId);
+        return this;
+    }
+
     public Map<PageField, Serializable> getFields() {
         return fields;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (fields == null ? 0 : fields.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        PageCreator other = (PageCreator) obj;
-        if (fields == null) {
-            if (other.fields != null) {
-                return false;
-            }
-        } else if (!fields.equals(other.fields)) {
-            return false;
-        }
-        return true;
     }
 
     @Override

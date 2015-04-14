@@ -13,16 +13,11 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 
 import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
@@ -44,7 +39,6 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -52,6 +46,7 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.page.ProcessPageDeployer;
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
@@ -109,6 +104,10 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         }
     }
 
+    protected ProcessPageDeployer createProcessPageDeployer() {
+        return new ProcessPageDeployer(getTenantAccessor().getPageService());
+    }
+
     @Deprecated
     public void deleteProcess(final long processDefinitionId) throws SBonitaException, BonitaHomeNotSetException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -161,9 +160,8 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         }
     }
 
-
     public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults,
-                                                         final ParameterCriterion sort) {
+            final ParameterCriterion sort) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -198,8 +196,6 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             throw new RetrieveException(e);
         }
     }
-
-
 
     public static SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
             throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
@@ -247,7 +243,5 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             throw new RetrieveException(e);
         }
     }
-
-
 
 }

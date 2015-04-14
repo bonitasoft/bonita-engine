@@ -5,7 +5,7 @@
     <parent>
         <artifactId>bonita-integration-tests</artifactId>
         <groupId>org.bonitasoft.engine.test</groupId>
-		<version>7.0.0-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-integration-tests-services-bpm</artifactId>
@@ -185,12 +185,12 @@
             <scope>test</scope>
         </dependency>
 
-		<dependency>
-			<groupId>org.bonitasoft.engine.core</groupId>
-			<artifactId>bonita-form-mapping-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core</groupId>
+            <artifactId>bonita-form-mapping-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Identity -->
         <dependency>
@@ -245,12 +245,12 @@
             <scope>test</scope>
         </dependency>
 
-		<dependency>
-			<groupId>org.bonitasoft.engine.page</groupId>
-			<artifactId>bonita-page-api</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.page</groupId>
+            <artifactId>bonita-page-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Platform -->
         <dependency>
             <groupId>org.bonitasoft.engine.platform</groupId>
@@ -498,11 +498,11 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -526,7 +526,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore/>
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -562,9 +562,9 @@
                         <configuration>
                             <target name="copy-bos-home-version-file">
                                 <copy todir="${bonita.home}">
-                                    <fileset dir="${basedir}/home"/>
+                                    <fileset dir="${basedir}/home" />
                                     <filterset>
-                                        <filter token="VERSION" value="${project.version}"/>
+                                        <filter token="VERSION" value="${project.version}" />
                                     </filterset>
                                 </copy>
                             </target>
@@ -579,11 +579,11 @@
                         <configuration>
                             <target name="copy-bpm-test-conf">
                                 <copy todir="${project.build.directory}/test-classes/conf">
-                                    <fileset dir="${project.build.directory}/server/conf/service"/>
+                                    <fileset dir="${project.build.directory}/server/conf/service" />
                                 </copy>
                                 <!-- Need this order to overwrite existing files -->
                                 <copy todir="${project.build.directory}/test-classes/conf" overwrite="true">
-                                    <fileset dir="${project.build.directory}/server/conf/bpm"/>
+                                    <fileset dir="${project.build.directory}/server/conf/bpm" />
                                 </copy>
                             </target>
                         </configuration>

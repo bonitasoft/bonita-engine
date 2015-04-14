@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -23,61 +24,86 @@ import org.junit.Test;
 
 public class PageCreatorTest {
 
-    private static final String CONTENT_ZIP = "content.zip";
+    private static final String ZIP_FILE_NAME = "content.zip";
 
     private static final String DISPLAY_NAME = "display name";
 
     private static final String NAME = "page name";
 
     private static final String DESCRIPTION = "page description";
+    public static final long PROCESS_DEFINITION_ID = 123L;
 
     @Test
-    public void pageCreatorWithName() {
+    public void should_create_page_with_default_content_type() {
         // given
-        final PageCreator pageCreator = new PageCreator(NAME, CONTENT_ZIP);
-
-        // wwhen
-        final Map<PageField, Serializable> fields = pageCreator.getFields();
-
-        // then
-        assertThat(fields).as("field size should contains name entry").hasSize(2).containsKey(PageField.NAME).doesNotContainKey(PageField.DESCRIPTION);
-        assertThat(fields.get(PageField.NAME)).as("name file should be").isEqualTo(NAME);
-        assertThat(fields.get(PageField.CONTENT_NAME)).as("content name should be").isEqualTo(CONTENT_ZIP);
-
-    }
-
-    @Test
-    public void pageCreatorWithDescrition() {
-        // given
-        final PageCreator pageCreator = new PageCreator(NAME, CONTENT_ZIP);
-        pageCreator.setDescription(DESCRIPTION);
+        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION);
 
         // when
         final Map<PageField, Serializable> fields = pageCreator.getFields();
 
         // then
-        assertThat(fields).as("field size should contains name entry").hasSize(3).containsKey(PageField.NAME).containsKey(PageField.DESCRIPTION);
-        assertThat(fields.get(PageField.NAME)).as("name file should be " + NAME).isEqualTo(NAME);
-        assertThat(fields.get(PageField.CONTENT_NAME)).as("name file should be").isEqualTo(CONTENT_ZIP);
-        assertThat(fields.get(PageField.DESCRIPTION)).as("description entry should be " + DESCRIPTION).isEqualTo(DESCRIPTION);
+        assertThat(fields).as("should set content type").containsOnly(entry(PageField.NAME, NAME),
+                entry(PageField.DISPLAY_NAME, DISPLAY_NAME),
+                entry(PageField.DESCRIPTION, DESCRIPTION),
+                entry(PageField.CONTENT_TYPE, ContentType.PAGE),
+                entry(PageField.CONTENT_NAME, ZIP_FILE_NAME)
+                );
 
+        assertThat(pageCreator.getName()).isEqualTo(NAME);
     }
 
     @Test
-    public void pageCreatorWithDisplayName() {
+    public void should_create_page_with_process_definition() {
         // given
-        final PageCreator pageCreator = new PageCreator(NAME, CONTENT_ZIP);
-        pageCreator.setDisplayName(DISPLAY_NAME);
+        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME).setDisplayName(DISPLAY_NAME).setDescription(DESCRIPTION)
+                .setProcessDefinitionId(PROCESS_DEFINITION_ID).setContentType(ContentType.FORM);
 
         // when
         final Map<PageField, Serializable> fields = pageCreator.getFields();
 
         // then
-        assertThat(fields).as("field size should contains name entry").hasSize(3).containsKey(PageField.NAME).containsKey(PageField.DISPLAY_NAME);
-        assertThat(fields.get(PageField.NAME)).as("name file should be " + NAME).isEqualTo(NAME);
-        assertThat(fields.get(PageField.CONTENT_NAME)).as("name file should be").isEqualTo(CONTENT_ZIP);
-        assertThat(fields.get(PageField.DISPLAY_NAME)).as("display name entry should be " + DISPLAY_NAME).isEqualTo(DISPLAY_NAME);
+        assertThat(fields).as("should set content type").containsOnly(entry(PageField.NAME, NAME),
+                entry(PageField.DISPLAY_NAME, DISPLAY_NAME),
+                entry(PageField.DESCRIPTION, DESCRIPTION),
+                entry(PageField.CONTENT_TYPE, ContentType.PAGE),
+                entry(PageField.CONTENT_NAME, ZIP_FILE_NAME),
+                entry(PageField.CONTENT_TYPE, ContentType.FORM),
+                entry(PageField.PROCESS_DEFINITION_ID, PROCESS_DEFINITION_ID)
+                );
+
+        assertThat(pageCreator.getName()).isEqualTo(NAME);
+    }
+
+    @Test
+    public void should_create_page_with_form_content_type() {
+        // given
+        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME, ContentType.FORM, 12345L).setDisplayName(DISPLAY_NAME);
+
+        // when
+        final Map<PageField, Serializable> fields = pageCreator.getFields();
+
+        // then
+        assertThat(fields).as("should set content type").containsOnly(
+                entry(PageField.NAME, NAME),
+                entry(PageField.DISPLAY_NAME, DISPLAY_NAME),
+                entry(PageField.CONTENT_TYPE, ContentType.FORM),
+                entry(PageField.PROCESS_DEFINITION_ID, 12345L),
+                entry(PageField.CONTENT_NAME, ZIP_FILE_NAME)
+                );
 
     }
 
+    @Test
+    public void should_print_all_fields() {
+        // given
+        final PageCreator pageCreator = new PageCreator(NAME, ZIP_FILE_NAME, ContentType.FORM, 12345L).setDisplayName(DISPLAY_NAME).setDescription(
+                DESCRIPTION);
+
+        // when
+        final Map<PageField, Serializable> fields = pageCreator.getFields();
+
+        // then
+        assertThat(pageCreator.toString()).as("should print human readable to string").isEqualTo("PageCreator [fields=" + fields + "]");
+
+    }
 }

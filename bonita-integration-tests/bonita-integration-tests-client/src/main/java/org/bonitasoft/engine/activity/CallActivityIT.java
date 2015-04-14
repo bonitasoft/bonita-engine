@@ -591,8 +591,9 @@ public class CallActivityIT extends TestWithTechnicalUser {
         waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
 
         for (int i = 0; i < nbLoop; i++) {
-            long stepInCalledProcess = waitForUserTaskAndExecuteIt("tStep1", cebolinha);
-            FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(stepInCalledProcess);
+            long tStep1 = waitForUserTask("tStep1");
+            FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(tStep1);
+            assignAndExecuteStep(tStep1, cebolinha);
             waitForProcessToFinish(flowNodeInstance.getParentProcessInstanceId());
         }
 

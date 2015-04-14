@@ -865,9 +865,12 @@ CREATE TABLE page (
   lastUpdatedBy BIGINT NOT NULL,
   contentName VARCHAR(50) NOT NULL,
   content LONGBLOB,
-  UNIQUE (tenantId, name),
-  PRIMARY KEY (tenantId, id)
+  contentType VARCHAR(50) NOT NULL,
+  processDefinitionId BIGINT
 );
+ALTER TABLE page ADD CONSTRAINT pk_page PRIMARY KEY (tenantid, id);
+ALTER TABLE page ADD CONSTRAINT uk_page UNIQUE (tenantId, name, processDefinitionId);
+
 CREATE TABLE sequence (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -991,15 +994,31 @@ CREATE TABLE theme (
   CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
   PRIMARY KEY (tenantId, id)
 );
+
 CREATE TABLE form_mapping (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
   process BIGINT NOT NULL,
-  task VARCHAR(255) NULL,
-  form VARCHAR(1024) NULL,
-  target VARCHAR(16) NOT NULL,
-  type VARCHAR(16) NOT NULL,
-  lastUpdateDate BIGINT NULL,
-  lastUpdatedBy BIGINT NULL,
+  type INT NOT NULL,
+  task VARCHAR(255),
+  page_mapping_tenant_id BIGINT,
+  page_mapping_id BIGINT,
+  lastUpdateDate BIGINT,
+  lastUpdatedBy BIGINT,
   PRIMARY KEY (tenantId, id)
 );
+
+CREATE TABLE page_mapping (
+  tenantId BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  key_ VARCHAR(255) NOT NULL,
+  pageId BIGINT NULL,
+  url VARCHAR(1024) NULL,
+  urladapter VARCHAR(255) NULL,
+  lastUpdateDate BIGINT NULL,
+  lastUpdatedBy BIGINT NULL,
+  PRIMARY KEY (tenantId, id),
+  UNIQUE (tenantId, key_)
+);
+
+ALTER TABLE form_mapping ADD CONSTRAINT fk_form_mapping_key FOREIGN KEY (page_mapping_tenant_id, page_mapping_id) REFERENCES page_mapping(tenantId, id);

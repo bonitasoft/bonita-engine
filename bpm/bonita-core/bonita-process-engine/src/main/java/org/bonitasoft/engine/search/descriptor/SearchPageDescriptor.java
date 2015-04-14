@@ -35,7 +35,7 @@ public class SearchPageDescriptor extends SearchEntityDescriptor {
 
     SearchPageDescriptor() {
         final SPageBuilderFactory keyProvider = BuilderFactory.get(SPageBuilderFactory.class);
-        pageKeys = new HashMap<String, FieldDescriptor>(6);
+        pageKeys = new HashMap<>(8);
         pageKeys.put(PageSearchDescriptor.ID, new FieldDescriptor(SPage.class, keyProvider.getIdKey()));
         pageKeys.put(PageSearchDescriptor.NAME, new FieldDescriptor(SPage.class, keyProvider.getNameKey()));
         pageKeys.put(PageSearchDescriptor.PROVIDED, new FieldDescriptor(SPage.class, keyProvider.getProvidedKey()));
@@ -43,8 +43,10 @@ public class SearchPageDescriptor extends SearchEntityDescriptor {
         pageKeys.put(PageSearchDescriptor.LAST_MODIFICATION_DATE, new FieldDescriptor(SPage.class, keyProvider.getLastModificationDateKey()));
         pageKeys.put(PageSearchDescriptor.INSTALLED_BY, new FieldDescriptor(SPage.class, keyProvider.getInstalledByKey()));
         pageKeys.put(PageSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SPage.class, keyProvider.getDisplayNameKey()));
+        pageKeys.put(PageSearchDescriptor.CONTENT_TYPE, new FieldDescriptor(SPage.class, keyProvider.getContentTypeKey()));
+        pageKeys.put(PageSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SPage.class, keyProvider.getProcessDefinitionIdKey()));
 
-        pageAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
+        pageAllFields = new HashMap<>(1);
 
         final Set<String> pageFields = new HashSet<String>(2);
         pageFields.add(keyProvider.getNameKey());
