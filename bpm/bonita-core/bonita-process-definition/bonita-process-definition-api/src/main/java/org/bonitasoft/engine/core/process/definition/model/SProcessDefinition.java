@@ -10,9 +10,10 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.process.definition.model;
 
+import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -45,4 +46,6 @@ public interface SProcessDefinition extends SNamedElement {
     boolean hasConnectors();
 
     SContractDefinition getContract();
+
+    List<SContextEntry> getContext();
 }
