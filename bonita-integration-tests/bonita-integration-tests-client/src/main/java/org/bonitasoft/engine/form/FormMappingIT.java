@@ -193,7 +193,7 @@ public class FormMappingIT extends TestWithUser {
         final String custompage_startProcessForm = "custompage_startProcessForm";
         BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
                 .createNewBusinessArchive().setProcessDefinition(processBuilder.done())
-                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("startProcessForm", FormMappingTarget.INTERNAL).build())
+                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("custompage_startProcessForm", FormMappingTarget.INTERNAL).build())
                 .addExternalResource(
                         new BarResource("customPages/custompage_startProcessForm.zip", createTestPageContent(custompage_startProcessForm, "kikoo", "LOL")));
 
@@ -212,7 +212,7 @@ public class FormMappingIT extends TestWithUser {
 
         assertThat(page.getId()).isEqualTo(pageURL.getPageId());
 
-        deleteProcess(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
 }

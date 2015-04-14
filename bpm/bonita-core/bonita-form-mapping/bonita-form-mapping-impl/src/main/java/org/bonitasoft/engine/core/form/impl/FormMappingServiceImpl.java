@@ -93,7 +93,7 @@ public class FormMappingServiceImpl implements FormMappingService {
         String key = formMappingKeyGenerator.generateKey(processDefinitionId, task, type);
         switch (target) {
             case SFormMapping.TARGET_INTERNAL:
-                sPageMapping = pageMappingService.create(key, getPageIdOrNull(form));
+                sPageMapping = pageMappingService.create(key, getPageIdOrNull(form, processDefinitionId));
                 break;
             case SFormMapping.TARGET_URL:
                 sPageMapping = pageMappingService.create(key, form, externalUrlAdapter);
@@ -113,8 +113,8 @@ public class FormMappingServiceImpl implements FormMappingService {
         return sFormMapping;
     }
 
-    Long getPageIdOrNull(String form) throws SBonitaReadException {
-        SPage pageByName = pageService.getPageByName(form);
+    Long getPageIdOrNull(String form, long processDefinitionId) throws SBonitaReadException {
+        SPage pageByName = pageService.getPageByNameAndProcessDefinitionId(form,processDefinitionId);
         return pageByName == null ? null : pageByName.getId();
     }
 
