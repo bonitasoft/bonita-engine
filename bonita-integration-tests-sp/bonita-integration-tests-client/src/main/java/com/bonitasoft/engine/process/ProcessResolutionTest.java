@@ -62,7 +62,7 @@ public class ProcessResolutionTest extends CommonAPISPIT {
         builder.createNewInstance("resolve", "1.0").addParameter("param1", String.class.getName()).addAutomaticTask("step1");
         final DesignProcessDefinition processDefinition = builder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
+        final ProcessDefinition definition = deployProcess(businessArchive);
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
 
@@ -83,7 +83,7 @@ public class ProcessResolutionTest extends CommonAPISPIT {
         builder.createNewInstance("resolve", "1.0").addParameter("param1", String.class.getName()).addActor("Leader", true).addUserTask("step1", "Leader");
         final DesignProcessDefinition processDefinition = builder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
+        final ProcessDefinition definition = deployProcess(businessArchive);
         final ActorInstance initiator = getProcessAPI().getActorInitiator(definition.getId());
         getProcessAPI().addUserToActor(initiator.getId(), getSession().getUserId());
 
@@ -108,7 +108,7 @@ public class ProcessResolutionTest extends CommonAPISPIT {
         builder.createNewInstance("resolve", "1.0").addParameter("param1", String.class.getName()).addActor("Leader", true).addUserTask("step1", "Leader");
         final DesignProcessDefinition processDefinition = builder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
+        final ProcessDefinition definition = deployProcess(businessArchive);
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
 
@@ -129,7 +129,7 @@ public class ProcessResolutionTest extends CommonAPISPIT {
                 .addConnector("exec", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER);
         final DesignProcessDefinition processDefinition = builder.done();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
+        final ProcessDefinition definition = deployProcess(businessArchive);
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
 

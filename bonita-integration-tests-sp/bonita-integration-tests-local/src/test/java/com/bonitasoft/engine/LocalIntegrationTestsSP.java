@@ -16,6 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.connector.ConnectorExecutionTimeOutTest;
 import com.bonitasoft.engine.connector.ConnectorImplementationLocalSPTest;
+import com.bonitasoft.engine.form.FormMappingSPIT;
 import com.bonitasoft.engine.tenant.TenantLocalIT;
 import com.bonitasoft.engine.tenant.TenantMaintenanceLocalIT;
 import com.bonitasoft.engine.theme.ThemeTest;
@@ -29,6 +30,7 @@ import com.bonitasoft.engine.theme.ThemeTest;
         ConnectorImplementationLocalSPTest.class,
         ThemeTest.class,
         TenantMaintenanceLocalIT.class,
+        FormMappingSPIT.class,
         PageAPILocalIT.class,
         TenantLocalIT.class,
         BDRepositoryLocalIT.class
