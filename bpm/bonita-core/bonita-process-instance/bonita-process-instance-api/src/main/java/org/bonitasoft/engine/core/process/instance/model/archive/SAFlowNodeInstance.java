@@ -32,8 +32,6 @@ public interface SAFlowNodeInstance extends SAFlowElementInstance {
 
     long getLastUpdateDate();
 
-    long getClaimedDate();
-
     String getDisplayName();
 
     String getDisplayDescription();

@@ -24,6 +24,8 @@ public interface SAHumanTaskInstance extends SATaskInstance {
 
     long getAssigneeId();
 
+    long getClaimedDate();
+
     STaskPriority getPriority();
 
     long getExpectedEndDate();

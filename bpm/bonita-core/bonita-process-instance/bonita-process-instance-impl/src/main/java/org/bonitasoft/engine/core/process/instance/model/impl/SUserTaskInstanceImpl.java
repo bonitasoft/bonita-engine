@@ -29,9 +29,9 @@ public class SUserTaskInstanceImpl extends SHumanTaskInstanceImpl implements SUs
     public SUserTaskInstanceImpl() {
     }
 
-    public SUserTaskInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parenteContainerId,
+    public SUserTaskInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parentContainerId,
             final long actorId, final STaskPriority priority, final long logicalGroup1, final long logicalGroup2) {
-        super(name, flowNodeDefinitionId, rootContainerId, parenteContainerId, actorId, priority, logicalGroup1, logicalGroup2);
+        super(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId, priority, logicalGroup1, logicalGroup2);
     }
 
     @Override

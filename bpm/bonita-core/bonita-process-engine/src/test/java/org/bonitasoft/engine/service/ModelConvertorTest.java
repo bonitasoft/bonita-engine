@@ -14,16 +14,8 @@
 package org.bonitasoft.engine.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoDefinition;
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoValue;
@@ -124,7 +116,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedUserTaskInstance_sould_return_the_right_idenfiers() {
+    public void toArchivedUserTaskInstance_sould_return_the_right_identifiers() {
         final SAUserTaskInstanceImpl sInstance = new SAUserTaskInstanceImpl();
         sInstance.setRootContainerId(1L);
         sInstance.setParentContainerId(2L);
@@ -133,6 +125,8 @@ public class ModelConvertorTest {
         sInstance.setLogicalGroup(2, 456L);
         sInstance.setLogicalGroup(3, 2L);
         sInstance.setStateId(5);
+        final long claimedDate = System.currentTimeMillis();
+        sInstance.setClaimedDate(claimedDate);
         sInstance.setPriority(STaskPriority.NORMAL);
 
         when(manager.getState(5)).thenReturn(new CompletedActivityStateImpl());
@@ -143,6 +137,7 @@ public class ModelConvertorTest {
         assertThat(archivedUserTaskInstance.getParentContainerId()).isEqualTo(2L);
         assertThat(archivedUserTaskInstance.getProcessInstanceId()).isEqualTo(2L);
         assertThat(archivedUserTaskInstance.getParentActivityInstanceId()).isEqualTo(456L);
+        assertThat(archivedUserTaskInstance.getClaimedDate().getTime()).isEqualTo(claimedDate);
     }
 
     @Test
