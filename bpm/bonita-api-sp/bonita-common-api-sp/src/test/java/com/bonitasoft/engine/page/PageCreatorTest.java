@@ -9,13 +9,14 @@
 package com.bonitasoft.engine.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.io.Serializable;
 import java.util.Map;
 
-import org.junit.Test;
-
 import com.bonitasoft.engine.page.PageCreator.PageField;
+import org.bonitasoft.engine.page.ContentType;
+import org.junit.Test;
 
 public class PageCreatorTest {
 
@@ -26,6 +27,8 @@ public class PageCreatorTest {
     private static final String NAME = "page name";
 
     private static final String DESCRIPTION = "page description";
+    public static final String CONTENT_TYPE = "form";
+    public static final long PROCESS_DEFINITION_ID = 1L;
 
     @Test
     public void pageCreatorWithName() {
@@ -36,10 +39,10 @@ public class PageCreatorTest {
         final Map<PageField, Serializable> fields = pageCreator.getFields();
 
         // then
-        assertThat(fields).as("field size should contains name entry").hasSize(2).containsKey(PageField.NAME).doesNotContainKey(PageField.DESCRIPTION);
-        assertThat(fields.get(PageField.NAME)).as("name file should be").isEqualTo(NAME);
-        assertThat(fields.get(PageField.CONTENT_NAME)).as("content name should be").isEqualTo(CONTENT_ZIP);
-
+        assertThat(fields).as("field size should contains name entry").containsOnly(
+                entry(PageField.NAME, NAME),
+                entry(PageField.CONTENT_NAME, CONTENT_ZIP),
+                entry(PageField.CONTENT_TYPE,  ContentType.PAGE));
     }
 
     @Test
@@ -52,10 +55,11 @@ public class PageCreatorTest {
         final Map<PageField, Serializable> fields = pageCreator.getFields();
 
         // then
-        assertThat(fields).as("field size should contains name entry").hasSize(3).containsKey(PageField.NAME).containsKey(PageField.DESCRIPTION);
-        assertThat(fields.get(PageField.NAME)).as("name file should be " + NAME).isEqualTo(NAME);
-        assertThat(fields.get(PageField.CONTENT_NAME)).as("name file should be").isEqualTo(CONTENT_ZIP);
-        assertThat(fields.get(PageField.DESCRIPTION)).as("description entry should be " + DESCRIPTION).isEqualTo(DESCRIPTION);
+        assertThat(fields).as("field size should contains name entry").containsOnly(
+                entry(PageField.NAME, NAME),
+                entry(PageField.CONTENT_NAME, CONTENT_ZIP),
+                entry(PageField.DESCRIPTION, DESCRIPTION),
+                entry(PageField.CONTENT_TYPE,  ContentType.PAGE));
 
     }
 
@@ -69,10 +73,29 @@ public class PageCreatorTest {
         final Map<PageField, Serializable> fields = pageCreator.getFields();
 
         // then
-        assertThat(fields).as("field size should contains name entry").hasSize(3).containsKey(PageField.NAME).containsKey(PageField.DISPLAY_NAME);
-        assertThat(fields.get(PageField.NAME)).as("name file should be " + NAME).isEqualTo(NAME);
-        assertThat(fields.get(PageField.CONTENT_NAME)).as("name file should be").isEqualTo(CONTENT_ZIP);
-        assertThat(fields.get(PageField.DISPLAY_NAME)).as("display name entry should be " + DISPLAY_NAME).isEqualTo(DISPLAY_NAME);
+        assertThat(fields).as("field size should contains name entry").containsOnly(
+                entry(PageField.NAME, NAME),
+                entry(PageField.CONTENT_NAME, CONTENT_ZIP),
+                entry(PageField.DISPLAY_NAME, DISPLAY_NAME),
+                entry(PageField.CONTENT_TYPE, ContentType.PAGE));
+    }
+
+    @Test
+    public void pageCreatorWithContentTypeAndProcessDefinitionID() {
+        // given
+        final PageCreator pageCreator = new PageCreator(NAME, CONTENT_ZIP, ContentType.FORM, PROCESS_DEFINITION_ID);
+        pageCreator.setDisplayName(DISPLAY_NAME);
+
+        // when
+        final Map<PageField, Serializable> fields = pageCreator.getFields();
+
+        // then
+        assertThat(fields).as("field size should contains name entry").containsOnly(
+                entry(PageField.NAME, NAME),
+                entry(PageField.CONTENT_NAME, CONTENT_ZIP),
+                entry(PageField.DISPLAY_NAME, DISPLAY_NAME),
+                entry(PageField.CONTENT_TYPE, ContentType.FORM),
+                entry(PageField.PROCESS_DEFINITION_ID, PROCESS_DEFINITION_ID));
 
     }
 
