@@ -408,7 +408,7 @@
             <xs:extension base="definition:SNamedElement">
                 <xs:sequence>
                     <xs:element name="conditionalExpression" type="xs:string" />
-                    <xs:element name="explanation" type="xs:string" />
+                    <xs:element name="explanation" type="xs:string" minOccurs="0" maxOccurs="1"/>
                     <xs:element name="inputDefinitionNames" minOccurs="0" maxOccurs="1">
                         <xs:complexType>
                             <xs:sequence minOccurs="1" maxOccurs="unbounded">

@@ -43,6 +43,7 @@ import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
@@ -541,6 +542,18 @@ public class BusinessArchiveTest {
                 assertEquals(connectorDefinition.getFailAction(), nextResultConnector.getFailAction());
             }
         }
+    }
+
+    @Test
+    public void readProcessWithContract() throws Exception {
+            final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+            builder.addActor("myActor");
+            builder.addUserTask("step1", "myActor").addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
+                    .addMandatoryConstraint("numberOfDays").addConstraint("Mystical constraint","true",null,"numberOfDays");
+        final DesignProcessDefinition process = builder.getProcess();
+        final DesignProcessDefinition result = getDesignProcessDefinition(builder);
+
+        assertThat(process).isEqualTo(result);
     }
 
     @Test
