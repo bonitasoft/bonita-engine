@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.execution;
 
 import java.io.File;
@@ -447,6 +447,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private void initializeBusinessData(SProcessDefinition sDefinition, SProcessInstance sInstance, SExpressionContext expressionContext)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException,
             SRefBusinessDataInstanceCreationException {
+        setContextContainerIfNotSet(expressionContext, sInstance);
         final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
         for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
             final SExpression expression = bdd.getDefaultValueExpression();
@@ -464,6 +465,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         .done();
                 refBusinessDataService.addRefBusinessDataInstance(instance);
             }
+        }
+    }
+
+    private void setContextContainerIfNotSet(SExpressionContext expressionContext, SProcessInstance sInstance) {
+        if (expressionContext != null && expressionContext.getContainerId() == null && sInstance != null && sInstance.getId() != 0) {
+            expressionContext.setContainerId(sInstance.getId());
+            expressionContext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
         }
     }
 

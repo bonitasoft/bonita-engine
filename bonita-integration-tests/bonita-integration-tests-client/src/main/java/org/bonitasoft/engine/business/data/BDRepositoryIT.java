@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.business.data;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
@@ -48,6 +48,7 @@ import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -352,9 +353,14 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "business data java setter operation" }, jira = "BS-7217", story = "update a business data using a java setter operation")
     @Test
     public void shouldBeAbleToUpdateBusinessDataUsingBizDataJavaSetterOperation() throws Exception {
-        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'Jules'; e.lastName = 'UnNamed'; return e;").toString(),
-                EMPLOYEE_QUALIFIED_NAME);
+        final String processContractInputName = "lastName_input";
+        final String initialLastNameValue = "Trebi";
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression(
+                "createNewEmployee",
+                new StringBuilder().append("import ")
+                        .append(EMPLOYEE_QUALIFIED_NAME)
+                        .append("; Employee e = new Employee(); e.firstName = 'Jules'; e.lastName = " + processContractInputName + "; return e;").toString(),
+                EMPLOYEE_QUALIFIED_NAME, new ExpressionBuilder().createContractInputExpression(processContractInputName, String.class.getName()));
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", "6.3-beta");
@@ -363,6 +369,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String newEmployeeLastName = "Péuigrec";
         processDefinitionBuilder.addBusinessData(businessDataName, EMPLOYEE_QUALIFIED_NAME, employeeExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step0", ACTOR_NAME);
         processDefinitionBuilder
                 .addAutomaticTask("step1")
                 .addOperation(
@@ -372,15 +379,30 @@ public class BDRepositoryIT extends CommonAPIIT {
                         new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setLastName", String.class.getName(),
                                 new ExpressionBuilder().createConstantStringExpression(newEmployeeLastName)));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step0", "step1");
         processDefinitionBuilder.addTransition("step1", "step2");
+        processDefinitionBuilder.addContract().addSimpleInput(processContractInputName, Type.TEXT, null);
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(definition.getId(),
+                Collections.singletonMap(processContractInputName, (Serializable) initialLastNameValue));
 
+        final long step0 = waitForUserTask(processInstance, "step0");
+
+        // Check that initial BizData value used process contract input:
+        Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(1);
+        final String expressionName = "bizDataExprName";
+        expressions.put(new ExpressionBuilder().createGroovyScriptExpression(expressionName, businessDataName + ".lastName", String.class.getName(),
+                new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIFIED_NAME)), null);
+        final String returnedInitialLastName = (String) getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions).get(
+                expressionName);
+        assertThat(returnedInitialLastName).isEqualTo(initialLastNameValue);
+
+        assignAndExecuteStep(step0, matti);
         waitForUserTask(processInstance, "step2");
 
         // Let's check the updated firstName + lastName values by calling an expression:
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        expressions = new HashMap<>(2);
         final String expressionFirstName = "retrieve_FirstName";
         expressions.put(new ExpressionBuilder().createGroovyScriptExpression(expressionFirstName, businessDataName + ".firstName", String.class.getName(),
                 new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIFIED_NAME)), null);
