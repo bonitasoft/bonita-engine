@@ -8,6 +8,28 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data;
 
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
+import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
+import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import javax.xml.bind.JAXBException;
+
 import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bdm.BusinessObjectDAOFactory;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
@@ -65,28 +87,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import javax.xml.bind.JAXBException;
-
-import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
-import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
-import static com.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
-import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class BDRepositoryIT extends CommonAPISPIT {
 
@@ -339,7 +339,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final String bizDataName = "myBizData";
         processDefinitionBuilder.addBusinessData(bizDataName, aQualifiedName, null);
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinitionBuilder.done()).done());
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, matti.getId());
         return processDefinition;

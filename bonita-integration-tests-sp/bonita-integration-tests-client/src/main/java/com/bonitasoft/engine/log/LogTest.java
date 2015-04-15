@@ -375,7 +375,7 @@ public class LogTest extends CommonAPISPIT {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(designProcessDefinition);
         final BusinessArchive receiveMessaceArchive = archiveBuilder.done();
-        final ProcessDefinition receiveMessageProcess = getProcessAPI().deploy(receiveMessaceArchive);
+        final ProcessDefinition receiveMessageProcess = deployProcess(receiveMessaceArchive);
 
         final List<ActorInstance> actors = getProcessAPI().getActors(receiveMessageProcess.getId(), 0, 1, ActorCriterion.NAME_ASC);
         getProcessAPI().addUserToActor(actors.get(0).getId(), user.getId());
