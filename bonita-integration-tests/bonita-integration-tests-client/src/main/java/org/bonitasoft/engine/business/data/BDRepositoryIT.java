@@ -964,7 +964,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     }
 
     private String getEmployeesToString(final String businessDataName, final long processInstanceId) throws InvalidExpressionException {
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(5);
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<>(5);
         final String expressionEmployee = "retrieve_Employee";
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression(expressionEmployee, "\"Employee [firstName=\" + " + businessDataName

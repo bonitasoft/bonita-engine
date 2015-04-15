@@ -11,32 +11,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.flownode;
 
-import java.util.List;
-import org.bonitasoft.engine.bpm.context.ContextEntry;
-import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
+package org.bonitasoft.engine.bpm.context;
+
+import org.bonitasoft.engine.bpm.BonitaObject;
+import org.bonitasoft.engine.expression.Expression;
 
 /**
- * A User Task is a typical “workflow” Task where a human performer performs the Task with the assistance of a
- * software application and is scheduled through a task list manager of some sort
- *
  * @author Baptiste Mesta
- * @author Matthieu Chaffotte
  */
-public interface UserTaskDefinition extends HumanTaskDefinition {
+public interface ContextEntry extends BonitaObject {
 
-    /**
-     * Contract that must be respected when executing an instance of this user task
-     *
-     * @return
-     *         the user task execution contract
-     */
-    ContractDefinition getContract();
+    String getKey();
 
-
-
-    List<ContextEntry> getContext();
-
+    Expression getExpression();
 }

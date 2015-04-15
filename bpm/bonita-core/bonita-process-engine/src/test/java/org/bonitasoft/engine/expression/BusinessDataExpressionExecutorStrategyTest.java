@@ -203,10 +203,11 @@ public class BusinessDataExpressionExecutorStrategyTest {
         final SimpleBizData expectedBizData = createAbizDataInRepository();
         final SFlowNodeInstance flowNode = createAflowNodeInstanceInRepository();
         final SRefBusinessDataInstance refBizData = createARefBizDataInRepository(expectedBizData, flowNode.getParentProcessInstanceId());
-        final HashMap<String, Object> context = buildBusinessDataExpressionContext(flowNode.getId(), DataInstanceContainer.PROCESS_INSTANCE);
+        final HashMap<String, Object> context = buildBusinessDataExpressionContext(flowNode.getId(), DataInstanceContainer.ACTIVITY_INSTANCE);
         final SExpressionImpl buildBusinessDataExpression = buildBusinessDataExpression(refBizData.getName());
 
-        when(flowNodeInstanceService.getProcessInstanceId(456L, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(1234L);
+        when(flowNodeInstanceService.getProcessInstanceId(456L, DataInstanceContainer.ACTIVITY_INSTANCE.name())).thenReturn(1234L);
+        doThrow(SRefBusinessDataInstanceNotFoundException.class).when(refBusinessDataService).getFlowNodeRefBusinessDataInstance(anyString(),anyLong());
 
         final Entity fetchedBizData = (Entity) businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null,
                 ContainerState.ACTIVE);

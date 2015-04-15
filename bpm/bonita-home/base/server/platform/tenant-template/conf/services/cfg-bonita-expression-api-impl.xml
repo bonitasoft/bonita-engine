@@ -1,5 +1,5 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="expressionService" class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">
 		<constructor-arg name="expressionExecutorStrategyProvider" ref="expressionExecutorStrategyProvider" />
@@ -27,19 +27,25 @@
 				<ref bean="xPathReadExpressionExecutorStrategy" />
                 <ref bean="contractInputExpressionExecutorStrategy" />
                 <ref bean="businessDataExpressionExecutorStrategy" />
+                <ref bean="businessDataExpressionReferenceExecutorStrategy" />
                 <ref bean="queryBusinessDataExpressionExecutorStrategy" />
                 <ref bean="businessObjectDAOExpressionStrategy" />
 			</list>
 		</property>
 	</bean>
 
-    <bean id="businessDataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.BusinessDataExpressionExecutorStrategy" >
-        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
-        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
-        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
-    </bean>
+	<bean id="businessDataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.BusinessDataExpressionExecutorStrategy" >
+		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+	</bean>
 
-    <bean id="businessObjectDAOExpressionStrategy" class="org.bonitasoft.engine.expression.BusinessObjectDAOExpressionStrategy" >
+	<bean id="businessDataExpressionReferenceExecutorStrategy" class="org.bonitasoft.engine.expression.BusinessDataReferenceExpressionExecutorStrategy">
+		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+	</bean>
+
+	<bean id="businessObjectDAOExpressionStrategy" class="org.bonitasoft.engine.expression.BusinessObjectDAOExpressionStrategy" >
         <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
     </bean>
 

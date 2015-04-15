@@ -137,7 +137,7 @@ public class PageProcessDependencyResolverTest {
         final List<Problem> problems = pageProcessDependencyResolver.checkResolution(tenantServiceAccessor, sDefinition);
 
         // then
-        assertThat(problems).as("should not return a problem").isEmpty();
+        assertThat(problems).as("should not return a problem").isNotEmpty();
 
     }
 

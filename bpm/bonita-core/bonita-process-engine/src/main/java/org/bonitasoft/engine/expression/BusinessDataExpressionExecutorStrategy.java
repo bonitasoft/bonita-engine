@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.expression;
 
 import java.util.ArrayList;
@@ -25,6 +25,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
@@ -39,19 +40,14 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
-
-    private final RefBusinessDataService refBusinessDataService;
+public class BusinessDataExpressionExecutorStrategy extends CommonBusinessDataExpressionExecutorStrategy {
 
     private final BusinessDataRepository businessDataRepository;
 
-    private final FlowNodeInstanceService flowNodeInstanceService;
-
     public BusinessDataExpressionExecutorStrategy(final RefBusinessDataService refBusinessDataService, final BusinessDataRepository businessDataRepository,
-            final FlowNodeInstanceService flowNodeInstanceService) {
-        this.refBusinessDataService = refBusinessDataService;
+                                                  final FlowNodeInstanceService flowNodeInstanceService) {
+        super(refBusinessDataService, flowNodeInstanceService);
         this.businessDataRepository = businessDataRepository;
-        this.flowNodeInstanceService = flowNodeInstanceService;
     }
 
     @Override
@@ -61,21 +57,26 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
 
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException {
+                           final ContainerState containerState) throws SExpressionEvaluationException {
         final String businessDataName = expression.getContent();
         if (context.containsKey(businessDataName)) {
             return context.get(businessDataName);
         }
-        long processInstanceId = -1;
+        final Long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
+        final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
         try {
-            final Long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
-            final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
-            if ("PROCESS_INSTANCE".equals(containerType)) {
-                processInstanceId = containerId;
-            }
-            final SRefBusinessDataInstance
-                    refBusinessDataInstance = getRefBusinessDataInstance(businessDataName, containerId, containerType);
+            final SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(businessDataName, containerId, containerType);
+            return getBusinessData(refBusinessDataInstance);
+        } catch (final SBonitaReadException | SFlowNodeReadException e) {
+            throw new SExpressionEvaluationException(e, "Unable to retrieve business data instance with name " + businessDataName);
+        } catch (final SBonitaException e) {
+            setProcessInstanceId(containerId, containerType, e);
+            throw new SExpressionEvaluationException(e, expression.getName());
+        }
+    }
 
+    Object getBusinessData(SRefBusinessDataInstance refBusinessDataInstance) throws org.bonitasoft.engine.business.data.SBusinessDataNotFoundException, SExpressionEvaluationException {
+        try {
             final Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
             if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance) {
                 final SSimpleRefBusinessDataInstance reference = (SSimpleRefBusinessDataInstance) refBusinessDataInstance;
@@ -84,53 +85,31 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
                 return proxyfier.proxify(findByNamedQuery);
             }
             final SMultiRefBusinessDataInstance reference = (SMultiRefBusinessDataInstance) refBusinessDataInstance;
-            List<Entity> entities =  businessDataRepository.findByIds(bizClass, reference.getDataIds());
-            
-            List<Entity> e = new ArrayList<Entity>();
+            List<Entity> entities = businessDataRepository.findByIds(bizClass, reference.getDataIds());
+
+            List<Entity> e = new ArrayList<>();
             for (Entity entity : entities) {
                 ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
                 e.add(proxyfier.proxify(entity));
             }
             return e;
-            
-        } catch (final SBonitaReadException e) {
-            throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + businessDataName, expression.getName());
-        } catch (final SBonitaException e) {
-            if (processInstanceId != -1) {
-                e.setProcessInstanceIdOnContext(processInstanceId);
-            }
-            throw new SExpressionEvaluationException(e, expression.getName());
         } catch (final ClassNotFoundException e) {
-            throw new SExpressionEvaluationException(e, expression.getName());
-        }
-    }
-
-    protected SRefBusinessDataInstance getRefBusinessDataInstance(final String businessDataName, final long containerId, final String containerType)
-            throws SBonitaException {
-        if ("PROCESS_INSTANCE".equals(containerType)) {
-            final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
-            return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
-        }
-        try {
-            return refBusinessDataService.getFlowNodeRefBusinessDataInstance(businessDataName, containerId);
-        } catch (final SBonitaException sbe) {
-            final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
-            return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
+            throw new SExpressionEvaluationException(e, "Unable to load class for the business data having reference" + refBusinessDataInstance.getName());
         }
     }
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException {
-        final List<Object> bizDatas = new ArrayList<Object>(expressions.size());
-        final List<String> alreadyEvaluatedExpressionContent = new ArrayList<String>();
+                                 final ContainerState containerState) throws SExpressionEvaluationException {
+        final List<Object> bizData = new ArrayList<>(expressions.size());
+        final List<String> alreadyEvaluatedExpressionContent = new ArrayList<>();
         for (final SExpression expression : expressions) {
             if (!alreadyEvaluatedExpressionContent.contains(expression.getContent())) {
-                bizDatas.add(evaluate(expression, context, resolvedExpressions, containerState));
+                bizData.add(evaluate(expression, context, resolvedExpressions, containerState));
                 alreadyEvaluatedExpressionContent.add(expression.getContent());
             }
         }
-        return bizDatas;
+        return bizData;
     }
 
     @Override

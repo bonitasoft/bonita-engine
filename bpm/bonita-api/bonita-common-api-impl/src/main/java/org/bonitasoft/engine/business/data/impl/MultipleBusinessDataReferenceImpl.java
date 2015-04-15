@@ -15,6 +15,7 @@ package org.bonitasoft.engine.business.data.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
 
@@ -41,4 +42,17 @@ public class MultipleBusinessDataReferenceImpl extends BusinessDataReferenceImpl
         return storageIds;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        MultipleBusinessDataReferenceImpl that = (MultipleBusinessDataReferenceImpl) o;
+        return Objects.equals(storageIds, that.storageIds);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), storageIds);
+    }
 }

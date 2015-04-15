@@ -103,16 +103,13 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
         if (getPageMapping() == null) {
             return TARGET_UNDEFINED;
         }
-        if (getPageMapping().getPageId() != null) {
-            return TARGET_INTERNAL;
-        }
         if (getPageMapping().getUrl() != null) {
             return TARGET_URL;
         }
         if (getPageMapping().getUrlAdapter() != null) {
             return TARGET_LEGACY;
         }
-        return null;
+        return TARGET_INTERNAL;
     }
 
     @Override

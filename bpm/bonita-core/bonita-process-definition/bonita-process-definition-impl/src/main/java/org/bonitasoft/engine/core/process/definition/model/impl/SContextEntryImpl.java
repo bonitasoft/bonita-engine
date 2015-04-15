@@ -11,52 +11,59 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.data.impl;
 
+package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import java.util.Objects;
 
-import org.bonitasoft.engine.business.data.BusinessDataReference;
+import org.bonitasoft.engine.core.process.definition.model.SContextEntry;
+import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
-public class BusinessDataReferenceImpl implements BusinessDataReference {
+public class SContextEntryImpl  implements SContextEntry{
 
-    private static final long serialVersionUID = -6913883854275484141L;
+    private String key;
+    private SExpression expression;
 
-    private final String name;
+    public SContextEntryImpl() {
+    }
 
-    private final String type;
-
-    public BusinessDataReferenceImpl(final String name, final String type) {
-        super();
-        this.name = name;
-        this.type = type;
+    public SContextEntryImpl(String key, SExpression expression) {
+        this.key = key;
+        this.expression = expression;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     @Override
-    public String getType() {
-        return type;
+    public SExpression getExpression() {
+        return expression;
     }
 
+    public void setExpression(SExpression expression) {
+        this.expression = expression;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BusinessDataReferenceImpl that = (BusinessDataReferenceImpl) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(type, that.type);
+        SContextEntryImpl that = (SContextEntryImpl) o;
+        return Objects.equals(key, that.key) &&
+                Objects.equals(expression, that.expression);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type);
+        return Objects.hash(key, expression);
     }
 }

@@ -1864,7 +1864,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Check whether a specific user is involved in a given human task instance.<br/>
-     * User A is involved with a  human task  instance if any of the following is true:
+     * User A is involved with a human task instance if any of the following is true:
      * <ul>
      * <li>the human task instance is assigned to user A</li>
      * <li>the human task instance is pending for user A</li>
@@ -2562,4 +2562,40 @@ public interface ProcessRuntimeAPI {
      * @throws ContractDataNotFoundException if identifier does not refer to an existing process instance.
      */
     Serializable getProcessInputValueAfterInitialization(long processInstanceId, String name) throws ContractDataNotFoundException;
+
+    /**
+     * return the context defined in the process definition for this user task instance
+     *
+     * @param userTaskInstanceId the id of the user task instance
+     * @return a map containing the evaluated context
+     * @throws UserTaskNotFoundException if <code>userTaskInstanceId</code> does not reference any existing task.
+     */
+    Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException;
+
+    /**
+     * return the context defined in the process definition for this user task instance
+     *
+     * @param archivedUserTaskInstanceId the id of the archived version of the user task instance
+     * @return a map containing the evaluated context
+     * @throws UserTaskNotFoundException if <code>archivedUserTaskInstanceId</code> does not reference any existing archived task.
+     */
+    Map<String, Serializable> getArchivedUserTaskExecutionContext(long archivedUserTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException;
+
+    /**
+     * return the context defined in the process definition for this process instance
+     *
+     * @param processInstanceId the id of the process instance
+     * @return a map containing the evaluated context
+     * @throws ProcessInstanceNotFoundException if <code>processInstanceId</code> does not reference any existing process.
+     */
+    Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
+
+    /**
+     * return the context defined in the process definition for this process instance
+     *
+     * @param archivedProcessInstanceId the id of the archived version of a process instance
+     * @return a map containing the evaluated context
+     * @throws ProcessInstanceNotFoundException if <code>archivedProcessInstanceId</code> does not reference any existing process.
+     */
+    Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long archivedProcessInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
 }
