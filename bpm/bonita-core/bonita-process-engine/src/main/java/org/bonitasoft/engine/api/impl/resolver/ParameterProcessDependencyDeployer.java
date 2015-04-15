@@ -39,12 +39,12 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class ParameterProcessDependencyResolver implements ProcessDependencyResolver {
+public class ParameterProcessDependencyDeployer implements ProcessDependencyDeployer {
 
     @Override
-    public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
-            final SProcessDefinition sDefinition) throws NotFoundException {
-        final Set<SParameterDefinition> parameters = sDefinition.getParameters();
+    public boolean deploy(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
+                          final SProcessDefinition processDefinition) throws NotFoundException {
+        final Set<SParameterDefinition> parameters = processDefinition.getParameters();
         boolean resolved = true;
         if (parameters.isEmpty()) {
             return resolved;
@@ -64,7 +64,7 @@ public class ParameterProcessDependencyResolver implements ProcessDependencyReso
             resolved = false;
         }
         try {
-            parameterService.addAll(sDefinition.getId(), storedParameters);
+            parameterService.addAll(processDefinition.getId(), storedParameters);
         } catch (final SParameterProcessNotFoundException e) {
             throw new NotFoundException(e);
         }

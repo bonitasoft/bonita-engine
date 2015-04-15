@@ -46,8 +46,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilder;
 import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilderFactory;
 import org.bonitasoft.engine.api.DocumentAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.impl.form.FormMappingDeployer;
-import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
+import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyDeployer;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstances;
@@ -749,19 +748,12 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
             processDefinitionService.store(sProcessDefinition, designProcessDefinition.getDisplayName(), designProcessDefinition.getDisplayDescription());
             unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
-            processManagementAPIImplDelegate.createProcessPageDeployer().deployProcessPages(businessArchive, sProcessDefinition.getId(),
-                    SessionInfos.getUserIdFromSession());
-            new FormMappingDeployer(getTenantAccessor().getFormMappingService()).deployFormMappings(businessArchive, sProcessDefinition.getId());
             final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(businessArchive, tenantAccessor, sProcessDefinition);
             if (isResolved) {
                 tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
                         sProcessDefinition);
             }
-        } catch (final BonitaHomeNotSetException e) {
-            throw new ProcessDeployException(e);
-        } catch (final IOException e) {
-            throw new ProcessDeployException(e);
-        } catch (final SBonitaException e) {
+        } catch (final BonitaHomeNotSetException | IOException |SBonitaException e) {
             throw new ProcessDeployException(e);
         }
 
@@ -5281,7 +5273,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
-        final List<ProcessDependencyResolver> resolvers = tenantAccessor.getDependencyResolver().getResolvers();
+        final List<ProcessDependencyDeployer> resolvers = tenantAccessor.getDependencyResolver().getResolvers();
         SProcessDefinition processDefinition;
         try {
             processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
@@ -5289,7 +5281,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ProcessDefinitionNotFoundException(e);
         }
         final List<Problem> problems = new ArrayList<Problem>();
-        for (final ProcessDependencyResolver resolver : resolvers) {
+        for (final ProcessDependencyDeployer resolver : resolvers) {
             final List<Problem> problem = resolver.checkResolution(tenantAccessor, processDefinition);
             if (problem != null) {
                 problems.addAll(problem);

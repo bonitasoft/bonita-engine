@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.api.impl;
 
 import java.io.File;
@@ -46,7 +46,6 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.page.ProcessPageDeployer;
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
@@ -63,21 +62,37 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Matthieu Chaffotte
  */
 // Uncomment the "implements" when this delegate implements all the methods.
-public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */{
+public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */ {
+
+    private static PlatformServiceAccessor getPlatformServiceAccessor() {
+        try {
+            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
+            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+        final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionId,
+                processDefinitionService);
+        try {
+            transactionContentWithResult.execute();
+            return transactionContentWithResult.getResult();
+        } catch (final SProcessDefinitionNotFoundException e) {
+            throw e;
+        } catch (final SProcessDefinitionReadException e) {
+            throw e;
+        } catch (final SBonitaException e) {
+            throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
+        }
+    }
 
     protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
             return TenantServiceSingleton.getInstance(tenantId);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static PlatformServiceAccessor getPlatformServiceAccessor() {
-        try {
-            return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
@@ -102,10 +117,6 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"
                     + processDefinitionId + ">");
         }
-    }
-
-    protected ProcessPageDeployer createProcessPageDeployer() {
-        return new ProcessPageDeployer(getTenantAccessor().getPageService());
     }
 
     @Deprecated
@@ -161,7 +172,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     }
 
     public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults,
-            final ParameterCriterion sort) {
+                                                         final ParameterCriterion sort) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -194,22 +205,6 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             return paramterInstances;
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
-        }
-    }
-
-    public static SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
-            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionId,
-                processDefinitionService);
-        try {
-            transactionContentWithResult.execute();
-            return transactionContentWithResult.getResult();
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw e;
-        } catch (final SProcessDefinitionReadException e) {
-            throw e;
-        } catch (final SBonitaException e) {
-            throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
         }
     }
 

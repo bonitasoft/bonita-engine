@@ -34,16 +34,16 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class ConnectorProcessDependencyResolver implements ProcessDependencyResolver {
+public class ConnectorProcessDependencyDeployer implements ProcessDependencyDeployer {
 
     @Override
-    public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition)
+    public boolean deploy(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition processDefinition)
             throws ConnectorException {
         try {
             final long tenantId = tenantAccessor.getTenantId();
             final ConnectorService connectorService = tenantAccessor.getConnectorService();
-            return connectorService.loadConnectors(sDefinition, tenantId)
-                    && checkAllConnectorsHaveImplementation(connectorService, sDefinition, tenantId).isEmpty();
+            return connectorService.loadConnectors(processDefinition, tenantId)
+                    && checkAllConnectorsHaveImplementation(connectorService, processDefinition, tenantId).isEmpty();
         } catch (final SConnectorException e) {
             throw new ConnectorException(e);
         }
