@@ -183,8 +183,7 @@ public class ApplicationNodeConverterTest {
     @Test
     public void toNode_should_replaceLayoutId_by_page_name() throws Exception {
         //given
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, null);
-        application.setLayoutId(9L);
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", 9L, null);
         final SPage layout = mock(SPage.class);
         given(layout.getName()).willReturn("mainLayout");
 
@@ -196,6 +195,24 @@ public class ApplicationNodeConverterTest {
         //then
         assertThat(applicationNode).isNotNull();
         assertThat(applicationNode.getLayout()).isEqualTo("mainLayout");
+    }
+
+    @Test
+    public void toNode_should_replaceThemeId_by_page_name() throws Exception {
+        //given
+        long themeId = 20L;
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, themeId);
+        final SPage layout = mock(SPage.class);
+        given(layout.getName()).willReturn("mainTheme");
+
+        given(pageService.getPage(themeId)).willReturn(layout);
+
+        //when
+        final ApplicationNode applicationNode = converter.toNode(application);
+
+        //then
+        assertThat(applicationNode).isNotNull();
+        assertThat(applicationNode.getTheme()).isEqualTo("mainTheme");
     }
 
     @Test(expected = ExportException.class)

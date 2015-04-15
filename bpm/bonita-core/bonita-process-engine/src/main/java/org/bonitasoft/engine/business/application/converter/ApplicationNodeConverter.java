@@ -73,6 +73,7 @@ public class ApplicationNodeConverter {
             applicationNode.setState(application.getState());
             applicationNode.setIconPath(application.getIconPath());
             setLayout(application, applicationNode);
+            setTheme(application, applicationNode);
             setProfile(application, applicationNode);
             setHomePage(application, applicationNode);
             setPages(application.getId(), applicationNode);
@@ -80,6 +81,13 @@ public class ApplicationNodeConverter {
             return applicationNode;
         } catch (SBonitaException e) {
             throw new ExportException(e);
+        }
+    }
+
+    private void setTheme(final SApplication application, final ApplicationNode applicationNode) throws SBonitaReadException, SObjectNotFoundException {
+        if (application.getThemeId() != null) {
+            SPage page = pageService.getPage(application.getThemeId());
+            applicationNode.setTheme(page.getName());
         }
     }
 
