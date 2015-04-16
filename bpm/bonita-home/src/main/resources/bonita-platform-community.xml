@@ -906,90 +906,110 @@
     </bean>
 
 
-    <bean id="hbm-bos-actor-mapping" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+    <bean id="communityHbmResourcesProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
         <property name="resources">
             <set>
+                <!-- actor -->
                 <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.hbm.xml</value>
                 <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="actor" />
-                <entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="actormember" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-theme-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
+                <!-- theme -->
                 <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.hbm.xml</value>
                 <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.theme.model.STheme" value="theme" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-supervisor-mapping" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
+                <!-- supervisor -->
                 <value>org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.hbm.xml</value>
                 <value>org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor" value="processsupervisor" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bonita-scheduler" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
+                <!-- scheduler -->
                 <value>org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.hbm.xml</value>
                 <value>org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.queries.hbm.xml</value>
+                <!-- profile -->
+                <value>org/bonitasoft/engine/profile/model/impl/hibernate/profile.hbm.xml</value>
+                <value>org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>
+                <!-- process instance -->
+                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
+                <!-- archived process instance -->
+                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
+                <!-- process definition -->
+                <value>org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.queries.hbm.xml</value>
+                <!-- comment -->
+                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
+                <!-- archived comment -->
+                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.queries.hbm.xml</value>
+                <!-- platform -->
+                <value>org/bonitasoft/engine/platform/model/impl/hibernate/platform.hbm.xml</value>
+                <value>org/bonitasoft/engine/platform/model/impl/hibernate/platform.queries.hbm.xml</value>
+                <!-- platform command -->
+                <value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.hbm.xml</value>
+                <value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.queries.hbm.xml</value>
+                <!-- page -->
+                <value>org/bonitasoft/engine/page/impl/hibernate/page.hbm.xml</value>
+                <value>org/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
+                <!-- queriable log -->
+                <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.hbm.xml</value>
+                <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.queries.hbm.xml</value>
+                <!-- identity -->
+                <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.hbm.xml</value>
+                <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
+                <!-- external identity -->
+                <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.hbm.xml</value>
+                <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.queries.hbm.xml</value>
+                <!-- document -->
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.queries.hbm.xml</value>
+                <!-- archived document -->
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/archive.document.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/archive.document.queries.hbm.xml</value>
+                <!-- platform dependency -->
+                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/platform-dependency.hbm.xml</value>
+                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/platform-dependency.queries.hbm.xml</value>
+                <!-- dependency -->
+                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.hbm.xml</value>
+                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.queries.hbm.xml</value>
+                <!-- data instance -->
+                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/data.instance.hbm.xml</value>
+                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/data.instance.queries.hbm.xml</value>
+                <!-- archived data instance -->
+                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.hbm.xml</value>
+                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.queries.hbm.xml</value>
+                <!-- command -->
+                <value>org/bonitasoft/engine/command/model/impl/hibernate/command.hbm.xml</value>
+                <value>org/bonitasoft/engine/command/model/impl/hibernate/command.queries.hbm.xml</value>
+                <!-- category -->
+                <value>org/bonitasoft/engine/core/category/model/impl/hibernate/category.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/category/model/impl/hibernate/category.queries.hbm.xml</value>
+                <!-- application -->
+                <value>org/bonitasoft/engine/business/application/impl/hibernate/application.hbm.xml</value>
+                <value>org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
+                <!-- form mapping -->
+                <value>org/bonitasoft/engine/core/form/impl/form-mapping.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/form/impl/form-mapping.queries.hbm.xml</value>
+                <!-- contract -->
+                <value>org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
             </set>
         </property>
         <property name="classAliasMappings">
             <map>
+                <!-- actor -->
+                <entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="actor" />
+                <entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="actormember" />
+                <!-- theme -->
+                <entry key="org.bonitasoft.engine.theme.model.STheme" value="theme" />
+                <!-- supervisor -->
+                <entry key="org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor" value="processsupervisor" />
+                <!-- scheduler -->
                 <entry key="org.bonitasoft.engine.scheduler.model.SJobDescriptor" value="jd" />
                 <entry key="org.bonitasoft.engine.scheduler.model.SJobParameter" value="jp" />
                 <entry key="org.bonitasoft.engine.scheduler.model.SJobLog" value="jl" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-profile-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/profile/model/impl/hibernate/profile.hbm.xml</value>
-                <value>org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
+                <!-- profile -->
                 <entry key="org.bonitasoft.engine.profile.model.SProfile" value="profile" />
                 <entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="profileentry" />
                 <entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="pm" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bonita-process-instance-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
-                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
+                <!-- process instance -->
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="p" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="a" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="f" />
@@ -1024,20 +1044,7 @@
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="la" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="a" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="a" />
-            </map>
-        </property>
-    </bean>
-
-    <!-- Archived objects -->
-    <bean id="hbm-bonita-process-instance-model-arch" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
-                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
+                <!-- archived process instance -->
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="ap" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" value="aa" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" value="aa" />
@@ -1052,82 +1059,71 @@
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="aa" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="at" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" value="ac" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bonita-process-definition-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.hbm.xml</value>
-                <value>org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
+                <!-- process definition -->
                 <entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo" value="process_definition" />
                 <entry key="org.bonitasoft.engine.core.process.definition.model.SActor" value="actor" />
                 <entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="actormember" />
                 <entry key="org.bonitasoft.engine.identity.model.SUser" value="user" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-process-comment-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.hbm.xml</value>
-                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
+                <!-- comment -->
                 <entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="comment" />
                 <entry key="org.bonitasoft.engine.core.process.comment.model.SHumanComment" value="comment" />
                 <entry key="org.bonitasoft.engine.core.process.comment.model.SSystemComment" value="comment" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-process-comment-model-arch" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.hbm.xml</value>
-                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
+                <!-- archived comment -->
                 <entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="saComment" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bonita-platform-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/platform/model/impl/hibernate/platform.hbm.xml</value>
-                <value>org/bonitasoft/engine/platform/model/impl/hibernate/platform.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
+                <!-- platform -->
                 <entry key="org.bonitasoft.engine.platform.model.SPlatform" value="platform" />
                 <entry key="org.bonitasoft.engine.platform.model.STenant" value="tenant" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-platform-command-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.hbm.xml</value>
-                <value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
+                <!-- platform command -->
                 <entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="platformCommand" />
+                <!-- page -->
+                <entry key="org.bonitasoft.engine.page.SPage" value="page" />
+                <entry key="org.bonitasoft.engine.page.SPageContent" value="pagecontent" />
+                <!-- queriable log -->
+                <entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog" value="log" />
+                <!-- identity -->
+                <entry key="org.bonitasoft.engine.identity.model.SUser" value="user" />
+                <entry key="org.bonitasoft.engine.identity.model.SRole" value="role" />
+                <entry key="org.bonitasoft.engine.identity.model.SGroup" value="group_" />
+                <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition" value="custom_usr_inf_def" />
+                <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoValue" value="custom_usr_inf_val" />
+                <entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="user_membership" />
+                <entry key="org.bonitasoft.engine.identity.model.SContactInfo" value="contactinfo" />
+                <!-- external identity -->
+                <entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="ext_ident_mapping" />
+                <!-- document -->
+                <entry key="org.bonitasoft.engine.core.document.model.SDocument" value="doc" />
+                <entry key="org.bonitasoft.engine.core.document.model.SLightDocument" value="doc" />
+                <entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="docmapping" />
+                <entry key="org.bonitasoft.engine.core.document.model.SMappedDocument" value="mappeddoc" />
+                <!-- archived document -->
+                <entry key="org.bonitasoft.engine.core.document.model.archive.SADocumentMapping" value="docmapping" />
+                <entry key="org.bonitasoft.engine.core.document.model.archive.SAMappedDocument" value="mappeddoc" />
+                <!-- platform dependency -->
+                <entry key="org.bonitasoft.engine.dependency.model.SPlatformDependency" value="pdependency" />
+                <entry key="org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping" value="pdependencymapping" />
+                <!-- dependency -->
+                <entry key="org.bonitasoft.engine.dependency.model.SDependency" value="dependency" />
+                <entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="dependencymapping" />
+                <!-- data instance -->
+                <entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="dataInstance" />
+                <!-- archived data instance -->
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="saDataInstance" />
+                <!-- command -->
+                <entry key="org.bonitasoft.engine.command.model.SCommand" value="command" />
+                <!-- category -->
+                <entry key="org.bonitasoft.engine.core.category.model.SCategory" value="category" />
+                <entry key="org.bonitasoft.engine.core.category.model.SProcessCategoryMapping" value="categorymapping" />
+                <!-- application -->
+                <entry key="org.bonitasoft.engine.business.application.model.SApplication" value="application" />
+                <entry key="org.bonitasoft.engine.business.application.model.SApplicationPage" value="applicationPage" />
+                <entry key="org.bonitasoft.engine.business.application.model.SApplicationMenu" value="applicationMenu" />
+                <!-- form mapping -->
+                <entry key="org.bonitasoft.engine.core.form.SFormMapping" value="formmap" />
+                <!-- contract -->
+                <entry key="org.bonitasoft.engine.core.contract.data.STaskContractData" value="tcd"/>
+                <entry key="org.bonitasoft.engine.core.contract.data.SATaskContractData" value="atcd"/>
+                <entry key="org.bonitasoft.engine.core.contract.data.SProcessContractData" value="pcd"/>
+                <entry key="org.bonitasoft.engine.core.contract.data.SAProcessContractData" value="apcd"/>
             </map>
         </property>
     </bean>
@@ -1389,221 +1385,4 @@
 
     <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType" />
 
-    <bean id="hbm-bos-page-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/page/impl/hibernate/page.hbm.xml</value>
-                <value>org/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.page.SPage" value="page" />
-                <entry key="org.bonitasoft.engine.page.SPageContent" value="pagecontent" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bonita-log-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.hbm.xml</value>
-                <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog" value="log" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bonita-identity-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.hbm.xml</value>
-                <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.identity.model.SUser" value="user" />
-                <entry key="org.bonitasoft.engine.identity.model.SRole" value="role" />
-                <entry key="org.bonitasoft.engine.identity.model.SGroup" value="group_" />
-                <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition" value="custom_usr_inf_def" />
-                <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoValue" value="custom_usr_inf_val" />
-                <entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="user_membership" />
-                <entry key="org.bonitasoft.engine.identity.model.SContactInfo" value="contactinfo" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-external-identity-mapping" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.hbm.xml</value>
-                <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="ext_ident_mapping" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bonita-document-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.hbm.xml</value>
-                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.queries.hbm.xml</value>
-                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/archive.document.hbm.xml</value>
-                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/archive.document.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.core.document.model.SDocument" value="doc" />
-                <entry key="org.bonitasoft.engine.core.document.model.SLightDocument" value="doc" />
-                <entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="docmapping" />
-                <entry key="org.bonitasoft.engine.core.document.model.SMappedDocument" value="mappeddoc" />
-                <entry key="org.bonitasoft.engine.core.document.model.archive.SADocumentMapping" value="docmapping" />
-                <entry key="org.bonitasoft.engine.core.document.model.archive.SAMappedDocument" value="mappeddoc" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bonita-dependency-platform-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/platform-dependency.hbm.xml</value>
-                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/platform-dependency.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.dependency.model.SPlatformDependency" value="pdependency" />
-                <entry key="org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping" value="pdependencymapping" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bonita-dependency-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.hbm.xml</value>
-                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.dependency.model.SDependency" value="dependency" />
-                <entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="dependencymapping" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-data-instance-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/data.instance.hbm.xml</value>
-                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/data.instance.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="dataInstance" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-data-instance-model-arch" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.hbm.xml</value>
-                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="saDataInstance" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-command-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/command/model/impl/hibernate/command.hbm.xml</value>
-                <value>org/bonitasoft/engine/command/model/impl/hibernate/command.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.command.model.SCommand" value="command" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-category-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/core/category/model/impl/hibernate/category.hbm.xml</value>
-                <value>org/bonitasoft/engine/core/category/model/impl/hibernate/category.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.core.category.model.SCategory" value="category" />
-                <entry key="org.bonitasoft.engine.core.category.model.SProcessCategoryMapping" value="categorymapping" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-application-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/business/application/impl/hibernate/application.hbm.xml</value>
-                <value>org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.business.application.model.SApplication" value="application" />
-                <entry key="org.bonitasoft.engine.business.application.model.SApplicationPage" value="applicationPage" />
-                <entry key="org.bonitasoft.engine.business.application.model.SApplicationMenu" value="applicationMenu" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-form-mapping-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/core/form/impl/form-mapping.hbm.xml</value>
-                <value>org/bonitasoft/engine/core/form/impl/form-mapping.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.core.form.SFormMapping" value="formmap" />
-            </map>
-        </property>
-    </bean>
-
-    <bean id="hbm-bos-contract-data-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-        <property name="resources">
-            <set>
-                <value>org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.hbm.xml</value>
-                <value>org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
-            </set>
-        </property>
-        <property name="classAliasMappings">
-            <map>
-                <entry key="org.bonitasoft.engine.core.contract.data.STaskContractData" value="tcd"/>
-                <entry key="org.bonitasoft.engine.core.contract.data.SATaskContractData" value="atcd"/>
-                <entry key="org.bonitasoft.engine.core.contract.data.SProcessContractData" value="pcd"/>
-                <entry key="org.bonitasoft.engine.core.contract.data.SAProcessContractData" value="apcd"/>
-            </map>
-        </property>
-    </bean>
 </beans>

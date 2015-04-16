@@ -51,13 +51,15 @@
 		<constructor-arg name="sequenceId" value="65" />
 	</bean>
 
-	<bean id="hbm-bonita-persistence-test" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+	<bean id="testHbmResourcesProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
 		<property name="resources">
 			<set>
 				<value>org/bonitasoft/engine/persistence/hibernate/parent-child.hbm.xml</value>
 				<value>org/bonitasoft/engine/persistence/hibernate/parent-child.queries.hbm.xml</value>
 				<value>org/bonitasoft/engine/persistence/hibernate/car.hbm.xml</value>
 				<value>org/bonitasoft/engine/persistence/hibernate/car.queries.hbm.xml</value>
+				<value>org/bonitasoft/engine/archive/model/hibernate/archive.hbm.xml</value>
+				<value>org/bonitasoft/engine/archive/model/hibernate/archive.queries.hbm.xml</value>
 			</set>
 		</property>
 		<property name="classAliasMappings">
@@ -66,19 +68,6 @@
 				<entry key="org.bonitasoft.engine.persistence.model.Child" value="child" />
 				<entry key="org.bonitasoft.engine.persistence.model.Parent" value="parent" />
 				<entry key="org.bonitasoft.engine.persistence.model.Car" value="car" />
-			</map>
-		</property>
-	</bean>
-
-	<bean id="hbm-bonita-archive-test" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-		<property name="resources">
-			<set>
-				<value>org/bonitasoft/engine/archive/model/hibernate/archive.hbm.xml</value>
-				<value>org/bonitasoft/engine/archive/model/hibernate/archive.queries.hbm.xml</value>
-			</set>
-		</property>
-		<property name="classAliasMappings">
-			<map>
 				<entry key="org.bonitasoft.engine.archive.model.Employee" value="employee" />
 				<entry key="org.bonitasoft.engine.archive.model.Laptop" value="laptop" />
 				<entry key="org.bonitasoft.engine.archive.model.Address" value="address" />
@@ -88,7 +77,7 @@
 			</map>
 		</property>
 	</bean>
-
+	
 	<bean id="sqlFolders" parent="communitySqlFolders" class="org.springframework.beans.factory.config.ListFactoryBean">
 		<property name="sourceList">
 			<list merge="true">
