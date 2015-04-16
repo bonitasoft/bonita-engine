@@ -69,30 +69,23 @@
 
 	<bean id="searchPlatformEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor" />
 
-	<bean id="hbm-bos-reporting-model" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+	<bean id="spHbmResourcesProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
 		<property name="resources">
 			<set>
+				<!-- report -->
 				<value>com/bonitasoft/engine/core/reporting/model/impl/hibernate/report.hbm.xml</value>
 				<value>com/bonitasoft/engine/core/reporting/model/impl/hibernate/report.queries.hbm.xml</value>
-			</set>
-		</property>
-		<property name="classAliasMappings">
-			<map>
-				<entry key="com.bonitasoft.engine.core.reporting.SReport" value="report" />
-				<entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="reportcontent" />
-			</map>
-		</property>
-	</bean>
-
-	<bean id="hbm-bonita-process-instance-model-ext" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
-		<property name="resources">
-			<set>
+				<!-- process instance -->
 				<value>com/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
 				<value>com/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
 			</set>
 		</property>
 		<property name="classAliasMappings">
 			<map>
+				<!-- report -->
+				<entry key="com.bonitasoft.engine.core.reporting.SReport" value="report" />
+				<entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="reportcontent" />
+				<!-- process instance -->
 				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="breakpoint" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" value="ref" />
 			</map>
