@@ -8,7 +8,7 @@
         ">
 
     <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl">
-        <constructor-arg name="initialCapacity" value="50" />
+        <constructor-arg name="initialCapacity" value="${bonita.platform.synchro.initialcapacity}" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="cacheService" ref="platformCacheService" />
     </bean>
@@ -18,7 +18,7 @@
             <props>
                 <prop key="org.quartz.scheduler.skipUpdateCheck">${org.quartz.scheduler.skipUpdateCheck:true}</prop>
                 <prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
-                <prop key="org.quartz.threadPool.threadCount">5</prop>
+                <prop key="org.quartz.threadPool.threadCount">${bonita.platform.scheduler.quartz.threadpool.size}</prop>
                 <prop key="org.quartz.jobStore.class">org.bonitasoft.engine.scheduler.impl.BonitaJobStoreCMT</prop>
                 <prop key="org.quartz.jobStore.driverDelegateClass">${${db.vendor}.quartz.connection.jobstoredriver}</prop>
                 <prop key="org.quartz.jobStore.dataSource">managedDS</prop>
@@ -56,7 +56,7 @@
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="servicesResolver" ref="servicesResolver" />
-        <constructor-arg name="batchSize" value="1000" />
+        <constructor-arg name="batchSize" value="${bonita.platform.scheduler.batchsize}" />
     </bean>
 
     <bean id="servicesResolver" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver" />
@@ -197,8 +197,8 @@
 
     <bean id="lockService" class="org.bonitasoft.engine.lock.impl.MemoryLockService" scope="singleton">
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-        <constructor-arg name="lockTimeout" value="60" />
-        <constructor-arg name="lockPoolSize" value="100" />
+        <constructor-arg name="lockTimeout" value="${bonita.platform.lock.memory.timeout}" />
+        <constructor-arg name="lockPoolSize" value="${bonita.platform.lock.memory.poolsize}" />
     </bean>
 
     <bean id="incidentService" class="org.bonitasoft.engine.incident.IncidentServiceImpl">
@@ -238,9 +238,15 @@
 
     <bean id="defaultPlatformCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
         <property name="name" value="DEFAULT_PLATFORM" />
-        <property name="maxElementsInMemory" value="1000" />
-        <property name="inMemoryOnly" value="true" />
-        <property name="eternal" value="true" />
+        <property name="maxElementsInMemory" value="${bonita.platform.cache.default.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.platform.cache.default.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.platform.cache.default.eternal}" />
+        <property name="evictionPolicy" value="${bonita.platform.cache.default.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.platform.cache.default.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.platform.cache.default.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.platform.cache.default.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.platform.cache.default.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.platform.cache.default.readIntensive}" />
     </bean>
 
     <bean id="platformCacheConfigurations" parent="communityPlatformCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
@@ -261,16 +267,28 @@
 
     <bean id="synchroServiceCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
         <property name="name" value="SYNCHRO_SERVICE_CACHE" />
-        <property name="timeToLiveSeconds" value="120" />
-        <property name="maxElementsInMemory" value="10000" />
-        <property name="inMemoryOnly" value="true" />
+        <property name="maxElementsInMemory" value="${bonita.platform.cache.synchro.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.platform.cache.synchro.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.platform.cache.synchro.eternal}" />
+        <property name="evictionPolicy" value="${bonita.platform.cache.synchro.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.platform.cache.synchro.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.platform.cache.synchro.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.platform.cache.synchro.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.platform.cache.synchro.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.platform.cache.synchro.readIntensive}" />
     </bean>
 
     <bean id="platformCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
         <property name="name" value="PLATFORM" />
-        <property name="maxElementsInMemory" value="100" />
-        <property name="inMemoryOnly" value="true" />
-        <property name="eternal" value="true" />
+        <property name="maxElementsInMemory" value="${bonita.platform.cache.platform.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.platform.cache.platform.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.platform.cache.platform.eternal}" />
+        <property name="evictionPolicy" value="${bonita.platform.cache.platform.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.platform.cache.platform.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.platform.cache.platform.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.platform.cache.platform.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.platform.cache.platform.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.platform.cache.platform.readIntensive}" />
     </bean>
 
     <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal" />
@@ -870,12 +888,12 @@
                 <!-- <entry key="20040" value="100" />SADocumentMapping -->
             </map>
         </constructor-arg>
-        <constructor-arg name="defaultRangeSize" value="100" />
+        <constructor-arg name="defaultRangeSize" value="${bonita.platform.sequence.defaultRangeSize}" />
         <constructor-arg name="sequenceMappingProvider" ref="sequenceMappingProvider" />
         <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
-        <constructor-arg name="retries" value="9" />
-        <constructor-arg name="delay" value="10" />
-        <constructor-arg name="delayFactor" value="3" />
+        <constructor-arg name="retries" value="${bonita.platform.sequence.retries}" />
+        <constructor-arg name="delay" value="${bonita.platform.sequence.delay}" />
+        <constructor-arg name="delayFactor" value="${bonita.platform.sequence.delayFactor}" />
     </bean>
 
     <bean id="transactionManager" class="org.springframework.jndi.JndiObjectFactoryBean">
@@ -1132,11 +1150,11 @@
         <constructor-arg name="name" value="platform" />
         <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
         <constructor-arg name="extraHibernateProperties" ref="extraPlatformHibernateProperties" />
-        <constructor-arg name="likeEscapeCharacter" value="#" />
+        <constructor-arg name="likeEscapeCharacter" value="${bonita.platform.persistence.platform.likeEscapeCharacter}" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
         <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
-        <constructor-arg name="enableWordSearch" value="false" />
+        <constructor-arg name="enableWordSearch" value="${bonita.platform.persistence.platform.enableWordSearch}" />
         <constructor-arg name="wordSearchExclusionMappings">
             <set>
                 <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
@@ -1149,11 +1167,11 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
         <constructor-arg name="extraHibernateProperties" ref="extraTenantHibernateProperties" />
-        <constructor-arg name="likeEscapeCharacter" value="#" />
+        <constructor-arg name="likeEscapeCharacter" value="${bonita.platform.persistence.tenant.likeEscapeCharacter}" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
         <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
-        <constructor-arg name="enableWordSearch" value="false" />
+        <constructor-arg name="enableWordSearch" value="${bonita.platform.persistence.tenant.enableWordSearch}" />
         <constructor-arg name="wordSearchExclusionMappings">
             <set>
                 <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
@@ -1180,11 +1198,11 @@
                 <entry key="hibernate.show_sql" value="${hibernate.journal.show_sql}" />
                 <entry key="hibernate.format_sql" value="${hibernate.journal.format_sql}" />
                 <entry key="hibernate.use_sql_comments" value="${hibernate.journal.use_sql_comments}" />
-                <entry key="hibernate.generate_statistics" value="false" />
-                <entry key="hibernate.connection.shutdown" value="true" />
-                <entry key="hibernate.validator.autoregister_listeners" value="false" />
-                <entry key="hibernate.validator.apply_to_ddl" value="false" />
-                <entry key="javax.persistence.validation.mode" value="NONE" />
+                <entry key="hibernate.generate_statistics" value="${bonita.platform.persistence.generate_statistics}" />
+                <entry key="hibernate.connection.shutdown" value="${bonita.platform.persistence.connection.shutdown}" />
+                <entry key="hibernate.validator.autoregister_listeners" value="${bonita.platform.persistence.validator.autoregister_listeners}" />
+                <entry key="hibernate.validator.apply_to_ddl" value="${bonita.platform.persistence.validator.apply_to_ddl}" />
+                <entry key="javax.persistence.validation.mode" value="${bonita.platform.persistence.javax.persistence.validation.mode}" />
             </map>
         </property>
     </bean>
