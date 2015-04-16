@@ -13,11 +13,10 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
+import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,20 +39,20 @@ public class ContractStructureValidator {
     }
 
     public void validate(final SContractDefinition contract, final Map<String, Serializable> inputs) throws ContractViolationException {
-        final List<String> messages = new ArrayList<>();
-        Map<String, Serializable> inputsToValidate = inputs != null ? inputs : Collections.<String, Serializable> emptyMap();
-        messages.addAll(recursive(contract.getSimpleInputs(), contract.getComplexInputs(), inputsToValidate));
+        final List<String> messages = new ArrayList<String>();
+        messages.addAll(recursive(contract.getSimpleInputs(), contract.getComplexInputs(), inputs));
         if (!messages.isEmpty()) {
             throw new ContractViolationException("Error while validating expected inputs", messages);
         }
     }
 
+    @SuppressWarnings("unchecked")
     private List<String> recursive(final List<SSimpleInputDefinition> simpleInputs, final List<SComplexInputDefinition> complexInputs,
             final Map<String, Serializable> inputs) {
 
         logInputsWhichAreNotInContract(DEBUG, simpleInputs, inputs);
 
-        final List<String> message = new ArrayList<>();
+        final List<String> message = new ArrayList<String>();
         for (final SInputDefinition def : union(simpleInputs, complexInputs)) {
             try {
                 validateInput(def, inputs);
@@ -81,7 +80,7 @@ public class ContractStructureValidator {
     }
 
     private List<SInputDefinition> union(final List<SSimpleInputDefinition> simpleInputs, final List<SComplexInputDefinition> complexInputs) {
-        final List<SInputDefinition> all = new ArrayList<>();
+        final List<SInputDefinition> all = new ArrayList<SInputDefinition>();
         all.addAll(simpleInputs);
         all.addAll(complexInputs);
         return all;
@@ -106,7 +105,7 @@ public class ContractStructureValidator {
     }
 
     private List<String> getInputsWhichAreNotInContract(final List<SSimpleInputDefinition> simpleInputs, final Map<String, Serializable> inputs) {
-        final List<String> keySet = new ArrayList<>(inputs.keySet());
+        final List<String> keySet = new ArrayList<String>(inputs.keySet());
         for (final SInputDefinition def : simpleInputs) {
             keySet.remove(def.getName());
         }
