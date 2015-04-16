@@ -12,7 +12,6 @@ import java.util.Set;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
-import org.bonitasoft.engine.bpm.experimental.ASCIIProcessDrawer;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
