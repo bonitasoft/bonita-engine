@@ -6,7 +6,7 @@
     <parent>
         <artifactId>bonita-document</artifactId>
         <groupId>org.bonitasoft.engine.core.document</groupId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.0.0.beta-01</version>
     </parent>
 
     <artifactId>bonita-document-api</artifactId>
