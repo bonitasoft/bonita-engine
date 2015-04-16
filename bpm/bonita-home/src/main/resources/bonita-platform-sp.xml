@@ -34,7 +34,7 @@
 	</bean>
 
 	<bean id="batchLogRegister" class="com.bonitasoft.engine.log.api.impl.InsertBatchLogsJobRegister">
-		<constructor-arg name="cronExpression" value="0/5 * * * * ?" />
+		<constructor-arg name="cronExpression" value="${bonita.platform.log.batch.cronExpression}" />
 	</bean>
 
 	<bean id="jvmMXBean" class="com.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl" />
@@ -42,7 +42,7 @@
 	<bean id="jobHandler" class="com.bonitasoft.engine.monitoring.impl.SJobHandlerImpl" />
 
 	<bean id="platformMonitoringService" class="com.bonitasoft.engine.monitoring.impl.PlatformMonitoringServiceImpl">
-		<constructor-arg name="allowMbeansRegistration" value="true" />
+		<constructor-arg name="allowMbeansRegistration" value="${bonita.platform.monitoring.allowMbeansRegistration}" />
 		<constructor-arg name="jvmMBean" ref="jvmMXBean" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="schedulerService" ref="scheduler" />
@@ -62,9 +62,9 @@
 	<bean id="transactionService" class="com.bonitasoft.engine.transaction.JTATransactionServiceExt" scope="singleton">
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="txManager" ref="transactionManager" />
-		<constructor-arg name="retries" value="3" />
-		<constructor-arg name="delay" value="20" />
-		<constructor-arg name="delayFactor" value="1.5" />
+		<constructor-arg name="retries" value="${bonita.platform.transaction.retries}" />
+		<constructor-arg name="delay" value="${bonita.platform.transaction.delay}" />
+		<constructor-arg name="delayFactor" value="${bonita.platform.transaction.delayFactor}" />
 	</bean>
 
 	<bean id="searchPlatformEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor" />
@@ -95,8 +95,8 @@
 	<bean id="spHibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
 		<property name="map">
 			<map>
-				<entry key="hibernate.cache.use_second_level_cache" value="true" />
-				<entry key="hibernate.cache.use_query_cache" value="true" />
+				<entry key="hibernate.cache.use_second_level_cache" value="${bonita.platform.persistence.use_second_level_cache}" />
+				<entry key="hibernate.cache.use_query_cache" value="${bonita.platform.persistence.use_query_cache}" />
 				<entry key="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory" />
 			</map>
 		</property>
@@ -139,7 +139,7 @@
 	<bean id="hbmConfigurationProviderProperties" parent="communityHbmConfigurationProviderProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
 		<property name="map">
 			<map merge="true">
-				<entry key="hibernate.jdbc.batch_size" value="50"/>
+				<entry key="hibernate.jdbc.batch_size" value="${bonita.platform.persistence.jdbc.batch_size}"/>
 			</map>
 		</property>
 	</bean>

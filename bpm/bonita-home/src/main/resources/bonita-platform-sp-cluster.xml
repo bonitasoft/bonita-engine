@@ -13,7 +13,7 @@
 
 	<bean id="broadcastService" class="com.bonitasoft.engine.service.impl.BroadcastServiceCluster">
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
-		<constructor-arg name="timeout" value="2" />
+		<constructor-arg name="timeout" value="${bonita.platform.cluster.broadcast.timeout}" />
 		<constructor-arg name="timeUnit" value="MINUTES" />
 	</bean>
 
@@ -62,9 +62,9 @@
 							<bean class="com.hazelcast.config.JoinConfig">
 								<property name="multicastConfig">
 									<bean class="com.hazelcast.config.MulticastConfig">
-										<property name="enabled" value="true" />
-										<property name="multicastGroup" value="224.2.2.3" />
-										<property name="multicastPort" value="54327" />
+										<property name="enabled" value="${bonita.platform.cluster.hazelcast.multicast.enabled}" />
+										<property name="multicastGroup" value="${bonita.platform.cluster.hazelcast.multicast.multicastGroup}" />
+										<property name="multicastPort" value="${bonita.platform.cluster.hazelcast.multicast.multicastPort}" />
 									</bean>
 								</property>
 							</bean>
@@ -95,8 +95,8 @@
 			</bean>
 		</constructor-arg>
 		<constructor-arg name="cacheConfigurations" ref="platformCacheConfigurations" />
-		<constructor-arg name="enableStats" value="false" />
-		<constructor-arg name="statsPrintInterval" value="10000" />
+		<constructor-arg name="enableStats" value="${bonita.platform.cluster.hazelcast.enableStats}" />
+		<constructor-arg name="statsPrintInterval" value="${bonita.platform.cluster.hazelcast.statsPrintInterval}" />
 	</bean>
 
 	<bean id="platformEventService" class="com.bonitasoft.engine.events.impl.ClusteredEventServiceImpl">
@@ -110,7 +110,7 @@
 	<bean id="lockService" class="com.bonitasoft.engine.lock.impl.ClusteredLockService" scope="singleton" >
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-		<constructor-arg name="lockTimeout" value="60" />
+		<constructor-arg name="lockTimeout" value="${bonita.platform.lock.memory.timeout}" />
 	</bean>
 
 	<bean id="nodeConfiguration" class="com.bonitasoft.engine.api.impl.NodeConfigurationExt" autowire="byType">
@@ -152,7 +152,7 @@
 				<prop key="org.quartz.scheduler.instanceName">BonitaClusteredScheduler</prop>
 				<prop key="org.quartz.scheduler.instanceId">AUTO</prop>
 				<prop key="org.quartz.jobStore.isClustered">true</prop>
-				<prop key="org.quartz.jobStore.clusterCheckinInterval">10000</prop>
+				<prop key="org.quartz.jobStore.clusterCheckinInterval">${bonita.platform.scheduler.quartz.clusterCheckinInterval}</prop>
 			</props>
 		</constructor-arg>
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
@@ -161,9 +161,15 @@
 	<bean id="platformSessionCache" class="org.bonitasoft.engine.cache.CacheConfiguration">
 		<!-- do not put the first letter because it will need to match the pattern *ESSION... -->
 		<property name="name" value="ESSION_MAP_PLATFORM" />
-		<property name="inMemoryOnly" value="true" />
-		<property name="timeToLiveSeconds" value="4000" />
-		<property name="maxElementsInMemory" value="100000" />
+		<property name="maxElementsInMemory" value="${bonita.platform.cache.session.maxElementsInMemory}" />
+		<property name="inMemoryOnly" value="${bonita.platform.cache.session.inMemoryOnly}" />
+		<property name="eternal" value="${bonita.platform.cache.session.eternal}" />
+		<property name="evictionPolicy" value="${bonita.platform.cache.session.evictionPolicy}" />
+		<property name="timeToLiveSeconds" value="${bonita.platform.cache.session.timeToLiveSeconds}" />
+		<property name="maxElementsOnDisk" value="${bonita.platform.cache.session.maxElementsOnDisk}" />
+		<property name="copyOnRead" value="${bonita.platform.cache.session.copyOnRead}" />
+		<property name="copyOnWrite" value="${bonita.platform.cache.session.copyOnWrite}" />
+		<property name="readIntensive" value="${bonita.platform.cache.session.readIntensive}" />
 	</bean>
 
 	<bean id="hibernateCacheProperties" parent="spHibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean" depends-on="hazelcastInstance">

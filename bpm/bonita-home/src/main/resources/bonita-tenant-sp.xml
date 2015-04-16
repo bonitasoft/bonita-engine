@@ -169,13 +169,13 @@
     </bean>
 
     <bean id="connectorExecutor" class="com.bonitasoft.engine.connector.impl.ConnectorExecutorTimedOut">
-        <constructor-arg name="queueCapacity" value="25" />
-        <constructor-arg name="corePoolSize" value="25" />
+        <constructor-arg name="queueCapacity" value="${bonita.tenant.connector.queueCapacity}" />
+        <constructor-arg name="corePoolSize" value="${bonita.tenant.connector.corePoolSize}" />
         <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
         <!-- timeout in seconds, default = 5 minutes -->
-        <constructor-arg name="timeout" value="300" />
-        <constructor-arg name="maximumPoolSize" value="25" />
-        <constructor-arg name="keepAliveTimeSeconds" value="100" />
+        <constructor-arg name="timeout" value="${bonita.tenant.connector.timeout}" />
+        <constructor-arg name="maximumPoolSize" value="${bonita.tenant.connector.maximumPoolSize}" />
+        <constructor-arg name="keepAliveTimeSeconds" value="${bonita.tenant.connector.keepAliveTimeSeconds}" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="timeTracker" ref="timeTracker" />
@@ -326,7 +326,7 @@
         <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
         <constructor-arg name="platformService" ref="platformService" />
-        <constructor-arg name="delayable" value="false" />
+        <constructor-arg name="delayable" value="${bonita.tenant.queriablelog.delayable}" />
     </bean>
 
     <bean id="batchLogRegister" class="com.bonitasoft.engine.log.api.impl.InsertBatchLogsJobRegister">
