@@ -37,6 +37,7 @@ import com.bonitasoft.engine.business.data.BusinessDataService;
 import com.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import com.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 
 public class BusinessDataServiceImpl implements BusinessDataService {
 
@@ -114,16 +115,15 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     private Object callJavaOperationOnEntity(final Entity businessObject, final Object valueToSetObjectWith, final String methodName, final String parameterType)
             throws SBusinessDataRepositoryException, SBusinessDataNotFoundException {
 
-        final Entity jpaEntity;
-        if (businessObject.getPersistenceId() == null) {
-            jpaEntity = copyForServer(businessObject);
-        } else {
+        Entity jpaEntity = businessObject;
+        if (businessObject.getPersistenceId() != null) {
             jpaEntity = businessDataRepository.findById(businessObject.getClass(), businessObject.getPersistenceId());
         }
+
         final Object valueToSet = loadValueToSet(businessObject, valueToSetObjectWith, methodName);
         try {
             invokeJavaMethod(jpaEntity, methodName, parameterType, valueToSet);
-            return copyForClient(jpaEntity);
+            return jpaEntity;
         } catch (final Exception e) {
             throw new SBusinessDataRepositoryException(e);
         }
@@ -134,11 +134,6 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         final JavaMethodInvoker methodInvoker = new JavaMethodInvoker();
         methodInvoker.invokeJavaMethod(parameterType, valueToSet, objectToSet, methodName, parameterType);
-    }
-
-    private Object copyForClient(final Entity jpaEntity) {
-        // TODO Auto-generated method stub
-        return jpaEntity;
     }
 
     @SuppressWarnings("unchecked")
@@ -182,18 +177,14 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private Entity getPersistedValue(final Entity entity, final Type type) throws SBusinessDataNotFoundException {
         if (Type.AGGREGATION.equals(type)) {
-            return businessDataRepository.findById(entity.getClass(), entity.getPersistenceId());
-        } else {
-            return copyForServer(entity);
+            return businessDataRepository.findById(ServerProxyfier.getRealClass(entity), entity.getPersistenceId());
         }
+        return entity;
+
     }
 
     private List<Entity> copyForServer(List<Entity> entities) {
         return entities;
-    }
-
-    private Entity copyForServer(final Entity entity) {
-        return entity;
     }
 
     private Type getRelationType(final Entity businessObject, final String methodName) throws SBusinessDataRepositoryException {

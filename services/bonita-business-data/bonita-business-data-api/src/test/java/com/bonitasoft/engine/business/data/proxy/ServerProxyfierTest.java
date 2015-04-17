@@ -6,7 +6,7 @@
  * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
  * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.api.impl.transaction.expression.bdm;
+package com.bonitasoft.engine.business.data.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -107,4 +107,15 @@ public class ServerProxyfierTest {
         assertThat(withLazyLoadedAnnotation).isEqualTo("getWithoutLazyLoadedAnnotation");
     }
 
+    @Test
+    public void should_retrieve_real_class() throws Exception {
+        //given
+        PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
+
+        //when
+        Class<? extends Entity> realClass = ServerProxyfier.getRealClass(proxy);
+
+        //then
+        assertThat(realClass.getName()).isEqualTo(PersonEntity.class.getName());
+    }
 }

@@ -22,10 +22,10 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
-import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import com.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
 import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;

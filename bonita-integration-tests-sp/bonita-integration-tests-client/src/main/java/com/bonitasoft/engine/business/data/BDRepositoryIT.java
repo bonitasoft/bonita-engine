@@ -56,6 +56,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.home.BonitaHome;
 import org.bonitasoft.engine.identity.User;
@@ -129,6 +130,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final BusinessObject countryBO = new BusinessObject();
         countryBO.setQualifiedName(COUNTRY_QUALIF_NAME);
         countryBO.addField(name);
+        countryBO.addUniqueConstraint("uk_name", "name");
 
         final SimpleField street = new SimpleField();
         street.setName("street");
@@ -813,15 +815,26 @@ public class BDRepositoryIT extends CommonAPISPIT {
     }
 
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "java setter operation", "mandatory field",
-            "intermixed" }, jira = "BS-8591", story = "Create business datas using intermixed java setter operations.")
+            "intermixed" }, jira = "BS-8591", story = "Create business data using intermixed java setter operations.")
     @Test
     public void shouldBeAbleToCreate2BusinessDataUsingIntermixedBizDataJavaSetterOperations() throws Exception {
+        Expression countryQueryNameParameter = new ExpressionBuilder().createExpression("name", "France", String.class.getName(), ExpressionType.TYPE_CONSTANT);
+        Expression countryQueryExpression = new ExpressionBuilder().createQueryBusinessDataExpression("country", "Country.findByName",
+                COUNTRY_QUALIF_NAME, countryQueryNameParameter);
+        final Expression createNewAddressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress", "import org.bonita.pojo.Address; Address a = new Address(street:'32, rue Gustave Eiffel', city:'Grenoble'); a;",
+                ADDRESS_QUALIF_NAME);
+        final Expression createNewCountryExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewCountry", "import " + COUNTRY_QUALIF_NAME + "; Country c = new Country(name:'France'); c;",
+                COUNTRY_QUALIF_NAME);
+
+
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
                 "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", PROCESS_VERSION);
         final String businessDataName = "newBornBaby";
         final String businessDataName2 = "data2";
         processDefinitionBuilder.addBusinessData(businessDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
         processDefinitionBuilder.addBusinessData(businessDataName2, EMPLOYEE_QUALIF_CLASSNAME, null);
+        processDefinitionBuilder.addBusinessData("address", ADDRESS_QUALIF_NAME, createNewAddressExpression);
+        processDefinitionBuilder.addBusinessData("country", COUNTRY_QUALIF_NAME, createNewCountryExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder
                 .addAutomaticTask("step1")
@@ -836,7 +849,10 @@ public class BDRepositoryIT extends CommonAPISPIT {
                                 new ExpressionBuilder().createConstantStringExpression("Péuigrec")))
                 .addOperation(
                         new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName2, "setLastName", String.class.getName(),
-                                new ExpressionBuilder().createConstantStringExpression("Plip")));
+                                new ExpressionBuilder().createConstantStringExpression("Plip")))
+                .addOperation(
+                        new OperationBuilder().createBusinessDataSetAttributeOperation("address", "setCountry", COUNTRY_QUALIF_NAME,
+                                countryQueryExpression));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
@@ -1199,7 +1215,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
                 "import org.bonita.pojo.Address; import org.bonita.pojo.Country; "
                         + "Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; a.country = myCountry ; a;",
-                ADDRESS_QUALIF_NAME);
+                ADDRESS_QUALIF_NAME, new ExpressionBuilder().createBusinessDataExpression("myCountry", COUNTRY_QUALIF_NAME));
         final Expression countryExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewCountry",
                 "import org.bonita.pojo.Country; "
                         + "Country c = new Country(); c.name='France'; "
@@ -1213,12 +1229,14 @@ public class BDRepositoryIT extends CommonAPISPIT {
         processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIF_NAME, null);
         processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addAutomaticTask("step1")
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myCountry"), OperatorType.ASSIGNMENT, null, null, countryExpression)
+        processDefinitionBuilder.addAutomaticTask("auto1")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myCountry"), OperatorType.ASSIGNMENT, null, null, countryExpression);
+        processDefinitionBuilder.addAutomaticTask("auto2")
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, addressExpression)
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
-        processDefinitionBuilder.addTransition("step1", "step2");
+        processDefinitionBuilder.addTransition("auto1", "auto2");
+        processDefinitionBuilder.addTransition("auto2", "step2");
 
         processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -1345,8 +1363,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
     private void verifyCommandGetQuery_findByHireDate() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
-        queryParameters.put("date1","1930-01-15");
-        queryParameters.put("date2","2050-12-31" );
+        queryParameters.put("date1", "1930-01-15");
+        queryParameters.put("date2", "2050-12-31");
 
         parameters.put("queryName", FIND_BY_HIRE_DATE_RANGE);
         parameters.put(ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);

@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright (C) 2014 Bonitasoft S.A.
- * Bonitasoft is a trademark of Bonitasoft SA.
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
- * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
- * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
- *******************************************************************************/
-package com.bonitasoft.engine.api.impl.transaction.expression.bdm;
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ **/
+package com.bonitasoft.engine.business.data.proxy;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -159,9 +159,19 @@ public class ServerProxyfier {
 
     public static Entity unProxyfyIfNeeded(final Entity entity) {
         if (isLazyMethodProxyfied(entity)) {
-            final LazyMethodHandler handler = (LazyMethodHandler) ProxyFactory.getHandler((Proxy) entity);
+            final LazyMethodHandler handler = (LazyMethodHandler) ProxyFactory.getHandler(((Proxy) entity));
             return handler.getEntity();
         }
         return entity;
     }
+
+    /**
+     * Retrieves the real class for the given entity. This result will be same as {@code entity.getClass()} if the entity is not a proxy.
+     * @param entity
+     * @return
+     */
+    public static Class<? extends Entity> getRealClass(final Entity entity) {
+        return unProxyfyIfNeeded(entity).getClass();
+    }
+
 }

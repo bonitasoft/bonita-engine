@@ -48,9 +48,9 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
+import com.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SProcessMultiRefBusinessDataInstance;

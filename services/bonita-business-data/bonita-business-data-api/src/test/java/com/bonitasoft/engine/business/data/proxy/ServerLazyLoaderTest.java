@@ -1,4 +1,13 @@
-package com.bonitasoft.engine.api.impl.transaction.expression.bdm;
+/**
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ **/
+
+package com.bonitasoft.engine.business.data.proxy;
 
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -12,15 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.CommandAPI;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
+import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import com.bonitasoft.engine.business.data.BusinessDataRepository;
-import com.bonitasoft.engine.business.data.NonUniqueResultException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ServerLazyLoaderTest {
@@ -41,7 +48,7 @@ public class ServerLazyLoaderTest {
         }
 
         public List<Addresses> getAddresses() {
-            return new ArrayList<ServerLazyLoaderTest.Addresses>();
+            return new ArrayList<Addresses>();
         }
 
         public String getName() {
@@ -49,9 +56,6 @@ public class ServerLazyLoaderTest {
         }
 
     }
-
-    @Mock
-    private CommandAPI commandAPI;
 
     @Mock
     private BusinessDataRepository businessDataRepository;

@@ -20,11 +20,11 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 
-import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerLazyLoader;
-import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
+import com.bonitasoft.engine.business.data.proxy.ServerLazyLoader;
+import com.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 
 /**
  * @author Matthieu Chaffotte

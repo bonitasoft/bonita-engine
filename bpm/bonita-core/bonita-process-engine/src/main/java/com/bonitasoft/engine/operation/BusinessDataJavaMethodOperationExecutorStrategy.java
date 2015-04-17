@@ -8,15 +8,14 @@
  *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
+import com.bonitasoft.engine.business.data.BusinessDataService;
+import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-
-import com.bonitasoft.engine.business.data.BusinessDataService;
-import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 
 /**
  * @author Laurent Leseigneur

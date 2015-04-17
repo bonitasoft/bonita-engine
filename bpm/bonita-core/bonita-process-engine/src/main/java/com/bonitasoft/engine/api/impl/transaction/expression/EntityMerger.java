@@ -5,12 +5,10 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -19,15 +17,13 @@ package com.bonitasoft.engine.api.impl.transaction.expression;
 import java.io.Serializable;
 import java.util.Collection;
 
-import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerLazyLoader;
-import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
-
+import com.bonitasoft.engine.business.data.proxy.ServerLazyLoader;
+import com.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 
 /**
  * @author Romain Bioteau
- *
  */
 public class EntityMerger {
 
@@ -43,7 +39,7 @@ public class EntityMerger {
             try {
                 @SuppressWarnings("unchecked")
                 final Collection<Entity> newCollection = collection.getClass().newInstance();
-                
+
                 ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(bdrService));
                 for (final Object item : collection) {
                     newCollection.add(proxyfier.proxify((Entity) item));
