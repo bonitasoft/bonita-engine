@@ -24,6 +24,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
+import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
@@ -74,6 +75,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     private Expression stringIndexValue5;
 
     private ContractDefinition contract;
+
+    private List<ContextEntry> context = new ArrayList<>();
 
     public DesignProcessDefinitionImpl(final String name, final String version) {
         super(name, version);
@@ -223,6 +226,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
         }
     }
 
+
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(displayName).append(displayDescription).append(parameters).append(actors).append(actorInitiator)
@@ -268,5 +272,14 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     public void setContract(ContractDefinition contract) {
         this.contract = contract;
+    }
+
+    @Override
+    public List<ContextEntry> getContext() {
+        return context;
+    }
+
+    public void addContextEntry(ContextEntry contextEntry) {
+        context.add(contextEntry);
     }
 }

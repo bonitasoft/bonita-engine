@@ -53,7 +53,7 @@ public class ExpressionServiceImpl implements ExpressionService {
             final boolean checkExpressionReturnType, final TimeTracker timeTracker) {
         super();
         final List<ExpressionExecutorStrategy> expressionExecutors = expressionExecutorStrategyProvider.getExpressionExecutors();
-        expressionExecutorsMap = new HashMap<ExpressionKind, ExpressionExecutorStrategy>(expressionExecutors.size());
+        expressionExecutorsMap = new HashMap<>(expressionExecutors.size());
         this.checkExpressionReturnType = checkExpressionReturnType;
         for (final ExpressionExecutorStrategy expressionExecutorStrategy : expressionExecutors) {
             expressionExecutorsMap.put(expressionExecutorStrategy.getExpressionKind(), expressionExecutorStrategy);

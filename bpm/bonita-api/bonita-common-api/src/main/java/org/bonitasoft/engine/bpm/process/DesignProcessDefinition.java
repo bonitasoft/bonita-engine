@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
+import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
@@ -150,4 +151,6 @@ public interface DesignProcessDefinition extends ProcessDefinition {
      */
     ContractDefinition getContract();
 
+
+    List<ContextEntry> getContext();
 }

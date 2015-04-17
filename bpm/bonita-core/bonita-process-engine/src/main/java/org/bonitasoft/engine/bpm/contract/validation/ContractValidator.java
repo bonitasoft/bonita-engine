@@ -37,7 +37,7 @@ public class ContractValidator {
     public ContractValidator(final ContractStructureValidator contractStructureValidator, final ContractConstraintsValidator contractRulesValidator) {
         rulesValidator = contractRulesValidator;
         structureValidator = contractStructureValidator;
-        comments = new ArrayList<String>();
+        comments = new ArrayList<>();
     }
 
     public boolean isValid(final SContractDefinition contract, final Map<String, Serializable> variables) {

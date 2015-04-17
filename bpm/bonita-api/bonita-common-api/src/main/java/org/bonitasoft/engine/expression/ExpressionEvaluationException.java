@@ -23,7 +23,7 @@ public class ExpressionEvaluationException extends BonitaException {
 
     private static final long serialVersionUID = 7295745453567432910L;
 
-    private final String expressionName;
+    private String expressionName;
 
     /**
      * @param cause
@@ -33,6 +33,10 @@ public class ExpressionEvaluationException extends BonitaException {
     public ExpressionEvaluationException(final Throwable cause, final String expressionName) {
         super(cause);
         this.expressionName = expressionName;
+    }
+
+    public ExpressionEvaluationException(Throwable cause) {
+        super(cause);
     }
 
     /**

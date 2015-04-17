@@ -11,51 +11,47 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  */
+
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.SContextEntry;
-import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.impl.SUserTaskDefinitionImpl;
 
 /**
  * @author Baptiste Mesta
- * @author Celine Souchet
- * @author Matthieu Chaffotte
  */
-public class SUserTaskDefinitionBinding extends SHumanTaskDefinitionBinding {
+public class SContextDefinitionBinding extends SNamedElementBinding {
 
-    private SContractDefinition contract;
-    private List<SContextEntry> context;
+    private final List<SContextEntry> context;
 
-    @Override
-    public void setChildObject(final String name, final Object value) {
-        super.setChildObject(name, value);
-        if (XMLSProcessDefinition.CONTRACT_NODE.equals(name)) {
-            contract = (SContractDefinition) value;
-        } else if (XMLSProcessDefinition.CONTEXT_NODE.equals(name)) {
-            context = (List<SContextEntry>) value;
-        }
+    public SContextDefinitionBinding() {
+        context = new ArrayList<>();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    public void setAttributes(final Map<String, String> attributes) {
+    }
+
+    @Override
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
+    }
+
+    @Override
+    public void setChildObject(final String name, final Object value) {
+        context.add((SContextEntry) value);
+    }
+
+    @Override
     public Object getObject() {
-        final SUserTaskDefinitionImpl userTask = new SUserTaskDefinitionImpl(id, name, actorName);
-        fillNode(userTask);
-        if (contract != null) {
-            userTask.setContract(contract);
-        }
-        if (context != null) {
-            userTask.getContext().addAll(context);
-        }
-        return userTask;
+        return context;
     }
 
     @Override
     public String getElementTag() {
-        return XMLSProcessDefinition.USER_TASK_NODE;
+        return XMLSProcessDefinition.CONTEXT_NODE;
     }
 
 }

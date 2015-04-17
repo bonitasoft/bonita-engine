@@ -31,6 +31,8 @@ import org.bonitasoft.engine.core.process.definition.model.bindings.SComplexInpu
 import org.bonitasoft.engine.core.process.definition.model.bindings.SConditionalExpressionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SConnectorDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SConnectorDefinitionInputBinding;
+import org.bonitasoft.engine.core.process.definition.model.bindings.SContextDefinitionBinding;
+import org.bonitasoft.engine.core.process.definition.model.bindings.SContextEntryBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SContractDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCorrelationBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCorrelationKeyBinding;
@@ -96,7 +98,7 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
     private final List<ElementBinding> bindings;
 
     public SProcessElementBindingsFactory() {
-        bindings = new ArrayList<ElementBinding>();
+        bindings = new ArrayList<>();
         bindings.add(new SProcessDefinitionBinding());
         bindings.add(new SGatewayDefinitionBinding());
         bindings.add(new SActorDefinitionBinding());
@@ -166,6 +168,8 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         bindings.add(new SSimpleInputDefinitionBinding());
         bindings.add(new SComplexInputDefinitionBinding());
         bindings.add(new SConstraintDefinitionBinding());
+        bindings.add(new SContextDefinitionBinding());
+        bindings.add(new SContextEntryBinding());
     }
 
     @Override
@@ -381,6 +385,12 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         }
         if (SConstraintDefinitionBinding.class.equals(binderClass)) {
             return new SConstraintDefinitionBinding();
+        }
+        if (SContextDefinitionBinding.class.equals(binderClass)) {
+            return new SContextDefinitionBinding();
+        }
+        if (SContextEntryBinding.class.equals(binderClass)) {
+            return new SContextEntryBinding();
         }
         return null;
     }

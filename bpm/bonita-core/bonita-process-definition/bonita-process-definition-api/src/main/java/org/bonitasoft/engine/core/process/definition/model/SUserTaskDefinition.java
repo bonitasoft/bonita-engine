@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model;
 
+import java.util.List;
+
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
@@ -20,5 +22,7 @@ package org.bonitasoft.engine.core.process.definition.model;
 public interface SUserTaskDefinition extends SHumanTaskDefinition {
 
     SContractDefinition getContract();
+
+    List<SContextEntry> getContext();
 
 }
