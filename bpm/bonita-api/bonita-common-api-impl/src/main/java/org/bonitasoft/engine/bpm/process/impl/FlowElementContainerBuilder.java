@@ -195,6 +195,7 @@ public class FlowElementContainerBuilder implements FlowElementBuilder {
         return new DataDefinitionBuilder(processDefinitionBuilder, container, name, className, defaultValue);
     }
 
+
     protected FlowElementContainerDefinitionImpl getContainer() {
         return container;
     }

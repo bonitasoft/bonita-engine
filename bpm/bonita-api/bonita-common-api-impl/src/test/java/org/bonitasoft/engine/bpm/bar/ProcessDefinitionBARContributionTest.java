@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,12 +20,14 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
+import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -36,6 +38,7 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * @author Celine Souchet
@@ -52,6 +55,9 @@ public class ProcessDefinitionBARContributionTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
+
+    @Rule
+    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     public final void serializeDeserializeProcessDefinition() throws Exception {
@@ -124,13 +130,10 @@ public class ProcessDefinitionBARContributionTest {
         new ProcessDefinitionBARContribution().checkVersion("invalid");
     }
 
-    private void checkSerializeDeserializeProcessDefinition(final DesignProcessDefinition designProcessDefinition) throws IOException,
+    private DesignProcessDefinition checkSerializeDeserializeProcessDefinition(final DesignProcessDefinition designProcessDefinition) throws IOException,
             InvalidBusinessArchiveFormatException {
         // Serialize designProcessDefinition
-        final File processDesignFolder = File.createTempFile("serializeDeserialize", "ProcessDefinition");
-        processDesignFolder.delete();
-        processDesignFolder.mkdir();
-        processDesignFolder.deleteOnExit();
+        final File processDesignFolder = temporaryFolder.newFolder();
         final ProcessDefinitionBARContribution processDefinitionBARContribution = new ProcessDefinitionBARContribution();
         processDefinitionBARContribution.serializeProcessDefinition(processDesignFolder, designProcessDefinition);
 
@@ -138,15 +141,7 @@ public class ProcessDefinitionBARContributionTest {
         final File processDesignFile = new File(processDesignFolder, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
         final DesignProcessDefinition resultDesignProcessDefinition = processDefinitionBARContribution.deserializeProcessDefinition(processDesignFile);
         assertThat(resultDesignProcessDefinition).isEqualTo(designProcessDefinition);
-
-        // Clean up
-        final File[] listFiles = processDesignFolder.listFiles();
-        for (int i = 0; i < listFiles.length; i++) {
-            listFiles[i].delete();
-        }
-        if (!processDesignFolder.delete()) {
-            System.out.println("Could not delete temporary test folder");
-        }
+        return resultDesignProcessDefinition;
     }
 
     private DesignProcessDefinition createDesignProcessDefinition() throws InvalidExpressionException, InvalidProcessDefinitionException {
@@ -176,6 +171,24 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addSendTask("SendTask", "messageName", targetProcessNameExpr);
         processBuilder.addTransition("BoundaryEvent", "ManualTask");
         return processBuilder;
+    }
+
+
+    @Test
+    public final void check_process_with_context() throws Exception {
+        Expression value1 = new ExpressionBuilder().createConstantStringExpression("value1");
+        Expression value2 = new ExpressionBuilder().createConstantStringExpression("value2");
+        Expression processValue1 = new ExpressionBuilder().createConstantStringExpression("processValue1");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithContext", "1.0");
+        processBuilder.addUserTask("taskWithContext", ACTOR_NAME).addContextEntry("key1", value1).addContextEntry("key2", value2);
+        processBuilder.addContextEntry("processKey1", processValue1);
+        processBuilder.addUserTask("taskWithoutContext", ACTOR_NAME);
+        processBuilder.addActor(ACTOR_NAME);
+
+        DesignProcessDefinition designProcessDefinition = checkSerializeDeserializeProcessDefinition(processBuilder.done());
+        assertThat(designProcessDefinition.getContext()).containsExactly(new ContextEntryImpl("processKey1", processValue1));
+        assertThat(((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithContext")).getContext()).containsExactly(new ContextEntryImpl("key1", value1), new ContextEntryImpl("key2", value2));
+        assertThat(((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithoutContext")).getContext()).isEmpty();
     }
 
 }

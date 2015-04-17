@@ -42,7 +42,7 @@ public class FormMappingKeyGeneratorImpl implements FormMappingKeyGenerator {
                 throw new SObjectCreationException("Process with id " + processDefinitionId + " does not exists");
             }
         } catch (SProcessDefinitionNotFoundException | SProcessDefinitionReadException e) {
-            throw new SObjectCreationException("Unable to get the process with id " + processDefinitionId);
+            throw new SObjectCreationException("Unable to get the process with id " + processDefinitionId, e);
         }
         switch (type) {
             case SFormMapping.TYPE_PROCESS_OVERVIEW:

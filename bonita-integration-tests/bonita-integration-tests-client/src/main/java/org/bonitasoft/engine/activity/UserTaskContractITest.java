@@ -121,7 +121,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
-                .addMandatoryConstraint("numberOfDays");
+                .addMandatoryConstraint("numberOfDays").addConstraint("Mystical constraint","true",null,"numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -137,10 +137,15 @@ public class UserTaskContractITest extends CommonAPIIT {
         assertThat(input.getType()).isEqualTo(Type.INTEGER);
         assertThat(input.getDescription()).isNull();
 
-        assertThat(contract.getConstraints()).hasSize(1);
+        assertThat(contract.getConstraints()).hasSize(2);
         final ConstraintDefinition rule = contract.getConstraints().get(0);
         assertThat(rule.getName()).isEqualTo("numberOfDays");
         assertThat(rule.getInputNames()).containsExactly("numberOfDays");
+        assertThat(rule.getExplanation()).isEqualTo("input numberOfDays is mandatory");
+        final ConstraintDefinition mysticRule = contract.getConstraints().get(1);
+        assertThat(mysticRule.getName()).isEqualTo("Mystical constraint");
+        assertThat(mysticRule.getInputNames()).containsExactly("numberOfDays");
+        assertThat(mysticRule.getExplanation()).isNull();
 
         //clean up
         disableAndDeleteProcess(processDefinition);

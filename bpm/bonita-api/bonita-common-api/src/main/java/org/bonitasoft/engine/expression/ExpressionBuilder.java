@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.Document;
+import org.bonitasoft.engine.business.data.BusinessDataReference;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -143,6 +144,10 @@ public class ExpressionBuilder {
 
     public Expression createBusinessDataExpression(final String businessDataName, final String returnType) throws InvalidExpressionException {
         return createNewInstance(businessDataName).setContent(businessDataName).setExpressionType(ExpressionType.TYPE_BUSINESS_DATA).setReturnType(returnType)
+                .done();
+    }
+    public Expression createBusinessDataReferenceExpression(final String businessDataName) throws InvalidExpressionException {
+        return createNewInstance(businessDataName).setContent(businessDataName).setExpressionType(ExpressionType.TYPE_BUSINESS_DATA_REFERENCE).setReturnType(BusinessDataReference.class.getName())
                 .done();
     }
 

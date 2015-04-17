@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 
 package org.bonitasoft.engine.form;
 
@@ -21,11 +21,15 @@ import java.util.Collections;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
+import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -38,8 +42,6 @@ import org.junit.rules.ExpectedException;
  * @author Baptiste Mesta
  */
 public class FormMappingIT extends TestWithUser {
-
-    public static final String PROCESS1_OVERVIEW_FORM = "process1OverviewForm";
 
     @Test
     public void deployProcessesWithFormMappings() throws Exception {
@@ -108,7 +110,7 @@ public class FormMappingIT extends TestWithUser {
         assertThat(processOverviewForm1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(processOverviewForm1.getPageId()).isNull();
         assertThat(processOverviewForm1.getURL()).isNull();
-        assertThat(processOverviewForm1.getTarget()).isNull(); // referenced page does not exists
+        assertThat(processOverviewForm1.getTarget()).isEqualTo(FormMappingTarget.INTERNAL); // referenced page does not exists
         assertThat(step1Form1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(step1Form1.getPageId()).isNull();
         assertThat(step2Form1.getProcessDefinitionId()).isEqualTo(p1.getId());
@@ -146,10 +148,10 @@ public class FormMappingIT extends TestWithUser {
         assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(), p1.getId());
 
         //resolve urls:
-        PageURL p1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("process/P1/1.0", Collections.<String, Serializable> emptyMap());
-        PageURL p1Overview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/P1/1.0", Collections.<String, Serializable> emptyMap());
+        PageURL p1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("process/P1/1.0", Collections.<String, Serializable>emptyMap());
+        PageURL p1Overview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/P1/1.0", Collections.<String, Serializable>emptyMap());
         PageURL p1step1Instanciation = getProcessConfigurationAPI()
-                .resolvePageOrURL("taskInstance/P1/1.0/step1", Collections.<String, Serializable> emptyMap());
+                .resolvePageOrURL("taskInstance/P1/1.0/step1", Collections.<String, Serializable>emptyMap());
         assertThat(p1Instanciation.getUrl()).isEqualTo("processStartForm");
         assertThat(p1Overview.getPageId()).isNull();
         assertThat(p1step1Instanciation.getUrl()).isEqualTo(null);
@@ -179,10 +181,43 @@ public class FormMappingIT extends TestWithUser {
 
         // try to resolve url:
         try {
-            getProcessConfigurationAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", Collections.<String, Serializable> emptyMap());
+            getProcessConfigurationAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", Collections.<String, Serializable>emptyMap());
         } finally {
             deleteProcess(processDefinition);
         }
+    }
+
+    @Test
+    public void deployProcessWithInternalPagesIncludedShouldBeResolved() throws Exception {
+        Page custompage_globalpage = getPageAPI().createPage("globalPage.zip", createTestPageContent("custompage_globalpage", "Global page", "a global page"));
+        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("CustomerSupport", "1.12");
+        final String custompage_startProcessForm = "custompage_startProcessForm";
+        BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
+                .createNewBusinessArchive().setProcessDefinition(processBuilder.done())
+                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("custompage_startProcessForm", FormMappingTarget.INTERNAL).addProcessOverviewForm("custompage_globalpage", FormMappingTarget.INTERNAL).build())
+                .addExternalResource(
+                        new BarResource("customPages/custompage_startProcessForm.zip", createTestPageContent(custompage_startProcessForm, "kikoo", "LOL")));
+
+        final ProcessDefinition processDefinition = deployProcess(bar.done());
+        final Page page = getPageAPI().getPageByNameAndProcessDefinitionId(custompage_startProcessForm, processDefinition.getId());
+        assertThat(page.getId()).isNotNull();
+        assertThat(getProcessAPI().getProcessResolutionProblems(processDefinition.getId())).isEmpty();
+        getProcessAPI().enableProcess(processDefinition.getId());
+
+        // Should not throw Exception
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
+
+        final PageURL pageURLStart = getProcessConfigurationAPI().resolvePageOrURL("process/CustomerSupport/1.12", Collections.<String, Serializable>emptyMap());
+        final PageURL pageURLOverview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/CustomerSupport/1.12", Collections.<String, Serializable>emptyMap());
+        assertThat(pageURLStart.getPageId()).isNotNull();
+        assertThat(page.getId()).isEqualTo(pageURLStart.getPageId());
+        assertThat(pageURLOverview.getPageId()).isNotNull();
+        assertThat(custompage_globalpage.getId()).isEqualTo(pageURLOverview.getPageId());
+
+
+        getPageAPI().deletePage(custompage_globalpage.getId());
+        disableAndDeleteProcess(processDefinition);
     }
 
 }
