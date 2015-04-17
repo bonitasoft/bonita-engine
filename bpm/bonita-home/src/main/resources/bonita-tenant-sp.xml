@@ -330,11 +330,11 @@
     </bean>
 
     <bean id="batchLogRegister" class="com.bonitasoft.engine.log.api.impl.InsertBatchLogsJobRegister">
-        <constructor-arg name="cronExpression" value="0/5 * * * * ?" />
+        <constructor-arg name="cronExpression" value="${bonita.tenant.queriablelog.batch.cronExpression}" />
     </bean>
 
     <bean id="monitoringService" class="com.bonitasoft.engine.monitoring.impl.TenantMonitoringServiceImpl">
-        <constructor-arg name="allowMbeansRegistration" value="true" />
+        <constructor-arg name="allowMbeansRegistration" value="${bonita.tenant.monitoring.allowMbeansRegistration}" />
         <constructor-arg name="identityService" ref="identityService" />
         <constructor-arg name="transactionService" ref="transactionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -398,24 +398,23 @@
         <bean id="archivingStrategyMapBase" class="org.springframework.beans.factory.config.MapFactoryBean">
             <property name="sourceMap">
                 <map>
-                    <entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="true" />
-                    <entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance" value="true" />
-                    <entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="true" />
+                    <entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="${bonita.tenant.archive.SComment}" />
+                    <entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="${bonita.tenant.archive.SDocumentMapping}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="${bonita.tenant.archive.SProcessInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="${bonita.tenant.archive.SAutomaticTaskInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" value="${bonita.tenant.archive.SManualTaskInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="${bonita.tenant.archive.SUserTaskInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance" value="${bonita.tenant.archive.SReceiveTaskInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="${bonita.tenant.archive.SLoopActivityInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="${bonita.tenant.archive.SMultiInstanceActivityInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="${bonita.tenant.archive.SCallActivityInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="${bonita.tenant.archive.SGatewayInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="${bonita.tenant.archive.SSubProcessActivityInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="${bonita.tenant.archive.SConnectorInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance" value="${bonita.tenant.archive.SSendTaskInstance}" />
+                    <entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="${bonita.tenant.archive.SDataInstance}" />
                     <!-- archived version because there is no not archived one -->
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="true" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="${bonita.tenant.archive.SATransitionInstance}" />
                 </map>
             </property>
         </bean>

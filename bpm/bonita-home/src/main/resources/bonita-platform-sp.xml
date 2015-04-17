@@ -33,10 +33,6 @@
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
-	<bean id="batchLogRegister" class="com.bonitasoft.engine.log.api.impl.InsertBatchLogsJobRegister">
-		<constructor-arg name="cronExpression" value="${bonita.platform.log.batch.cronExpression}" />
-	</bean>
-
 	<bean id="jvmMXBean" class="com.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl" />
 
 	<bean id="jobHandler" class="com.bonitasoft.engine.monitoring.impl.SJobHandlerImpl" />

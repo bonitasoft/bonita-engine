@@ -25,9 +25,15 @@
 	<bean id="sessionCache" class="org.bonitasoft.engine.cache.CacheConfiguration">
 		<!-- do not put the first letter because it will need to match the pattern *ESSION... -->
 		<property name="name" value="ESSION_MAP" />
-		<property name="inMemoryOnly" value="true" />
-		<property name="timeToLiveSeconds" value="4000" />
-		<property name="maxElementsInMemory" value="100000" />
+		<property name="maxElementsInMemory" value="${bonita.tenant.cache.session.maxElementsInMemory}" />
+		<property name="inMemoryOnly" value="${bonita.tenant.cache.session.inMemoryOnly}" />
+		<property name="eternal" value="${bonita.tenant.cache.session.eternal}" />
+		<property name="evictionPolicy" value="${bonita.tenant.cache.session.evictionPolicy}" />
+		<property name="timeToLiveSeconds" value="${bonita.tenant.cache.session.timeToLiveSeconds}" />
+		<property name="maxElementsOnDisk" value="${bonita.tenant.cache.session.maxElementsOnDisk}" />
+		<property name="copyOnRead" value="${bonita.tenant.cache.session.copyOnRead}" />
+		<property name="copyOnWrite" value="${bonita.tenant.cache.session.copyOnWrite}" />
+		<property name="readIntensive" value="${bonita.tenant.cache.session.readIntensive}" />
 	</bean>
 
 	<bean id="distributedCacheService" class="com.bonitasoft.engine.cache.impl.ClusteredCacheService">
@@ -61,12 +67,11 @@
 	<bean id="bonitaExecutorServiceFactory" class="com.bonitasoft.engine.work.ClusteredLocalQueueBonitaExecutorServiceFactory">
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="tenantId" value="${tenantId}" />
-		<constructor-arg name="corePoolSize" value="20" />
-		<constructor-arg name="maximumPoolSize" value="20" />
+		<constructor-arg name="corePoolSize" value="${bonita.tenant.work.corePoolSize}" />
+		<constructor-arg name="maximumPoolSize" value="${bonita.tenant.work.maximumPoolSize}" />
 		<!-- small value because of the hazelcast bug on queue not interrupted -->
-		<constructor-arg name="keepAliveTimeSeconds" value="15" />
+		<constructor-arg name="keepAliveTimeSeconds" value="${bonita.tenant.work.keepAliveTimeSeconds}" />
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
 	</bean>
-
 
 </beans>
