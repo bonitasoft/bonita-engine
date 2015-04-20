@@ -1,32 +1,45 @@
 package org.bonitasoft.engine.sequence;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * @author Charles Souillard
  */
 public class SequenceMapping {
 
-    private final String className;
+    private final Set<String> classNames;
     private final long sequenceId;
+    private final int rangeSize;
 
+    public SequenceMapping(String className, long sequenceId, final int rangeSize) {
+        this(Collections.singleton(className), sequenceId, rangeSize);
+    }
 
-    public SequenceMapping(String className, long sequenceId) {
-        this.className = className;
+    public SequenceMapping(Set<String> classNames, long sequenceId, final int rangeSize) {
+        this.classNames = classNames;
         this.sequenceId = sequenceId;
+        this.rangeSize = rangeSize;
     }
 
     public long getSequenceId() {
         return sequenceId;
     }
 
-    public String getClassName() {
-        return className;
+    public Set<String> getClassNames() {
+        return classNames;
+    }
+
+    public int getRangeSize() {
+        return rangeSize;
     }
 
     @Override
     public String toString() {
         return "SequenceMapping{" +
-                "className='" + className + '\'' +
-                ", sequenceId=" + sequenceId +
+                "sequenceId=" + sequenceId +
+                ", classNames='" + classNames + '\'' +
+                ", rangeSize=" + rangeSize +
                 '}';
     }
 }

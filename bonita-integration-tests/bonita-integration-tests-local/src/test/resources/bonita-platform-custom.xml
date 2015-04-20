@@ -11,44 +11,50 @@
 	">
 
 	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-		<constructor-arg name="className" value="org.bonitasoft.engine.persistence.model.Human" />
+		<constructor-arg name="classNames">
+			<set>
+				<value>org.bonitasoft.engine.persistence.model.Human</value>
+				<value>org.bonitasoft.engine.persistence.model.Child</value>
+				<value>org.bonitasoft.engine.persistence.model.Parent</value>
+			</set>
+		</constructor-arg>
 		<constructor-arg name="sequenceId" value="1000" />
-	</bean>
-	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-		<constructor-arg name="className" value="org.bonitasoft.engine.persistence.model.Child" />
-		<constructor-arg name="sequenceId" value="1000" />
-	</bean>
-	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-		<constructor-arg name="className" value="org.bonitasoft.engine.persistence.model.Parent" />
-		<constructor-arg name="sequenceId" value="1000" />
+		<constructor-arg name="rangeSize" value="${bonita.platform.sequence.1000:${bonita.platform.sequence.defaultRangeSize}}" />
 	</bean>
 	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
 		<constructor-arg name="className" value="org.bonitasoft.engine.persistence.model.Car" />
 		<constructor-arg name="sequenceId" value="1001" />
+		<constructor-arg name="rangeSize" value="${bonita.platform.sequence.1001:${bonita.platform.sequence.defaultRangeSize}}" />
 	</bean>
 	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
 		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.Employee" />
 		<constructor-arg name="sequenceId" value="60" />
+		<constructor-arg name="rangeSize" value="${bonita.platform.sequence.60:${bonita.platform.sequence.defaultRangeSize}}" />
 	</bean>
 	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
 		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.Laptop" />
 		<constructor-arg name="sequenceId" value="61" />
+		<constructor-arg name="rangeSize" value="${bonita.platform.sequence.61:${bonita.platform.sequence.defaultRangeSize}}" />
 	</bean>
 	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
 		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.Address" />
 		<constructor-arg name="sequenceId" value="62" />
+		<constructor-arg name="rangeSize" value="${bonita.platform.sequence.62:${bonita.platform.sequence.defaultRangeSize}}" />
 	</bean>
 	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
 		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.Project" />
 		<constructor-arg name="sequenceId" value="63" />
+		<constructor-arg name="rangeSize" value="${bonita.platform.sequence.63:${bonita.platform.sequence.defaultRangeSize}}" />
 	</bean>
 	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
 		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" />
 		<constructor-arg name="sequenceId" value="64" />
+		<constructor-arg name="rangeSize" value="${bonita.platform.sequence.64:${bonita.platform.sequence.defaultRangeSize}}" />
 	</bean>
 	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
 		<constructor-arg name="className" value="org.bonitasoft.engine.archive.model.SAEmployee" />
 		<constructor-arg name="sequenceId" value="65" />
+		<constructor-arg name="rangeSize" value="${bonita.platform.sequence.65:${bonita.platform.sequence.defaultRangeSize}}" />
 	</bean>
 
 	<bean id="testHbmResourcesProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">

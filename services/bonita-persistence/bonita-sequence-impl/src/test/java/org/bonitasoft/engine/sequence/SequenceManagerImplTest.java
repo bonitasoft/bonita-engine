@@ -74,8 +74,6 @@ public class SequenceManagerImplTest {
 
     private ResultSet resultSet;
 
-    private Map<Long, Integer> rangeSizes;
-
     private BonitaLock lock;
 
     private static final long TENANTID = 1;
@@ -84,12 +82,11 @@ public class SequenceManagerImplTest {
     public void before() throws SQLException, SLockException {
         lockService = mock(LockService.class);
         datasource = mock(DataSource.class);
-        rangeSizes = Collections.singletonMap(125L, RANGE_SIZE);
         lock = mock(BonitaLock.class);
         when(lockService.lock(anyLong(), anyString(), eq(TENANTID))).thenReturn(lock);
         final SequenceMappingProvider sequenceMappingProvider = new SequenceMappingProvider();
-        sequenceMappingProvider.setSequenceMappings(Collections.singletonList(new SequenceMapping("myClass", SEQUENCE_ID)));
-        sequenceManager = new SequenceManagerImpl(lockService, rangeSizes, 5, sequenceMappingProvider, datasource, 2, 1,
+        sequenceMappingProvider.setSequenceMappings(Collections.singletonList(new SequenceMapping("myClass", SEQUENCE_ID, RANGE_SIZE)));
+        sequenceManager = new SequenceManagerImpl(lockService, sequenceMappingProvider, datasource, 2, 1,
                 1);
         when(datasource.getConnection()).thenReturn(connection);
         preparedStatement = mock(PreparedStatement.class);

@@ -318,334 +318,300 @@
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" />
         <constructor-arg name="sequenceId" value="0" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.0:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
 
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.platform.model.impl.STenantImpl" />
         <constructor-arg name="sequenceId" value="1" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.1:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
 
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" />
         <constructor-arg name="sequenceId" value="2" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.2:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
 
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" />
         <constructor-arg name="sequenceId" value="3" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.3:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
 
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" />
         <constructor-arg name="sequenceId" value="4" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.4:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" />
         <constructor-arg name="sequenceId" value="10" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" />
         <constructor-arg name="sequenceId" value="11" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.11:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
         <constructor-arg name="sequenceId" value="20" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SRoleImpl" />
         <constructor-arg name="sequenceId" value="21" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.21:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SGroupImpl" />
         <constructor-arg name="sequenceId" value="22" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.22:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" />
         <constructor-arg name="sequenceId" value="23" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.23:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" />
         <constructor-arg name="sequenceId" value="24" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.24:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" />
         <constructor-arg name="sequenceId" value="25" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.25:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" />
         <constructor-arg name="sequenceId" value="26" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.26:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" />
         <constructor-arg name="sequenceId" value="30" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.30:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" />
         <constructor-arg name="sequenceId" value="31" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.31:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl" />
         <constructor-arg name="sequenceId" value="70" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.70:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl" />
         <constructor-arg name="sequenceId" value="71" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.71:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl" />
         <constructor-arg name="sequenceId" value="72" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.72:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.command.model.SCommandImpl" />
         <constructor-arg name="sequenceId" value="90" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.90:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.theme.model.impl.SThemeImpl" />
         <constructor-arg name="sequenceId" value="9890" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9890:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.impl.SProfileImpl" />
         <constructor-arg name="sequenceId" value="9990" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9990:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
         <constructor-arg name="sequenceId" value="9991" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9991:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
         <constructor-arg name="sequenceId" value="9992" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9992:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" />
         <constructor-arg name="sequenceId" value="10000" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10000:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" />
         <constructor-arg name="sequenceId" value="10001" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10001:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
         <constructor-arg name="sequenceId" value="10010" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10010:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" />
+        <constructor-arg name="classNames">
+            <set>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SSendTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl</value>
+            </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SSendTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10011" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10011:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" />
         <constructor-arg name="sequenceId" value="10012" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10012:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.definition.model.impl.SActorImpl" />
         <constructor-arg name="sequenceId" value="10013" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10013:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" />
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceWithFailureInfoImpl</value>
+        </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="10014" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10014:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceWithFailureInfoImpl" />
-        <constructor-arg name="sequenceId" value="10014" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" />
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl</value>
+        </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="10015" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10015:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10015" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10015" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10015" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" />
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl</value>
+        </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="10016" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl" />
-        <constructor-arg name="sequenceId" value="10016" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl" />
-        <constructor-arg name="sequenceId" value="10016" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10016:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
         <constructor-arg name="sequenceId" value="10017" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10017:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" />
         <constructor-arg name="sequenceId" value="10018" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10018:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" />
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl</value>
+        </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="10020" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10020" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10020" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10020" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10020" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10020" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10020" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10020" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10020" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10020" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10020" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10020" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10020:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" />
         <constructor-arg name="sequenceId" value="10030" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10030:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" />
         <constructor-arg name="sequenceId" value="10031" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10031:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" />
         <constructor-arg name="sequenceId" value="10040" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10040:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl" />
         <constructor-arg name="sequenceId" value="10050" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10050:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl" />
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl</value>
+        <value>org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl</value>
+        </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="10060" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" />
-        <constructor-arg name="sequenceId" value="10060" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10060:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" />
         <constructor-arg name="sequenceId" value="10070" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10070:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
         <constructor-arg name="sequenceId" value="10080" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.bonitasoft:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" />
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.document.model.impl.SDocumentImpl</value>
+        <value>org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl</value>
+        </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="10090" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10090:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" />
-        <constructor-arg name="sequenceId" value="10090" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.page.impl.SPageWithContentImpl" />
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.page.impl.SPageWithContentImpl</value>
+        <value>org.bonitasoft.engine.page.impl.SPageImpl</value>
+        <value>org.bonitasoft.engine.page.impl.SPageContentImpl</value>
+        </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="10120" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.page.impl.SPageImpl" />
-        <constructor-arg name="sequenceId" value="10120" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.page.impl.SPageContentImpl" />
-        <constructor-arg name="sequenceId" value="10120" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10120:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.page.impl.SPageMappingImpl" />
@@ -654,245 +620,120 @@
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" />
         <constructor-arg name="sequenceId" value="10200" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10200:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" />
         <constructor-arg name="sequenceId" value="10201" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10201:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" />
         <constructor-arg name="sequenceId" value="10202" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10202:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.STaskContractData" />
         <constructor-arg name="sequenceId" value="10210" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10210:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.SProcessContractData" />
         <constructor-arg name="sequenceId" value="10220" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10220:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" />
         <constructor-arg name="sequenceId" value="10300" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10300:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl" />
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl</value>
+        </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="10096" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10096" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="10096" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10096:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
         <constructor-arg name="sequenceId" value="20010" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20010:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" />
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SASendTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAMultiInstanceActivityInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl</value>
+        </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SASendTaskInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAMultiInstanceActivityInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20011" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20011:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" />
         <constructor-arg name="sequenceId" value="20012" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20012:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl" />
         <constructor-arg name="sequenceId" value="20013" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20013:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" />
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl</value>
+        </set>
+        </constructor-arg>
         <constructor-arg name="sequenceId" value="20050" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20050" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20050" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20050" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20050" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20050" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20050" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20050" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20050" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20050" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20050" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20050" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20050:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" />
         <constructor-arg name="sequenceId" value="20040" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20040:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.SATaskContractData" />
         <constructor-arg name="sequenceId" value="20210" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20210:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.SAProcessContractData" />
         <constructor-arg name="sequenceId" value="20220" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20220:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
 
     <bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
         <constructor-arg name="lockService" ref="lockService" />
-        <constructor-arg name="rangeSizes">
-            <map>
-                <!-- Most used objects: range size depends on process design -->
-                <entry key="70" value="2000" />
-                <!-- Job description -->
-                <entry key="30" value="10000" />
-                <!-- queriable log -->
-                <entry key="31" value="200000" />
-                <!-- queriable log parameter -->
-                <entry key="10010" value="1000" />
-                <!-- ProcessInstance -->
-                <entry key="10011" value="20000" />
-                <!-- ActivityInstance --><!-- 20 step by process average -->
-                <entry key="10013" value="20000" />
-                <!-- TransitoinInstance --><!-- same as activity instance -->
-                <entry key="10014" value="20000" />
-                <!-- ConnectorInstance --><!-- same as activity instance -->
-                <entry key="20010" value="3000" />
-                <!-- archived ProcessInstance --><!-- Process instance * nb state -->
-                <entry key="20011" value="80000" />
-                <!-- archived ActivityInstance --><!-- Activity instance * average nb state -->
-                <entry key="20012" value="40000" />
-                <!-- archived TransitionInstance --><!-- transition instance * nb state -->
-                <entry key="10015" value="4000" />
-                <!-- EventTriggerInstance --><!-- 1/5 of activity -->
-                <entry key="10016" value="4000" />
-                <!-- WaitingEvent --><!-- 1/5 of activity -->
-                <entry key="10017" value="4000" />
-                <!-- MessageInstance --><!-- 1/5 of activity -->
-                <entry key="10018" value="4000" />
-                <!-- PendingActivityMapping --><!-- 1/5 of activity -->
-                <entry key="10020" value="5000" />
-                <!-- data -->
-                <entry key="20050" value="25000" />
-                <!-- archived data --><!-- 5 change by data -->
-                <entry key="10060" value="20000" />
-                <!-- comment -->
-                <entry key="10080" value="20000" />
-                <!-- SAComment -->
-
-                <!-- less used objects : -->
-                <!-- <entry key="10012" value="100" />ProcessDefinition -->
-                <!-- <entry key="20" value="100" />user -->
-                <!-- <entry key="21" value="100" />group -->
-                <!-- <entry key="22" value="100" />role -->
-                <!-- <entry key="23" value="100" />user_memebership -->
-                <!-- <entry key="24" value="100" />P-metadata_def -->
-                <!-- <entry key="25" value="100" />P-metadata_val -->
-                <!-- <entry key="26" value="100" />user_contactinfo -->
-                <!-- <entry key="60" value="100" />employee -->
-                <!-- <entry key="61" value="100" />laptop -->
-                <!-- <entry key="62" value="100" />address -->
-                <!-- <entry key="63" value="100" />project -->
-                <!-- <entry key="64" value="100" />employeeprojectmapping -->
-                <!-- <entry key="65" value="100" />saemployee -->
-                <!-- <entry key="70" value="100" />jobDescriptor -->
-                <!-- <entry key="71" value="100" />jobParameter -->
-                <!-- <entry key="90" value="100" />command -->
-                <!-- <entry key="4" value="100" />platform command -->
-                <!-- <entry key="10000" value="100" />actor -->
-                <!-- <entry key="10001" value="100" />actorMapping -->
-                <!-- <entry key="10030" value="100" />category -->
-                <!-- <entry key="10040" value="100" />SDocumentMapping -->
-                <!-- <entry key="10050" value="100" />supervisor -->
-                <!-- <entry key="10070" value="100" />ExternalIdentityMapping -->
-                <!-- <entry key="10090" value="100" />document_content -->
-                <!-- <entry key="10096" value="100" />RefBusinessDataInstance -->
-                <!-- <entry key="20040" value="100" />SADocumentMapping -->
-            </map>
-        </constructor-arg>
-        <constructor-arg name="defaultRangeSize" value="${bonita.platform.sequence.defaultRangeSize}" />
         <constructor-arg name="sequenceMappingProvider" ref="sequenceMappingProvider" />
         <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
         <constructor-arg name="retries" value="${bonita.platform.sequence.retries}" />
