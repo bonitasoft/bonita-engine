@@ -28,9 +28,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.xml.bind.JAXBException;
 
+import com.bonitasoft.engine.CommonAPISPIT;
+import com.bonitasoft.engine.bdm.BusinessObjectDAOFactory;
+import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
+import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
+import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -70,28 +86,12 @@ import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-
-import com.bonitasoft.engine.CommonAPISPIT;
-import com.bonitasoft.engine.bdm.BusinessObjectDAOFactory;
-import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
-import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
-import com.bonitasoft.engine.bdm.model.BusinessObject;
-import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.model.Query;
-import com.bonitasoft.engine.bdm.model.field.FieldType;
-import com.bonitasoft.engine.bdm.model.field.RelationField;
-import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
-import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
-import com.bonitasoft.engine.bdm.model.field.SimpleField;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.businessdata.BusinessDataReference;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
-import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 
 /**
  * @deprecated From 7.0.0 on, please report changes to this class in org.bonitasoft.engine.business.data.BDRepositoryIT
@@ -131,9 +131,59 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     public static final String FIND_BY_HIRE_DATE_RANGE = "findByHireDateRange";
 
+    private static BDRepositoryIT bdRepositoryIT;
     private User matti;
 
-    private File clientFolder;
+    private static File clientFolder;
+    private Long tenantId;
+
+    private static boolean isDirty = false;
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        bdRepositoryIT = new BDRepositoryIT();
+        clientFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("bdr_it_client");
+        bdRepositoryIT.loginOnDefaultTenantWithDefaultTechnicalUser();
+
+        assertThat(bdRepositoryIT.getTenantManagementAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
+
+        bdRepositoryIT.installBusinessDataModel(bdRepositoryIT.buildBOM());
+
+        assertThat(bdRepositoryIT.getTenantManagementAPI().isPaused()).as("should have resume tenant after installing Business Object Model").isFalse();
+
+    }
+
+    @AfterClass
+    public static void afterClass() throws Exception {
+        try {
+            FileUtils.deleteDirectory(clientFolder);
+        } catch (final Exception e) {
+            clientFolder.deleteOnExit();
+        }
+        bdRepositoryIT.uninstallBusinessObjectModel();
+
+        bdRepositoryIT.logoutOnTenant();
+    }
+
+    @Before
+    public void before() throws Exception {
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+
+        if(isDirty){
+            uninstallBusinessObjectModel();
+            installBusinessDataModel(buildBOM());
+            isDirty = false;
+        }
+        tenantId = getSession().getTenantId();
+
+        matti = createUser("matti", "bpm");
+    }
+
+    @After
+    public void after() throws Exception {
+        deleteUser(matti);
+        logoutOnTenant();
+    }
 
     private BusinessObjectModel buildBOM() {
         final SimpleField name = new SimpleField();
@@ -278,35 +328,6 @@ public class BDRepositoryIT extends CommonAPISPIT {
         return model;
     }
 
-    private Long tenantId;
-
-    @Before
-    public void setUp() throws Exception {
-        clientFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("bdr_it_client");
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        matti = createUser("matti", "bpm");
-
-        assertThat(getTenantManagementAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
-
-        installBusinessDataModel(buildBOM());
-
-        assertThat(getTenantManagementAPI().isPaused()).as("should have resume tenant after installing Business Object Model").isFalse();
-
-        tenantId = getSession().getTenantId();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        try {
-            FileUtils.deleteDirectory(clientFolder);
-        } catch (final Exception e) {
-            clientFolder.deleteOnExit();
-        }
-        uninstallBusinessObjectModel();
-
-        deleteUser(matti);
-        logoutOnTenant();
-    }
 
     private void uninstallBusinessObjectModel() throws UpdateException, BusinessDataRepositoryDeploymentException {
         if (!getTenantManagementAPI().isPaused()) {
@@ -417,7 +438,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
     @Test
     public void deployABDRAndCreateADefaultBusinessDataAndReuseReference() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;").toString(),
+                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'Johny'; e.lastName = 'Cash'; return e;").toString(),
                 EMPLOYEE_QUALIFIED_NAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
@@ -428,7 +449,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(
                 new OperationBuilder().attachBusinessDataSetAttributeOperation(secondBizData, new ExpressionBuilder().createQueryBusinessDataExpression(
                         "oneEmployee", "Employee." + GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, EMPLOYEE_QUALIFIED_NAME,
-                        new ExpressionBuilder().createConstantStringExpression("lastName", "Doe"))));
+                        new ExpressionBuilder().createConstantStringExpression("lastName", "Cash"))));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
@@ -437,12 +458,12 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         final long step1Id = waitForUserTask(processInstance, "step1");
         final String employeeToString = getEmployeeToString("myEmployee", processInstance.getId());
-        assertThat(employeeToString).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
+        assertThat(employeeToString).isEqualTo("Employee [firstName=Johny, lastName=Cash]");
 
         assignAndExecuteStep(step1Id, matti);
         waitForUserTask(processInstance, "step2");
         final String people = getEmployeeToString(secondBizData, processInstance.getId());
-        assertThat(people).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
+        assertThat(people).isEqualTo("Employee [firstName=Johny, lastName=Cash]");
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -570,7 +591,6 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final String employeeToString = getEmployeeToString("myEmployee", instance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=John, lastName=Hakkinen]");
 
-        assertCount(instance.getId());
         disableAndDeleteProcess(definition);
     }
 
@@ -587,6 +607,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         getTenantManagementAPI().pause();
         getTenantManagementAPI().uninstallBusinessDataModel();
+        isDirty = true;
         getTenantManagementAPI().resume();
 
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
@@ -653,8 +674,6 @@ public class BDRepositoryIT extends CommonAPISPIT {
         assertThat(returnedLastName).isEqualTo("Grenoble");
         logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalUser();
-
-        assertCount(processInstanceId);
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -911,12 +930,12 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         final long processInstanceId = processInstance.getId();
         Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
-        assertThat(result.get("countEmployee")).isEqualTo(1L);
+        Long countEmployee = (Long) result.get("countEmployee");
 
         assignAndExecuteStep(step1Id, matti);
         waitForUserTask(processInstance, "step2");
         result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
-        assertThat(result.get("countEmployee")).isEqualTo(0L);
+        assertThat(result.get("countEmployee")).isEqualTo(countEmployee - 1);
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -1225,7 +1244,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
-        long step2 = waitForUserTask(instance, "step2");
+        waitForUserTask(instance, "step2");
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("names", instance.getId());
         assertThat(dataInstance.getValue().toString()).isEqualTo("[Doe, Doe]");
@@ -1413,7 +1432,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
         // then
-        assertThatJson(jsonResult).as("should get employee count ").isEqualTo(getJsonContent("countEmployee.json"));
+        assertThatJson(jsonResult).as("should get employee count ").hasSameStructureAs(getJsonContent("countEmployee.json"));
 
     }
 
@@ -1534,6 +1553,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
                         .build())
                 .build();
         installBusinessDataModel(businessObjectModel);
+        isDirty = true;
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
