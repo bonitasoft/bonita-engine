@@ -126,7 +126,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         params.put("bee", "busy");
         businessArchive.setParameters(params);
 
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
+        final ProcessDefinition definition = deployProcess(businessArchive.done());
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
         getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", "sleepy");
@@ -147,7 +147,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
+        final ProcessDefinition definition = deployProcess(businessArchive.done());
         getProcessAPI().updateParameterInstanceValue(definition.getId(), "bear", "sleepy");
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ConfigurationState.UNRESOLVED, processDeploymentInfo.getConfigurationState());
@@ -209,7 +209,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         params.put("bear", "bos");
         businessArchive.setParameters(params);
 
-        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
+        final ProcessDefinition definition = deployProcess(businessArchive.done());
         ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ConfigurationState.RESOLVED, deploymentInfo.getConfigurationState());
 
@@ -237,7 +237,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         processDefinitionBuilder.addParameter(paraName1, String.class.getCanonicalName());
         processDefinitionBuilder.addParameter(paraName2, Integer.class.getCanonicalName());
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
         final long pDefinitionId = processDefinition.getId();
         getProcessAPI().importParameters(pDefinitionId, parametersXML);
@@ -303,7 +303,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         disableAndDeleteProcess(processDefinition);
 
         final BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(baiStream);
-        final ProcessDefinition processDef = getProcessAPI().deploy(businessArchive);
+        final ProcessDefinition processDef = deployProcess(businessArchive);
         final long processDefinitionId = processDef.getId();
         getProcessAPI().enableProcess(processDefinitionId);
         processInstance = getProcessAPI().startProcess(processDefinitionId);

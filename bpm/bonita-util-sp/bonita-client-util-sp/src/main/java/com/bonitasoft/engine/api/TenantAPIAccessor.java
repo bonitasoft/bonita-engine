@@ -16,7 +16,6 @@ import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.EJB3ServerAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
-import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
@@ -131,7 +130,8 @@ public final class TenantAPIAccessor {
         return getAPI(CommandAPI.class, session);
     }
 
-    public static ProcessConfigurationAPI getProcessConfigurationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static ProcessConfigurationAPI getProcessConfigurationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
+            UnknownAPITypeException {
         return getAPI(ProcessConfigurationAPI.class, session);
     }
 
@@ -182,4 +182,5 @@ public final class TenantAPIAccessor {
     public static ApplicationAPI getApplicationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ApplicationAPI.class, session);
     }
+
 }

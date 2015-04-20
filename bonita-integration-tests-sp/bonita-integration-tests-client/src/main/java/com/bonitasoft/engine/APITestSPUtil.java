@@ -20,27 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.api.ApplicationAPI;
-import com.bonitasoft.engine.api.IdentityAPI;
-import com.bonitasoft.engine.api.LogAPI;
-import com.bonitasoft.engine.api.MonitoringAPI;
-import com.bonitasoft.engine.api.PageAPI;
-import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.api.PlatformMonitoringAPI;
-import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.ProfileAPI;
-import com.bonitasoft.engine.api.ReportingAPI;
-import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.api.TenantManagementAPI;
-import com.bonitasoft.engine.api.ThemeAPI;
-import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
-import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
-import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
-import com.bonitasoft.engine.connector.APIAccessorConnector;
-import com.bonitasoft.engine.log.Log;
-import com.bonitasoft.engine.monitoring.MonitoringException;
-import com.bonitasoft.engine.reporting.Report;
-import com.bonitasoft.engine.reporting.ReportSearchDescriptor;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
@@ -75,6 +54,29 @@ import org.bonitasoft.engine.test.BuildTestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bonitasoft.engine.api.ApplicationAPI;
+import com.bonitasoft.engine.api.IdentityAPI;
+import com.bonitasoft.engine.api.LogAPI;
+import com.bonitasoft.engine.api.MonitoringAPI;
+import com.bonitasoft.engine.api.PageAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.api.PlatformMonitoringAPI;
+import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.ProcessConfigurationAPI;
+import com.bonitasoft.engine.api.ProfileAPI;
+import com.bonitasoft.engine.api.ReportingAPI;
+import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.api.TenantManagementAPI;
+import com.bonitasoft.engine.api.ThemeAPI;
+import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
+import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
+import com.bonitasoft.engine.connector.APIAccessorConnector;
+import com.bonitasoft.engine.log.Log;
+import com.bonitasoft.engine.monitoring.MonitoringException;
+import com.bonitasoft.engine.reporting.Report;
+import com.bonitasoft.engine.reporting.ReportSearchDescriptor;
+
 public class APITestSPUtil extends APITestUtil {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(APITestSPUtil.class);
@@ -94,6 +96,8 @@ public class APITestSPUtil extends APITestUtil {
     private PageAPI pageAPI;
 
     private ApplicationAPI applicationAPI;
+
+    private ProcessConfigurationAPI processConfigurationAPI;
 
     @Override
     public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
@@ -145,6 +149,11 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
+    public ProcessConfigurationAPI getProcessConfigurationAPI() {
+        return processConfigurationAPI;
+    }
+
+    @Override
     public IdentityAPI getIdentityAPI() {
         return (IdentityAPI) super.getIdentityAPI();
     }
@@ -182,6 +191,10 @@ public class APITestSPUtil extends APITestUtil {
     @Deprecated
     public void setTenantManagementAPI(final TenantManagementAPI tenantManagementAPI) {
         this.tenantManagementAPI = tenantManagementAPI;
+    }
+
+    public void setProcessConfigurationAPI(ProcessConfigurationAPI processConfigurationAPI) {
+        this.processConfigurationAPI = processConfigurationAPI;
     }
 
     public void loginOnTenantWith(final String userName, final String password, final long tenantId) throws BonitaException {
