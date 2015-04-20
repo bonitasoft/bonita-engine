@@ -1528,7 +1528,7 @@
         <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
         <constructor-arg name="formMappingService" ref="formMappingService" />
     </bean>
-    <bean class="org.bonitasoft.engine.core.form.ExternalURLAdapter" />
+    <bean id="externalUrlAdapter" class="org.bonitasoft.engine.core.form.ExternalURLAdapter" />
 
 
 </beans>
