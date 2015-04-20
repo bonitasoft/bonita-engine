@@ -17,6 +17,9 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
+import static org.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
+import static org.bonitasoft.engine.bdm.builder.FieldBuilder.aStringField;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +49,7 @@ import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.Type;
@@ -79,47 +83,82 @@ import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 public class BDRepositoryIT extends CommonAPIIT {
 
-    private static final String BDM_PACKAGE_PREFIX = "com.company.model";
-
-    private static final String COUNTRY_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Country";
-
-    private static final String ADDRESS_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Address";
-
-    private static final String EMPLOYEE_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Employee";
-
-    private static final String PRODUCT_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Product";
-
-    private static final String PRODUCT_CATALOG_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".ProductCatalog";
-
-    private static final String PERSON_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Person";
-
-    private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "findByLastName";
-
-    private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
-
-    private static final String FIND_BY_FIRST_NAME_FETCH_ADDRESSES = "findByFirstNameFetchAddresses";
-
-    private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
-
-    private static final String COUNT_EMPLOYEE = "countEmployee";
-
-    private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
-
     public static final String BUSINESS_DATA_CLASS_NAME_ID_FIELD = "/businessdata/{className}/{id}/{field}";
-
     public static final String ENTITY_CLASS_NAME = "entityClassName";
-
     public static final String FIND_BY_HIRE_DATE_RANGE = "findByHireDateRange";
-
+    private static final String BDM_PACKAGE_PREFIX = "com.company.model";
+    private static final String COUNTRY_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Country";
+    private static final String ADDRESS_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Address";
+    private static final String EMPLOYEE_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Employee";
+    private static final String PRODUCT_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Product";
+    private static final String PRODUCT_CATALOG_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".ProductCatalog";
+    private static final String PERSON_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Person";
+    private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "findByLastName";
+    private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
+    private static final String FIND_BY_FIRST_NAME_FETCH_ADDRESSES = "findByFirstNameFetchAddresses";
+    private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
+    private static final String COUNT_EMPLOYEE = "countEmployee";
+    private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
+    private static BDRepositoryIT bdRepositoryIT;
     private User matti;
+    private static File clientFolder;
+    private Long tenantId;
 
-    private File clientFolder;
+    private static boolean isDirty = false;
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        bdRepositoryIT = new BDRepositoryIT();
+        clientFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("bdr_it_client");
+        bdRepositoryIT.loginOnDefaultTenantWithDefaultTechnicalUser();
+
+        assertThat(bdRepositoryIT.getTenantAdministrationAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
+
+        bdRepositoryIT.installBusinessDataModel(bdRepositoryIT.buildBOM());
+
+        assertThat(bdRepositoryIT.getTenantAdministrationAPI().isPaused()).as("should have resume tenant after installing Business Object Model").isFalse();
+
+    }
+
+    @AfterClass
+    public static void afterClass() throws Exception {
+        try {
+            FileUtils.deleteDirectory(clientFolder);
+        } catch (final Exception e) {
+            clientFolder.deleteOnExit();
+        }
+        bdRepositoryIT.uninstallBusinessObjectModel();
+
+        bdRepositoryIT.logoutOnTenant();
+    }
+
+    @Before
+    public void before() throws Exception {
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+
+        if(isDirty){
+            uninstallBusinessObjectModel();
+            installBusinessDataModel(buildBOM());
+            isDirty = false;
+        }
+        tenantId = getSession().getTenantId();
+
+        matti = createUser("matti", "bpm");
+    }
+
+    @After
+    public void after() throws Exception {
+        deleteUser(matti);
+        logoutOnTenant();
+    }
 
     private BusinessObjectModel buildBOM() {
         final SimpleField name = new SimpleField();
@@ -263,35 +302,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         return model;
     }
 
-    private Long tenantId;
 
-    @Before
-    public void setUp() throws Exception {
-        clientFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("bdr_it_client");
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        matti = createUser("matti", "bpm");
-
-        assertThat(getTenantAdministrationAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
-
-        installBusinessDataModel(buildBOM());
-
-        assertThat(getTenantAdministrationAPI().isPaused()).as("should have resume tenant after installing Business Object Model").isFalse();
-
-        tenantId = getSession().getTenantId();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        try {
-            FileUtils.deleteDirectory(clientFolder);
-        } catch (final Exception e) {
-            clientFolder.deleteOnExit();
-        }
-        uninstallBusinessObjectModel();
-
-        deleteUser(matti);
-        logoutOnTenant();
-    }
 
     private void uninstallBusinessObjectModel() throws UpdateException, BusinessDataRepositoryDeploymentException {
         if (!getTenantAdministrationAPI().isPaused()) {
@@ -319,9 +330,9 @@ public class BDRepositoryIT extends CommonAPIIT {
         deleteProcess(processDefinition);
     }
 
-    private void installBusinessDataModel(final BusinessObjectModel bom) throws Exception {
+    private void installBusinessDataModel(final BusinessObjectModel bdm) throws Exception {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(bom);
+        final byte[] zip = converter.zip(bdm);
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
         getTenantAdministrationAPI().installBusinessDataModel(zip);
@@ -349,11 +360,10 @@ public class BDRepositoryIT extends CommonAPIIT {
         bo.addField(field);
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(bo);
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         return model;
     }
 
-    @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "business data java setter operation" }, jira = "BS-7217", story = "update a business data using a java setter operation")
+    @Cover(classes = {Operation.class}, concept = BPMNConcept.OPERATION, keywords = {"BusinessData", "business data java setter operation"}, jira = "BS-7217", story = "update a business data using a java setter operation")
     @Test
     public void shouldBeAbleToUpdateBusinessDataUsingBizDataJavaSetterOperation() throws Exception {
         final String processContractInputName = "lastName_input";
@@ -418,14 +428,13 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(returnedFirstName).isEqualTo(newEmployeeFirstName);
         assertThat(returnedLastName).isEqualTo(newEmployeeLastName);
 
-        assertCount(processInstance.getId());
         disableAndDeleteProcess(definition.getId());
     }
 
     @Test
     public void deployABDRAndCreateADefaultBusinessDataAndReuseReference() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", new StringBuilder().append("import ")
-                .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;").toString(),
+                        .append(EMPLOYEE_QUALIFIED_NAME).append("; Employee e = new Employee(); e.firstName = 'Johny'; e.lastName = 'Cash'; return e;").toString(),
                 EMPLOYEE_QUALIFIED_NAME);
 
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("test", "1.2-alpha");
@@ -436,7 +445,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(
                 new OperationBuilder().attachBusinessDataSetAttributeOperation(secondBizData, new ExpressionBuilder().createQueryBusinessDataExpression(
                         "oneEmployee", "Employee." + GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME, EMPLOYEE_QUALIFIED_NAME,
-                        new ExpressionBuilder().createConstantStringExpression("lastName", "Doe"))));
+                        new ExpressionBuilder().createConstantStringExpression("lastName", "Cash"))));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
@@ -445,12 +454,12 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         final long step1Id = waitForUserTask(processInstance, "step1");
         final String employeeToString = getEmployeeToString("myEmployee", processInstance.getId());
-        assertThat(employeeToString).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
+        assertThat(employeeToString).isEqualTo("Employee [firstName=Johny, lastName=Cash]");
 
         assignAndExecuteStep(step1Id, matti);
         waitForUserTask(processInstance, "step2");
         final String people = getEmployeeToString(secondBizData, processInstance.getId());
-        assertThat(people).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
+        assertThat(people).isEqualTo("Employee [firstName=Johny, lastName=Cash]");
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -578,7 +587,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String employeeToString = getEmployeeToString("myEmployee", instance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=John, lastName=Hakkinen]");
 
-        assertCount(instance.getId());
         disableAndDeleteProcess(definition);
     }
 
@@ -593,6 +601,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     @Test(expected = BusinessDataRepositoryException.class)
     public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
+        isDirty = true;
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().uninstallBusinessDataModel();
         getTenantAdministrationAPI().resume();
@@ -661,8 +670,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(returnedLastName).isEqualTo("Grenoble");
         logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalUser();
-
-        assertCount(processInstanceId);
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -842,8 +849,8 @@ public class BDRepositoryIT extends CommonAPIIT {
         }
     }
 
-    @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "java setter operation", "mandatory field",
-            "intermixed" }, jira = "BS-8591", story = "Create business datas using intermixed java setter operations.")
+    @Cover(classes = {Operation.class}, concept = BPMNConcept.OPERATION, keywords = {"BusinessData", "java setter operation", "mandatory field",
+            "intermixed"}, jira = "BS-8591", story = "Create business datas using intermixed java setter operations.")
     @Test
     public void shouldBeAbleToCreate2BusinessDataUsingIntermixedBizDataJavaSetterOperations() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
@@ -898,16 +905,16 @@ public class BDRepositoryIT extends CommonAPIIT {
         final long step1Id = waitForUserTask(processInstance, "step1");
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression("countEmployee", "Employee.countEmployee", Long.class.getName()),
-                Collections.<String, Serializable> emptyMap());
+                Collections.<String, Serializable>emptyMap());
 
         final long processInstanceId = processInstance.getId();
         Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
-        assertThat(result.get("countEmployee")).isEqualTo(1L);
+        Long countEmployee = (Long) result.get("countEmployee");
 
         assignAndExecuteStep(step1Id, matti);
         waitForUserTask(processInstance, "step2");
         result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
-        assertThat(result.get("countEmployee")).isEqualTo(0L);
+        assertThat(result.get("countEmployee")).isEqualTo(countEmployee - 1);
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -915,42 +922,10 @@ public class BDRepositoryIT extends CommonAPIIT {
     public void assertCount(final long processInstanceId) throws Exception {
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression("countEmployee", "Employee.countEmployee", Long.class.getName()),
-                Collections.<String, Serializable> emptyMap());
+                Collections.<String, Serializable>emptyMap());
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         assertThat(result.get("countEmployee")).isEqualTo(1L);
-    }
-
-    class AddressRef {
-
-        private final String varName;
-
-        private final String street;
-
-        private final String city;
-
-        AddressRef(final String varName, final String street, final String city) {
-            this.varName = varName;
-            this.street = street;
-            this.city = city;
-        }
-
-        public Expression createDependency() throws InvalidExpressionException {
-            return new ExpressionBuilder().createBusinessDataExpression(getVarName(), ADDRESS_QUALIFIED_NAME);
-        }
-
-        public String getVarName() {
-            return varName;
-        }
-
-        public String getStreet() {
-            return street;
-        }
-
-        public String getCity() {
-            return city;
-        }
-
     }
 
     @Test
@@ -1219,7 +1194,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         Map<String, Serializable> employee = getProcessAPI().evaluateExpressionsOnProcessInstance(
                 instance.getId(),
                 Collections.singletonMap(new ExpressionBuilder().createBusinessDataReferenceExpression("myEmployees"),
-                        Collections.<String, Serializable> emptyMap()));
+                        Collections.<String, Serializable>emptyMap()));
         assertThat(employee).hasSize(1);
         assertThat(employee.get("myEmployees")).isInstanceOf(MultipleBusinessDataReference.class);
         MultipleBusinessDataReference myEmployees = (MultipleBusinessDataReference) employee.get("myEmployees");
@@ -1398,7 +1373,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String jsonResult = (String) getCommandAPI().execute("getBusinessDataByQueryCommand", parameters);
 
         // then
-        assertThatJson(jsonResult).as("should get employee count ").isEqualTo(getJsonContent("countEmployee.json"));
+        assertThatJson(jsonResult).as("should get employee count ").hasSameStructureAs(getJsonContent("countEmployee.json"));
 
     }
 
@@ -1511,6 +1486,70 @@ public class BDRepositoryIT extends CommonAPIIT {
         clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("server").append(File.separator).append("tenants")
                 .append(File.separator).append(tenantId).append(File.separator).append("data-management").append(File.separator).append("client").toString();
         return clientBdmJarPath;
-   }
+    }
+
+    @Test
+    public void should_execute_a_connector_with_tenant_dependency() throws Exception {
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+
+        uninstallBusinessObjectModel();
+
+        BusinessObjectModel businessObjectModel = aBOM().
+                withBO(aBO("org.test.Restaurant").withField(aStringField("name").ofType(FieldType.STRING).build())
+                        .build())
+                .build();
+        installBusinessDataModel(businessObjectModel);
+        isDirty = true;
+
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
+        final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
+        final UserTaskDefinitionBuilder addUserTask = pBuilder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME);
+        addUserTask
+                .addConnector("myConnector1", "connectorInJar", "1.0.0", ConnectorEvent.ON_ENTER);
+        final DesignProcessDefinition done = pBuilder.done();
+        final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(done);
+        builder.addConnectorImplementation(getBarResource("/org/bonitasoft/engine/business/data/TestConnectorInJarForBdm.impl", "TestConnectorInJar.impl",
+                BDRepositoryIT.class));
+        builder.addClasspathResource(getBarResource("/org/bonitasoft/engine/business/data/test-connector-with-bdm-0.0.1-SNAPSHOT.jar.bak",
+                "test-connector-with-bdm-0.0.1-SNAPSHOT.jar", BDRepositoryIT.class));
+        final BusinessArchive businessArchive = builder.done();
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask(processInstance, "step1");
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    class AddressRef {
+
+        private final String varName;
+
+        private final String street;
+
+        private final String city;
+
+        AddressRef(final String varName, final String street, final String city) {
+            this.varName = varName;
+            this.street = street;
+            this.city = city;
+        }
+
+        public Expression createDependency() throws InvalidExpressionException {
+            return new ExpressionBuilder().createBusinessDataExpression(getVarName(), ADDRESS_QUALIFIED_NAME);
+        }
+
+        public String getVarName() {
+            return varName;
+        }
+
+        public String getStreet() {
+            return street;
+        }
+
+        public String getCity() {
+            return city;
+        }
+
+    }
 
 }
