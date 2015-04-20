@@ -71,6 +71,7 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -1203,6 +1204,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
     }
 
     @Test
+    @Ignore("BS-13108 is being fixed")
     public void getBusinessDataCommand_should_return_json_entities() throws Exception {
         final ProcessDefinition processDefinition;
         final ProcessDefinitionBuilderExt processDefinitionBuilder;
