@@ -616,6 +616,7 @@
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.page.impl.SPageMappingImpl" />
         <constructor-arg name="sequenceId" value="10121" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10121:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" />
