@@ -20,6 +20,8 @@ import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.contract.data.ContractDataService;
@@ -64,6 +66,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -83,7 +86,21 @@ public class ProcessArchiver {
             final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
             final DocumentService documentService, final TechnicalLoggerService logger,
             final SCommentService commentService, final ProcessDefinitionService processDefinitionService,
-            final ConnectorInstanceService connectorInstanceService) throws SArchivingException {
+                                              final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) throws SArchivingException {
+
+        //set the classloader to this process because we need it e.g. to archive data instance
+
+        ClassLoader processClassLoader;
+        try {
+            processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processInstance.getProcessDefinitionId());
+
+        } catch (SClassLoaderException e) {
+            throw new SArchivingException(e);
+        }
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(processClassLoader);
+        try {
+
         final SAProcessInstance saProcessInstance = BuilderFactory.get(SAProcessInstanceBuilderFactory.class).createNewInstance(processInstance).done();
         final long archiveDate = saProcessInstance.getEndDate();
 
@@ -109,6 +126,10 @@ public class ProcessArchiver {
 
         // Archive
         archiveProcessInstance(processDefinition, processInstance, saProcessInstance, archiveDate, archiveService, processInstanceService, logger);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+    }
+
     }
 
     private static void archiveConnectors(final ConnectorInstanceService connectorInstanceService, final long archiveDate, final long containerId,
@@ -174,21 +195,21 @@ public class ProcessArchiver {
     private static void archiveComments(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
             final SCommentService commentService, final long archiveDate) throws SArchivingException {
         try {
-            List<SComment> sComments = null;
-            int startIndex = 0;
-            do {
+        List<SComment> sComments = null;
+        int startIndex = 0;
+        do {
                 sComments = commentService
                         .getComments(processInstance.getId(), new QueryOptions(startIndex, BATCH_SIZE, SComment.class, "id", OrderByType.ASC));
                 for (final SComment sComment : sComments) {
                     commentService.archive(archiveDate, sComment);
-                }
-                startIndex += BATCH_SIZE;
+            }
+            startIndex += BATCH_SIZE;
             } while (!sComments.isEmpty());
         } catch (final SBonitaException e) {
-            setExceptionContext(processDefinition, processInstance, e);
-            throw new SArchivingException("Unable to archive the process instance comments.", e);
+                setExceptionContext(processDefinition, processInstance, e);
+                throw new SArchivingException("Unable to archive the process instance comments.", e);
+            }
         }
-    }
 
     private static void setExceptionContext(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
             final SBonitaException e) {

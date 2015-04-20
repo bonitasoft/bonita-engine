@@ -755,7 +755,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
             throws SArchivingException {
-        //FIXME HERRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEEE
+        //FIXME we archive the flow node instance here because it was not archived before because the flow node was interrupting the parent.. we should change that because it's not very easy to see how it works
         if (child.getId() != sProcessInstance.getInterruptingEventId() || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
             // Let's archive the final state of the child:
             flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
@@ -763,7 +763,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private boolean needToReevaluateInclusiveGateways(FlowNodeTransitionsWrapper transitionsDescriptor) {
-        int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size();
+        int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size() + (transitionsDescriptor.getDefaultTransition()!=null?1:0);
         int takenTransition = transitionsDescriptor.getValidOutgoingTransitionDefinitions().size();
         /*
          * Why this condition?

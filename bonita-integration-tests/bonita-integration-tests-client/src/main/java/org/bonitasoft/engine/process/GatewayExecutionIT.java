@@ -1072,6 +1072,50 @@ public class GatewayExecutionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Test
+    public void processWithAlternativePathUsingExclusiveGatewayMergedByInclusive() throws Exception {
+
+        /*
+            Diagram: one step5 is executed, step6 should be ready
+                    ╭────❲Step2❳────────────────────╮
+        ○─❲Step1❳─❬o❭                             ❬o❭─❲Step6❳─○
+                    ╰────❲Step3❳──❬x❭──❲Step4❳────╯
+                                    ╰────❲Step5❳──○
+
+         */
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
+        processDefinitionBuilder = processDefinitionBuilder.createNewInstance("processWithDiedBranch", PROCESS_VERSION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addStartEvent("Start");
+        processDefinitionBuilder.addUserTask("Step1", ACTOR_NAME);
+        processDefinitionBuilder.addGateway("Gateway1", GatewayType.INCLUSIVE);
+        processDefinitionBuilder.addUserTask("Step2", ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("Step3", ACTOR_NAME);
+        processDefinitionBuilder.addGateway("Exclu", GatewayType.EXCLUSIVE);
+        processDefinitionBuilder.addUserTask("Step4", ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("Step5", ACTOR_NAME);
+        processDefinitionBuilder.addGateway("Gateway2", GatewayType.INCLUSIVE);
+        processDefinitionBuilder.addUserTask("Step6", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("Start", "Gateway1");
+        processDefinitionBuilder.addTransition("Gateway1", "Step2");
+        processDefinitionBuilder.addTransition("Gateway1", "Step3");
+        processDefinitionBuilder.addTransition("Step3", "Exclu");
+        processDefinitionBuilder.addDefaultTransition("Exclu", "Step4");
+        processDefinitionBuilder.addTransition("Exclu", "Step5",trueExpression);
+        processDefinitionBuilder.addTransition("Step4", "Gateway2");
+        processDefinitionBuilder.addTransition("Step2", "Gateway2");
+        processDefinitionBuilder.addTransition("Gateway2", "Step6");
+        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
+        waitForUserTaskAndExecuteIt(processInstance, "Step2", user);
+        waitForUserTaskAndExecuteIt(processInstance, "Step3", user);
+        waitForUserTask("Step5");
+        waitForUserTask("Step6");
+        disableAndDeleteProcess(processDefinition);
+    }
+
 
     @Test
     public void processWithLoopAndInclusive() throws Exception {

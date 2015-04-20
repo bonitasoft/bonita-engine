@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
@@ -31,11 +32,11 @@ public abstract class SFlowNodeInstanceBuilderImpl implements SFlowNodeInstanceB
     }
 
     @Override
-    public SFlowNodeInstanceBuilder setState(final int stateId, final boolean stable, final boolean terminal, final String stateName) {
-        this.entity.setStateId(stateId);
-        this.entity.setStable(stable);
-        this.entity.setTerminal(terminal);
-        this.entity.setStateName(stateName);
+    public SFlowNodeInstanceBuilder setState(final FlowNodeState state) {
+        entity.setStateId(state.getId());
+        entity.setStateName(state.getName());
+        entity.setStable(state.isStable());
+        entity.setTerminal(state.isTerminal());
         return this;
     }
 

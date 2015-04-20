@@ -15,9 +15,7 @@ package org.bonitasoft.engine.execution.work;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 
@@ -32,18 +30,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(WorkFactory.class)
+@RunWith(MockitoJUnitRunner.class)
 public class RestartFlowNodesHandlerTest {
 
     @InjectMocks
     private RestartFlowNodesHandler restartFlowNodesHandler;
+
     private PlatformServiceAccessor platformServiceAccessor;
     private TenantServiceAccessor tenantServiceAccessor;
     private TechnicalLoggerService logger;

@@ -30,6 +30,8 @@ public abstract class ArchivedHumanTaskInstanceImpl extends ArchivedActivityInst
 
     private long assigneeId;
 
+    private Date claimedDate;
+
     private TaskPriority priority;
 
     private Date expectedEndDate;
@@ -46,6 +48,15 @@ public abstract class ArchivedHumanTaskInstanceImpl extends ArchivedActivityInst
     @Override
     public long getAssigneeId() {
         return assigneeId;
+    }
+
+    @Override
+    public Date getClaimedDate() {
+        return claimedDate;
+    }
+
+    public void setClaimedDate(Date claimedDate) {
+        this.claimedDate = claimedDate;
     }
 
     @Override
