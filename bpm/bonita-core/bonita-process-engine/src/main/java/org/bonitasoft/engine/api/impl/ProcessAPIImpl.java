@@ -2593,7 +2593,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final String dataClassName = sDataInstance.getClassName();
         Class<?> dataClass;
         try {
-            dataClass = Class.forName(dataClassName);
+            dataClass = Class.forName(dataClassName, true, Thread.currentThread().getContextClassLoader());
         } catch (final ClassNotFoundException e) {
             throw new UpdateException(e);
         }
