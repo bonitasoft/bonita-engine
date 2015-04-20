@@ -383,6 +383,10 @@
         <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
     </bean>
 
+    <!-- override community -->
+    <bean id="externalUrlAdapter" class="com.bonitasoft.engine.core.form.ExternalURLAdapterExt">
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+    </bean>
 
     <beans profile="performance">
         <bean id="archivingStrategy" class="com.bonitasoft.engine.archive.impl.ListArchivingStrategy">
@@ -419,6 +423,8 @@
             </property>
         </bean>
     </beans>
+
+
 
 
 </beans>
