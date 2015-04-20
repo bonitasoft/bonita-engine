@@ -3,4 +3,22 @@
 
     <!-- ADD ANY BEAN DEFINITION YOU WANT TO BE AVAILABLE TO THE TENANT ACCESSOR -->
 
+    <!--
+    <bean id="flushEventListeners" parent="defaultFlushEventListeners" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+    -->
+
+    <!--
+    <bean id="activatedRecords" parent="defaultActivatedRecords" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+    -->
+
 </beans>
