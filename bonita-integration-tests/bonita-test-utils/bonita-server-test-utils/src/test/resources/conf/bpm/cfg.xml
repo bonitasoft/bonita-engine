@@ -290,11 +290,11 @@
     <bean id="dependencyResolver" class="org.bonitasoft.engine.api.impl.resolver.DependencyResolver">
         <constructor-arg name="dependencyResolvers">
             <list>
-                <bean class="org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyResolver" />
-                <bean class="org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyResolver" />
-                <bean class="org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyResolver" />
-                <bean class="org.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyResolver" />
-                <bean class="org.bonitasoft.engine.api.impl.resolver.PageProcessDependencyResolver" />
+                <bean class="org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyDeployer" />
+                <bean class="org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyDeployer" />
+                <bean class="org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyDeployer" />
+                <bean class="org.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyDeployer" />
+                <bean class="org.bonitasoft.engine.api.impl.resolver.FormMappingAndPageDependencyDeployer" />
             </list>
         </constructor-arg>
     </bean>
