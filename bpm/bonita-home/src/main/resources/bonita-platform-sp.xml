@@ -49,10 +49,12 @@
 	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
 		<constructor-arg name="className" value="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
 		<constructor-arg name="sequenceId" value="10019" />
+		<constructor-arg name="rangeSize" value="${bonita.platform.sequence.10019:${bonita.platform.sequence.defaultRangeSize}}" />
 	</bean>
 	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
 		<constructor-arg name="className" value="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" />
 		<constructor-arg name="sequenceId" value="500" />
+		<constructor-arg name="rangeSize" value="${bonita.platform.sequence.500:${bonita.platform.sequence.defaultRangeSize}}" />
 	</bean>
 
 	<bean id="transactionService" class="com.bonitasoft.engine.transaction.JTATransactionServiceExt" scope="singleton">
