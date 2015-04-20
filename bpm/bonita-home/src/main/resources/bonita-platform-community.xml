@@ -997,11 +997,29 @@
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
         <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
         <constructor-arg name="enableWordSearch" value="${bonita.platform.persistence.platform.enableWordSearch}" />
-        <constructor-arg name="wordSearchExclusionMappings">
-            <set>
+        <constructor-arg name="wordSearchExclusionMappings" ref="platformWordSearchExclusionMappings"/>
+    </bean>
+
+    <bean id="defaultPlatformWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
+        <property name="targetSetClass">
+            <value>java.util.HashSet</value>
+        </property>
+        <property name="sourceSet">
+            <list>
+
+            </list>
+        </property>
+    </bean>
+
+    <bean id="platformWordSearchExclusionMappings" parent="defaultPlatformWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
+        <property name="targetSetClass">
+            <value>java.util.HashSet</value>
+        </property>
+        <property name="sourceSet">
+            <list merge="true">
                 <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
-            </set>
-        </constructor-arg>
+            </list>
+        </property>
     </bean>
 
     <bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" destroy-method="destroy">
@@ -1014,11 +1032,29 @@
         <constructor-arg name="sequenceManager" ref="sequenceManager" />
         <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
         <constructor-arg name="enableWordSearch" value="${bonita.platform.persistence.tenant.enableWordSearch}" />
-        <constructor-arg name="wordSearchExclusionMappings">
-            <set>
+        <constructor-arg name="wordSearchExclusionMappings" ref="tenantWordSearchExclusionMappings"/>
+    </bean>
+
+    <bean id="defaultTenantWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
+        <property name="targetSetClass">
+            <value>java.util.HashSet</value>
+        </property>
+        <property name="sourceSet">
+            <list>
+
+            </list>
+        </property>
+    </bean>
+
+    <bean id="tenantWordSearchExclusionMappings" parent="defaultTenantWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
+        <property name="targetSetClass">
+            <value>java.util.HashSet</value>
+        </property>
+        <property name="sourceSet">
+            <list merge="true">
                 <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
-            </set>
-        </constructor-arg>
+            </list>
+        </property>
     </bean>
 
     <bean id="hbmConfigurationProviderProperties" parent="communityHbmConfigurationProviderProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
