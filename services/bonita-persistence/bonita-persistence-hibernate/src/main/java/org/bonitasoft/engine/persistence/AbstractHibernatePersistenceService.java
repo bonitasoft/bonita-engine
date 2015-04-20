@@ -35,7 +35,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang3.text.WordUtils;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.EnumToObjectConvertible;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -352,12 +351,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    private void setField(final PersistentObject entity, final String fieldName, final Object parameterValue) throws SPersistenceException {
+    void setField(final PersistentObject entity, final String fieldName, final Object parameterValue) throws SPersistenceException {
         Long id = null;
         try {
             id = entity.getId();
-            final String setterName = "set" + WordUtils.capitalize(fieldName);
-            ClassReflector.invokeMethodByName(entity, setterName, parameterValue);
+            ClassReflector.setField(entity, fieldName, parameterValue);
         } catch (final Exception e) {
             throw new SPersistenceException("Problem while updating entity: " + entity + " with id: " + id, e);
         }
@@ -397,6 +395,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         } catch (final SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
         }
+    }
+
+    @Override
+    protected void setId(PersistentObject entity) throws SPersistenceException {
+        super.setId(entity);
     }
 
     @SuppressWarnings("unchecked")

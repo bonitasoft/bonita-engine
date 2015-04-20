@@ -45,7 +45,6 @@ public enum ExpressionType {
     TYPE_DOCUMENT,
 
     /**
-     *
      * expressions that return a list of document
      *
      * @since 6.4.0
@@ -64,6 +63,8 @@ public enum ExpressionType {
 
     TYPE_BUSINESS_DATA,
 
+    TYPE_BUSINESS_DATA_REFERENCE,
+
     /**
      * Expression of type Business object DAO, that instantiates a business object Server DAO class, used to execute server queries.
      */
@@ -71,6 +72,6 @@ public enum ExpressionType {
 
     TYPE_QUERY_BUSINESS_DATA,
 
-    TYPE_CONTRACT_INPUT;
+    TYPE_CONTRACT_INPUT
 
 }

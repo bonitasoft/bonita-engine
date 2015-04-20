@@ -63,6 +63,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -242,6 +243,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     RefBusinessDataService getRefBusinessDataService();
 
+    PageMappingService getPageMappingService();
     GenericAuthenticationService getAuthenticationService();
 
     ReadPersistenceService getReadPersistenceService();

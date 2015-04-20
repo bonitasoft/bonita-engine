@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
+import java.util.List;
+import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
 
@@ -32,5 +34,9 @@ public interface UserTaskDefinition extends HumanTaskDefinition {
      *         the user task execution contract
      */
     ContractDefinition getContract();
+
+
+
+    List<ContextEntry> getContext();
 
 }

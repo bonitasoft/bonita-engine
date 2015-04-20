@@ -648,6 +648,10 @@
         <constructor-arg name="sequenceId" value="10120" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.page.impl.SPageMappingImpl" />
+        <constructor-arg name="sequenceId" value="10121" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" />
         <constructor-arg name="sequenceId" value="10200" />
     </bean>
@@ -1336,6 +1340,7 @@
                 <entry key="org.bonitasoft.engine.page.SPage" value="org.bonitasoft.engine.page.impl.SPageImpl" />
                 <entry key="org.bonitasoft.engine.page.SPageContent" value="org.bonitasoft.engine.page.impl.SPageContentImpl" />
                 <entry key="org.bonitasoft.engine.page.SPageWithContent" value="org.bonitasoft.engine.page.impl.SPageWithContentImpl" />
+                <entry key="org.bonitasoft.engine.page.SPageMapping" value="org.bonitasoft.engine.page.impl.SPageMappingImpl" />
                 <entry key="org.bonitasoft.engine.business.application.model.SApplication" value="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" />
                 <entry key="org.bonitasoft.engine.business.application.model.SApplicationPage" value="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" />
                 <entry key="org.bonitasoft.engine.business.application.model.SApplicationMenu" value="org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" />

@@ -173,7 +173,7 @@ public class ProcessActorIT extends TestWithUser {
         builder.append("</actormapping:actorMappings>");
         barBuilder.setActorMapping(builder.toString().getBytes());
         final BusinessArchive businessArchive = barBuilder.done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
+        final ProcessDefinition processDefinition = deployProcess(businessArchive);
 
         // process deployed but not activated
         // trying to add an actor on the process now
@@ -416,7 +416,7 @@ public class ProcessActorIT extends TestWithUser {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, user.getId());
         getProcessAPI().enableProcess(processDefinition.getId());
@@ -436,7 +436,7 @@ public class ProcessActorIT extends TestWithUser {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
         getProcessAPI().addRoleToActor(ACTOR_NAME, processDefinition, role.getId());
         getProcessAPI().enableProcess(processDefinition.getId());
@@ -457,7 +457,7 @@ public class ProcessActorIT extends TestWithUser {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
         getProcessAPI().addGroupToActor(ACTOR_NAME, group.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
@@ -479,7 +479,7 @@ public class ProcessActorIT extends TestWithUser {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
 
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+        final ProcessDefinition processDefinition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
         getProcessAPI().addRoleAndGroupToActor(ACTOR_NAME, processDefinition, role.getId(), group.getId());
         getProcessAPI().enableProcess(processDefinition.getId());
@@ -503,7 +503,7 @@ public class ProcessActorIT extends TestWithUser {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addUserTask("userTask1", ACTOR_NAME);
-        final ProcessDefinition definition = getProcessAPI().deploy(
+        final ProcessDefinition definition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
         getProcessAPI().addUserToActor(ACTOR_NAME, definition, user1.getId());
         getProcessAPI().addUserToActor(ACTOR_NAME, definition, user2.getId());
@@ -541,7 +541,7 @@ public class ProcessActorIT extends TestWithUser {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addUserTask("roleTask1", ACTOR_NAME);
-        final ProcessDefinition definition = getProcessAPI().deploy(
+        final ProcessDefinition definition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
         addMappingOfActorsForRole(ACTOR_NAME, role1.getId(), definition);
         addMappingOfActorsForRole(ACTOR_NAME, role2.getId(), definition);
@@ -612,7 +612,7 @@ public class ProcessActorIT extends TestWithUser {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addUserTask("userMembershipTask1", ACTOR_NAME);
-        final ProcessDefinition definition = getProcessAPI().deploy(
+        final ProcessDefinition definition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
         getProcessAPI().addUserToActor(ACTOR_NAME, definition, user1.getId());
         addMappingOfActorsForRoleAndGroup(ACTOR_NAME, user1.getId(), group1.getId(), definition);
@@ -795,7 +795,7 @@ public class ProcessActorIT extends TestWithUser {
         processBuilder.addTransition("deliver", "endEvent");
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
 
-        final ProcessDefinition definition = getProcessAPI().deploy(
+        final ProcessDefinition definition = deployProcess(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
         final ActorInstance actor = checkActors(actorName, definition);
 
@@ -836,7 +836,7 @@ public class ProcessActorIT extends TestWithUser {
                 .addTransition("step1", "step3").addTransition("step1", "step4").getProcess();
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
+        final ProcessDefinition processDefinition = deployProcess(businessArchive);
         int nbOfActors = getProcessAPI().getNumberOfActors(processDefinition.getId());
         assertEquals(3, nbOfActors);
 

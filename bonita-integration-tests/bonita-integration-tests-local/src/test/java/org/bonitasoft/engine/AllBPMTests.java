@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.archive.ArchiveServiceTest;
@@ -37,6 +37,7 @@ import org.bonitasoft.engine.data.instance.TransientDataInstanceServiceIT;
 import org.bonitasoft.engine.dependency.DependencyServiceTest;
 import org.bonitasoft.engine.expression.ExpressionServiceTest;
 import org.bonitasoft.engine.identity.IdentityServiceTest;
+import org.bonitasoft.engine.page.PageMappingServiceIT;
 import org.bonitasoft.engine.persistence.PersistenceTests;
 import org.bonitasoft.engine.platform.TenantManagementTest;
 import org.bonitasoft.engine.platform.auth.PlatformAuthenticationServiceTest;
@@ -91,7 +92,8 @@ import org.junit.runners.Suite.SuiteClasses;
         NodeConfigurationTest.class,
         ConnectorInstanceServiceIntegrationTests.class,
         PlatformLoginServiceTest.class,
-        FormMappingServiceIT.class
+        FormMappingServiceIT.class,
+        PageMappingServiceIT.class
 })
 public class AllBPMTests {
 }

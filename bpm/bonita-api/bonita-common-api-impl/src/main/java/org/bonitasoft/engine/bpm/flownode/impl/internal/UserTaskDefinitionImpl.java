@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 
@@ -26,6 +30,7 @@ public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements U
     private static final long serialVersionUID = -8168685139931497082L;
 
     private ContractDefinition contract;
+    private List<ContextEntry> context = new ArrayList<>();
 
     public UserTaskDefinitionImpl(final String name, final String actorName) {
         super(name, actorName);
@@ -42,6 +47,15 @@ public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements U
     @Override
     public ContractDefinition getContract() {
         return contract;
+    }
+
+    @Override
+    public List<ContextEntry> getContext() {
+        return context;
+    }
+
+    public void addContextEntry(ContextEntry contextEntry) {
+        context.add(contextEntry);
     }
 
 }

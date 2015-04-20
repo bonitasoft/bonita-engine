@@ -44,6 +44,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.page.ProcessPageDeployer;
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
@@ -95,6 +96,10 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         }
     }
 
+    protected ProcessPageDeployer createProcessPageDeployer() {
+        return new ProcessPageDeployer(getTenantAccessor().getPageService());
+    }
+
     protected DeleteProcess instantiateDeleteProcessTransactionContent(final long processId) {
         return new DeleteProcess(getTenantAccessor(), processId);
     }
@@ -134,7 +139,6 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         }
     }
 
-
     public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults,
                                                          final ParameterCriterion sort) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -171,8 +175,6 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             throw new RetrieveException(e);
         }
     }
-
-
 
     public static SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
             throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
@@ -220,7 +222,5 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
             throw new RetrieveException(e);
         }
     }
-
-
 
 }

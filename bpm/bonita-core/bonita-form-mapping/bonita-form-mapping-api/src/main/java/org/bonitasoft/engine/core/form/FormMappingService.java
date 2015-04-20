@@ -26,17 +26,19 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  */
 public interface FormMappingService {
 
-    SFormMapping create(long processDefinitionId, String task, String form, String target, String type) throws SObjectCreationException;
+    SFormMapping create(long processDefinitionId, String task, Integer type, String target, String form) throws SObjectCreationException, SBonitaReadException;
 
-    void update(SFormMapping formMapping, String form, String target) throws SObjectModificationException;
+    void update(SFormMapping formMapping, String url, Long pageId) throws SObjectModificationException;
 
     void delete(SFormMapping formMapping) throws SObjectModificationException;
 
     SFormMapping get(long formMappingId) throws SBonitaReadException, SObjectNotFoundException;
 
-    SFormMapping get(long processDefinitionId, String type, String task) throws SBonitaReadException, SObjectNotFoundException;
+    SFormMapping get(String key) throws SBonitaReadException, SObjectNotFoundException;
 
-    SFormMapping get(long processDefinitionId, String type) throws SBonitaReadException, SObjectNotFoundException;
+    SFormMapping get(long processDefinitionId, Integer type, String task) throws SBonitaReadException, SObjectNotFoundException;
+
+    SFormMapping get(long processDefinitionId, Integer type) throws SBonitaReadException, SObjectNotFoundException;
 
     List<SFormMapping> list(long processDefinitionId, int fromIndex, int numberOfResults) throws SBonitaReadException;
 

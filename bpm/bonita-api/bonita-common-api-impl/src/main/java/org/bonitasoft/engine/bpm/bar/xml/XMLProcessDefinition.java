@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.HashMap;
@@ -23,6 +23,7 @@ import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.FailAction;
+import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
@@ -374,6 +375,12 @@ public class XMLProcessDefinition {
 
     public static final String INPUT_NAME = "inputDefinitionName";
 
+    public static final String CONTEXT_NODE = "context";
+
+    public static final String CONTEXT_ENTRY_NODE = "contextEntry";
+
+    public static final String CONTEXT_ENTRY_KEY = "key";
+
     public Map<Object, String> objectToId = new HashMap<Object, String>();
 
     public static final class BEntry<K, V> implements Map.Entry<K, V> {
@@ -460,6 +467,7 @@ public class XMLProcessDefinition {
         if (contract != null) {
             rootNode.addChild(createContractNode(contract));
         }
+        rootNode.addChild(createContextNode(processDefinition.getContext()));
         return rootNode;
     }
 
@@ -534,8 +542,11 @@ public class XMLProcessDefinition {
                     fillUserFilterNode(userFilterNode, humanTaskDefinition.getUserFilter());
                     activityNode.addChild(userFilterNode);
                 }
-                if (humanTaskDefinition instanceof UserTaskDefinition && ((UserTaskDefinition) humanTaskDefinition).getContract() != null) {
-                    activityNode.addChild(createContractNode(((UserTaskDefinition) humanTaskDefinition).getContract()));
+                if (humanTaskDefinition instanceof UserTaskDefinition) {
+                    if (((UserTaskDefinition) humanTaskDefinition).getContract() != null) {
+                        activityNode.addChild(createContractNode(((UserTaskDefinition) humanTaskDefinition).getContract()));
+                    }
+                    activityNode.addChild(createContextNode(((UserTaskDefinition) humanTaskDefinition).getContext()));
                 }
             } else if (activity instanceof CallActivityDefinition) {
                 fillCallActivity((CallActivityDefinition) activity, activityNode);
@@ -587,6 +598,19 @@ public class XMLProcessDefinition {
         }
         return contractNode;
     }
+
+
+    private XMLNode createContextNode(List<ContextEntry> context) {
+        final XMLNode contextNode = new XMLNode(CONTEXT_NODE);
+        for (ContextEntry contextEntry : context) {
+            XMLNode node = new XMLNode(CONTEXT_ENTRY_NODE);
+            node.addAttribute(CONTEXT_ENTRY_KEY, contextEntry.getKey());
+            addExpressionNode(node, EXPRESSION_NODE, contextEntry.getExpression());
+            contextNode.addChild(node);
+        }
+        return contextNode;
+    }
+
 
     private XMLNode createConstraintNode(final ConstraintDefinition constraintDefinition) {
         final XMLNode xmlNode = new XMLNode(CONTRACT_CONSTRAINT_NODE);

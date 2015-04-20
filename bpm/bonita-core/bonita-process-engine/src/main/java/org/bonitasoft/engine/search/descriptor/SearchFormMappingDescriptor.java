@@ -14,6 +14,7 @@
 
 package org.bonitasoft.engine.search.descriptor;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Set;
 
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.form.FormMappingSearchDescriptor;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.profile.model.SProfile;
 
@@ -34,17 +36,14 @@ public class SearchFormMappingDescriptor extends SearchEntityDescriptor {
     private final Map<Class<? extends PersistentObject>, Set<String>> profileAllFields;
 
     public SearchFormMappingDescriptor() {
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(1);
+        searchEntityKeys = new HashMap<>(6);
         searchEntityKeys.put(FormMappingSearchDescriptor.ID, new FieldDescriptor(SFormMapping.class, "id"));
         searchEntityKeys.put(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SFormMapping.class, "processDefinitionId"));
         searchEntityKeys.put(FormMappingSearchDescriptor.TYPE, new FieldDescriptor(SFormMapping.class, "type"));
-        searchEntityKeys.put(FormMappingSearchDescriptor.FORM, new FieldDescriptor(SFormMapping.class, "form"));
         searchEntityKeys.put(FormMappingSearchDescriptor.TASK, new FieldDescriptor(SFormMapping.class, "task"));
-        searchEntityKeys.put(FormMappingSearchDescriptor.TARGET, new FieldDescriptor(SFormMapping.class, "target"));
 
-        profileAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
-        final Set<String> fields = new HashSet<String>(0);
-        profileAllFields.put(SProfile.class, fields);
+        profileAllFields = new HashMap<>(1);
+        profileAllFields.put(SProfile.class, new HashSet<String>(0));
     }
 
     @Override
@@ -57,4 +56,11 @@ public class SearchFormMappingDescriptor extends SearchEntityDescriptor {
         return profileAllFields;
     }
 
+    @Override
+    protected Serializable convertFilterValue(String filterField, Serializable filterValue) {
+        if(filterValue instanceof FormMappingType){
+            return ((FormMappingType) filterValue).getId();
+        }
+        return super.convertFilterValue(filterField, filterValue);
+    }
 }

@@ -76,6 +76,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -257,6 +258,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private BusinessDataModelRepository businessDataModelRespository;
 
     private BusinessDataService businessDataService;
+    private PageMappingService pageMappingService;
     private GenericAuthenticationService genericAuthenticationService;
     private ReadPersistenceService readPersistenceService;
     private Recorder recorder;
@@ -908,5 +910,13 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             formMappingService = beanAccessor.getService(FormMappingService.class);
         }
         return formMappingService;
+    }
+
+    @Override
+    public PageMappingService getPageMappingService() {
+        if (pageMappingService == null) {
+            pageMappingService = beanAccessor.getService(PageMappingService.class);
+        }
+        return pageMappingService;
     }
 }

@@ -13,15 +13,20 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContextEntry;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
+import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Baptiste Mesta
@@ -33,6 +38,7 @@ public class SUserTaskDefinitionImpl extends SHumanTaskDefinitionImpl implements
     private static final long serialVersionUID = 9039679250456947450L;
 
     private SContractDefinition contract;
+    private final List<SContextEntry> context = new ArrayList<>();
 
     public SUserTaskDefinitionImpl(final UserTaskDefinition userTaskDefinition,
             final Map<String, STransitionDefinition> transitionsMap) {
@@ -40,6 +46,9 @@ public class SUserTaskDefinitionImpl extends SHumanTaskDefinitionImpl implements
         final ContractDefinition contract = userTaskDefinition.getContract();
         if (contract != null) {
             setContract(new SContractDefinitionImpl(contract));
+        }
+        for (ContextEntry contextEntry : userTaskDefinition.getContext()) {
+            context.add(new SContextEntryImpl(contextEntry.getKey(), ServerModelConvertor.convertExpression(contextEntry.getExpression())));
         }
     }
 
@@ -58,6 +67,11 @@ public class SUserTaskDefinitionImpl extends SHumanTaskDefinitionImpl implements
             return new SContractDefinitionImpl();
         }
         return contract;
+    }
+
+    @Override
+    public List<SContextEntry> getContext() {
+        return context;
     }
 
     public void setContract(final SContractDefinition contract) {

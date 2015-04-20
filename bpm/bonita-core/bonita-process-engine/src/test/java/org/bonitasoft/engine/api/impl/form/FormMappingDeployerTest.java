@@ -15,12 +15,7 @@ package org.bonitasoft.engine.api.impl.form;
 
 import static org.bonitasoft.engine.bpm.form.FormMappingDefinitionBuilder.buildFormMapping;
 import static org.bonitasoft.engine.bpm.form.FormMappingModelBuilder.buildFormMappingModel;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -68,8 +63,10 @@ public class FormMappingDeployerTest {
                                 .build()).done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, null, startForm, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_START.name());
-        verify(formMappingService, times(1)).create(processDefinitionId, null, overviewForm, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_OVERVIEW.name());
+        verify(formMappingService, times(1))
+                .create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(), FormMappingTarget.INTERNAL.name(), startForm);
+        verify(formMappingService, times(1))
+                .create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingTarget.INTERNAL.name(), overviewForm);
     }
 
     @Test
@@ -81,8 +78,9 @@ public class FormMappingDeployerTest {
         deployer.deployFormMappings(barBuilder.done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, null, null, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_OVERVIEW.name());
-        verify(formMappingService, times(1)).create(processDefinitionId, null, null, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_START.name());
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingTarget.UNDEFINED.name(),
+                null);
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(), FormMappingTarget.UNDEFINED.name(), null);
     }
 
     @Test
@@ -94,15 +92,15 @@ public class FormMappingDeployerTest {
 
         final long processDefinitionId = 3L;
         final String form = "pagename";
-        final String type = FormMappingType.TASK.name();
+        final FormMappingType type = FormMappingType.TASK;
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 processDefBuilder.done());
         businessArchiveBuilder.setFormMappings(buildFormMappingModel().withFormMapping(
-                buildFormMapping(form, FormMappingType.valueOf(type), FormMappingTarget.INTERNAL).withTaskname(taskname).build()).build());
+                buildFormMapping(form, type, FormMappingTarget.INTERNAL).withTaskname(taskname).build()).build());
         deployer.deployFormMappings(businessArchiveBuilder.done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, taskname, form, FormMappingTarget.INTERNAL.name(), type);
+        verify(formMappingService, times(1)).create(processDefinitionId, taskname, type.getId(), FormMappingTarget.INTERNAL.name(), form);
     }
 
     @Test
@@ -122,8 +120,9 @@ public class FormMappingDeployerTest {
         deployer.deployFormMappings(businessArchiveBuilder.done(), processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, null, null, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_START.name());
-        verify(formMappingService, times(1)).create(processDefinitionId, null, null, FormMappingTarget.INTERNAL.name(), FormMappingType.PROCESS_OVERVIEW.name());
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_START.getId(), FormMappingTarget.UNDEFINED.name(), null);
+        verify(formMappingService, times(1)).create(processDefinitionId, null, FormMappingType.PROCESS_OVERVIEW.getId(), FormMappingTarget.UNDEFINED.name(),
+                null);
         verifyNoMoreInteractions(formMappingService);
     }
 
@@ -140,7 +139,7 @@ public class FormMappingDeployerTest {
         deployer.deployFormMappings(businessArchive, processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(processDefinitionId, taskName, null, FormMappingTarget.INTERNAL.name(), FormMappingType.TASK.name());
+        verify(formMappingService, times(1)).create(processDefinitionId, taskName, FormMappingType.TASK.getId(), FormMappingTarget.UNDEFINED.name(), null);
     }
 
     @Test
@@ -153,14 +152,15 @@ public class FormMappingDeployerTest {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 processDefBuilder.done());
         final String unknownTaskName = "Unknown__Task__Name";
-        businessArchiveBuilder.setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addTaskForm("someForm", FormMappingTarget.INTERNAL, unknownTaskName).build());
+        businessArchiveBuilder.setFormMappings(FormMappingModelBuilder.buildFormMappingModel()
+                .addTaskForm("someForm", FormMappingTarget.INTERNAL, unknownTaskName).build());
         final BusinessArchive businessArchive = businessArchiveBuilder.done();
 
         // when:
         deployer.deployFormMappings(businessArchive, processDefinitionId);
 
         // then:
-        verify(formMappingService, times(1)).create(eq(processDefinitionId), eq(declaredTaskName), anyString(), anyString(), eq(FormMappingType.TASK.name()));
-        verify(formMappingService, times(0)).create(eq(processDefinitionId), eq(unknownTaskName), anyString(), anyString(), eq(FormMappingType.TASK.name()));
+        verify(formMappingService, times(1)).create(eq(processDefinitionId), eq(declaredTaskName), eq(FormMappingType.TASK.getId()), anyString(), anyString());
+        verify(formMappingService, times(0)).create(eq(processDefinitionId), eq(unknownTaskName), eq(FormMappingType.TASK.getId()), anyString(), anyString());
     }
 }

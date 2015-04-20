@@ -27,6 +27,7 @@ import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
@@ -800,6 +801,11 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      */
     public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
         return new ParameterDefinitionBuilder(this, process, parameterName, type);
+    }
+
+    public ProcessDefinitionBuilder addContextEntry(final String key, final Expression expression){
+        process.addContextEntry(new ContextEntryImpl(key,expression));
+        return this;
     }
 
 
