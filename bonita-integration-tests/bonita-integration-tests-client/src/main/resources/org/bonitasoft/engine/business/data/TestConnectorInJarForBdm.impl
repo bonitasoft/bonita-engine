@@ -1,9 +1,0 @@
-<connectorImplementation>
-	
-	<definitionId>connectorInJar</definitionId>
-	<definitionVersion>1.0.0</definitionVersion>
-	<implementationClassname>org.test.connector.MyConnector</implementationClassname>
-	<implementationId>connectorInJarImpl</implementationId>
-	<implementationVersion>1.0.0</implementationVersion>
-	
-</connectorImplementation>
