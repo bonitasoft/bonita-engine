@@ -37,9 +37,6 @@ public class BonitaSuiteRunner extends Suite {
         public Class<?> value();
     }
 
-
-
-
     public BonitaSuiteRunner(final Class<?> klass, final Class<?>[] suiteClasses) throws InitializationError {
         super(klass, suiteClasses);
         BonitaTestContext.initializeRunner(klass, this);
@@ -79,7 +76,6 @@ public class BonitaSuiteRunner extends Suite {
         super.run(notifier);
     }
 
-
     @Override
     protected Statement classBlock(final RunNotifier notifier) {
 
@@ -88,7 +84,6 @@ public class BonitaSuiteRunner extends Suite {
         statement = withGlobalAfter(statement);
         return statement;
     }
-
 
     private Statement withGlobalBefore(final Statement statement) {
         return new WithGlobalBefore(statement, this);

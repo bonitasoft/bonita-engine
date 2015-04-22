@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
-import org.junit.runner.JUnitCore;
 import org.junit.runner.Runner;
 import org.junit.runners.model.InitializationError;
 
@@ -41,11 +40,11 @@ public class BonitaTestContext {
     }
 
     public static void initializeEngine() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if(!isInitialized){
+        if (!isInitialized) {
             if (initializer == null) {
                 throw new IllegalStateException("Unable to run the suite as a root suite because it does not have a @Initialize set");
             }
-            System.out.println("Found these runners: "+runnerThatUsesBonita);
+            System.out.println("Found these runners: " + runnerThatUsesBonita);
             Method declaredMethod = initializer.getDeclaredMethod("beforeAll");
             declaredMethod.invoke(null);
             isInitialized = true;
@@ -54,10 +53,10 @@ public class BonitaTestContext {
 
     public static void shutdownEngine() throws Throwable {
         try {
-            if(!runnerThatUsesBonita.isEmpty()){
+            if (!runnerThatUsesBonita.isEmpty()) {
                 return;
             }
-            if(initializer == null){
+            if (initializer == null) {
                 throw new IllegalStateException("Unable to run the suite as a root suite because it does not have a @Initialize set");
             }
             Method declaredMethod = initializer.getDeclaredMethod("afterAll");
@@ -67,10 +66,11 @@ public class BonitaTestContext {
         }
     }
 
-    public static void addRunner(Runner runner){
+    public static void addRunner(Runner runner) {
         runnerThatUsesBonita.add(runner);
     }
-    public static void removeRunner(Runner runner){
+
+    public static void removeRunner(Runner runner) {
         runnerThatUsesBonita.remove(runner);
     }
 
@@ -78,6 +78,7 @@ public class BonitaTestContext {
         BonitaTestContext.setInitializer(getAnnotatedInitializer(klass));
         BonitaTestContext.addRunner(runner);
     }
+
     static Class<?> getAnnotatedInitializer(final Class<?> klass) throws InitializationError {
         final Initializer annotation = klass.getAnnotation(Initializer.class);
         return annotation == null ? null : annotation.value();

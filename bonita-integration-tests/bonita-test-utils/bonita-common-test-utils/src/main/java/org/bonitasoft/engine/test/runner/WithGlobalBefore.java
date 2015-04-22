@@ -26,7 +26,7 @@ final class WithGlobalBefore extends Statement {
 
     @Override
     public void evaluate() throws Throwable {
-            BonitaTestContext.initializeEngine();
+        BonitaTestContext.initializeEngine();
         classBlock.evaluate();
     }
 }

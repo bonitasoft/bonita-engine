@@ -22,7 +22,6 @@ final class WithGlobalAfter extends Statement {
 
     private final Runner testRunner;
 
-
     WithGlobalAfter(final Statement classBlock, final Runner testRunner) {
         this.classBlock = classBlock;
         this.testRunner = testRunner;
