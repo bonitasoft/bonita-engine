@@ -1,11 +1,7 @@
 <beans
         xmlns="http://www.springframework.org/schema/beans"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:util="http://www.springframework.org/schema/util"
-        xsi:schemaLocation="
-        http://www.springframework.org/schema/util      http://www.springframework.org/schema/util/spring-util-3.0.xsd
-        http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans.xsd
-        ">
+        xsi:schemaLocation="http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor" />
 
@@ -227,6 +223,8 @@
                 <entry key="COMMAND_UPDATED:INTERNAL" value="true" />
                 <entry key="COMMENT_CREATED:INTERNAL" value="true" />
                 <entry key="COMMENT_DELETED:INTERNAL" value="true" />
+                <entry key="USERTASK_CONTRACT_DATA_CREATED:INTERNAL" value="true" />
+                <entry key="PROCESS_CONTRACT_DATA_CREATED:INTERNAL" value="true" />
                 <entry key="CONNECTOR_INSTANCE_CREATED:INTERNAL" value="true" />
                 <entry key="CONNECTOR_INSTANCE_UPDATED:INTERNAL" value="true" />
                 <entry key="CONNECTOR_INSTANCE_DELETED:INTERNAL" value="true" />
