@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine;
 
+import org.bonitasoft.engine.activity.UserTaskContractITest;
 import org.bonitasoft.engine.business.application.ApplicationIT;
 import org.bonitasoft.engine.business.application.ApplicationMenuIT;
 import org.bonitasoft.engine.business.application.ApplicationPageIT;
@@ -35,6 +36,7 @@ import org.junit.runners.Suite.SuiteClasses;
         BPMLocalSuiteTests.class,
         BPMRemoteTestsLocal.class,
         FormMappingIT.class,
+        UserTaskContractITest.class,
         PageAPIIT.class,
         ApplicationIT.class,
         ApplicationPageIT.class,

@@ -13,7 +13,6 @@
  */
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.activity.UserTaskContractITest;
 import org.bonitasoft.engine.archive.ArchiveServiceTest;
 import org.bonitasoft.engine.authentication.AuthenticationServiceTest;
 import org.bonitasoft.engine.bpm.ActorMappingServiceTest;
@@ -94,8 +93,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ConnectorInstanceServiceIntegrationTests.class,
         PlatformLoginServiceTest.class,
         FormMappingServiceIT.class,
-        PageMappingServiceIT.class,
-        UserTaskContractITest.class
+        PageMappingServiceIT.class
 })
 public class AllBPMTests {
 }
