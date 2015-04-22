@@ -2594,7 +2594,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         Class<?> dataClass;
         try {
             dataClass = classLoader.loadClass(dataClassName);
-            //dataClass = getClassForName(classLoader, dataClassName);
         } catch (final ClassNotFoundException e) {
             throw new UpdateException(e);
         }
