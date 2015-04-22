@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.execution;
 
+import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
+import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
@@ -37,11 +39,7 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.work.WorkService;
-
-import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
-import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 
 /**
  * SP implementation of the activity state manager.
@@ -55,21 +53,20 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
 
     public FlowNodeStateManagerExt(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
             final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService,
-            final DataInstanceService dataInstanceService, final EventInstanceService eventInstanceService, final OperationService operationService,
+            final ExpressionResolverService expressionResolverService, final DataInstanceService dataInstanceService,
+            final EventInstanceService eventInstanceService, final OperationService operationService,
             final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
             final TechnicalLoggerService logger, final DocumentService documentService, final SCommentService commentService,
             final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
             final WorkService workService, final IdentityService identityService, final BreakpointService breakpointService,
             final RefBusinessDataService refBusinessDataService, final ParentContainerResolver parentContainerResolver,
-            final WaitingEventsInterrupter waitingEventsInterrupter) {
+            final WaitingEventsInterrupter waitingEventsInterrupter, ClassLoaderService classLoaderService) {
         super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, expressionResolverService,
                 dataInstanceService, operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentService, commentService,
                 new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
                         connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
                         containerRegistry, eventInstanceService, commentService, identityService, processInstanceService, parentContainerResolver,
-                        waitingEventsInterrupter, logger,
-                        refBusinessDataService), waitingEventsInterrupter);
+                        waitingEventsInterrupter, logger, refBusinessDataService), waitingEventsInterrupter, classLoaderService);
         this.breakpointService = breakpointService;
     }
 
