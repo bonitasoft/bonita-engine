@@ -678,6 +678,9 @@ public class ModelConvertor {
         if (saHumanTask.getExpectedEndDate() > 0) {
             activity.setExpectedEndDate(new Date(saHumanTask.getExpectedEndDate()));
         }
+        if (saHumanTask.getClaimedDate() > 0) {
+            activity.setClaimedDate(new Date(saHumanTask.getClaimedDate()));
+        }
     }
 
     /**

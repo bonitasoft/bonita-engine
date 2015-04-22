@@ -61,6 +61,7 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
@@ -272,11 +273,7 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         assertThat(getTenantAdministrationAPI().isPaused()).as("should not have tenant is paused mode").isFalse();
 
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        final byte[] zip = converter.zip(buildBOM());
-        getTenantAdministrationAPI().pause();
-        getTenantAdministrationAPI().installBusinessDataModel(zip);
-        getTenantAdministrationAPI().resume();
+        installBusinessDataModel(buildBOM());
 
         assertThat(getTenantAdministrationAPI().isPaused()).as("should have resume tenant after installing Business Object Model").isFalse();
 
@@ -290,20 +287,24 @@ public class BDRepositoryIT extends CommonAPIIT {
         } catch (final Exception e) {
             clientFolder.deleteOnExit();
         }
-        if (!getTenantAdministrationAPI().isPaused()) {
-            getTenantAdministrationAPI().pause();
-            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-            getTenantAdministrationAPI().resume();
-        }
+        uninstallBusinessObjectModel();
 
         deleteUser(matti);
         logoutOnTenant();
     }
 
+    private void uninstallBusinessObjectModel() throws UpdateException, BusinessDataRepositoryDeploymentException {
+        if (!getTenantAdministrationAPI().isPaused()) {
+            getTenantAdministrationAPI().pause();
+            getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
+            getTenantAdministrationAPI().resume();
+        }
+    }
+
     @Test
     public void deploying_bdm_after_process_should_put_process_in_resolved_state() throws Exception {
         final String qualifiedName = "com.company.test.Bo";
-        final byte[] bom = buildSimpleBom(qualifiedName);
+        final BusinessObjectModel bom = buildSimpleBom(qualifiedName);
 
         final ProcessDefinition processDefinition = deploySimpleProcessWithBusinessData(qualifiedName);
 
@@ -318,10 +319,12 @@ public class BDRepositoryIT extends CommonAPIIT {
         deleteProcess(processDefinition);
     }
 
-    private void installBusinessDataModel(final byte[] bdm) throws Exception {
+    private void installBusinessDataModel(final BusinessObjectModel bom) throws Exception {
+        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
+        final byte[] zip = converter.zip(bom);
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI().installBusinessDataModel(bdm);
+        getTenantAdministrationAPI().installBusinessDataModel(zip);
         getTenantAdministrationAPI().resume();
     }
 
@@ -337,7 +340,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         return processDefinition;
     }
 
-    private byte[] buildSimpleBom(final String boQualifiedName) throws IOException, JAXBException, SAXException {
+    private BusinessObjectModel buildSimpleBom(final String boQualifiedName) throws IOException, JAXBException, SAXException {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName(boQualifiedName);
         final SimpleField field = new SimpleField();
@@ -347,7 +350,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(bo);
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        return converter.zip(model);
+        return model;
     }
 
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "business data java setter operation" }, jira = "BS-7217", story = "update a business data using a java setter operation")
@@ -1209,10 +1212,20 @@ public class BDRepositoryIT extends CommonAPIIT {
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
-        waitForUserTask(instance, "step2");
+        long step2 = waitForUserTask(instance, "step2");
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("names", instance.getId());
         assertThat(dataInstance.getValue().toString()).isEqualTo("[Doe, Doe]");
+        Map<String, Serializable> employee = getProcessAPI().evaluateExpressionsOnProcessInstance(
+                instance.getId(),
+                Collections.singletonMap(new ExpressionBuilder().createBusinessDataReferenceExpression("myEmployees"),
+                        Collections.<String, Serializable> emptyMap()));
+        assertThat(employee).hasSize(1);
+        assertThat(employee.get("myEmployees")).isInstanceOf(MultipleBusinessDataReference.class);
+        MultipleBusinessDataReference myEmployees = (MultipleBusinessDataReference) employee.get("myEmployees");
+        assertThat(myEmployees.getName()).isEqualTo("myEmployees");
+        assertThat(myEmployees.getType()).isEqualTo(EMPLOYEE_QUALIFIED_NAME);
+        assertThat(myEmployees.getStorageIds()).hasSize(2);
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -1498,5 +1511,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("server").append(File.separator).append("tenants")
                 .append(File.separator).append(tenantId).append(File.separator).append("data-management").append(File.separator).append("client").toString();
         return clientBdmJarPath;
-    }
+   }
+
 }

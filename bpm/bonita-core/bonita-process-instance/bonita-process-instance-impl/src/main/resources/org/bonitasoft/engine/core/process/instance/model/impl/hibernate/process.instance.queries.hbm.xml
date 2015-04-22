@@ -357,6 +357,14 @@
 		AND c.activationEvent = :activationEvent
 		AND c.state = :state
 	</query>
+
+    <query name="getConnectorInstancesWithFailureInfoInState">
+        SELECT cfi
+        FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceWithFailureInfoImpl AS cfi
+        WHERE cfi.containerId = :containerId
+        AND cfi.containerType = :containerType
+        AND cfi.state = :state
+    </query>
 	
 	
 	<query name="getNumberOfSConnectorInstance">

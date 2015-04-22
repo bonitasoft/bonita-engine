@@ -39,8 +39,6 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
 
     private long expectedEndDate;
 
-    private long claimedDate;
-
     private String displayDescription;
 
     private String displayName;
@@ -134,15 +132,6 @@ public abstract class SAFlowNodeInstanceImpl extends SAFlowElementInstanceImpl i
 
     public void setExpectedEndDate(long expectedEndDate) {
         this.expectedEndDate = expectedEndDate;
-    }
-
-    @Override
-    public long getClaimedDate() {
-        return claimedDate;
-    }
-
-    public void setClaimedDate(long claimedDate) {
-        this.claimedDate = claimedDate;
     }
 
     @Override

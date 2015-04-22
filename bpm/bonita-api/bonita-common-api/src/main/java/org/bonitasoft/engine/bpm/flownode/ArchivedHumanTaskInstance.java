@@ -28,4 +28,6 @@ public interface ArchivedHumanTaskInstance extends ArchivedTaskInstance {
     TaskPriority getPriority();
 
     Date getExpectedEndDate();
+
+    Date getClaimedDate();
 }

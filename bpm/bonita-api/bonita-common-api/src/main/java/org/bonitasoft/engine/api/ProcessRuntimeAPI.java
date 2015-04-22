@@ -1411,18 +1411,23 @@ public interface ProcessRuntimeAPI {
     void cancelProcessInstance(long processInstanceId) throws ProcessInstanceNotFoundException, UpdateException;
 
     /**
-     * Reset the state of a failed activity instance to its previous state and then execute it.
-     * The activity must be in state FAILED.
+     * Reset the state of a failed {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstance} to its previous state and then execute it. Pre-condition: the
+     * {@code FlowNodeInstance} must be in state FAILED. If this condition is not respected, a ActivityExecutionException is thrown.
+     * <p>If the {@code FlowNodeInstance} contains failed {@link org.bonitasoft.engine.bpm.connector.ConnectorInstance}s, they will be re-executed. In the case
+     * where the connector execution fails again, the {@code FlowNodeInstance} will remain in failed state. There is not counter on the number of
+     * re-executions</p>
      *
      * @param activityInstanceId
-     *        The identifier of the activity instance.
+     *        The identifier of the {@code FlowNodeInstance} to be re-retried.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid, e.g. the session has expired.
+     *         when session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
-     *         If there is no activity instance with the specified identifier.
+     *         when no {@code FlowNodeInstance} is found with the specified identifier.
      * @throws ActivityExecutionException
-     *         If an error occurs either while resetting the state of while executing the activity instance.
+     *         occurs if the current Flownode is not in FAILED state, or while resetting the state, or while executing the {@code FlowNodeInstance}.
      * @since 6.0
+     * @see org.bonitasoft.engine.bpm.flownode.FlowNodeInstance
+     * @see org.bonitasoft.engine.bpm.connector.ConnectorInstance
      */
     void retryTask(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
