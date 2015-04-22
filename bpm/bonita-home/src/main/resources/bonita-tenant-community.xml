@@ -65,7 +65,6 @@
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="transientDataService" ref="transientDataService" />
-        <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="parentContainerResolver" ref="parentContainerResolver" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
 
@@ -118,6 +117,7 @@
         <constructor-arg name="commentService" ref="commentService" />
         <constructor-arg name="stateBehaviors" ref="stateBehaviors" />
         <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
     </bean>
 
     <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">

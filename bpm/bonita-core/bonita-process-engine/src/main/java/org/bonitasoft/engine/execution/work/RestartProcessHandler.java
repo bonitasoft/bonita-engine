@@ -32,6 +32,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -62,17 +63,19 @@ public class RestartProcessHandler implements TenantRestartHandler {
 
         private final ProcessExecutor processExecutor;
 
+        private final FlowNodeStateManager flowNodeStateManager;
         private final Iterator<Long> iterator;
 
         public ExecuteProcesses(final WorkService workService, final TechnicalLoggerService logger, final ActivityInstanceService activityInstanceService,
                 final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
-                final ProcessExecutor processExecutor, final Iterator<Long> iterator) {
+                final ProcessExecutor processExecutor, FlowNodeStateManager flowNodeStateManager, final Iterator<Long> iterator) {
             this.workService = workService;
             this.logger = logger;
             this.activityInstanceService = activityInstanceService;
             this.processDefinitionService = processDefinitionService;
             this.processInstanceService = processInstanceService;
             this.processExecutor = processExecutor;
+            this.flowNodeStateManager = flowNodeStateManager;
             this.iterator = iterator;
         }
 
@@ -86,13 +89,13 @@ public class RestartProcessHandler implements TenantRestartHandler {
                     final ProcessInstanceState state = getState(processInstance.getStateId());
                     switch (state) {
                         case ABORTED:
-                            handleCompletion(processInstance, state, logger, activityInstanceService, workService);
+                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager);
                             break;
                         case CANCELLED:
-                            handleCompletion(processInstance, state, logger, activityInstanceService, workService);
+                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager);
                             break;
                         case COMPLETED:
-                            handleCompletion(processInstance, state, logger, activityInstanceService, workService);
+                            handleCompletion(processInstance, logger, activityInstanceService, workService, flowNodeStateManager);
                             break;
                         case COMPLETING:
                             restartConnector(processDefinition, processInstance, ConnectorEvent.ON_FINISH, processExecutor);
@@ -109,7 +112,6 @@ public class RestartProcessHandler implements TenantRestartHandler {
             }
             return null;
         }
-
     }
 
     private final Map<Long, List<Long>> processInstancesByTenant = new HashMap<Long, List<Long>>();
@@ -179,7 +181,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
         try {
             do {
                 exec = new ExecuteProcesses(workService, logger, activityInstanceService, processDefinitionService, processInstanceService, processExecutor,
-                        iterator);
+                        tenantServiceAccessor.getFlowNodeStateManager(), iterator);
                 transactionService.executeInTransaction(exec);
             } while (iterator.hasNext());
         } catch (final Exception e) {
@@ -188,19 +190,9 @@ public class RestartProcessHandler implements TenantRestartHandler {
 
     }
 
-    /**
-     * @param processInstance
-     * @param state
-     * @param logger
-     * @param activityInstanceService
-     * @param workService
-     * @throws SBonitaException
-     * @throws SActivityReadException
-     */
-    private void handleCompletion(final SProcessInstance processInstance, final ProcessInstanceState state, final TechnicalLoggerService logger,
-            final ActivityInstanceService activityInstanceService, final WorkService workService) throws SBonitaException {
-        logInfo(logger, "Restarting notification of finished process '" + processInstance.getName()
-                + "' with id " + processInstance.getId() + " in state " + state);
+    protected void handleCompletion(final SProcessInstance processInstance, final TechnicalLoggerService logger,
+            final ActivityInstanceService activityInstanceService, final WorkService workService, FlowNodeStateManager flowNodeStateManager)
+            throws SBonitaException {
         // Only Error events set interruptedByEvent on SProcessInstance:
         if (!processInstance.hasBeenInterruptedByEvent()) {
 
@@ -208,19 +200,16 @@ public class RestartProcessHandler implements TenantRestartHandler {
             // Should always be in a CallActivity:
             if (callerId > 0) {
                 final SActivityInstance callActivityInstance = activityInstanceService.getActivityInstance(processInstance.getCallerId());
-                workService.registerWork(WorkFactory.createExecuteFlowNodeWork(callActivityInstance.getProcessDefinitionId(),
-                        callActivityInstance.getParentProcessInstanceId(), callActivityInstance.getId(), null, null));
+                if (callActivityInstance.getStateId() != flowNodeStateManager.getFailedState().getId()) {
+                    workService.registerWork(WorkFactory.createExecuteFlowNodeWork(callActivityInstance.getProcessDefinitionId(),
+                            callActivityInstance.getParentProcessInstanceId(), callActivityInstance.getId(), null, null));
+                    logInfo(logger, "Restarting notification of finished process '" + processInstance.getName() + "' with id " + processInstance.getId()
+                            + " in state " + getState(processInstance.getStateId()));
+                }
             }
         }
     }
 
-    /**
-     * @param processDefinition
-     * @param processInstance
-     * @param processExecutor
-     * @param onFinish
-     * @throws SBonitaException
-     */
     private void restartConnector(final SProcessDefinition processDefinition, final SProcessInstance processInstance, final ConnectorEvent event,
             final ProcessExecutor processExecutor) throws SBonitaException {
         processExecutor.executeConnectors(processDefinition, processInstance, event, null);

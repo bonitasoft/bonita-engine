@@ -11,23 +11,16 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.instance.model.archive;
 
-import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+package org.bonitasoft.engine.api.impl.connector;
+
+import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 
 /**
- * @author Baptiste Mesta
+ * @author Elias Ricken de Medeiros
  */
-public interface SAHumanTaskInstance extends SATaskInstance {
+public interface ConnectorResetStrategy {
 
-    long getActorId();
-
-    long getAssigneeId();
-
-    long getClaimedDate();
-
-    STaskPriority getPriority();
-
-    long getExpectedEndDate();
+    public void resetConnectorsOf(long flowNodeInstanceId) throws ActivityExecutionException;
 
 }

@@ -147,7 +147,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedUserTaskInstance_sould_return_the_right_idenfiers() {
+    public void toArchivedUserTaskInstance_sould_return_the_right_identifiers() {
         final SAUserTaskInstanceImpl sInstance = new SAUserTaskInstanceImpl();
         sInstance.setRootContainerId(1L);
         sInstance.setParentContainerId(2L);
@@ -156,6 +156,8 @@ public class ModelConvertorTest {
         sInstance.setLogicalGroup(2, 456L);
         sInstance.setLogicalGroup(3, 2L);
         sInstance.setStateId(5);
+        final long claimedDate = System.currentTimeMillis();
+        sInstance.setClaimedDate(claimedDate);
         sInstance.setPriority(STaskPriority.NORMAL);
 
         when(manager.getState(5)).thenReturn(new CompletedActivityStateImpl());
@@ -166,6 +168,7 @@ public class ModelConvertorTest {
         assertThat(archivedUserTaskInstance.getParentContainerId()).isEqualTo(2L);
         assertThat(archivedUserTaskInstance.getProcessInstanceId()).isEqualTo(2L);
         assertThat(archivedUserTaskInstance.getParentActivityInstanceId()).isEqualTo(456L);
+        assertThat(archivedUserTaskInstance.getClaimedDate().getTime()).isEqualTo(claimedDate);
     }
 
     @Test
