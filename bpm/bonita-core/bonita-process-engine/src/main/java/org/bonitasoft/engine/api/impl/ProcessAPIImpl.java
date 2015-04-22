@@ -2593,7 +2593,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final String dataClassName = sDataInstance.getClassName();
         Class<?> dataClass;
         try {
-            dataClass = getClassForName(classLoader, dataClassName);
+            dataClass = classLoader.loadClass(dataClassName);
+            //dataClass = getClassForName(classLoader, dataClassName);
         } catch (final ClassNotFoundException e) {
             throw new UpdateException(e);
         }
@@ -2605,11 +2606,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw e;
         }
     }
-
-    protected Class<?> getClassForName(ClassLoader classLoader, String dataClassName) throws ClassNotFoundException {
-        return Class.forName(dataClassName, true, classLoader);
-    }
-
     private EntityUpdateDescriptor buildEntityUpdateDescriptorForData(final Serializable dataValue) {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField("value", dataValue);

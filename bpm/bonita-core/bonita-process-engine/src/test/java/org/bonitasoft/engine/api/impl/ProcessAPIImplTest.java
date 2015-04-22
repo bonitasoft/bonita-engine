@@ -358,7 +358,10 @@ public class ProcessAPIImplTest {
     @Test
     public void updateProcessDataInstances_should_update_data_instances_when_new_value_is_instance_of_data_type() throws Exception {
         // Given
-        doReturn(null).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
+        ClassLoader processClassLoader = mock(ClassLoader.class);
+        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class)SBlobDataInstanceImpl.class);
+        when(processClassLoader.loadClass(String.class.getName())).thenReturn((Class)String.class);
+        doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
 
         final SBlobDataInstanceImpl sDataFoo = new SBlobDataInstanceImpl();
         sDataFoo.setClassName(String.class.getName());
@@ -384,13 +387,18 @@ public class ProcessAPIImplTest {
         assertThat(argument.getValue()).containsOnly("foo", "bar");
         verify(dataInstanceService).updateDataInstance(eq(sDataFoo), any(EntityUpdateDescriptor.class));
         verify(dataInstanceService).updateDataInstance(eq(sDataBar), any(EntityUpdateDescriptor.class));
-        verify(processAPI, times(2)).getClassForName(any(ClassLoader.class), anyString());
     }
 
     @Test
     public void updateProcessDataInstances_should_throw_exception_when_new_value_is_not_instance_of_data_type() throws Exception {
         // Given
         final String dataName = "dataName";
+        ClassLoader processClassLoader = mock(ClassLoader.class);
+        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class)SBlobDataInstanceImpl.class);
+        when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
+        doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
+        when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
+
         final Map<String, Serializable> dataNameValues = singletonMap(dataName, (Serializable) "dataValue");
 
         final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
@@ -559,6 +567,11 @@ public class ProcessAPIImplTest {
     public void updateActivityDataInstance_should_throw_exception_when_new_value_is_not_instance_of_data_type() throws Exception {
         // Given
         final String dataName = "dataName";
+        ClassLoader processClassLoader = mock(ClassLoader.class);
+        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class)SBlobDataInstanceImpl.class);
+        when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
+        doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
+        when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
 
         final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
         dataInstance.setClassName(List.class.getName());
@@ -584,6 +597,12 @@ public class ProcessAPIImplTest {
     public void updateActivityTransientDataInstance_should_throw_exception_when_new_value_is_not_instance_of_data_type() throws Exception {
         // Given
         final String dataName = "dataName";
+        ClassLoader processClassLoader = mock(ClassLoader.class);
+        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class)SBlobDataInstanceImpl.class);
+        when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
+        doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
+        when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
+
 
         final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
         dataInstance.setClassName(List.class.getName());
