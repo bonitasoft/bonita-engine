@@ -7,95 +7,94 @@
         http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans.xsd
         ">
 
-    <bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor"/>
+    <bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor" />
 
     <bean id="flowNodeStateManager" class="com.bonitasoft.engine.execution.FlowNodeStateManagerExt">
-        <constructor-arg name="processDefinitionService" ref="processDefinitionManager"/>
-        <constructor-arg name="processInstanceService" ref="processInstanceService"/>
-        <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
-        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService"/>
-        <constructor-arg name="classLoaderService" ref="classLoaderService"/>
-        <constructor-arg name="expressionResolverService" ref="expressionResolverService"/>
-        <constructor-arg name="schedulerService" ref="scheduler"/>
-        <constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
-        <constructor-arg name="eventInstanceService" ref="eventInstanceService"/>
-        <constructor-arg name="operationService" ref="operationService"/>
-        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator"/>
-        <constructor-arg name="containerRegistry" ref="containerRegistry"/>
-        <constructor-arg name="archiveService" ref="archiveService"/>
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService"/>
-        <constructor-arg name="documentService" ref="documentService"/>
-        <constructor-arg name="commentService" ref="commentService"/>
-        <constructor-arg name="eventsHandler" ref="eventsHandler"/>
-        <constructor-arg name="userFilterService" ref="userFilterService"/>
-        <constructor-arg name="actorMappingService" ref="actorMappingService"/>
-        <constructor-arg name="workService" ref="workService"/>
-        <constructor-arg name="identityService" ref="identityService"/>
-        <constructor-arg name="breakpointService" ref="breakpointService"/>
-        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
-        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
-        <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter"/>
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="operationService" ref="operationService" />
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+        <constructor-arg name="containerRegistry" ref="containerRegistry" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="commentService" ref="commentService" />
+        <constructor-arg name="eventsHandler" ref="eventsHandler" />
+        <constructor-arg name="userFilterService" ref="userFilterService" />
+        <constructor-arg name="actorMappingService" ref="actorMappingService" />
+        <constructor-arg name="workService" ref="workService" />
+        <constructor-arg name="identityService" ref="identityService" />
+        <constructor-arg name="breakpointService" ref="breakpointService" />
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver" />
+        <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
     </bean>
 
     <bean id="processExecutor" class="com.bonitasoft.engine.execution.ProcessExecutorExt">
-        <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
-        <constructor-arg name="processInstanceService" ref="processInstanceService"/>
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService"/>
-        <constructor-arg name="flowNodeExecutor" ref="flowNodeExecutor"/>
-        <constructor-arg name="workService" ref="workService"/>
-        <constructor-arg name="processDefinitionService" ref="processDefinitionManager"/>
-        <constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService"/>
-        <constructor-arg name="transitionService" ref="transitionService"/>
-        <constructor-arg name="eventInstanceService" ref="eventInstanceService"/>
-        <constructor-arg name="connectorService" ref="connectorService"/>
-        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService"/>
-        <constructor-arg name="classLoaderService" ref="classLoaderService"/>
-        <constructor-arg name="operationService" ref="operationService"/>
-        <constructor-arg name="expressionResolverService" ref="expressionResolverService"/>
-        <constructor-arg name="eventService" ref="tenantEventService"/>
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="flowNodeExecutor" ref="flowNodeExecutor" />
+        <constructor-arg name="workService" ref="workService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
+        <constructor-arg name="transitionService" ref="transitionService" />
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="connectorService" ref="connectorService" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="operationService" ref="operationService" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="handlers">
             <map>
                 <entry key="PROCESSINSTANCE_STATE_UPDATED">
                     <bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
-                        <constructor-arg name="tenantId" value="${tenantId}"/>
+                        <constructor-arg name="tenantId" value="${tenantId}" />
                         <constructor-arg name="identifier"
-                                         value="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler"/>
+                                         value="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler" />
                     </bean>
                 </entry>
             </map>
         </constructor-arg>
-        <constructor-arg name="documentService" ref="documentService"/>
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor"/>
-        <constructor-arg name="containerRegistry" ref="containerRegistry"/>
-        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator"/>
-        <constructor-arg name="eventsHandler" ref="eventsHandler"/>
-        <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager"/>
-        <constructor-arg name="businessDataRepository" ref="businessDataRepository"/>
-        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="containerRegistry" ref="containerRegistry" />
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+        <constructor-arg name="eventsHandler" ref="eventsHandler" />
+        <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
         <constructor-arg name="transitionEvaluator" ref="transitionEvaluator" />
         <constructor-arg name="contractDataService" ref="contractDataService" />
     </bean>
-<!--
-    <bean id="casAuthenticatorDelegate"
-          class="com.bonitasoft.engine.authentication.impl.cas.CASAuthenticatorImpl" lazy-init="true">
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <property name="casServerUrlPrefix"
-                  value="${authentication.delegate.cas.server.url.prefix:http://cas.internal.bonitasoft.com/}" />
-        <property name="casService"
-                  value="${authentication.delegate.cas.service.url:http://internal.bonitasoft.com/bonita/loginservice}" />
-    </bean>
+    <!--
+        <bean id="casAuthenticatorDelegate"
+              class="com.bonitasoft.engine.authentication.impl.cas.CASAuthenticatorImpl" lazy-init="true">
+            <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+            <property name="casServerUrlPrefix"
+                      value="${authentication.delegate.cas.server.url.prefix:http://cas.internal.bonitasoft.com/}" />
+            <property name="casService"
+                      value="${authentication.delegate.cas.service.url:http://internal.bonitasoft.com/bonita/loginservice}" />
+        </bean>
 
-    <bean id="nullAuthenticationDelegate"
-          class="com.bonitasoft.engine.authentication.impl.NullAuthenticationDelegate"  lazy-init="true"/>
+        <bean id="nullAuthenticationDelegate"
+              class="com.bonitasoft.engine.authentication.impl.NullAuthenticationDelegate"  lazy-init="true"/>
 
-    <bean id="authenticationService"
-          class="com.bonitasoft.engine.authentication.impl.JAASGenericAuthenticationServiceImpl" lazy-init="true">
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <property name="authenticatorDelegate"
-                  ref="${authenticator.delegate:nullAuthenticationDelegate}" />
-    </bean>
--->
+        <bean id="authenticationService"
+              class="com.bonitasoft.engine.authentication.impl.JAASGenericAuthenticationServiceImpl" lazy-init="true">
+            <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+            <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+            <property name="authenticatorDelegate"
+                      ref="${authenticator.delegate:nullAuthenticationDelegate}" />
+        </bean>
+    -->
     <bean id="defaultCommands" parent="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
         <property name="sourceList">
             <list merge="true">
@@ -192,18 +191,18 @@
     </bean>
 
     <bean id="tenantEventService" class="com.bonitasoft.engine.events.impl.ConfigurableEventServiceImpl">
-        <constructor-arg name="handlers" ref="eventHandlers"/>
+        <constructor-arg name="handlers" ref="eventHandlers" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
-    <bean id="engineConstantExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy" >
+    <bean id="engineConstantExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy">
         <constructor-arg name="processInstanceService" ref="processInstanceService" />
         <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
     </bean>
 
-    <bean id="queriableLoggerStrategy" class="com.bonitasoft.engine.log.api.impl.MapQueriableLoggerStrategy" >
+    <bean id="queriableLoggerStrategy" class="com.bonitasoft.engine.log.api.impl.MapQueriableLoggerStrategy">
         <constructor-arg name="loggableLevels">
             <map>
                 <entry key="ACTOR_CREATED:INTERNAL" value="true" />
@@ -373,14 +372,14 @@
     <bean id="leftOperandHandlers" parent="communityLeftOperandHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
         <property name="sourceList">
             <list merge="true">
-                <ref bean="stringIndexLeftOperandHandler"/>
+                <ref bean="stringIndexLeftOperandHandler" />
             </list>
         </property>
     </bean>
 
     <bean id="stringIndexLeftOperandHandler" class="com.bonitasoft.engine.operation.StringIndexLeftOperandHandler">
-        <constructor-arg name="processInstanceService" ref="processInstanceService"/>
-        <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
     </bean>
 
     <!-- override community -->
@@ -390,12 +389,12 @@
 
     <beans profile="performance">
         <bean id="archivingStrategy" class="com.bonitasoft.engine.archive.impl.ListArchivingStrategy">
-            <constructor-arg name="archives" ref="archivingStrategyMap"/>
+            <constructor-arg name="archives" ref="archivingStrategyMap" />
         </bean>
 
         <bean id="archivingStrategyMap" parent="archivingStrategyMapBase" class="org.springframework.beans.factory.config.MapFactoryBean">
             <property name="sourceMap">
-                <map merge="true"/>
+                <map merge="true" />
             </property>
         </bean>
 
@@ -423,8 +422,6 @@
             </property>
         </bean>
     </beans>
-
-
 
 
 </beans>
