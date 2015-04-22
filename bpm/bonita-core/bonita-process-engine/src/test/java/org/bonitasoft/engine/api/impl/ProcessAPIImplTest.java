@@ -351,7 +351,6 @@ public class ProcessAPIImplTest {
     public void updateProcessDataInstance_should_throw_exception_when_updateProcessDataInstances_failed() throws Exception {
         // Given
         doThrow(new UpdateException()).when(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), anyMapOf(String.class, Serializable.class));
-
         // When
         processAPI.updateProcessDataInstance("foo", PROCESS_INSTANCE_ID, "go");
     }
@@ -382,9 +381,10 @@ public class ProcessAPIImplTest {
         // Then
         // Check that we called DataInstanceService for each pair data/value
         verify(dataInstanceService, times(2)).updateDataInstance(any(SDataInstance.class), any(EntityUpdateDescriptor.class));
-        assertThat(argument.getValue()).containsOnly("foo","bar");
+        assertThat(argument.getValue()).containsOnly("foo", "bar");
         verify(dataInstanceService).updateDataInstance(eq(sDataFoo), any(EntityUpdateDescriptor.class));
         verify(dataInstanceService).updateDataInstance(eq(sDataBar), any(EntityUpdateDescriptor.class));
+        verify(processAPI, times(2)).getClassForName(any(ClassLoader.class), anyString());
     }
 
     @Test
@@ -505,7 +505,7 @@ public class ProcessAPIImplTest {
     public void getActivityTransientDataInstances() throws Exception {
         final String dataValue = "TestOfCourse";
         final String dataName = "TransientName";
-        doNothing().when(processAPI).updateTransientData(dataName, FLOW_NODE_INSTANCE_ID, dataValue, transientDataService);
+        doNothing().when(processAPI).updateTransientData(eq(dataName), eq(FLOW_NODE_INSTANCE_ID), eq(dataValue), eq(transientDataService), any(ClassLoader.class));
 
         final int nbResults = 100;
         final int startIndex = 0;
@@ -534,7 +534,7 @@ public class ProcessAPIImplTest {
     public void getActivityTransientDataInstance() throws Exception {
         final String dataValue = "TestOfCourse";
         final String dataName = "TransientName";
-        doNothing().when(processAPI).updateTransientData(dataName, FLOW_NODE_INSTANCE_ID, dataValue, transientDataService);
+        doNothing().when(processAPI).updateTransientData(eq(dataName), eq(FLOW_NODE_INSTANCE_ID), eq(dataValue), eq(transientDataService), any(ClassLoader.class));
 
         final SDataInstance sDataInstance = mock(SDataInstance.class);
         when(sDataInstance.getClassName()).thenReturn(Integer.class.getName());
@@ -610,13 +610,16 @@ public class ProcessAPIImplTest {
         // Given
         final String dataValue = "TestOfCourse";
         final String dataName = "TransientName";
-        doNothing().when(processAPI).updateTransientData(dataName, FLOW_NODE_INSTANCE_ID, dataValue, transientDataService);
+        ClassLoader contextClassLoader = mock(ClassLoader.class);
+        when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(contextClassLoader);
+        doNothing().when(processAPI).updateTransientData(dataName, FLOW_NODE_INSTANCE_ID, dataValue, transientDataService, contextClassLoader);
 
         // When
         processAPI.updateActivityTransientDataInstance(dataName, FLOW_NODE_INSTANCE_ID, dataValue);
 
         // Then
-        verify(processAPI).updateTransientData(dataName, FLOW_NODE_INSTANCE_ID, dataValue, transientDataService);
+
+        verify(processAPI).updateTransientData(dataName, FLOW_NODE_INSTANCE_ID, dataValue, transientDataService, contextClassLoader);
         verify(tenantAccessor, times(1)).getTransientDataService();
         verify(tenantAccessor, times(1)).getClassLoaderService();
         verify(tenantAccessor, times(1)).getActivityInstanceService();
@@ -630,7 +633,7 @@ public class ProcessAPIImplTest {
         // Given
         final String dataValue = "TestOfCourse";
         final String dataName = "TransientName";
-        doThrow(new SDataInstanceException("")).when(processAPI).updateTransientData(dataName, FLOW_NODE_INSTANCE_ID, dataValue, transientDataService);
+        doThrow(new SDataInstanceException("")).when(processAPI).updateTransientData(eq(dataName), eq(FLOW_NODE_INSTANCE_ID), eq(dataValue), eq(transientDataService), any(ClassLoader.class));
 
         // When
         processAPI.updateActivityTransientDataInstance(dataName, FLOW_NODE_INSTANCE_ID, dataValue);
@@ -648,7 +651,7 @@ public class ProcessAPIImplTest {
                 DataInstanceContainer.ACTIVITY_INSTANCE.toString())).thenReturn(dataInstance);
 
         // When
-        processAPI.updateTransientData(dataName, FLOW_NODE_INSTANCE_ID, dataValue, transientDataService);
+        processAPI.updateTransientData(dataName, FLOW_NODE_INSTANCE_ID, dataValue, transientDataService, this.getClass().getClassLoader());
 
         // Then
         verify(transientDataService).updateDataInstance(eq(dataInstance), any(EntityUpdateDescriptor.class));

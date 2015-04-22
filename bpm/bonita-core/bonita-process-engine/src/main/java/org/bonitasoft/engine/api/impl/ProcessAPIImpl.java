@@ -2561,7 +2561,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final List<String> dataNames = new ArrayList<String>(dataNameValues.keySet());
             final List<SDataInstance> sDataInstances = dataInstanceService.getDataInstances(dataNames, processInstanceId,
                     DataInstanceContainer.PROCESS_INSTANCE.toString(), parentContainerResolver);
-            updateDataInstances(sDataInstances, dataNameValues);
+            updateDataInstances(sDataInstances, dataNameValues, processClassLoader);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         } catch (final ClassNotFoundException e) {
@@ -2571,29 +2571,29 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private void updateDataInstances(final List<SDataInstance> sDataInstances, final Map<String, Serializable> dataNameValues) throws ClassNotFoundException,
+    protected void updateDataInstances(final List<SDataInstance> sDataInstances, final Map<String, Serializable> dataNameValues, ClassLoader classLoader) throws ClassNotFoundException,
             UpdateException, SDataInstanceException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         for (final SDataInstance sDataInstance : sDataInstances) {
             final Serializable dataValue = dataNameValues.get(sDataInstance.getName());
-            updateDataInstance(dataInstanceService, sDataInstance, dataValue);
+            updateDataInstance(dataInstanceService, sDataInstance, dataValue, classLoader);
         }
     }
 
-    private void updateDataInstance(final DataInstanceService dataInstanceService, final SDataInstance sDataInstance, final Serializable dataNewValue)
+    protected void updateDataInstance(final DataInstanceService dataInstanceService, final SDataInstance sDataInstance, final Serializable dataNewValue, ClassLoader classLoader)
             throws UpdateException, SDataInstanceException {
-        verifyTypeOfNewDataValue(sDataInstance, dataNewValue);
+        verifyTypeOfNewDataValue(sDataInstance, dataNewValue, classLoader);
 
         final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(dataNewValue);
         dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
     }
 
-    private void verifyTypeOfNewDataValue(final SDataInstance sDataInstance, final Serializable dataValue) throws UpdateException {
+    protected void verifyTypeOfNewDataValue(final SDataInstance sDataInstance, final Serializable dataValue, ClassLoader classLoader) throws UpdateException {
         final String dataClassName = sDataInstance.getClassName();
         Class<?> dataClass;
         try {
-            dataClass = Class.forName(dataClassName);
+            dataClass = getClassForName(classLoader, dataClassName);
         } catch (final ClassNotFoundException e) {
             throw new UpdateException(e);
         }
@@ -2604,6 +2604,10 @@ public class ProcessAPIImpl implements ProcessAPI {
             e.setDataClassName(dataClassName);
             throw e;
         }
+    }
+
+    protected Class<?> getClassForName(ClassLoader classLoader, String dataClassName) throws ClassNotFoundException {
+        return Class.forName(dataClassName, true, classLoader);
     }
 
     private EntityUpdateDescriptor buildEntityUpdateDescriptorForData(final Serializable dataValue) {
@@ -2696,7 +2700,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             Thread.currentThread().setContextClassLoader(processClassLoader);
             final SDataInstance sDataInstance = dataInstanceService.getDataInstance(dataName, activityInstanceId,
                     DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
-            updateDataInstance(dataInstanceService, sDataInstance, dataValue);
+            updateDataInstance(dataInstanceService, sDataInstance, dataValue, processClassLoader);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         } finally {
@@ -2779,7 +2783,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            updateTransientData(dataName, activityInstanceId, dataValue, transientDataService);
+            updateTransientData(dataName, activityInstanceId, dataValue, transientDataService, processClassLoader);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         } finally {
@@ -2789,10 +2793,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     protected void updateTransientData(final String dataName, final long activityInstanceId, final Serializable dataValue,
-            final TransientDataService transientDataInstanceService) throws SDataInstanceException, UpdateException {
+            final TransientDataService transientDataInstanceService, ClassLoader classLoader) throws SDataInstanceException, UpdateException {
         final SDataInstance sDataInstance = transientDataInstanceService.getDataInstance(dataName, activityInstanceId,
                 DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-        verifyTypeOfNewDataValue(sDataInstance, dataValue);
+        verifyTypeOfNewDataValue(sDataInstance, dataValue, classLoader);
         final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(dataValue);
         transientDataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
     }
