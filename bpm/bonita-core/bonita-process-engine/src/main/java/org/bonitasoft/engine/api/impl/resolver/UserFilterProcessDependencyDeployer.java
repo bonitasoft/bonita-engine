@@ -29,15 +29,15 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class UserFilterProcessDependencyResolver implements ProcessDependencyResolver {
+public class UserFilterProcessDependencyDeployer implements ProcessDependencyDeployer {
 
     @Override
-    public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition)
+    public boolean deploy(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition processDefinition)
             throws UserFilterException {
         try {
             final long tenantId = tenantAccessor.getTenantId();
             final UserFilterService userFilterService = tenantAccessor.getUserFilterService();
-            return userFilterService.loadUserFilters(sDefinition.getId(), tenantId);
+            return userFilterService.loadUserFilters(processDefinition.getId(), tenantId);
         } catch (final SUserFilterLoadingException e) {
             throw new UserFilterException(e);
         }

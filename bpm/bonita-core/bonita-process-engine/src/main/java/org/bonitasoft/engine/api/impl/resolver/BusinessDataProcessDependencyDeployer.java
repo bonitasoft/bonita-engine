@@ -30,11 +30,11 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Matthieu Chaffotte
  */
-public class BusinessDataProcessDependencyResolver implements ProcessDependencyResolver {
+public class BusinessDataProcessDependencyDeployer implements ProcessDependencyDeployer {
 
     @Override
-    public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition) {
-        return checkResolution(tenantAccessor, sDefinition).isEmpty();
+    public boolean deploy(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition processDefinition) {
+        return checkResolution(tenantAccessor, processDefinition).isEmpty();
     }
 
     @Override

@@ -47,10 +47,10 @@ import org.bonitasoft.engine.xml.Parser;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class ActorProcessDependencyResolver implements ProcessDependencyResolver {
+public class ActorProcessDependencyDeployer implements ProcessDependencyDeployer {
 
     @Override
-    public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition)
+    public boolean deploy(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition processDefinition)
             throws ActorMappingImportException {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         BuilderFactory.getInstance();
@@ -62,19 +62,19 @@ public class ActorProcessDependencyResolver implements ProcessDependencyResolver
         } catch (final IllegalArgumentException e) {
             throw new ActorMappingImportException("unable to instantiate parser of actor mapping", e);
         }
-        final Set<SActorDefinition> actors = sDefinition.getActors();
+        final Set<SActorDefinition> actors = processDefinition.getActors();
         final Set<SActor> sActors = new HashSet<SActor>(actors.size() + 1);
-        final SActorDefinition actorInitiator = sDefinition.getActorInitiator();
+        final SActorDefinition actorInitiator = processDefinition.getActorInitiator();
         String initiatorName = null;
         if (actorInitiator != null) {
             initiatorName = actorInitiator.getName();
-            final SActorBuilder sActorBuilder = sActorBuilderFactory.create(initiatorName, sDefinition.getId(), true);
+            final SActorBuilder sActorBuilder = sActorBuilderFactory.create(initiatorName, processDefinition.getId(), true);
             sActorBuilder.addDescription(actorInitiator.getDescription());
             sActors.add(sActorBuilder.getActor());
         }
         for (final SActorDefinition actor : actors) {
             if (initiatorName == null || !initiatorName.equals(actor.getName())) {
-                final SActorBuilder sActorBuilder = sActorBuilderFactory.create(actor.getName(), sDefinition.getId(), false);
+                final SActorBuilder sActorBuilder = sActorBuilderFactory.create(actor.getName(), processDefinition.getId(), false);
                 sActorBuilder.addDescription(actor.getDescription());
                 sActors.add(sActorBuilder.getActor());
             }
@@ -84,7 +84,7 @@ public class ActorProcessDependencyResolver implements ProcessDependencyResolver
             final byte[] actorMappingXML = businessArchive.getResource(ActorMappingContribution.ACTOR_MAPPING_FILE);
             if (actorMappingXML != null) {
                 final String actorMapping = new String(actorMappingXML);
-                final ImportActorMapping importActorMapping = new ImportActorMapping(actorMappingService, identityService, parser, sDefinition.getId(),
+                final ImportActorMapping importActorMapping = new ImportActorMapping(actorMappingService, identityService, parser, processDefinition.getId(),
                         actorMapping);
                 try {
                     importActorMapping.execute();
@@ -95,7 +95,7 @@ public class ActorProcessDependencyResolver implements ProcessDependencyResolver
         } catch (final SBonitaException e) {
             // ignored
         }
-        return checkResolution(actorMappingService, sDefinition.getId()).isEmpty();
+        return checkResolution(actorMappingService, processDefinition.getId()).isEmpty();
     }
 
     @Override

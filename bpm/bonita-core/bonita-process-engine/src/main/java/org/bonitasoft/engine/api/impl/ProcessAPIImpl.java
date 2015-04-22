@@ -46,11 +46,10 @@ import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilder;
 import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilderFactory;
 import org.bonitasoft.engine.api.DocumentAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.impl.form.FormMappingDeployer;
 import org.bonitasoft.engine.api.impl.connector.ConnectorReseter;
 import org.bonitasoft.engine.api.impl.connector.ResetAllFailedConnectorStrategy;
 import org.bonitasoft.engine.api.impl.flownode.FlowNodeRetrier;
-import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
+import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyDeployer;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstances;
@@ -634,7 +633,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void deleteProcessInstances(final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger,
             final boolean ignoreProcessInstanceNotFound, final ActivityInstanceService activityInstanceService, final List<Long> processInstanceIds)
-                    throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+            throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         for (final Long processInstanceId : processInstanceIds) {
             try {
                 deleteProcessInstance(processInstanceService, processInstanceId, activityInstanceService);
@@ -697,7 +696,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessDefinition deployAndEnableProcess(final DesignProcessDefinition designProcessDefinition) throws ProcessDeployException,
-    ProcessEnablementException, AlreadyExistsException, InvalidProcessDefinitionException {
+            ProcessEnablementException, AlreadyExistsException, InvalidProcessDefinitionException {
         BusinessArchive businessArchive;
         try {
             businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
@@ -709,7 +708,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessDefinition deployAndEnableProcess(final BusinessArchive businessArchive) throws ProcessDeployException, ProcessEnablementException,
-    AlreadyExistsException {
+            AlreadyExistsException {
         final ProcessDefinition processDefinition = deploy(businessArchive);
         try {
             enableProcess(processDefinition.getId());
@@ -751,19 +750,12 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
             processDefinitionService.store(sProcessDefinition, designProcessDefinition.getDisplayName(), designProcessDefinition.getDisplayDescription());
             unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
-            processManagementAPIImplDelegate.createProcessPageDeployer().deployProcessPages(businessArchive, sProcessDefinition.getId(),
-                    SessionInfos.getUserIdFromSession());
-            new FormMappingDeployer(getTenantAccessor().getFormMappingService()).deployFormMappings(businessArchive, sProcessDefinition.getId());
             final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(businessArchive, tenantAccessor, sProcessDefinition);
             if (isResolved) {
                 tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
                         sProcessDefinition);
             }
-        } catch (final BonitaHomeNotSetException e) {
-            throw new ProcessDeployException(e);
-        } catch (final IOException e) {
-            throw new ProcessDeployException(e);
-        } catch (final SBonitaException e) {
+        } catch (final BonitaHomeNotSetException | IOException | SBonitaException e) {
             throw new ProcessDeployException(e);
         }
 
@@ -867,7 +859,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void disableAndDeleteProcessDefinition(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException,
-    DeletionException {
+            DeletionException {
         disableProcess(processDefinitionId);
         deleteProcessDefinition(processDefinitionId);
     }
@@ -904,7 +896,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Override
     public void executeFlowNode(final long flownodeInstanceId) throws FlowNodeExecutionException {
-            executeFlowNode(0, flownodeInstanceId, true);
+        executeFlowNode(0, flownodeInstanceId, true);
     }
 
     @CustomTransactions
@@ -924,7 +916,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             executeFlowNode(userId, flownodeInstanceId, wrapInTransaction, new HashMap<String, Serializable>());
         } catch (final ContractViolationException e) {
             throw new FlowNodeExecutionException(e);
-            } catch (final SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new FlowNodeExecutionException(e);
         }
     }
@@ -1111,7 +1103,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessInstance startProcess(final long userId, final long processDefinitionId) throws ProcessDefinitionNotFoundException,
-    ProcessExecutionException, ProcessActivationException {
+            ProcessExecutionException, ProcessActivationException {
         return startProcess(userId, processDefinitionId, null, null);
     }
 
@@ -1293,7 +1285,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ActorMember addUserToActor(final String actorName, final ProcessDefinition processDefinition, final long userId) throws CreationException,
-    AlreadyExistsException, ActorNotFoundException {
+            AlreadyExistsException, ActorNotFoundException {
         final List<ActorInstance> actors = getActors(processDefinition.getId(), 0, Integer.MAX_VALUE, ActorCriterion.NAME_ASC);
         for (final ActorInstance ai : actors) {
             if (actorName.equals(ai.getName())) {
@@ -1338,7 +1330,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ActorMember addGroupToActor(final String actorName, final long groupId, final ProcessDefinition processDefinition) throws CreationException,
-    AlreadyExistsException, ActorNotFoundException {
+            AlreadyExistsException, ActorNotFoundException {
         final List<ActorInstance> actors = getActors(processDefinition.getId(), 0, Integer.MAX_VALUE, ActorCriterion.NAME_ASC);
         for (final ActorInstance actorInstance : actors) {
             if (actorName.equals(actorInstance.getName())) {
@@ -1383,7 +1375,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ActorMember addRoleToActor(final String actorName, final ProcessDefinition processDefinition, final long roleId) throws ActorNotFoundException,
-    CreationException {
+            CreationException {
         final List<ActorInstance> actors = getActors(processDefinition.getId(), 0, Integer.MAX_VALUE, ActorCriterion.NAME_ASC);
         for (final ActorInstance ai : actors) {
             if (actorName.equals(ai.getName())) {
@@ -1600,7 +1592,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ArchivedFlowNodeInstance getArchivedFlowNodeInstance(final long archivedFlowNodeInstanceId) throws ArchivedFlowNodeInstanceNotFoundException,
-    RetrieveException {
+            RetrieveException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -2256,7 +2248,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 final StringBuilder builder = new StringBuilder("User '");
                 builder.append(SessionInfos.getUserNameFromSession()).append("' has re-executed assignation on activity ").append(humanTaskInstanceId);
                 builder.append(" of process instance ").append(humanTaskInstance.getLogicalGroup(1)).append(" of process named '")
-                .append(processDefinition.getName()).append("' in version ").append(processDefinition.getVersion());
+                        .append(processDefinition.getName()).append("' in version ").append(processDefinition.getVersion());
                 technicalLoggerService.log(ProcessAPIImpl.class, TechnicalLogSeverity.INFO, builder.toString());
             }
         } catch (final SBonitaException sbe) {
@@ -2288,7 +2280,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void cleanPendingMappingsAndUnassignHumanTask(final long userTaskId, final SHumanTaskInstance humanTaskInstance) throws SFlowNodeNotFoundException,
-    SFlowNodeReadException, SActivityModificationException {
+            SFlowNodeReadException, SActivityModificationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         // release
@@ -2560,7 +2552,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void updateDataInstances(final List<SDataInstance> sDataInstances, final Map<String, Serializable> dataNameValues) throws ClassNotFoundException,
-    UpdateException, SDataInstanceException {
+            UpdateException, SDataInstanceException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         for (final SDataInstance sDataInstance : sDataInstances) {
@@ -2827,7 +2819,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public boolean isManagerOfUserInvolvedInProcessInstance(final long managerUserId, final long processInstanceId) throws ProcessInstanceNotFoundException,
-    BonitaException {
+            BonitaException {
         return new ProcessInvolvementAPIImpl(this).isManagerOfUserInvolvedInProcessInstance(managerUserId, processInstanceId);
     }
 
@@ -3201,7 +3193,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public int getNumberOfActivityDataDefinitions(final long processDefinitionId, final String activityName) throws ProcessDefinitionNotFoundException,
-    ActivityDefinitionNotFoundException {
+            ActivityDefinitionNotFoundException {
         List<SDataDefinition> sdataDefinitionList = Collections.emptyList();
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
@@ -3413,7 +3405,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnProcessDefinition(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processDefinitionId)
-                    throws ConnectorExecutionException {
+            throws ConnectorExecutionException {
         return executeConnectorOnProcessDefinitionWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processDefinitionId);
     }
@@ -3732,7 +3724,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                         logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
                                 "No job found with name '" + jobName + "' when interrupting timer catch event named '" + sCatchEventDefinition.getName()
-                                + "' and id '" + sCatchEventInstance.getId() + "'. It was probably already triggered.");
+                                        + "' and id '" + sCatchEventInstance.getId() + "'. It was probably already triggered.");
                     }
                 }
             }
@@ -4006,7 +3998,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Deprecated
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(final long userId, final SearchOptions searchOptions) throws RetrieveException,
-    SearchException {
+            SearchException {
         return searchProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
     }
 
@@ -4256,7 +4248,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessSupervisor createProcessSupervisorForGroup(final long processDefinitionId, final long groupId) throws CreationException,
-    AlreadyExistsException {
+            AlreadyExistsException {
         final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
         supervisorBuilder.setGroupId(groupId);
         return createSupervisor(supervisorBuilder.done());
@@ -5033,7 +5025,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<Document> searchDocumentsSupervisedBy(final long userId, final SearchOptions searchOptions) throws SearchException,
-    UserNotFoundException {
+            UserNotFoundException {
         return documentAPI.searchDocumentsSupervisedBy(userId, searchOptions);
     }
 
@@ -5045,7 +5037,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ArchivedDocument> searchArchivedDocumentsSupervisedBy(final long userId, final SearchOptions searchOptions) throws SearchException,
-    UserNotFoundException {
+            UserNotFoundException {
         return documentAPI.searchArchivedDocumentsSupervisedBy(userId, searchOptions);
     }
 
@@ -5261,7 +5253,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
-        final List<ProcessDependencyResolver> resolvers = tenantAccessor.getDependencyResolver().getResolvers();
+        final List<ProcessDependencyDeployer> resolvers = tenantAccessor.getDependencyResolver().getResolvers();
         SProcessDefinition processDefinition;
         try {
             processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
@@ -5269,7 +5261,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ProcessDefinitionNotFoundException(e);
         }
         final List<Problem> problems = new ArrayList<Problem>();
-        for (final ProcessDependencyResolver resolver : resolvers) {
+        for (final ProcessDependencyDeployer resolver : resolvers) {
             final List<Problem> problem = resolver.checkResolution(tenantAccessor, processDefinition);
             if (problem != null) {
                 problems.addAll(problem);
@@ -5515,7 +5507,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final ArchivedProcessInstance archiveProcessInstance = getStartedArchivedProcessInstance(processInstanceId);
             final Map<String, Serializable> evaluateExpressionInArchiveProcessInstance = evaluateExpressionsInstanceLevelAndArchived(expressions,
                     processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE, archiveProcessInstance.getProcessDefinitionId(), archiveProcessInstance.getStartDate()
-                    .getTime());
+                            .getTime());
             return evaluateExpressionInArchiveProcessInstance;
         } catch (final SExpressionEvaluationException e) {
             throw new ExpressionEvaluationException(e, e.getExpressionName());
@@ -6008,7 +6000,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void setDocumentList(final long processInstanceId, final String name, final List<DocumentValue> documentsValues) throws DocumentException,
-    DocumentNotFoundException {
+            DocumentNotFoundException {
         documentAPI.setDocumentList(processInstanceId, name, documentsValues);
     }
 
@@ -6033,8 +6025,8 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Document updateDocument(final long documentId, final DocumentValue documentValue) throws ProcessInstanceNotFoundException,
-    DocumentAttachmentException,
-    AlreadyExistsException {
+            DocumentAttachmentException,
+            AlreadyExistsException {
         return documentAPI.updateDocument(documentId, documentValue);
     }
 
@@ -6064,19 +6056,19 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-        @Override
+    @Override
     public Serializable getProcessInputValueAfterInitialization(long processInstanceId, String name) throws ContractDataNotFoundException {
         try {
             return getTenantAccessor().getContractDataService().getArchivedProcessDataValue(processInstanceId, name);
         } catch (SContractDataNotFoundException | SBonitaReadException e) {
             throw new ContractDataNotFoundException(e);
-                }
+        }
     }
 
     @Override
     public int getNumberOfParameterInstances(final long processDefinitionId) {
         return processManagementAPIImplDelegate.getNumberOfParameterInstances(processDefinitionId);
-                }
+    }
 
     @Override
     public ParameterInstance getParameterInstance(final long processDefinitionId, final String parameterName) throws NotFoundException {
@@ -6095,22 +6087,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             SFlowNodeInstance activityInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(userTaskInstanceId);
             SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(activityInstance.getProcessDefinitionId());
-            final SExpressionContext expressionContext = createExpressionContext(userTaskInstanceId, processDefinition, CONTAINER_TYPE_ACTIVITY_INSTANCE, null );
-            SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(activityInstance.getFlowNodeDefinitionId());
-            return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, ((SUserTaskDefinition) flowNode).getContext());
-        } catch (SFlowNodeNotFoundException | SProcessDefinitionReadException | SFlowNodeReadException | SProcessDefinitionNotFoundException e) {
-            throw new UserTaskNotFoundException(e);
-        } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
-            throw new ExpressionEvaluationException(e);
-            }
-        }
-    @Override
-    public Map<String, Serializable> getArchivedUserTaskExecutionContext(long archivedUserTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        try {
-            SAFlowNodeInstance activityInstance = tenantAccessor.getActivityInstanceService().getArchivedFlowNodeInstance(archivedUserTaskInstanceId);
-            SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(activityInstance.getProcessDefinitionId());
-            final SExpressionContext expressionContext = createExpressionContext(activityInstance.getSourceObjectId(), processDefinition, CONTAINER_TYPE_ACTIVITY_INSTANCE, activityInstance.getArchiveDate());
+            final SExpressionContext expressionContext = createExpressionContext(userTaskInstanceId, processDefinition, CONTAINER_TYPE_ACTIVITY_INSTANCE, null);
             SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(activityInstance.getFlowNodeDefinitionId());
             return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, ((SUserTaskDefinition) flowNode).getContext());
         } catch (SFlowNodeNotFoundException | SProcessDefinitionReadException | SFlowNodeReadException | SProcessDefinitionNotFoundException e) {
@@ -6121,7 +6098,26 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException {
+    public Map<String, Serializable> getArchivedUserTaskExecutionContext(long archivedUserTaskInstanceId) throws UserTaskNotFoundException,
+            ExpressionEvaluationException {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            SAFlowNodeInstance activityInstance = tenantAccessor.getActivityInstanceService().getArchivedFlowNodeInstance(archivedUserTaskInstanceId);
+            SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(activityInstance.getProcessDefinitionId());
+            final SExpressionContext expressionContext = createExpressionContext(activityInstance.getSourceObjectId(), processDefinition,
+                    CONTAINER_TYPE_ACTIVITY_INSTANCE, activityInstance.getArchiveDate());
+            SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(activityInstance.getFlowNodeDefinitionId());
+            return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, ((SUserTaskDefinition) flowNode).getContext());
+        } catch (SFlowNodeNotFoundException | SProcessDefinitionReadException | SFlowNodeReadException | SProcessDefinitionNotFoundException e) {
+            throw new UserTaskNotFoundException(e);
+        } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
+            throw new ExpressionEvaluationException(e);
+        }
+    }
+
+    @Override
+    public Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException,
+            ExpressionEvaluationException {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             SProcessInstance processInstance = getProcessInstanceService(tenantAccessor).getProcessInstance(processInstanceId);
@@ -6136,22 +6132,26 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException {
+    public Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException,
+            ExpressionEvaluationException {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             SAProcessInstance processInstance = getProcessInstanceService(tenantAccessor).getArchivedProcessInstance(processInstanceId);
             SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processInstance.getProcessDefinitionId());
-            final SExpressionContext expressionContext = createExpressionContext(processInstance.getSourceObjectId(), processDefinition, CONTAINER_TYPE_PROCESS_INSTANCE, processInstance.getArchiveDate());
+            final SExpressionContext expressionContext = createExpressionContext(processInstance.getSourceObjectId(), processDefinition,
+                    CONTAINER_TYPE_PROCESS_INSTANCE, processInstance.getArchiveDate());
             return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, processDefinition.getContext());
-        } catch ( SProcessDefinitionReadException | SProcessInstanceReadException | SProcessDefinitionNotFoundException e) {
+        } catch (SProcessDefinitionReadException | SProcessInstanceReadException | SProcessDefinitionNotFoundException e) {
             throw new ProcessInstanceNotFoundException(e);
         } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
             throw new ExpressionEvaluationException(e);
         }
     }
 
-    Map<String, Serializable> evaluateContext(ExpressionResolverService expressionResolverService, SExpressionContext expressionContext, List<SContextEntry> context) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
-        if(context.isEmpty()){
+    Map<String, Serializable> evaluateContext(ExpressionResolverService expressionResolverService, SExpressionContext expressionContext,
+            List<SContextEntry> context) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException,
+            SInvalidExpressionException {
+        if (context.isEmpty()) {
             return Collections.emptyMap();
         }
         List<SExpression> expressions = toExpressionList(context);
@@ -6184,7 +6184,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         expressionContext.setContainerId(processInstanceId);
         expressionContext.setContainerType(type);
         expressionContext.setProcessDefinitionId(processDefinition.getId());
-        if(time != null){
+        if (time != null) {
             expressionContext.setTime(time);
         }
         return expressionContext;
