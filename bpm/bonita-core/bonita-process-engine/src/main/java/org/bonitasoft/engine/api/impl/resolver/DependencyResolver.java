@@ -64,18 +64,18 @@ public class DependencyResolver {
 
     private static final int BATCH_SIZE = 100;
 
-    private final List<ProcessDependencyResolver> dependencyResolvers;
+    private final List<ProcessDependencyDeployer> dependencyResolvers;
 
-    public DependencyResolver(final List<ProcessDependencyResolver> dependencyResolvers) {
+    public DependencyResolver(final List<ProcessDependencyDeployer> dependencyResolvers) {
         this.dependencyResolvers = dependencyResolvers;
     }
 
     public boolean resolveDependencies(final BusinessArchive businessArchive, final TenantServiceAccessor tenantAccessor, final SProcessDefinition sDefinition) {
-        final List<ProcessDependencyResolver> resolvers = getResolvers();
+        final List<ProcessDependencyDeployer> resolvers = getResolvers();
         boolean resolved = true;
-        for (final ProcessDependencyResolver resolver : resolvers) {
+        for (final ProcessDependencyDeployer resolver : resolvers) {
             try {
-                resolved &= resolver.resolve(tenantAccessor, businessArchive, sDefinition);
+                resolved &= resolver.deploy(tenantAccessor, businessArchive, sDefinition);
                 if (!resolved) {
                     for (Problem problem : resolver.checkResolution(tenantAccessor, sDefinition)) {
                         tenantAccessor.getTechnicalLoggerService().log(DependencyResolver.class, INFO, problem.getDescription());
@@ -111,17 +111,17 @@ public class DependencyResolver {
      * this does not throw exception, it only log because it can be retried after.
      */
     public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor) {
-        final List<ProcessDependencyResolver> resolvers = getResolvers();
-        resolveDependencies(processDefinitionId, tenantAccessor, resolvers.toArray(new ProcessDependencyResolver[resolvers.size()]));
+        final List<ProcessDependencyDeployer> resolvers = getResolvers();
+        resolveDependencies(processDefinitionId, tenantAccessor, resolvers.toArray(new ProcessDependencyDeployer[resolvers.size()]));
     }
 
-    public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor, final ProcessDependencyResolver... resolvers) {
+    public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor, final ProcessDependencyDeployer... resolvers) {
         final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         try {
             boolean resolved = true;
-            for (final ProcessDependencyResolver dependencyResolver : resolvers) {
+            for (final ProcessDependencyDeployer dependencyResolver : resolvers) {
                 final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
                 resolved &= dependencyResolver.checkResolution(tenantAccessor, processDefinition).isEmpty();
             }
@@ -253,7 +253,7 @@ public class DependencyResolver {
         addSDependency.execute();
     }
 
-    public List<ProcessDependencyResolver> getResolvers() {
+    public List<ProcessDependencyDeployer> getResolvers() {
         return dependencyResolvers;
     }
 }

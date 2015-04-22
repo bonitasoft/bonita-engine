@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.api.impl.resolver;
 
 import java.util.List;
@@ -26,24 +26,30 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface ProcessDependencyResolver {
+public interface ProcessDependencyDeployer {
 
     /**
-     * resolve a dedicated part of the process
+     * deploy a dedicated part of the process
      * e.g. load connectors
      * Must throw an exception is something is not resolved in the process
-     * 
+     *
      * @param tenantAccessor
+     *      the tenantAccessor to access services
      * @param businessArchive
-     * @param sDefinition
+     *      the business archive containing the dependency
+     * @param processDefinition
+     *      the process definition
      * @throws BonitaException
      */
-    boolean resolve(TenantServiceAccessor tenantAccessor, BusinessArchive businessArchive, SProcessDefinition sDefinition) throws BonitaException;
+    boolean deploy(TenantServiceAccessor tenantAccessor, BusinessArchive businessArchive, SProcessDefinition processDefinition) throws BonitaException;
 
     /**
      * @param tenantAccessor
+     *      the tenantAccessor to access services
      * @param processDefinition
+     *      the process definition
      * @return
+     *      a list of resolution problems or an empty list is there is no issue for this artefact
      */
     List<Problem> checkResolution(TenantServiceAccessor tenantAccessor, final SProcessDefinition processDefinition);
 
