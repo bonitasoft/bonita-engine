@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.ArrayList;
@@ -40,10 +40,10 @@ public class ComplexInputDefinitionBinding extends InputDefinitionBinding {
 
     @Override
     public void setChildObject(final String name, final Object value) throws XMLParseException {
-        if(name.equals(XMLProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE)){
+        if (name.equals(XMLProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE)) {
             complexInputDefinitionList.add((ComplexInputDefinition) value);
         }
-        if(name.equals(XMLProcessDefinition.CONTRACT_SIMPLE_INPUT_NODE)){
+        if (name.equals(XMLProcessDefinition.CONTRACT_SIMPLE_INPUT_NODE)) {
             simpleInputDefinitionList.add((SimpleInputDefinition) value);
 
         }
