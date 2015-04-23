@@ -45,7 +45,6 @@ public class ComplexInputDefinitionBinding extends InputDefinitionBinding {
         }
         if (name.equals(XMLProcessDefinition.CONTRACT_SIMPLE_INPUT_NODE)) {
             simpleInputDefinitionList.add((SimpleInputDefinition) value);
-
         }
     }
 

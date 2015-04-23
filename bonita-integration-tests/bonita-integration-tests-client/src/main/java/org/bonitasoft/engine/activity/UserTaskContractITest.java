@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.bpm.process.impl.ContractDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnectorWithAPICall;
@@ -90,9 +92,15 @@ public class UserTaskContractITest extends CommonAPIIT {
         // have a initial data value using process input, so that we ensure inputs are treated before data at process instantiation:
         builder.addData("nbDaysProcessData", Integer.class.getName(),
                 new ExpressionBuilder().createContractInputExpression(numberOfDaysProcessContractData, Integer.class.getName()));
+        builder.addData("multipleTextData", List.class.getName(), new ExpressionBuilder().createContractInputExpression("multipleText", List.class.getName()));
+        builder.addData("complexData", Map.class.getName(), new ExpressionBuilder().createContractInputExpression("complex", Map.class.getName()));
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME);
-        builder.addContract().addSimpleInput(numberOfDaysProcessContractData, Type.INTEGER, null).addMandatoryConstraint(numberOfDaysProcessContractData);
+        ContractDefinitionBuilder contract = builder.addContract();
+        contract.addSimpleInput(numberOfDaysProcessContractData, Type.INTEGER, null).addMandatoryConstraint(numberOfDaysProcessContractData);
+        contract.addSimpleInput("multipleText", Type.TEXT, "a multiple text", true);
+        contract.addComplexInput("complex", "a complex input", Collections.<SimpleInputDefinition>singletonList(new SimpleInputDefinitionImpl("text", Type.TEXT, "text in complex")), Collections.<ComplexInputDefinition>emptyList());
+
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -102,9 +110,16 @@ public class UserTaskContractITest extends CommonAPIIT {
         Map<String, Serializable> inputs = new HashMap<>(1);
         int value = 14;
         inputs.put(numberOfDaysProcessContractData, value);
+        ArrayList<String> multiples = new ArrayList<>(Arrays.asList("String1", "String2"));
+        inputs.put("multipleText", multiples);
+        HashMap<Object, Object> map = new HashMap<>();
+        map.put("text", "textValue");
+        inputs.put("complex", map);
         ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), inputs);
         waitForUserTask(processInstance, TASK1);
         DataInstance processDataValueInitializedFromInput = getProcessAPI().getProcessDataInstance("nbDaysProcessData", processInstance.getId());
+        assertThat(getProcessAPI().getProcessDataInstance("multipleTextData", processInstance.getId()).getValue()).isEqualTo(multiples);
+        assertThat(getProcessAPI().getProcessDataInstance("complexData", processInstance.getId()).getValue()).isEqualTo(map);
         assertThat(processDataValueInitializedFromInput.getValue()).isEqualTo(value);
 
         Serializable processInstanciationInputValue = getProcessAPI().getProcessInputValueAfterInitialization(processInstance.getId(),
@@ -121,7 +136,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
-                .addMandatoryConstraint("numberOfDays").addConstraint("Mystical constraint","true",null,"numberOfDays");
+                .addMandatoryConstraint("numberOfDays").addConstraint("Mystical constraint", "true", null, "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -184,7 +199,7 @@ public class UserTaskContractITest extends CommonAPIIT {
 
     @Test
     public void should_create_a_contract_with_special_char() throws Exception {
-        final long[] badValues = { 0, 366 };
+        final long[] badValues = {0, 366};
         for (final long badValue : badValues) {
             check_invalid_contract_with_special_char(badValue);
         }
@@ -302,7 +317,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final List<Map<String, Serializable>> expenseReport = new ArrayList<>();
         expenseReport.add(createExpenseLine("hotel", 150.3f, new Date(System.currentTimeMillis()), null));
         expenseReport.add(createExpenseLine("taxi", 25, new Date(System.currentTimeMillis()), new byte[0]));
-        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 }));
+        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[]{0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}));
 
         final Map<String, Serializable> taskInput = new HashMap<>();
         taskInput.put("expenseReport", (Serializable) expenseReport);
