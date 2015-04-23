@@ -14,7 +14,10 @@
 
 package org.bonitasoft.engine.page.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.StringTokenizer;
 
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
@@ -22,12 +25,15 @@ import org.bonitasoft.engine.persistence.PersistentObjectId;
 /**
  * @author Baptiste Mesta
  */
-public class SPageMappingImpl extends  PersistentObjectId implements SPageMapping {
+public class SPageMappingImpl extends PersistentObjectId implements SPageMapping {
 
+    public static final String COMMA_DELIM = ",";
     private String key;
     private Long pageId;
     private String url;
     private String urlAdapter;
+    private String pageAuthorizRules;
+    private List<String> authorizationRules = new ArrayList<>();
     private long lastUpdateDate;
     private long lastUpdatedBy;
 
@@ -50,6 +56,45 @@ public class SPageMappingImpl extends  PersistentObjectId implements SPageMappin
 
     public void setUrlAdapter(String urlAdapter) {
         this.urlAdapter = urlAdapter;
+    }
+
+    public String getPageAuthorizRules() {
+        return pageAuthorizRules;
+    }
+
+    public void setPageAuthorizRules(String pageAuthorizRules) {
+        this.pageAuthorizRules = pageAuthorizRules;
+        parseRules();
+    }
+
+    private void parseRules() {
+        if (pageAuthorizRules != null) {
+            authorizationRules.clear();
+            for (StringTokenizer stringTk = new StringTokenizer(pageAuthorizRules, COMMA_DELIM, false); stringTk.hasMoreTokens();) {
+                String rule = stringTk.nextToken();
+                authorizationRules.add(rule);
+            }
+        }
+    }
+
+    private void buildRulesAsString() {
+        pageAuthorizRules = null;
+        if (authorizationRules != null && !authorizationRules.isEmpty()) {
+            pageAuthorizRules = "";
+            for (String authorizationRule : authorizationRules) {
+                pageAuthorizRules += (authorizationRule + COMMA_DELIM);
+            }
+        }
+    }
+
+    @Override
+    public List<String> getPageAuthorizationRules() {
+        return authorizationRules;
+    }
+
+    public void setPageAuthorizationRules(List<String> rules) {
+        authorizationRules = rules;
+        buildRulesAsString();
     }
 
     @Override
@@ -95,21 +140,25 @@ public class SPageMappingImpl extends  PersistentObjectId implements SPageMappin
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SPageMappingImpl)) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof SPageMappingImpl))
+            return false;
+        if (!super.equals(o))
+            return false;
         SPageMappingImpl that = (SPageMappingImpl) o;
         return Objects.equals(lastUpdateDate, that.lastUpdateDate) &&
                 Objects.equals(lastUpdatedBy, that.lastUpdatedBy) &&
                 Objects.equals(key, that.key) &&
                 Objects.equals(pageId, that.pageId) &&
                 Objects.equals(url, that.url) &&
-                Objects.equals(urlAdapter, that.urlAdapter);
+                Objects.equals(urlAdapter, that.urlAdapter) &&
+                Objects.equals(pageAuthorizRules, that.pageAuthorizRules);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), key, pageId, url, urlAdapter, lastUpdateDate, lastUpdatedBy);
+        return Objects.hash(super.hashCode(), key, pageId, url, urlAdapter, lastUpdateDate, lastUpdatedBy, pageAuthorizRules);
     }
 
     @Override
@@ -119,6 +168,8 @@ public class SPageMappingImpl extends  PersistentObjectId implements SPageMappin
                 ", pageId=" + pageId +
                 ", url='" + url + '\'' +
                 ", urlAdapter='" + urlAdapter + '\'' +
+                ", pageAuthorizRules='" + pageAuthorizRules + '\'' +
+                ", authorizationRules=" + authorizationRules +
                 ", lastUpdateDate=" + lastUpdateDate +
                 ", lastUpdatedBy=" + lastUpdatedBy +
                 "} " + super.toString();

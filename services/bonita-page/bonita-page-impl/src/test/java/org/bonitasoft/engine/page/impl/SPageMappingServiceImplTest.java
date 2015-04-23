@@ -17,14 +17,12 @@ package org.bonitasoft.engine.page.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
@@ -34,6 +32,8 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.page.AuthorizationRule;
+import org.bonitasoft.engine.page.SAuthorizationException;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.SPageURL;
 import org.bonitasoft.engine.page.URLAdapter;
@@ -78,13 +78,13 @@ public class SPageMappingServiceImplTest {
     @Mock
     private ReadSessionAccessor readSessionAccessor;
 
-
     @InjectMocks
     private PageMappingServiceImpl pageMappingService;
 
     @Before
     public void before() {
         URLAdapter urlAdapter = new URLAdapter() {
+
             @Override
             public String adapt(String url, String key, Map<String, Serializable> context) {
                 return url + "_adapted_" + context.size();
@@ -98,7 +98,6 @@ public class SPageMappingServiceImplTest {
         pageMappingService.setURLAdapters(Collections.singletonList(urlAdapter));
     }
 
-
     @Test
     public void should_create_return_the_created_element() throws Exception {
         //given
@@ -109,7 +108,6 @@ public class SPageMappingServiceImplTest {
         assertThat(sPageMapping.getKey()).isEqualTo("theKey");
         assertThat(sPageMapping.getPageId()).isEqualTo(PAGE_ID);
         assertThat(sPageMapping.getUrl()).isEqualTo(null);
-
 
         final ArgumentCaptor<SInsertEvent> insertEvent = ArgumentCaptor.forClass(SInsertEvent.class);
         final ArgumentCaptor<InsertRecord> insertRecord = ArgumentCaptor.forClass(InsertRecord.class);
@@ -129,7 +127,6 @@ public class SPageMappingServiceImplTest {
         pageMappingService.create("theKey", PAGE_ID);
     }
 
-
     @Test
     public void should_create_return_external_mapping() throws Exception {
         //given
@@ -141,7 +138,6 @@ public class SPageMappingServiceImplTest {
         assertThat(sPageMapping.getUrl()).isEqualTo("http://www.mycompagny.com/aResource/page.html");
         assertThat(sPageMapping.getPageId()).isNull();
         assertThat(sPageMapping.getUrlAdapter()).isEqualTo("myAdapter");
-
 
         final ArgumentCaptor<SInsertEvent> insertEvent = ArgumentCaptor.forClass(SInsertEvent.class);
         final ArgumentCaptor<InsertRecord> insertRecord = ArgumentCaptor.forClass(InsertRecord.class);
@@ -195,7 +191,6 @@ public class SPageMappingServiceImplTest {
         pageMappingService.delete(new SPageMappingImpl());
     }
 
-
     @Test
     public void should_update_pageId_set_null_on_url() throws Exception {
         //given
@@ -213,7 +208,8 @@ public class SPageMappingServiceImplTest {
         assertThat(updateEvent.getValue().getObject()).isEqualTo(pageMapping);
         assertThat(updateEvent.getValue().getType()).isEqualTo("PAGE_MAPPING_UPDATED");
         assertThat(updateRecord.getValue().getEntity()).isEqualTo(pageMapping);
-        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", 124l), entry("url", null), entry("urlAdapter", null), entry("lastUpdatedBy", 0L));
+        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", 124l), entry("url", null), entry("urlAdapter", null),
+                entry("lastUpdatedBy", 0L));
 
     }
 
@@ -244,7 +240,8 @@ public class SPageMappingServiceImplTest {
         assertThat(updateEvent.getValue().getObject()).isEqualTo(pageMapping);
         assertThat(updateEvent.getValue().getType()).isEqualTo("PAGE_MAPPING_UPDATED");
         assertThat(updateRecord.getValue().getEntity()).isEqualTo(pageMapping);
-        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", null), entry("url", "myNewUrl"), entry("urlAdapter", "urlAdapter"), entry("lastUpdatedBy", 0L));
+        assertThat(updateRecord.getValue().getFields()).contains(entry("pageId", null), entry("url", "myNewUrl"), entry("urlAdapter", "urlAdapter"),
+                entry("lastUpdatedBy", 0L));
     }
 
     @Test
@@ -252,7 +249,7 @@ public class SPageMappingServiceImplTest {
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         pageMapping.setPageId(56l);
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable>emptyMap());
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
 
         assertThat(sPageURL.getPageId()).isEqualTo(56l);
         assertThat(sPageURL.getUrl()).isEqualTo(null);
@@ -263,7 +260,7 @@ public class SPageMappingServiceImplTest {
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         pageMapping.setUrl("theUrl");
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable>emptyMap());
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
 
         assertThat(sPageURL.getPageId()).isEqualTo(null);
         assertThat(sPageURL.getUrl()).isEqualTo("theUrl");
@@ -275,7 +272,7 @@ public class SPageMappingServiceImplTest {
         pageMapping.setUrl(null);
         pageMapping.setUrlAdapter("testAdapter");
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable>emptyMap());
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
 
         assertThat(sPageURL.getPageId()).isEqualTo(null);
         assertThat(sPageURL.getUrl()).isEqualTo("null_adapted_0");
@@ -287,7 +284,7 @@ public class SPageMappingServiceImplTest {
         pageMapping.setUrl("theUrl");
         pageMapping.setUrlAdapter("testAdapter");
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable>singletonMap("test", "test"));
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> singletonMap("test", "test"));
 
         assertThat(sPageURL.getPageId()).isEqualTo(null);
         assertThat(sPageURL.getUrl()).isEqualTo("theUrl_adapted_1");/* 1 is the map size */
@@ -299,6 +296,54 @@ public class SPageMappingServiceImplTest {
         pageMapping.setUrl("theUrl");
         pageMapping.setUrlAdapter("unknown");
 
-        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable>singletonMap("test", "test"));
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> singletonMap("test", "test"));
+    }
+
+    @Test
+    public void resolvePageURL_shouldExecuteAuthorizationRule() throws Exception {
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        final String validRuleKey = "validRule";
+        pageMapping.setPageAuthorizationRules(Arrays.asList(validRuleKey));
+
+        final AuthorizationRule authorizationRule = spy(new AuthorizationRule() {
+
+            @Override
+            public boolean isAllowed(Map<String, Serializable> context) {
+                return true;
+            }
+
+            @Override
+            public String getId() {
+                return validRuleKey;
+            }
+        });
+        pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(authorizationRule));
+
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
+
+        verify(authorizationRule).isAllowed(anyMap());
+    }
+
+    @Test(expected = SAuthorizationException.class)
+    public void resolvePageURL_shouldThrowExceptionIfAuthorizationRuleInvalid() throws Exception {
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        final String invalidRuleKey = "invalidRuleKey";
+        pageMapping.setPageAuthorizationRules(Arrays.asList(invalidRuleKey));
+
+        final AuthorizationRule authorizationRule = spy(new AuthorizationRule() {
+
+            @Override
+            public boolean isAllowed(Map<String, Serializable> context) {
+                return false;
+            }
+
+            @Override
+            public String getId() {
+                return invalidRuleKey;
+            }
+        });
+        pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(authorizationRule));
+
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
     }
 }

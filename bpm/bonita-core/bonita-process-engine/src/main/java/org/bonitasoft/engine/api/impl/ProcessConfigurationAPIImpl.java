@@ -27,9 +27,11 @@ import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageURL;
+import org.bonitasoft.engine.page.SAuthorizationException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -72,7 +74,7 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     }
 
     @Override
-    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context) throws NotFoundException, ExecutionException {
+    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context) throws NotFoundException, ExecutionException, UnauthorizedAccessException {
         PageMappingService pageMappingService = getTenantAccessor().getPageMappingService();
         try {
             return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context));
@@ -82,6 +84,8 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
             throw new RetrieveException(e);
         } catch (SExecutionException e) {
             throw new ExecutionException(e);
+        } catch (SAuthorizationException e) {
+            throw new UnauthorizedAccessException(e);
         }
     }
 

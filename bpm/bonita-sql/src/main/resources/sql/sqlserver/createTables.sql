@@ -1148,6 +1148,7 @@ CREATE TABLE page_mapping (
   pageId NUMERIC(19, 0) NULL,
   url NVARCHAR(1024) NULL,
   urladapter NVARCHAR(255) NULL,
+  page_authoriz_rules NVARCHAR(MAX) NULL,
   lastUpdateDate NUMERIC(19, 0) NULL,
   lastUpdatedBy NUMERIC(19, 0) NULL,
   CONSTRAINT UK_page_mapping UNIQUE (tenantId, key_),

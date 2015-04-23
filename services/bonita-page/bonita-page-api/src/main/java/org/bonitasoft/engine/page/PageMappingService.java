@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.page;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
@@ -26,30 +25,36 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
+ * Service that allows to map an arbitrary String key to a (Custom) Page or URL.
+ * Also allows to process the URL or Page return by providing an URLAdapter implementation that will be called automatically.
+ * Also allows to execute Authorization checkings by specifying rules to execute before returning the Page or URL.
+ *
+ * @see URLAdapter
  * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
  */
 public interface PageMappingService {
-
-
 
     /**
      * @param key the key used to retrieve the mapping
      * @param pageId the id of the custom page
+     * @param authorizationRules the names of the authorization rules to execute
      * @return the created page mapping
      * @throws SObjectCreationException when there is an issue while creating this object
      * @since 7.0.0
      */
-    SPageMapping create(String key, Long pageId) throws SObjectCreationException;
+    SPageMapping create(String key, Long pageId, String... authorizationRules) throws SObjectCreationException;
 
     /**
      * @param key the key used to retrieve the mapping
      * @param url the external url the mapping points to
      * @param urlAdapter the name of the url adapter that transform the url in case of an external url. i.e. it can add parameters
+     * @param authorizationRules the names of the authorization rules to execute
      * @return the created page mapping
      * @throws SObjectCreationException when there is an issue while creating this object
      * @since 7.0.0
      */
-    SPageMapping create(String key, String url, String urlAdapter) throws SObjectCreationException;
+    SPageMapping create(String key, String url, String urlAdapter, String... authorizationRules) throws SObjectCreationException;
 
     /**
      * @param key the key of the page mapping to retrieve
@@ -58,7 +63,15 @@ public interface PageMappingService {
      */
     SPageMapping get(String key) throws SObjectNotFoundException, SBonitaReadException;
 
-    SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context) throws SExecutionException;
+    /**
+     *
+     * @param pageMapping
+     * @param context
+     * @return
+     * @throws SExecutionException
+     * @throws SAuthorizationException
+     */
+    SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context) throws SExecutionException, SAuthorizationException;
 
     /**
      * delete this page mapping

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,30 +10,16 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-
+ */
 package org.bonitasoft.engine.page;
 
-import java.util.List;
-
-import org.bonitasoft.engine.persistence.PersistentObject;
-
 /**
- * @author Baptiste Mesta
+ * Thrown when access to a given page or URL is not allowed for a given key.
+ * author Emmanuel Duchastenier
  */
-public interface SPageMapping extends PersistentObject {
+public class SAuthorizationException extends Exception {
 
-    String getKey();
-
-    String getUrlAdapter();
-
-    List<String> getPageAuthorizationRules();
-
-    Long getPageId();
-
-    String getUrl();
-
-    long getLastUpdateDate();
-
-    long getLastUpdatedBy();
+    public SAuthorizationException(String message) {
+        super(message);
+    }
 }
