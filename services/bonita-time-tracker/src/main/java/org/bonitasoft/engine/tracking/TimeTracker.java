@@ -73,7 +73,7 @@ public class TimeTracker implements TenantLifecycleService {
         if (activatedRecords != null && activatedRecords.length > 0 && logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             this.logger.log(getClass(), TechnicalLogSeverity.INFO,
                     "Time tracker is activated for some records. This may not be used in production as performances may be strongly impacted: "
-                            + activatedRecords);
+                            + Arrays.toString(activatedRecords));
         }
         flushThread = new FlushThread(clock, flushIntervalInSeconds, this, logger);
 
