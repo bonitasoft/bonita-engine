@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.contract.impl;
 
+import java.util.Objects;
+
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 
 /**
@@ -30,48 +32,6 @@ public class InputDefinitionImpl implements InputDefinition {
 
     private final boolean multiple;
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (multiple ? 1231 : 1237);
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        return result;
-    }
-
-
-    @Override
-    public boolean equals(final Object obj) {
-        switch (NaiveEqualityResult.checkEquality(this, obj)) {
-            case RETURN_FALSE:
-                return false;
-            case RETURN_TRUE:
-                return true;
-            case CONTINUE:
-            default:
-                break;
-        }
-        final InputDefinitionImpl other = (InputDefinitionImpl) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (multiple != other.multiple) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        return true;
-    }
 
     protected InputDefinitionImpl(final String name, final String description, final boolean multiple) {
         this.description = description;
@@ -94,4 +54,27 @@ public class InputDefinitionImpl implements InputDefinition {
         return multiple;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InputDefinitionImpl that = (InputDefinitionImpl) o;
+        return Objects.equals(multiple, that.multiple) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description, name, multiple);
+    }
+
+    @Override
+    public String toString() {
+        return "InputDefinitionImpl{" +
+                "description='" + description + '\'' +
+                ", name='" + name + '\'' +
+                ", multiple=" + multiple +
+                '}';
+    }
 }

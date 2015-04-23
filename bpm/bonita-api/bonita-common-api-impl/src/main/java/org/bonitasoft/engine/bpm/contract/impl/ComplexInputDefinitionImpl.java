@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.contract.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
@@ -23,13 +24,6 @@ import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
  * @author Laurent Leseigneur
  */
 public class ComplexInputDefinitionImpl extends InputDefinitionImpl implements ComplexInputDefinition {
-
-    @Override
-    public String toString() {
-        return "ComplexInputDefinitionImpl [simpleInputDefinitions=" + simpleInputDefinitions + ", complexInputDefinitions=" + complexInputDefinitions
-                + ", getSimpleInputs()=" + getSimpleInputs() + ", getComplexInputs()=" + getComplexInputs() + ", getDescription()=" + getDescription()
-                + ", getName()=" + getName() + ", isMultiple()=" + isMultiple() + "]";
-    }
 
     private static final long serialVersionUID = 2836592506382887928L;
     private final List<SimpleInputDefinition> simpleInputDefinitions;
@@ -76,4 +70,26 @@ public class ComplexInputDefinitionImpl extends InputDefinitionImpl implements C
         return complexInputDefinitions;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ComplexInputDefinitionImpl that = (ComplexInputDefinitionImpl) o;
+        return Objects.equals(simpleInputDefinitions, that.simpleInputDefinitions) &&
+                Objects.equals(complexInputDefinitions, that.complexInputDefinitions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), simpleInputDefinitions, complexInputDefinitions);
+    }
+
+    @Override
+    public String toString() {
+        return "ComplexInputDefinitionImpl{" +
+                "simpleInputDefinitions=" + simpleInputDefinitions +
+                ", complexInputDefinitions=" + complexInputDefinitions +
+                "} " + super.toString();
+    }
 }
