@@ -13,8 +13,12 @@
  **/
 package org.bonitasoft.engine.bpm.bar.xml;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
 import org.bonitasoft.engine.io.xml.XMLParseException;
 
@@ -22,6 +26,8 @@ import org.bonitasoft.engine.io.xml.XMLParseException;
  * @author Matthieu Chaffotte
  */
 public class ComplexInputDefinitionBinding extends InputDefinitionBinding {
+    List<SimpleInputDefinition> simpleInputDefinitionList = new ArrayList<>();
+    List<ComplexInputDefinition> complexInputDefinitionList = new ArrayList<>();
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
@@ -34,11 +40,18 @@ public class ComplexInputDefinitionBinding extends InputDefinitionBinding {
 
     @Override
     public void setChildObject(final String name, final Object value) throws XMLParseException {
+        if(name.equals(XMLProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE)){
+            complexInputDefinitionList.add((ComplexInputDefinition) value);
+        }
+        if(name.equals(XMLProcessDefinition.CONTRACT_SIMPLE_INPUT_NODE)){
+            simpleInputDefinitionList.add((SimpleInputDefinition) value);
+
+        }
     }
 
     @Override
     public Object getObject() {
-        return new ComplexInputDefinitionImpl(name, description, multiple);
+        return new ComplexInputDefinitionImpl(name, description, multiple, simpleInputDefinitionList, complexInputDefinitionList);
     }
 
     @Override

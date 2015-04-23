@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.contract.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
@@ -68,4 +69,27 @@ public class ContractDefinitionImpl implements ContractDefinition {
         return complexInputs;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ContractDefinitionImpl that = (ContractDefinitionImpl) o;
+        return Objects.equals(constraints, that.constraints) &&
+                Objects.equals(complexInputs, that.complexInputs) &&
+                Objects.equals(simpleInputs, that.simpleInputs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(constraints, complexInputs, simpleInputs);
+    }
+
+    @Override
+    public String toString() {
+        return "ContractDefinitionImpl{" +
+                "constraints=" + constraints +
+                ", complexInputs=" + complexInputs +
+                ", simpleInputs=" + simpleInputs +
+                '}';
+    }
 }

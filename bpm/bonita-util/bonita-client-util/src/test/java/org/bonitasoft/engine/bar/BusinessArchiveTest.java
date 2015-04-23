@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,7 +44,11 @@ import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
+import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
@@ -66,6 +71,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.ContractDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.MultiInstanceLoopCharacteristicsBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SendTaskDefinitionBuilder;
@@ -548,12 +554,21 @@ public class BusinessArchiveTest {
     public void readProcessWithContract() throws Exception {
             final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
             builder.addActor("myActor");
-            builder.addUserTask("step1", "myActor").addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
-                    .addMandatoryConstraint("numberOfDays").addConstraint("Mystical constraint","true",null,"numberOfDays");
+        ContractDefinitionBuilder contractDefinitionBuilder = builder.addUserTask("step1", "myActor").addContract();
+        createContract(contractDefinitionBuilder);
+        createContract(builder.addContract());
         final DesignProcessDefinition process = builder.getProcess();
         final DesignProcessDefinition result = getDesignProcessDefinition(builder);
 
         assertThat(process).isEqualTo(result);
+    }
+
+    void createContract(ContractDefinitionBuilder contractDefinitionBuilder) {
+        contractDefinitionBuilder.addSimpleInput("numberOfDays", Type.INTEGER, null)
+                    .addMandatoryConstraint("numberOfDays").addConstraint("Mystical constraint", "true", null, "numberOfDays");
+        final SimpleInputDefinition childText = new SimpleInputDefinitionImpl("childText", Type.TEXT, "a text simple input");
+        final SimpleInputDefinition childDecimal = new SimpleInputDefinitionImpl("childDecimal", Type.DECIMAL, "a decimal simple input");
+        contractDefinitionBuilder.addComplexInput("complex", "a complex input", Arrays.asList(childText, childDecimal), Collections.<ComplexInputDefinition>emptyList());
     }
 
     @Test

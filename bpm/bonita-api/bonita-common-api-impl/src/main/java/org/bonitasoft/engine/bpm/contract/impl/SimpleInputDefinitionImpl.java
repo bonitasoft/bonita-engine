@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.contract.impl;
 
+import java.util.Objects;
+
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 
@@ -44,32 +46,17 @@ public class SimpleInputDefinitionImpl extends InputDefinitionImpl implements Si
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        SimpleInputDefinitionImpl that = (SimpleInputDefinitionImpl) o;
+        return Objects.equals(type, that.type);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        switch (NaiveEqualityResult.checkEquality(this, obj)) {
-            case RETURN_FALSE:
-                return false;
-            case RETURN_TRUE:
-                return true;
-            case CONTINUE:
-            default:
-                break;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        final SimpleInputDefinitionImpl other = (SimpleInputDefinitionImpl) obj;
-        if (type != other.type) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), type);
     }
 
     @Override
