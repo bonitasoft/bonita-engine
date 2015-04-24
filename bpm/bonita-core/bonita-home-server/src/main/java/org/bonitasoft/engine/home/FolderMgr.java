@@ -114,7 +114,9 @@ class FolderMgr {
     }
 
     public static Folder getTenantTempProcessFolder(File bonitaHomeFolder, long tenantId, long processId) throws IOException {
-        Folder folder = getFolder(getTenantTempProcessesFolder(bonitaHomeFolder, tenantId), Long.toString(processId));
+        Folder tenantTempProcessesFolder = getTenantTempProcessesFolder(bonitaHomeFolder, tenantId);
+        tenantTempProcessesFolder.createIfNotExists();
+        Folder folder = getFolder(tenantTempProcessesFolder, Long.toString(processId));
         folder.createIfNotExists();
         return folder;
     }
