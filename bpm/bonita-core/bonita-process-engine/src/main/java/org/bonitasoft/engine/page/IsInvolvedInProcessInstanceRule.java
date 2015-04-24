@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * author Emmanuel Duchastenier
  */
-public class AlwaysAllowedRule implements AuthorizationRule {
+public class IsInvolvedInProcessInstanceRule implements AuthorizationRule {
 
     @Override
     public boolean isAllowed(Map<String, Serializable> context) {
@@ -28,6 +28,6 @@ public class AlwaysAllowedRule implements AuthorizationRule {
 
     @Override
     public String getId() {
-        return AuthorizationRuleConstants.ALWAYS_ALLOWED;
+        return AuthorizationRuleConstants.IS_INVOLVED_IN_PROCESS_INSTANCE;
     }
 }

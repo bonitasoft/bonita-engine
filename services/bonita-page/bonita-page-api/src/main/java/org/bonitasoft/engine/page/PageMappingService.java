@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.page;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
@@ -43,7 +44,7 @@ public interface PageMappingService {
      * @throws SObjectCreationException when there is an issue while creating this object
      * @since 7.0.0
      */
-    SPageMapping create(String key, Long pageId, String... authorizationRules) throws SObjectCreationException;
+    SPageMapping create(String key, Long pageId, List<String> authorizationRules) throws SObjectCreationException;
 
     /**
      * @param key the key used to retrieve the mapping
@@ -54,7 +55,7 @@ public interface PageMappingService {
      * @throws SObjectCreationException when there is an issue while creating this object
      * @since 7.0.0
      */
-    SPageMapping create(String key, String url, String urlAdapter, String... authorizationRules) throws SObjectCreationException;
+    SPageMapping create(String key, String url, String urlAdapter, List<String> authorizationRules) throws SObjectCreationException;
 
     /**
      * @param key the key of the page mapping to retrieve
@@ -64,7 +65,6 @@ public interface PageMappingService {
     SPageMapping get(String key) throws SObjectNotFoundException, SBonitaReadException;
 
     /**
-     *
      * @param pageMapping
      * @param context
      * @return

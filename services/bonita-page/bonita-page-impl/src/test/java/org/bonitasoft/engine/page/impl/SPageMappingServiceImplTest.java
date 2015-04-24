@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
@@ -102,12 +103,14 @@ public class SPageMappingServiceImplTest {
     public void should_create_return_the_created_element() throws Exception {
         //given
         //when
-        SPageMapping sPageMapping = pageMappingService.create("theKey", PAGE_ID);
+        final List<String> authorizationRules = Arrays.asList("toto", "titi");
+        SPageMapping sPageMapping = pageMappingService.create("theKey", PAGE_ID, authorizationRules);
         //then
         assertThat(sPageMapping).isNotNull();
         assertThat(sPageMapping.getKey()).isEqualTo("theKey");
         assertThat(sPageMapping.getPageId()).isEqualTo(PAGE_ID);
         assertThat(sPageMapping.getUrl()).isEqualTo(null);
+        assertThat(sPageMapping.getPageAuthorizationRules()).isEqualTo(authorizationRules);
 
         final ArgumentCaptor<SInsertEvent> insertEvent = ArgumentCaptor.forClass(SInsertEvent.class);
         final ArgumentCaptor<InsertRecord> insertRecord = ArgumentCaptor.forClass(InsertRecord.class);
@@ -124,14 +127,15 @@ public class SPageMappingServiceImplTest {
         doThrow(SRecorderException.class).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
         //when
         expectedException.expect(SObjectCreationException.class);
-        pageMappingService.create("theKey", PAGE_ID);
+        pageMappingService.create("theKey", PAGE_ID, Collections.<String> emptyList());
     }
 
     @Test
     public void should_create_return_external_mapping() throws Exception {
         //given
         //when
-        SPageMapping sPageMapping = pageMappingService.create("theKey", "http://www.mycompagny.com/aResource/page.html", "myAdapter");
+        SPageMapping sPageMapping = pageMappingService.create("theKey", "http://www.mycompagny.com/aResource/page.html", "myAdapter",
+                Collections.<String> emptyList());
         //then
         assertThat(sPageMapping).isNotNull();
         assertThat(sPageMapping.getKey()).isEqualTo("theKey");
