@@ -75,7 +75,7 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
 
     @Override
     public PageURL resolvePageOrURL(String key, Map<String, Serializable> context) throws NotFoundException, ExecutionException, UnauthorizedAccessException {
-        PageMappingService pageMappingService = getTenantAccessor().getPageMappingService();
+        PageMappingService pageMappingService = retrievePageMappingService();
         try {
             return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context));
         } catch (SObjectNotFoundException e) {
@@ -87,6 +87,10 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         } catch (SAuthorizationException e) {
             throw new UnauthorizedAccessException(e);
         }
+    }
+
+    protected PageMappingService retrievePageMappingService() {
+        return getTenantAccessor().getPageMappingService();
     }
 
     @Override
