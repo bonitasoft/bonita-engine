@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,30 +10,29 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-
+ */
 package org.bonitasoft.engine.page;
 
-import java.util.List;
-
-import org.bonitasoft.engine.persistence.PersistentObject;
+import java.io.Serializable;
+import java.util.Map;
 
 /**
- * @author Baptiste Mesta
+ * Represent a rule to execute to grant access or not.
+ * author Emmanuel Duchastenier
  */
-public interface SPageMapping extends PersistentObject {
+public interface AuthorizationRule {
 
-    String getKey();
+    /**
+     * Execute this rule and, according to the context, says whether the rule is valid.
+     * 
+     * @param context the information necessary to execute this rule.
+     * @return true if allowed, false otherwise.
+     */
+    boolean isAllowed(Map<String, Serializable> context);
 
-    String getUrlAdapter();
+    /**
+     * @return the identifier for this authorization rule
+     */
+    String getId();
 
-    List<String> getPageAuthorizationRules();
-
-    Long getPageId();
-
-    String getUrl();
-
-    long getLastUpdateDate();
-
-    long getLastUpdatedBy();
 }

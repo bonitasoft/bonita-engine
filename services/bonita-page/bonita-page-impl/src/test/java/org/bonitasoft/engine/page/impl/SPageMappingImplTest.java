@@ -15,9 +15,9 @@
 package org.bonitasoft.engine.page.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
-import org.assertj.core.api.Assertions;
+import java.util.Arrays;
+
 import org.junit.Test;
 
 /**
@@ -61,11 +61,27 @@ public class SPageMappingImplTest {
     void setValues(SPageMappingImpl sPageMapping1, SPageMappingImpl sPageMapping2) {
         sPageMapping1.setKey("myKey");
         sPageMapping1.setUrlAdapter("urlAdapter");
+        sPageMapping1.setPageAuthorizRules("net.comp.Rule");
         sPageMapping1.setUrl("myUrl");
         sPageMapping1.setPageId(11l);
         sPageMapping2.setKey("myKey");
         sPageMapping2.setUrlAdapter("urlAdapter");
+        sPageMapping2.setPageAuthorizRules("net.comp.Rule");
         sPageMapping2.setUrl("myUrl");
         sPageMapping2.setPageId(11l);
+    }
+
+    @Test
+    public void parseRulesShouldSetListOfRules() throws Exception {
+        SPageMappingImpl mapping = new SPageMappingImpl();
+        mapping.setPageAuthorizRules(",,toto,titi,tutu,");
+        assertThat(mapping.getPageAuthorizationRules()).containsExactly("toto", "titi", "tutu");
+    }
+
+    @Test
+    public void buildRulesAsStringShouldConcatRulesWithComma() throws Exception {
+        SPageMappingImpl mapping = new SPageMappingImpl();
+        mapping.setPageAuthorizationRules(Arrays.asList("toto", "titi", "tata"));
+        assertThat(mapping.getPageAuthorizRules()).contains("toto,titi,tata");
     }
 }
