@@ -10,12 +10,16 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.contract.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.Type;
 
 /**
  * @author Matthieu Chaffotte
@@ -23,20 +27,52 @@ import org.bonitasoft.engine.bpm.contract.InputDefinition;
 public class InputDefinitionImpl implements InputDefinition {
 
 
-
     private static final long serialVersionUID = 2836592506382887928L;
-
+    protected final Type type;
     private final String description;
-
     private final String name;
-
     private final boolean multiple;
+    protected List<InputDefinition> inputDefinitions;
 
 
-    protected InputDefinitionImpl(final String name, final String description, final boolean multiple) {
+    public InputDefinitionImpl(final String name, final String description, final boolean multiple, Type type, final List<InputDefinition> inputDefinitions) {
         this.description = description;
         this.name = name;
         this.multiple = multiple;
+        this.type = type;
+        List<InputDefinition> objects = inputDefinitions == null ? Collections.<InputDefinition>emptyList() : inputDefinitions;
+        this.inputDefinitions = new ArrayList<>(objects);
+    }
+
+    protected InputDefinitionImpl(final String name, final String description, final boolean multiple) {
+        this(name, description, multiple, null, Collections.<InputDefinition>emptyList());
+    }
+
+    public InputDefinitionImpl(final String name, final Type type, final String description, final boolean multiple) {
+        this(name, description, multiple, type, Collections.<InputDefinition>emptyList());
+
+    }
+
+    public InputDefinitionImpl(final String name, final Type type, final String description) {
+        this(name, description, false, type, Collections.<InputDefinition>emptyList());
+
+    }
+
+    public InputDefinitionImpl(final String name, final String description) {
+        this(name, description, false, null, null);
+    }
+
+    public InputDefinitionImpl(final String name, final String description, final List<InputDefinition> inputDefinitions) {
+        this(name, description, false, inputDefinitions);
+    }
+
+    public InputDefinitionImpl(final String name, final String description, final boolean multiple, final List<InputDefinition> inputDefinitions) {
+        this(name, description, multiple);
+        if (inputDefinitions != null) {
+            for (final InputDefinition inputDefinition : inputDefinitions) {
+                this.getInputs().add(inputDefinition);
+            }
+        }
     }
 
     @Override
@@ -76,5 +112,18 @@ public class InputDefinitionImpl implements InputDefinition {
                 ", name='" + name + '\'' +
                 ", multiple=" + multiple +
                 '}';
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public List<InputDefinition> getInputs() {
+        return inputDefinitions;
+    }
+
+    @Override
+    public boolean hasChildren() {
+        return !inputDefinitions.isEmpty();
     }
 }

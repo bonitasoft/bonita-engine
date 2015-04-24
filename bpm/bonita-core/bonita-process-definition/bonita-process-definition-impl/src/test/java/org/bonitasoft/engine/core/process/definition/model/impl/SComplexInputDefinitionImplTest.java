@@ -10,18 +10,16 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
@@ -82,18 +80,17 @@ public class SComplexInputDefinitionImplTest {
 
     }
 
-    private ComplexInputDefinition createComplexInputs() {
-        final SimpleInputDefinition name = new SimpleInputDefinitionImpl("name", Type.TEXT, DESCRIPTION);
-        final SimpleInputDefinition amount = new SimpleInputDefinitionImpl("amount", Type.DECIMAL, DESCRIPTION);
-        final SimpleInputDefinition date = new SimpleInputDefinitionImpl("date", Type.DATE, DESCRIPTION);
+    private InputDefinition createComplexInputs() {
+        final InputDefinition name = new InputDefinitionImpl("name", Type.TEXT, DESCRIPTION);
+        final InputDefinition amount = new InputDefinitionImpl("amount", Type.DECIMAL, DESCRIPTION);
+        final InputDefinition date = new InputDefinitionImpl("date", Type.DATE, DESCRIPTION);
 
-        final SimpleInputDefinition city = new SimpleInputDefinitionImpl("city", Type.TEXT, DESCRIPTION);
-        final SimpleInputDefinition zip = new SimpleInputDefinitionImpl("zip", Type.INTEGER, DESCRIPTION);
+        final InputDefinition city = new InputDefinitionImpl("city", Type.TEXT, DESCRIPTION);
+        final InputDefinition zip = new InputDefinitionImpl("zip", Type.INTEGER, DESCRIPTION);
 
-        final ComplexInputDefinition adress = new ComplexInputDefinitionImpl("adress", DESCRIPTION, Arrays.asList(city, zip), null);
+        final InputDefinition adress = new InputDefinitionImpl("adress", DESCRIPTION, Arrays.asList(city, zip));
 
-        final ComplexInputDefinition expense = new ComplexInputDefinitionImpl("expense", DESCRIPTION, true, Arrays.asList(name, amount, date),
-                Arrays.asList(adress));
+        final InputDefinition expense = new InputDefinitionImpl("expense", DESCRIPTION, true, Arrays.asList(name, amount, date, adress));
         return expense;
     }
 

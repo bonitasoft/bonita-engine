@@ -10,17 +10,16 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.contract.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 
 /**
  * @author Matthieu Chaffotte
@@ -32,26 +31,19 @@ public class ContractDefinitionImpl implements ContractDefinition {
 
     private final List<ConstraintDefinition> constraints;
 
-    private final List<ComplexInputDefinition> complexInputs;
-
-    private final List<SimpleInputDefinition> simpleInputs;
+    private final List<InputDefinition> inputs;
 
     public ContractDefinitionImpl() {
-        simpleInputs = new ArrayList<SimpleInputDefinition>();
-        complexInputs = new ArrayList<ComplexInputDefinition>();
-        constraints = new ArrayList<ConstraintDefinition>();
+        inputs = new ArrayList<>();
+        constraints = new ArrayList<>();
     }
 
-    public void addSimpleInput(final SimpleInputDefinition input) {
-        simpleInputs.add(input);
+    public void addInput(final InputDefinition input) {
+        inputs.add(input);
     }
 
     public void addConstraint(final ConstraintDefinition constraint) {
         constraints.add(constraint);
-    }
-
-    public void addComplexInput(final ComplexInputDefinition complexInput) {
-        complexInputs.add(complexInput);
     }
 
     @Override
@@ -60,13 +52,16 @@ public class ContractDefinitionImpl implements ContractDefinition {
     }
 
     @Override
-    public List<SimpleInputDefinition> getSimpleInputs() {
-        return simpleInputs;
+    public List<InputDefinition> getInputs() {
+        return inputs;
     }
 
     @Override
-    public List<ComplexInputDefinition> getComplexInputs() {
-        return complexInputs;
+    public String toString() {
+        return "ContractDefinitionImpl{" +
+                "constraints=" + constraints +
+                ", inputs=" + inputs +
+                '}';
     }
 
     @Override
@@ -75,21 +70,11 @@ public class ContractDefinitionImpl implements ContractDefinition {
         if (o == null || getClass() != o.getClass()) return false;
         ContractDefinitionImpl that = (ContractDefinitionImpl) o;
         return Objects.equals(constraints, that.constraints) &&
-                Objects.equals(complexInputs, that.complexInputs) &&
-                Objects.equals(simpleInputs, that.simpleInputs);
+                Objects.equals(inputs, that.inputs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(constraints, complexInputs, simpleInputs);
-    }
-
-    @Override
-    public String toString() {
-        return "ContractDefinitionImpl{" +
-                "constraints=" + constraints +
-                ", complexInputs=" + complexInputs +
-                ", simpleInputs=" + simpleInputs +
-                '}';
+        return Objects.hash(constraints, inputs);
     }
 }

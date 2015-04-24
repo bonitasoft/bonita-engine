@@ -34,14 +34,7 @@ public interface ContractDefinition extends BonitaObject {
      *
      * @return the simple inputs of the contract
      */
-    List<SimpleInputDefinition> getSimpleInputs();
-
-    /**
-     * Lists the complex inputs of the contract.
-     *
-     * @return the complex inputs of the contract
-     */
-    List<ComplexInputDefinition> getComplexInputs();
+    List<InputDefinition> getInputs();
 
     /**
      * Lists the validation rules of the contract.

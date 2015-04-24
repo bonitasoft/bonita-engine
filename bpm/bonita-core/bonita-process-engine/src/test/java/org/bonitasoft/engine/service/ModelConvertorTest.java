@@ -22,14 +22,12 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoDefinition;
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoValue;
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
@@ -443,9 +441,9 @@ public class ModelConvertorTest {
     @Test
     public void convertSContractDefinition() {
         //given
-        final SimpleInputDefinition expectedSimpleInput = new SimpleInputDefinitionImpl("name", Type.TEXT, "description");
-        final ComplexInputDefinition expectedComplexInput = new ComplexInputDefinitionImpl("complex input", "complex description",
-                Arrays.asList(expectedSimpleInput), null);
+        final InputDefinition expectedSimpleInput = new InputDefinitionImpl("name", Type.TEXT, "description");
+        final InputDefinition expectedComplexInput = new InputDefinitionImpl("complex input", "complex description",
+                Arrays.asList(expectedSimpleInput));
         final ConstraintDefinition expectedRule = new ConstraintDefinitionImpl("name", "expression", "explanation");
         expectedRule.getInputNames().add("input1");
         expectedRule.getInputNames().add("input2");
@@ -464,17 +462,16 @@ public class ModelConvertorTest {
 
         //then
         assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
-        assertThat(contract.getSimpleInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput);
-        assertThat(contract.getComplexInputs()).as("should convert complex inputs").containsExactly(expectedComplexInput);
+        assertThat(contract.getInputs()).as("should convert inputs").containsExactly(expectedSimpleInput, expectedComplexInput);
     }
 
     @Test
     public void convertMultipleSContractDefinition() {
         //given
-        final SimpleInputDefinition expectedSimpleInput = new SimpleInputDefinitionImpl("name", Type.TEXT, "description", true);
-        final ComplexInputDefinition expectedComplexInput = new ComplexInputDefinitionImpl("complex input", "complex description", true,
-                Arrays.asList(expectedSimpleInput), null);
-        final ComplexInputDefinition expectedComplexWithComplexInput = new ComplexInputDefinitionImpl("complex in complext", "complex description", true,
+        final InputDefinition expectedSimpleInput = new InputDefinitionImpl("name", Type.TEXT, "description", true);
+        final InputDefinition expectedComplexInput = new InputDefinitionImpl("complex input", "complex description", true,
+                Arrays.asList(expectedSimpleInput));
+        final InputDefinition expectedComplexWithComplexInput = new InputDefinitionImpl("complex in complext", "complex description", true,
                 null, Arrays.asList(expectedComplexInput));
 
         final ConstraintDefinition expectedRule = new ConstraintDefinitionImpl("name", "expression", "explanation");
@@ -495,8 +492,7 @@ public class ModelConvertorTest {
 
         //then
         assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
-        assertThat(contract.getSimpleInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput);
-        assertThat(contract.getComplexInputs()).as("should convert complex inputs").containsExactly(expectedComplexWithComplexInput);
+        assertThat(contract.getInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput, expectedComplexWithComplexInput);
     }
 
     SProcessSimpleRefBusinessDataInstance createProcessSimpleDataReference(String name, long processInstanceId, String type, long businessDataId) {

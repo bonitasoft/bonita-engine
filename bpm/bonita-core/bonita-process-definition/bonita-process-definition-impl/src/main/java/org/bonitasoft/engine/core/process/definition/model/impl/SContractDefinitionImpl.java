@@ -16,10 +16,9 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
@@ -40,18 +39,21 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
 
     public SContractDefinitionImpl() {
         super();
-        simpleInputs = new ArrayList<SSimpleInputDefinition>();
-        complexInputs = new ArrayList<SComplexInputDefinition>();
-        constraints = new ArrayList<SConstraintDefinition>();
+        simpleInputs = new ArrayList<>();
+        complexInputs = new ArrayList<>();
+        constraints = new ArrayList<>();
     }
 
     public SContractDefinitionImpl(final ContractDefinition contract) {
         this();
-        for (final SimpleInputDefinition input : contract.getSimpleInputs()) {
-            simpleInputs.add(new SSimpleInputDefinitionImpl(input));
-        }
-        for (final ComplexInputDefinition input : contract.getComplexInputs()) {
-            complexInputs.add(new SComplexInputDefinitionImpl(input));
+        for (final InputDefinition input : contract.getInputs()) {
+            if(input.hasChildren()){
+
+                complexInputs.add(new SComplexInputDefinitionImpl(input));
+            }else{
+        //FIXME merge
+                simpleInputs.add(new SSimpleInputDefinitionImpl(input));
+            }
         }
         for (final ConstraintDefinition rule : contract.getConstraints()) {
             constraints.add(new SConstraintDefinitionImpl(rule));

@@ -13,7 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import java.util.Objects;
+
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
@@ -42,7 +44,7 @@ public class SSimpleInputDefinitionImpl extends SNamedElementImpl implements SSi
         this.multiple = multiple;
     }
 
-    public SSimpleInputDefinitionImpl(final SimpleInputDefinition input) {
+    public SSimpleInputDefinitionImpl(final InputDefinition input) {
         this(input.getName(), convertTypeToSType(input.getType()), input.getDescription(), input.isMultiple());
     }
 
@@ -61,46 +63,32 @@ public class SSimpleInputDefinitionImpl extends SNamedElementImpl implements SSi
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SSimpleInputDefinitionImpl other = (SSimpleInputDefinitionImpl) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (type == null) {
-            if (other.type != null) {
-                return false;
-            }
-        } else if (!type.equals(other.type)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public boolean isMultiple() {
         return multiple;
     }
 
+    @Override
+    public String toString() {
+        return "SSimplInputDefinitionImpl{" +
+                "description='" + description + '\'' +
+                ", type=" + type +
+                ", multiple=" + multiple +
+                "} " + super.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        SSimpleInputDefinitionImpl that = (SSimpleInputDefinitionImpl) o;
+        return Objects.equals(multiple, that.multiple) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), description, type, multiple);
+    }
 }

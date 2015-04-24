@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
+import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
 import org.bonitasoft.engine.xml.SXMLParseException;
 

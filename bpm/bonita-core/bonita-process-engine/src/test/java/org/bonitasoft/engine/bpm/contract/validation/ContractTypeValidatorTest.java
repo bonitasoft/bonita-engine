@@ -29,6 +29,7 @@ import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
 import org.junit.Before;
 import org.junit.Test;

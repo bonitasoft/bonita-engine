@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.contract.validation.builder;
 
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
+import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
 
 public class SSimpleInputDefinitionBuilder {
