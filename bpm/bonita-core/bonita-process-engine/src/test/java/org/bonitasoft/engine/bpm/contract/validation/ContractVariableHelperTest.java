@@ -13,20 +13,21 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.*;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.aMap;
 
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ContractVariableHelperTest {
 
@@ -45,7 +46,19 @@ public class ContractVariableHelperTest {
 
         final List<Map<String, Serializable>> buildMandatoryMultipleInputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(
                 constraintDefinition, variables);
-        assertThat(buildMandatoryMultipleInputVariables).as("should not find variable for constraint " + constraintDefinition.getName()).hasSize(2);
+        assertThat(buildMandatoryMultipleInputVariables).as("should not find variable for constraint " + constraintDefinition.getName()).hasSize(8);
+
+    }
+
+    @Test
+    public void should_find_multiple_contract_variables_with_complex() throws Exception {
+        final Map<String, Serializable> variables = buildMapWithComplexAndSimpleMultiple();
+
+        final SConstraintDefinition constraintDefinition = getConstraintDefinitionWithName("nature");
+
+        final List<Map<String, Serializable>> buildMandatoryMultipleInputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(
+                constraintDefinition, variables);
+        assertThat(buildMandatoryMultipleInputVariables).as("should not find variable for constraint " + constraintDefinition.getName()).hasSize(8);
 
     }
 
@@ -102,10 +115,25 @@ public class ContractVariableHelperTest {
         final List<Map<String, Serializable>> expenseLines = new ArrayList<Map<String, Serializable>>();
         expenseLines.add(taxiExpenseLine);
         expenseLines.add(hotelExpenseLine);
+
         final Map<String, Serializable> expenseReport = aMap().put("expenseReport", (Serializable) expenseLines).build();
 
-        variables = aMap().put("user", (Serializable) user).put("expenseReport", (Serializable) expenseReport).build();
+
+        final List<Map<String, Serializable>> expenseReports = new ArrayList<Map<String, Serializable>>();
+        expenseReports.add(expenseReport);
+        expenseReports.add(expenseReport);
+        expenseReports.add(expenseReport);
+        expenseReports.add(expenseReport);
+
+        variables = aMap().put("user", (Serializable) user).put("expenseReport", (Serializable) expenseReports).build();
         return variables;
+    }
+
+    private Map<String, Serializable> buildMapWithComplexAndSimpleMultiple(){
+        Map<String, Serializable> map = new HashMap<>(buildMap());
+        map.put("comments",new ArrayList<>(Arrays.asList("good trip", "hello")));
+//        map.put("hotel",);
+        return map;
     }
 
     private SConstraintDefinition getConstraintDefinitionWithName(final String inputName) {
