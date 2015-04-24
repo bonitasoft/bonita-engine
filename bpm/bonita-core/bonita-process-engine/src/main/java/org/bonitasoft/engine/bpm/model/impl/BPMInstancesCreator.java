@@ -27,7 +27,6 @@ import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.connector.CreateConnectorInstances;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -122,6 +121,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
@@ -151,17 +151,11 @@ public class BPMInstancesCreator {
 
     private final ConnectorInstanceService connectorInstanceService;
 
-    private Map<SFlowNodeType, Integer> firstStateIds;
-
-    private Map<SFlowNodeType, String> firstStateNames;
-
     private final ExpressionResolverService expressionResolverService;
 
     private final DataInstanceService dataInstanceService;
 
     private final TransientDataService transientDataService;
-
-    private final ArchiveService archiveService;
 
     private final TechnicalLoggerService logger;
 
@@ -169,12 +163,14 @@ public class BPMInstancesCreator {
 
     private final RefBusinessDataService refBusinessDataService;
 
+    private FlowNodeStateManager stateManager;
+
     public BPMInstancesCreator(final ActivityInstanceService activityInstanceService,
             final ActorMappingService actorMappingService, final GatewayInstanceService gatewayInstanceService,
             final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService,
             final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final TransientDataService transientDataService,
-            final ArchiveService archiveService, final ParentContainerResolver parentContainerResolver, RefBusinessDataService refBusinessDataService) {
+            final ParentContainerResolver parentContainerResolver, RefBusinessDataService refBusinessDataService) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.actorMappingService = actorMappingService;
@@ -185,9 +181,12 @@ public class BPMInstancesCreator {
         this.dataInstanceService = dataInstanceService;
         this.logger = logger;
         this.transientDataService = transientDataService;
-        this.archiveService = archiveService;
         this.parentContainerResolver = parentContainerResolver;
         this.refBusinessDataService = refBusinessDataService;
+    }
+
+    public void setStateManager(final FlowNodeStateManager stateManager) {
+        this.stateManager = stateManager;
     }
 
     public List<SFlowNodeInstance> createFlowNodeInstances(final Long processDefinitionId, final long rootContainerId, final long parentContainerId,
@@ -235,7 +234,7 @@ public class BPMInstancesCreator {
                     builder = createMultiInstanceActivityInstance(processDefinitionId, rootContainerId, parentContainerId, rootProcessInstanceId,
                             parentProcessInstanceId, activityDefinition, (SMultiInstanceLoopCharacteristics) loopCharacteristics);
                 }
-                builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
+                builder.setState(stateManager.getFirstState(builder.getFlowNodeType()));
                 builder.setStateCategory(stateCategory);
                 return builder.done();
             }
@@ -299,7 +298,7 @@ public class BPMInstancesCreator {
                 throw new SActivityReadException("Activity type not found : " + sFlowNodeDefinition.getType());
         }
         builder.setLoopCounter(loopCounter);
-        builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
+        builder.setState(stateManager.getFirstState(builder.getFlowNodeType()));
         builder.setStateCategory(stateCategory);
         return builder.done();
     }
@@ -382,7 +381,7 @@ public class BPMInstancesCreator {
         builder.setDisplayDescription(description);
         builder.setDisplayName(displayName);
         builder.setPriority(priority);
-        builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
+        builder.setState(stateManager.getFirstState(builder.getFlowNodeType()));
         return builder.done();
     }
 
@@ -556,14 +555,6 @@ public class BPMInstancesCreator {
         }
         final CreateConnectorInstances transaction = new CreateConnectorInstances(connectorInstances, connectorInstanceService);
         transaction.execute();
-    }
-
-    public void setFirstStateIds(final Map<SFlowNodeType, Integer> firstStateIds) {
-        this.firstStateIds = firstStateIds;
-    }
-
-    public void setFirstStateNames(final Map<SFlowNodeType, String> firstStateNames) {
-        this.firstStateNames = firstStateNames;
     }
 
     public void createDataInstances(final SProcessInstance processInstance, final SFlowElementContainerDefinition processContainer,

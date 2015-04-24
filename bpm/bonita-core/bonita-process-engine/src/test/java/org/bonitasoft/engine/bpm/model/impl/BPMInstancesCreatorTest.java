@@ -19,11 +19,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.ignoreStubs;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,7 +75,7 @@ public class BPMInstancesCreatorTest {
     @Test
     public void testExecutionOrder() throws Exception {
         final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, null, null, null, connectorInstanceService, null,
-                null, null, null, null, null,null);
+                null, null, null, null, null);
         final SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
         final SConnectorInstanceBuilder connectorBuilder = mock(SConnectorInstanceBuilder.class);
         when(connectorBuilderFact.createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), anyInt()))
@@ -102,7 +98,7 @@ public class BPMInstancesCreatorTest {
     public void should_getOperationToSetData_return_the_operation_for_the_data() {
         // given
         final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, null, null, null, null, null,
-                null, null, null, null, null,null);
+                null, null, null, null, null);
         SLeftOperandImpl leftOp1 = new SLeftOperandImpl();
         leftOp1.setName(new String("Plop1"));
         leftOp1.setType(new String(SLeftOperand.TYPE_DATA));

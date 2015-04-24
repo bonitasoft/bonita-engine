@@ -18,6 +18,7 @@ import java.util.UUID;
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -70,9 +71,10 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
             final SCommentService commentService = tenantServiceAccessor.getCommentService();
             final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
             final ConnectorInstanceService connectorInstanceService = tenantServiceAccessor.getConnectorInstanceService();
+            ClassLoaderService classLoaderService = tenantServiceAccessor.getClassLoaderService();
 
             ProcessArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, dataInstanceService, documentService,
-                    logger, commentService, processDefinitionService, connectorInstanceService);
+                    logger, commentService, processDefinitionService, connectorInstanceService, classLoaderService);
         } catch (final SArchivingException e) {
             throw new SHandlerExecutionException(e);
         } catch (SBonitaException e) {

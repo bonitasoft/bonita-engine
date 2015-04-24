@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.state;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -31,6 +32,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -57,6 +59,7 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
     private final ProcessDefinitionService processDefinitionService;
 
     private final ConnectorInstanceService connectorInstanceService;
+    private final ClassLoaderService classLoaderService;
 
     private final DocumentService documentService;
 
@@ -64,7 +67,7 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
             final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
             final DocumentService documentService, final TechnicalLoggerService logger,
             final ArchiveService archiveService, final SCommentService commentService,
-            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) {
+            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService) {
         super(stateBehaviors);
         this.operationService = operationService;
         this.processInstanceService = processInstanceService;
@@ -75,6 +78,7 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
         this.commentService = commentService;
         this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
+        this.classLoaderService = classLoaderService;
     }
 
     @Override
@@ -96,7 +100,7 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
             operationService.execute(callActivityDef.getDataOutputOperations(), instance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), expressionContext);
             // archive child process instance
             ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentService, logger,
-                    commentService, processDefinitionService, connectorInstanceService);
+                    commentService, processDefinitionService, connectorInstanceService, classLoaderService);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }

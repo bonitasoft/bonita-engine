@@ -46,6 +46,9 @@ import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilder;
 import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilderFactory;
 import org.bonitasoft.engine.api.DocumentAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.impl.connector.ConnectorReseter;
+import org.bonitasoft.engine.api.impl.connector.ResetAllFailedConnectorStrategy;
+import org.bonitasoft.engine.api.impl.flownode.FlowNodeRetrier;
 import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyDeployer;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetArchivedActivityInstance;
@@ -279,7 +282,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -456,7 +458,7 @@ import org.bonitasoft.engine.xml.XMLWriter;
  */
 public class ProcessAPIImpl implements ProcessAPI {
 
-    private static final int BATCH_SIZE = 100;
+    private static final int BATCH_SIZE = 500;
 
     private static final String CONTAINER_TYPE_PROCESS_INSTANCE = "PROCESS_INSTANCE";
 
@@ -753,7 +755,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
                         sProcessDefinition);
             }
-        } catch (final BonitaHomeNotSetException | IOException |SBonitaException e) {
+        } catch (final BonitaHomeNotSetException | IOException | SBonitaException e) {
             throw new ProcessDeployException(e);
         }
 
@@ -5040,36 +5042,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void retryTask(final long activityInstanceId) throws ActivityExecutionException {
+    public void retryTask(final long activityInstanceId) throws ActivityExecutionException, ActivityInstanceNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-        final FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
-        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        final SAutomaticTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class);
-
-        try {
-            final SFlowNodeInstance activity = activityInstanceService.getFlowNodeInstance(activityInstanceId);
-            final long processDefinitionId = activity.getLogicalGroup(keyProvider.getProcessDefinitionIndex());
-            final FlowNodeState flowNodeState = flowNodeStateManager.getState(activity.getStateId());
-            final int stateId = activity.getPreviousStateId();
-            final FlowNodeState state = flowNodeStateManager.getState(stateId);
-
-            if (!ActivityStates.FAILED_STATE.equals(flowNodeState.getName())) {
-                throw new ActivityExecutionException("Unable to retry a task that is not failed - task name=" + activity.getName() + " id="
-                        + activityInstanceId + " that was in state " + flowNodeState);
-            }
-
-            flowNodeExecutor.setStateByStateId(processDefinitionId, activity.getId(), stateId);
-            // execute the flow node only if it is not the final state
-            if (!state.isTerminal()) {
-                final long userIdFromSession = getUserId();
-                // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
-                processExecutor.executeFlowNode(activityInstanceId, null, null, activity.getParentProcessInstanceId(), userIdFromSession, userIdFromSession);
-            }
-        } catch (final SBonitaException e) {
-            throw new ActivityExecutionException(e);
-        }
+        ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
+        ResetAllFailedConnectorStrategy strategy = new ResetAllFailedConnectorStrategy(connectorInstanceService,
+                new ConnectorReseter(connectorInstanceService), BATCH_SIZE);
+        FlowNodeRetrier flowNodeRetrier = new FlowNodeRetrier(tenantAccessor.getContainerRegistry(), tenantAccessor.getFlowNodeExecutor(),
+                tenantAccessor.getActivityInstanceService(), tenantAccessor.getFlowNodeStateManager(), strategy);
+        flowNodeRetrier.retry(activityInstanceId);
     }
 
     @Override
@@ -6107,22 +6087,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             SFlowNodeInstance activityInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(userTaskInstanceId);
             SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(activityInstance.getProcessDefinitionId());
-            final SExpressionContext expressionContext = createExpressionContext(userTaskInstanceId, processDefinition, CONTAINER_TYPE_ACTIVITY_INSTANCE, null );
-            SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(activityInstance.getFlowNodeDefinitionId());
-            return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, ((SUserTaskDefinition) flowNode).getContext());
-        } catch (SFlowNodeNotFoundException | SProcessDefinitionReadException | SFlowNodeReadException | SProcessDefinitionNotFoundException e) {
-            throw new UserTaskNotFoundException(e);
-        } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
-            throw new ExpressionEvaluationException(e);
-        }
-    }
-    @Override
-    public Map<String, Serializable> getArchivedUserTaskExecutionContext(long archivedUserTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        try {
-            SAFlowNodeInstance activityInstance = tenantAccessor.getActivityInstanceService().getArchivedFlowNodeInstance(archivedUserTaskInstanceId);
-            SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(activityInstance.getProcessDefinitionId());
-            final SExpressionContext expressionContext = createExpressionContext(activityInstance.getSourceObjectId(), processDefinition, CONTAINER_TYPE_ACTIVITY_INSTANCE, activityInstance.getArchiveDate());
+            final SExpressionContext expressionContext = createExpressionContext(userTaskInstanceId, processDefinition, CONTAINER_TYPE_ACTIVITY_INSTANCE, null);
             SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(activityInstance.getFlowNodeDefinitionId());
             return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, ((SUserTaskDefinition) flowNode).getContext());
         } catch (SFlowNodeNotFoundException | SProcessDefinitionReadException | SFlowNodeReadException | SProcessDefinitionNotFoundException e) {
@@ -6133,7 +6098,26 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException {
+    public Map<String, Serializable> getArchivedUserTaskExecutionContext(long archivedUserTaskInstanceId) throws UserTaskNotFoundException,
+            ExpressionEvaluationException {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            SAFlowNodeInstance activityInstance = tenantAccessor.getActivityInstanceService().getArchivedFlowNodeInstance(archivedUserTaskInstanceId);
+            SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(activityInstance.getProcessDefinitionId());
+            final SExpressionContext expressionContext = createExpressionContext(activityInstance.getSourceObjectId(), processDefinition,
+                    CONTAINER_TYPE_ACTIVITY_INSTANCE, activityInstance.getArchiveDate());
+            SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(activityInstance.getFlowNodeDefinitionId());
+            return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, ((SUserTaskDefinition) flowNode).getContext());
+        } catch (SFlowNodeNotFoundException | SProcessDefinitionReadException | SFlowNodeReadException | SProcessDefinitionNotFoundException e) {
+            throw new UserTaskNotFoundException(e);
+        } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
+            throw new ExpressionEvaluationException(e);
+        }
+    }
+
+    @Override
+    public Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException,
+            ExpressionEvaluationException {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             SProcessInstance processInstance = getProcessInstanceService(tenantAccessor).getProcessInstance(processInstanceId);
@@ -6148,22 +6132,26 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException {
+    public Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException,
+            ExpressionEvaluationException {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             SAProcessInstance processInstance = getProcessInstanceService(tenantAccessor).getArchivedProcessInstance(processInstanceId);
             SProcessDefinition processDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processInstance.getProcessDefinitionId());
-            final SExpressionContext expressionContext = createExpressionContext(processInstance.getSourceObjectId(), processDefinition, CONTAINER_TYPE_PROCESS_INSTANCE, processInstance.getArchiveDate());
+            final SExpressionContext expressionContext = createExpressionContext(processInstance.getSourceObjectId(), processDefinition,
+                    CONTAINER_TYPE_PROCESS_INSTANCE, processInstance.getArchiveDate());
             return evaluateContext(tenantAccessor.getExpressionResolverService(), expressionContext, processDefinition.getContext());
-        } catch ( SProcessDefinitionReadException | SProcessInstanceReadException | SProcessDefinitionNotFoundException e) {
+        } catch (SProcessDefinitionReadException | SProcessInstanceReadException | SProcessDefinitionNotFoundException e) {
             throw new ProcessInstanceNotFoundException(e);
         } catch (SInvalidExpressionException | SExpressionEvaluationException | SExpressionDependencyMissingException | SExpressionTypeUnknownException e) {
             throw new ExpressionEvaluationException(e);
         }
     }
 
-    Map<String, Serializable> evaluateContext(ExpressionResolverService expressionResolverService, SExpressionContext expressionContext, List<SContextEntry> context) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
-        if(context.isEmpty()){
+    Map<String, Serializable> evaluateContext(ExpressionResolverService expressionResolverService, SExpressionContext expressionContext,
+            List<SContextEntry> context) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException,
+            SInvalidExpressionException {
+        if (context.isEmpty()) {
             return Collections.emptyMap();
         }
         List<SExpression> expressions = toExpressionList(context);
@@ -6196,7 +6184,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         expressionContext.setContainerId(processInstanceId);
         expressionContext.setContainerType(type);
         expressionContext.setProcessDefinitionId(processDefinition.getId());
-        if(time != null){
+        if (time != null) {
             expressionContext.setTime(time);
         }
         return expressionContext;
