@@ -170,13 +170,13 @@ import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
-import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
@@ -2163,11 +2163,7 @@ public class ModelConvertor {
 
     public static ContractDefinition toContract(final SContractDefinition sContract) {
         final ContractDefinitionImpl contract = new ContractDefinitionImpl();
-        for (final SSimpleInputDefinition input : sContract.getSimpleInputs()) {
-            contract.addInput(toInput(input));
-        }
-        for (final SComplexInputDefinition input : sContract.getComplexInputs()) {
-            //FIXME merge
+        for (final SInputDefinition input : sContract.getInputs()) {
             contract.addInput(toInput(input));
         }
         for (final SConstraintDefinition sConstraintDefinition : sContract.getConstraints()) {
@@ -2181,19 +2177,15 @@ public class ModelConvertor {
         return contract;
     }
 
-    private static InputDefinition toInput(final SSimpleInputDefinition input) {
-        return new InputDefinitionImpl(input.getName(), Type.valueOf(input.getType().toString()), input.getDescription(), input.isMultiple());
-    }
-
-    private static InputDefinition toInput(final SComplexInputDefinition input) {
+    private static InputDefinition toInput(final SInputDefinition input) {
         final List<InputDefinition> inputDefinitions = new ArrayList<InputDefinition>();
-        for (final SSimpleInputDefinition sSimpleInputDefinition : input.getSimpleInputDefinitions()) {
-            inputDefinitions.add(toInput(sSimpleInputDefinition));
+        for (final SInputDefinition sInputDefinition : input.getInputDefinitions()) {
+            inputDefinitions.add(toInput(sInputDefinition));
         }
-        for (final SComplexInputDefinition sComplexInputDefinition : input.getComplexInputDefinitions()) {
-            inputDefinitions.add(toInput(sComplexInputDefinition));
-        }
-        return new InputDefinitionImpl(input.getName(), input.getDescription(), input.isMultiple(), inputDefinitions);
+        SType type = input.getType();
+        InputDefinitionImpl inputDefinition = new InputDefinitionImpl(input.getName(), type == null ? null : Type.valueOf(type.toString()), input.getDescription(), input.isMultiple());
+        inputDefinition.getInputs().addAll(inputDefinitions);
+        return inputDefinition;
 
     }
 
