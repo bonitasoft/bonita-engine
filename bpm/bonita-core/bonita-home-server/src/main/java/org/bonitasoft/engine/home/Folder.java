@@ -111,7 +111,7 @@ public class Folder {
     public void create() throws IOException {
         //System.err.println("CREATING FOLDER: " + folder);
         if (!folder.getParentFile().exists()) {
-            new Folder(folder.getParentFile()).create();
+            throw new IOException("Folder denoted by path " + folder.getAbsolutePath() + " cannot be created as its parent does not exist.");
         }
         if (!folder.getParentFile().isDirectory()) {
             throw new IOException("Folder denoted by path " + folder.getAbsolutePath() + " cannot be created as its parent is not a folder.");

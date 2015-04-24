@@ -69,7 +69,9 @@ class FolderMgr {
     }
 
     private static Folder getTenantsTempFolder(final File bonitaHomeFolder) throws IOException {
-        return getFolder(getTempFolder(bonitaHomeFolder), "tenants");
+        Folder tenants = getFolder(getTempFolder(bonitaHomeFolder), "tenants");
+        tenants.createIfNotExists();
+        return tenants;
     }
 
     public static Folder getTenantWorkFolder(final File bonitaHomeFolder, long tenantId) throws IOException {
@@ -80,7 +82,9 @@ class FolderMgr {
         return getFolder(getTenantsConfFolder(bonitaHomeFolder), Long.toString(tenantId));
     }
     public static Folder getTenantTempFolder(File bonitaHomeFolder, long tenantId) throws IOException {
-        return getFolder(getTenantsTempFolder(bonitaHomeFolder), Long.toString(tenantId));
+        Folder tenantsTempFolder = getTenantsTempFolder(bonitaHomeFolder);
+        tenantsTempFolder.createIfNotExists();
+        return getFolder(tenantsTempFolder, Long.toString(tenantId));
     }
 
     public static Folder getTenantTemplateWorkFolder(File bonitaHomeFolder) throws IOException {
@@ -100,7 +104,9 @@ class FolderMgr {
     }
 
     public static Folder getTenantTempProcessesFolder(File bonitaHomeFolder, long tenantId) throws IOException {
-        return getFolder(getTenantTempFolder(bonitaHomeFolder, tenantId), "processes");
+        Folder folder = getTenantTempFolder(bonitaHomeFolder, tenantId);
+        folder.createIfNotExists();
+        return getFolder(folder, "processes");
     }
 
     public static Folder getTenantWorkProcessFolder(File bonitaHomeFolder, long tenantId, long processId) throws IOException {
@@ -108,7 +114,9 @@ class FolderMgr {
     }
 
     public static Folder getTenantTempProcessFolder(File bonitaHomeFolder, long tenantId, long processId) throws IOException {
-        return getFolder(getTenantTempProcessesFolder(bonitaHomeFolder, tenantId), Long.toString(processId));
+        Folder folder = getFolder(getTenantTempProcessesFolder(bonitaHomeFolder, tenantId), Long.toString(processId));
+        folder.createIfNotExists();
+        return folder;
     }
 
     public static void deleteTenant(File bonitaHomeFolder, long tenantId) throws IOException {
