@@ -346,4 +346,16 @@ public class SPageMappingServiceImplTest {
 
         pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
     }
+
+    @Test
+    public void resolvePageURL_shouldThrowExecutionExceptionIfAuthorizationRuleIsNotKnown() throws Exception {
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        final String unknownRuleKey = "unknownRuleKey";
+        pageMapping.setPageAuthorizationRules(Arrays.asList(unknownRuleKey));
+
+        expectedException.expect(SExecutionException.class);
+        expectedException.expectMessage("Authorization rule " + unknownRuleKey);
+
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
+    }
 }

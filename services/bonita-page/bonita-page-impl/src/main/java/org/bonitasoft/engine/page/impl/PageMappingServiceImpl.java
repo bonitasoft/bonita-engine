@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.page.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -134,9 +133,12 @@ public class PageMappingServiceImpl implements PageMappingService {
     @Override
     public SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context) throws SExecutionException, SAuthorizationException {
         final List<String> pageAuthorizationRules = pageMapping.getPageAuthorizationRules();
-        final List<AuthorizationRule> rules = getRules(pageAuthorizationRules);
-        for (AuthorizationRule rule : rules) {
-            if (!rule.isAllowed(context)) {
+        for (String rule : pageAuthorizationRules) {
+            final AuthorizationRule authorizationRule = authorizationRuleMap.get(rule);
+            if (authorizationRule == null) {
+                throw new SExecutionException("Authorization rule " + rule + " is not known. Cannot check if authorized or not.");
+            }
+            if (!authorizationRule.isAllowed(context)) {
                 throw new SAuthorizationException("Access to Page or URL with key " + pageMapping.getKey() + " is not allowed");
             }
         }
@@ -147,14 +149,6 @@ public class PageMappingServiceImpl implements PageMappingService {
             url = getUrlAdapter(urlAdapter).adapt(url, pageMapping.getKey(), context);
         }
         return new SPageURL(url, pageMapping.getPageId());
-    }
-
-    private List<AuthorizationRule> getRules(List<String> pageAuthorizationRules) {
-        List<AuthorizationRule> rules = new ArrayList<>(pageAuthorizationRules.size());
-        for (String rule : pageAuthorizationRules) {
-            rules.add(authorizationRuleMap.get(rule));
-        }
-        return rules;
     }
 
     private URLAdapter getUrlAdapter(String urlAdapterName) throws SExecutionException {
