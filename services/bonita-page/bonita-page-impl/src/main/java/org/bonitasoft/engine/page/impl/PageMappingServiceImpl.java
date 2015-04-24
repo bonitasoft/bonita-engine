@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.page.impl;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -87,10 +86,10 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public SPageMapping create(String key, Long pageId, String... authorizationRules) throws SObjectCreationException {
+    public SPageMapping create(String key, Long pageId, List<String> authorizationRules) throws SObjectCreationException {
         SPageMappingImpl entity = new SPageMappingImpl();
         entity.setPageId(pageId);
-        entity.setPageAuthorizationRules(Arrays.asList(authorizationRules));
+        entity.setPageAuthorizationRules(authorizationRules);
         entity.setKey(key);
         return insert(entity);
     }
@@ -106,11 +105,11 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public SPageMapping create(String key, String url, String urlAdapter, String... authorizationRules) throws SObjectCreationException {
+    public SPageMapping create(String key, String url, String urlAdapter, List<String> authorizationRules) throws SObjectCreationException {
         SPageMappingImpl entity = new SPageMappingImpl();
         entity.setUrl(url);
         entity.setUrlAdapter(urlAdapter);
-        entity.setPageAuthorizationRules(Arrays.asList(authorizationRules));
+        entity.setPageAuthorizationRules(authorizationRules);
         entity.setKey(key);
         return insert(entity);
 

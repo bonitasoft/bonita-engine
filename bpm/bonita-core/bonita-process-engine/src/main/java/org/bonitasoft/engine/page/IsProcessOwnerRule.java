@@ -13,15 +13,21 @@
  */
 package org.bonitasoft.engine.page;
 
+import java.io.Serializable;
+import java.util.Map;
+
 /**
  * author Emmanuel Duchastenier
  */
-public class AuthorizationRuleConstants {
+public class IsProcessOwnerRule implements AuthorizationRule {
 
-    public static final String IS_ADMIN = "IS_ADMIN";
-    public static final String IS_PROCESS_OWNER = "IS_PROCESS_OWNER";
-    public static final String IS_PROCESS_INITIATOR = "IS_PROCESS_INITIATOR";
-    public static final String IS_INVOLVED_IN_PROCESS_INSTANCE = "IS_INVOLVED_IN_PROCESS_INSTANCE";
-    public static final String IS_TASK_AVAILABLE_FOR_USER = "IS_TASK_AVAILABLE_FOR_USER";
+    @Override
+    public boolean isAllowed(Map<String, Serializable> context) {
+        return true;
+    }
 
+    @Override
+    public String getId() {
+        return AuthorizationRuleConstants.IS_PROCESS_OWNER;
+    }
 }
