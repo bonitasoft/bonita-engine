@@ -73,7 +73,8 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
     }
 
     @Override
-    public Object computeNewValueForLeftOperand(final SOperation operation, final Object value, final SExpressionContext expressionContext) throws SOperationExecutionException {
+    public Object computeNewValueForLeftOperand(final SOperation operation, final Object value, final SExpressionContext expressionContext,
+            final boolean shouldPersistValue) throws SOperationExecutionException {
         try {
             final String dataInstanceName = operation.getLeftOperand().getName();
             // should be a String because the data is an xml expression
@@ -150,4 +151,5 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
             throw new SOperationExecutionException(te);
         }
     }
+
 }

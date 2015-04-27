@@ -21,7 +21,6 @@ import java.util.Collections;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
-import org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -63,7 +62,7 @@ public class AssignmentOperationExecutorStrategyTest {
     public void testGetValue() throws Exception {
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", "value"));
         when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_DATA);
-        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext);
+        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext, false);
         assertEquals("value", returnedValue);
     }
 
@@ -72,7 +71,7 @@ public class AssignmentOperationExecutorStrategyTest {
         // return type is not compatible
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
         when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_EXTERNAL_DATA);
-        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext);
+        Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext, false);
         assertEquals("value", returnedValue);
     }
 
@@ -81,7 +80,7 @@ public class AssignmentOperationExecutorStrategyTest {
         // return type is not compatible
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
         when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_DATA);
-        assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext);
+        assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext, false);
     }
 
 }

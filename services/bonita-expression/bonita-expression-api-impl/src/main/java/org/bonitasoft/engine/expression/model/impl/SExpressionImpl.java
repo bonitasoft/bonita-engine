@@ -111,6 +111,11 @@ public class SExpressionImpl implements SExpression {
     }
 
     @Override
+    public boolean hasDependencies() {
+        return !getDependencies().isEmpty();
+    }
+
+    @Override
     public ExpressionKind getExpressionKind() {
         return expressionKind;
     }

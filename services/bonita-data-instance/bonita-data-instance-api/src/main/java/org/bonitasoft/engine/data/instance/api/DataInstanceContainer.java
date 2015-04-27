@@ -23,6 +23,6 @@ public enum DataInstanceContainer {
 
     ACTIVITY_INSTANCE,
 
-    MESSAGE_INSTANCE;
+    MESSAGE_INSTANCE
 
 }

@@ -26,18 +26,18 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 public interface OperationExecutorStrategy {
 
     /**
-     * 
      * Calculate the new value of the left operand base of right operand expression value
-     * 
-     * @param operation
+     *
+     * @param operation the operation in progress
      * @param rightOperandValue
-     *            result of the evaluation of right operand expression
-     * @param expressionContext
+     *        result of the evaluation of right operand expression
+     * @param expressionContext the expression context
+     * @param shouldPersistValue true if the right operand must be persisted (Business Data)
      * @return
      *         the new value to set the left operand with
      * @throws SOperationExecutionException
      */
-    Object computeNewValueForLeftOperand(SOperation operation, Object rightOperandValue, SExpressionContext expressionContext)
+    Object computeNewValueForLeftOperand(SOperation operation, Object rightOperandValue, SExpressionContext expressionContext, final boolean shouldPersistValue)
             throws SOperationExecutionException;
 
     String getOperationType();
