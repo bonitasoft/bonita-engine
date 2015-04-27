@@ -47,6 +47,7 @@ import org.bonitasoft.engine.core.process.definition.model.SReceiveTaskDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
@@ -646,7 +647,10 @@ public class XMLSProcessDefinition {
         final XMLNode inputNode = new XMLNode(CONTRACT_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
         inputNode.addAttribute(MULTIPLE, input.isMultiple());
-        inputNode.addAttribute(TYPE, input.getType().toString());
+        SType type = input.getType();
+        if(type != null){
+            inputNode.addAttribute(TYPE, type.toString());
+        }
         inputNode.addAttribute(DESCRIPTION, input.getDescription());
         for (final SInputDefinition sInputDefinition : input.getInputDefinitions()) {
             inputNode.addChild(createInputNode(sInputDefinition));

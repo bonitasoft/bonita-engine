@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
@@ -35,7 +34,8 @@ public class SInputDefinitionBinding extends SNamedElementBinding {
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
-        String typeAsString = attributes.get(XMLProcessDefinition.TYPE);
+        multiple = Boolean.parseBoolean(attributes.get(XMLSProcessDefinition.MULTIPLE));
+        String typeAsString = attributes.get(XMLSProcessDefinition.TYPE);
         if (typeAsString != null) {
             type = SType.valueOf(typeAsString);
         }
@@ -48,7 +48,7 @@ public class SInputDefinitionBinding extends SNamedElementBinding {
 
     @Override
     public void setChildObject(final String name, final Object value) throws SXMLParseException {
-        if(name.equals(XMLSProcessDefinition.CONTRACT_INPUT_NODE)){
+        if (name.equals(XMLSProcessDefinition.CONTRACT_INPUT_NODE)) {
             inputDefinitions.add((SInputDefinition) value);
         }
     }
