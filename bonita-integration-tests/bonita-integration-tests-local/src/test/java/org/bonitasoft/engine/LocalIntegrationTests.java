@@ -45,7 +45,7 @@ import org.junit.runners.Suite.SuiteClasses;
         APIMethodLocalIT.class,
         TenantMaintenanceLocalIT.class,
         BDRepositoryLocalIT.class,
-        //TODO last because it kind of f*** up the platform, fix that
+        //last test suite because it break the platform
         AllBPMTests.class,
 })
 @Initializer(LocalServerTestsInitializer.class)

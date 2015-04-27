@@ -31,9 +31,7 @@ import org.bonitasoft.engine.profile.ProfileAllTest;
 import org.bonitasoft.engine.search.SearchEntitiesTests;
 import org.bonitasoft.engine.supervisor.SupervisorTests;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.junit.runners.Suite.SuiteClasses;
 
 @SuiteClasses({
