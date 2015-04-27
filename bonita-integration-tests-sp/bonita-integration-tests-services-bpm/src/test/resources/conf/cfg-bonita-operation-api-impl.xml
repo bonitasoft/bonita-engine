@@ -2,10 +2,17 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 
+    <bean id="operationsAnalyzer" class="org.bonitasoft.engine.core.operation.impl.OperationsAnalyzer"/>
+
+    <bean id="persistRightOperandResolver" class="org.bonitasoft.engine.core.operation.impl.PersistRightOperandResolver">
+        <constructor-arg name="operationsAnalyzer" ref="operationsAnalyzer" />
+    </bean>
+
     <bean id="operationService" class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
         <constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider"/>
         <constructor-arg name="leftOperandHandlerProvider" ref="leftOperandHandlerProvider"/>
         <constructor-arg name="expressionResolverService" ref="expressionResolverService"/>
+        <constructor-arg name="persistRightOperandResolver" ref="persistRightOperandResolver"/>
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService"/>
     </bean>
 
@@ -35,9 +42,17 @@
     <bean id="externalDataLeftOperandHandler"
           class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>
 
-     <bean id="javaMethodOperationExecutorStrategy"
+    <bean id="mergeEntityAction" class="com.bonitasoft.engine.operation.MergeEntityAction">
+        <constructor-arg name="repository" ref="businessDataRepository"/>
+    </bean>
+
+    <bean id="entitiesActionsExecutor" class="com.bonitasoft.engine.operation.EntitiesActionsExecutor"/>
+
+    <bean id="javaMethodOperationExecutorStrategy"
           class="com.bonitasoft.engine.operation.BusinessDataJavaMethodOperationExecutorStrategy">
         <constructor-arg name="businessDataService" ref="businessDataService"/>
+        <constructor-arg name="entitiesActionsExecutor" ref="entitiesActionsExecutor"/>
+        <constructor-arg name="mergeEntityAction" ref="mergeEntityAction"/>
     </bean>      
 
     <bean id="xpathUpdateQueryOperationExecutorStrategy"
