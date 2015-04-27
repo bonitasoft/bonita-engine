@@ -30,15 +30,14 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 public class IsProcessOwnerRule implements AuthorizationRule {
 
     SupervisorMappingService supervisorService;
-    
+
     SessionAccessor sessionAccessor;
-    
+
     SessionService sessionService;
-    
+
     FormMappingService formMappingService;
 
-    public IsProcessOwnerRule(SupervisorMappingService supervisorService,
-            SessionAccessor sessionAccessor, SessionService sessionService,
+    public IsProcessOwnerRule(SupervisorMappingService supervisorService, SessionAccessor sessionAccessor, SessionService sessionService,
             FormMappingService formMappingService) {
         this.supervisorService = supervisorService;
         this.sessionAccessor = sessionAccessor;
@@ -47,7 +46,7 @@ public class IsProcessOwnerRule implements AuthorizationRule {
     }
 
     @Override
-    public boolean isAllowed(final String key, Map<String, Serializable> context) throws SExecutionException {
+    public boolean isAllowed(final String key, final Map<String, Serializable> context) throws SExecutionException {
         try {
             SFormMapping formMapping = formMappingService.get(key);
             long processDefinitionId = formMapping.getProcessDefinitionId();

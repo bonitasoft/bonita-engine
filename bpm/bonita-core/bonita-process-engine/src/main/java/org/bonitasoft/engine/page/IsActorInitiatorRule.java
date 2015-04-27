@@ -30,25 +30,24 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 public class IsActorInitiatorRule implements AuthorizationRule {
 
     ActorMappingService actorMappingService;
-    
+
     SessionAccessor sessionAccessor;
-    
+
     SessionService sessionService;
-    
+
     FormMappingService formMappingService;
 
-    public IsActorInitiatorRule(ActorMappingService actorMappingService,
-			SessionAccessor sessionAccessor, SessionService sessionService,
-			FormMappingService formMappingService) {
-		super();
-		this.actorMappingService = actorMappingService;
-		this.sessionAccessor = sessionAccessor;
-		this.sessionService = sessionService;
-		this.formMappingService = formMappingService;
-	}
+    public IsActorInitiatorRule(ActorMappingService actorMappingService, SessionAccessor sessionAccessor, SessionService sessionService,
+            FormMappingService formMappingService) {
+        super();
+        this.actorMappingService = actorMappingService;
+        this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
+        this.formMappingService = formMappingService;
+    }
 
-	@Override
-    public boolean isAllowed(String key, Map<String, Serializable> context) throws SExecutionException {
+    @Override
+    public boolean isAllowed(final String key, final Map<String, Serializable> context) throws SExecutionException {
         try {
             SFormMapping formMapping = formMappingService.get(key);
             long processDefinitionId = formMapping.getProcessDefinitionId();

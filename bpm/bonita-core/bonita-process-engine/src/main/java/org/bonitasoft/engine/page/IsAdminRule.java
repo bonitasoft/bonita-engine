@@ -22,7 +22,7 @@ import java.util.Map;
 public class IsAdminRule implements AuthorizationRule {
 
     @Override
-    public boolean isAllowed(String key, Map<String, Serializable> context) {
+    public boolean isAllowed(final String key, final Map<String, Serializable> context) {
         if (context.containsKey(AuthorizationRuleConstants.IS_ADMIN)) {
             return (Boolean) context.get(AuthorizationRuleConstants.IS_ADMIN);
         }
