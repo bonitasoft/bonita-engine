@@ -22,5 +22,4 @@
     <bean id="isInvolvedInProcessInstance" class="org.bonitasoft.engine.page.IsInvolvedInProcessInstanceRule" />
     <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule" />
 
-
 </beans>

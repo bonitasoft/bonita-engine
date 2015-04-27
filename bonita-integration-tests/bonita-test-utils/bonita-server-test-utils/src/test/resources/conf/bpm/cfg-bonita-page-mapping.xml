@@ -16,10 +16,4 @@
         <constructor-arg name="pageMappingService" ref="pageMappingService" />
     </bean>
 
-    <!-- Authorization rules to register -->
-    <bean id="isAdmin" class="org.bonitasoft.engine.page.IsAdminRule" />
-    <bean id="isProcessOwner" class="org.bonitasoft.engine.page.IsProcessOwnerRule" />
-    <bean id="isInvolvedInProcessInstance" class="org.bonitasoft.engine.page.IsInvolvedInProcessInstanceRule" />
-    <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule" />
-
 </beans>

@@ -23,7 +23,10 @@ public class IsAdminRule implements AuthorizationRule {
 
     @Override
     public boolean isAllowed(Map<String, Serializable> context) {
-        return true;
+    	if (context.containsKey(AuthorizationRuleConstants.IS_ADMIN)) {
+    		return (Boolean) context.get(AuthorizationRuleConstants.IS_ADMIN);
+    	}
+        return false;
     }
 
     @Override

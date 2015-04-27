@@ -16,26 +16,18 @@ package org.bonitasoft.engine.page;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SExecutionException;
-
 /**
- * Represent a rule to execute to grant access or not.
- * author Emmanuel Duchastenier
+ * author Anthony Birembaut
  */
-public interface AuthorizationRule {
+public class IsProcessInitiatorRule implements AuthorizationRule {
 
-    /**
-     * Execute this rule and, according to the context, says whether the rule is valid.
-     * 
-     * @param context the information necessary to execute this rule.
-     * @return true if allowed, false otherwise.
-     * @throws SExecutionException 
-     */
-    boolean isAllowed(Map<String, Serializable> context) throws SExecutionException;
+    @Override
+    public boolean isAllowed(Map<String, Serializable> context) {
+        return true;
+    }
 
-    /**
-     * @return the identifier for this authorization rule
-     */
-    String getId();
-
+    @Override
+    public String getId() {
+        return AuthorizationRuleConstants.IS_PROCESS_INITIATOR;
+    }
 }
