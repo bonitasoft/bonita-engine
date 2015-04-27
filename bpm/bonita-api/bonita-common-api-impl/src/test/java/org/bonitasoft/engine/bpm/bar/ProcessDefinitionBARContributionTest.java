@@ -18,14 +18,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -68,34 +67,32 @@ public class ProcessDefinitionBARContributionTest {
     public final void serializeDeserializeProcessDefinitionWithContract() throws Exception {
         final ProcessDefinitionBuilder processBuilder = createProcessBuilderDefinition();
         processBuilder.addUserTask("taskWithInput", ACTOR_NAME).addContract();
-        processBuilder.addUserTask("taskWithConstraint", ACTOR_NAME).addContract().addSimpleInput("simpleInput", Type.INTEGER, DESCRIPTION)
+        processBuilder.addUserTask("taskWithConstraint", ACTOR_NAME).addContract().addInput("simpleInput", Type.INTEGER, DESCRIPTION)
                 .addConstraint("Mandatory", "in != null", "in must be set", "in");
         processBuilder.addUserTask("taskWithComplexInput", ACTOR_NAME).addContract()
-                .addComplexInput("complexInput", DESCRIPTION,
-                        Arrays.asList((SimpleInputDefinition) new SimpleInputDefinitionImpl("simple", Type.TEXT, DESCRIPTION)), null);
+                .addInput("complexInput", DESCRIPTION,
+                        Collections.<InputDefinition>singletonList(new InputDefinitionImpl("simple", Type.TEXT, DESCRIPTION)));
         processBuilder
                 .addUserTask("taskWithComplexComplexInput", ACTOR_NAME)
                 .addContract()
-                .addComplexInput("complexInput", DESCRIPTION,
-                        Arrays.asList((SimpleInputDefinition) new SimpleInputDefinitionImpl("simple", Type.TEXT, DESCRIPTION)),
-                        Arrays.asList(createComplexInputs()));
+                .addInput("complexInput", DESCRIPTION,
+                        Arrays.asList(new InputDefinitionImpl("simple", Type.TEXT, DESCRIPTION), createComplexInputs()));
 
         checkSerializeDeserializeProcessDefinition(processBuilder.done());
     }
 
-    private ComplexInputDefinition createComplexInputs() {
-        final SimpleInputDefinition name = new SimpleInputDefinitionImpl("name", Type.TEXT, DESCRIPTION);
-        final SimpleInputDefinition amount = new SimpleInputDefinitionImpl("amount", Type.DECIMAL, DESCRIPTION);
-        final SimpleInputDefinition date = new SimpleInputDefinitionImpl("date", Type.DATE, DESCRIPTION);
-        final SimpleInputDefinition proof = new SimpleInputDefinitionImpl("proof", Type.BYTE_ARRAY, DESCRIPTION);
+    private InputDefinition createComplexInputs() {
+        final InputDefinition name = new InputDefinitionImpl("name", Type.TEXT, DESCRIPTION);
+        final InputDefinition amount = new InputDefinitionImpl("amount", Type.DECIMAL, DESCRIPTION);
+        final InputDefinition date = new InputDefinitionImpl("date", Type.DATE, DESCRIPTION);
+        final InputDefinition proof = new InputDefinitionImpl("proof", Type.BYTE_ARRAY, DESCRIPTION);
 
-        final SimpleInputDefinition city = new SimpleInputDefinitionImpl("city", Type.TEXT, DESCRIPTION);
-        final SimpleInputDefinition zip = new SimpleInputDefinitionImpl("zip", Type.INTEGER, DESCRIPTION);
+        final InputDefinition city = new InputDefinitionImpl("city", Type.TEXT, DESCRIPTION);
+        final InputDefinition zip = new InputDefinitionImpl("zip", Type.INTEGER, DESCRIPTION);
 
-        final ComplexInputDefinition adress = new ComplexInputDefinitionImpl("adress", DESCRIPTION, Arrays.asList(city, zip), null);
+        final InputDefinition adress = new InputDefinitionImpl("adress", DESCRIPTION, Arrays.asList(city, zip));
 
-        final ComplexInputDefinition expense = new ComplexInputDefinitionImpl("expense", DESCRIPTION, Arrays.asList(name, amount, date, proof),
-                Arrays.asList(adress));
+        final InputDefinition expense = new InputDefinitionImpl("expense", DESCRIPTION, Arrays.asList(name, amount, date, proof,adress));
         return expense;
     }
 

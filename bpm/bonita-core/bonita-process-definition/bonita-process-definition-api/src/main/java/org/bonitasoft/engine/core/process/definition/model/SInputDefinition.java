@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model;
 
+import java.util.List;
+
 /**
  * @author Matthieu Chaffotte
  */
@@ -22,4 +24,9 @@ public interface SInputDefinition extends SNamedElement {
 
     boolean isMultiple();
 
+    List<SInputDefinition> getInputDefinitions();
+
+    SType getType();
+
+    boolean hasChildren();
 }

@@ -28,16 +28,16 @@
                         <inputDefinition description="end date" name="endDate" type="DATE" multiple="false" />
                         <inputDefinition description="request is approved" name="isValid" type="BOOLEAN" multiple="false" />
                         <inputDefinition description="comment" name="comment" type="TEXT" multiple="false" />
-                        <complexInputDefinition description="expense line" name="expense" multiple="false">
+                        <inputDefinition description="expense line" name="expense" multiple="false">
                             <inputDefinition description="expense type" name="type" type="TEXT" multiple="false" />
                             <inputDefinition description="expense comment" name="comment" type="TEXT" multiple="false" />
                             <inputDefinition description="expense date" name="date" type="DATE" multiple="false" />
                             <inputDefinition description="expense poof" name="proof" type="BYTE_ARRAY" multiple="false" />
-                            <complexInputDefinition description="expense line" name="expense" multiple="false">
+                            <inputDefinition description="expense line" name="expense" multiple="false">
                                 <inputDefinition description="complex in complex" name="comment" type="TEXT" multiple="false" />
-                            </complexInputDefinition>
+                            </inputDefinition>
                             <inputDefinition description="expense comment" name="comment" type="DECIMAL" multiple="false" />
-                        </complexInputDefinition>
+                        </inputDefinition>
                         <inputDefinition description="comment" name="comment" type="TEXT" multiple="false" />
                     </inputDefinitions>
                     <constraintDefinitions>

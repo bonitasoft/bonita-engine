@@ -44,11 +44,9 @@ import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
@@ -564,11 +562,11 @@ public class BusinessArchiveTest {
     }
 
     void createContract(ContractDefinitionBuilder contractDefinitionBuilder) {
-        contractDefinitionBuilder.addSimpleInput("numberOfDays", Type.INTEGER, null)
+        contractDefinitionBuilder.addInput("numberOfDays", Type.INTEGER, null)
                     .addMandatoryConstraint("numberOfDays").addConstraint("Mystical constraint", "true", null, "numberOfDays");
-        final SimpleInputDefinition childText = new SimpleInputDefinitionImpl("childText", Type.TEXT, "a text simple input");
-        final SimpleInputDefinition childDecimal = new SimpleInputDefinitionImpl("childDecimal", Type.DECIMAL, "a decimal simple input");
-        contractDefinitionBuilder.addComplexInput("complex", "a complex input", Arrays.asList(childText, childDecimal), Collections.<ComplexInputDefinition>emptyList());
+        final InputDefinition childText = new InputDefinitionImpl("childText", Type.TEXT, "a text simple input");
+        final InputDefinition childDecimal = new InputDefinitionImpl("childDecimal", Type.DECIMAL, "a decimal simple input");
+        contractDefinitionBuilder.addInput("complex", "a complex input", Arrays.asList(childText, childDecimal));
     }
 
     @Test
