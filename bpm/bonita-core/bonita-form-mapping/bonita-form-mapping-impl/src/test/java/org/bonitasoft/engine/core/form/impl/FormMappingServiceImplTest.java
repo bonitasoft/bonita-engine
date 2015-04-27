@@ -122,7 +122,7 @@ public class FormMappingServiceImplTest {
 
         formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId(), SFormMapping.TARGET_URL, null);
 
-        verify(pageMappingService).create("keye", null, EXTERNAL, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_PROCESS_INITIATOR));
+        verify(pageMappingService).create("keye", null, EXTERNAL, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_ACTOR_INITIATOR));
     }
 
     @Test

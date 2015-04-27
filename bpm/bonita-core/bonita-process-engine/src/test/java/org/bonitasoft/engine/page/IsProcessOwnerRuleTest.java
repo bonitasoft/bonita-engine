@@ -26,16 +26,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class IsProcessOwnerRuleTest {
 
     @Mock
-    private SupervisorMappingService supervisorService;
+    SupervisorMappingService supervisorMappingService;
     
     @Mock
-    private SessionAccessor sessionAccessor;
+    SessionAccessor sessionAccessor;
     
     @Mock
-    private SessionService sessionService;
+    SessionService sessionService;
     
     @Mock
-    private FormMappingService formMappingService;
+    FormMappingService formMappingService;
     
     @Mock
     SFormMapping formMapping;
@@ -47,7 +47,7 @@ public class IsProcessOwnerRuleTest {
     long userId = 2L;
     
     @InjectMocks
-    IsProcessOwnerRule isProcessOwnerRule = new IsProcessOwnerRule(supervisorService, sessionAccessor, sessionService, formMappingService);
+    IsProcessOwnerRule isProcessOwnerRule = new IsProcessOwnerRule(supervisorMappingService, sessionAccessor, sessionService, formMappingService);
     
     @Before
     public void initMocks() throws Exception {
@@ -62,7 +62,7 @@ public class IsProcessOwnerRuleTest {
     @Test
     public void isAllowed_should_return_true_if_process_supervisor() throws Exception {
         Map<String, Serializable> context = new HashMap<String, Serializable>();
-        when(supervisorService.isProcessSupervisor(processDefinitionId, userId)).thenReturn(true);
+        when(supervisorMappingService.isProcessSupervisor(processDefinitionId, userId)).thenReturn(true);
         
         assertThat(isProcessOwnerRule.isAllowed(pageMappingKey, context)).isTrue();
     }
@@ -70,7 +70,7 @@ public class IsProcessOwnerRuleTest {
     @Test
     public void isAllowed_should_return_false_if_not_process_supervisor() throws Exception {
         Map<String, Serializable> context = new HashMap<String, Serializable>();
-        when(supervisorService.isProcessSupervisor(processDefinitionId, userId)).thenReturn(false);
+        when(supervisorMappingService.isProcessSupervisor(processDefinitionId, userId)).thenReturn(false);
         
         assertThat(isProcessOwnerRule.isAllowed(pageMappingKey, context)).isFalse();
     }

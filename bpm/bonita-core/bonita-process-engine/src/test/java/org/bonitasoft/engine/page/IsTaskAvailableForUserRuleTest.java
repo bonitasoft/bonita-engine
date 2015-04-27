@@ -24,16 +24,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class IsTaskAvailableForUserRuleTest {
 
     @Mock
-    private SessionAccessor sessionAccessor;
+    SessionAccessor sessionAccessor;
     
     @Mock
-    private SessionService sessionService;
+    SessionService sessionService;
     
     @Mock
-    private ActivityInstanceService activityInstanceService;
+    ActivityInstanceService activityInstanceService;
     
     @Mock
-    private SHumanTaskInstance humanTaskInstance;
+    SHumanTaskInstance humanTaskInstance;
     
     long userId = 2L;
     

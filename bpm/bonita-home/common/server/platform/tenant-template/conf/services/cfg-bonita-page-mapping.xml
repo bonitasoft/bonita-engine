@@ -18,8 +18,23 @@
 
     <!-- Authorization rules to register -->
     <bean id="isAdmin" class="org.bonitasoft.engine.page.IsAdminRule" />
-    <bean id="isProcessOwner" class="org.bonitasoft.engine.page.IsProcessOwnerRule" />
+    <bean id="isProcessOwner" class="org.bonitasoft.engine.page.IsProcessOwnerRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="formMappingService" ref="formMappingService" />
+        <constructor-arg name="supervisorMappingService" ref="supervisorMappingService" />
+    </bean>
     <bean id="isInvolvedInProcessInstance" class="org.bonitasoft.engine.page.IsInvolvedInProcessInstanceRule" />
-    <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule" />
+    <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+    </bean>
+    <bean id="isActorInitiatorRule" class="org.bonitasoft.engine.page.IsActorInitiatorRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="formMappingService" ref="formMappingService" />
+        <constructor-arg name="actorMappingService" ref="actorMappingService" />
+    </bean>
 
 </beans>

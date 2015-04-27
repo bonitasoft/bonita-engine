@@ -29,7 +29,7 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
  */
 public class IsProcessOwnerRule implements AuthorizationRule {
 
-    SupervisorMappingService supervisorService;
+    SupervisorMappingService supervisorMappingService;
 
     SessionAccessor sessionAccessor;
 
@@ -37,9 +37,9 @@ public class IsProcessOwnerRule implements AuthorizationRule {
 
     FormMappingService formMappingService;
 
-    public IsProcessOwnerRule(SupervisorMappingService supervisorService, SessionAccessor sessionAccessor, SessionService sessionService,
+    public IsProcessOwnerRule(SupervisorMappingService supervisorMappingService, SessionAccessor sessionAccessor, SessionService sessionService,
             FormMappingService formMappingService) {
-        this.supervisorService = supervisorService;
+        this.supervisorMappingService = supervisorMappingService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.formMappingService = formMappingService;
@@ -51,7 +51,7 @@ public class IsProcessOwnerRule implements AuthorizationRule {
             SFormMapping formMapping = formMappingService.get(key);
             long processDefinitionId = formMapping.getProcessDefinitionId();
             final long userId = sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
-            return supervisorService.isProcessSupervisor(processDefinitionId, userId);
+            return supervisorMappingService.isProcessSupervisor(processDefinitionId, userId);
         } catch (final SBonitaException e) {
             throw new SExecutionException("Unable to figure out if the logged user is a process owner.", e);
         }

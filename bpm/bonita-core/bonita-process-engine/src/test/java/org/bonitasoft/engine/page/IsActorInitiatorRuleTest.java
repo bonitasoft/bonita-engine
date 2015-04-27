@@ -26,16 +26,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class IsActorInitiatorRuleTest {
     
     @Mock
-    private ActorMappingService actorMappingService;
+    ActorMappingService actorMappingService;
     
     @Mock
-    private SessionAccessor sessionAccessor;
+    SessionAccessor sessionAccessor;
     
     @Mock
-    private SessionService sessionService;
+    SessionService sessionService;
     
     @Mock
-    private FormMappingService formMappingService;
+    FormMappingService formMappingService;
     
     @Mock
     SFormMapping formMapping;
