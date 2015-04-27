@@ -45,10 +45,8 @@ public class IsTaskAvailableForUserRule implements AuthorizationRule {
         @SuppressWarnings("unchecked")
         final Map<String, String[]> queryParameters = (Map<String, String[]>) context.get(URLAdapterConstants.QUERY_PARAMETERS);
         String[] idParamValue = new String[0];
-        String[] userParamValue = new String[0];
         if (queryParameters != null) {
             idParamValue = queryParameters.get(URLAdapterConstants.ID_QUERY_PARAM);
-            userParamValue = queryParameters.get(URLAdapterConstants.USER_QUERY_PARAM);
         }
         long taskInstanceId;
         if (idParamValue == null || idParamValue.length == 0) {
@@ -56,12 +54,7 @@ public class IsTaskAvailableForUserRule implements AuthorizationRule {
         } else {
             taskInstanceId = Long.parseLong(idParamValue[0]);
             try {
-                long userId;
-                if (userParamValue == null || userParamValue.length == 0) {
-                    userId = sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
-                } else {
-                    userId = Long.parseLong(userParamValue[0]);
-                }
+                long userId = sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
                 final SHumanTaskInstance humanTaskInstance = activityInstanceService.getHumanTaskInstance(taskInstanceId);
                 long assigneeId = humanTaskInstance.getAssigneeId();
                 if (assigneeId > 0) {

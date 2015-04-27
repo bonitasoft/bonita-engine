@@ -39,7 +39,6 @@ public class IsActorInitiatorRule implements AuthorizationRule {
 
     public IsActorInitiatorRule(ActorMappingService actorMappingService, SessionAccessor sessionAccessor, SessionService sessionService,
             FormMappingService formMappingService) {
-        super();
         this.actorMappingService = actorMappingService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
