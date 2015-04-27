@@ -63,16 +63,11 @@ public class InputDefinitionImpl implements InputDefinition {
     }
 
     public InputDefinitionImpl(final String name, final String description, final List<InputDefinition> inputDefinitions) {
-        this(name, description, false, inputDefinitions);
+        this(name, description, false, null, inputDefinitions);
     }
 
     public InputDefinitionImpl(final String name, final String description, final boolean multiple, final List<InputDefinition> inputDefinitions) {
-        this(name, description, multiple);
-        if (inputDefinitions != null) {
-            for (final InputDefinition inputDefinition : inputDefinitions) {
-                this.getInputs().add(inputDefinition);
-            }
-        }
+        this(name, description, multiple, null, inputDefinitions);
     }
 
     @Override
