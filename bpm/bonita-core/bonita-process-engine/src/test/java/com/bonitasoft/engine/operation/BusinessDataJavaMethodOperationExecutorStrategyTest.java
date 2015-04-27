@@ -2,15 +2,17 @@ package com.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -25,6 +27,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataService;
+import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BusinessDataJavaMethodOperationExecutorStrategyTest {
@@ -39,7 +42,10 @@ public class BusinessDataJavaMethodOperationExecutorStrategyTest {
     private BusinessDataService businessDataService;
 
     @Mock
-    private JavaMethodOperationExecutorStrategy javaMethodOperationExecutorStrategy;
+    private EntitiesActionsExecutor actionsExecutor;
+
+    @Mock
+    private MergeEntityAction mergeEntityAction;
 
     @InjectMocks
     @Spy
@@ -76,7 +82,7 @@ public class BusinessDataJavaMethodOperationExecutorStrategyTest {
     }
 
     @Test
-    public void shouldDelegateToBusinessDataService() throws Exception {
+    public void should_delegateToBusinessDataService_and_call_merge_action_when_should_persist() throws Exception {
         //given
         final String methodName = METHOD_NAME;
         final String parameterType = PARAMETER_TYPE;
@@ -88,27 +94,78 @@ public class BusinessDataJavaMethodOperationExecutorStrategyTest {
         doReturn(methodName + ":" + parameterType).when(operation).getOperator();
         doReturn(map).when(context).getInputValues();
 
+        Address valueAfterCallOperation = new Address(20L);
+        Address valueAfterMerge = new Address(21L);
+        given(businessDataService.callJavaOperation(businessData, valuetoSetObjectWith, methodName, parameterType)).willReturn(valueAfterCallOperation);
+        given(actionsExecutor.executeAction(valueAfterCallOperation, null, mergeEntityAction)).willReturn(valueAfterMerge);
+
         //when
-        strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context);
+        Object newValue = strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context, true);
 
         //then
-        verify(businessDataService).callJavaOperation(businessData, valuetoSetObjectWith, methodName, parameterType);
-        verifyZeroInteractions(javaMethodOperationExecutorStrategy);
+        assertThat(newValue).isEqualTo(valueAfterMerge);
 
+    }
+
+    @Test
+    public void should_delegate_To_BusinessDataService_without_calling_merge_action_when_should_not_persist() throws Exception {
+        //given
+        final String methodName = METHOD_NAME;
+        final String parameterType = PARAMETER_TYPE;
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put(DATA_TO_SET, businessData);
+
+        doReturn(SLeftOperand.TYPE_BUSINESS_DATA).when(leftOperand).getType();
+        doReturn(DATA_TO_SET).when(leftOperand).getName();
+        doReturn(methodName + ":" + parameterType).when(operation).getOperator();
+        doReturn(map).when(context).getInputValues();
+
+        Address valueAfterCallOperation = new Address(20L);
+        given(businessDataService.callJavaOperation(businessData, valuetoSetObjectWith, methodName, parameterType)).willReturn(valueAfterCallOperation);
+
+        //when
+        Object newValue = strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context, false);
+
+        //then
+        assertThat(newValue).isEqualTo(valueAfterCallOperation);
+        verify(actionsExecutor, never()).executeAction(businessData, null, mergeEntityAction);
+
+    }
+
+    @Test(expected = SOperationExecutionException.class)
+    public void should_throw_exception_when_businessDataService_throws_exception() throws Exception {
+        //given
+        final String methodName = METHOD_NAME;
+        final String parameterType = PARAMETER_TYPE;
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put(DATA_TO_SET, businessData);
+
+        doReturn(SLeftOperand.TYPE_BUSINESS_DATA).when(leftOperand).getType();
+        doReturn(DATA_TO_SET).when(leftOperand).getName();
+        doReturn(methodName + ":" + parameterType).when(operation).getOperator();
+        doReturn(map).when(context).getInputValues();
+
+        given(businessDataService.callJavaOperation(businessData, valuetoSetObjectWith, methodName, parameterType)).willThrow(
+                new SBusinessDataNotFoundException(""));
+
+        //when
+        strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context, false);
+
+        //then exception
     }
 
     @Test
     public void shouldNotDelegateToBusinessDataService() throws Exception {
         //given
         doReturn("not business data type").when(leftOperand).getType();
-        doReturn(null).when(strategy).computeJavaOperation(operation, valuetoSetObjectWith, context);
+        doReturn(null).when(strategy).computeJavaOperation(operation, valuetoSetObjectWith, context, false);
         verifyNoMoreInteractions(businessDataService);
 
         //when
-        strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context);
+        strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context, false);
 
         //then
-        verify(strategy).computeJavaOperation(operation, valuetoSetObjectWith, context);
+        verify(strategy).computeJavaOperation(operation, valuetoSetObjectWith, context, false);
 
     }
 
@@ -119,7 +176,7 @@ public class BusinessDataJavaMethodOperationExecutorStrategyTest {
          * new arrayList(adresses) adresses
          * client.setAdresses(adresses)
          */
-        final Object computeNewValueForLeftOperand = strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context);
+        final Object computeNewValueForLeftOperand = strategy.computeNewValueForLeftOperand(operation, valuetoSetObjectWith, context, false);
 
         fail("not yet implemented");
 
