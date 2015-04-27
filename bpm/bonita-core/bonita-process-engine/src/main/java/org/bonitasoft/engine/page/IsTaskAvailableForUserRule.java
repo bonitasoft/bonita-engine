@@ -22,7 +22,7 @@ import java.util.Map;
 public class IsTaskAvailableForUserRule implements AuthorizationRule {
 
     @Override
-    public boolean isAllowed(Map<String, Serializable> context) {
+    public boolean isAllowed(String key, Map<String, Serializable> context) {
         return true;
     }
 

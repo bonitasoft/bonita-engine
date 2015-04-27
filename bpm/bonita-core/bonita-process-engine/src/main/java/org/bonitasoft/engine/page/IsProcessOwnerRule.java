@@ -16,14 +16,46 @@ package org.bonitasoft.engine.page;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.core.form.FormMappingService;
+import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
+
 /**
- * author Emmanuel Duchastenier
+ * author Emmanuel Duchastenier, Anthony Birembaut
  */
 public class IsProcessOwnerRule implements AuthorizationRule {
 
+    SupervisorMappingService supervisorService;
+    
+    SessionAccessor sessionAccessor;
+    
+    SessionService sessionService;
+    
+    FormMappingService formMappingService;
+
+    public IsProcessOwnerRule(SupervisorMappingService supervisorService,
+            SessionAccessor sessionAccessor, SessionService sessionService,
+            FormMappingService formMappingService) {
+        this.supervisorService = supervisorService;
+        this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
+        this.formMappingService = formMappingService;
+    }
+
     @Override
-    public boolean isAllowed(Map<String, Serializable> context) {
-        return true;
+    public boolean isAllowed(final String key, Map<String, Serializable> context) throws SExecutionException {
+        try {
+            SFormMapping formMapping = formMappingService.get(key);
+            long processDefinitionId = formMapping.getProcessDefinitionId();
+            final long userId = sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
+            return supervisorService.isProcessSupervisor(processDefinitionId, userId);
+        } catch (final SBonitaException e) {
+            throw new SExecutionException("Unable to figure out if the logged user is a process owner.", e);
+        }
     }
 
     @Override

@@ -27,11 +27,12 @@ public interface AuthorizationRule {
     /**
      * Execute this rule and, according to the context, says whether the rule is valid.
      * 
+     * @param page mapping key
      * @param context the information necessary to execute this rule.
      * @return true if allowed, false otherwise.
      * @throws SExecutionException 
      */
-    boolean isAllowed(Map<String, Serializable> context) throws SExecutionException;
+    boolean isAllowed(String key, Map<String, Serializable> context) throws SExecutionException;
 
     /**
      * @return the identifier for this authorization rule

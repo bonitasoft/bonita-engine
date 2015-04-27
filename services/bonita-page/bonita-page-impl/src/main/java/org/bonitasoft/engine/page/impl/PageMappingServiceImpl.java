@@ -137,7 +137,7 @@ public class PageMappingServiceImpl implements PageMappingService {
             if (authorizationRule == null) {
                 throw new SExecutionException("Authorization rule " + rule + " is not known. Cannot check if authorized or not.");
             }
-            if (!authorizationRule.isAllowed(context)) {
+            if (!authorizationRule.isAllowed(pageMapping.getKey(), context)) {
                 throw new SAuthorizationException("Access to Page or URL with key " + pageMapping.getKey() + " is not allowed");
             }
         }

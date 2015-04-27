@@ -23,5 +23,6 @@ public class AuthorizationRuleConstants {
     public static final String IS_PROCESS_INITIATOR = "IS_PROCESS_INITIATOR";
     public static final String IS_INVOLVED_IN_PROCESS_INSTANCE = "IS_INVOLVED_IN_PROCESS_INSTANCE";
     public static final String IS_TASK_AVAILABLE_FOR_USER = "IS_TASK_AVAILABLE_FOR_USER";
+	public static final String IS_ACTOR_INITIATOR = "IS_ACTOR_INITIATOR";
 
 }

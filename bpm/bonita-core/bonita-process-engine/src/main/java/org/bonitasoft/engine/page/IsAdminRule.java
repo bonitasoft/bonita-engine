@@ -17,15 +17,15 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * author Emmanuel Duchastenier
+ * author Emmanuel Duchastenier, Anthony Birembaut
  */
 public class IsAdminRule implements AuthorizationRule {
 
     @Override
-    public boolean isAllowed(Map<String, Serializable> context) {
-    	if (context.containsKey(AuthorizationRuleConstants.IS_ADMIN)) {
-    		return (Boolean) context.get(AuthorizationRuleConstants.IS_ADMIN);
-    	}
+    public boolean isAllowed(String key, Map<String, Serializable> context) {
+        if (context.containsKey(AuthorizationRuleConstants.IS_ADMIN)) {
+            return (Boolean) context.get(AuthorizationRuleConstants.IS_ADMIN);
+        }
         return false;
     }
 

@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.actor.xml.ActorMapping;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.session.SessionService;
@@ -26,7 +25,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * author Anthony Birembaut
  */
-public class IsProcessActorInitiatorRule implements AuthorizationRule {
+public class IsActorInitiatorRule implements AuthorizationRule {
 
     ActorMappingService actorMappingService;
     
@@ -34,14 +33,14 @@ public class IsProcessActorInitiatorRule implements AuthorizationRule {
     
     SessionService sessionService;
     
-    public IsProcessActorInitiatorRule(ActorMappingService actorMappingService, SessionAccessor sessionAccessor, SessionService sessionService) {
+    public IsActorInitiatorRule(ActorMappingService actorMappingService, SessionAccessor sessionAccessor, SessionService sessionService) {
         this.actorMappingService = actorMappingService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
     }
 
     @Override
-    public boolean isAllowed(Map<String, Serializable> context) throws SExecutionException {
+    public boolean isAllowed(String key, Map<String, Serializable> context) throws SExecutionException {
         @SuppressWarnings("unchecked")
         final Map<String, String[]> queryParameters = (Map<String, String[]>) context.get(URLAdapterConstants.QUERY_PARAMETERS);
         String[] idParamValue = new String[0];
@@ -64,6 +63,6 @@ public class IsProcessActorInitiatorRule implements AuthorizationRule {
 
     @Override
     public String getId() {
-        return AuthorizationRuleConstants.IS_PROCESS_OWNER;
+        return AuthorizationRuleConstants.IS_ACTOR_INITIATOR;
     }
 }

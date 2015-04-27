@@ -312,7 +312,7 @@ public class SPageMappingServiceImplTest {
         final AuthorizationRule authorizationRule = spy(new AuthorizationRule() {
 
             @Override
-            public boolean isAllowed(Map<String, Serializable> context) {
+            public boolean isAllowed(String key, Map<String, Serializable> context) {
                 return true;
             }
 
@@ -325,7 +325,7 @@ public class SPageMappingServiceImplTest {
 
         pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
 
-        verify(authorizationRule).isAllowed(anyMap());
+        verify(authorizationRule).isAllowed(anyString(), anyMap());
     }
 
     @Test(expected = SAuthorizationException.class)
@@ -337,7 +337,7 @@ public class SPageMappingServiceImplTest {
         final AuthorizationRule authorizationRule = spy(new AuthorizationRule() {
 
             @Override
-            public boolean isAllowed(Map<String, Serializable> context) {
+            public boolean isAllowed(String key, Map<String, Serializable> context) {
                 return false;
             }
 
