@@ -19,6 +19,8 @@ import java.util.Map;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.core.form.FormMappingService;
+import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -33,31 +35,27 @@ public class IsActorInitiatorRule implements AuthorizationRule {
     
     SessionService sessionService;
     
-    public IsActorInitiatorRule(ActorMappingService actorMappingService, SessionAccessor sessionAccessor, SessionService sessionService) {
-        this.actorMappingService = actorMappingService;
-        this.sessionAccessor = sessionAccessor;
-        this.sessionService = sessionService;
-    }
+    FormMappingService formMappingService;
 
-    @Override
+    public IsActorInitiatorRule(ActorMappingService actorMappingService,
+			SessionAccessor sessionAccessor, SessionService sessionService,
+			FormMappingService formMappingService) {
+		super();
+		this.actorMappingService = actorMappingService;
+		this.sessionAccessor = sessionAccessor;
+		this.sessionService = sessionService;
+		this.formMappingService = formMappingService;
+	}
+
+	@Override
     public boolean isAllowed(String key, Map<String, Serializable> context) throws SExecutionException {
-        @SuppressWarnings("unchecked")
-        final Map<String, String[]> queryParameters = (Map<String, String[]>) context.get(URLAdapterConstants.QUERY_PARAMETERS);
-        String[] idParamValue = new String[0];
-        if(queryParameters != null){
-            idParamValue = queryParameters.get(URLAdapterConstants.ID_QUERY_PARAM);
-        }
-        long processDefinitionId;
-        if (idParamValue == null || idParamValue.length == 0) {
-            throw new IllegalArgumentException("The parameter \"id\" is missing from the original URL");
-        } else {
-            processDefinitionId = Long.parseLong(idParamValue[0]);
-            try {
-                final long userId = sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
-                return actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId);
-            } catch (final SBonitaException e) {
-                throw new SExecutionException("Unable to figure out if the logged user is an actor initiator for the process " + processDefinitionId, e);
-            }
+        try {
+            SFormMapping formMapping = formMappingService.get(key);
+            long processDefinitionId = formMapping.getProcessDefinitionId();
+            final long userId = sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
+            return actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId);
+        } catch (final SBonitaException e) {
+            throw new SExecutionException("Unable to figure out if the logged user is an actor initiator for the process.", e);
         }
     }
 
