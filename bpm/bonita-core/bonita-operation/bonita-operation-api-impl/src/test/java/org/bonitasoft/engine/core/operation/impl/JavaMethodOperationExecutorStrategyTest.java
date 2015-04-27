@@ -54,7 +54,7 @@ public class JavaMethodOperationExecutorStrategyTest {
 
         final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
         expressionContext.setInputValues(Collections.<String, Object> emptyMap());
-        strategy.computeNewValueForLeftOperand(operation, "Update", expressionContext);
+        strategy.computeNewValueForLeftOperand(operation, "Update", expressionContext, false);
     }
 
     @Test(expected = SOperationExecutionException.class)
@@ -76,7 +76,7 @@ public class JavaMethodOperationExecutorStrategyTest {
         map.put("myData", new MyClassThatThrowException());
         expressionContext.setInputValues(map);
 
-        strategy.computeNewValueForLeftOperand(operation, "Update", expressionContext);
+        strategy.computeNewValueForLeftOperand(operation, "Update", expressionContext, false);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class JavaMethodOperationExecutorStrategyTest {
         final Map<String, Object> map = new HashMap<String, Object>();
         map.put("myData", new MyClass());
         expressionContext.setInputValues(map);
-        final MyClass updated = (MyClass) strategy.computeNewValueForLeftOperand(operation, 12, expressionContext);
+        final MyClass updated = (MyClass) strategy.computeNewValueForLeftOperand(operation, 12, expressionContext, false);
 
         assertEquals(12, updated.getThing());
     }

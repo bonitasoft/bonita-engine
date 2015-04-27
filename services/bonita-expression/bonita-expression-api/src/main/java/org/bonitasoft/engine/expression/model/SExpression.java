@@ -61,6 +61,8 @@ public interface SExpression extends Serializable {
 
     List<SExpression> getDependencies();
 
+    boolean hasDependencies();
+
     int getDiscriminant();
 
 }
