@@ -14,6 +14,7 @@ import com.bonitasoft.engine.form.FormMappingSPIT;
 import com.bonitasoft.engine.tenant.TenantLocalIT;
 import com.bonitasoft.engine.tenant.TenantMaintenanceLocalIT;
 import com.bonitasoft.engine.theme.ThemeTest;
+import org.bonitasoft.engine.BPMRemoteTestsLocal;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
@@ -23,6 +24,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({BPMSPTests.class,
         BPMLocalSuiteTests.class,
+        BPMRemoteTestsLocal.class,
+        BPMRemoteSPTests.class,
         LocalLogTest.class,
         APIMethodSPIT.class,
         ConnectorExecutionTimeOutTest.class,
