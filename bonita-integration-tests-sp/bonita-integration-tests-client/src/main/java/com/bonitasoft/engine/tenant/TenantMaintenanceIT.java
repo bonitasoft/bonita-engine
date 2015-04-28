@@ -15,6 +15,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import com.bonitasoft.engine.BPMTestSPUtil;
+import com.bonitasoft.engine.CommonAPISPIT;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -34,7 +37,6 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,17 +45,11 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPIT;
-import com.bonitasoft.engine.TestsInitializerSP;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-
 /**
  * @author Laurent Leseigneur
  * @author Celine Souchet
  */
 @RunWith(BonitaTestRunner.class)
-@Initializer(TestsInitializerSP.class)
 @Deprecated // Please, do not delete this class when cleaning deprecated TenantMaintenanceAPI. The following tests must be kept:
 //- twoTenantPauseMode
 //- can_executeConnectorOnActivityInstance_after_resume_tenant

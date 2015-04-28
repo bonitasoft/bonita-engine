@@ -36,49 +36,40 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
 
     private final IdentityService identityService;
 
-    private final EventService eventService;
-
     private final SessionService sessionService;
-
-    private final SJobHandlerImpl jobHandler;
 
     private final TransactionService transactionService;
 
     private final SessionAccessor sessionAccessor;
+    private SServiceMXBean serviceBean;
+    private SEntityMXBean entityBean;
 
-    public TenantMonitoringServiceImpl(final boolean allowMbeansRegistration, final IdentityService identityService, final EventService eventService,
+    public TenantMonitoringServiceImpl(final boolean allowMbeansRegistration, final IdentityService identityService,
             final TransactionService transactionService, final SessionAccessor sessionAccessor, final SessionService sessionService,
-            final SJobHandlerImpl jobHandler, final TechnicalLoggerService technicalLog) {
+            final TechnicalLoggerService technicalLog) {
         super(allowMbeansRegistration, technicalLog);
         this.identityService = identityService;
-        this.jobHandler = jobHandler;
-        this.eventService = eventService;
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
-
-        addHandlers();
         addMBeans();
     }
 
     private void addMBeans() {
-        final SEntityMXBean entityBean = new SEntityMXBeanImpl(transactionService, this, sessionAccessor, sessionService);
-        final SServiceMXBean serviceBean = new SServiceMXBeanImpl(transactionService, this, sessionAccessor, sessionService);
+        entityBean = new SEntityMXBeanImpl(transactionService, this, sessionAccessor, sessionService);
+        serviceBean = new SServiceMXBeanImpl(transactionService, this, sessionAccessor, sessionService);
         addMBean(entityBean);
         addMBean(serviceBean);
     }
 
-    private void addHandlers() {
-        for (String event : asList(SJobHandlerImpl.JOB_COMPLETED, SJobHandlerImpl.JOB_EXECUTING, SJobHandlerImpl.JOB_FAILED)) {
-            try {
-                eventService.addHandler(event, jobHandler);
-            } catch (HandlerRegistrationException hre) {
-                // It has already been registered, just log a warning
-                if (technicalLog.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                    technicalLog.log(getClass(), TechnicalLogSeverity.WARNING, hre);
-                }
-            }
-        }
+    @Override
+    public SEntityMXBean getEntityBean() {
+        return entityBean;
+    }
+
+    @Override
+    public SServiceMXBean getServiceBean() {
+        return serviceBean;
     }
 
     @Override
@@ -95,9 +86,5 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
         return transactionService.getNumberOfActiveTransactions();
     }
 
-    @Override
-    public long getNumberOfExecutingJobs() {
-        return jobHandler.getExecutingJobs();
-    }
 
 }

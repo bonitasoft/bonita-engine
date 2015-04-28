@@ -1,0 +1,190 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+	<bean id="platformCacheConfigurations" parent="communityPlatformCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list merge="true">
+				<ref bean="platformSessionCache" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="broadcastService" class="com.bonitasoft.engine.service.impl.BroadcastServiceCluster">
+		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
+		<constructor-arg name="timeout" value="${bonita.platform.cluster.broadcast.timeout}" />
+		<constructor-arg name="timeUnit" value="MINUTES" />
+	</bean>
+
+	<bean id="classLoaderService"
+		  class="com.bonitasoft.engine.classloader.ClusteredClassLoaderService" depends-on="hazelcastInstance">
+		<constructor-arg name="classLoaderService" ref="normalClassLoader" />
+		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
+		<constructor-arg name="loggerService" ref="platformTechnicalLoggerService" />
+	</bean>
+	<bean id="parentClassLoaderResolver" class="org.bonitasoft.engine.bpm.classloader.BonitaBPMParentClassLoaderResolver">
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+	</bean>
+
+	<bean id="normalClassLoader" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
+		<constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+	</bean>
+
+	<!-- configure the instance named bonita,it is the default instance used
+		by bonita -->
+
+	<!-- the factory with start stop method that returns the hazelcast instance -->
+	<bean id="hazelcastService" class="com.bonitasoft.engine.service.impl.BonitaHazelcastInstanceFactory" scope="singleton" destroy-method="destroy"></bean>
+
+	<bean id="hazelcastInstance"
+		  factory-bean="hazelcastService"
+		  factory-method="newHazelcastInstance" scope="singleton" >
+		<constructor-arg>
+			<bean class="com.hazelcast.config.Config">
+				<property name="groupConfig">
+					<bean class="com.hazelcast.config.GroupConfig">
+						<property name="name" value="${bonita.cluster.group.name:bonita}" />
+						<property name="password" value="${bonita.cluster.group.password:bpm}" />
+					</bean>
+				</property>
+				<!-- Disable the hazelcast shutdown hook because we handle the shutdown ourself -->
+				<property name="properties">
+					<props>
+						<prop key="hazelcast.shutdownhook.enabled">false</prop>
+					</props>
+				</property>
+				<property name="instanceName" value="bonita" />
+				<property name="networkConfig">
+					<bean class="com.hazelcast.config.NetworkConfig">
+						<property name="join">
+							<bean class="com.hazelcast.config.JoinConfig">
+								<property name="multicastConfig">
+									<bean class="com.hazelcast.config.MulticastConfig">
+										<property name="enabled" value="${bonita.platform.cluster.hazelcast.multicast.enabled}" />
+										<property name="multicastGroup" value="${bonita.platform.cluster.hazelcast.multicast.multicastGroup}" />
+										<property name="multicastPort" value="${bonita.platform.cluster.hazelcast.multicast.multicastPort}" />
+									</bean>
+								</property>
+							</bean>
+						</property>
+						<property name="interfaces">
+							<bean class="com.hazelcast.config.InterfacesConfig">
+								<property name="interfaces">
+									<list>
+										<value>127.0.0.1</value>
+									</list>
+								</property>
+							</bean>
+						</property>
+					</bean>
+				</property>
+				<!-- <property name="serializationConfig"> -->
+				<!-- <bean class="com.hazelcast.config.SerializationConfig"> -->
+				<!-- <property name="serializerConfigs"> -->
+				<!-- <list> -->
+				<!-- <bean class="com.hazelcast.config.SerializerConfig"> -->
+				<!-- <property name="className" value="com.bonitasoft.engine.classloader.BonitaSerializer"/> -->
+				<!-- <property name="typeClassName" value="org.bonitasoft.engine.commons.BonitaSerializable"/> -->
+				<!-- </bean> -->
+				<!-- </list> -->
+				<!-- </property> -->
+				<!-- </bean> -->
+				<!-- </property> -->
+			</bean>
+		</constructor-arg>
+		<constructor-arg name="cacheConfigurations" ref="platformCacheConfigurations" />
+		<constructor-arg name="enableStats" value="${bonita.platform.cluster.hazelcast.enableStats}" />
+		<constructor-arg name="statsPrintInterval" value="${bonita.platform.cluster.hazelcast.statsPrintInterval}" />
+	</bean>
+
+	<bean id="platformEventService" class="com.bonitasoft.engine.events.impl.ClusteredEventServiceImpl">
+		<constructor-arg name="handlers">
+			<map />
+		</constructor-arg>
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
+	</bean>
+
+	<bean id="lockService" class="com.bonitasoft.engine.lock.impl.ClusteredLockService" scope="singleton" >
+		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+		<constructor-arg name="lockTimeout" value="${bonita.platform.lock.memory.timeout}" />
+	</bean>
+
+	<bean id="nodeConfiguration" class="com.bonitasoft.engine.api.impl.NodeConfigurationExt" autowire="byType">
+		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance"/>
+		<property name="shouldStartScheduler" value="true" />
+		<property name="shouldRestartElements" value="true" />
+		<property name="TenantRestartHandlers" >
+			<list>
+				<bean class="org.bonitasoft.engine.execution.work.RestartFlowNodesHandler" />
+				<bean class="org.bonitasoft.engine.execution.work.RestartProcessHandler" />
+				<bean class="org.bonitasoft.engine.execution.work.BPMEventWorksHandler" />
+				<bean class="com.bonitasoft.engine.profile.ProfilesUpdaterRestartHandlerExt" />
+			</list>
+		</property>
+		<property name="lifecycleServices">
+			<list>
+				<ref bean="classLoaderService" />
+				<ref bean="normalClassLoader" />
+				<ref bean="platformCacheService" />
+			</list>
+		</property>
+		<property name="jobListeners">
+			<list>
+				<ref bean="loggerJobListener" />
+				<ref bean="jdbcJobListener" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="platformSessionProvider"
+		  class="com.bonitasoft.engine.platform.session.impl.PlatformSessionProviderClustered">
+		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
+	</bean>
+
+	<bean id="quartzSchedulerFactory" class="com.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactoryExtended">
+		<constructor-arg name="props" ref="quartzProperties"/>
+		<constructor-arg name="additionalProperties">
+			<props>
+				<prop key="org.quartz.scheduler.instanceName">BonitaClusteredScheduler</prop>
+				<prop key="org.quartz.scheduler.instanceId">AUTO</prop>
+				<prop key="org.quartz.jobStore.isClustered">true</prop>
+				<prop key="org.quartz.jobStore.clusterCheckinInterval">${bonita.platform.scheduler.quartz.clusterCheckinInterval}</prop>
+			</props>
+		</constructor-arg>
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+	</bean>
+
+	<bean id="platformSessionCache" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<!-- do not put the first letter because it will need to match the pattern *ESSION... -->
+		<property name="name" value="ESSION_MAP_PLATFORM" />
+		<property name="maxElementsInMemory" value="${bonita.platform.cache.session.maxElementsInMemory}" />
+		<property name="inMemoryOnly" value="${bonita.platform.cache.session.inMemoryOnly}" />
+		<property name="eternal" value="${bonita.platform.cache.session.eternal}" />
+		<property name="evictionPolicy" value="${bonita.platform.cache.session.evictionPolicy}" />
+		<property name="timeToLiveSeconds" value="${bonita.platform.cache.session.timeToLiveSeconds}" />
+		<property name="maxElementsOnDisk" value="${bonita.platform.cache.session.maxElementsOnDisk}" />
+		<property name="copyOnRead" value="${bonita.platform.cache.session.copyOnRead}" />
+		<property name="copyOnWrite" value="${bonita.platform.cache.session.copyOnWrite}" />
+		<property name="readIntensive" value="${bonita.platform.cache.session.readIntensive}" />
+	</bean>
+
+	<bean id="hibernateCacheProperties" parent="spHibernateCacheProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean" depends-on="hazelcastInstance">
+		<property name="map">
+			<map merge="true">
+				<!-- 				Hazelcast second level cache configuration, more details here : http://www.hazelcast.com/docs/3.0/manual/multi_html/ch13.html -->
+				<entry key="hibernate.cache.use_second_level_cache" value="false"/>
+				<entry key="hibernate.cache.use_query_cache" value="false"/>
+				<entry key="hibernate.cache.use_minimal_puts" value="false"/>
+				<!-- 				name of the default instance used by bonita, it's configuration is set using cfg-bonita-clustering.xml -->
+				<entry key="hibernate.cache.hazelcast.instance_name" value="bonita"/>
+				<!--				<prop key="hibernate.cache.region.factory_class">com.hazelcast.hibernate.HazelcastCacheRegionFactory</prop> -->
+				<entry key="hibernate.cache.region.factory_class" value="com.hazelcast.hibernate.HazelcastLocalCacheRegionFactory"/>
+			</map>
+		</property>
+	</bean>
+
+</beans>

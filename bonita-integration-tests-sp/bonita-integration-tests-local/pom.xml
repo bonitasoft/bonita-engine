@@ -11,7 +11,7 @@
     <artifactId>bonita-integration-tests-local-sp</artifactId>
 
     <properties>
-        <bonita.home>${project.build.directory}/home</bonita.home>
+        <bonita.home>${project.build.directory}/bonita-home</bonita.home>
         <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
     </properties>
 
@@ -20,6 +20,12 @@
             <groupId>com.bonitasoft.engine</groupId>
             <artifactId>bonita-server-sp</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine</groupId>
+            <artifactId>bonita-home-sp</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
         </dependency>
         <dependency>
             <groupId>com.bonitasoft.engine.test</groupId>
@@ -42,6 +48,22 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.bonitasoft.engine.test</groupId>
+            <artifactId>bonita-integration-tests-local</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine</groupId>
+                    <artifactId>bonita-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.hazelcast</groupId>
+                    <artifactId>hazelcast-hibernate</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>compile</scope>
@@ -50,12 +72,6 @@
         <dependency>
             <groupId>org.bonitasoft.engine</groupId>
             <artifactId>bonita-deploy-tcp</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.bonitasoft.engine.test</groupId>
-            <artifactId>bonita-server-test-utils-sp</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -117,24 +133,72 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack</id>
-                        <phase>generate-resources</phase>
+
+            <id>unpack-community-local-tests</id>
+            <phase>process-test-resources</phase>
+            <goals>
+                <goal>unpack</goal>
+            </goals>
+            <configuration>
+                <outputDirectory>${project.build.directory}</outputDirectory>
+                <artifactItems>
+                    <artifactItem>
+                        <groupId>org.bonitasoft.engine.test</groupId>
+                        <artifactId>bonita-integration-tests-local</artifactId>
+                        <version>${project.version}</version>
+                        <type>zip</type>
+                    </artifactItem>
+                </artifactItems>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+
+
+    <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+            <execution>
+                <id>unpack-server-tests-util</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                    <goal>unpack</goal>
+                </goals>
+                <configuration>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>org.bonitasoft.engine.test</groupId>
+                            <artifactId>bonita-server-test-utils</artifactId>
+                            <version>${project.version}</version>
+                            <type>zip</type>
+                        </artifactItem>
+                    </artifactItems>
+                </configuration>
+            </execution>
+            </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-bonita-home</id>
+                        <phase>process-test-resources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
+                            <outputDirectory>${project.build.directory}/bonita-home-sp</outputDirectory>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>com.bonitasoft.engine</groupId>
                                     <artifactId>bonita-home-sp</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
-                                    <classifier>${bonita.home.classifier}</classifier>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
                         </configuration>
                     </execution>
                 </executions>
@@ -144,21 +208,23 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>configure-bdm-repository</id>
+                        <id>complete test conf setup</id>
                         <phase>process-test-resources</phase>
-                        <configuration>
-                            <target>
-                                <!-- Change Dialect of BDR -->
-                                <property file="${bonita.home}/server/platform/conf/bonita-platform.properties" />
-                                <property file="${basedir}/src/test/resources/jdbc-${sysprop.bonita.db.vendor}.properties" />
-                                <replaceregexp file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties" match="businessdata.hibernate.dialect=(.*)"
-                                    replace="businessdata.hibernate.dialect=${db.hibernate.dialect}" byline="true" />
-                            </target>
-                        </configuration>
                         <goals>
                             <goal>run</goal>
                         </goals>
+                        <configuration>
+                            <target name="build-home-sp">
+                                <ant antfile="build-home-sp.xml" target="build-home-sp"/>
+                            </target>
+                        </configuration>
                     </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
                     <execution>
                         <id>install license</id>
                         <phase>process-test-resources</phase>
@@ -212,19 +278,7 @@
     </build>
     <profiles>
         <profile>
-            <id>hibernate</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <bonita.home.classifier>performance</bonita.home.classifier>
-            </properties>
-        </profile>
-        <profile>
             <id>slow</id>
-            <properties>
-                <bonita.home.classifier>performance</bonita.home.classifier>
-            </properties>
             <build>
                 <plugins>
                     <plugin>

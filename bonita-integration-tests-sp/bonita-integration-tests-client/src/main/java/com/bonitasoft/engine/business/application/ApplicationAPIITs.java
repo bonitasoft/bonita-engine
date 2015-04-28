@@ -9,11 +9,8 @@
 package com.bonitasoft.engine.business.application;
 
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
-
-import com.bonitasoft.engine.TestsInitializerSP;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -25,7 +22,6 @@ import com.bonitasoft.engine.TestsInitializerSP;
         ApplicationAPIApplicationMenuIT.class,
         ApplicationAPIImportExportIT.class
 })
-@Initializer(TestsInitializerSP.class)
 @Deprecated
 public class ApplicationAPIITs {
 }

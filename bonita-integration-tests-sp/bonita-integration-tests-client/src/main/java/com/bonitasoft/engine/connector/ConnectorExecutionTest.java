@@ -17,7 +17,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -82,7 +81,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPIT {
         ByteArrayOutputStream baos = null;
         ZipOutputStream zos = null;
         try {
-            stream = BPMRemoteTests.class.getResourceAsStream(implSourceFile);
+            stream = this.getClass().getResourceAsStream(implSourceFile);
             assertNotNull(stream);
             final String baseName = implSourceFile.substring(implSourceFile.lastIndexOf('/') + 1, implSourceFile.lastIndexOf('.'));
             final byte[] byteArray = IOUtils.toByteArray(stream);
