@@ -89,7 +89,8 @@ public class FormMappingServiceImpl implements FormMappingService {
 
         authorizationRulesMap = new HashMap<>(3);
         authorizationRulesMap.put(FormMappingType.PROCESS_START, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_ACTOR_INITIATOR));
-        authorizationRulesMap.put(FormMappingType.PROCESS_OVERVIEW, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_INVOLVED_IN_PROCESS_INSTANCE));
+        authorizationRulesMap.put(FormMappingType.PROCESS_OVERVIEW,
+                Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_PROCESS_INITIATOR, IS_TASK_PERFORMER, IS_INVOLVED_IN_PROCESS_INSTANCE));
         authorizationRulesMap.put(FormMappingType.TASK, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_TASK_AVAILABLE_FOR_USER));
     }
 

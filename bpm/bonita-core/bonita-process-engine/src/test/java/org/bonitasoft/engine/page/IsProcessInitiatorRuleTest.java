@@ -1,0 +1,106 @@
+/*
+ * Copyright (C) 2015 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ */
+package org.bonitasoft.engine.page;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
+import java.io.Serializable;
+import java.util.Map;
+
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+/**
+ * author Emmanuel Duchastenier
+ */
+@RunWith(MockitoJUnitRunner.class)
+public class IsProcessInitiatorRuleTest extends RuleTest {
+
+    @Mock
+    ProcessInstanceService processInstanceService;
+
+    @Mock
+    TechnicalLoggerService technicalLoggerService;
+
+    @InjectMocks
+    IsProcessInitiatorRule rule;
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegallArgumentIfUserIdParamNotPresent() throws Exception {
+        Map<String, Serializable> context = buildContext(24L, null);
+
+        final boolean allowed = rule.isAllowed("key", context);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegallArgumentIfProcessInstanceIdParamNotPresent() throws Exception {
+        Map<String, Serializable> context = buildContext(null, 7L);
+
+        final boolean allowed = rule.isAllowed("someKey", context);
+    }
+
+    @Test
+    public void shouldNotBeAllowedIfProcessInstanceInitiatorIsNotGivenUser() throws Exception {
+        final long processInstanceId = 541L;
+
+        Map<String, Serializable> context = buildContext(processInstanceId, 11L);
+        final SProcessInstance processInstance = mock(SProcessInstance.class);
+        doReturn(444L).when(processInstance).getStartedBy();
+        doReturn(processInstance).when(processInstanceService).getProcessInstance(processInstanceId);
+
+        final boolean allowed = rule.isAllowed("someKey", context);
+
+        assertThat(allowed).isFalse();
+    }
+
+    @Test
+    public void shouldBeAllowedIfProcessInstanceInitiatorIsPreciselyTheGivenUser() throws Exception {
+        final long processInstanceId = 541L;
+
+        final long userId = 11L;
+        Map<String, Serializable> context = buildContext(processInstanceId, userId);
+        final SProcessInstance processInstance = mock(SProcessInstance.class);
+        doReturn(userId).when(processInstance).getStartedBy();
+        doReturn(processInstance).when(processInstanceService).getProcessInstance(processInstanceId);
+
+        final boolean allowed = rule.isAllowed("someKey", context);
+
+        assertThat(allowed).isTrue();
+    }
+
+    @Test(expected = SExecutionException.class)
+    public void shouldThrowExecutionExceptionIfServiceProblemOccurs() throws Exception {
+        final long processInstanceId = 541L;
+
+        final long userId = 11L;
+        Map<String, Serializable> context = buildContext(processInstanceId, userId);
+        doThrow(SBonitaReadException.class).when(processInstanceService).getProcessInstance(processInstanceId);
+
+        final boolean allowed = rule.isAllowed("exception raised", context);
+    }
+
+    @Test
+    public void getIdShouldReturnIsProcessInitiator() throws Exception {
+        assertThat(rule.getId()).isEqualTo("IS_PROCESS_INITIATOR");
+    }
+}

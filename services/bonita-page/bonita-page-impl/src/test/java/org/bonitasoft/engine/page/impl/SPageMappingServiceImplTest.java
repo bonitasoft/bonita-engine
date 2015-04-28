@@ -20,6 +20,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -103,7 +104,9 @@ public class SPageMappingServiceImplTest {
     public void should_create_return_the_created_element() throws Exception {
         //given
         //when
-        final List<String> authorizationRules = Arrays.asList("toto", "titi");
+        final List<String> authorizationRules = new ArrayList<>(2);
+        authorizationRules.add("toto");
+        authorizationRules.add("titi");
         SPageMapping sPageMapping = pageMappingService.create("theKey", PAGE_ID, authorizationRules);
         //then
         assertThat(sPageMapping).isNotNull();
@@ -303,24 +306,53 @@ public class SPageMappingServiceImplTest {
         pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> singletonMap("test", "test"));
     }
 
+    class ValidRule implements AuthorizationRule {
+
+        private String validRuleKey;
+
+        public ValidRule(String validRuleKey) {
+            this.validRuleKey = validRuleKey;
+        }
+
+        @Override
+        public boolean isAllowed(String key, Map<String, Serializable> context) {
+            return true;
+        }
+
+        @Override
+        public String getId() {
+            return validRuleKey;
+        }
+    }
+
+    class NeverValidRule implements AuthorizationRule {
+
+        private String invalidRuleKey;
+
+        public NeverValidRule(String invalidRuleKey) {
+            this.invalidRuleKey = invalidRuleKey;
+        }
+
+        @Override
+        public boolean isAllowed(String key, Map<String, Serializable> context) {
+            return false;
+        }
+
+        @Override
+        public String getId() {
+            return invalidRuleKey;
+        }
+    }
+
     @Test
     public void resolvePageURL_shouldExecuteAuthorizationRule() throws Exception {
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         final String validRuleKey = "validRule";
-        pageMapping.setPageAuthorizationRules(Arrays.asList(validRuleKey));
+        final List<String> rules = new ArrayList<>(1);
+        rules.add(validRuleKey);
+        pageMapping.setPageAuthorizationRules(rules);
 
-        final AuthorizationRule authorizationRule = spy(new AuthorizationRule() {
-
-            @Override
-            public boolean isAllowed(String key, Map<String, Serializable> context) {
-                return true;
-            }
-
-            @Override
-            public String getId() {
-                return validRuleKey;
-            }
-        });
+        final AuthorizationRule authorizationRule = spy(new ValidRule(validRuleKey));
         pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(authorizationRule));
 
         pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
@@ -332,30 +364,46 @@ public class SPageMappingServiceImplTest {
     public void resolvePageURL_shouldThrowExceptionIfAuthorizationRuleInvalid() throws Exception {
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         final String invalidRuleKey = "invalidRuleKey";
-        pageMapping.setPageAuthorizationRules(Arrays.asList(invalidRuleKey));
+        final List<String> rules = new ArrayList<>(1);
+        rules.add(invalidRuleKey);
+        pageMapping.setPageAuthorizationRules(rules);
 
-        final AuthorizationRule authorizationRule = spy(new AuthorizationRule() {
-
-            @Override
-            public boolean isAllowed(String key, Map<String, Serializable> context) {
-                return false;
-            }
-
-            @Override
-            public String getId() {
-                return invalidRuleKey;
-            }
-        });
+        final AuthorizationRule authorizationRule = new NeverValidRule(invalidRuleKey);
         pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(authorizationRule));
 
         pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
     }
 
     @Test
+    public void resolvePageURL_shouldAllowAsSoonAsOneRuleIsValid() throws Exception {
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        final String invalidRuleKey = "invalidRule";
+        final String validKey = "validRule";
+        final String invalidRuleKey2 = "invalidRule2";
+        final List<String> rules = new ArrayList<>(2);
+        rules.add(invalidRuleKey);
+        rules.add(validKey);
+        pageMapping.setPageAuthorizationRules(rules);
+
+        final NeverValidRule neverValidRule = spy(new NeverValidRule(invalidRuleKey));
+        final ValidRule validRule = spy(new ValidRule(validKey));
+        final NeverValidRule neverValidRule2 = spy(new NeverValidRule(invalidRuleKey2));
+        pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(neverValidRule, validRule));
+
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
+
+        verify(neverValidRule).isAllowed(anyString(), anyMap());
+        verify(validRule).isAllowed(anyString(), anyMap());
+        verifyZeroInteractions(neverValidRule2);
+    }
+
+    @Test
     public void resolvePageURL_shouldThrowExecutionExceptionIfAuthorizationRuleIsNotKnown() throws Exception {
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         final String unknownRuleKey = "unknownRuleKey";
-        pageMapping.setPageAuthorizationRules(Arrays.asList(unknownRuleKey));
+        final List<String> rules = new ArrayList<>(1);
+        rules.add(unknownRuleKey);
+        pageMapping.setPageAuthorizationRules(rules);
 
         expectedException.expect(SExecutionException.class);
         expectedException.expectMessage("Authorization rule " + unknownRuleKey);

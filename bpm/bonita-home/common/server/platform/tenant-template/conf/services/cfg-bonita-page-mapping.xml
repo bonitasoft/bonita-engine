@@ -24,7 +24,6 @@
         <constructor-arg name="formMappingService" ref="formMappingService" />
         <constructor-arg name="supervisorMappingService" ref="supervisorMappingService" />
     </bean>
-    <bean id="isInvolvedInProcessInstance" class="org.bonitasoft.engine.page.IsInvolvedInProcessInstanceRule" />
     <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule">
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -35,6 +34,17 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="formMappingService" ref="formMappingService" />
         <constructor-arg name="actorMappingService" ref="actorMappingService" />
+    </bean>
+    <bean id="isProcessInitiator" class="org.bonitasoft.engine.page.IsProcessInitiatorRule">
+        <constructor-arg ref="processInstanceService" />
+        <constructor-arg ref="tenantTechnicalLoggerService" />
+    </bean>
+    <bean id="isTaskPerformer" class="org.bonitasoft.engine.page.IsTaskPerformerRule">
+        <constructor-arg ref="activityInstanceService" />
+        <constructor-arg ref="tenantTechnicalLoggerService" />
+    </bean>
+    <bean id="isInvolvedInProcessInstance" class="org.bonitasoft.engine.page.IsInvolvedInProcessInstanceRule">
+
     </bean>
 
 </beans>

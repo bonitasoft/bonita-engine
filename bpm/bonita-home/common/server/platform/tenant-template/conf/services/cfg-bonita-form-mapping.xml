@@ -10,10 +10,10 @@
         <constructor-arg name="pageService" ref="pageService" />
         <constructor-arg name="formMappingKeyGenerator" ref="formMappingKeyGenerator" />
         <constructor-arg name="externalUrlAdapter">
-            <util:constant static-field="org.bonitasoft.engine.page.URLAdapterConstants.EXTERNAL_URL_ADAPTER"/>
+            <util:constant static-field="org.bonitasoft.engine.page.URLAdapterConstants.EXTERNAL_URL_ADAPTER" />
         </constructor-arg>
-        <constructor-arg name="legacyUrlAdapter" >
-            <util:constant static-field="org.bonitasoft.engine.page.URLAdapterConstants.LEGACY_URL_ADAPTER"/>
+        <constructor-arg name="legacyUrlAdapter">
+            <util:constant static-field="org.bonitasoft.engine.page.URLAdapterConstants.LEGACY_URL_ADAPTER" />
         </constructor-arg>
     </bean>
 

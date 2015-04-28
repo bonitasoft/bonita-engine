@@ -14,29 +14,25 @@
 package org.bonitasoft.engine.page;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SExecutionException;
-
 /**
- * Represent a rule to execute to grant access or not.
  * author Emmanuel Duchastenier
  */
-public interface AuthorizationRule {
+public abstract class RuleTest {
 
-    /**
-     * Execute this rule and, according to the context, says whether the rule is valid.
-     * 
-     * @param key the page mapping key
-     * @param context the information necessary to execute this rule.
-     * @return true if allowed, false otherwise.If determination cannot be fullfilled, an Exception should be thrown.
-     * @throws SExecutionException exception thrown if authorization cannot be determined.
-     */
-    boolean isAllowed(String key, Map<String, Serializable> context) throws SExecutionException;
-
-    /**
-     * @return the identifier for this authorization rule
-     */
-    String getId();
+    protected Map<String, Serializable> buildContext(Long processInstanceId, Long userId) {
+        Map<String, Serializable> context = new HashMap<>(1);
+        final Map<String, String[]> queryParameters = new HashMap<>(2);
+        if (processInstanceId != null) {
+            queryParameters.put(URLAdapterConstants.ID_QUERY_PARAM, new String[] { Long.toString(processInstanceId) });
+        }
+        if (userId != null) {
+            queryParameters.put(URLAdapterConstants.USER_QUERY_PARAM, new String[] { Long.toString(userId) });
+        }
+        context.put(URLAdapterConstants.QUERY_PARAMETERS, (Serializable) queryParameters);
+        return context;
+    }
 
 }

@@ -64,7 +64,6 @@ public class SPageMappingImpl extends PersistentObjectId implements SPageMapping
 
     public void setPageAuthorizRules(String pageAuthorizRules) {
         this.pageAuthorizRules = pageAuthorizRules;
-        parseRules();
     }
 
     private void parseRules() {
@@ -89,6 +88,7 @@ public class SPageMappingImpl extends PersistentObjectId implements SPageMapping
 
     @Override
     public List<String> getPageAuthorizationRules() {
+        parseRules(); // Need to do it here because Hibernate does not call setter to set fields from DB to Object
         return authorizationRules;
     }
 

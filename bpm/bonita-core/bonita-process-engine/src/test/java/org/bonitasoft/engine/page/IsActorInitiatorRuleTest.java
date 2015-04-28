@@ -21,34 +21,33 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class IsActorInitiatorRuleTest {
-    
+
     @Mock
     ActorMappingService actorMappingService;
-    
+
     @Mock
     SessionAccessor sessionAccessor;
-    
+
     @Mock
     SessionService sessionService;
-    
+
     @Mock
     FormMappingService formMappingService;
-    
+
     @Mock
     SFormMapping formMapping;
-    
+
     String pageMappingKey = "key";
-    
+
     long processDefinitionId = 42L;
-    
+
     long userId = 2L;
-    
+
     @InjectMocks
     IsActorInitiatorRule isActorInitiatorRule = new IsActorInitiatorRule(actorMappingService, sessionAccessor, sessionService, formMappingService);
-    
+
     @Before
     public void initMocks() throws Exception {
         when(formMappingService.get(pageMappingKey)).thenReturn(formMapping);
@@ -58,20 +57,25 @@ public class IsActorInitiatorRuleTest {
         when(session.getUserId()).thenReturn(userId);
         when(sessionService.getSession(1L)).thenReturn(session);
     }
-    
+
     @Test
     public void isAllowed_should_return_true_if_actor_initiator() throws Exception {
         Map<String, Serializable> context = new HashMap<String, Serializable>();
         when(actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId)).thenReturn(true);
-        
+
         assertThat(isActorInitiatorRule.isAllowed(pageMappingKey, context)).isTrue();
     }
-    
+
     @Test
     public void isAllowed_should_return_false_if_not_actor_initiator() throws Exception {
         Map<String, Serializable> context = new HashMap<String, Serializable>();
         when(actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId)).thenReturn(false);
-        
+
         assertThat(isActorInitiatorRule.isAllowed(pageMappingKey, context)).isFalse();
+    }
+
+    @Test
+    public void getIdShouldReturnIsActorInitiator() throws Exception {
+        assertThat(isActorInitiatorRule.getId()).isEqualTo("IS_ACTOR_INITIATOR");
     }
 }

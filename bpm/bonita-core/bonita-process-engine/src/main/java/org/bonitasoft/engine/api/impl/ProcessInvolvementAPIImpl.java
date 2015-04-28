@@ -17,28 +17,29 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
-import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -65,35 +66,45 @@ public class ProcessInvolvementAPIImpl {
     }
 
     public boolean isInvolvedInProcessInstance(final long userId, final long processInstanceId) throws ProcessInstanceNotFoundException {
-        final TenantServiceAccessor serviceAccessor = processAPI.getTenantAccessor();
-        final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        final TenantServiceAccessor tenantAccessor = processAPI.getTenantAccessor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         try {
-
             // Part specific to active process instances:
-            final ProcessInstance processInstance = processAPI.getProcessInstance(processInstanceId);
+            final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
             if (userId == processInstance.getStartedBy()) {
                 return true;
             }
             // is user assigned or has pending tasks on this process instance:
-            if (processAPI.searchMyAvailableHumanTasks(userId,
-                    new SearchOptionsBuilder(0, 1).filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).done()).getCount() > 0) {
+            final QueryOptions queryOptions = new QueryOptions(0, 1, Collections.EMPTY_LIST, Arrays.asList(new FilterOption(SHumanTaskInstance.class,
+                    "logicalGroup2", processInstanceId)), null);
+            if (activityInstanceService.getNumberOfPendingOrAssignedTasks(userId, queryOptions) > 0) {
                 return true;
             }
-        } catch (final ProcessInstanceNotFoundException exc) {
+        } catch (SProcessInstanceReadException | SBonitaReadException e) {
+            throw new RetrieveException(e);
+        } catch (SProcessInstanceNotFoundException e) {
             // process instance may be completed already:
 
-            // Part specific to archived process instances:
             try {
-                final ArchivedProcessInstance archProcessInstance = processAPI.getLastArchivedProcessInstance(processInstanceId);
-                if (userId == archProcessInstance.getStartedBy()) {
+                final List<OrderByOption> orderByOptions = Arrays.asList(
+                        new OrderByOption(SAProcessInstance.class, ArchivedProcessInstancesSearchDescriptor.ARCHIVE_DATE, OrderByType.DESC),
+                        new OrderByOption(SAProcessInstance.class, ArchivedProcessInstancesSearchDescriptor.END_DATE, OrderByType.DESC));
+                final List<FilterOption> filterOptions = Arrays.asList(new FilterOption(SAProcessInstance.class,
+                        ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId));
+                final QueryOptions queryOptions = new QueryOptions(0, 1, orderByOptions, filterOptions, null);
+
+                final List<SAProcessInstance> saProcessInstances = processInstanceService.searchArchivedProcessInstances(queryOptions);
+                if (saProcessInstances.isEmpty()) {
+                    throw new SProcessInstanceNotFoundException(processInstanceId);
+                }
+                if (userId == saProcessInstances.get(0).getStartedBy()) {
                     return true;
                 }
-            } catch (final SBonitaException e) {
-                throw new ProcessInstanceNotFoundException(processInstanceId);
+            } catch (SBonitaReadException | SProcessInstanceNotFoundException e1) {
+                throw new ProcessInstanceNotFoundException(e1);
             }
-        } catch (final SearchException e) {
-            throw new BonitaRuntimeException(e);
         }
 
         // Part common to active and archived process instances:
@@ -113,13 +124,12 @@ public class ProcessInvolvementAPIImpl {
             return false;
         } catch (final SBonitaException e) {
             // no rollback, read only method
-            throw new BonitaRuntimeException(e);// TODO refactor Exceptions!
+            throw new RetrieveException(e);
         }
+
     }
 
-
-
-    public boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId)  throws ActivityInstanceNotFoundException {
+    public boolean isInvolvedInHumanTaskInstance(long userId, long humanTaskInstanceId) throws ActivityInstanceNotFoundException {
         try {
             return isInvolvedInHumanTaskInstance(userId, humanTaskInstanceId, processAPI.getTenantAccessor());
         } catch (SActivityInstanceNotFoundException e) {
@@ -132,7 +142,6 @@ public class ProcessInvolvementAPIImpl {
             throw new RetrieveException(e);
         }
     }
-
 
     private Boolean isInvolvedInHumanTaskInstance(final long userId, final long humanTaskInstanceId, final TenantServiceAccessor serviceAccessor)
             throws SActivityInstanceNotFoundException, SActorNotFoundException, SBonitaReadException, SActivityReadException {
