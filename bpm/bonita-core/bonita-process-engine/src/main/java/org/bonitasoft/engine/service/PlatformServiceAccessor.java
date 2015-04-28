@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -56,8 +57,6 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
 
     PlatformSessionService getPlatformSessionService();
 
-    SessionService getSessionService();
-
     ClassLoaderService getClassLoaderService();
 
     DependencyService getDependencyService();
@@ -70,4 +69,6 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
 
     void destroy();
     BroadcastService getBroadcastService();
+
+    PlatformAuthenticationService getPlatformAuthenticationService();
 }

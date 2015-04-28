@@ -29,6 +29,7 @@ import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -78,6 +79,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.xml.ChildrenEntriesBinding;
 import org.bonitasoft.engine.profile.xml.MembershipBinding;
@@ -88,6 +90,7 @@ import org.bonitasoft.engine.profile.xml.ProfileEntriesBinding;
 import org.bonitasoft.engine.profile.xml.ProfileEntryBinding;
 import org.bonitasoft.engine.profile.xml.ProfileMappingBinding;
 import org.bonitasoft.engine.profile.xml.ProfilesBinding;
+import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
@@ -256,6 +259,9 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private BusinessDataService businessDataService;
     private PageMappingService pageMappingService;
+    private GenericAuthenticationService genericAuthenticationService;
+    private ReadPersistenceService readPersistenceService;
+    private Recorder recorder;
 
 
     @Override
@@ -267,16 +273,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     public SpringTenantServiceAccessor(final Long tenantId) {
-        beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
+        beanAccessor = SpringFileSystemBeanAccessorFactory.getTenantAccessor(tenantId);
         this.tenantId = tenantId;
-    }
-
-    @Override
-    public ReadSessionAccessor getReadSessionAccessor() {
-        if (readSessionAccessor == null) {
-            readSessionAccessor = beanAccessor.getService(ReadSessionAccessor.class);
-        }
-        return readSessionAccessor;
     }
 
     @Override
@@ -704,11 +702,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return eventService;
     }
 
-    @Override
-    public void initializeServiceAccessor(final ClassLoader classLoader) {
-        beanAccessor.initializeContext(classLoader);
-    }
-
     public SpringTenantFileSystemBeanAccessor getBeanAccessor() {
         return beanAccessor;
     }
@@ -878,12 +871,38 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
+    public GenericAuthenticationService getAuthenticationService() {
+        if (genericAuthenticationService == null) {
+            genericAuthenticationService = beanAccessor.getService(GenericAuthenticationService.class);
+        }
+        return genericAuthenticationService;
+    }
+
+    @Override
+    public ReadPersistenceService getReadPersistenceService() {
+        if (readPersistenceService == null) {
+            readPersistenceService = beanAccessor.getService("persistenceService");
+        }
+        return readPersistenceService;
+    }
+
+    @Override
+    public Recorder getRecorder() {
+        if (recorder == null) {
+            recorder = beanAccessor.getService(Recorder.class);
+        }
+        return recorder;
+    }
+
+    @Override
     public BusinessDataService getBusinessDataService() {
         if (businessDataService == null) {
             businessDataService = beanAccessor.getService(BusinessDataService.class);
         }
         return businessDataService;
     }
+
+
 
     @Override
     public FormMappingService getFormMappingService() {

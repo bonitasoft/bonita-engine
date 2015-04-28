@@ -642,25 +642,32 @@ public class IOUtil {
 
     public static byte[] getZipEntryContent(final String entryName, final InputStream inputStream) throws IOException {
         final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipEntry zipEntry = null;
         try {
             while ((zipEntry = zipInputstream.getNextEntry()) != null) {
                 if (!entryName.equals(zipEntry.getName())) {
                     continue;
                 }
-                int bytesRead;
-                final byte[] buffer = new byte[BUFFER_SIZE];
-                while ((bytesRead = zipInputstream.read(buffer)) > -1) {
-                    byteArrayOutputStream.write(buffer, 0, bytesRead);
-                }
-                return byteArrayOutputStream.toByteArray();
+                return getBytes(zipInputstream);
             }
         } finally {
             zipInputstream.close();
-            byteArrayOutputStream.close();
         }
         throw new IOException("Entry " + entryName + " does not exists in the zip file");
+    }
+
+    public static byte[] getBytes(ZipInputStream zipInputstream) throws IOException {
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try {
+            int bytesRead;
+            final byte[] buffer = new byte[BUFFER_SIZE];
+            while ((bytesRead = zipInputstream.read(buffer)) > -1) {
+                byteArrayOutputStream.write(buffer, 0, bytesRead);
+            }
+            return byteArrayOutputStream.toByteArray();
+        } finally {
+            byteArrayOutputStream.close();
+        }
     }
 
     public static byte[] getZipEntryContent(final String entryName, final byte[] zipFile) throws IOException {
@@ -771,6 +778,39 @@ public class IOUtil {
             return read(md5File).equals(md5(contentToCheck));
         } catch (IOException e) {
             return false;
+        }
+    }
+
+    public static void updatePropertyValue(File propertiesFile, final Map<String, String> pairs) throws IOException {
+        final BufferedReader br = new BufferedReader(new FileReader(propertiesFile));
+        try {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                String lineToWrite = line;
+                if (!line.startsWith("#")) {
+                    //it is not a comment
+                    final int splitCharIndex = line.indexOf("=");
+                    if (splitCharIndex >= 0) {
+                        final String key = line.substring(0, splitCharIndex);
+                        //this is a key-value pair
+                        if (pairs.containsKey(key.trim())) {
+                            String value = pairs.get(key.trim());
+                            value = value.replace("\\", "\\\\");
+                            lineToWrite = key + "=" + value;
+                        }
+                    }
+                }
+                sb.append(lineToWrite);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+            IOUtil.writeFile(propertiesFile, sb.toString());
+        } finally {
+            if (br != null) {
+                br.close();
+            }
         }
     }
 }

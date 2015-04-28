@@ -44,7 +44,7 @@ public class TenantSequenceManagerImpl {
 
     private final Long tenantId;
 
-    private final Map<Long, Integer> rangeSizes;
+    private final Map<Long, Integer> sequenceIdToRangeSize;
 
     // Map of available IDs: key=sequenceId, value = nextAvailableId to be assigned to a new entity of the given sequence
     private final Map<Long, Long> nextAvailableIds = new HashMap<Long, Long>();
@@ -55,9 +55,7 @@ public class TenantSequenceManagerImpl {
     // Map of sequenceId, mutex
     private static final Map<Long, Object> SEQUENCE_MUTEXS = new HashMap<Long, Object>();
 
-    private final int defaultRangeSize;
-
-    private final Map<String, Long> sequencesMappings;
+    private final Map<String, Long> classNameToSequenceId;
 
     private final int retries;
 
@@ -69,20 +67,19 @@ public class TenantSequenceManagerImpl {
 
     private final LockService lockService;
 
-    public TenantSequenceManagerImpl(final long tenantId, final LockService lockService, final Map<Long, Integer> rangeSizes, final int defaultRangeSize,
-            final Map<String, Long> sequencesMappings,
+    public TenantSequenceManagerImpl(final long tenantId, final LockService lockService, final Map<Long, Integer> sequenceIdToRangeSize,
+            final Map<String, Long> classNameToSequenceId,
             final DataSource datasource, final int retries, final int delay, final int delayFactor) {
         this.tenantId = tenantId;
         this.lockService = lockService;
-        this.defaultRangeSize = defaultRangeSize;
-        this.rangeSizes = rangeSizes;
-        this.sequencesMappings = sequencesMappings;
+        this.sequenceIdToRangeSize = sequenceIdToRangeSize;
+        this.classNameToSequenceId = classNameToSequenceId;
         this.retries = retries;
         this.delay = delay;
         this.delayFactor = delayFactor;
         this.datasource = datasource;
 
-        for (final Long sequenceId : sequencesMappings.values()) {
+        for (final Long sequenceId : classNameToSequenceId.values()) {
             SEQUENCE_MUTEXS.put(sequenceId, new TenantSequenceManagerImplMutex());
             nextAvailableIds.put(sequenceId, 0L);
             lastIdInRanges.put(sequenceId, -1L);
@@ -94,7 +91,7 @@ public class TenantSequenceManagerImpl {
     }
 
     public long getNextId(final String entityName) throws SObjectNotFoundException {
-        final Long sequenceId = sequencesMappings.get(entityName);
+        final Long sequenceId = classNameToSequenceId.get(entityName);
         if (sequenceId == null) {
             throw new SObjectNotFoundException("No sequence id found for " + entityName);
         }
@@ -135,7 +132,7 @@ public class TenantSequenceManagerImpl {
                         final long nextAvailableId = selectById(connection, sequenceId, tenantId);
                         nextAvailableIds.put(sequenceId, nextAvailableId);
 
-                        final long nextSequenceId = nextAvailableId + getRangeSize(sequenceId);
+                        final long nextSequenceId = nextAvailableId + sequenceIdToRangeSize.get(sequenceId);
                         updateSequence(connection, nextSequenceId, tenantId, sequenceId);
                         lastIdInRanges.put(sequenceId, nextSequenceId - 1);
 
@@ -180,11 +177,6 @@ public class TenantSequenceManagerImpl {
         }
         throw new SObjectNotFoundException(
                 "Unable to get a sequence id for " + sequenceId);
-    }
-
-    int getRangeSize(final long sequenceId) {
-        final Integer rangeSize = rangeSizes.get(sequenceId);
-        return rangeSize != null ? rangeSize : defaultRangeSize;
     }
 
     protected void updateSequence(final Connection connection, final long nextSequenceId, final long tenantId, final long id)

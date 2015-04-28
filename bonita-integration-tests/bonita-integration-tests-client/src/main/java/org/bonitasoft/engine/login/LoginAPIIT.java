@@ -27,8 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.CommonAPIIT;
+import org.bonitasoft.engine.CommonAPIIT;
+import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformCommandAPI;
@@ -39,13 +40,17 @@ import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.command.DependencyNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -58,23 +63,18 @@ import org.junit.Test;
  */
 public class LoginAPIIT extends CommonAPIIT {
 
-    private static final String COMMAND_NAME = "deleteSession";
+    private static final String COMMAND_NAME = "deleteSessionCommand";
 
-    private static final String COMMAND_DEPENDENCY_NAME = "deleteSessionCommand";
-
-    private static PlatformCommandAPI platformCommandAPI;
-
-    private static PlatformSession session;
+    private static PlatformSession platformSession;
 
     @Before
-    public void before() throws BonitaException {
-        session = loginOnPlatform();
-        platformCommandAPI = PlatformAPIAccessor.getPlatformCommandAPI(session);
+    public void before() throws BonitaException, IOException {
+        platformSession = loginOnPlatform();
     }
 
     @After
     public void after() throws BonitaException {
-        logoutOnPlatform(session);
+        logoutOnPlatform(platformSession);
     }
 
     @Test(expected = SessionNotFoundException.class)
@@ -91,19 +91,12 @@ public class LoginAPIIT extends CommonAPIIT {
     }
 
     private void deleteSession(final long sessionId) throws IOException, AlreadyExistsException, CreationException, CreationException,
-            CommandNotFoundException, CommandParameterizationException, CommandExecutionException, DeletionException, DependencyNotFoundException {
-        // deploy and execute a command to delete a session
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/session-commands.jar.bak");
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
-        platformCommandAPI.addDependency(COMMAND_DEPENDENCY_NAME, byteArray);
-        platformCommandAPI.register(COMMAND_NAME, "Delete a session", "org.bonitasoft.engine.command.DeleteSessionCommand");
+            CommandNotFoundException, CommandParameterizationException, CommandExecutionException, DeletionException, DependencyNotFoundException, BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        // execute a command to delete a session
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("sessionId", sessionId);
-        platformCommandAPI.execute(COMMAND_NAME, parameters);
-        platformCommandAPI.unregister(COMMAND_NAME);
-        platformCommandAPI.removeDependency(COMMAND_DEPENDENCY_NAME);
+        final CommandAPI commandAPI = TenantAPIAccessor.getCommandAPI(getSession());
+        commandAPI.execute(COMMAND_NAME, parameters);
     }
 
     @Test(expected = LoginException.class)

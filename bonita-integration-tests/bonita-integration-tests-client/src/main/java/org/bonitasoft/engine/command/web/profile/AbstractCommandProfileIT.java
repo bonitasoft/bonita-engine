@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,8 @@ import org.junit.Before;
 public abstract class AbstractCommandProfileIT extends TestWithTechnicalUser {
 
     protected static final String IMPORT_PROFILES_CMD = "importProfilesCommand";
+
+    protected static final String EXPORT_DEFAULT_PROFILES_CMD = "exportDefaultProfilesCommand";
 
     protected static final long ADMIN_PROFILE_ENTRY_COUNT = 24;
 
@@ -91,13 +94,11 @@ public abstract class AbstractCommandProfileIT extends TestWithTechnicalUser {
 
     @AfterClass
     public static void restorDefaultProfiles() throws Exception {
-        final InputStream xmlStream = AbstractProfileIT.class.getResourceAsStream("/profiles.xml");
-        final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
-        xmlStream.close();
-        final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
-        importParameters.put("xmlContent", xmlContent);
         final APITestUtil testUtil = new APITestUtil();
         testUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
+        final byte[] xmlContent = (byte[]) testUtil.getCommandAPI().execute(EXPORT_DEFAULT_PROFILES_CMD, Collections.<String, Serializable>emptyMap());
+        final Map<String, Serializable> importParameters = new HashMap<String, Serializable>(1);
+        importParameters.put("xmlContent", xmlContent);
         testUtil.getCommandAPI().execute(IMPORT_PROFILES_CMD, importParameters);
         testUtil.logoutOnTenant();
     }

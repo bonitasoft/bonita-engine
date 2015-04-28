@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ActivationState;
@@ -34,14 +35,19 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.test.CommonAPILocalIT;
 import org.bonitasoft.engine.test.TestStates;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@RunWith(BonitaTestRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class LocalTimerEventIT extends CommonAPILocalIT {
 
     private static final String TIMER_EVENT_PREFIX = "Timer_Ev_";

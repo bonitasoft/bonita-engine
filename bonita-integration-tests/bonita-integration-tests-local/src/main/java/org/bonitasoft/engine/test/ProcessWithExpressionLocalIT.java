@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessRuntimeAPI;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -49,11 +50,16 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Baptiste Mesta
  */
+@RunWith(BonitaTestRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class ProcessWithExpressionLocalIT extends TestWithUser {
 
     private ProcessDefinition processDefinition;

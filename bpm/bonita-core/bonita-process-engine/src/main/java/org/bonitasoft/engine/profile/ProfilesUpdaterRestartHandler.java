@@ -117,7 +117,7 @@ public class ProfilesUpdaterRestartHandler implements TenantRestartHandler {
                 .getIdentityService(), profilesFromXML, ImportPolicy.UPDATE_DEFAULTS);
     }
 
-    File getMD5File(TenantServiceAccessor tenantServiceAccessor) throws BonitaHomeNotSetException {
+    File getMD5File(TenantServiceAccessor tenantServiceAccessor) throws BonitaHomeNotSetException, IOException {
         return ProfilesImporter.getFileContainingMD5(tenantServiceAccessor);
     }
 

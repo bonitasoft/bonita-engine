@@ -1508,8 +1508,8 @@ public class BDRepositoryIT extends CommonAPIIT {
 
     private String getClientBdmJarClassPath(String bonitaHomePath) {
         String clientBdmJarPath;
-        clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("server").append(File.separator).append("tenants")
-                .append(File.separator).append(tenantId).append(File.separator).append("data-management").append(File.separator).append("client").toString();
+        clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("engine-server").append(File.separator).append("work").append(File.separator).append("tenants")
+                .append(File.separator).append(tenantId).append(File.separator).append("data-management-client").toString();
         return clientBdmJarPath;
    }
 

@@ -41,8 +41,7 @@ public class CleanInvalidSessionsJob extends InternalJob {
     @Override
     public void execute() throws SJobExecutionException {
         try {
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            final SessionService sessionService = platformServiceAccessor.getSessionService();
+            final SessionService sessionService = getTenantServiceAccessor().getSessionService();
             sessionService.cleanInvalidSessions();
         } catch (final Exception e) {
             throw new SJobExecutionException("Unable to clean invalid sessions", e);

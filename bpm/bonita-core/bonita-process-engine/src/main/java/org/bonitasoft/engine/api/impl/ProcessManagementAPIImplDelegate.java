@@ -13,7 +13,6 @@
  */
 package org.bonitasoft.engine.api.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,7 +42,6 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.parameter.OrderBy;
@@ -105,30 +103,11 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final DeleteProcess deleteProcess = instantiateDeleteProcessTransactionContent(processDefinitionId);
         deleteProcess.execute();
 
-        final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
-        final File file = new File(processesFolder);
-        if (!file.exists()) {
-            file.mkdir();
-        }
+        BonitaHomeServer.getInstance().deleteProcess(tenantAccessor.getTenantId(), processDefinitionId);
 
-        final File processFolder = new File(file, String.valueOf(processDefinitionId));
-        IOUtil.deleteDir(processFolder);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id = <"
                     + processDefinitionId + ">");
-        }
-    }
-
-    @Deprecated
-    public void deleteProcess(final long processDefinitionId) throws SBonitaException, BonitaHomeNotSetException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final DeleteProcess deleteProcess = new DeleteProcess(getTenantAccessor(), processDefinitionId);
-        deleteProcess.execute();
-
-        final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
-        final File file = new File(processesFolder);
-        if (!file.exists()) {
-            file.mkdir();
         }
     }
 
@@ -172,7 +151,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     }
 
     public List<ParameterInstance> getParameterInstances(final long processDefinitionId, final int startIndex, final int maxResults,
-                                                         final ParameterCriterion sort) {
+            final ParameterCriterion sort) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();

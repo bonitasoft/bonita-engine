@@ -533,6 +533,10 @@ public class IOUtil {
 
     public static void writeContentToFile(final String content, final File outputFile) throws IOException {
         final FileOutputStream fileOutput = new FileOutputStream(outputFile);
+        writeContentToFileOutputStream(content, fileOutput);
+    }
+
+    public static void writeContentToFileOutputStream(final String content, final FileOutputStream fileOutput) throws IOException {
         OutputStreamWriter out = null;
         try {
             out = new OutputStreamWriter(fileOutput, FILE_ENCODING);
@@ -546,13 +550,13 @@ public class IOUtil {
         }
     }
 
-    public static void write(final File file, final byte[] content) throws FileNotFoundException, IOException {
+    public static void write(final File file, final byte[] fileContent) throws FileNotFoundException, IOException {
         FileOutputStream fos = null;
         BufferedOutputStream bos = null;
         try {
             fos = new FileOutputStream(file);
             bos = new BufferedOutputStream(fos);
-            bos.write(content);
+            bos.write(fileContent);
             bos.flush();
         } finally {
             if (bos != null) {

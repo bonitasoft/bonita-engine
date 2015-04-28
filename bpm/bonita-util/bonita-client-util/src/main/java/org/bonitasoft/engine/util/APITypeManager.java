@@ -34,13 +34,11 @@ public class APITypeManager {
 
     private static final String API_TYPE = "org.bonitasoft.engine.api-type";
 
-    private static final BonitaHomeClient bonitaHome = BonitaHomeClient.getInstance();
-
     private static ApiAccessType apiAccessType = null;
 
     private static Map<String, String> apiTypeParameters = null;
 
-    public static ApiAccessType getAPIType() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static ApiAccessType getAPIType() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException, IOException {
         if (apiAccessType == null) {
             final String apiType = getProperty(API_TYPE);
             if (ApiAccessType.LOCAL.name().equalsIgnoreCase(apiType)) {
@@ -67,25 +65,14 @@ public class APITypeManager {
         }
     }
 
-    private static String getProperty(final String propertyName) throws BonitaHomeNotSetException, ServerAPIException {
-        final Properties properties = getProperties();
-        return properties.getProperty(propertyName);
-    }
-
-    private static Properties getProperties() throws BonitaHomeNotSetException, ServerAPIException {
-        final String bonitaHomePath = bonitaHome.getBonitaHomeClientFolder();
-        final String fileName = bonitaHomePath + File.separatorChar + "conf" + File.separatorChar + "bonita-client.properties";
-        try {
-            return PropertiesManager.getProperties(fileName);
-        } catch (final IOException ioe) {
-            throw new ServerAPIException(ioe);
-        }
+    private static String getProperty(final String propertyName) throws BonitaHomeNotSetException, ServerAPIException, IOException {
+        return BonitaHomeClient.getInstance().getProperty(propertyName);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Map<String, String> getAPITypeParameters() throws BonitaHomeNotSetException, ServerAPIException {
+    public static Map<String, String> getAPITypeParameters() throws BonitaHomeNotSetException, ServerAPIException, IOException {
         if (apiTypeParameters == null) {
-            final Properties properties = getProperties();
+            final Properties properties = BonitaHomeClient.getInstance().getProperties();
             apiTypeParameters = new HashMap<String, String>((Map) properties);
             apiTypeParameters.remove(API_TYPE);
         }
@@ -95,7 +82,7 @@ public class APITypeManager {
     public static void refresh() {
         apiAccessType = null;
         apiTypeParameters = null;
-        bonitaHome.refreshBonitaHome();
+        BonitaHomeClient.getInstance().refreshBonitaHome();
     }
 
 }
