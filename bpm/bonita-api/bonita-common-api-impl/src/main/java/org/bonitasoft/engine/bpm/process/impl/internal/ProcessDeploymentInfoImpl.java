@@ -124,4 +124,22 @@ public class ProcessDeploymentInfoImpl extends NamedElementImpl implements Proce
     public ActivationState getActivationState() {
         return activationState;
     }
+
+    @Override
+    public String toString() {
+        return "ProcessDeploymentInfoImpl{" +
+                "version='" + version + '\'' +
+                ", displayDescription='" + displayDescription + '\'' +
+                ", deploymentDate=" + deploymentDate +
+                ", deployedBy=" + deployedBy +
+                ", configurationState=" + configurationState +
+                ", activationState=" + activationState +
+                ", processId=" + processId +
+                ", displayName='" + displayName + '\'' +
+                ", lastUpdateDate=" + lastUpdateDate +
+                ", iconPath='" + iconPath + '\'' +
+                ", description='" + description + '\'' +
+                ", namedElement='" + super.toString() + '\'' +
+                '}';
+    }
 }

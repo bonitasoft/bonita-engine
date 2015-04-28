@@ -21,7 +21,6 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
-import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Before;
@@ -34,7 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class CommonEhCacheCacheServiceTest {
 
     @Mock
-    private CacheConfigurations cacheConfigurations;
+    private List<CacheConfiguration> cacheConfigurations;
 
     @Mock
     private CacheConfiguration defaultCacheConfiguration;

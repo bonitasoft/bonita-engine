@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchivingStrategy;
-import org.bonitasoft.engine.archive.SArchiveDescriptor;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.services.PersistenceService;
@@ -35,13 +34,12 @@ public class ArchiveServiceImplTest {
     // Only one test has to survive !
     @Test
     public void should_recordInserts_register_beforeCommitCallable_v2() throws Exception {
-        final SArchiveDescriptor definitiveArchiveDescriptor = null;
         final PersistenceService definitiveArchivePersistenceService = null;
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final ArchivingStrategy archivingStrategy = null;
         final TransactionService transactionService = mock(TransactionService.class);
 
-        ArchiveServiceImpl archiveService = spy(new ArchiveServiceImpl(definitiveArchiveDescriptor, definitiveArchivePersistenceService, logger, archivingStrategy, transactionService));
+        ArchiveServiceImpl archiveService = spy(new ArchiveServiceImpl(definitiveArchivePersistenceService, logger, archivingStrategy, transactionService));
 
         final ArchivedPersistentObjectWithSetter mockArchivedPersistentObject = mock(ArchivedPersistentObjectWithSetter.class);
         ArchiveInsertRecord record = new ArchiveInsertRecord(mockArchivedPersistentObject);

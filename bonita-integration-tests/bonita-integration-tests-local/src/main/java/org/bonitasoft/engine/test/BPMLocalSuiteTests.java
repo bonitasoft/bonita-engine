@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.test;
 
-import org.bonitasoft.engine.TestsInitializer;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.event.LocalInterruptingTimerBoundaryEventIT;
 import org.bonitasoft.engine.event.LocalTimerEventIT;
 import org.bonitasoft.engine.job.JobExecutionIT;
@@ -37,7 +37,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ThemeIT.class,
         PermissionAPIIT.class
 })
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public class BPMLocalSuiteTests {
 
 }

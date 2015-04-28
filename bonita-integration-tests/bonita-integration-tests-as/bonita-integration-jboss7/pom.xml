@@ -245,26 +245,14 @@
                                         
 										<!-- Create default bonita.home folder -->
                                         <copy todir="${bonita.home}" verbose="true">
-                                            <fileset dir="${distrib.dir}/resources/home/" />
+                                            <fileset dir="${distrib.dir}/resources/bonita-home/" />
                                         </copy>
 
-                                        <copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
-                                        <replace file="${bonita.home}/client/conf/bonita-client.properties" token="#provider.port#" value="${provider.port}"/>
+                                        <copy file="${basedir}/client/bonita-client-custom.properties" todir="${bonita.home}/engine-client/conf" overwrite="true" />
+                                        <replace file="${bonita.home}/engine-client/conf/bonita-client-custom.properties" token="#provider.port#" value="${provider.port}"/>
 
                                         <!-- set the bonita client to use ejb3 -->
                                         <copy file="${basedir}/client/jboss-ejb-client.properties" todir="${project.build.directory}/test-classes" overwrite="true" />
-                                        <copy file="${basedir}/client/logback.xml" todir="${bonita.home}/client/conf" overwrite="true" />
-                                        
-                                        <!-- Change Dialect of BDR -->
-                                         <if>
-                                            <not><equals arg1="${db.vendor}" arg2="h2" /></not>
-                                            <then><replaceregexp
-                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties"
-                                                match="businessdata.hibernate.dialect=.*"
-                                                replace="businessdata.hibernate.dialect=org.hibernate.dialect.PostgreSQL82Dialect"
-                                                byline="true"/>
-                                            </then>
-                                        </if>
 
                                         <mkdir dir="${project.build.directory}/test-classes"/>
                                         <copy file="${basedir}/client/logback.xml" todir="${project.build.directory}/test-classes" overwrite="true" />
@@ -366,6 +354,7 @@
 									<sysprop.bonita.hibernate.transaction.jta_platform>org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</sysprop.bonita.hibernate.transaction.jta_platform>
                                     <hibernate.transaction.manager_lookup_class>org.bonitasoft.JBoss7TransactionManagerLookup</hibernate.transaction.manager_lookup_class>
                                     <sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
+                                    <sysprop.bonita.bdm.db.vendor>${db.vendor}</sysprop.bonita.bdm.db.vendor>
 									<jboss.server.log.threshold>WARN</jboss.server.log.threshold>
 								</systemProperties>
                                 <timeout>360000</timeout>

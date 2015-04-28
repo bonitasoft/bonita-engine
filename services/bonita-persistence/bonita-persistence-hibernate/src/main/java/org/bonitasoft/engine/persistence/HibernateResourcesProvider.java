@@ -26,8 +26,6 @@ public class HibernateResourcesProvider {
 
     private Set<String> resources = new HashSet<String>();
 
-    private Map<String, Long> sequencesMappings = new HashMap<String, Long>();
-
     private Map<? extends String, ? extends String> classAliasMappings = new HashMap<String, String>();
 
     public void setResources(final Set<String> resources) {
@@ -40,14 +38,6 @@ public class HibernateResourcesProvider {
 
     public Set<String> getResources() {
         return resources;
-    }
-
-    public Map<String, Long> getSequencesMappings() {
-        return sequencesMappings;
-    }
-
-    public void setSequencesMappings(final Map<String, Long> sequencesMappings) {
-        this.sequencesMappings = sequencesMappings;
     }
 
     public Map<? extends String, ? extends String> getClassAliasMappings() {

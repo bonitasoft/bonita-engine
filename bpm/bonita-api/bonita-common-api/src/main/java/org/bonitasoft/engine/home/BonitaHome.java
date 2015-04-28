@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.home;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 
@@ -39,7 +40,7 @@ public abstract class BonitaHome {
      *         when bonita.home system property is not set
      * @since 6.0.0
      */
-    public final String getBonitaHomeFolder() throws BonitaHomeNotSetException {
+    public final String getBonitaHomeFolderPath() throws BonitaHomeNotSetException {
         if (this.home == null) {// once set bonita home will never change
             String path = System.getProperty(BONITA_HOME);
             if (path == null || path.isEmpty()) {
@@ -52,6 +53,10 @@ public abstract class BonitaHome {
             this.home = path;
         }
         return this.home;
+    }
+
+    public final File getBonitaHomeFolder() throws BonitaHomeNotSetException {
+        return new File(getBonitaHomeFolderPath());
     }
 
     public final void refreshBonitaHome() {

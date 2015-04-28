@@ -19,16 +19,18 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
+
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,13 +63,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Baptiste Mesta
  */
 @SuppressWarnings("javadoc")
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(BonitaHomeServer.class)
 public class ConnectorServiceImplTest {
 
     /**
@@ -80,6 +84,9 @@ public class ConnectorServiceImplTest {
             return name.endsWith(".jar");
         }
     };
+
+    @Mock
+    private BonitaHomeServer bonitaHomeServer;
 
     private ConnectorServiceImpl connectorService;
 
@@ -101,24 +108,15 @@ public class ConnectorServiceImplTest {
     @SuppressWarnings("unchecked")
     @Before
     public void setup() {
+        mockStatic(BonitaHomeServer.class);
 
-        fixBonitaHomeIfNotSet();
+        when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
 
-        // parser = mock(Parser.class);
-
-        //  parserFactory = mock(ParserFactory.class);
         doReturn(parser).when(parserFactory).createParser(anyList());
-
-        //  dependencyService = mock(DependencyService.class);
 
         connectorService = new ConnectorServiceImpl(/* cacheService */mock(CacheService.class), mock(ConnectorExecutor.class), parserFactory,
                 mock(ReadSessionAccessor.class),
                 mock(ExpressionResolverService.class), mock(OperationService.class), dependencyService, null, mock(TimeTracker.class));
-    }
-
-    private void fixBonitaHomeIfNotSet() {
-        //when test are run outside of maven
-        System.setProperty("bonita.home", System.getProperty("bonita.home", IOUtil.createTempDirectoryInDefaultTempDirectory("bonita_home").getAbsolutePath()));
     }
 
     @Test(expected = SInvalidConnectorImplementationException.class)
@@ -134,7 +132,7 @@ public class ConnectorServiceImplTest {
 
     @Test
     public void checkConnectorImplementationIsValidWithValidZip() throws Exception {
-        when(parser.getObjectFromXML(any(InputStream.class))).thenReturn(
+        when(parser.getObjectFromXML(eq("mocked".getBytes()))).thenReturn(
                 new SConnectorImplementationDescriptor("org.Test", "myConnector", "1.0.0", "myConnector", "1.0.0", new JarDependencies(Collections
                         .<String> emptyList())));
         final byte[] zip = IOUtil.zip(Collections.<String, byte[]> singletonMap("connector.impl", "mocked".getBytes()));
@@ -143,7 +141,7 @@ public class ConnectorServiceImplTest {
 
     @Test(expected = SInvalidConnectorImplementationException.class)
     public void checkConnectorImplementationIsValidWithValidFileButWrongImpl() throws Exception {
-        when(parser.getObjectFromXML(any(InputStream.class))).thenReturn(
+        when(parser.getObjectFromXML(eq("mocked".getBytes()))).thenReturn(
                 new SConnectorImplementationDescriptor("org.Test", "myConnector", "1.0.0", "myConnectorWrong", "1.0.0", new JarDependencies(Collections
                         .<String> emptyList())));
         final byte[] zip = IOUtil.zip(Collections.<String, byte[]> singletonMap("connector.impl", "mocked".getBytes()));
@@ -154,54 +152,40 @@ public class ConnectorServiceImplTest {
     public void setNewConnectorImplemCleansOldDependencies() throws Exception {
         final long tenantId = 98774L;
         final long processDefId = 17L;
-        final File processDefFolder = new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId) + File.separator + processDefId);
-        final File connFolder = new File(processDefFolder, "connector");
-        final File classPathFolder = new File(processDefFolder, "classpath");
-        connFolder.mkdirs();
-        classPathFolder.mkdirs();
-        try {
-            final SProcessDefinition sProcessDef = mock(SProcessDefinition.class);
-            when(sProcessDef.getId()).thenReturn(processDefId);
-            final String connectorDefId = "org.bonitasoft.connector.BeerConnector";
-            final String connectorDefVersion = "1.0.0";
-            final String connectorImplId = "org.bonitasoft.connector.HoogardenConnector";
-            final String connectorImplVersion = "1.0";
-            final String implementationClassName = "org.bonitasoft.engine.connectors.HoogardenBeerConnector";
-            final String dep1Jar = "some1.jar";
-            final String hoogardenConnectorJar = "HoogardenConnector.jar";
-            final SConnectorImplementationDescriptor ConnectorImplDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
-                    connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList(dep1Jar, hoogardenConnectorJar)));
-            when(parser.getObjectFromXML(any(InputStream.class))).thenReturn(ConnectorImplDescriptor);
-            when(parser.getObjectFromXML(any(File.class))).thenReturn(ConnectorImplDescriptor);
-            Map<String, byte[]> zipFileMap = new HashMap<String, byte[]>(3);
-            zipFileMap.put("HoogardenBeerConnector.impl", "tototo".getBytes());
-            zipFileMap.put(dep1Jar, new byte[] { 12, 94, 14, 12 });
-            zipFileMap.put(hoogardenConnectorJar, new byte[] { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 });
-            final byte[] zip1 = IOUtil.zip(zipFileMap);
-            connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip1);
-            File[] jarFiles = classPathFolder.listFiles(jarFilenameFilter);
 
-            assertEquals(2, jarFiles.length);
-            final List<File> jars = Arrays.asList(jarFiles);
-            assertThat(names(jars)).as("Not all jar files have been found").contains(hoogardenConnectorJar, dep1Jar);
+        final SProcessDefinition sProcessDef = mock(SProcessDefinition.class);
+        when(sProcessDef.getId()).thenReturn(processDefId);
+        final String connectorDefId = "org.bonitasoft.connector.BeerConnector";
+        final String connectorDefVersion = "1.0.0";
+        final String connectorImplId = "org.bonitasoft.connector.HoogardenConnector";
+        final String connectorImplVersion = "1.0";
+        final String implementationClassName = "org.bonitasoft.engine.connectors.HoogardenBeerConnector";
+        final SConnectorImplementationDescriptor hoogardenConnectorDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
+                connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList("some1.jar", "HoogardenConnector.jar")));
+        final SConnectorImplementationDescriptor oldConnectorDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
+                connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList("file.jar")));
 
-            zipFileMap = new HashMap<String, byte[]>(1);
-            zipFileMap.put("GrimbergenBeerConnector.impl", "GrimbergenBeerConnector.impl".getBytes());
-            final String newJar = "GrimbergenBeerConnector.jar";
-            zipFileMap.put(newJar, new byte[] { 12, 3, 14 });
-            final byte[] zip2 = IOUtil.zip(zipFileMap);
-            connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip2);
+        Map<String, byte[]> zipFileMap = new HashMap<String, byte[]>(3);
+        final byte[] implBytes = "tototo".getBytes();
+        zipFileMap.put("HoogardenBeerConnector.impl", implBytes);
+        final byte[] dep1Bytes = {12, 94, 14, 12};
+        zipFileMap.put("some1.jar", dep1Bytes);
+        final byte[] hoogardenConnectorBytes = {12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65};
+        zipFileMap.put("HoogardenConnector.jar", hoogardenConnectorBytes);
+        final byte[] zip1 = IOUtil.zip(zipFileMap);
+        final Map<String, byte[]> returnedMap = new HashMap<String, byte[]>();
+        returnedMap.put("file.jar", new byte[]{1});
+        returnedMap.put("file.impl", new byte[]{2});
+        when(parser.getObjectFromXML(eq(new byte[]{2}))).thenReturn(oldConnectorDescriptor);
+        when(parser.getObjectFromXML(eq(implBytes))).thenReturn(hoogardenConnectorDescriptor);
 
-            jarFiles = classPathFolder.listFiles(jarFilenameFilter);
-
-            assertEquals(1, jarFiles.length);
-            assertEquals(newJar, jarFiles[0].getName());
-        } finally {
-            final boolean folderCleaned = IOUtil.deleteDir(processDefFolder);
-            if (!folderCleaned) {
-                System.err.println("Folder " + processDefFolder.getName() + " could not be deleted");
-            }
-        }
+        doReturn(returnedMap).when(bonitaHomeServer).getConnectorFiles(tenantId, processDefId);
+        connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip1);
+        verify(bonitaHomeServer, times(1)).storeClasspathFile(tenantId, processDefId, "HoogardenConnector.jar", hoogardenConnectorBytes);
+        verify(bonitaHomeServer, times(1)).storeClasspathFile(tenantId, processDefId, "some1.jar", dep1Bytes);
+        verify(bonitaHomeServer, times(1)).storeConnectorFile(tenantId, processDefId, "HoogardenBeerConnector.impl", implBytes);
+        verify(bonitaHomeServer, times(1)).deleteClasspathFiles(tenantId, processDefId, "file.jar");
+        verify(bonitaHomeServer, times(1)).deleteConnectorFile(tenantId, processDefId, "file.impl");
     }
 
     private List<String> names(final List<File> files) {
@@ -210,114 +194,6 @@ public class ConnectorServiceImplTest {
             names.add(file.getName());
         }
         return names;
-    }
-
-    @Test
-    public void setConnectorImplementationOverwritesExistingJars() throws Exception {
-        final long tenantId = 98774L;
-        final long processDefId = 17L;
-        final File processDefFolder = new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId) + File.separator + processDefId);
-        final File connFolder = new File(processDefFolder, "connector");
-        final File classPathFolder = new File(processDefFolder, "classpath");
-        connFolder.mkdirs();
-        classPathFolder.mkdirs();
-        try {
-            final SProcessDefinition sProcessDef = mock(SProcessDefinition.class);
-            when(sProcessDef.getId()).thenReturn(processDefId);
-            final String connectorDefId = "org.bonitasoft.connector.BeerConnector";
-            final String connectorDefVersion = "1.0.0";
-            final String connectorImplId = "org.bonitasoft.connector.HoogardenConnector";
-            final String connectorImplVersion = "1.0";
-            final String implementationClassName = "org.bonitasoft.engine.connectors.HoogardenBeerConnector";
-            final String sameConnectorJarName = "HoogardenConnector.jar";
-            final SConnectorImplementationDescriptor ConnectorImplDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
-                    connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList(sameConnectorJarName)));
-            when(parser.getObjectFromXML(any(InputStream.class))).thenReturn(ConnectorImplDescriptor);
-            when(parser.getObjectFromXML(any(File.class))).thenReturn(ConnectorImplDescriptor);
-            Map<String, byte[]> zipFileMap = new HashMap<String, byte[]>(3);
-            final byte[] originalConnectorJarContent = new byte[] { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 };
-            zipFileMap.put("anyName.impl", "tototo".getBytes());
-            zipFileMap.put(sameConnectorJarName, originalConnectorJarContent);
-            final byte[] zip1 = IOUtil.zip(zipFileMap);
-            connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip1);
-
-            File[] jarFiles = classPathFolder.listFiles(jarFilenameFilter);
-            assertEquals(1, jarFiles.length);
-            assertTrue("Deployed connector jar is not the expected size + content",
-                    Arrays.equals(org.bonitasoft.engine.commons.io.IOUtil.getAllContentFrom(jarFiles[0]), originalConnectorJarContent));
-
-            // now let's prepare the new connector implementation to replace:
-            zipFileMap = new HashMap<String, byte[]>(1);
-            zipFileMap.put("GrimbergenBeerConnector.impl", "GrimbergenBeerConnector.impl".getBytes());
-            final byte[] newConnectorJarContent = new byte[] { 12, 3, 14 };
-            zipFileMap.put(sameConnectorJarName, newConnectorJarContent);
-            final byte[] zip2 = IOUtil.zip(zipFileMap);
-            connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip2);
-
-            jarFiles = classPathFolder.listFiles(jarFilenameFilter);
-            assertEquals(1, jarFiles.length);
-            assertTrue("Replaced connector jar is not the expected size + content",
-                    Arrays.equals(org.bonitasoft.engine.commons.io.IOUtil.getAllContentFrom(jarFiles[0]), newConnectorJarContent));
-        } finally {
-            final boolean folderCleaned = IOUtil.deleteDir(processDefFolder);
-            if (!folderCleaned) {
-                System.err.println("Folder " + processDefFolder.getName() + " could not be deleted");
-            }
-        }
-    }
-
-    @Test
-    public void setConnectorImplementationDoesNotCareWhereTheJarsAre() throws Exception {
-        final long tenantId = 98774L;
-        final long processDefId = 17L;
-        final File processDefFolder = new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId) + File.separator + processDefId);
-        final File connFolder = new File(processDefFolder, "connector");
-        final File classPathFolder = new File(processDefFolder, "classpath");
-        connFolder.mkdirs();
-        classPathFolder.mkdirs();
-        try {
-            final SProcessDefinition sProcessDef = mock(SProcessDefinition.class);
-            when(sProcessDef.getId()).thenReturn(processDefId);
-            final String connectorDefId = "org.bonitasoft.connector.BeerConnector";
-            final String connectorDefVersion = "1.0.0";
-            final String connectorImplId = "org.bonitasoft.connector.HoogardenConnector";
-            final String connectorImplVersion = "1.0";
-            final String implementationClassName = "org.bonitasoft.engine.connectors.HoogardenBeerConnector";
-            final String dep1Jar = "some1.jar";
-            final String hoogardenConnectorJar = "HoogardenConnector.jar";
-            final SConnectorImplementationDescriptor ConnectorImplDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
-                    connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList(dep1Jar, hoogardenConnectorJar)));
-            when(parser.getObjectFromXML(any(InputStream.class))).thenReturn(ConnectorImplDescriptor);
-            when(parser.getObjectFromXML(any(File.class))).thenReturn(ConnectorImplDescriptor);
-            Map<String, byte[]> zipFileMap = new HashMap<String, byte[]>(3);
-            zipFileMap.put("HoogardenBeerConnector.impl", "tototo".getBytes());
-            zipFileMap.put(dep1Jar, new byte[] { 12, 94, 14, 12 });
-            zipFileMap.put(hoogardenConnectorJar, new byte[] { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 });
-            final byte[] zip1 = IOUtil.zip(zipFileMap);
-            connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip1);
-            File[] jarFiles = classPathFolder.listFiles(jarFilenameFilter);
-
-            assertEquals(2, jarFiles.length);
-            final List<File> jars = Arrays.asList(jarFiles);
-            assertThat(names(jars)).as("Not all jar files have been found").contains(hoogardenConnectorJar, dep1Jar);
-
-            zipFileMap = new HashMap<String, byte[]>(1);
-            zipFileMap.put("GrimbergenBeerConnector.impl", "GrimbergenBeerConnector.impl".getBytes());
-            final String newJar = "GrimbergenBeerConnector.jar";
-            zipFileMap.put("dummyFolder/" + newJar, new byte[] { 12, 3, 14 });
-            final byte[] zip2 = IOUtil.zip(zipFileMap);
-            connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip2);
-
-            jarFiles = classPathFolder.listFiles(jarFilenameFilter);
-
-            assertEquals(1, jarFiles.length);
-            assertEquals(newJar, jarFiles[0].getName());
-        } finally {
-            final boolean folderCleaned = IOUtil.deleteDir(processDefFolder);
-            if (!folderCleaned) {
-                System.err.println("Folder " + processDefFolder.getName() + " could not be deleted");
-            }
-        }
     }
 
     @Test
@@ -350,62 +226,49 @@ public class ConnectorServiceImplTest {
 
         final long tenantId = 98774L;
         final long processDefId = 17L;
-        final File processDefFolder = new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId) + File.separator + processDefId);
-        final File connFolder = new File(processDefFolder, "connector");
-        final File classPathFolder = new File(processDefFolder, "classpath");
+        final SProcessDefinition sProcessDef;
+        sProcessDef = mock(SProcessDefinition.class);
 
-        connFolder.mkdirs();
-        classPathFolder.mkdirs();
-        try {
-            final SProcessDefinition sProcessDef;
-            sProcessDef = mock(SProcessDefinition.class);
+        when(sProcessDef.getId()).thenReturn(processDefId);
+        final String connectorDefId = "org.bonitasoft.connector.BeerConnector";
+        final String connectorDefVersion = "1.0.0";
+        final String connectorImplId = "org.bonitasoft.connector.HoogardenConnector";
+        final String connectorImplVersion = "1.0";
+        final String implementationClassName = "org.bonitasoft.engine.connectors.HoogardenBeerConnector";
+        final SConnectorImplementationDescriptor connectorImplDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
+                connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList("some1.jar", "HoogardenConnector.jar")));
+        when(parser.getObjectFromXML(eq("tototo".getBytes()))).thenReturn(connectorImplDescriptor);
 
-            when(sProcessDef.getId()).thenReturn(processDefId);
-            final String connectorDefId = "org.bonitasoft.connector.BeerConnector";
-            final String connectorDefVersion = "1.0.0";
-            final String connectorImplId = "org.bonitasoft.connector.HoogardenConnector";
-            final String connectorImplVersion = "1.0";
-            final String implementationClassName = "org.bonitasoft.engine.connectors.HoogardenBeerConnector";
-            final String dep1Jar = "some1.jar";
-            final String hoogardenConnectorJar = "HoogardenConnector.jar";
-            final SConnectorImplementationDescriptor connectorImplDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
-                    connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList(dep1Jar, hoogardenConnectorJar)));
-            when(parser.getObjectFromXML(any(InputStream.class))).thenReturn(connectorImplDescriptor);
-            when(parser.getObjectFromXML(any(File.class))).thenReturn(connectorImplDescriptor);
-            final Map<String, byte[]> zipFileMap = new HashMap<String, byte[]>(3);
-            zipFileMap.put("HoogardenBeerConnector.impl", "tototo".getBytes());
-            zipFileMap.put(dep1Jar, new byte[] { 12, 94, 14, 12 });
-            zipFileMap.put(hoogardenConnectorJar, new byte[] { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 });
-            final byte[] zip1 = IOUtil.zip(zipFileMap);
+        final Map<String, byte[]> zipFileMap = new HashMap<String, byte[]>(3);
+        zipFileMap.put("HoogardenBeerConnector.impl", "tototo".getBytes());
+        zipFileMap.put("some1.jar", new byte[] { 12, 94, 14, 12 });
+        zipFileMap.put("HoogardenConnector.jar", new byte[] { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 });
+        final byte[] zip1 = IOUtil.zip(zipFileMap);
 
-            //setConnectorImplementation store to cache
-            connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip1);
+        doReturn(zipFileMap).when(bonitaHomeServer).getConnectorFiles(tenantId, processDefId);
 
-            //given
-            doReturn(givenCacheSizeToBeReturned).when(cacheService).getCacheSize(ConnectorServiceImpl.CONNECTOR_CACHE_NAME);
+        //setConnectorImplementation store to cache
+        connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip1);
 
-            List<String> cacheContentKeys = Collections.emptyList();
-            final String buildConnectorImplementationKey = connectorService
-                    .buildConnectorImplementationKey(processDefId, connectorImplId, connectorImplVersion);
-            if (shouldCacheContainsConnectorImplementation) {
-                cacheContentKeys = Arrays.asList(buildConnectorImplementationKey);
-            }
-            doReturn(cacheContentKeys).when(cacheService).getKeys(ConnectorServiceImpl.CONNECTOR_CACHE_NAME);
-            doReturn(connectorImplDescriptor).when(cacheService).get(ConnectorServiceImpl.CONNECTOR_CACHE_NAME, buildConnectorImplementationKey);
+        //given
+        doReturn(givenCacheSizeToBeReturned).when(cacheService).getCacheSize(ConnectorServiceImpl.CONNECTOR_CACHE_NAME);
 
-            //when
-            connectorService.getConnectorImplementations(processDefId, tenantId, 0,
-                    10, "", OrderByType.ASC);
-
-            //then
-            verify(cacheService, times(expectedNumberOfCacheStoreInvocations + 1)).store(anyString(), any(Serializable.class), any(Object.class));
-
-        } finally {
-            final boolean folderCleaned = IOUtil.deleteDir(processDefFolder);
-            if (!folderCleaned) {
-                System.err.println("Folder " + processDefFolder.getName() + " could not be deleted");
-            }
+        List<String> cacheContentKeys = Collections.emptyList();
+        final String buildConnectorImplementationKey = connectorService
+                .buildConnectorImplementationKey(processDefId, connectorImplId, connectorImplVersion);
+        if (shouldCacheContainsConnectorImplementation) {
+            cacheContentKeys = Arrays.asList(buildConnectorImplementationKey);
         }
+        doReturn(cacheContentKeys).when(cacheService).getKeys(ConnectorServiceImpl.CONNECTOR_CACHE_NAME);
+        doReturn(connectorImplDescriptor).when(cacheService).get(ConnectorServiceImpl.CONNECTOR_CACHE_NAME, buildConnectorImplementationKey);
+
+        //when
+        connectorService.getConnectorImplementations(processDefId, tenantId, 0,
+                10, "", OrderByType.ASC);
+
+        //then
+        verify(cacheService, times(expectedNumberOfCacheStoreInvocations + 1)).store(anyString(), any(Serializable.class), any(Object.class));
+
     }
 
 }

@@ -39,11 +39,20 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
 
     private final FlowNodeInstanceService flowNodeInstanceService;
     private final ProcessInstanceService processInstanceService;
+    private boolean allowUnknownContainer;
 
     public ParentContainerResolverImpl(final FlowNodeInstanceService flowNodeInstanceService, final ProcessInstanceService processInstanceService) {
         super();
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.processInstanceService = processInstanceService;
+    }
+
+    public boolean getAllowUnknownContainer() {
+        return allowUnknownContainer;
+    }
+
+    public void setAllowUnknownContainer(boolean allowUnknownContainer) {
+        this.allowUnknownContainer = allowUnknownContainer;
     }
 
     @Override
@@ -69,15 +78,9 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
                 container = getNextContainer(isArchived, container, containerHierarchy);
             } while (container != null);
             return containerHierarchy;
-        } catch (SProcessInstanceNotFoundException e) {
+        } catch (SProcessInstanceNotFoundException | SFlowNodeNotFoundException e) {
             throw new SObjectNotFoundException(e);
-        } catch (SFlowNodeNotFoundException e) {
-            throw new SObjectNotFoundException(e);
-        } catch (SProcessInstanceReadException e) {
-            throw new SObjectReadException(e);
-        } catch (SBonitaReadException e) {
-            throw new SObjectReadException(e);
-        } catch (SFlowNodeReadException e) {
+        } catch (SProcessInstanceReadException | SBonitaReadException | SFlowNodeReadException e) {
             throw new SObjectReadException(e);
         }
     }
@@ -90,7 +93,11 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         } else if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(container.getRight())) {
             container = handleProcessContainer(container.getLeft(), containerHierarchy, isArchived);
         } else {
-            throw new SObjectNotFoundException("Unknown container type: " + container.getRight());
+            if(allowUnknownContainer){
+                return null;
+            }else{
+                throw new SObjectNotFoundException("Unknown container type: " + container.getRight());
+            }
         }
         return container;
     }

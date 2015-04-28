@@ -135,20 +135,16 @@ public class DependencyResolver {
                 loggerService.log(clazz, TechnicalLogSeverity.WARNING, "Unable to resolve dependencies after they were modified because of " + e.getMessage()
                         + ". Please retry it manually");
             }
-        } catch (final BonitaHomeNotSetException e) {
-            throw new BonitaRuntimeException("Bonita home not set", e);
         }
     }
 
     private void changeResolutionStatus(final long processDefinitionId, final TenantServiceAccessor tenantAccessor,
             final ProcessDefinitionService processDefinitionService, final DependencyService dependencyService,
-            final boolean resolved) throws SBonitaException, BonitaHomeNotSetException {
+            final boolean resolved) throws SBonitaException {
         final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
         if (resolved) {
             if (ConfigurationState.UNRESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
-                resolveAndCreateDependencies(
-                        new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId())), String.valueOf(processDefinitionId)),
-                        processDefinitionService, dependencyService, processDefinitionId);
+                resolveAndCreateDependencies(tenantAccessor.getTenantId(), processDefinitionService, dependencyService, processDefinitionId);
             }
         } else {
             if (ConfigurationState.RESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
@@ -160,30 +156,22 @@ public class DependencyResolver {
     }
 
     /**
-     * create dependencies based on the bonita home (the process folder)
+     * create dependencies based on the bonita home
      * 
-     * @param processFolder
      * @param processDefinitionService
      * @param dependencyService
      * @param processDefinitionId
      * @throws SBonitaException
      */
-    public void resolveAndCreateDependencies(final File processFolder, final ProcessDefinitionService processDefinitionService,
+    public void resolveAndCreateDependencies(final long tenantId, final ProcessDefinitionService processDefinitionService,
             final DependencyService dependencyService, final long processDefinitionId) throws SBonitaException {
-        final Map<String, byte[]> resources = new HashMap<>();
-
-        final File file = new File(processFolder, "classpath");
-        if (file.exists() && file.isDirectory()) {
-            final File[] listFiles = file.listFiles();
-            for (final File jarFile : listFiles) {
-                final String name = jarFile.getName();
+        Map<String, byte[]> resources = null;
                 try {
-                    final byte[] jarContent = FileUtils.readFileToByteArray(jarFile);
-                    resources.put(name, jarContent);
+        resources = BonitaHomeServer.getInstance().getProcessClasspath(tenantId, processDefinitionId);
                 } catch (final IOException e) {
                     throw new SDependencyCreationException(e);
-                }
-            }
+        } catch (BonitaHomeNotSetException e) {
+            throw new SDependencyCreationException(e);
         }
         addDependencies(resources, dependencyService, processDefinitionId);
         processDefinitionService.resolveProcess(processDefinitionId);

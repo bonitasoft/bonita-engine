@@ -26,13 +26,13 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
 
-import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -51,17 +51,22 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     private final String diskStorePath;
 
+    private String cacheManagerLastCreation;
+
     public CommonEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-            final CacheConfigurations cacheConfigurations, final org.bonitasoft.engine.cache.CacheConfiguration defaultCacheConfiguration,
+            final List<org.bonitasoft.engine.cache.CacheConfiguration> cacheConfigurations, final org.bonitasoft.engine.cache.CacheConfiguration defaultCacheConfiguration,
             final String diskStorePath) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.diskStorePath = diskStorePath;
         this.defaultCacheConfiguration = getEhCacheConfiguration(defaultCacheConfiguration);
-        final List<org.bonitasoft.engine.cache.CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
-        this.cacheConfigurations = new HashMap<String, CacheConfiguration>(configurations.size());
-        for (final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig : configurations) {
-            this.cacheConfigurations.put(cacheConfig.getName(), getEhCacheConfiguration(cacheConfig));
+        if (cacheConfigurations != null && cacheConfigurations.size() > 0) {
+            this.cacheConfigurations = new HashMap<String, CacheConfiguration>(cacheConfigurations.size());
+            for (final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig : cacheConfigurations) {
+                this.cacheConfigurations.put(cacheConfig.getName(), getEhCacheConfiguration(cacheConfig));
+            }
+        } else {
+            this.cacheConfigurations = Collections.emptyMap();
         }
     }
 
@@ -79,16 +84,45 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         return ehCacheConfig;
     }
 
-    protected void buildCacheManagerWithDefaultConfiguration() {
+    protected void buildCacheManagerWithDefaultConfiguration() throws SCacheException {
+        if (cacheManager != null) {
+            String message = "Unable to build a new Cache Manager as the existing one is still alive: " + cacheManager + ". ";
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                message += ". Last creation was: \n" + cacheManagerLastCreation;
+            }
+            throw new SCacheException(message);
+        }
         final Configuration configuration = new Configuration();
         configuration.setDefaultCacheConfiguration(defaultCacheConfiguration);
         configuration.diskStore(new DiskStoreConfiguration().path(diskStorePath));
         cacheManager = new CacheManager(configuration);
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            cacheManagerLastCreation = getCacheManagerCreationDetails();
+        }
+        //System.err.println("\n\nCREATING CACHE MANAGER: " + cacheManager + "\n\n" + getCacheManagerCreationDetails());
+    }
+
+    private String getCacheManagerCreationDetails() {
+        final StringBuilder sb = new StringBuilder();
+        String tenantId = "--UNKNOWN TENANT ID--";
+        try {
+            tenantId = Long.toString(this.sessionAccessor.getTenantId());
+        } catch (STenantIdNotSetException e) {
+            e.printStackTrace();
+        }
+        sb.append("CacheManager (" + cacheManager + ") built for tenant " + tenantId);
+        sb.append("\n");
+        final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        for (final StackTraceElement stackTraceElement : stackTraceElements) {
+            sb.append("\n        at ");
+            sb.append(stackTraceElement);
+        }
+        return sb.toString();
     }
 
     protected synchronized Cache createCache(final String cacheName, final String internalCacheName) throws SCacheException {
         if (cacheManager == null) {
-            throw new SCacheException("The cache is not stated, call start() on the cache service");
+            throw new SCacheException("The cache is not started, call start() on the cache service");
         }
         Cache cache = cacheManager.getCache(internalCacheName);
         if (cache == null) {
@@ -321,5 +355,10 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             cacheManager.shutdown();
             cacheManager = null;
         }
+    }
+
+    @Override
+    public boolean isStopped() {
+        return cacheManager == null;
     }
 }

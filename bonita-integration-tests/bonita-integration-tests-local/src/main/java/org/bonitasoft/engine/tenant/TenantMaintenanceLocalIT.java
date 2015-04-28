@@ -17,7 +17,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.TestsInitializer;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -36,13 +36,13 @@ import org.junit.runner.RunWith;
  * @author Celine Souchet
  */
 @RunWith(BonitaTestRunner.class)
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public class TenantMaintenanceLocalIT extends TestWithUser {
 
     @Test
-    public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
+    public void should_pause_tenant_then_stop_start_node_dont_restart_elements_but_resume_restart_them() throws Exception {
         // given: tenant is paused
-        int tenantId = 1;
+        long tenantId = getSession().getTenantId();
         WorkService workService = getTenantAccessor(tenantId).getWorkService();
         assertFalse(workService.isStopped());
 
