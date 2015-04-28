@@ -32,7 +32,7 @@
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
   <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
 
-  <Listener className="org.bonitasoft.tomcat.H2Listener" tcpPort="#db.server.port#" baseDir="${catalina.home}/bonita/server/platform/work" start="true" />
+  <Listener className="org.bonitasoft.tomcat.H2Listener" tcpPort="#db.server.port#" baseDir="${catalina.home}/bonita/engine-server/work/platform" start="true" />
 
   <Listener className="bitronix.tm.integration.tomcat55.BTMLifecycleListener" />
 

@@ -1,0 +1,53 @@
+<project name="bonita-integration-tests-local-sp" default="build-home-sp">
+
+	<property name="target.dir" value="${basedir}/target"/>
+	<property name="resources.dir" value="${basedir}/src/test/resources"/>
+	<property name="bh.source.dir" value="${target.dir}/bonita-home-sp/bonita-home"/>
+	<property name="local.server.resources.dir" value="${target.dir}/local-server"/>
+	<property name="community.tests.resources.dir" value="${target.dir}/bh-tests-resources"/>
+	<property name="bh.target.dir" value="${target.dir}/bonita-home"/>
+	<property name="bh.target.conf.platform.dir" value="${bh.target.dir}/engine-server/conf/platform"/>
+	<property name="bh.target.conf.tenant.dir" value="${bh.target.dir}/engine-server/conf/tenants/template"/>
+	<property name="bh.target.conf.platforminit.dir" value="${bh.target.dir}/engine-server/conf/platform-init"/>
+
+	<target name="build-home-sp">
+		<delete dir="${bh.target.dir}" />
+		<copy todir="${bh.target.dir}">
+			<fileset dir="${bh.source.dir}">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy todir="${bh.target.conf.platforminit.dir}">
+			<fileset dir="${local.server.resources.dir}">
+				<include name="*"/>
+			</fileset>
+		</copy>
+		<copy description="copy community services-bpm platform resources into bonita home" todir="${bh.target.conf.platform.dir}" overwrite="true">
+			<fileset dir="${community.tests.resources.dir}">
+				<include name="bonita-platform-custom.xml"/>
+			</fileset>
+		</copy>
+		<copy description="copy community services-bpm tenants resources into bonita home" todir="${bh.target.conf.tenant.dir}" overwrite="true">
+			<fileset dir="${community.tests.resources.dir}">
+				<include name="bonita-tenants-custom.xml"/>
+			</fileset>
+		</copy>
+		<copy todir="${bh.target.conf.tenant.dir}" overwrite="true">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-tenants-sp-custom.xml"/>
+			</fileset>
+		</copy>
+		<copy todir="${bh.target.conf.platform.dir}" overwrite="true">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-platform-sp-custom.xml"/>
+			</fileset>
+		</copy>
+		<copy todir="${bh.target.conf.platforminit.dir}">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-platform-init-community-custom.properties"/>
+			</fileset>
+		</copy>
+		<ant antfile="${basedir}/install-license.xml"/>
+	</target>
+
+</project>

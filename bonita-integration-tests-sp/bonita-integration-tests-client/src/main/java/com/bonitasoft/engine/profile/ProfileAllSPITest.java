@@ -9,18 +9,14 @@
 package com.bonitasoft.engine.profile;
 
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
-
-import com.bonitasoft.engine.TestsInitializerSP;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({ ProfileSPITest.class,
         ProfileEntrySPITest.class,
         ProfileMemberSPITest.class,
         ProfileImportAndExportSPITest.class })
-@Initializer(TestsInitializerSP.class)
 public class ProfileAllSPITest {
 
 }

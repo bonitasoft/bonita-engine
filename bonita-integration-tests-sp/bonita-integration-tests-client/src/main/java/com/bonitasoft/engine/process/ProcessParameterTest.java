@@ -29,7 +29,6 @@ import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.process.impl.ParameterDefinitionBuilder;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -340,7 +339,7 @@ public class ProcessParameterTest extends CommonAPISPIT {
         ByteArrayOutputStream baos = null;
         ZipOutputStream zos = null;
         try {
-            stream = BPMRemoteTests.class.getResourceAsStream(implSourceFile);
+            stream = this.getClass().getResourceAsStream(implSourceFile);
             assertNotNull(stream);
             final String baseName = implSourceFile.substring(implSourceFile.lastIndexOf('/') + 1, implSourceFile.lastIndexOf('.'));
             final byte[] byteArray = IOUtils.toByteArray(stream);
