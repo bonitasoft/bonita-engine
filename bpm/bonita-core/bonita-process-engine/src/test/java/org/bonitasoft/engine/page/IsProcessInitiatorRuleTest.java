@@ -17,14 +17,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.hamcrest.CoreMatchers;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -38,9 +44,6 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
 
     @Mock
     ProcessInstanceService processInstanceService;
-
-    @Mock
-    TechnicalLoggerService technicalLoggerService;
 
     @InjectMocks
     IsProcessInitiatorRule rule;
@@ -94,9 +97,44 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
 
         final long userId = 11L;
         Map<String, Serializable> context = buildContext(processInstanceId, userId);
-        doThrow(SBonitaReadException.class).when(processInstanceService).getProcessInstance(processInstanceId);
+        doThrow(SProcessInstanceReadException.class).when(processInstanceService).getProcessInstance(processInstanceId);
 
         final boolean allowed = rule.isAllowed("exception raised", context);
+    }
+
+    @Test
+    public void shouldEnsureArchivedProcessInstanceStartedBy() throws Exception {
+        final long processInstanceId = 541L;
+
+        final long userId = 11L;
+        Map<String, Serializable> context = buildContext(processInstanceId, userId);
+        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(processInstanceId);
+        final SAProcessInstance saProcessInstance = mock(SAProcessInstance.class);
+        doReturn(userId).when(saProcessInstance).getStartedBy();
+        doReturn(Collections.singletonList(saProcessInstance)).when(processInstanceService).searchArchivedProcessInstances(any(QueryOptions.class));
+
+        final boolean allowed = rule.isAllowed("someKey", context);
+
+        assertThat(allowed).isTrue();
+    }
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void shouldThrowNotFoundIfProcessNotFoundInTheArchivesEither() throws Exception {
+        final long processInstanceId = 541L;
+
+        final long userId = 11L;
+        Map<String, Serializable> context = buildContext(processInstanceId, userId);
+        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(processInstanceId);
+        doReturn(Collections.emptyList()).when(processInstanceService).searchArchivedProcessInstances(any(QueryOptions.class));
+
+        expectedException.expect(SExecutionException.class);
+        expectedException.expectCause(CoreMatchers.<Throwable> instanceOf(SProcessInstanceNotFoundException.class));
+
+        rule.isAllowed("exception raised", context);
+
     }
 
     @Test

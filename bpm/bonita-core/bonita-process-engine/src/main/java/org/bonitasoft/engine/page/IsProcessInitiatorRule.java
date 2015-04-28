@@ -14,13 +14,22 @@
 package org.bonitasoft.engine.page;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * author Anthony Birembaut
@@ -28,28 +37,44 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 public class IsProcessInitiatorRule extends AuthorizationRuleWithParameters implements AuthorizationRule {
 
     private ProcessInstanceService processInstanceService;
-    private TechnicalLoggerService technicalLoggerService;
 
-    public IsProcessInitiatorRule(ProcessInstanceService processInstanceService, TechnicalLoggerService technicalLoggerService) {
+    public IsProcessInitiatorRule(ProcessInstanceService processInstanceService) {
         this.processInstanceService = processInstanceService;
-        this.technicalLoggerService = technicalLoggerService;
     }
 
     @Override
     public boolean isAllowed(final String key, final Map<String, Serializable> context) throws SExecutionException {
+        Long userId = getLongParameter(context, URLAdapterConstants.USER_QUERY_PARAM);
+        Long processInstanceId = getLongParameter(context, URLAdapterConstants.ID_QUERY_PARAM);
+        if (userId == null || processInstanceId == null) {
+            throw new IllegalArgumentException(
+                    "Parameters 'userId' and 'processInstanceId' are mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
+        }
         try {
-            Long userId = getLongParameter(context, URLAdapterConstants.USER_QUERY_PARAM);
-            Long processInstanceId = getLongParameter(context, URLAdapterConstants.ID_QUERY_PARAM);
-            if (userId == null || processInstanceId == null) {
-                throw new IllegalArgumentException(
-                        "Parameters 'userId' and 'processInstanceId' are mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
-            }
-
             final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
             return userId == processInstance.getStartedBy();
 
-        } catch (SBonitaException e) {
+        } catch (SProcessInstanceReadException e) {
             throw new SExecutionException(e);
+        } catch (SProcessInstanceNotFoundException e) {
+            // process instance may be completed already:
+
+            try {
+                final List<OrderByOption> orderByOptions = Arrays.asList(
+                        new OrderByOption(SAProcessInstance.class, ArchivedProcessInstancesSearchDescriptor.ARCHIVE_DATE, OrderByType.DESC),
+                        new OrderByOption(SAProcessInstance.class, ArchivedProcessInstancesSearchDescriptor.END_DATE, OrderByType.DESC));
+                final List<FilterOption> filterOptions = Arrays.asList(new FilterOption(SAProcessInstance.class,
+                        ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId));
+                final QueryOptions queryOptions = new QueryOptions(0, 1, orderByOptions, filterOptions, null);
+
+                final List<SAProcessInstance> saProcessInstances = processInstanceService.searchArchivedProcessInstances(queryOptions);
+                if (saProcessInstances.isEmpty()) {
+                    throw new SProcessInstanceNotFoundException(processInstanceId);
+                }
+                return userId == saProcessInstances.get(0).getStartedBy();
+            } catch (SBonitaReadException | SProcessInstanceNotFoundException e1) {
+                throw new SExecutionException(e1);
+            }
         }
     }
 

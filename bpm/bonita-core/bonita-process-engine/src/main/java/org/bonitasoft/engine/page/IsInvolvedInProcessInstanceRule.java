@@ -14,16 +14,45 @@
 package org.bonitasoft.engine.page;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
+
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * author Emmanuel Duchastenier
  */
-public class IsInvolvedInProcessInstanceRule implements AuthorizationRule {
+public class IsInvolvedInProcessInstanceRule extends AuthorizationRuleWithParameters implements AuthorizationRule {
+
+    private ActivityInstanceService activityInstanceService;
+
+    public IsInvolvedInProcessInstanceRule(ActivityInstanceService activityInstanceService) {
+        this.activityInstanceService = activityInstanceService;
+    }
 
     @Override
-    public boolean isAllowed(final String key, final Map<String, Serializable> context) {
-        return true;
+    public boolean isAllowed(final String key, final Map<String, Serializable> context) throws SExecutionException {
+        Long userId = getLongParameter(context, URLAdapterConstants.USER_QUERY_PARAM);
+        Long processInstanceId = getLongParameter(context, URLAdapterConstants.ID_QUERY_PARAM);
+        if (userId == null || processInstanceId == null) {
+            throw new IllegalArgumentException(
+                    "Parameters 'userId' and 'processInstanceId' are mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
+        }
+
+        // is user assigned or has pending tasks on this process instance:
+        final QueryOptions queryOptions = new QueryOptions(0, 1, Collections.EMPTY_LIST, Arrays.asList(new FilterOption(SHumanTaskInstance.class,
+                "logicalGroup2", processInstanceId)), null);
+        try {
+            return activityInstanceService.getNumberOfPendingOrAssignedTasks(userId, queryOptions) > 0;
+        } catch (SBonitaReadException e) {
+            throw new SExecutionException(e);
+        }
     }
 
     @Override

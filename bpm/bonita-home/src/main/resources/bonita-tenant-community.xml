@@ -1565,14 +1565,12 @@
     </bean>
     <bean id="isProcessInitiator" class="org.bonitasoft.engine.page.IsProcessInitiatorRule">
         <constructor-arg ref="processInstanceService" />
-        <constructor-arg ref="tenantTechnicalLoggerService" />
     </bean>
     <bean id="isTaskPerformer" class="org.bonitasoft.engine.page.IsTaskPerformerRule">
         <constructor-arg ref="activityInstanceService" />
-        <constructor-arg ref="tenantTechnicalLoggerService" />
     </bean>
     <bean id="isInvolvedInProcessInstance" class="org.bonitasoft.engine.page.IsInvolvedInProcessInstanceRule">
-
+        <constructor-arg ref="activityInstanceService" />
     </bean>
 
     <bean id="formMappingKeyGenerator" class="org.bonitasoft.engine.core.form.impl.FormMappingKeyGeneratorImpl">

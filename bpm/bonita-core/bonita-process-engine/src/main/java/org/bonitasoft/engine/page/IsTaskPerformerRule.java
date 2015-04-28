@@ -24,7 +24,6 @@ import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -36,11 +35,9 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 public class IsTaskPerformerRule extends AuthorizationRuleWithParameters implements AuthorizationRule {
 
     private ActivityInstanceService activityInstanceService;
-    private TechnicalLoggerService technicalLoggerService;
 
-    public IsTaskPerformerRule(ActivityInstanceService activityInstanceService, TechnicalLoggerService technicalLoggerService) {
+    public IsTaskPerformerRule(ActivityInstanceService activityInstanceService) {
         this.activityInstanceService = activityInstanceService;
-        this.technicalLoggerService = technicalLoggerService;
     }
 
     @Override

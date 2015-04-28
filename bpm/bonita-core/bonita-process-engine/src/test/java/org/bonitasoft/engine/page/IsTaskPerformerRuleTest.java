@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
@@ -44,9 +43,6 @@ public class IsTaskPerformerRuleTest extends RuleTest {
 
     @Mock
     ActivityInstanceService activityInstanceService;
-
-    @Mock
-    TechnicalLoggerService technicalLoggerService;
 
     @InjectMocks
     IsTaskPerformerRule rule;
