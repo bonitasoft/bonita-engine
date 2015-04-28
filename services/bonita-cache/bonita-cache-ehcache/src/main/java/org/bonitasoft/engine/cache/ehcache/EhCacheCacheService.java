@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
-import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
@@ -33,7 +32,7 @@ import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
  */
 public class EhCacheCacheService extends CommonEhCacheCacheService implements CacheService {
 
-    public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final CacheConfigurations cacheConfigurations,
+    public EhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final List<CacheConfiguration> cacheConfigurations,
             final CacheConfiguration defaultCacheConfiguration, final String diskStorePath) {
         super(logger, sessionAccessor, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
     }
@@ -73,7 +72,7 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
     }
 
     @Override
-    public synchronized void start() {
+    public synchronized void start() throws SCacheException {
         buildCacheManagerWithDefaultConfiguration();
     }
 
@@ -92,7 +91,7 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
     }
 
     @Override
-    public void resume() {
+    public void resume() throws SCacheException {
         if (cacheManager == null) {
             start();
         }

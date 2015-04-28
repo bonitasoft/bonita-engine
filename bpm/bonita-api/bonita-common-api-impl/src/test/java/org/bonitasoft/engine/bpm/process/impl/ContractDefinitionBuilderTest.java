@@ -21,15 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintType;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
-import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -82,11 +80,11 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addInputTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addSimpleInput(name, type, description);
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, type, description);
 
         //then
-        assertThat(activity.getContract().getSimpleInputs()).as("should get 1 input").hasSize(1);
-        assertThat(activity.getContract().getSimpleInputs().get(0).isMultiple()).as("should not be multiple").isFalse();
+        assertThat(activity.getContract().getInputs()).as("should get 1 input").hasSize(1);
+        assertThat(activity.getContract().getInputs().get(0).isMultiple()).as("should not be multiple").isFalse();
         checkBuilder(builder);
 
     }
@@ -94,10 +92,10 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addMultipleInputTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addSimpleInput(name, type, description, true);
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, type, description, true);
 
         //then
-        assertThat(activity.getContract().getSimpleInputs().get(0).isMultiple()).as("should be multiple").isTrue();
+        assertThat(activity.getContract().getInputs().get(0).isMultiple()).as("should be multiple").isTrue();
         checkBuilder(builder);
 
     }
@@ -105,10 +103,10 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addMultipleSimpleInputTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addSimpleInput(name, type, description);
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, type, description);
 
         //then
-        assertThat(activity.getContract().getSimpleInputs()).hasSize(1);
+        assertThat(activity.getContract().getInputs()).hasSize(1);
         checkBuilder(builder);
 
     }
@@ -116,11 +114,11 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addComplexInputTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addComplexInput(name, description, new ArrayList<SimpleInputDefinition>(), null);
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, description, new ArrayList<InputDefinition>());
 
         //then
-        assertThat(activity.getContract().getComplexInputs()).hasSize(1);
-        assertThat(activity.getContract().getComplexInputs().get(0).isMultiple()).as("should not be multiple").isFalse();
+        assertThat(activity.getContract().getInputs()).hasSize(1);
+        assertThat(activity.getContract().getInputs().get(0).isMultiple()).as("should not be multiple").isFalse();
         checkBuilder(builder);
 
     }
@@ -128,12 +126,11 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addMultipleComplexInputTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addComplexInput(name, description, true, new ArrayList<SimpleInputDefinition>(),
-                null);
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, description, true, new ArrayList<InputDefinition>());
 
         //then
-        assertThat(activity.getContract().getComplexInputs()).hasSize(1);
-        assertThat(activity.getContract().getComplexInputs().get(0).isMultiple()).as("should be multiple").isTrue();
+        assertThat(activity.getContract().getInputs()).hasSize(1);
+        assertThat(activity.getContract().getInputs().get(0).isMultiple()).as("should be multiple").isTrue();
         checkBuilder(builder);
 
     }
@@ -142,9 +139,9 @@ public class ContractDefinitionBuilderTest {
     public void addFileComplexInputTest() throws Exception {
         final ContractDefinitionBuilder builder = contractDefinitionBuilder.addFileInput("document", "It is a simple document");
 
-        final List<ComplexInputDefinition> complexInputs = activity.getContract().getComplexInputs();
+        final List<InputDefinition> complexInputs = activity.getContract().getInputs();
         assertThat(complexInputs).hasSize(1);
-        final List<SimpleInputDefinition> simpleInputs = complexInputs.get(0).getSimpleInputs();
+        final List<InputDefinition> simpleInputs = complexInputs.get(0).getInputs();
         assertThat(simpleInputs).hasSize(2);
         assertThat(simpleInputs.get(0).getName()).isEqualTo("name");
         assertThat(simpleInputs.get(0).getType()).isEqualTo(Type.TEXT);

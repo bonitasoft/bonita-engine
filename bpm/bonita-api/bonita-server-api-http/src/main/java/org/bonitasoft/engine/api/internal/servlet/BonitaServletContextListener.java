@@ -36,8 +36,6 @@ public class BonitaServletContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
         try {
-            SpringPlatformFileSystemBeanAccessor.initializeContext(null);
-
             PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();

@@ -22,6 +22,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
+
 /**
  * Report incident in a log file located inside the bonita home
  * Is a tenant service must be declared in tenant part
@@ -31,12 +34,10 @@ import java.util.logging.SimpleFormatter;
  */
 public class FileLoggerIncidentHandler implements IncidentHandler {
 
-    private final String logFilePath;
 
     private final Map<Long, Logger> loggers;
 
-    public FileLoggerIncidentHandler(final String logFilePath) {
-        this.logFilePath = logFilePath;
+    public FileLoggerIncidentHandler() {
         loggers = new HashMap<Long, Logger>(2);
     }
 
@@ -55,14 +56,16 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
             e.printStackTrace();
         } catch (final IOException e) {
             e.printStackTrace();
+        } catch (BonitaHomeNotSetException e) {
+            e.printStackTrace();
         }
     }
 
-    protected Logger getLogger(final long tenantId) throws SecurityException, IOException {
+    protected Logger getLogger(final long tenantId) throws SecurityException, IOException, BonitaHomeNotSetException {
         Logger logger = loggers.get(tenantId);
         if (logger == null) {
             logger = Logger.getLogger("INCIDENT" + tenantId);
-            final FileHandler fh = new FileHandler(logFilePath + File.separatorChar + tenantId + File.separatorChar + "incidents.log");
+            final FileHandler fh = BonitaHomeServer.getInstance().getIncidentFileHandler(tenantId);
             logger.addHandler(fh);
             final SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);

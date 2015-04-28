@@ -33,7 +33,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 public class StarterThread extends Thread {
 
     private final PlatformServiceAccessor platformAccessor;
-    private final SessionService sessionService;
     private final NodeConfiguration platformConfiguration;
     private final List<STenant> tenants;
     private final SessionAccessor sessionAccessor;
@@ -41,19 +40,17 @@ public class StarterThread extends Thread {
 
     /**
      * @param platformAccessor
-     * @param sessionService
      * @param platformConfiguration
      * @param tenants
      * @param sessionAccessor
      * @param technicalLoggerService
      * @param platformAPIImpl TODO
      */
-    public StarterThread(final PlatformServiceAccessor platformAccessor, final SessionService sessionService,
+    public StarterThread(final PlatformServiceAccessor platformAccessor,
             final NodeConfiguration platformConfiguration,
             final List<STenant> tenants, final SessionAccessor sessionAccessor, final TechnicalLoggerService technicalLoggerService) {
         super("Starter Thread");
         this.platformAccessor = platformAccessor;
-        this.sessionService = sessionService;
         this.platformConfiguration = platformConfiguration;
         this.tenants = tenants;
         this.sessionAccessor = sessionAccessor;
@@ -70,6 +67,7 @@ public class StarterThread extends Thread {
                 if (!tenant.isPaused()) {
                     final long tenantId = tenant.getId();
                     long sessionId = -1;
+                    final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
                     try {
                         sessionId = createSessionAndMakeItActive(platformAccessor, sessionAccessor, tenantId);
                         final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
@@ -92,7 +90,7 @@ public class StarterThread extends Thread {
 
     private long createSessionAndMakeItActive(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor, final long tenantId)
             throws SBonitaException {
-        final SessionService sessionService = platformAccessor.getSessionService();
+        final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
 
         final long sessionId = sessionService.createSession(tenantId, SessionService.SYSTEM).getId();
         sessionAccessor.setSessionInfo(sessionId, tenantId);

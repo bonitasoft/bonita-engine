@@ -30,9 +30,9 @@ public enum SType {
     DECIMAL(Float.class, Double.class, BigDecimal.class, Integer.class, Long.class, BigInteger.class, Short.class, Byte.class),
     BYTE_ARRAY(byte[].class);
 
-    private List<Class<?>> assignableTypes;
+    private final List<Class<?>> assignableTypes;
 
-    private SType(final Class<?>... assignableTypes) {
+    SType(final Class<?>... assignableTypes) {
         this.assignableTypes = Arrays.asList(assignableTypes);
     }
 

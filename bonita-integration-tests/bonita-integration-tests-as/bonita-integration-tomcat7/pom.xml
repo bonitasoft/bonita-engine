@@ -256,18 +256,11 @@
 
 										<!-- Create default bonita.home folder -->
 										<copy todir="${bonita.home}" verbose="true">
-                                            <fileset dir="${distrib.dir}/resources/home/"/>
+                                            <fileset dir="${distrib.dir}/resources/bonita-home/"/>
 										</copy>
 
-										<!-- Change Dialect of BDR -->
-                                        <property file="tomcat/${db.vendor}/bdm.properties"/>
-                                        <replaceregexp
-                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties"
-                                                match="businessdata.hibernate.dialect=.*"
-                                                replace="businessdata.hibernate.dialect=${bdm.dialect}" byline="true"/>
-
-                                        <copy file="${basedir}/client/bonita-client.properties"
-                                              todir="${bonita.home}/client/conf" overwrite="true"/>
+                                        <copy file="${basedir}/bonita-client-custom.properties"
+                                              todir="${bonita.home}/engine-client/conf" overwrite="true"/>
 									</target>
 								</configuration>
 							</execution>
@@ -339,6 +332,7 @@
 								<systemProperties>
 									<bonita.home>${bonita.home}</bonita.home>
 									<sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
+                                    <sysprop.bonita.bdm.db.vendor>${db.vendor}</sysprop.bonita.bdm.db.vendor>
 									<db.vendor>${db.vendor}</db.vendor>
 
 									<file.encoding>${project.build.sourceEncoding}</file.encoding>

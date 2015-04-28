@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.parameter.propertyfile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,19 +24,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.io.PropertiesManager;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-
 import org.bonitasoft.engine.parameter.OrderBy;
 import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.parameter.SParameter;
 import org.bonitasoft.engine.parameter.SParameterNameNotFoundException;
 import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -46,17 +44,15 @@ import org.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
  */
 public class PropertyFileParameterService implements ParameterService {
 
-    private static final String PARAMETERS_PROPERTIES = "current-parameters.properties";
-
-    private static final String NULL = "-==NULLL==-";
+    static final String NULL = "-==NULLL==-";
 
     private static final String CACHE_NAME = "parameters";
 
     private final ReadSessionAccessor sessionAccessor;
 
-    private final PlatformCacheService cacheService;
+    private final CacheService cacheService;
 
-    public PropertyFileParameterService(final ReadSessionAccessor sessionAccessor, final PlatformCacheService cacheService) {
+    public PropertyFileParameterService(final ReadSessionAccessor sessionAccessor, final CacheService cacheService) {
         this.sessionAccessor = sessionAccessor;
         this.cacheService = cacheService;
     }
@@ -65,20 +61,14 @@ public class PropertyFileParameterService implements ParameterService {
     public void update(final long processDefinitionId, final String parameterName, final String parameterValue) throws SParameterProcessNotFoundException,
             SParameterNameNotFoundException {
         try {
-            final String filePath = getFilePath(processDefinitionId);
-            final Properties properties = getProperties(filePath);
+            final long tenantId = sessionAccessor.getTenantId();
+            final Properties properties = getProperties(tenantId, processDefinitionId);
             if (!properties.containsKey(parameterName)) {
                 throw new SParameterNameNotFoundException("The parameter name " + parameterName + " does not exist");
             }
             final String newValue = parameterValue == null ? NULL : parameterValue;
-            putProperty(filePath, parameterName, newValue);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final IOException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final SCacheException e) {
+            putProperty(tenantId, processDefinitionId, parameterName, newValue);
+        } catch (final BonitaHomeNotSetException | IOException | SCacheException | STenantIdNotSetException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }
@@ -86,7 +76,6 @@ public class PropertyFileParameterService implements ParameterService {
     @Override
     public void addAll(final long processDefinitionId, final Map<String, String> parameters) throws SParameterProcessNotFoundException {
         try {
-            final String filePath = getFilePathWithoutChecking(processDefinitionId);
             final Properties properties = new Properties();
             if (parameters != null) {
                 for (final Entry<String, String> parameter : parameters.entrySet()) {
@@ -94,88 +83,48 @@ public class PropertyFileParameterService implements ParameterService {
                     properties.put(parameter.getKey(), value);
                 }
             }
-            final File file = new File(filePath);
-            file.createNewFile();
-            saveProperties(properties, file.getAbsolutePath());
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final IOException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final SCacheException e) {
+            saveProperties(properties, sessionAccessor.getTenantId(), processDefinitionId);
+        } catch (final BonitaHomeNotSetException | IOException | SCacheException | STenantIdNotSetException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }
 
-    private void saveProperties(final Properties properties, final String filePath) throws IOException, SCacheException {
-        cacheService.store(CACHE_NAME, filePath, properties);
-        PropertiesManager.saveProperties(properties, filePath);
+    private void saveProperties(final Properties properties, final long tenantId, final long processId) throws IOException, SCacheException, BonitaHomeNotSetException {
+        cacheService.store(CACHE_NAME, getCacheKey(tenantId, processId), properties);
+        BonitaHomeServer.getInstance().storeParameters(tenantId, processId, properties);
     }
 
     @Override
     public void deleteAll(final long processDefinitionId) throws SParameterProcessNotFoundException {
         try {
-            final String filePath = getFilePath(processDefinitionId);
-            final File file = new File(filePath);
-            if (!file.exists()) {
-                final StringBuilder errorBuilder = new StringBuilder();
-                errorBuilder.append("The process definition ").append(processDefinitionId).append(" does not exist");
-                throw new SParameterProcessNotFoundException(errorBuilder.toString());
+            final long tenantId = sessionAccessor.getTenantId();
+            if (!BonitaHomeServer.getInstance().hasParameters(tenantId, processDefinitionId)) {
+                throw new SParameterProcessNotFoundException("The process definition " + processDefinitionId + " does not exist");
             }
-            final boolean isDeleted = file.delete();
+            final boolean isDeleted = BonitaHomeServer.getInstance().deleteParameters(tenantId, processDefinitionId);
             if (!isDeleted) {
-                throw new SParameterProcessNotFoundException("The property file was not deleted propertly");
+                throw new SParameterProcessNotFoundException("The property file was not deleted properly");
             }
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
+        } catch (final BonitaHomeNotSetException | STenantIdNotSetException | IOException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }
 
-    private String getFilePathWithoutChecking(final long processDefinitionId) throws BonitaHomeNotSetException, STenantIdNotSetException {
-        final long tenantId = sessionAccessor.getTenantId();
-        final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
-        final StringBuilder pathBuilder = new StringBuilder(processesFolder);
-        pathBuilder.append(File.separatorChar).append(processDefinitionId);
-        pathBuilder.append(File.separatorChar).append(PARAMETERS_PROPERTIES);
-        return pathBuilder.toString();
-    }
-
-    private String getFilePath(final long processDefinitionId) throws BonitaHomeNotSetException, STenantIdNotSetException, SParameterProcessNotFoundException {
-        final long tenantId = sessionAccessor.getTenantId();
-        final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
-        final StringBuilder pathBuilder = new StringBuilder(processesFolder);
-        pathBuilder.append(File.separatorChar).append(processDefinitionId);
-        final File file = new File(pathBuilder.toString());
-        if (!file.exists()) {
-            final StringBuilder errorBuilder = new StringBuilder();
-            errorBuilder.append("The process definition ").append(processDefinitionId).append(" does not exist");
-            throw new SParameterProcessNotFoundException(errorBuilder.toString());
-        }
-        pathBuilder.append(File.separatorChar).append(PARAMETERS_PROPERTIES);
-        return pathBuilder.toString();
-    }
-
-    private List<SParameter> getListProperties(final String fileName, final boolean onlyNulls) throws IOException, SCacheException {
-        final Properties properties = getProperties(fileName);
-        final List<SParameter> paramters = new ArrayList<SParameter>();
+    private List<SParameter> getListProperties(final Properties properties, final boolean onlyNulls) throws IOException, SCacheException {
+        final List<SParameter> parameters = new ArrayList<SParameter>();
         for (final Entry<Object, Object> property : properties.entrySet()) {
             String value = (String) property.getValue();
             if (NULL.equals(value)) {
                 value = null;
             }
-            if (!onlyNulls) {
-                paramters.add(new SParameterImpl(property.getKey().toString(), value));
-            } else if (value == null) {
-                paramters.add(new SParameterImpl(property.getKey().toString(), value));
+            if (!onlyNulls || value == null) {
+                parameters.add(new SParameterImpl(property.getKey().toString(), value));
             }
         }
-        return paramters;
+        return parameters;
     }
 
-    private List<SParameter> getOrderedParameters(final String filePath, final OrderBy order, final boolean onlyNulls) throws IOException, SCacheException {
+    private List<SParameter> getOrderedParameters(final Properties properties, final OrderBy order, final boolean onlyNulls) throws IOException, SCacheException {
         final Comparator<SParameter> sorting;
         switch (order) {
             case NAME_DESC:
@@ -185,24 +134,22 @@ public class PropertyFileParameterService implements ParameterService {
                 sorting = new NameAscComparator(NULL);
                 break;
         }
-        final List<SParameter> parameters = getListProperties(filePath, onlyNulls);
+        final List<SParameter> parameters = getListProperties(properties, onlyNulls);
         final List<SParameter> sortedList = new ArrayList<SParameter>(parameters);
         Collections.sort(sortedList, sorting);
         return sortedList;
     }
 
-    private synchronized void putProperty(final String filePath, final String key, final String value) throws IOException, SCacheException {
-        final Properties properties = getProperties(filePath);
+    private synchronized void putProperty(final long tenantId, final long processId, final String key, final String value) throws IOException, SCacheException, BonitaHomeNotSetException {
+        final Properties properties = getProperties(tenantId, processId);
         properties.put(key, value);
-        saveProperties(properties, filePath);
+        saveProperties(properties, tenantId, processId);
     }
 
     @Override
     public boolean containsNullValues(final long processDefinitionId) throws SParameterProcessNotFoundException {
-        String filePath;
         try {
-            filePath = getFilePath(processDefinitionId);
-            final Properties properties = getProperties(filePath);
+            final Properties properties = getProperties(sessionAccessor.getTenantId(), processDefinitionId);
             final Collection<Object> values = properties.values();
             final Iterator<Object> iterator = values.iterator();
             boolean contains = false;
@@ -213,23 +160,17 @@ public class PropertyFileParameterService implements ParameterService {
                 }
             }
             return contains;
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final IOException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final SCacheException e) {
+        } catch (final BonitaHomeNotSetException | STenantIdNotSetException | SCacheException | IOException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }
 
     @Override
-    public SParameter get(final long processDefinitionId, final String parameterName) throws SParameterProcessNotFoundException,
+    public SParameter get(final long processDefinitionId, final String parameterName) throws
             SParameterProcessNotFoundException {
         try {
-            final String filePath = getFilePath(processDefinitionId);
-            final Properties properties = getProperties(filePath);
+            final long tenantId = sessionAccessor.getTenantId();
+            final Properties properties = getProperties(tenantId, processDefinitionId);
             final String property = properties.getProperty(parameterName);
             if (property == null) {
                 throw new SParameterProcessNotFoundException(parameterName);
@@ -238,25 +179,24 @@ public class PropertyFileParameterService implements ParameterService {
             } else {
                 return new SParameterImpl(parameterName, property);
             }
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final IOException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final SCacheException e) {
+        } catch (final BonitaHomeNotSetException | STenantIdNotSetException | IOException | SCacheException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }
 
-    private Properties getProperties(final String filePath) throws IOException, SCacheException {
-        final Object object = cacheService.get(CACHE_NAME, filePath);
+    private String getCacheKey(final long tenantId, final long processId) {
+        return Long.toString(tenantId) + "$$" + Long.toString(processId);
+    }
+
+    private Properties getProperties(final long tenantId, final long processId) throws BonitaHomeNotSetException, SCacheException, IOException {
+        final String key = getCacheKey(tenantId, processId);
+        final Object object = cacheService.get(CACHE_NAME, key);
         Properties properties;
         if (object != null) {
             properties = (Properties) object;
         } else {
-            properties = PropertiesManager.getProperties(filePath);
-            cacheService.store(CACHE_NAME, filePath, properties);
+            properties = BonitaHomeServer.getInstance().getParameters(tenantId, processId);
+            cacheService.store(CACHE_NAME, key, properties);
         }
         return properties;
 
@@ -275,10 +215,10 @@ public class PropertyFileParameterService implements ParameterService {
     }
 
     private List<SParameter> getParameters(final long processDefinitionId, final int fromIndex, final int numberOfResult, final OrderBy order,
-            final boolean onlyNulls) throws SParameterProcessNotFoundException {
+                                           final boolean onlyNulls) throws SParameterProcessNotFoundException {
         try {
-            final String filePath = getFilePath(processDefinitionId);
-            final List<SParameter> orderedParameters = getOrderedParameters(filePath, order, onlyNulls);
+            final Properties properties = getProperties(sessionAccessor.getTenantId(), processDefinitionId);
+            final List<SParameter> orderedParameters = getOrderedParameters(properties, order, onlyNulls);
 
             final int numberOfParameters = orderedParameters.size();
             if (fromIndex != 0 && numberOfParameters <= fromIndex) {
@@ -291,13 +231,7 @@ public class PropertyFileParameterService implements ParameterService {
                 parameters.add(parameterDef);
             }
             return parameters;
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final IOException e) {
-            throw new SParameterProcessNotFoundException(e);
-        } catch (final SCacheException e) {
+        } catch (final BonitaHomeNotSetException | STenantIdNotSetException | SCacheException | IOException e) {
             throw new SParameterProcessNotFoundException(e);
         }
     }

@@ -1,0 +1,1587 @@
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="
+        http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+        ">
+
+    <bean id="sessionService" class="org.bonitasoft.engine.session.impl.SessionServiceImpl">
+        <constructor-arg name="sessionProvider" ref="sessionProvider" />
+        <constructor-arg name="applicationName" value="BPM" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <!-- set Engine session duration (in ms) : -->
+        <property name="sessionDuration" value="${bonita.tenant.session.duration}" />
+    </bean>
+
+    <bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="tenantRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+    </bean>
+
+    <bean id="searchEntitiesDescriptor" class="org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor">
+    </bean>
+
+    <bean id="flowNodeExecutor" class="org.bonitasoft.engine.execution.FlowNodeExecutorImpl">
+        <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
+        <constructor-arg name="activityInstanceManager" ref="activityInstanceService" />
+        <constructor-arg name="operationService" ref="operationService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="containerRegistry" ref="containerRegistry" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="commentService" ref="commentService" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="workService" ref="workService" />
+        <constructor-arg name="contractDataService" ref="contractDataService" />
+    </bean>
+
+    <bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
+        <constructor-arg name="workService" ref="workService" />
+    </bean>
+
+    <bean id="parentContainerResolver" class="org.bonitasoft.engine.data.ParentContainerResolverImpl">
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+    </bean>
+
+    <bean id="bpmInstancesCreator" class="org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator">
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="actorMappingService" ref="actorMappingService" />
+        <constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="transientDataService" ref="transientDataService" />
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver" />
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+
+    </bean>
+
+    <bean id="waitingEventsInterrupter" class="org.bonitasoft.engine.execution.WaitingEventsInterrupter">
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="schedulerService" ref="scheduler" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="stateBehaviors" class="org.bonitasoft.engine.execution.StateBehaviors">
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+        <constructor-arg name="eventsHandler" ref="eventsHandler" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="userFilterService" ref="userFilterService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="actorMappingService" ref="actorMappingService" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="operationService" ref="operationService" />
+        <constructor-arg name="workService" ref="workService" />
+        <constructor-arg name="containerRegistry" ref="containerRegistry" />
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="commentService" ref="commentService" />
+        <constructor-arg name="identityService" ref="identityService" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver" />
+        <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+    </bean>
+
+
+    <bean id="flowNodeStateManager" class="org.bonitasoft.engine.execution.FlowNodeStateManagerImpl">
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="operationService" ref="operationService" />
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+        <constructor-arg name="containerRegistry" ref="containerRegistry" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="commentService" ref="commentService" />
+        <constructor-arg name="stateBehaviors" ref="stateBehaviors" />
+        <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+    </bean>
+
+    <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
+        <constructor-arg name="schedulerService" ref="scheduler" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="containerRegistry" ref="containerRegistry" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="transitionConditionEvaluator" class="org.bonitasoft.engine.execution.transition.TransitionConditionEvaluator">
+        <constructor-arg name="resolverService" ref="expressionResolverService" />
+    </bean>
+
+    <bean id="defaultTransitionGetter" class="org.bonitasoft.engine.execution.transition.DefaultTransitionGetter" />
+
+    <bean id="implicitGatewayTransitionEvaluator" class="org.bonitasoft.engine.execution.transition.ImplicitGatewayTransitionEvaluator">
+        <constructor-arg name="conditionEvaluator" ref="transitionConditionEvaluator" />
+        <constructor-arg name="defaultTransitionGetter" ref="defaultTransitionGetter" />
+    </bean>
+
+
+    <bean id="inclusiveGatewayTransitionEvaluationStrategy" class="org.bonitasoft.engine.execution.transition.InclusiveGatewayTransitionEvaluationStrategy" />
+    <bean id="exclusiveGatewayTransitionEvaluationStrategy" class="org.bonitasoft.engine.execution.transition.ExclusiveGatewayTransitionEvaluationStrategy" />
+
+    <bean id="inclusiveTransitionEvaluator" class="org.bonitasoft.engine.execution.transition.InclusiveExclusiveTransitionEvaluator">
+        <constructor-arg name="strategy" ref="inclusiveGatewayTransitionEvaluationStrategy" />
+        <constructor-arg name="evaluator" ref="transitionConditionEvaluator" />
+        <constructor-arg name="defaultTransitionGetter" ref="defaultTransitionGetter" />
+
+    </bean>
+
+    <bean id="exclusiveTransitionEvaluator" class="org.bonitasoft.engine.execution.transition.InclusiveExclusiveTransitionEvaluator">
+        <constructor-arg name="strategy" ref="exclusiveGatewayTransitionEvaluationStrategy" />
+        <constructor-arg name="evaluator" ref="transitionConditionEvaluator" />
+        <constructor-arg name="defaultTransitionGetter" ref="defaultTransitionGetter" />
+    </bean>
+
+    <bean id="parallelGatewayTransitionEvaluator" class="org.bonitasoft.engine.execution.transition.ParallelGatewayTransitionEvaluator" />
+
+    <bean id="transitionEvaluator" class="org.bonitasoft.engine.execution.TransitionEvaluator">
+        <constructor-arg name="implicitGatewayTransitionEvaluator" ref="implicitGatewayTransitionEvaluator" />
+        <constructor-arg name="parallelGatewayTransitionEvaluator" ref="parallelGatewayTransitionEvaluator" />
+        <constructor-arg name="inclusiveTransitionEvaluator" ref="inclusiveTransitionEvaluator" />
+        <constructor-arg name="exclusiveTransitionEvaluator" ref="exclusiveTransitionEvaluator" />
+    </bean>
+
+    <bean id="processExecutor" class="org.bonitasoft.engine.execution.ProcessExecutorImpl">
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="flowNodeExecutor" ref="flowNodeExecutor" />
+        <constructor-arg name="workService" ref="workService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
+        <constructor-arg name="transitionService" ref="transitionService" />
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="connectorService" ref="connectorService" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="operationService" ref="operationService" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="handlers">
+            <map>
+                <entry key="PROCESSINSTANCE_STATE_UPDATED">
+                    <bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
+                        <constructor-arg name="tenantId" value="${tenantId}" />
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="containerRegistry" ref="containerRegistry" />
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+        <constructor-arg name="eventsHandler" ref="eventsHandler" />
+        <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="transitionEvaluator" ref="transitionEvaluator" />
+        <constructor-arg name="contractDataService" ref="contractDataService" />
+    </bean>
+
+    <bean id="transactionalProcessInstanceInterruptor"
+          class="org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor">
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="processExecutor" ref="processExecutor" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="documentReferenceExpressionExecutorStrategy"
+          class="org.bonitasoft.engine.expression.DocumentReferenceExpressionExecutorStrategy">
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+    </bean>
+
+    <bean id="documentListReferenceExpressionExecutorStrategy"
+          class="org.bonitasoft.engine.expression.DocumentListReferenceExpressionExecutorStrategy">
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+    </bean>
+
+    <bean id="dependencyResolver" class="org.bonitasoft.engine.api.impl.resolver.DependencyResolver">
+        <constructor-arg name="dependencyResolvers">
+            <list>
+                <bean class="org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyDeployer" />
+                <bean class="org.bonitasoft.engine.api.impl.resolver.ConnectorProcessDependencyDeployer" />
+                <bean class="org.bonitasoft.engine.api.impl.resolver.UserFilterProcessDependencyDeployer" />
+                <bean class="org.bonitasoft.engine.api.impl.resolver.ParameterProcessDependencyDeployer" />
+                <bean class="org.bonitasoft.engine.api.impl.resolver.FormMappingAndPageDependencyDeployer" />
+                <bean class="org.bonitasoft.engine.api.impl.resolver.BusinessDataProcessDependencyDeployer" />
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="commandService" class="org.bonitasoft.engine.command.api.impl.CommandServiceImpl">
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="defaultCommandProvider" ref="defaultCommandProvider" />
+    </bean>
+
+    <bean id="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list>
+                <ref bean="canStartProcessDefinition" />
+                <ref bean="isInvolvedInHumanTask" />
+                <ref bean="importProfiles" />
+                <ref bean="exportDefaultProfiles" />
+                <ref bean="isUserProcessSupervisor" />
+                <ref bean="createSupervisor" />
+                <ref bean="getSupervisor" />
+                <ref bean="deleteSupervisor" />
+                <ref bean="searchProcessSupervisors" />
+                <ref bean="executeActionsAndTerminate" />
+                <ref bean="isAllowedToStartProcess" />
+                <ref bean="isAllowedToSeeOverviewForm" />
+                <ref bean="isAllowedToSeeInstanciationForm" />
+                <ref bean="searchAssignedTasksSupervisedBy" />
+                <ref bean="searchArchivedTasksSupervisedBy" />
+                <ref bean="searchProcessDefinitionsSupervisedBy" />
+                <ref bean="searchSCommentSupervisedBy" />
+                <ref bean="isAllowedToStartProcesses" />
+                <ref bean="addEntityMemberCommand" />
+                <ref bean="removeEntityMemberCommand" />
+                <ref bean="searchEntityMembersCommand" />
+                <ref bean="searchEntityMembersForUserCommand" />
+                <ref bean="deleteEntityMembersCommand" />
+                <ref bean="searchWaitingEventsCommand" />
+                <ref bean="advancedStartProcessCommand" />
+                <ref bean="executeBDMQuery" />
+                <ref bean="getBusinessDataByIdCommand" />
+                <ref bean="getBusinessDataByQueryCommand" />
+                <ref bean="multipleStartPointsProcessCommand" />
+                <ref bean="deleteSessionCommand" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="defaultCommands" parent="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="deleteSessionCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>deleteSessionCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Deletes a tenant session based on its sessionId</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.command.DeleteSessionCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="defaultCommandProvider" class="org.bonitasoft.engine.command.api.impl.CommandProvider">
+        <property name="defaultCommands" ref="defaultCommands" />
+    </bean>
+
+    <bean id="canStartProcessDefinition" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>canStartProcessDefinition</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Return true if the user can start the process, false otherwise. Use parameter key USER_ID_KEY and PROCESS_DEFINITION_ID_KEY</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.permission.CanStartProcessDefinition</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="isInvolvedInHumanTask" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>isInvolvedInHumanTask</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Return true if a user is involved in a specific human task, false otherwise. Use parameter key USER_ID_KEY and HUMAN_TASK_INSTANCE_ID_KEY</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.permission.IsInvolvedInHumanTask</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="executeBDMQuery" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>executeBDMQuery</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Execute a named query in the BDM. Use parameter keys : "queryName" the name of the query in the bdm, "returnType" the query expected return type, "returnsList" if result is a List or a single value, "queryParameters" a Map to value query parameters</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.command.ExecuteBDMQueryCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="isUserProcessSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>isUserProcessSupervisor</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Get if the user a supervisor of processDefinition. Use parameter keys USER_ID_KEY, PROCESS_DEFINITION_ID_KEY</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.process.IsUserProcessSupervisor</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="createSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>createSupervisor</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Create process supervisor.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.process.CreateSupervisor</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="getSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>getSupervisor</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Get process supervisor. Use parameter key SUPERVISOR_ID_KEY</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.process.GetSupervisor</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="deleteSupervisor" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>deleteSupervisor</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Delete process supervisor. Use parameter key SUPERVISOR_ID_KEY</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.process.DeleteSupervisor</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="searchProcessSupervisors" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>searchProcessSupervisors</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Search process supervisor for process definition.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.process.SearchProcessSupervisors</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="importProfiles" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>importProfilesCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Import profiles, profileEntries and profile mappings</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.web.profile.command.ImportProfilesCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="exportDefaultProfiles" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>exportDefaultProfilesCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Export default profiles</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.web.profile.command.ExportDefaultProfilesCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="executeActionsAndTerminate" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>executeActionsAndTerminate</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>execute actions and terminate a user task instance</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTask</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="isAllowedToStartProcess" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>isAllowedToStartProcess</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Check if one of many actors can be allowed to start process.(who's the process Initiator)</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.permission.IsAllowedToStartProcess</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="isAllowedToSeeOverviewForm" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>isAllowedToSeeOverviewForm</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Check if one of many actors can be allowed to read overview form.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.permission.IsAllowedToSeeOverviewForm</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="isAllowedToSeeInstanciationForm" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>isAllowedToSeeInstanciationForm</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Check if one of many actors can be allowed to read Instanciation form.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.permission.IsAllowedToSeeInstanciationForm</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="searchAssignedTasksSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>searchAssignedTasksSupervisedBy</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Returns the list of assigned user tasks of process definition supervised by a user.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.task.supervisor.SearchAssignedTasksSupervisedBy</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="searchArchivedTasksSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>searchArchivedTasksSupervisedBy</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Returns the list of archived user tasks of process definition supervised by a user. Use parameter keys SUPERVISOR_ID_KEY: id of the supervisor,
+                SEARCH_OPTIONS_KEY: the object containing all the search parameters
+            </value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.task.supervisor.SearchArchivedTasksSupervisedBy</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="searchProcessDefinitionsSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>searchProcessDefinitionsSupervisedBy</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Searching processeDefinitions whose supervisor is the specified user.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.supervisor.SearchProcessDefinitionsSupervisedBy</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="searchSCommentSupervisedBy" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>searchSCommentSupervisedBy</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Returns the list of comments for processes supervised by a user. One mandatory parameter: supervisorId: ID of the user supervisor of the processes on
+                which comments are.
+            </value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.comment.SearchCommentsSupervisedBy</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="isAllowedToStartProcesses" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>isAllowedToStartProcesses</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Check if the user can be allowed to start all of processes.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.permission.IsAllowedToStartProcesses</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="addEntityMemberCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>addEntityMemberCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Adds a Entity member to the provided identity notions. Parameter keys: EXTERNAL_ID_KEY: Entity member id provided as is by the external system,
+                userId: -1 is not needed, roleId: -1 is not needed, groupId: -1 is not needed
+            </value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.identitymapping.AddEntityMemberCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="removeEntityMemberCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>removeEntityMemberCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Removes a Entity member mapping: ENTITY_MEMBER_ID_KEY: Entity member id to remove</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.identitymapping.RemoveEntityMemberCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="searchEntityMembersCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>searchEntityMembersCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Searches Entity member mappings: Parameter keys: DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions,
+                SEARCH_OPTIONS_KEY: the Search options to filter and sort the results, MEMBER_TYPE_KEY: Member Type to search for (USER, GROUP, ROLE, or MEMBERSHIP).
+            </value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.identitymapping.SearchEntityMembersCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="searchEntityMembersForUserCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>searchEntityMembersForUserCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Searches Entity member mappings: Parameter keys: USER_ID_KEY: the ID of the user to search Entity members for (directly associated, or through role or
+                group), DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions, SEARCH_OPTIONS_KEY: the Search options to filter and sort the
+                results.
+            </value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.identitymapping.SearchEntityMembersForUserCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="deleteEntityMembersCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>deleteEntityMembersCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Delete all Entity member mappings associated with provided externalId, for specific Discriminator. Parameter keys: EXTERNAL_ID_KEY: external id
+                provided as is by the external system, DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions.
+            </value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.external.identitymapping.DeleteEntityMembersCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="searchWaitingEventsCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>searchWaitingEventsCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Search waiting events. Parameter keys: searchOptions.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.command.system.SearchWaitingEventsCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="advancedStartProcessCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>advancedStartProcessCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Advanced start process.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.command.AdvancedStartProcessCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="getBusinessDataByIdCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>getBusinessDataById</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Get the business data via its identifier and class name, and returns its Json representation.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.command.GetBusinessDataByIdCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="getBusinessDataByQueryCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>getBusinessDataByQueryCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Execute a named query in the BDM, and returns its Json representation. Use parameter keys : "queryName" the name of the query in the bdm, "returnType" the query expected return type, "returnsList" if result is a List or a single value, "queryParameters" a Map to value query parameters</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.command.GetBusinessDataByQueryCommand</value>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="multipleStartPointsProcessCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>multipleStartPointsProcessCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Advanced start process using multiple start points.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.command.MultipleStartPointsProcessCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="tenantEventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="connectorExecutor" class="org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl">
+        <constructor-arg name="queueCapacity" value="${bonita.tenant.connector.queueCapacity}" />
+        <constructor-arg name="corePoolSize" value="${bonita.tenant.connector.corePoolSize}" />
+        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="maximumPoolSize" value="${bonita.tenant.connector.maximumPoolSize}" />
+        <constructor-arg name="keepAliveTimeSeconds" value="${bonita.tenant.connector.keepAliveTimeSeconds}" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="timeTracker" ref="timeTracker" />
+    </bean>
+
+    <bean id="expressionService" class="org.bonitasoft.engine.expression.impl.ExpressionServiceImpl">
+        <constructor-arg name="expressionExecutorStrategyProvider" ref="expressionExecutorStrategyProvider" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="checkExpressionReturnType" value="true" />
+        <constructor-arg name="timeTracker" ref="timeTracker" />
+    </bean>
+
+    <bean id="expressionExecutorStrategyProvider" class="org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider">
+        <property name="expressionExecutors">
+            <list>
+                <ref bean="constantExpressionExecutorStrategy" />
+                <ref bean="groovyScriptExpressionExecutorStrategy" />
+                <ref bean="inputExpressionExecutorStrategy" />
+                <ref bean="dataExpressionExecutorStrategy" />
+                <ref bean="transientDataExpressionExecutorStrategy" />
+                <ref bean="patternExpressionExecutorStrategy" />
+                <ref bean="documentReferenceExpressionExecutorStrategy" />
+                <ref bean="documentListReferenceExpressionExecutorStrategy" />
+                <ref bean="engineConstantExpressionExecutorStrategy" />
+                <ref bean="listExpressionExecutorStrategy" />
+                <ref bean="conditionExpressionExecutorStrategy" />
+                <ref bean="javaMethodCallExpressionExecutorStrategy" />
+                <ref bean="parameterExpressionExecutorStrategy" />
+                <ref bean="xPathReadExpressionExecutorStrategy" />
+                <ref bean="businessDataExpressionExecutorStrategy" />
+                <ref bean="queryBusinessDataExpressionExecutorStrategy" />
+                <ref bean="businessObjectDAOExpressionStrategy" />
+                <ref bean="businessDataExpressionReferenceExecutorStrategy" />
+                <ref bean="contractInputExpressionExecutorStrategy" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="businessDataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.BusinessDataExpressionExecutorStrategy">
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+    </bean>
+
+    <bean id="businessObjectDAOExpressionStrategy" class="org.bonitasoft.engine.expression.BusinessObjectDAOExpressionStrategy">
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+    </bean>
+
+    <bean id="queryBusinessDataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.QueryBusinessDataExpressionExecutorStrategy">
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+    </bean>
+
+    <bean id="constantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy" />
+
+    <bean id="groovyScriptExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorCacheStrategy">
+        <constructor-arg name="cacheService" ref="cacheService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="inputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.InputExpressionExecutorStrategy" />
+
+    <bean id="patternExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.PatternExpressionExecutorStrategy" />
+
+    <bean id="xPathReadExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.XPathReadExpressionExecutorStrategy" />
+
+    <bean id="engineConstantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy">
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+    </bean>
+
+    <bean id="contractInputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ContractInputExpressionExecutorStrategy">
+        <constructor-arg name="contractDataService" ref="contractDataService" />
+    </bean>
+
+    <bean id="listExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ListExpressionExecutorStrategy" />
+
+
+    <bean id="businessDataExpressionReferenceExecutorStrategy" class="org.bonitasoft.engine.expression.BusinessDataReferenceExpressionExecutorStrategy">
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+    </bean>
+
+    <bean id="equalityComparator" class="org.bonitasoft.engine.expression.impl.condition.EqualityComparator" />
+    <bean id="inequalityComparator" class="org.bonitasoft.engine.expression.impl.condition.InequalityComparator" />
+    <bean id="binaryComparatorMapper" class="org.bonitasoft.engine.expression.impl.condition.BinaryComparatorMapper">
+        <constructor-arg name="equalityComparator" ref="equalityComparator" />
+        <constructor-arg name="inequalityComparator" ref="inequalityComparator" />
+    </bean>
+
+    <bean id="binaryComparatorExecutor" class="org.bonitasoft.engine.expression.impl.condition.BinaryComparatorExecutor">
+        <constructor-arg name="mapper" ref="binaryComparatorMapper" />
+    </bean>
+
+    <bean id="logicalComplementExecutor" class="org.bonitasoft.engine.expression.impl.condition.LogicalComplementExecutor" />
+
+    <bean id="conditionExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConditionExpressionExecutorStrategy">
+        <constructor-arg name="logicalComplementExecutor" ref="logicalComplementExecutor" />
+        <constructor-arg name="binaryComparatorExecutor" ref="binaryComparatorExecutor" />
+    </bean>
+
+    <bean id="javaMethodCallExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.JavaMethodCallExpressionExecutorStrategy" />
+
+    <bean id="parameterExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
+        <constructor-arg name="parameterService" ref="parameterService" />
+    </bean>
+
+    <bean id="parameterService" class="org.bonitasoft.engine.parameter.propertyfile.PropertyFileParameterService">
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="cacheService" ref="cacheService" />
+    </bean>
+
+    <bean id="queriableLoggerStrategy" class="org.bonitasoft.engine.services.impl.SimpleQueriableLoggerStrategy" />
+
+    <bean id="workSynchronizationFactory" class="org.bonitasoft.engine.work.SequenceWorkSynchronizationFactory" />
+
+    <bean id="workService" class="org.bonitasoft.engine.work.ExecutorWorkService">
+        <constructor-arg name="transactionService" ref="transactionService" />
+        <constructor-arg name="workSynchronizationFactory" ref="workSynchronizationFactory" />
+        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="bonitaExecutorServiceFactory" ref="bonitaExecutorServiceFactory" />
+        <constructor-arg name="workTerminationTimeout" value="${bonita.tenant.work.terminationTimeout}" />
+    </bean>
+
+    <bean id="operationService" class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
+        <constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider" />
+        <constructor-arg name="leftOperandHandlerProvider" ref="leftOperandHandlerProvider" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="operationExecutorStrategyProvider"
+          class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="constructor" />
+
+    <bean id="leftOperandHandlers" parent="communityLeftOperandHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="communityLeftOperandHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list>
+                <ref bean="dataLeftOperandHandler" />
+                <ref bean="transientDataLeftOperandHandler" />
+                <ref bean="externalDataLeftOperandHandler" />
+                <ref bean="documentLeftOperandHandler" />
+                <ref bean="documentListLeftOperandHandler" />
+                <ref bean="businessDataLeftOperandHandler" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="leftOperandHandlerProvider" class="org.bonitasoft.engine.core.operation.LeftOperandHandlerProvider">
+        <property name="leftOperandHandlers" ref="leftOperandHandlers" />
+    </bean>
+
+    <bean id="businessDataLeftOperandHandler" class="org.bonitasoft.engine.operation.BusinessDataLeftOperandHandler">
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+    </bean>
+
+    <bean id="assignmentOperationExecutorStrategy"
+          class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy" />
+
+    <bean id="dataLeftOperandHandler" class="org.bonitasoft.engine.operation.DataLeftOperandHandler">
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver" />
+    </bean>
+
+    <bean id="transientDataLeftOperandHandler" class="org.bonitasoft.engine.operation.TransientDataLeftOperandHandler">
+        <constructor-arg name="transientDataService" ref="transientDataService" />
+        <constructor-arg name="flownodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="externalDataLeftOperandHandler"
+          class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler" />
+
+    <bean id="javaMethodOperationExecutorStrategy"
+          class="org.bonitasoft.engine.operation.BusinessDataJavaMethodOperationExecutorStrategy">
+        <constructor-arg name="businessDataService" ref="businessDataService" />
+    </bean>
+
+    <bean id="xpathUpdateQueryOperationExecutorStrategy"
+          class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy" />
+
+    <bean id="documentLeftOperandHandler" class="org.bonitasoft.engine.operation.DocumentLeftOperandHandler">
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+    </bean>
+
+    <bean id="documentListLeftOperandHandler" class="org.bonitasoft.engine.operation.DocumentListLeftOperandHandler">
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+    </bean>
+
+    <bean id="actorMappingService" class="org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="identityService" ref="identityService" />
+    </bean>
+
+    <bean id="bonitaExecutorServiceFactory" class="org.bonitasoft.engine.work.DefaultBonitaExecutorServiceFactory">
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
+        <constructor-arg name="corePoolSize" value="${bonita.tenant.work.corePoolSize}" />
+        <constructor-arg name="maximumPoolSize" value="${bonita.tenant.work.maximumPoolSize}" />
+        <constructor-arg name="keepAliveTimeSeconds" value="${bonita.tenant.work.keepAliveTimeSeconds}" />
+        <constructor-arg name="queueCapacity" value="${bonita.tenant.work.queueCapacity}" />
+    </bean>
+
+    <bean id="userFilterService" class="org.bonitasoft.engine.userfilter.UserFilterServiceDecorator">
+        <constructor-arg name="userFilterService" ref="userFilterServiceSub" />
+    </bean>
+
+    <bean id="userFilterServiceSub" class="org.bonitasoft.engine.core.filter.impl.UserFilterServiceImpl">
+        <constructor-arg name="connectorExecutor" ref="connectorExecutor" />
+        <constructor-arg name="cacheService" ref="cacheService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="parserFactory" ref="parserFactory" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+
+    <bean id="defaultFlushEventListeners" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list>
+                <ref bean="csvFlushEventListener" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="flushEventListeners" parent="defaultFlushEventListeners" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="defaultActivatedRecords" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list>
+                <value>EXECUTE_CONNECTOR_INCLUDING_POOL_SUBMIT</value>
+                <value>EXECUTE_CONNECTOR_CALLABLE</value>
+                <value>EXECUTE_CONNECTOR_OUTPUT_OPERATIONS</value>
+                <value>EXECUTE_CONNECTOR_INPUT_EXPRESSIONS</value>
+                <value>EXECUTE_CONNECTOR_DISCONNECT</value>
+                <value>EXECUTE_CONNECTOR_WORK</value>
+                <value>EVALUATE_EXPRESSION_INCLUDING_CONTEXT</value>
+                <value>EVALUATE_EXPRESSION</value>
+                <value>EVALUATE_EXPRESSIONS</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="activatedRecords" parent="defaultActivatedRecords" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="timeTracker" class="org.bonitasoft.engine.tracking.TimeTracker">
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="startFlushThread" value="${bonita.tenant.timetracker.startFlushThread}" />
+        <constructor-arg name="flushEventListeners" ref="flushEventListeners" />
+        <constructor-arg name="maxSize" value="${bonita.tenant.timetracker.maxSize}" />
+        <constructor-arg name="flushIntervalInSeconds"
+                         value="${bonita.tenant.timetracker.flushIntervalInSeconds}" />
+        <constructor-arg name="activatedRecords" ref="activatedRecords" />
+    </bean>
+
+    <bean id="csvFlushEventListener" class="org.bonitasoft.engine.tracking.csv.CSVFlushEventListener">
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="outputFolder" value="${bonita.tenant.timetracker.csv.folder}" />
+        <constructor-arg name="csvSeparator" value="${bonita.tenant.timetracker.csv.separator}" />
+    </bean>
+
+    <bean id="themeService" class="org.bonitasoft.engine.theme.impl.ThemeServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+    </bean>
+
+
+    <bean id="tenantConfiguration" class="org.bonitasoft.engine.api.impl.TenantConfiguration" autowire="byType">
+        <property name="eventHandlingJobCron" value="${org.bonitasoft.engine.cron}" />
+        <property name="cleanInvalidSessionsJobCron" value="${org.bonitasoft.engine.clean.invalid.sessions.cron}" />
+        <property name="jobListeners">
+            <list>
+                <ref bean="timerEventTriggerJobListener" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="timerEventTriggerJobListener" class="org.bonitasoft.engine.jobs.TimerEventTriggerJobListener">
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
+    </bean>
+
+
+    <bean id="supervisorMappingService" class="org.bonitasoft.engine.supervisor.mapping.impl.SupervisorMappingServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+    </bean>
+
+
+    <bean id="profileService" class="org.bonitasoft.engine.profile.impl.ProfileServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+    </bean>
+
+
+    <bean id="activityInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl">
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="processInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.ProcessInstanceServiceImpl">
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="persistenceRead" ref="persistenceService" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="activityService" ref="activityInstanceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="bpmEventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+        <constructor-arg name="transitionService" ref="transitionService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="commentService" ref="commentService" />
+    </bean>
+
+    <bean id="gatewayInstanceService" class="org.bonitasoft.engine.core.process.instance.impl.GatewayInstanceServiceImpl">
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="persistenceRead" ref="persistenceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+    </bean>
+
+    <bean id="transitionService" class="org.bonitasoft.engine.core.process.instance.impl.TransitionServiceImpl">
+        <constructor-arg name="persistenceRead" ref="persistenceService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+    </bean>
+
+    <bean id="eventInstanceService" class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl">
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+    </bean>
+    <bean id="refBusinessDataService" class="org.bonitasoft.engine.core.process.instance.impl.RefBusinessDataServiceImpl">
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="persistenceRead" ref="persistenceService" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+    </bean>
+
+    <bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">
+        <constructor-arg name="validatorFactory" ref="xmlValidatorFactory" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="xmlValidatorFactory" class="org.bonitasoft.engine.xml.SAXValidatorFactory" />
+
+    <bean id="xmlValidator" class="org.bonitasoft.engine.xml.SAXValidator" />
+
+    <bean id="xmlWriter" class="org.bonitasoft.engine.xml.DOMWriter">
+        <constructor-arg name="validator" ref="xmlValidator" />
+    </bean>
+
+    <bean id="processDefinitionManager" class="org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl">
+        <constructor-arg name="cacheService" ref="cacheService" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="parserFactory" ref="parserFactory" />
+        <constructor-arg name="xmlWriter" ref="xmlWriter" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="dependencyService" ref="dependencyService" />
+    </bean>
+
+
+    <bean id="commentService" class="org.bonitasoft.engine.core.process.comment.api.impl.SCommentServiceImpl">
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+        <constructor-arg name="systemCommentType">
+            <map>
+                <entry key="STATE_CHANGE" value="true" />
+            </map>
+        </constructor-arg>
+        <constructor-arg name="eventService" ref="tenantEventService" />
+    </bean>
+
+
+    <bean id="permissionService" class="org.bonitasoft.engine.service.impl.PermissionServiceImpl">
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
+    </bean>
+
+
+    <bean id="pageService" class="org.bonitasoft.engine.page.impl.PageServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="profileService" ref="profileService" />
+    </bean>
+
+
+    <bean id="loginService" class="org.bonitasoft.engine.core.login.SecuredLoginServiceImpl">
+        <constructor-arg ref="${authentication.service.ref.name:authenticationService}" />
+        <constructor-arg ref="sessionService" />
+        <constructor-arg ref="sessionAccessor" />
+        <constructor-arg ref="identityService" />
+    </bean>
+
+
+    <bean id="tenantTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl">
+        <constructor-arg name="tenantId" value="${tenantId}" />
+    </bean>
+
+
+    <bean id="identityService" class="org.bonitasoft.engine.identity.impl.IdentityServiceImpl">
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="encrypter">
+            <bean class="org.bonitasoft.engine.identity.impl.MD5CredentialsEncrypter" />
+        </constructor-arg>
+    </bean>
+
+    <bean id="externalIdentityMappingService" class="org.bonitasoft.engine.external.identity.mapping.impl.ExternalIdentityMappingServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+    </bean>
+
+    <!-- depends on transientDataExpressionExecutorStrategy because if this bean is loaded before it cause a circular dependency -->
+    <bean id="expressionResolverService" class="org.bonitasoft.engine.core.expression.control.api.impl.ExpressionResolverServiceImpl" depends-on="transientDataExpressionExecutorStrategy">
+        <constructor-arg name="expressionService" ref="expressionService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="timeTracker" ref="timeTracker" />
+    </bean>
+
+    <bean id="documentService" class="org.bonitasoft.engine.core.document.api.impl.DocumentServiceImpl">
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="urlProvider" ref="documentURLProvider" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+    </bean>
+
+    <bean name="documentURLProvider"
+          class="org.bonitasoft.engine.core.document.api.impl.SDocumentDownloadURLProviderImpl">
+        <constructor-arg name="servletUrl" value="${document.servlet.url}" />
+    </bean>
+
+    <bean id="dependencyService" class="org.bonitasoft.engine.dependency.impl.DependencyServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+    </bean>
+
+    <bean id="transientDataService" class="org.bonitasoft.engine.core.data.instance.impl.TransientDataServiceImpl">
+        <constructor-arg name="cacheService" ref="cacheService" />
+    </bean>
+
+    <bean id="transientDataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ReevaluatingTransientDataExpressionExecutorStrategy" autowire="byType">
+        <constructor-arg name="transientDataService" ref="transientDataService" />
+        <property name="flownodeInstanceService" ref="activityInstanceService" />
+        <property name="processDefinitionService" ref="processDefinitionManager" />
+        <property name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="dataInstanceService" class="org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl">
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="dataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.DataExpressionExecutorStrategy">
+        <constructor-arg name="dataService" ref="dataInstanceService" />
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver" />
+    </bean>
+
+    <bean id="connectorServiceSub" class="org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl">
+        <constructor-arg name="cacheService" ref="cacheService" />
+        <constructor-arg name="connectorExecutor" ref="connectorExecutor" />
+        <constructor-arg name="parserFactory" ref="parserFactory" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="operationService" ref="operationService" />
+        <constructor-arg name="dependencyService" ref="dependencyService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="timeTracker" ref="timeTracker" />
+    </bean>
+
+    <bean id="connectorService" class="org.bonitasoft.engine.connector.ConnectorServiceDecorator">
+        <constructor-arg name="connectorService" ref="connectorServiceSub" />
+    </bean>
+
+    <bean id="connectorInstanceService" class="org.bonitasoft.engine.core.connector.impl.ConnectorInstanceServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+    </bean>
+
+    <bean id="categoryService" class="org.bonitasoft.engine.core.category.impl.CategoryServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+    </bean>
+
+    <bean id="cacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
+        <constructor-arg name="defaultCacheConfiguration" ref="defaultTenantCacheConfiguration" />
+        <constructor-arg name="diskStorePath" value="java.io.tmpdir/tenant.cache" />
+    </bean>
+
+    <bean id="defaultTenantCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="DEFAULT_TENANT" />
+        <property name="maxElementsInMemory" value="${bonita.tenant.cache.default.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.tenant.cache.default.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.tenant.cache.default.eternal}" />
+        <property name="evictionPolicy" value="${bonita.tenant.cache.default.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.default.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.default.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.tenant.cache.default.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.tenant.cache.default.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.tenant.cache.default.readIntensive}" />
+    </bean>
+
+    <bean id="cacheConfigurations" parent="communityCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="communityCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+                <ref bean="connectorCacheConfig" />
+                <ref bean="parameterCacheConfig" />
+                <ref bean="processDefCacheConfig" />
+                <ref bean="userFilterCacheConfig" />
+                <ref bean="migrationPlanCacheConfig" />
+                <ref bean="breakpointCacheConfig" />
+                <ref bean="groovyScriptCacheConfig" />
+                <ref bean="transientDataCacheConfig" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="connectorCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="CONNECTOR" />
+        <property name="maxElementsInMemory" value="${bonita.tenant.cache.connector.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.tenant.cache.connector.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.tenant.cache.connector.eternal}" />
+        <property name="evictionPolicy" value="${bonita.tenant.cache.connector.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.connector.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.connector.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.tenant.cache.connector.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.tenant.cache.connector.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.tenant.cache.connector.readIntensive}" />
+    </bean>
+
+
+    <bean id="parameterCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="parameters" />
+        <property name="maxElementsInMemory" value="${bonita.tenant.cache.parameter.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.tenant.cache.parameter.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.tenant.cache.parameter.eternal}" />
+        <property name="evictionPolicy" value="${bonita.tenant.cache.parameter.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.parameter.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.parameter.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.tenant.cache.parameter.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.tenant.cache.parameter.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.tenant.cache.parameter.readIntensive}" />
+    </bean>
+
+    <bean id="processDefCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="_PROCESSDEF" />
+        <property name="maxElementsInMemory" value="${bonita.tenant.cache.processdef.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.tenant.cache.processdef.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.tenant.cache.processdef.eternal}" />
+        <property name="evictionPolicy" value="${bonita.tenant.cache.processdef.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.processdef.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.processdef.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.tenant.cache.processdef.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.tenant.cache.processdef.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.tenant.cache.processdef.readIntensive}" />
+    </bean>
+
+    <bean id="userFilterCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="USER_FILTER" />
+        <property name="maxElementsInMemory" value="${bonita.tenant.cache.userfilter.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.tenant.cache.userfilter.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.tenant.cache.userfilter.eternal}" />
+        <property name="evictionPolicy" value="${bonita.tenant.cache.userfilter.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.userfilter.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.userfilter.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.tenant.cache.userfilter.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.tenant.cache.userfilter.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.tenant.cache.userfilter.readIntensive}" />
+    </bean>
+
+    <bean id="migrationPlanCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="MIGRATION_PLAN_CACHE_NAME" />
+        <property name="maxElementsInMemory" value="${bonita.tenant.cache.migrationplan.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.tenant.cache.migrationplan.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.tenant.cache.migrationplan.eternal}" />
+        <property name="evictionPolicy" value="${bonita.tenant.cache.migrationplan.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.migrationplan.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.migrationplan.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.tenant.cache.migrationplan.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.tenant.cache.migrationplan.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.tenant.cache.migrationplan.readIntensive}" />
+    </bean>
+
+    <bean id="breakpointCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="BREAKPOINTS_BY_INSTANCE" />
+        <property name="maxElementsInMemory" value="${bonita.tenant.cache.breakpoint.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.tenant.cache.breakpoint.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.tenant.cache.breakpoint.eternal}" />
+        <property name="evictionPolicy" value="${bonita.tenant.cache.breakpoint.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.breakpoint.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.breakpoint.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.tenant.cache.breakpoint.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.tenant.cache.breakpoint.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.tenant.cache.breakpoint.readIntensive}" />
+    </bean>
+
+    <bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="GROOVY_SCRIPT_CACHE_NAME" />
+        <property name="maxElementsInMemory" value="${bonita.tenant.cache.groovy.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.tenant.cache.groovy.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.tenant.cache.groovy.eternal}" />
+        <property name="evictionPolicy" value="${bonita.tenant.cache.groovy.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.groovy.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.groovy.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.tenant.cache.groovy.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.tenant.cache.groovy.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.tenant.cache.groovy.readIntensive}" />
+    </bean>
+
+    <bean id="transientDataCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="transient_data" />
+        <property name="maxElementsInMemory" value="${bonita.tenant.cache.transientdata.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.tenant.cache.transientdata.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.tenant.cache.transientdata.eternal}" />
+        <property name="evictionPolicy" value="${bonita.tenant.cache.transientdata.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.transientdata.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.transientdata.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.tenant.cache.transientdata.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.tenant.cache.transientdata.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.tenant.cache.transientdata.readIntensive}" />
+    </bean>
+
+    <bean id="businessDataRepository" class="org.bonitasoft.engine.business.data.impl.JPABusinessDataRepositoryImpl">
+        <constructor-arg name="transactionService" ref="transactionService" />
+        <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
+        <constructor-arg name="configuration">
+            <map>
+                <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
+                <entry key="hibernate.connection.datasource" value="${bdm.datasource.jndi.path}" />
+                <entry key="hibernate.show_sql" value="${bonita.tenant.bdm.repository.show_sql}" />
+                <entry key="hibernate.format_sql" value="${bonita.tenant.bdm.repository.format_sql}" />
+                <entry key="hibernate.transaction.jta.platform"
+                       value="${bdm.hibernate.transaction.jta_platform}" />
+                <entry key="hibernate.validator.autoregister_listeners" value="${bonita.tenant.bdm.repository.validator.autoregister_listeners}" />
+                <entry key="hibernate.validator.apply_to_ddl" value="${bonita.tenant.bdm.repository.validator.apply_to_ddl}" />
+                <entry key="javax.persistence.validation.mode" value="${bonita.tenant.bdm.repository.javax.persistence.validation.mode}" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="businessDataModelRepository"
+          class="org.bonitasoft.engine.business.data.impl.BusinessDataModelRepositoryImpl">
+        <constructor-arg name="dependencyService" ref="dependencyService" />
+        <constructor-arg name="schemaManager" ref="schemaManager" />
+        <constructor-arg name="tenantId" value="${tenantId}" />
+    </bean>
+
+    <bean id="schemaManager" class="org.bonitasoft.engine.business.data.impl.SchemaManager">
+        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="configuration">
+            <map>
+                <entry key="hibernate.dialect" value="${${bdm.db.vendor}.hibernate.dialect}" />
+                <entry key="hibernate.connection.datasource" value="${bdm.notmanageddatasource.jndi.path}" />
+                <entry key="hibernate.show_sql" value="${bonita.tenant.bdm.schemamanager.show_sql}" />
+                <entry key="hibernate.format_sql" value="${bonita.tenant.bdm.schemamanager.format_sql}" />
+                <entry key="hibernate.transaction.jta.platform"
+                       value="${bdm.hibernate.transaction.jta_platform}" />
+                <entry key="hibernate.validator.autoregister_listeners" value="${bonita.tenant.bdm.schemamanager.validator.autoregister_listeners}" />
+                <entry key="hibernate.validator.apply_to_ddl" value="${bonita.tenant.bdm.schemamanager.validator.apply_to_ddl}" />
+                <entry key="javax.persistence.validation.mode" value="${bonita.tenant.bdm.schemamanager.javax.persistence.validation.mode}" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="jsonBusinessDataSerializer"
+          class="org.bonitasoft.engine.business.data.impl.JsonBusinessDataSerializerImpl" />
+
+    <bean id="typeConverterUtil" class="org.bonitasoft.engine.commons.TypeConverterUtil">
+        <constructor-arg name="datePatterns" type="java.lang.String[]">
+            <list>
+                <value>yyyy-MM-dd</value>
+                <value>HH:mm:ss</value>
+                <value>yyyy-MM-dd HH:mm:ss</value>
+                <value>yyyy-MM-dd'T'HH:mm:ss</value>
+                <value>yyyy-MM-dd'T'HH:mm:ss.SSS</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="businessDataService" class="org.bonitasoft.engine.business.data.impl.BusinessDataServiceImpl">
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+        <constructor-arg name="jsonBusinessDataSerializer" ref="jsonBusinessDataSerializer" />
+        <constructor-arg name="businessDataModelRepository" ref="businessDataModelRepository" />
+        <constructor-arg name="typeConverterUtil" ref="typeConverterUtil" />
+    </bean>
+
+    <bean id="authenticationService" class="org.bonitasoft.engine.authentication.impl.AuthenticationServiceImpl">
+        <constructor-arg name="identityService" ref="identityService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="archivingStrategy" class="org.bonitasoft.engine.archive.impl.DefaultArchivingStrategy">
+        <constructor-arg name="additionalConfiguration" ref="archivingStrategyAdditionalConfiguration" />
+    </bean>
+
+    <util:map id="archivingStrategyAdditionalConfiguration">
+    </util:map>
+
+    <bean id="archiveService" class="org.bonitasoft.engine.archive.impl.ArchiveServiceImpl">
+        <constructor-arg name="definitiveArchivePersistenceService" ref="persistenceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="archivingStrategy" ref="archivingStrategy" />
+        <constructor-arg ref="transactionService" />
+    </bean>
+
+    <bean id="applicationService" class="org.bonitasoft.engine.business.application.impl.ApplicationServiceImpl">
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+    </bean>
+
+    <bean id="contractDataService" class="org.bonitasoft.engine.core.contract.data.ContractDataServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+    </bean>
+
+
+    <bean id="formMappingService" class="org.bonitasoft.engine.core.form.impl.FormMappingServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="pageMappingService" ref="pageMappingService" />
+        <constructor-arg name="pageService" ref="pageService" />
+        <constructor-arg name="formMappingKeyGenerator" ref="formMappingKeyGenerator" />
+        <constructor-arg name="externalUrlAdapter">
+            <util:constant static-field="org.bonitasoft.engine.page.URLAdapterConstants.EXTERNAL_URL_ADAPTER" />
+        </constructor-arg>
+        <constructor-arg name="legacyUrlAdapter">
+            <util:constant static-field="org.bonitasoft.engine.page.URLAdapterConstants.LEGACY_URL_ADAPTER" />
+        </constructor-arg>
+    </bean>
+
+    <bean id="syncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.SyncQueriableLoggerServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
+        <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="platformService" ref="platformService" />
+    </bean>
+
+    <bean id="sessionProvider" class="org.bonitasoft.engine.session.impl.SessionProviderImpl" />
+
+
+    <bean id="pageMappingService" class="org.bonitasoft.engine.page.impl.PageMappingServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+    </bean>
+
+    <bean id="urlAdapterInjector" class="org.bonitasoft.engine.page.impl.UrlAdapterInjector" autowire="byType" init-method="injectUrlAdapters">
+        <constructor-arg name="pageMappingService" ref="pageMappingService" />
+    </bean>
+
+    <bean id="authorizationRulesInjector" class="org.bonitasoft.engine.page.impl.AuthorizationRulesInjector" autowire="byType" init-method="injectAuthorizationRules">
+        <constructor-arg name="pageMappingService" ref="pageMappingService" />
+    </bean>
+
+    <!-- Authorization rules to register -->
+    <bean id="isAdmin" class="org.bonitasoft.engine.page.IsAdminRule" />
+    <bean id="isProcessOwner" class="org.bonitasoft.engine.page.IsProcessOwnerRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="formMappingService" ref="formMappingService" />
+        <constructor-arg name="supervisorMappingService" ref="supervisorMappingService" />
+    </bean>
+    <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+    </bean>
+    <bean id="isActorInitiatorRule" class="org.bonitasoft.engine.page.IsActorInitiatorRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="formMappingService" ref="formMappingService" />
+        <constructor-arg name="actorMappingService" ref="actorMappingService" />
+    </bean>
+    <bean id="isProcessInitiator" class="org.bonitasoft.engine.page.IsProcessInitiatorRule">
+        <constructor-arg ref="processInstanceService" />
+        <constructor-arg ref="tenantTechnicalLoggerService" />
+    </bean>
+    <bean id="isTaskPerformer" class="org.bonitasoft.engine.page.IsTaskPerformerRule">
+        <constructor-arg ref="activityInstanceService" />
+        <constructor-arg ref="tenantTechnicalLoggerService" />
+    </bean>
+    <bean id="isInvolvedInProcessInstance" class="org.bonitasoft.engine.page.IsInvolvedInProcessInstanceRule">
+
+    </bean>
+
+    <bean id="formMappingKeyGenerator" class="org.bonitasoft.engine.core.form.impl.FormMappingKeyGeneratorImpl">
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+    </bean>
+    <bean class="org.bonitasoft.engine.core.form.LegacyURLAdapter">
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="formMappingService" ref="formMappingService" />
+    </bean>
+    <bean id="externalUrlAdapter" class="org.bonitasoft.engine.core.form.ExternalURLAdapter" />
+
+</beans>

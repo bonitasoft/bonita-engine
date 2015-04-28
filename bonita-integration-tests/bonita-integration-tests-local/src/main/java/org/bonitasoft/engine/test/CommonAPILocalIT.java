@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.test;
 
 import org.bonitasoft.engine.CommonAPIIT;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -21,10 +22,15 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
+import org.junit.runner.RunWith;
 
 /**
  * @author Baptiste Mesta
  */
+@RunWith(BonitaTestRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class CommonAPILocalIT extends CommonAPIIT {
 
     protected TenantServiceAccessor getTenantAccessor() {
