@@ -91,10 +91,10 @@ public class FormMappingSPIT extends CommonAPISPIT {
 
         //resolve urls:
         final Map<String, Serializable> context = Collections.singletonMap(AuthorizationRuleConstants.IS_ADMIN, (Serializable) true);
-        PageURL pInstanciation = getProcessConfigurationAPI().resolvePageOrURL("process/ProcessWithUpdatedFormMappings/1.0", context);
-        PageURL pOverview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/ProcessWithUpdatedFormMappings/1.0", context);
-        PageURL pStep1Execution = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step1", context);
-        PageURL pStep2Execution = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step2", context);
+        PageURL pInstanciation = getProcessConfigurationAPI().resolvePageOrURL("process/ProcessWithUpdatedFormMappings/1.0", context, true);
+        PageURL pOverview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/ProcessWithUpdatedFormMappings/1.0", context, true);
+        PageURL pStep1Execution = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step1", context, true);
+        PageURL pStep2Execution = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step2", context, true);
         assertThat(pInstanciation.getUrl()).isEqualTo("processStartForm?tenant=" + getSession().getTenantId());
         assertThat(pInstanciation.getPageId()).isNull();
         assertThat(pOverview.getPageId()).isNull();
