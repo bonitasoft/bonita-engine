@@ -27,7 +27,11 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.hamcrest.CoreMatchers;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -44,20 +48,29 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
 
     @Mock
     ProcessInstanceService processInstanceService;
+    
+    @Mock
+    SessionService sessionService;
+
+    @Mock
+    SessionAccessor sessionAccessor;
 
     @InjectMocks
     IsProcessInitiatorRule rule;
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIllegallArgumentIfUserIdParamNotPresent() throws Exception {
-        Map<String, Serializable> context = buildContext(24L, null);
-
-        final boolean allowed = rule.isAllowed("key", context);
+    
+    long loggedUserId = 7L;
+    
+    @Before
+    public void initMocks() throws Exception {
+        when(sessionAccessor.getSessionId()).thenReturn(1L);
+        SSession session = mock(SSession.class);
+        when(session.getUserId()).thenReturn(loggedUserId);
+        when(sessionService.getSession(1L)).thenReturn(session);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowIllegallArgumentIfProcessInstanceIdParamNotPresent() throws Exception {
-        Map<String, Serializable> context = buildContext(null, 7L);
+        Map<String, Serializable> context = buildContext(null, null);
 
         final boolean allowed = rule.isAllowed("someKey", context);
     }
@@ -66,7 +79,7 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
     public void shouldNotBeAllowedIfProcessInstanceInitiatorIsNotGivenUser() throws Exception {
         final long processInstanceId = 541L;
 
-        Map<String, Serializable> context = buildContext(processInstanceId, 11L);
+        Map<String, Serializable> context = buildContext(processInstanceId, null);
         final SProcessInstance processInstance = mock(SProcessInstance.class);
         doReturn(444L).when(processInstance).getStartedBy();
         doReturn(processInstance).when(processInstanceService).getProcessInstance(processInstanceId);
@@ -80,10 +93,9 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
     public void shouldBeAllowedIfProcessInstanceInitiatorIsPreciselyTheGivenUser() throws Exception {
         final long processInstanceId = 541L;
 
-        final long userId = 11L;
-        Map<String, Serializable> context = buildContext(processInstanceId, userId);
+        Map<String, Serializable> context = buildContext(processInstanceId, null);
         final SProcessInstance processInstance = mock(SProcessInstance.class);
-        doReturn(userId).when(processInstance).getStartedBy();
+        doReturn(loggedUserId).when(processInstance).getStartedBy();
         doReturn(processInstance).when(processInstanceService).getProcessInstance(processInstanceId);
 
         final boolean allowed = rule.isAllowed("someKey", context);
@@ -106,11 +118,10 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
     public void shouldEnsureArchivedProcessInstanceStartedBy() throws Exception {
         final long processInstanceId = 541L;
 
-        final long userId = 11L;
-        Map<String, Serializable> context = buildContext(processInstanceId, userId);
+        Map<String, Serializable> context = buildContext(processInstanceId, null);
         doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(processInstanceId);
         final SAProcessInstance saProcessInstance = mock(SAProcessInstance.class);
-        doReturn(userId).when(saProcessInstance).getStartedBy();
+        doReturn(loggedUserId).when(saProcessInstance).getStartedBy();
         doReturn(Collections.singletonList(saProcessInstance)).when(processInstanceService).searchArchivedProcessInstances(any(QueryOptions.class));
 
         final boolean allowed = rule.isAllowed("someKey", context);
@@ -125,8 +136,7 @@ public class IsProcessInitiatorRuleTest extends RuleTest {
     public void shouldThrowNotFoundIfProcessNotFoundInTheArchivesEither() throws Exception {
         final long processInstanceId = 541L;
 
-        final long userId = 11L;
-        Map<String, Serializable> context = buildContext(processInstanceId, userId);
+        Map<String, Serializable> context = buildContext(processInstanceId, null);
         doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(processInstanceId);
         doReturn(Collections.emptyList()).when(processInstanceService).searchArchivedProcessInstances(any(QueryOptions.class));
 

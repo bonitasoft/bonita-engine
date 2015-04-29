@@ -24,11 +24,16 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -43,15 +48,24 @@ public class IsTaskPerformerRuleTest extends RuleTest {
 
     @Mock
     ActivityInstanceService activityInstanceService;
+    
+    @Mock
+    SessionService sessionService;
+
+    @Mock
+    SessionAccessor sessionAccessor;
 
     @InjectMocks
     IsTaskPerformerRule rule;
+    
+    long loggedUserId = 7L;
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIllegalArgumentIfUserIdParamNotPresent() throws Exception {
-        Map<String, Serializable> context = buildContext(24L, null);
-
-        rule.isAllowed("betje", context);
+    @Before
+    public void initMocks() throws Exception {
+        when(sessionAccessor.getSessionId()).thenReturn(1L);
+        SSession session = mock(SSession.class);
+        when(session.getUserId()).thenReturn(loggedUserId);
+        when(sessionService.getSession(1L)).thenReturn(session);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -65,7 +79,7 @@ public class IsTaskPerformerRuleTest extends RuleTest {
     public void shouldNotBeAllowedIfNoArchivedTasks() throws Exception {
         final long processInstanceId = 541L;
 
-        Map<String, Serializable> context = buildContext(processInstanceId, 11L);
+        Map<String, Serializable> context = buildContext(processInstanceId, null);
         doReturn(Collections.emptyList()).when(activityInstanceService).searchArchivedTasks(any(QueryOptions.class));
 
         final boolean allowed = rule.isAllowed("someKey", context);
@@ -75,12 +89,10 @@ public class IsTaskPerformerRuleTest extends RuleTest {
 
     @Test
     public void shouldBeAllowedIAnArchivedTaskIsAssignedToGivenUser() throws Exception {
-
-        final long userId = 11L;
-        Map<String, Serializable> context = buildContext(541L, userId);
-        final SProcessInstance processInstance = mock(SProcessInstance.class);
+        
+        Map<String, Serializable> context = buildContext(541L, null);
         final SAUserTaskInstance userTaskInstance = mock(SAUserTaskInstance.class);
-        doReturn(userId).when(userTaskInstance).getAssigneeId();
+        doReturn(loggedUserId).when(userTaskInstance).getAssigneeId();
         doReturn(Arrays.asList(userTaskInstance)).when(activityInstanceService).searchArchivedTasks(any(QueryOptions.class));
 
         final boolean allowed = rule.isAllowed("someKey", context);
@@ -91,12 +103,10 @@ public class IsTaskPerformerRuleTest extends RuleTest {
     @Test
     public void shouldBeAllowedIAnArchivedTaskIsAssignedToGivenUserWithPagination() throws Exception {
 
-        final long userId = 11L;
-        Map<String, Serializable> context = buildContext(541L, userId);
-        final SProcessInstance processInstance = mock(SProcessInstance.class);
+        Map<String, Serializable> context = buildContext(541L, null);
         final SAUserTaskInstance notMatchingArchivedTask = mock(SAUserTaskInstance.class);
         final SAUserTaskInstance userTaskInstance = mock(SAUserTaskInstance.class);
-        doReturn(userId).when(userTaskInstance).getAssigneeId();
+        doReturn(loggedUserId).when(userTaskInstance).getAssigneeId();
         when(activityInstanceService.searchArchivedTasks(any(QueryOptions.class))).thenReturn(Arrays.<SAHumanTaskInstance> asList(notMatchingArchivedTask),
                 Arrays.<SAHumanTaskInstance> asList(userTaskInstance));
 
@@ -107,7 +117,7 @@ public class IsTaskPerformerRuleTest extends RuleTest {
 
     @Test(expected = SExecutionException.class)
     public void shouldThrowSExecutionExceptionIfExceptionOccurs() throws Exception {
-        Map<String, Serializable> context = buildContext(256L, 31L);
+        Map<String, Serializable> context = buildContext(256L, null);
         doThrow(SBonitaReadException.class).when(activityInstanceService).searchArchivedTasks(any(QueryOptions.class));
 
         rule.isAllowed("exception raised", context);

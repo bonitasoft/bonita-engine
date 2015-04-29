@@ -28,6 +28,8 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * author Emmanuel Duchastenier
@@ -35,19 +37,25 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 public class IsTaskPerformerRule extends AuthorizationRuleWithParameters implements AuthorizationRule {
 
     private ActivityInstanceService activityInstanceService;
+    
+    private SessionService sessionService;
 
-    public IsTaskPerformerRule(ActivityInstanceService activityInstanceService) {
+    private SessionAccessor sessionAccessor;
+    
+    public IsTaskPerformerRule(ActivityInstanceService activityInstanceService, SessionService sessionService, SessionAccessor sessionAccessor) {
         this.activityInstanceService = activityInstanceService;
+        this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
     }
 
     @Override
     public boolean isAllowed(String key, Map<String, Serializable> context) throws SExecutionException {
         try {
-            Long userId = getLongParameter(context, URLAdapterConstants.USER_QUERY_PARAM);
+            long userId = getLoggedUserId(sessionAccessor, sessionService);
             Long processInstanceId = getLongParameter(context, URLAdapterConstants.ID_QUERY_PARAM);
-            if (userId == null || processInstanceId == null) {
+            if (processInstanceId == null) {
                 throw new IllegalArgumentException(
-                        "Parameters 'userId' and 'processInstanceId' are mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
+                        "Parameter 'id' is mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
             }
 
             QueryOptions archivedQueryOptions = buildArchivedTasksQueryOptions(processInstanceId);

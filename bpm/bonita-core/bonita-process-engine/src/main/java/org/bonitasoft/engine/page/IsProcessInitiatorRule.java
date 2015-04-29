@@ -30,6 +30,10 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * author Anthony Birembaut
@@ -37,18 +41,24 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 public class IsProcessInitiatorRule extends AuthorizationRuleWithParameters implements AuthorizationRule {
 
     private ProcessInstanceService processInstanceService;
+    
+    private SessionService sessionService;
 
-    public IsProcessInitiatorRule(ProcessInstanceService processInstanceService) {
+    private SessionAccessor sessionAccessor;
+
+    public IsProcessInitiatorRule(ProcessInstanceService processInstanceService, SessionService sessionService, SessionAccessor sessionAccessor) {
         this.processInstanceService = processInstanceService;
+        this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
     }
 
     @Override
     public boolean isAllowed(final String key, final Map<String, Serializable> context) throws SExecutionException {
-        Long userId = getLongParameter(context, URLAdapterConstants.USER_QUERY_PARAM);
+        long userId = getLoggedUserId(sessionAccessor, sessionService);
         Long processInstanceId = getLongParameter(context, URLAdapterConstants.ID_QUERY_PARAM);
-        if (userId == null || processInstanceId == null) {
+        if (processInstanceId == null) {
             throw new IllegalArgumentException(
-                    "Parameters 'userId' and 'processInstanceId' are mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
+                    "Parameter 'id' is mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
         }
         try {
             final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);

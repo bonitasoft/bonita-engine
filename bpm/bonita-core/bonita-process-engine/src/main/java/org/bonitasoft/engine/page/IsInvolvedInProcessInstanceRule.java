@@ -24,6 +24,8 @@ import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * author Emmanuel Duchastenier
@@ -31,18 +33,24 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 public class IsInvolvedInProcessInstanceRule extends AuthorizationRuleWithParameters implements AuthorizationRule {
 
     private ActivityInstanceService activityInstanceService;
+    
+    private SessionService sessionService;
 
-    public IsInvolvedInProcessInstanceRule(ActivityInstanceService activityInstanceService) {
+    private SessionAccessor sessionAccessor;
+
+    public IsInvolvedInProcessInstanceRule(ActivityInstanceService activityInstanceService, SessionService sessionService, SessionAccessor sessionAccessor) {
         this.activityInstanceService = activityInstanceService;
+        this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
     }
 
     @Override
     public boolean isAllowed(final String key, final Map<String, Serializable> context) throws SExecutionException {
-        Long userId = getLongParameter(context, URLAdapterConstants.USER_QUERY_PARAM);
+        long userId = getLoggedUserId(sessionAccessor, sessionService);
         Long processInstanceId = getLongParameter(context, URLAdapterConstants.ID_QUERY_PARAM);
-        if (userId == null || processInstanceId == null) {
+        if (processInstanceId == null) {
             throw new IllegalArgumentException(
-                    "Parameters 'userId' and 'processInstanceId' are mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
+                    "Parameter 'id' is mandatory to execute Page Authorization rule 'IsProcessInitiatorRule'");
         }
 
         // is user assigned or has pending tasks on this process instance:
