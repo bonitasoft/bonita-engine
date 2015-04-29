@@ -15,9 +15,11 @@ package org.bonitasoft.engine.core.form.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.bonitasoft.engine.page.AuthorizationRuleConstants.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -25,6 +27,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingKeyGenerator;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.impl.SPageImpl;
@@ -101,7 +104,35 @@ public class FormMappingServiceImplTest {
 
         formMappingService.create(PROCESS_DEFINITION_ID, "step1", 2, SFormMapping.TARGET_INTERNAL, null);
 
-        verify(pageMappingService).create("theKey", null);
+        verify(pageMappingService).create(eq("theKey"), isNull(Long.class), anyList());
+    }
+
+    @Test
+    public void createForTaskShouldAddCorrectAuthorizations() throws Exception {
+        doReturn("clef").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, "task", FormMappingType.TASK.getId());
+
+        formMappingService.create(PROCESS_DEFINITION_ID, "task", FormMappingType.TASK.getId(), SFormMapping.TARGET_INTERNAL, null);
+
+        verify(pageMappingService).create("clef", null, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_TASK_AVAILABLE_FOR_USER));
+    }
+
+    @Test
+    public void createForProcessStartShouldAddCorrectAuthorizations() throws Exception {
+        doReturn("keye").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId());
+
+        formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId(), SFormMapping.TARGET_URL, null);
+
+        verify(pageMappingService).create("keye", null, EXTERNAL, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_ACTOR_INITIATOR));
+    }
+
+    @Test
+    public void createForProcessOverviewShouldAddCorrectAuthorizations() throws Exception {
+        doReturn("clave").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_OVERVIEW.getId());
+
+        formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_OVERVIEW.getId(), SFormMapping.TARGET_LEGACY, null);
+
+        verify(pageMappingService).create("clave", null, LEGACY,
+                Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_PROCESS_INITIATOR, IS_TASK_PERFORMER, IS_INVOLVED_IN_PROCESS_INSTANCE));
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -10,31 +10,28 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.contract.validation.builder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
 
 public class SComplexInputDefinitionBuilder {
 
+    private final List<SInputDefinition> inputDefinitions = new ArrayList<>();
     private String name = "aName";
     private String description = "a description";
     private boolean multiple = false;
-    private final List<SSimpleInputDefinition> inputDefinitions = new ArrayList<SSimpleInputDefinition>();
-    private final List<SComplexInputDefinition> complexDefinitions = new ArrayList<SComplexInputDefinition>();
 
     public static SComplexInputDefinitionBuilder aComplexInput() {
         return new SComplexInputDefinitionBuilder();
     }
 
-    public SComplexInputDefinition build() {
-        return new SComplexInputDefinitionImpl(name, description, multiple, inputDefinitions, complexDefinitions);
+    public SInputDefinition build() {
+        return new SInputDefinitionImpl(name, description, multiple, inputDefinitions);
     }
 
     public SComplexInputDefinitionBuilder withInput(final SSimpleInputDefinitionBuilder... definitions) {
@@ -46,11 +43,7 @@ public class SComplexInputDefinitionBuilder {
 
     public SComplexInputDefinitionBuilder withInput(final SInputDefinition... definitions) {
         for (final SInputDefinition definition : definitions) {
-            if (definition instanceof SSimpleInputDefinition) {
-                inputDefinitions.add((SSimpleInputDefinition) definition);
-            } else if (definition instanceof SComplexInputDefinition) {
-                complexDefinitions.add((SComplexInputDefinition) definition);
-            }
+            inputDefinitions.add(definition);
         }
         return this;
     }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,23 +10,16 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.bpm.contract;
-
+ */
+package org.bonitasoft.engine.page;
 
 /**
- * An <code>ComplexInputDefinition</code> defines
- *
- * @author Laurent Leseigneur
- * @since 7.0
+ * Thrown when access to a given page or URL is not allowed for a given key.
+ * author Emmanuel Duchastenier
  */
-public interface SimpleInputDefinition extends InputDefinition {
+public class SAuthorizationException extends Exception {
 
-    /**
-     * Gets the type of the input.
-     *
-     * @return the input {@link Type}
-     */
-    Type getType();
-
+    public SAuthorizationException(String message) {
+        super(message);
+    }
 }

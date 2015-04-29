@@ -16,14 +16,12 @@ package org.bonitasoft.engine.bpm.process.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintType;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
@@ -48,34 +46,33 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
         container.setContract(contract);
     }
 
-    public ContractDefinitionBuilder addSimpleInput(final String name, final Type type, final String description) {
-        return addSimpleInput(name, type, description, false);
+    public ContractDefinitionBuilder addInput(final String name, final Type type, final String description) {
+        return addInput(name, type, description, false);
     }
 
-    public ContractDefinitionBuilder addSimpleInput(final String name, final Type type, final String description, final boolean multiple) {
-        final SimpleInputDefinition input = new SimpleInputDefinitionImpl(name, type, description, multiple);
-        contract.addSimpleInput(input);
+    public ContractDefinitionBuilder addInput(final String name, final Type type, final String description, final boolean multiple) {
+        final InputDefinition input = new InputDefinitionImpl(name, type, description, multiple);
+        contract.addInput(input);
         return this;
     }
 
-    public ContractDefinitionBuilder addComplexInput(final String name, final String description, final List<SimpleInputDefinition> simpleInputs,
-            final List<ComplexInputDefinition> complexInputs) {
-        return addComplexInput(name, description, false, simpleInputs, complexInputs);
+    public ContractDefinitionBuilder addInput(final String name, final String description, final List<InputDefinition> inputDefinitions) {
+        return addInput(name, description, false, inputDefinitions);
     }
 
-    public ContractDefinitionBuilder addComplexInput(final String name, final String description, final boolean multiple,
-            final List<SimpleInputDefinition> simpleInputs, final List<ComplexInputDefinition> complexInputs) {
-        final ComplexInputDefinitionImpl input = new ComplexInputDefinitionImpl(name, description, multiple, simpleInputs, complexInputs);
-        contract.addComplexInput(input);
+    public ContractDefinitionBuilder addInput(final String name, final String description, final boolean multiple,
+                                              final List<InputDefinition> inputDefinitions) {
+        final InputDefinitionImpl input = new InputDefinitionImpl(name, description, multiple, inputDefinitions);
+        contract.addInput(input);
         return this;
     }
 
     public ContractDefinitionBuilder addFileInput(final String name, final String description) {
-        final SimpleInputDefinitionImpl nameInput= new SimpleInputDefinitionImpl("name", Type.TEXT, "The file name");
-        final SimpleInputDefinitionImpl contentInput= new SimpleInputDefinitionImpl("content", Type.BYTE_ARRAY, "The file content");
-        final ComplexInputDefinitionImpl fileInput = new ComplexInputDefinitionImpl(name, description,
-                Arrays.<SimpleInputDefinition> asList(nameInput, contentInput), null);
-        contract.addComplexInput(fileInput);
+        final InputDefinitionImpl nameInput= new InputDefinitionImpl("name", Type.TEXT, "The file name");
+        final InputDefinitionImpl contentInput= new InputDefinitionImpl("content", Type.BYTE_ARRAY, "The file content");
+        final InputDefinitionImpl fileInput = new InputDefinitionImpl(name, description,
+                Arrays.<InputDefinition> asList(nameInput, contentInput));
+        contract.addInput(fileInput);
         return this;
     }
 

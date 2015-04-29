@@ -356,7 +356,6 @@
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:choice>
                             <xs:element name="inputDefinition" type="definition:SInputDefinition" />
-                            <xs:element name="complexInputDefinition" type="definition:SComplexInputDefinition" />
                         </xs:choice>
                     </xs:sequence>
                 </xs:complexType>
@@ -374,6 +373,11 @@
     <xs:complexType name="SInputDefinition">
         <xs:complexContent>
             <xs:extension base="definition:SInputElement">
+                <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:choice>
+                        <xs:element name="inputDefinition" type="definition:SInputDefinition" />
+                    </xs:choice>
+                </xs:sequence>
                 <xs:attribute name="type">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
@@ -386,19 +390,6 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="SComplexInputDefinition">
-        <xs:complexContent>
-            <xs:extension base="definition:SInputElement">
-                <xs:sequence minOccurs="1" maxOccurs="unbounded">
-                    <xs:choice>
-                        <xs:element name="inputDefinition" type="definition:SInputDefinition" />
-                        <xs:element name="complexInputDefinition" type="definition:SComplexInputDefinition" />
-                    </xs:choice>
-                </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

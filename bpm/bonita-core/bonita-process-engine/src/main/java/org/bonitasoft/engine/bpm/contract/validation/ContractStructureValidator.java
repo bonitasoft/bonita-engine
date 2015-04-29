@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.contract.validation;
 
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
@@ -22,10 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
-import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -41,32 +39,31 @@ public class ContractStructureValidator {
 
     public void validate(final SContractDefinition contract, final Map<String, Serializable> inputs) throws ContractViolationException {
         final List<String> messages = new ArrayList<>();
-        Map<String, Serializable> inputsToValidate = inputs != null ? inputs : Collections.<String, Serializable> emptyMap();
-        messages.addAll(recursive(contract.getSimpleInputs(), contract.getComplexInputs(), inputsToValidate));
+        Map<String, Serializable> inputsToValidate = inputs != null ? inputs : Collections.<String, Serializable>emptyMap();
+        messages.addAll(recursive(contract.getInputs(), inputsToValidate));
         if (!messages.isEmpty()) {
             throw new ContractViolationException("Error while validating expected inputs", messages);
         }
     }
 
-    private List<String> recursive(final List<SSimpleInputDefinition> simpleInputs, final List<SComplexInputDefinition> complexInputs,
-            final Map<String, Serializable> inputs) {
+    private List<String> recursive(final List<SInputDefinition> inputDefinitions,
+                                   final Map<String, Serializable> inputs) {
 
-        logInputsWhichAreNotInContract(DEBUG, simpleInputs, inputs);
+        logInputsWhichAreNotInContract(DEBUG, inputDefinitions, inputs);
 
         final List<String> message = new ArrayList<>();
-        for (final SInputDefinition def : union(simpleInputs, complexInputs)) {
+        for (final SInputDefinition def : inputDefinitions) {
             try {
                 validateInput(def, inputs);
-                if (def instanceof SComplexInputDefinition) {
-                    final SComplexInputDefinition complex = (SComplexInputDefinition) def;
-                    if (def.isMultiple()) {
-                        for (final Map<String, Serializable> complexItem : (List<Map<String, Serializable>>) inputs.get(def.getName())) {
-                            validateComplexItem(complexItem, message, def, complex);
-                        }
+                if (!def.hasChildren()) {
+                    continue;
+                }
+                if (def.isMultiple()) {
+                    for (final Map<String, Serializable> complexItem : (List<Map<String, Serializable>>) inputs.get(def.getName())) {
+                        validateComplexItem(complexItem, message, def, def);
                     }
-                    else {
-                        validateComplexItem((Map<String, Serializable>) inputs.get(def.getName()), message, def, complex);
-                    }
+                } else {
+                    validateComplexItem((Map<String, Serializable>) inputs.get(def.getName()), message, def, def);
                 }
             } catch (final InputValidationException e) {
                 message.add(e.getMessage());
@@ -76,15 +73,8 @@ public class ContractStructureValidator {
     }
 
     private void validateComplexItem(final Map<String, Serializable> complexItem, final List<String> message, final SInputDefinition def,
-            final SComplexInputDefinition complex) {
-        message.addAll(recursive(complex.getSimpleInputDefinitions(), complex.getComplexInputDefinitions(), complexItem));
-    }
-
-    private List<SInputDefinition> union(final List<SSimpleInputDefinition> simpleInputs, final List<SComplexInputDefinition> complexInputs) {
-        final List<SInputDefinition> all = new ArrayList<>();
-        all.addAll(simpleInputs);
-        all.addAll(complexInputs);
-        return all;
+                                     final SInputDefinition complex) {
+        message.addAll(recursive(complex.getInputDefinitions(), complexItem));
     }
 
     private void validateInput(final SInputDefinition definition, final Map<String, Serializable> inputs) throws InputValidationException {
@@ -96,8 +86,8 @@ public class ContractStructureValidator {
         }
     }
 
-    private void logInputsWhichAreNotInContract(final TechnicalLogSeverity severity, final List<SSimpleInputDefinition> simpleInputs,
-            final Map<String, Serializable> inputs) {
+    private void logInputsWhichAreNotInContract(final TechnicalLogSeverity severity, final List<SInputDefinition> simpleInputs,
+                                                final Map<String, Serializable> inputs) {
         if (logger.isLoggable(ContractStructureValidator.class, severity)) {
             for (final String input : getInputsWhichAreNotInContract(simpleInputs, inputs)) {
                 logger.log(ContractStructureValidator.class, severity, "Unexpected input [" + input + "] provided");
@@ -105,7 +95,7 @@ public class ContractStructureValidator {
         }
     }
 
-    private List<String> getInputsWhichAreNotInContract(final List<SSimpleInputDefinition> simpleInputs, final Map<String, Serializable> inputs) {
+    private List<String> getInputsWhichAreNotInContract(final List<SInputDefinition> simpleInputs, final Map<String, Serializable> inputs) {
         final List<String> keySet = new ArrayList<>(inputs.keySet());
         for (final SInputDefinition def : simpleInputs) {
             keySet.remove(def.getName());
