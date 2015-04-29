@@ -203,6 +203,7 @@ public class PageAPIIT extends CommonAPIIT {
 
     }
 
+    @Test
     public void updatePage_contents_should_updates_page() throws Exception {
         // given
         final Page pageBefore = getPageAPI().createPage(
@@ -251,6 +252,31 @@ public class PageAPIIT extends CommonAPIIT {
         assertThat(returnedPage.getLastModificationDate()).as("last modification date should be modified ").isAfter(
                 page.getLastModificationDate());
     }
+
+    @Test
+    public void should_create_page_use_content_type_in_properties() throws Exception {
+        // given
+        final String pageName1 = generateUniquePageName(0);
+        final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName1, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION,
+                "contentType=WillBeIgnored");
+
+        final String pageName2 = generateUniquePageName(1);
+        final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName2, DISPLAY_NAME, "with page creator " + PAGE_DESCRIPTION, "contentType="
+                + ContentType.API_EXTENSION);
+
+        // when
+        final Page pageWithCreator = getPageAPI().createPage(
+                new PageCreator(pageName1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
+                        .setContentType(ContentType.API_EXTENSION),
+                pageContent1);
+        final Page pageWithContent = getPageAPI().createPage(pageName2, pageContent2);
+
+        // then
+        PageAssert.assertThat(pageWithContent).hasContentType(ContentType.API_EXTENSION);
+        PageAssert.assertThat(pageWithCreator).hasContentType(ContentType.API_EXTENSION);
+    }
+
+
 
     @Test
     public void should_getPage_by_name_return_the_page() throws Exception {
