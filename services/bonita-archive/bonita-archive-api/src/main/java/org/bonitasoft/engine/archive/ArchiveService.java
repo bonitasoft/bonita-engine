@@ -66,13 +66,6 @@ public interface ArchiveService {
     ReadPersistenceService getDefinitiveArchiveReadPersistenceService();
 
     /**
-     * Get the archive descriptor corresponding to the definitive archive
-     * 
-     * @return the archive descriptor corresponding to the definitive archive
-     */
-    SArchiveDescriptor getDefinitiveArchiveDescriptor();
-
-    /**
      * @param sourceObjectClass
      *            Persistent object to be judged achievable or not
      * @return Return true if the objects of the given class can be archived.

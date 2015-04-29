@@ -115,6 +115,12 @@
 			<groupId>org.bonitasoft.engine.classloader</groupId>
 			<artifactId>bonita-classloader-impl</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine.core</groupId>
+					<artifactId>bonita-home-server</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Command -->

@@ -15,14 +15,12 @@ package org.bonitasoft.engine.api.impl;
 
 import static java.util.Collections.singletonMap;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,10 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -125,7 +120,6 @@ import org.bonitasoft.engine.bpm.actor.ActorUpdater;
 import org.bonitasoft.engine.bpm.actor.ActorUpdater.ActorField;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
 import org.bonitasoft.engine.bpm.category.Category;
@@ -208,7 +202,6 @@ import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
-import org.bonitasoft.engine.commons.StringUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -353,7 +346,6 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
@@ -779,61 +771,17 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     // TODO delete files after use/if an exception occurs
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
-        String processesFolder;
+        final long tenantId = getTenantAccessor().getTenantId();
         try {
-            final long tenantId = getTenantAccessor().getTenantId();
-            processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new BonitaRuntimeException(e);
-        }
-        final File file = new File(processesFolder);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        final File processFolder = new File(file, String.valueOf(processDefinitionId));
-
-        // export actormapping
-        try {
-
-            final File actormappF = new File(processFolder.getPath(), "actorMapping.xml");
-            if (!actormappF.exists()) {
-                actormappF.createNewFile();
-            }
-            String xmlcontent = "";
-            try {
-                xmlcontent = exportActorMapping(processDefinitionId);
-            } catch (final ActorMappingExportException e) {
-                throw new ProcessExportException(e);
-            }
-            IOUtil.writeContentToFile(xmlcontent, actormappF);
-
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            final ZipOutputStream zos = new ZipOutputStream(baos);
-            try {
-                IOUtil.zipDir(processFolder.getPath(), zos, processFolder.getPath());
-                return baos.toByteArray();
-            } finally {
-                zos.close();
-                baos.close();
-            }
-        } catch (final IOException e) {
+            return BonitaHomeServer.getInstance().exportBarProcessContentUnderHome(tenantId, processDefinitionId, exportActorMapping(processDefinitionId));
+        } catch (Exception e) {
             throw new ProcessExportException(e);
         }
     }
 
     protected void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sProcessDefinition, final long tenantId)
             throws BonitaHomeNotSetException, IOException {
-        final File processFolder = getProcessFolder(sProcessDefinition.getId(), tenantId);
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, processFolder);
-    }
-
-    private File getProcessFolder(final long processDefinitionId, final long tenantId) throws BonitaHomeNotSetException {
-        final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
-        final File file = new File(processesFolder);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        return new File(file, String.valueOf(processDefinitionId));
+        BonitaHomeServer.getInstance().writeBusinessArchive(tenantId, sProcessDefinition.getId(), businessArchive);
     }
 
     @Override
@@ -975,8 +923,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public DesignProcessDefinition getDesignProcessDefinition(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            final File processFolder = getProcessFolder(processDefinitionId, tenantAccessor.getTenantId());
-            final File processDesignFile = new File(processFolder, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
+            final File processDesignFile = BonitaHomeServer.getInstance().getProcessDefinitionFile(tenantAccessor.getTenantId(), processDefinitionId, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
             final ProcessDefinitionBARContribution processDefinitionBARContribution = new ProcessDefinitionBARContribution();
             return processDefinitionBARContribution.deserializeProcessDefinition(processDesignFile);
         } catch (final BonitaHomeNotSetException e) {
@@ -2428,39 +2375,15 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<String, byte[]> getProcessResources(final long processDefinitionId, final String filenamesPattern) throws RetrieveException {
-        String processesFolder;
+        final Map<String, byte[]> processResources;
         try {
-            processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(getTenantAccessor().getTenantId());
-        } catch (final BonitaHomeNotSetException e) {
-            throw new RetrieveException("Problem accessing basic Bonita Home server resources", e);
+            processResources = BonitaHomeServer.getInstance().getProcessResources(getTenantAccessor().getTenantId(), processDefinitionId, filenamesPattern);
+        } catch (BonitaHomeNotSetException e) {
+            throw new RetrieveException(e);
+        } catch (IOException e) {
+            throw new RetrieveException(e);
         }
-        final String sep = File.separator;
-        processesFolder = StringUtils.uniformizePathPattern(processesFolder);
-        if (!processesFolder.endsWith(sep)) {
-            processesFolder = processesFolder + sep;
-        }
-        processesFolder = processesFolder + processDefinitionId + sep;
-        final File processDirectory = new File(processesFolder);
-        final Collection<File> files = FileUtils.listFiles(processDirectory, new DeepRegexFileFilter(processDirectory, filenamesPattern),
-                DirectoryFileFilter.DIRECTORY);
-        final Map<String, byte[]> res = new HashMap<String, byte[]>(files.size());
-        try {
-            for (final File f : files) {
-                res.put(generateRelativeResourcePath(processDirectory, f), IOUtil.getAllContentFrom(f));
-            }
-        } catch (final IOException e) {
-            throw new RetrieveException("Problem accessing resources " + filenamesPattern + " for processDefinitionId: " + processDefinitionId, e);
-        }
-        return res;
-    }
-
-    protected String generateRelativeResourcePath(final File processDirectory, final File f) {
-        String path = StringUtils.uniformizePathPattern(f.getAbsolutePath().replace(processDirectory.getAbsolutePath(), ""));
-        // remove first slash, if any:
-        if (path.startsWith("/")) {
-            path = path.substring(1);
-        }
-        return path;
+        return processResources;
     }
 
     @Override

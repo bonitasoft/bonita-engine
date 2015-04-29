@@ -16,18 +16,14 @@ package org.bonitasoft.engine.tenant;
 import java.util.Date;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.TestsInitializer;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +31,6 @@ import org.slf4j.LoggerFactory;
  * @author Laurent Leseigneur
  * @author Celine Souchet
  */
-@RunWith(BonitaTestRunner.class)
-@Initializer(TestsInitializer.class)
 public class TenantMaintenanceIT extends TestWithUser {
 
     private static final String CRON_EXPRESSION_EACH_SECOND = "*/1 * * * * ?";

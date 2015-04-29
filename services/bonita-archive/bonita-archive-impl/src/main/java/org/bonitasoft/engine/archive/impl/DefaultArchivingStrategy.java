@@ -10,9 +10,11 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.archive.impl;
 
+
+import java.util.Map;
 
 /**
  * @author Matthieu Chaffotte
@@ -20,7 +22,7 @@ package org.bonitasoft.engine.archive.impl;
  */
 public class DefaultArchivingStrategy extends AbstractArchivingStrategy {
 
-    public DefaultArchivingStrategy() {
+    public DefaultArchivingStrategy(Map<String, Boolean> additionalConfiguration) {
         super();
         archives.put("org.bonitasoft.engine.core.process.comment.model.SComment", true);
         archives.put("org.bonitasoft.engine.core.document.model.SDocumentMapping", true);
@@ -41,6 +43,11 @@ public class DefaultArchivingStrategy extends AbstractArchivingStrategy {
         archives.put("org.bonitasoft.engine.data.instance.model.SDataInstance", true);
         // is the archived version because there is no not archived version
         archives.put("org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance", true);
+        for (Map.Entry<String, Boolean> entry : additionalConfiguration.entrySet()) {
+            if (!archives.containsKey(entry.getKey())) {
+                archives.put(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
 }

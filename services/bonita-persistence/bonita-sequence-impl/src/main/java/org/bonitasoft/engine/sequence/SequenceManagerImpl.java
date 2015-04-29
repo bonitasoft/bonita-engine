@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.sequence;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -28,11 +29,7 @@ import org.bonitasoft.engine.lock.LockService;
  */
 public class SequenceManagerImpl implements SequenceManager {
 
-    private final Map<Long, Integer> rangeSizes;
-
-    private final int defaultRangeSize;
-
-    private final Map<String, Long> sequencesMappings;
+    private final SequenceMappingProvider sequenceMappingProvider;
 
     private final int retries;
 
@@ -48,13 +45,11 @@ public class SequenceManagerImpl implements SequenceManager {
 
     private final Object mutex = new SequenceManagerImplMutex();
 
-    public SequenceManagerImpl(final LockService lockService, final Map<Long, Integer> rangeSizes, final int defaultRangeSize,
-            final Map<String, Long> sequencesMappings,
+    public SequenceManagerImpl(final LockService lockService,
+            final SequenceMappingProvider sequenceMappingProvider,
             final DataSource datasource, final int retries, final int delay, final int delayFactor) {
         this.lockService = lockService;
-        this.defaultRangeSize = defaultRangeSize;
-        this.rangeSizes = rangeSizes;
-        this.sequencesMappings = sequencesMappings;
+        this.sequenceMappingProvider = sequenceMappingProvider;
         this.retries = retries;
         this.delay = delay;
         this.delayFactor = delayFactor;
@@ -77,7 +72,7 @@ public class SequenceManagerImpl implements SequenceManager {
             synchronized (mutex) {
                 mgr = this.sequenceManagers.get(tenantId);
                 if (mgr == null) {
-                    mgr = new TenantSequenceManagerImpl(tenantId, lockService, rangeSizes, defaultRangeSize, sequencesMappings, datasource, retries, delay,
+                    mgr = new TenantSequenceManagerImpl(tenantId, lockService, getSequenceIdToRangeSizeMap(), getClassNameToSequenceIdMap(), datasource, retries, delay,
                             delayFactor);
                     this.sequenceManagers.put(tenantId, mgr);
                 }
@@ -99,6 +94,28 @@ public class SequenceManagerImpl implements SequenceManager {
     @Override
     public void clear(final long tenantId) {
         this.sequenceManagers.remove(tenantId);
+    }
+
+    private Map<String, Long> getClassNameToSequenceIdMap() {
+        final Map<String, Long> result = new HashMap<>();
+        for (SequenceMapping sequenceMapping : sequenceMappingProvider.getSequenceMappings()) {
+            for (String className : sequenceMapping.getClassNames()) {
+                result.put(className, sequenceMapping.getSequenceId());
+            }
+        }
+        return result;
+    }
+
+    private Map<Long, Integer> getSequenceIdToRangeSizeMap() {
+        final Map<Long, Integer> result = new HashMap<>();
+        for (SequenceMapping sequenceMapping : sequenceMappingProvider.getSequenceMappings()) {
+            final long sequenceId = sequenceMapping.getSequenceId();
+            if (result.containsKey(sequenceId)) {
+                throw new RuntimeException("SequenceMapping for id <" + sequenceId + "> is duplicated. Please make sure there is only one configuration for this sequence.");
+            }
+            result.put(sequenceId, sequenceMapping.getRangeSize());
+        }
+        return result;
     }
 
 }

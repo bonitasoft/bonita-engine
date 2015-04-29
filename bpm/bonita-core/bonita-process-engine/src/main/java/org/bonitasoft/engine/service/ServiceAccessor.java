@@ -18,10 +18,4 @@ package org.bonitasoft.engine.service;
  */
 public interface ServiceAccessor {
 
-    /**
-     * allow to specify a classloader for loading the engine
-     * 
-     * @param classLoader
-     */
-    void initializeServiceAccessor(ClassLoader classLoader);
 }

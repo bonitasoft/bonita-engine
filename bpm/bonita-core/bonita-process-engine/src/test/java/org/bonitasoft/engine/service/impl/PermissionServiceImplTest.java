@@ -23,6 +23,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +36,8 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -51,8 +55,11 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(BonitaHomeServer.class)
 public class PermissionServiceImplTest {
 
     @Rule
@@ -68,20 +75,26 @@ public class PermissionServiceImplTest {
     @Mock
     private SessionService sessionService;
 
-    private String scriptFolder;
-
     @Mock
     private APIAccessorImpl apiIAccessorImpl;
 
     private PermissionServiceImpl permissionService;
 
+    @Mock
+    private BonitaHomeServer bonitaHomeServer;
+
+    private File securityFolder = new File(System.getProperty("java.io.tmpdir"));
+
     @Before
-    public void before() throws IOException, SClassLoaderException, SSessionNotFoundException {
-        scriptFolder = temporaryFolder.newFolder().getAbsolutePath();
+    public void before() throws IOException, SClassLoaderException, SSessionNotFoundException, BonitaHomeNotSetException {
         doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
-        permissionService = spy(new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, scriptFolder, 1));
+        permissionService = spy(new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, 1));
         doReturn(apiIAccessorImpl).when(permissionService).createAPIAccessorImpl();
         doReturn(mock(SSession.class)).when(sessionService).getSession(anyLong());
+
+        mockStatic(BonitaHomeServer.class);
+        when(BonitaHomeServer.getInstance()).thenReturn(bonitaHomeServer);
+        doReturn(securityFolder).when(bonitaHomeServer).getSecurityScriptsFolder(anyLong());
     }
 
     @Test
@@ -124,17 +137,6 @@ public class PermissionServiceImplTest {
     }
 
     @Test
-    public void should_start_with_no_folder_log() throws SBonitaException, IOException {
-        //given
-        FileUtils.deleteDirectory(new File(scriptFolder));
-        //when
-        permissionService.start();
-        //then
-        verify(logger).log(permissionService.getClass(), TechnicalLogSeverity.INFO, "The security script folder " + scriptFolder
-                + " does not exists or is a file, PermissionRules will be loaded only from the tenant classloader");
-    }
-
-    @Test
     public void should_checkAPICallWithScript_throw_exception_if_not_started() throws SExecutionException, ClassNotFoundException {
         //given service not started
         expectedException.expect(SExecutionException.class);
@@ -158,7 +160,7 @@ public class PermissionServiceImplTest {
     @Test
     public void should_checkAPICallWithScript_run_the_class_in_script_folder() throws SBonitaException, ClassNotFoundException, IOException {
         //given
-        FileUtils.writeStringToFile(new File(scriptFolder, "MyCustomRule.groovy"), "" +
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), "" +
                 "import org.bonitasoft.engine.api.APIAccessor\n" +
                 "import org.bonitasoft.engine.api.Logger\n" +
                 "import org.bonitasoft.engine.api.permission.APICallContext\n" +
@@ -188,7 +190,7 @@ public class PermissionServiceImplTest {
     @Test
     public void should_checkAPICallWithScript_run_the_class_with_package_in_script_root_folder() throws SBonitaException, ClassNotFoundException, IOException {
         //given
-        File test = new File(scriptFolder, "test");
+        File test = new File(securityFolder, "test");
         test.mkdir();
         FileUtils.writeStringToFile(new File(test, "MyCustomRule.groovy"), "" +
                 "package test;" +
@@ -251,7 +253,7 @@ public class PermissionServiceImplTest {
     public void should_checkAPICallWithScript_reload_classes() throws SBonitaException, ClassNotFoundException, IOException {
         //given
         permissionService.start();
-        FileUtils.writeStringToFile(new File(scriptFolder, "MyCustomRule.groovy"), "" +
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), "" +
                 "import org.bonitasoft.engine.api.APIAccessor\n" +
                 "import org.bonitasoft.engine.api.Logger\n" +
                 "import org.bonitasoft.engine.api.permission.APICallContext\n" +
@@ -270,7 +272,7 @@ public class PermissionServiceImplTest {
         boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), true);
 
         assertThat(myCustomRule).isTrue();
-        FileUtils.writeStringToFile(new File(scriptFolder, "MyCustomRule.groovy"), "" +
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), "" +
                 "import org.bonitasoft.engine.api.APIAccessor\n" +
                 "import org.bonitasoft.engine.api.Logger\n" +
                 "import org.bonitasoft.engine.api.permission.APICallContext\n" +
@@ -292,7 +294,7 @@ public class PermissionServiceImplTest {
     @Test
     public void should_checkAPICallWithScript_that_throw_exception() throws SBonitaException, ClassNotFoundException, IOException {
         //given
-        FileUtils.writeStringToFile(new File(scriptFolder, "MyCustomRule.groovy"), "" +
+        FileUtils.writeStringToFile(new File(securityFolder, "MyCustomRule.groovy"), "" +
                 "import org.bonitasoft.engine.api.APIAccessor\n" +
                 "import org.bonitasoft.engine.api.Logger\n" +
                 "import org.bonitasoft.engine.api.permission.APICallContext\n" +

@@ -298,7 +298,7 @@ public class ProfilesImporter {
         }
     }
 
-    public static File getFileContainingMD5(TenantServiceAccessor tenantServiceAccessor) throws BonitaHomeNotSetException {
-        return new File(BonitaHomeServer.getInstance().getTenantWorkFolder(tenantServiceAccessor.getTenantId()), "profiles.md5");
+    public static File getFileContainingMD5(TenantServiceAccessor tenantServiceAccessor) throws BonitaHomeNotSetException, IOException {
+        return BonitaHomeServer.getInstance().getTenantWorkFile(tenantServiceAccessor.getTenantId(), "profiles.md5");
     }
 }

@@ -331,48 +331,6 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void generateRelativeResourcePathShouldHandleBackslashOS() {
-        // given:
-        final String pathname = "C:\\hello\\hi\\folder";
-        final String resourceRelativePath = "resource/toto.lst";
-
-        // when:
-        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
-                + resourceRelativePath));
-
-        // then:
-        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
-    }
-
-    @Test
-    public void generateRelativeResourcePathShouldNotContainFirstSlash() {
-        // given:
-        final String pathname = "/home/target/some_folder/";
-        final String resourceRelativePath = "resource/toto.lst";
-
-        // when:
-        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
-                + resourceRelativePath));
-
-        // then:
-        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
-    }
-
-    @Test
-    public void generateRelativeResourcePathShouldWorkWithRelativeInitialPath() {
-        // given:
-        final String pathname = "target/nuns";
-        final String resourceRelativePath = "resource/toto.lst";
-
-        // when:
-        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
-                + resourceRelativePath));
-
-        // then:
-        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
-    }
-
-    @Test
     public void updateProcessDataInstance_should_call_updateProcessDataInstances() throws Exception {
         // Given
         doNothing().when(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), anyMapOf(String.class, Serializable.class));
