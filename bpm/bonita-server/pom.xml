@@ -63,7 +63,7 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- Authentication -->
+      <!-- Authentication -->
     <dependency>
       <groupId>org.bonitasoft.engine.authentication</groupId>
       <artifactId>bonita-authentication-api-impl</artifactId>
@@ -96,6 +96,12 @@
             <groupId>org.bonitasoft.engine.data</groupId>
             <artifactId>bonita-business-data-impl</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.core</groupId>
+                    <artifactId>bonita-home-server</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
       <dependency>
           <groupId>org.bonitasoft.engine.data</groupId>
@@ -133,6 +139,12 @@
       <groupId>org.bonitasoft.engine.classloader</groupId>
       <artifactId>bonita-classloader-impl</artifactId>
       <version>${project.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.bonitasoft.engine.core</groupId>
+                <artifactId>bonita-home-server</artifactId>
+            </exclusion>
+        </exclusions>
     </dependency>
     <dependency>
       <groupId>com.bonitasoft.engine.classloader</groupId>
@@ -176,6 +188,10 @@
 					<groupId>org.bonitasoft.engine.api</groupId>
             		<artifactId>bonita-common-api</artifactId>
 				</exclusion>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.core</groupId>
+                    <artifactId>bonita-home-server</artifactId>
+                </exclusion>
 			</exclusions>
     </dependency>
 
@@ -262,19 +278,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- Home Server -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.core</groupId>
-      <artifactId>bonita-home-server</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.bonitasoft.engine.api</groupId>
-          <artifactId>bonita-common-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- Incident -->
     <dependency>
       <groupId>org.bonitasoft.engine.incident</groupId>
@@ -289,6 +292,10 @@
                 <exclusion>
                     <groupId>org.bonitasoft.engine.api</groupId>
                     <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.core</groupId>
+                    <artifactId>bonita-home-server</artifactId>
                 </exclusion>
             </exclusions>
     </dependency>
@@ -322,6 +329,10 @@
 					<groupId>org.bonitasoft.engine.api</groupId>
             		<artifactId>bonita-common-api</artifactId>
 				</exclusion>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.core</groupId>
+                    <artifactId>bonita-home-server</artifactId>
+                </exclusion>
 			</exclusions>
     </dependency>
 
@@ -373,9 +384,15 @@
 
     <!-- Parameter -->
     <dependency>
-            <groupId>org.bonitasoft.engine.core</groupId>
-      <artifactId>bonita-parameter-propertyfile</artifactId>
-      <version>${project.version}</version>
+        <groupId>org.bonitasoft.engine.core</groupId>
+        <artifactId>bonita-parameter-propertyfile</artifactId>
+        <version>${project.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.bonitasoft.engine.core</groupId>
+                <artifactId>bonita-home-server</artifactId>
+            </exclusion>
+        </exclusions>
     </dependency>
 
     <!-- Persistence -->

@@ -29,7 +29,7 @@ import com.bonitasoft.engine.theme.ThemeTest;
         ThemeTest.class,
         PageAPILocalIT.class,
         TenantMaintenanceLocalIT.class })
-@Initializer(TestsInitializerSP.class)
+@Initializer(LocalServerTestsInitializerSP.class)
 public class EngineTCPLauncher {
 
 }

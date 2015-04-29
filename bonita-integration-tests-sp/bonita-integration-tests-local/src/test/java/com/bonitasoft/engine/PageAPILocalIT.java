@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import com.bonitasoft.engine.page.Page;
 
 @RunWith(BonitaTestRunner.class)
-@Initializer(TestsInitializerSP.class)
+@Initializer(LocalServerTestsInitializerSP.class)
 @SuppressWarnings("javadoc")
 public class PageAPILocalIT extends CommonAPISPIT {
 

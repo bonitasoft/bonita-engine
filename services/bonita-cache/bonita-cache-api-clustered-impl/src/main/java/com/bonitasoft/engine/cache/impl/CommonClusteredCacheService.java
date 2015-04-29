@@ -214,4 +214,8 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
 
     protected abstract String getKeyFromCacheName(final String cacheName) throws SCacheException;
 
+    @Override
+    public boolean isStopped() {
+        return false;
+    }
 }

@@ -403,7 +403,7 @@ public class ReportingAPIIT extends CommonAPISPIT {
         builder.append("AND CS.STARTDATE BETWEEN $P{_p_date_from} AND $P{_p_date_to} ");
 
         String query = builder.toString();
-        query = query.replace("$P{BONITA_TENANT_ID}", "1");
+        query = query.replace("$P{BONITA_TENANT_ID}", Long.toString(getSession().getTenantId()));
         query = query.replace("$P{_p_date_from}", "" + (System.currentTimeMillis() - 1000));
         query = query.replace("$P{_p_date_to}", "" + (System.currentTimeMillis() + 1000000));
         query = query.replace("$P!{__p_state_name}", "AND CS.STATEID in (1, 6) ");
@@ -449,7 +449,7 @@ public class ReportingAPIIT extends CommonAPISPIT {
 
         String selectList = getReportingAPI().selectList(query);
         String[] split = selectList.split("\n");
-        assertEquals(3, split.length);
+        assertEquals("selectList found: " + selectList, 3, split.length);
 
         taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertEquals(1, taskInstances.size());

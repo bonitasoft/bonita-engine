@@ -22,7 +22,7 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Matthieu Chaffotte
  */
-public final class ServiceAccessorFactory {
+public class ServiceAccessorFactory extends org.bonitasoft.engine.service.impl.ServiceAccessorFactory {
 
     private static ServiceAccessorFactory instance = new ServiceAccessorFactory();
 
@@ -51,5 +51,4 @@ public final class ServiceAccessorFactory {
             IllegalAccessException, ClassNotFoundException, IOException {
         return bosServiceAccessorFactory.createSessionAccessor();
     }
-
 }

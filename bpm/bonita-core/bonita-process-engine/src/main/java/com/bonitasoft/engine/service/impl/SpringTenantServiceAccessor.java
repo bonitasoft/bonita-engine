@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service.impl;
 
-import org.bonitasoft.engine.parameter.ParameterService;
-
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
@@ -17,8 +15,6 @@ import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.impl.SpringTenantServiceAccessor implements TenantServiceAccessor {
-
-    private ParameterService parameterService;
 
     private BreakpointService breakpointService;
 
