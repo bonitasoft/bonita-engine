@@ -389,7 +389,7 @@ public class PageAPIIT extends CommonAPIIT {
                 while ((bytesRead = zipInputstream.read(buffer)) > -1) {
                     byteArrayOutputStream.write(buffer, 0, bytesRead);
                 }
-				zipMap.put(zipEntry.getName(), new String(byteArrayOutputStream.toByteArray(), UTF8));
+                zipMap.put(zipEntry.getName(), new String(byteArrayOutputStream.toByteArray(), UTF8));
             }
         } finally {
             zipInputstream.close();
