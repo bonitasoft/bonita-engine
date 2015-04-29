@@ -13,6 +13,8 @@
  */
 package org.bonitasoft.engine.page;
 
+import java.util.Objects;
+
 /**
  * author Emmanuel Duchastenier
  */
@@ -33,5 +35,27 @@ public class PageURL {
     public PageURL(String url, Long pageId) {
         this.url = url;
         this.pageId = pageId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PageURL pageURL = (PageURL) o;
+        return Objects.equals(url, pageURL.url) &&
+                Objects.equals(pageId, pageURL.pageId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url, pageId);
+    }
+
+    @Override
+    public String toString() {
+        return "PageURL{" +
+                "url='" + url + '\'' +
+                ", pageId=" + pageId +
+                '}';
     }
 }
