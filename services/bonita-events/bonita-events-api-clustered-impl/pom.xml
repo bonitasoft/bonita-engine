@@ -4,7 +4,7 @@
     <parent>
         <artifactId>bonita-events</artifactId>
         <groupId>com.bonitasoft.engine.events</groupId>
-        <version>6.5.2-SNAPSHOT</version>
+        <version>6.5.2.RC1</version>
     </parent>
 
     <artifactId>bonita-events-api-clustered-impl</artifactId>

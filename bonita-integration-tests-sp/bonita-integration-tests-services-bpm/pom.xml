@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.bonitasoft.engine.test</groupId>
         <artifactId>bonita-integration-tests-sp</artifactId>
-        <version>6.5.2-SNAPSHOT</version>
+        <version>6.5.2.RC1</version>
     </parent>
 
     <artifactId>bonita-integration-tests-services-bpm-sp</artifactId>
