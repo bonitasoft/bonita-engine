@@ -23,7 +23,15 @@ import java.util.zip.ZipOutputStream;
  */
 public class CommonTestUtil {
 
-    public static byte[] createTestPageContent(final String pageName, final String displayName, final String description)
+    /**
+     * @param pageName
+     * @param displayName
+     * @param description
+     * @param extraProperties some property to add in page.properties file. eg: value=data
+     * @return
+     * @throws IOException
+     */
+    public static byte[] createTestPageContent(final String pageName, final String displayName, final String description, final String... extraProperties)
             throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final ZipOutputStream zos = new ZipOutputStream(baos);
@@ -41,6 +49,12 @@ public class CommonTestUtil {
         stringBuilder.append("description=");
         stringBuilder.append(description);
         stringBuilder.append("\n");
+        for (String extraProperty : extraProperties) {
+            stringBuilder.append(extraProperty);
+            stringBuilder.append("\n");
+
+        }
+
         zos.write(stringBuilder.toString().getBytes());
 
         zos.closeEntry();
