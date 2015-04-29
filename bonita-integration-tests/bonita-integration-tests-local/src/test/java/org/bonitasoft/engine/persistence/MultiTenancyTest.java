@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
 import org.bonitasoft.engine.persistence.model.Human;
@@ -23,8 +21,6 @@ import org.bonitasoft.engine.persistence.model.Parent;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
-import org.bonitasoft.engine.session.SSessionException;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.Test;
@@ -39,10 +35,6 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
     public MultiTenancyTest() {
         persistenceService = getTenantAccessor().getReadPersistenceService();
         recorder = getTenantAccessor().getRecorder();
-    }
-
-    @Override
-    public void before() throws Exception {
     }
 
     @Override
@@ -122,7 +114,6 @@ public class MultiTenancyTest extends CommonBPMServicesTest {
         final long tenant2Id = createTenant("tenant2");
         try {
             changeTenant(tenant1Id);
-
 
             final String firstName = "firstName";
             final String lastName = "lastName";

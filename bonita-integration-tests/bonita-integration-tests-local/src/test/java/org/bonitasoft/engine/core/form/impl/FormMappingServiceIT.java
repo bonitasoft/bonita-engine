@@ -41,20 +41,22 @@ import org.junit.Test;
  */
 public class FormMappingServiceIT extends CommonBPMServicesTest {
 
-    private final PageService pageService;
+    private PageService pageService;
     public FormMappingService formMappingService;
 
-    private final TransactionService transactionService;
+    private TransactionService transactionService;
     public static final String PAGE_NAME = "custompage_coucou";
     private SPage page;
     private ProcessDefinitionService processDefinitionService;
     private SProcessDefinition p1;
     private SProcessDefinition p2;
 
-
     @Before
     public void setup() throws Exception {
         processDefinitionService = getTenantAccessor().getProcessDefinitionService();
+        transactionService = getTransactionService();
+        formMappingService = getTenantAccessor().getFormMappingService();
+        pageService = getTenantAccessor().getPageService();
         transactionService.begin();
         p1 = processDefinitionService.store(new SProcessDefinitionImpl("P1", "1.0"), "display", "display");
         p2 = processDefinitionService.store(new SProcessDefinitionImpl("P2", "1.0"), "display", "display");
@@ -65,7 +67,7 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
     }
 
     @After
-    public void tearDown() throws Exception{
+    public void tearDown() throws Exception {
         clearFormMapping();
     }
 
@@ -78,13 +80,6 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         processDefinitionService.delete(p1.getId());
         processDefinitionService.delete(p2.getId());
         transactionService.complete();
-    }
-
-    public FormMappingServiceIT() {
-        super();
-        transactionService = getTransactionService();
-        formMappingService = getTenantAccessor().getFormMappingService();
-        pageService = getTenantAccessor().getPageService();
     }
 
     @Test
@@ -107,7 +102,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
                 FormMappingType.PROCESS_OVERVIEW.getId());
         assertThat(list).extracting("task").containsExactly("step1", null, null);
         assertThat(list).extracting("pageMapping.url").containsExactly(null, "http://bit.coin", null);
-        assertThat(list).extracting("pageMapping.urlAdapter").containsExactly(null, URLAdapterConstants.EXTERNAL_URL_ADAPTER, URLAdapterConstants.LEGACY_URL_ADAPTER);
+        assertThat(list).extracting("pageMapping.urlAdapter").containsExactly(null, URLAdapterConstants.EXTERNAL_URL_ADAPTER,
+                URLAdapterConstants.LEGACY_URL_ADAPTER);
         assertThat(list).extracting("pageMapping.pageId").containsExactly(page.getId(), null, null);
         //        assertThat(list).extracting("pageMapping.key").containsExactly();
         assertThat(listAll).extracting("type").containsExactly(FormMappingType.TASK.getId(), FormMappingType.PROCESS_START.getId(),
@@ -194,6 +190,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         assertThat(updatedInDatabase.getPageMapping().getUrl()).isEqualTo("newFormName");
         assertThat(updatedInDatabase.getTarget()).isEqualTo(FormMappingTarget.URL.name());
         assertThat(updatedInDatabase.getLastUpdateDate()).isGreaterThan(taskForm.getLastUpdateDate());
+
+        Thread.sleep(10);
 
         transactionService.begin();
         SFormMapping reupdated = formMappingService.get(taskForm.getId());

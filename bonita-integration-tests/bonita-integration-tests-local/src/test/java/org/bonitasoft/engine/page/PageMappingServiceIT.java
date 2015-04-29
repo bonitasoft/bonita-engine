@@ -103,7 +103,6 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
     @Test
     public void update() throws Exception {
 
-
         String key = "theKey/process1/12.0";
         transactionService.begin();
         pageMappingService.create(key, PAGE_ID, Collections.<String> emptyList());
@@ -122,6 +121,8 @@ public class PageMappingServiceIT extends CommonBPMServicesTest {
         assertThat(updated.getPageId()).isEqualTo(NEW_PAGE_ID);
         assertThat(updated.getUrl()).isNull();
         assertThat(updated.getUrlAdapter()).isNull();
+
+        Thread.sleep(10);
 
         transactionService.begin();
         SPageMapping reUpdated = pageMappingService.get(key);
