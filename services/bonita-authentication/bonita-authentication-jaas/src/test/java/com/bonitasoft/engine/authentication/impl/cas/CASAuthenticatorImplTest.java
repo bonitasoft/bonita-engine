@@ -390,8 +390,8 @@ public class CASAuthenticatorImplTest {
         // assertEquals(sw.toString(), FileUtils.readFileToString(new
         // File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.xml")));
 		final String readFileToString = FileUtils
-                .readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.xml"), "UTF-8").replaceAll(
-                		REGEX_LINEBREAK_ALL_PLATFORMS, "");
+                .readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.xml"), "UTF-8")
+                .replaceAll(REGEX_LINEBREAK_ALL_PLATFORMS, "");
         assertThat(xmlDoc).isEqualToIgnoringCase(readFileToString);
     }
 
