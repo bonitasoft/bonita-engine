@@ -152,9 +152,9 @@ public class FormMappingIT extends TestWithUser {
         assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(), p1.getId());
 
         //resolve urls:
-        PageURL p1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("process/P1/1.0", context);
-        PageURL p1Overview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/P1/1.0", context);
-        PageURL p1step1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/P1/1.0/step1", context);
+        PageURL p1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("process/P1/1.0", context, true);
+        PageURL p1Overview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/P1/1.0", context, true);
+        PageURL p1step1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/P1/1.0/step1", context, true);
         assertThat(p1Instanciation.getUrl()).isEqualTo("processStartForm");
         assertThat(p1Overview.getPageId()).isNull();
         assertThat(p1step1Instanciation.getUrl()).isEqualTo(null);
@@ -184,7 +184,7 @@ public class FormMappingIT extends TestWithUser {
 
         // try to resolve url:
         try {
-            getProcessConfigurationAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", Collections.<String, Serializable> emptyMap());
+            getProcessConfigurationAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", Collections.<String, Serializable> emptyMap(), true);
         } finally {
             deleteProcess(processDefinition);
         }
@@ -214,8 +214,8 @@ public class FormMappingIT extends TestWithUser {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
 
-        final PageURL pageURLStart = getProcessConfigurationAPI().resolvePageOrURL("process/CustomerSupport/1.12", context);
-        final PageURL pageURLOverview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/CustomerSupport/1.12", context);
+        final PageURL pageURLStart = getProcessConfigurationAPI().resolvePageOrURL("process/CustomerSupport/1.12", context, true);
+        final PageURL pageURLOverview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/CustomerSupport/1.12", context, true);
         assertThat(pageURLStart.getPageId()).isNotNull();
         assertThat(page.getId()).isEqualTo(pageURLStart.getPageId());
         assertThat(pageURLOverview.getPageId()).isNotNull();

@@ -43,13 +43,13 @@ public class ProcessConfigurationAPIImplTest {
         final String pageKey = "pageKey";
         final SPageMapping pageMapping = mock(SPageMapping.class);
         doReturn(pageMapping).when(pageMappingService).get(pageKey);
-        doThrow(SAuthorizationException.class).when(pageMappingService).resolvePageURL(pageMapping, null);
+        doThrow(SAuthorizationException.class).when(pageMappingService).resolvePageURL(pageMapping, null, true);
 
         final ProcessConfigurationAPIImpl processConfigurationAPI = spy(new ProcessConfigurationAPIImpl());
         doReturn(pageMappingService).when(processConfigurationAPI).retrievePageMappingService();
 
         expectedException.expect(UnauthorizedAccessException.class);
 
-        processConfigurationAPI.resolvePageOrURL(pageKey, null);
+        processConfigurationAPI.resolvePageOrURL(pageKey, null, true);
     }
 }

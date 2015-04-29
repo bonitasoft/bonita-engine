@@ -130,10 +130,12 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context) throws SExecutionException, SAuthorizationException {
-        final List<String> pageAuthorizationRules = pageMapping.getPageAuthorizationRules();
-        if (!isAllowedToAccess(pageMapping, context, pageAuthorizationRules)) {
-            throw new SAuthorizationException("Access to Page or URL with key " + pageMapping.getKey() + " is not allowed");
+    public SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context, boolean executeAuthorizationRules) throws SExecutionException, SAuthorizationException {
+        if (executeAuthorizationRules) {
+            final List<String> pageAuthorizationRules = pageMapping.getPageAuthorizationRules();
+            if (!isAllowedToAccess(pageMapping, context, pageAuthorizationRules)) {
+                throw new SAuthorizationException("Access to Page or URL with key " + pageMapping.getKey() + " is not allowed");
+            }
         }
 
         String url = pageMapping.getUrl();
