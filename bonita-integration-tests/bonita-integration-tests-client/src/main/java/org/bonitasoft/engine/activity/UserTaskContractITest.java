@@ -34,6 +34,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
@@ -98,7 +99,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         contract.addInput(numberOfDaysProcessContractData, Type.INTEGER, null);
         contract.addInput("multipleText", Type.TEXT, "a multiple text", true);
         contract.addInput("complex", "a complex input",
-                Collections.<InputDefinition> singletonList(new InputDefinitionImpl("text", Type.TEXT, "text in complex")));
+                Collections.<InputDefinition>singletonList(new InputDefinitionImpl("text", Type.TEXT, "text in complex")));
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -192,7 +193,7 @@ public class UserTaskContractITest extends CommonAPIIT {
 
     @Test
     public void should_create_a_contract_with_special_char() throws Exception {
-        final long[] badValues = { 0, 366 };
+        final long[] badValues = {0, 366};
         for (final long badValue : badValues) {
             check_invalid_contract_with_special_char(badValue);
         }
@@ -289,12 +290,19 @@ public class UserTaskContractITest extends CommonAPIIT {
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         userTaskDefinitionBuilder.addContract()
                 .addInput("expenseReport", "expense report with several expense lines", true,
-                        Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof));
+                        Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof))
+                .addFileInput("report", "the report")
+                .addFileInput("receipts", "the receipts", true);
 
-        final List<Map<String, Object>> expenses = new ArrayList<Map<String, Object>>();
-        userTaskDefinitionBuilder.addData("expenseData", expenses.getClass().getName(), null);
+        userTaskDefinitionBuilder.addData("expenseData", List.class.getName(), null);
+        userTaskDefinitionBuilder.addData("reportData", List.class.getName(), null);
+        userTaskDefinitionBuilder.addData("receiptsData", List.class.getName(), null);
         userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDataOperation("expenseData",
-                new ExpressionBuilder().createContractInputExpression("expenseReport", expenses.getClass().getName())));
+                new ExpressionBuilder().createContractInputExpression("expenseReport", List.class.getName())));
+        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDataOperation("reportData",
+                new ExpressionBuilder().createContractInputExpression("report", FileInputValue.class.getName())));
+        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDataOperation("receiptsData",
+                new ExpressionBuilder().createContractInputExpression("receipts", List.class.getName())));
         builder.addUserTask(TASK2, ACTOR_NAME).addTransition(TASK1, TASK2);
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -307,17 +315,24 @@ public class UserTaskContractITest extends CommonAPIIT {
         final List<Map<String, Serializable>> expenseReport = new ArrayList<>();
         expenseReport.add(createExpenseLine("hotel", 150.3f, new Date(System.currentTimeMillis()), new byte[0]));
         expenseReport.add(createExpenseLine("taxi", 25, new Date(System.currentTimeMillis()), new byte[0]));
-        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[]{0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 }));
+        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[]{0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}));
 
         final Map<String, Serializable> taskInput = new HashMap<>();
         taskInput.put("expenseReport", (Serializable) expenseReport);
+        final FileInputValue reportFile = new FileInputValue("report.pdf", new byte[]{0, 1, 2, 3});
+        taskInput.put("report", reportFile);
+        final FileInputValue receipt1 = new FileInputValue("receipt1.pdf", new byte[]{0, 1, 2, 4});
+        final FileInputValue receipt2 = new FileInputValue("receipt2.pdf", new byte[]{0, 1, 2, 5});
+        taskInput.put("receipts", (Serializable) Arrays.asList(receipt1, receipt2));
 
         getProcessAPI().executeUserTask(userTask.getId(), taskInput);
 
         //then
         waitForUserTaskAndGetIt(TASK2);
-        assertThat((List<Map<String, Object>>) getProcessAPI().getArchivedActivityDataInstance("expenseData", userTask.getId()).getValue()).as(
-                "should have my expense report data").hasSize(3);
+        assertThat((List<Map<String, Object>>) getProcessAPI().getArchivedActivityDataInstance("expenseData", userTask.getId()).getValue()).as("should have my expense report data").hasSize(3);
+        final Serializable reportData = getProcessAPI().getArchivedActivityDataInstance("reportData", userTask.getId()).getValue();
+        assertThat(reportData).as("should have single file").isEqualTo(reportFile);
+        assertThat((List<Object>) getProcessAPI().getArchivedActivityDataInstance("receiptsData", userTask.getId()).getValue()).as("should have multiple file").containsExactly(receipt1, receipt2);
 
         //clean up
         disableAndDeleteProcess(processDefinition);
@@ -363,11 +378,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         inputList.add("input4");
         inputList.add("input5");
         taskInputs.put("input", (Serializable) inputList);
-        try {
-            getProcessAPI().executeUserTask(userTask.getId(), taskInputs);
-        } catch (final ContractViolationException e) {
-            fail(e.getExplanations().toString());
-        }
+        getProcessAPI().executeUserTask(userTask.getId(), taskInputs);
 
         //then
         waitForUserTaskAndGetIt(TASK2);
@@ -395,14 +406,10 @@ public class UserTaskContractITest extends CommonAPIIT {
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         final long expectedValue = 8l;
-        try {
-            final Map<String, Serializable> inputs = new HashMap<>();
-            inputs.put("numberOfDays", expectedValue);
+        final Map<String, Serializable> inputs = new HashMap<>();
+        inputs.put("numberOfDays", expectedValue);
 
-            getProcessAPI().executeUserTask(userTask.getId(), inputs);
-        } catch (final ContractViolationException e) {
-            System.err.println(e.getExplanations());
-        }
+        getProcessAPI().executeUserTask(userTask.getId(), inputs);
         waitForUserTaskAndGetIt(TASK2);
 
         final ArchivedDataInstance archivedResult = getProcessAPI().getArchivedActivityDataInstance("result", userTask.getId());
@@ -458,7 +465,8 @@ public class UserTaskContractITest extends CommonAPIIT {
         } catch (final ContractViolationException e) {
             final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
             assertThat(state).isEqualTo("ready");
-            assertThat(e.getExplanations()).as("should get explainations").isNotEmpty();
+            assertThat(e.getExplanations()).as("should get explanations").isNotEmpty();
+            assertThat(e.getMessage()).contains("numberOfDays");
         }
 
         disableAndDeleteProcess(processDefinition);
