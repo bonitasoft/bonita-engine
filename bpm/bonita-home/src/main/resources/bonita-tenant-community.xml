@@ -851,6 +851,11 @@
         <property name="leftOperandHandlers" ref="leftOperandHandlers" />
     </bean>
 
+    <bean id="updateDataRefAction" class="org.bonitasoft.engine.operation.UpdateDataRefAction">
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService"/>
+    </bean>
+
     <bean id="businessDataLeftOperandHandler" class="org.bonitasoft.engine.operation.BusinessDataLeftOperandHandler">
         <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
@@ -878,12 +883,12 @@
     <bean id="externalDataLeftOperandHandler"
           class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler" />
 
-    <bean id="mergeEntityAction" class="com.bonitasoft.engine.operation.MergeEntityAction">
+    <bean id="mergeEntityAction" class="org.bonitasoft.engine.operation.MergeEntityAction">
         <constructor-arg name="repository" ref="businessDataRepository"/>
 
     </bean>
 
-    <bean id="entitiesActionsExecutor" class="com.bonitasoft.engine.operation.EntitiesActionsExecutor"/>
+    <bean id="entitiesActionsExecutor" class="org.bonitasoft.engine.operation.EntitiesActionsExecutor"/>
 
     <bean id="javaMethodOperationExecutorStrategy"
           class="org.bonitasoft.engine.operation.BusinessDataJavaMethodOperationExecutorStrategy">
