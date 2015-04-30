@@ -47,7 +47,6 @@ import org.bonitasoft.engine.bpm.connector.impl.ArchivedConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceWithFailureInfoImpl;
-import org.bonitasoft.engine.bpm.contract.ConstraintType;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
@@ -973,7 +972,7 @@ public class ModelConvertor {
         if (managerUserId > 0 && userIdToUser != null) {
             user.setManagerUserName(userIdToUser.get(managerUserId).getUserName());
         }
-        SUserLogin sUserLogin = sUser.getSUserLogin();
+        final SUserLogin sUserLogin = sUser.getSUserLogin();
         if (sUserLogin != null && sUserLogin.getLastConnection() != null) {
             user.setLastConnection(new Date(sUserLogin.getLastConnection()));
         }
@@ -2118,14 +2117,14 @@ public class ModelConvertor {
         return value;
     }
 
-    public static FormMapping toFormMapping(SFormMapping sFormMapping) {
+    public static FormMapping toFormMapping(final SFormMapping sFormMapping) {
         if (sFormMapping == null) {
             return null;
         }
-        FormMapping formMapping = new FormMapping();
+        final FormMapping formMapping = new FormMapping();
         formMapping.setId(sFormMapping.getId());
         formMapping.setTask(sFormMapping.getTask());
-        SPageMapping pageMapping = sFormMapping.getPageMapping();
+        final SPageMapping pageMapping = sFormMapping.getPageMapping();
         if (pageMapping != null) {
             formMapping.setPageMappingKey(pageMapping.getKey());
             formMapping.setPageId(pageMapping.getPageId());
@@ -2134,13 +2133,13 @@ public class ModelConvertor {
         formMapping.setType(FormMappingType.getTypeFromId(sFormMapping.getType()));
         formMapping.setTarget(sFormMapping.getTarget() == null ? null : FormMappingTarget.valueOf(sFormMapping.getTarget()));
         formMapping.setProcessDefinitionId(sFormMapping.getProcessDefinitionId());
-        long lastUpdateDate = sFormMapping.getLastUpdateDate();
+        final long lastUpdateDate = sFormMapping.getLastUpdateDate();
         formMapping.setLastUpdateDate(lastUpdateDate > 0 ? new Date(lastUpdateDate) : null);
         formMapping.setLastUpdatedBy(sFormMapping.getLastUpdatedBy());
         return formMapping;
     }
 
-    public static List<FormMapping> toFormMappings(List<SFormMapping> serverObjects) {
+    public static List<FormMapping> toFormMappings(final List<SFormMapping> serverObjects) {
         final List<FormMapping> clientObjects = new ArrayList<>(serverObjects.size());
         for (final SFormMapping serverObject : serverObjects) {
             clientObjects.add(toFormMapping(serverObject));
@@ -2148,15 +2147,15 @@ public class ModelConvertor {
         return clientObjects;
     }
 
-    public static BusinessDataReference toBusinessDataReference(SRefBusinessDataInstance sRefBusinessDataInstance) {
+    public static BusinessDataReference toBusinessDataReference(final SRefBusinessDataInstance sRefBusinessDataInstance) {
         if (sRefBusinessDataInstance == null) {
             return null;
         }
         if (sRefBusinessDataInstance instanceof SMultiRefBusinessDataInstance) {
-            SMultiRefBusinessDataInstance multi = ((SMultiRefBusinessDataInstance) sRefBusinessDataInstance);
+            final SMultiRefBusinessDataInstance multi = (SMultiRefBusinessDataInstance) sRefBusinessDataInstance;
             return new MultipleBusinessDataReferenceImpl(multi.getName(), multi.getDataClassName(), multi.getDataIds());
         }
-        SSimpleRefBusinessDataInstance simple = ((SSimpleRefBusinessDataInstance) sRefBusinessDataInstance);
+        final SSimpleRefBusinessDataInstance simple = (SSimpleRefBusinessDataInstance) sRefBusinessDataInstance;
         return new SimpleBusinessDataReferenceImpl(simple.getName(), simple.getDataClassName(), simple.getDataId());
 
     }
@@ -2168,7 +2167,7 @@ public class ModelConvertor {
         }
         for (final SConstraintDefinition sConstraintDefinition : sContract.getConstraints()) {
             final ConstraintDefinitionImpl constraint = new ConstraintDefinitionImpl(sConstraintDefinition.getName(), sConstraintDefinition.getExpression(),
-                    sConstraintDefinition.getExplanation(), ConstraintType.valueOf(sConstraintDefinition.getConstraintType().toString()));
+                    sConstraintDefinition.getExplanation());
             for (final String inputName : sConstraintDefinition.getInputNames()) {
                 constraint.addInputName(inputName);
             }
@@ -2182,14 +2181,15 @@ public class ModelConvertor {
         for (final SInputDefinition sInputDefinition : input.getInputDefinitions()) {
             inputDefinitions.add(toInput(sInputDefinition));
         }
-        SType type = input.getType();
-        InputDefinitionImpl inputDefinition = new InputDefinitionImpl(input.getName(), type == null ? null : Type.valueOf(type.toString()), input.getDescription(), input.isMultiple());
+        final SType type = input.getType();
+        final InputDefinitionImpl inputDefinition = new InputDefinitionImpl(input.getName(), type == null ? null : Type.valueOf(type.toString()),
+                input.getDescription(), input.isMultiple());
         inputDefinition.getInputs().addAll(inputDefinitions);
         return inputDefinition;
 
     }
 
-    public static PageURL toPageURL(SPageURL sPageURL) {
+    public static PageURL toPageURL(final SPageURL sPageURL) {
         return new PageURL(sPageURL.getUrl(), sPageURL.getPageId());
     }
 }

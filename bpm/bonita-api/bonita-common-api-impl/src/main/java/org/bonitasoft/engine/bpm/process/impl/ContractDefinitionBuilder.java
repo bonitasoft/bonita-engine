@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bpm.process.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.contract.ConstraintType;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
@@ -35,11 +34,12 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     private final ContractDefinitionImpl contract;
 
     public ContractDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
-                                     final UserTaskDefinitionImpl activity) {
+            final UserTaskDefinitionImpl activity) {
         super(container, processDefinitionBuilder);
         contract = new ContractDefinitionImpl();
         activity.setContract(contract);
     }
+
     public ContractDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final DesignProcessDefinitionImpl container) {
         super((FlowElementContainerDefinitionImpl) container.getProcessContainer(), processDefinitionBuilder);
         contract = new ContractDefinitionImpl();
@@ -61,15 +61,15 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     }
 
     public ContractDefinitionBuilder addInput(final String name, final String description, final boolean multiple,
-                                              final List<InputDefinition> inputDefinitions) {
+            final List<InputDefinition> inputDefinitions) {
         final InputDefinitionImpl input = new InputDefinitionImpl(name, description, multiple, inputDefinitions);
         contract.addInput(input);
         return this;
     }
 
     public ContractDefinitionBuilder addFileInput(final String name, final String description) {
-        final InputDefinitionImpl nameInput= new InputDefinitionImpl("name", Type.TEXT, "The file name");
-        final InputDefinitionImpl contentInput= new InputDefinitionImpl("content", Type.BYTE_ARRAY, "The file content");
+        final InputDefinitionImpl nameInput = new InputDefinitionImpl("name", Type.TEXT, "The file name");
+        final InputDefinitionImpl contentInput = new InputDefinitionImpl("content", Type.BYTE_ARRAY, "The file content");
         final InputDefinitionImpl fileInput = new InputDefinitionImpl(name, description,
                 Arrays.<InputDefinition> asList(nameInput, contentInput));
         contract.addInput(fileInput);
@@ -77,7 +77,7 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     }
 
     public ContractDefinitionBuilder addConstraint(final String name, final String expression, final String explanation, final String... inputNames) {
-        final ConstraintDefinitionImpl constraintDefinition = new ConstraintDefinitionImpl(name, expression, explanation, ConstraintType.CUSTOM);
+        final ConstraintDefinitionImpl constraintDefinition = new ConstraintDefinitionImpl(name, expression, explanation);
         for (final String inputName : inputNames) {
             constraintDefinition.addInputName(inputName);
         }
