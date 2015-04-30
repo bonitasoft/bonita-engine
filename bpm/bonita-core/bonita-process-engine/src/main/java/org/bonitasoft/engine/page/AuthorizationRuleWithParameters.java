@@ -16,6 +16,12 @@ package org.bonitasoft.engine.page;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
+
 /**
  * author Emmanuel Duchastenier
  */
@@ -30,5 +36,15 @@ public abstract class AuthorizationRuleWithParameters {
             }
         }
         return null;
+    }
+    
+    protected long getLoggedUserId(SessionAccessor sessionAccessor, SessionService sessionService) throws SExecutionException {
+        try {
+            return sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
+        } catch (SSessionNotFoundException e) {
+            throw new SExecutionException(e);
+        } catch (SessionIdNotSetException e) {
+            throw new SExecutionException(e);
+        }
     }
 }

@@ -1550,12 +1550,14 @@
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="formMappingService" ref="formMappingService" />
-        <constructor-arg name="supervisorMappingService" ref="supervisorMappingService" />
+        <constructor-arg name="supervisorMappingService"
+            ref="supervisorMappingService" />
     </bean>
     <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule">
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="activityInstanceService"
+            ref="activityInstanceService" />
     </bean>
     <bean id="isActorInitiatorRule" class="org.bonitasoft.engine.page.IsActorInitiatorRule">
         <constructor-arg name="sessionService" ref="sessionService" />
@@ -1564,17 +1566,25 @@
         <constructor-arg name="actorMappingService" ref="actorMappingService" />
     </bean>
     <bean id="isProcessInitiator" class="org.bonitasoft.engine.page.IsProcessInitiatorRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg ref="processInstanceService" />
     </bean>
     <bean id="isTaskPerformer" class="org.bonitasoft.engine.page.IsTaskPerformerRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg ref="activityInstanceService" />
     </bean>
     <bean id="isInvolvedInProcessInstance" class="org.bonitasoft.engine.page.IsInvolvedInProcessInstanceRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg ref="activityInstanceService" />
     </bean>
 
-    <bean id="formMappingKeyGenerator" class="org.bonitasoft.engine.core.form.impl.FormMappingKeyGeneratorImpl">
-        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+    <bean id="formMappingKeyGenerator"
+        class="org.bonitasoft.engine.core.form.impl.FormMappingKeyGeneratorImpl">
+        <constructor-arg name="processDefinitionService"
+            ref="processDefinitionManager" />
     </bean>
     <bean class="org.bonitasoft.engine.core.form.LegacyURLAdapter">
         <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
