@@ -126,12 +126,21 @@ public class FormMappingServiceImplTest {
     }
 
     @Test
+    public void createLegacyFormShouldNotAddCorrectAuthorizations() throws Exception {
+        doReturn("keye").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId());
+
+        formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId(), SFormMapping.TARGET_LEGACY, null);
+
+        verify(pageMappingService).create("keye", null, LEGACY, null);
+    }
+
+    @Test
     public void createForProcessOverviewShouldAddCorrectAuthorizations() throws Exception {
         doReturn("clave").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_OVERVIEW.getId());
 
-        formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_OVERVIEW.getId(), SFormMapping.TARGET_LEGACY, null);
+        formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_OVERVIEW.getId(), SFormMapping.TARGET_URL, null);
 
-        verify(pageMappingService).create("clave", null, LEGACY,
+        verify(pageMappingService).create("clave", null, EXTERNAL,
                 Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_PROCESS_INITIATOR, IS_TASK_PERFORMER, IS_INVOLVED_IN_PROCESS_INSTANCE));
     }
 

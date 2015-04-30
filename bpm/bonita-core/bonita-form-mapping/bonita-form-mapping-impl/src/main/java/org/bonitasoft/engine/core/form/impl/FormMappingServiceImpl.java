@@ -111,7 +111,7 @@ public class FormMappingServiceImpl implements FormMappingService {
                 sPageMapping = pageMappingService.create(key, form, externalUrlAdapter, authorizationRules);
                 break;
             case SFormMapping.TARGET_LEGACY:
-                sPageMapping = pageMappingService.create(key, null, legacyUrlAdapter, authorizationRules);
+                sPageMapping = pageMappingService.create(key, null, legacyUrlAdapter, null);
                 break;
             case SFormMapping.TARGET_UNDEFINED:
                 sPageMapping = null;
