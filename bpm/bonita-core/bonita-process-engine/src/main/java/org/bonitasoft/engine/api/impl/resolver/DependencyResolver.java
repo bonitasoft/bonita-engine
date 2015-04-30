@@ -64,18 +64,18 @@ public class DependencyResolver {
 
     private static final int BATCH_SIZE = 100;
 
-    private final List<ProcessDependencyResolver> dependencyResolvers;
+    private final List<ProcessDependencyDeployer> dependencyResolvers;
 
-    public DependencyResolver(final List<ProcessDependencyResolver> dependencyResolvers) {
+    public DependencyResolver(final List<ProcessDependencyDeployer> dependencyResolvers) {
         this.dependencyResolvers = dependencyResolvers;
     }
 
     public boolean resolveDependencies(final BusinessArchive businessArchive, final TenantServiceAccessor tenantAccessor, final SProcessDefinition sDefinition) {
-        final List<ProcessDependencyResolver> resolvers = getResolvers();
+        final List<ProcessDependencyDeployer> resolvers = getResolvers();
         boolean resolved = true;
-        for (final ProcessDependencyResolver resolver : resolvers) {
+        for (final ProcessDependencyDeployer resolver : resolvers) {
             try {
-                resolved &= resolver.resolve(tenantAccessor, businessArchive, sDefinition);
+                resolved &= resolver.deploy(tenantAccessor, businessArchive, sDefinition);
                 if (!resolved) {
                     for (Problem problem : resolver.checkResolution(tenantAccessor, sDefinition)) {
                         tenantAccessor.getTechnicalLoggerService().log(DependencyResolver.class, INFO, problem.getDescription());
@@ -111,17 +111,17 @@ public class DependencyResolver {
      * this does not throw exception, it only log because it can be retried after.
      */
     public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor) {
-        final List<ProcessDependencyResolver> resolvers = getResolvers();
-        resolveDependencies(processDefinitionId, tenantAccessor, resolvers.toArray(new ProcessDependencyResolver[resolvers.size()]));
+        final List<ProcessDependencyDeployer> resolvers = getResolvers();
+        resolveDependencies(processDefinitionId, tenantAccessor, resolvers.toArray(new ProcessDependencyDeployer[resolvers.size()]));
     }
 
-    public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor, final ProcessDependencyResolver... resolvers) {
+    public void resolveDependencies(final long processDefinitionId, final TenantServiceAccessor tenantAccessor, final ProcessDependencyDeployer... resolvers) {
         final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         try {
             boolean resolved = true;
-            for (final ProcessDependencyResolver dependencyResolver : resolvers) {
+            for (final ProcessDependencyDeployer dependencyResolver : resolvers) {
                 final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
                 resolved &= dependencyResolver.checkResolution(tenantAccessor, processDefinition).isEmpty();
             }
@@ -135,20 +135,16 @@ public class DependencyResolver {
                 loggerService.log(clazz, TechnicalLogSeverity.WARNING, "Unable to resolve dependencies after they were modified because of " + e.getMessage()
                         + ". Please retry it manually");
             }
-        } catch (final BonitaHomeNotSetException e) {
-            throw new BonitaRuntimeException("Bonita home not set", e);
         }
     }
 
     private void changeResolutionStatus(final long processDefinitionId, final TenantServiceAccessor tenantAccessor,
             final ProcessDefinitionService processDefinitionService, final DependencyService dependencyService,
-            final boolean resolved) throws SBonitaException, BonitaHomeNotSetException {
+            final boolean resolved) throws SBonitaException {
         final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
         if (resolved) {
             if (ConfigurationState.UNRESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
-                resolveAndCreateDependencies(
-                        new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId())), String.valueOf(processDefinitionId)),
-                        processDefinitionService, dependencyService, processDefinitionId);
+                resolveAndCreateDependencies(tenantAccessor.getTenantId(), processDefinitionService, dependencyService, processDefinitionId);
             }
         } else {
             if (ConfigurationState.RESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
@@ -160,30 +156,22 @@ public class DependencyResolver {
     }
 
     /**
-     * create dependencies based on the bonita home (the process folder)
+     * create dependencies based on the bonita home
      * 
-     * @param processFolder
      * @param processDefinitionService
      * @param dependencyService
      * @param processDefinitionId
      * @throws SBonitaException
      */
-    public void resolveAndCreateDependencies(final File processFolder, final ProcessDefinitionService processDefinitionService,
+    public void resolveAndCreateDependencies(final long tenantId, final ProcessDefinitionService processDefinitionService,
             final DependencyService dependencyService, final long processDefinitionId) throws SBonitaException {
-        final Map<String, byte[]> resources = new HashMap<>();
-
-        final File file = new File(processFolder, "classpath");
-        if (file.exists() && file.isDirectory()) {
-            final File[] listFiles = file.listFiles();
-            for (final File jarFile : listFiles) {
-                final String name = jarFile.getName();
+        Map<String, byte[]> resources = null;
                 try {
-                    final byte[] jarContent = FileUtils.readFileToByteArray(jarFile);
-                    resources.put(name, jarContent);
+        resources = BonitaHomeServer.getInstance().getProcessClasspath(tenantId, processDefinitionId);
                 } catch (final IOException e) {
                     throw new SDependencyCreationException(e);
-                }
-            }
+        } catch (BonitaHomeNotSetException e) {
+            throw new SDependencyCreationException(e);
         }
         addDependencies(resources, dependencyService, processDefinitionId);
         processDefinitionService.resolveProcess(processDefinitionId);
@@ -265,7 +253,7 @@ public class DependencyResolver {
         addSDependency.execute();
     }
 
-    public List<ProcessDependencyResolver> getResolvers() {
+    public List<ProcessDependencyDeployer> getResolvers() {
         return dependencyResolvers;
     }
 }

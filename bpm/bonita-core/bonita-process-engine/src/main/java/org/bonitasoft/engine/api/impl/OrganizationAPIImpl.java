@@ -16,7 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyResolver;
+import org.bonitasoft.engine.api.impl.resolver.ActorProcessDependencyDeployer;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -110,7 +110,7 @@ public class OrganizationAPIImpl {
     private void updateActorProcessDependenciesForAllActors(final TenantServiceAccessor tenantAccessor) throws SBonitaException {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         List<Long> processDefinitionIds;
-        final ActorProcessDependencyResolver dependencyResolver = new ActorProcessDependencyResolver();
+        final ActorProcessDependencyDeployer dependencyResolver = new ActorProcessDependencyDeployer();
         do {
             processDefinitionIds = processDefinitionService.getProcessDefinitionIds(0, 100);
             for (final Long processDefinitionId : processDefinitionIds) {

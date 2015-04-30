@@ -1,0 +1,150 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <bean id="bonitaDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
+        <property name="className" value="${${sysprop.bonita.db.vendor}.db.datasource.class}" />
+        <property name="uniqueName" value="${local.journal.xads.uniqueName}" />
+        <property name="minPoolSize" value="${local.journal.xads.minPoolSize}" />
+        <property name="maxPoolSize" value="${local.journal.xads.maxPoolSize}" />
+		<property name="acquireIncrement" value="${local.journal.xads.acquireIncrement}" />
+        <property name="allowLocalTransactions" value="${local.journal.xads.allowLocalTransactions}" /> <!--  For hibernate : see if we can set it to false -->
+        <property name="driverProperties" ref="${sysprop.bonita.db.vendor}.properties">
+        </property>
+    </bean>  
+
+	<bean id="bonitaSequenceManagerDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+		<property name="driverClass" value="${${sysprop.bonita.db.vendor}.db.driver.class}"/>
+		<property name="jdbcUrl" value="${${sysprop.bonita.db.vendor}.db.url}"/>
+		<property name="username" value="${${sysprop.bonita.db.vendor}.db.user}"/>
+		<property name="password" value="${${sysprop.bonita.db.vendor}.db.password}"/>
+
+		<property name="idleConnectionTestPeriodInMinutes" value="${local.journal.nonxads.idleConnectionTestPeriodInMinutes}"/>
+		<property name="idleMaxAgeInMinutes" value="${local.journal.nonxads.idleMaxAgeInMinutes}"/>
+		<property name="maxConnectionsPerPartition" value="${local.journal.nonxads.maxConnectionsPerPartition}"/>
+		<property name="minConnectionsPerPartition" value="${local.journal.nonxads.minConnectionsPerPartition}"/>
+		<property name="partitionCount" value="${local.journal.nonxads.partitionCount}"/>
+		<property name="acquireIncrement" value="${local.journal.nonxads.acquireIncrement}"/>
+		<property name="statementsCacheSize" value="${local.journal.nonxads.statementsCacheSize}"/>
+		<property name="releaseHelperThreads" value="${local.journal.nonxads.releaseHelperThreads}"/>
+	</bean>
+
+    <bean id="businessDataDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
+        <property name="className" value="${${sysprop.bonita.db.vendor}.db.datasource.class}" />
+        <property name="uniqueName" value="${local.bdm.xads.uniqueName}" />
+        <property name="minPoolSize" value="${local.bdm.xads.minPoolSize}" />
+        <property name="maxPoolSize" value="${local.bdm.xads.maxPoolSize}" />
+        <property name="acquireIncrement" value="${local.bdm.xads.acquireIncrement}" />
+        <property name="allowLocalTransactions" value="${local.bdm.xads.allowLocalTransactions}" /> <!--  For hibernate : see if we can set it to false -->
+        <property name="driverProperties" ref="${sysprop.bonita.db.vendor}.properties">
+        </property>
+    </bean>
+
+    <bean id="notManagedBizDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+        <property name="driverClass" value="${${sysprop.bonita.db.vendor}.db.driver.class}" />
+        <property name="jdbcUrl" value="${${sysprop.bonita.db.vendor}.db.url}" />
+        <property name="username" value="${${sysprop.bonita.db.vendor}.db.user}" />
+        <property name="password" value="${${sysprop.bonita.db.vendor}.db.password}" />
+        <property name="idleConnectionTestPeriodInMinutes" value="${local.bdm.nonxads.idleConnectionTestPeriodInMinutes}" />
+        <property name="idleMaxAgeInMinutes" value="${local.bdm.nonxads.idleMaxAgeInMinutes}" />
+        <property name="maxConnectionsPerPartition" value="${local.bdm.nonxads.maxConnectionsPerPartition}" />
+        <property name="minConnectionsPerPartition" value="${local.bdm.nonxads.minConnectionsPerPartition}" />
+        <property name="partitionCount" value="${local.bdm.nonxads.partitionCount}" />
+        <property name="acquireIncrement" value="${local.bdm.nonxads.acquireIncrement}" />
+        <property name="statementsCacheSize" value="${local.bdm.nonxads.statementsCacheSize}" />
+        <property name="releaseHelperThreads" value="${local.bdm.nonxads.releaseHelperThreads}" />
+    </bean>
+
+    <!-- H2 -->
+    <bean id="h2.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean" >
+        <property name="properties">
+        <props>
+            <prop key="user">${h2.db.user}</prop>
+            <prop key="password">${h2.db.password}</prop>
+            <prop key="URL">${h2.db.url}</prop>
+        </props>
+        </property>
+    </bean>
+
+    <!-- MySQL -->
+    <bean id="mysql.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="user">${mysql.db.user}</prop>
+                <prop key="password">${mysql.db.password}</prop>
+                <prop key="URL">${mysql.db.url}</prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <!-- Postgres -->
+    <bean id="postgres.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="user">${postgres.db.user}</prop>
+                <prop key="password">${postgres.db.password}</prop>
+                <prop key="serverName">${postgres.db.server.name}</prop>
+                <prop key="portNumber">${postgres.db.server.port}</prop>
+                <prop key="databaseName">${postgres.db.database.name}</prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <!-- Oracle -->
+    <bean id="oracle.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="user">${oracle.db.user}</prop>
+                <prop key="password">${oracle.db.password}</prop>
+                <prop key="URL">${oracle.db.url}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- SqlServer -->
+    <bean id="sqlserver.properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="user">${sqlserver.db.user}</prop>
+                <prop key="password">${sqlserver.db.password}</prop>
+                <prop key="URL">${sqlserver.db.url}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--  Bitronix Transaction Manager embedded configuration -->
+    <bean id="btmConfig" factory-method="getConfiguration" class="bitronix.tm.TransactionManagerServices">
+        <property name="serverId" value="btm-bonita" />
+        <property name="logPart1Filename" value="${btm.logPart1Filename}" />
+        <property name="logPart2Filename" value="${btm.logPart2Filename}" />
+        <property name="debugZeroResourceTransaction" value="${btm.debugZeroResourceTransaction}" />
+        <property name="warnAboutZeroResourceTransaction" value="${btm.warnAboutZeroResourceTransaction}" />
+        <property name="defaultTransactionTimeout" value="${btm.defaultTransactionTimeout}" />
+    </bean>
+
+    <!-- create BTM transaction manager -->
+    <bean id="BitronixTransactionManager" factory-method="getTransactionManager" class="bitronix.tm.TransactionManagerServices" depends-on="btmConfig" destroy-method="shutdown" />
+
+    <!-- Set up the mapping jndiName -> Datasource -->
+    <util:map id="jndiMapping">
+        <entry key="java:comp/env/bonitaDS" value-ref="bonitaDataSource" />
+        <entry key="java:comp/env/bonitaSequenceManagerDS" value-ref="bonitaSequenceManagerDataSource" />
+        <entry key="java:comp/env/BusinessDataDS" value-ref="businessDataDataSource" />
+        <entry key="java:comp/env/NotManagedBizDataDS" value-ref="notManagedBizDataSource" />
+        <entry key="java:comp/UserTransaction" value-ref="BitronixTransactionManager" />
+    </util:map>
+
+    <!-- This is the base class that will allow to lookup the JNDI tree -->
+    <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate" />
+
+    <!-- Bind the mapping into Carol -->
+    <bean id="jndiSetup" lazy-init="false" class="org.bonitasoft.engine.local.MemoryJNDISetup" scope="singleton" init-method="init" destroy-method="clean">
+        <constructor-arg name="jndiTemplate" ref="jndiTemplate" />
+        <constructor-arg name="jndiMapping" ref="jndiMapping" />
+    </bean>
+
+</beans>

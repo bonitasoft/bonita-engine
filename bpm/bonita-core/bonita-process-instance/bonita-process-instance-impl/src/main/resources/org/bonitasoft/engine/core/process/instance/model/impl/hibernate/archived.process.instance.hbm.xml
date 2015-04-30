@@ -2,206 +2,206 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.core.process.instance.model.archive.impl">
 
-	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
-		<filter-param name="tenantId" type="long" />
-	</filter-def>
+    <filter-def name="tenantFilter" condition=":tenantId = tenantid">
+        <filter-param name="tenantId" type="long" />
+    </filter-def>
 
-	<class name="SAProcessInstanceImpl" table="arch_process_instance">
-		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-			<key-property name="tenantId" column="tenantid" type="long" />
-			<key-property name="id" column="id" type="long" />
-		</composite-id>
-		<property name="stateId" column="stateId" />
-		<property name="name" column="name" />
-		<property name="processDefinitionId" column="processDefinitionId" />
-		<property name="description" column="description" />
-		<property name="startDate" column="startDate" />
-		<property name="startedBy" column="startedBy" />
-		<property name="startedBySubstitute" column="startedBySubstitute" />
-		<property name="endDate" column="endDate" />
-		<property name="archiveDate" column="archiveDate" />
-		<property name="sourceObjectId" column="sourceObjectId" type="long" />
-		<property name="lastUpdate" column="lastUpdate" />
-		<property name="rootProcessInstanceId" column="rootProcessInstanceId" />
-		<property name="callerId" column="callerId" />
-		<property name="migrationPlanId" column="migration_plan" />
-		<property name="stringIndex1" column="stringIndex1" />
-		<property name="stringIndex2" column="stringIndex2" />
-		<property name="stringIndex3" column="stringIndex3" />
-		<property name="stringIndex4" column="stringIndex4" />
-		<property name="stringIndex5" column="stringIndex5" />
-		<filter name="tenantFilter" />
-	</class>
+    <class name="SAProcessInstanceImpl" table="arch_process_instance">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long" />
+            <key-property name="id" column="id" type="long" />
+        </composite-id>
+        <property name="stateId" column="stateId" />
+        <property name="name" column="name" />
+        <property name="processDefinitionId" column="processDefinitionId" />
+        <property name="description" column="description" />
+        <property name="startDate" column="startDate" />
+        <property name="startedBy" column="startedBy" />
+        <property name="startedBySubstitute" column="startedBySubstitute" />
+        <property name="endDate" column="endDate" />
+        <property name="archiveDate" column="archiveDate" />
+        <property name="sourceObjectId" column="sourceObjectId" type="long" />
+        <property name="lastUpdate" column="lastUpdate" />
+        <property name="rootProcessInstanceId" column="rootProcessInstanceId" />
+        <property name="callerId" column="callerId" />
+        <property name="migrationPlanId" column="migration_plan" />
+        <property name="stringIndex1" column="stringIndex1" />
+        <property name="stringIndex2" column="stringIndex2" />
+        <property name="stringIndex3" column="stringIndex3" />
+        <property name="stringIndex4" column="stringIndex4" />
+        <property name="stringIndex5" column="stringIndex5" />
+        <filter name="tenantFilter" />
+    </class>
 
-	<class name="SAFlowNodeInstanceImpl" abstract="true" table="arch_flownode_instance">
-		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-			<key-property name="tenantId" column="tenantid" type="long" />
-			<key-property name="id" column="id" type="long" />
-		</composite-id>
-		<discriminator column="kind" type="string" />
-		<property name="flowNodeDefinitionId" column="flownodeDefinitionId" />
-		<property name="kind" column="kind" insert="false" update="false" />
-		<property name="rootContainerId" column="rootContainerId" />
-		<property name="parentContainerId" column="parentContainerId" />
-		<property name="name" column="name" />
-		<property name="displayName" column="displayName" />
-		<property name="displayDescription" column="displayDescription" />
-		<property name="stateId" column="stateId" />
-		<property name="stateName" column="stateName" />
-		<property name="terminal" column="terminal" />
-		<property name="stable" column="stable" />
-		<property name="reachedStateDate" column="reachedStateDate" />
-		<property name="lastUpdateDate" column="lastUpdateDate" />
-		<property name="expectedEndDate" column="expectedEndDate" />
-		<property name="claimedDate" column="claimedDate" />
-		<property name="archiveDate" column="archiveDate" />
-		<property name="sourceObjectId" column="sourceObjectId" type="long" />
-		<property name="aborting" column="aborting" type="boolean" />
-		<property name="logicalGroup1" column="logicalGroup1" type="long" />
-		<property name="logicalGroup2" column="logicalGroup2" type="long" />
-		<property name="logicalGroup3" column="logicalGroup3" type="long" />
-		<property name="logicalGroup4" column="logicalGroup4" type="long" />
-		<property name="description" column="description" />
-		<property name="executedBy" column="executedBy" />
-		<property name="executedBySubstitute" column="executedBySubstitute" />
-		<filter name="tenantFilter" />
-	</class>
+    <class name="SAFlowNodeInstanceImpl" abstract="true" table="arch_flownode_instance">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long" />
+            <key-property name="id" column="id" type="long" />
+        </composite-id>
+        <discriminator column="kind" type="string" />
+        <property name="flowNodeDefinitionId" column="flownodeDefinitionId" />
+        <property name="kind" column="kind" insert="false" update="false" />
+        <property name="rootContainerId" column="rootContainerId" />
+        <property name="parentContainerId" column="parentContainerId" />
+        <property name="name" column="name" />
+        <property name="displayName" column="displayName" />
+        <property name="displayDescription" column="displayDescription" />
+        <property name="stateId" column="stateId" />
+        <property name="stateName" column="stateName" />
+        <property name="terminal" column="terminal" />
+        <property name="stable" column="stable" />
+        <property name="reachedStateDate" column="reachedStateDate" />
+        <property name="lastUpdateDate" column="lastUpdateDate" />
+        <property name="expectedEndDate" column="expectedEndDate" />
+        <property name="archiveDate" column="archiveDate" />
+        <property name="sourceObjectId" column="sourceObjectId" type="long" />
+        <property name="aborting" column="aborting" type="boolean" />
+        <property name="logicalGroup1" column="logicalGroup1" type="long" />
+        <property name="logicalGroup2" column="logicalGroup2" type="long" />
+        <property name="logicalGroup3" column="logicalGroup3" type="long" />
+        <property name="logicalGroup4" column="logicalGroup4" type="long" />
+        <property name="description" column="description" />
+        <property name="executedBy" column="executedBy" />
+        <property name="executedBySubstitute" column="executedBySubstitute" />
+        <filter name="tenantFilter" />
+    </class>
 
 
-	<subclass name="SAActivityInstanceImpl" extends="SAFlowNodeInstanceImpl" abstract="true" />
+    <subclass name="SAActivityInstanceImpl" extends="SAFlowNodeInstanceImpl" abstract="true" />
 
-	<subclass name="SALoopActivityInstanceImpl" discriminator-value="loop" extends="SAActivityInstanceImpl">
-		<property name="loopCounter" column="loop_counter" />
-		<property name="loopMax" column="loop_max" />
-	</subclass>
-	
-	<subclass name="SAMultiInstanceActivityInstanceImpl" discriminator-value="multi" extends="SAActivityInstanceImpl">
-		<property name="sequential" column="sequential" />
-		<property name="loopDataInputRef" column="loopDataInputRef" />
-		<property name="loopDataOutputRef" column="loopDataOutputRef" />
-		<property name="dataInputItemRef" column="dataInputItemRef" />
-		<property name="dataOutputItemRef" column="dataOutputItemRef" />
-		<property name="loopCardinality" column="loopCardinality" />
-		<property name="numberOfActiveInstances" column="nbActiveInst" />
-		<property name="numberOfCompletedInstances" column="nbCompletedInst" />
-		<property name="numberOfTerminatedInstances" column="nbTerminatedInst" />
-	</subclass>
+    <subclass name="SALoopActivityInstanceImpl" discriminator-value="loop" extends="SAActivityInstanceImpl">
+        <property name="loopCounter" column="loop_counter" />
+        <property name="loopMax" column="loop_max" />
+    </subclass>
 
-	<subclass name="SAHumanTaskInstanceImpl" extends="SAActivityInstanceImpl" abstract="true">
-		<property name="actorId" column="actorId" type="long" />
-		<property name="assigneeId" column="assigneeId" type="long" />
-		<property name="priority" column="priority">
-			<type name="org.hibernate.type.EnumType">
-				<param name="enumClass">org.bonitasoft.engine.core.process.instance.model.STaskPriority</param>
-			</type>
-		</property>
-	</subclass>
+    <subclass name="SAMultiInstanceActivityInstanceImpl" discriminator-value="multi" extends="SAActivityInstanceImpl">
+        <property name="sequential" column="sequential" />
+        <property name="loopDataInputRef" column="loopDataInputRef" />
+        <property name="loopDataOutputRef" column="loopDataOutputRef" />
+        <property name="dataInputItemRef" column="dataInputItemRef" />
+        <property name="dataOutputItemRef" column="dataOutputItemRef" />
+        <property name="loopCardinality" column="loopCardinality" />
+        <property name="numberOfActiveInstances" column="nbActiveInst" />
+        <property name="numberOfCompletedInstances" column="nbCompletedInst" />
+        <property name="numberOfTerminatedInstances" column="nbTerminatedInst" />
+    </subclass>
 
-	<subclass name="SAGatewayInstanceImpl" discriminator-value="gate" extends="SAFlowNodeInstanceImpl">
-		<property name="gatewayType" column="gatewayType">
-			<type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
-				<param name="enumClass">
-					org.bonitasoft.engine.core.process.definition.model.SGatewayType
-				</param>
-			</type>
-		</property>
-		<property name="hitBys" column="hitBys" />
-	</subclass>
+    <subclass name="SAHumanTaskInstanceImpl" extends="SAActivityInstanceImpl" abstract="true">
+        <property name="actorId" column="actorId" type="long" />
+        <property name="assigneeId" column="assigneeId" type="long" />
+        <property name="claimedDate" column="claimedDate" />
+        <property name="priority" column="priority">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">org.bonitasoft.engine.core.process.instance.model.STaskPriority</param>
+            </type>
+        </property>
+    </subclass>
 
-	<class name="SAConnectorInstanceImpl" table="arch_connector_instance">
-		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-			<key-property name="tenantId" column="tenantid" type="long" />
-			<key-property name="id" column="id" type="long" />
-		</composite-id>
-		<property name="containerId" column="containerId" />
-		<property name="containerType" column="containerType" />
-		<property name="connectorId" column="connectorId" />
-		<property name="version" column="version" />
-		<property name="name" column="name" />
-		<property name="activationEvent" column="activationEvent">
-			<type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
-				<param name="enumClass">
-					org.bonitasoft.engine.bpm.connector.ConnectorEvent
-				</param>
-			</type>
-		</property>
-		<property name="state" column="state" />
-		<property name="archiveDate" column="archiveDate" />
-		<property name="sourceObjectId" column="sourceObjectId" type="long" />
-		<filter name="tenantFilter" />
-	</class>
+    <subclass name="SAGatewayInstanceImpl" discriminator-value="gate" extends="SAFlowNodeInstanceImpl">
+        <property name="gatewayType" column="gatewayType">
+            <type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
+                <param name="enumClass">
+                    org.bonitasoft.engine.core.process.definition.model.SGatewayType
+                </param>
+            </type>
+        </property>
+        <property name="hitBys" column="hitBys" />
+    </subclass>
 
-	<subclass name="SAUserTaskInstanceImpl" discriminator-value="user" extends="SAHumanTaskInstanceImpl" />
+    <class name="SAConnectorInstanceImpl" table="arch_connector_instance">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long" />
+            <key-property name="id" column="id" type="long" />
+        </composite-id>
+        <property name="containerId" column="containerId" />
+        <property name="containerType" column="containerType" />
+        <property name="connectorId" column="connectorId" />
+        <property name="version" column="version" />
+        <property name="name" column="name" />
+        <property name="activationEvent" column="activationEvent">
+            <type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
+                <param name="enumClass">
+                    org.bonitasoft.engine.bpm.connector.ConnectorEvent
+                </param>
+            </type>
+        </property>
+        <property name="state" column="state" />
+        <property name="archiveDate" column="archiveDate" />
+        <property name="sourceObjectId" column="sourceObjectId" type="long" />
+        <filter name="tenantFilter" />
+    </class>
 
-	<subclass name="SAManualTaskInstanceImpl" discriminator-value="manual" extends="SAHumanTaskInstanceImpl" />
+    <subclass name="SAUserTaskInstanceImpl" discriminator-value="user" extends="SAHumanTaskInstanceImpl" />
 
-	<subclass name="SAAutomaticTaskInstanceImpl" discriminator-value="auto" extends="SAActivityInstanceImpl" />
-	
-	<subclass name="SAReceiveTaskInstanceImpl" discriminator-value="receive" extends="SAActivityInstanceImpl" />
-	
-	<subclass name="SASendTaskInstanceImpl" discriminator-value="send" extends="SAActivityInstanceImpl" />
+    <subclass name="SAManualTaskInstanceImpl" discriminator-value="manual" extends="SAHumanTaskInstanceImpl" />
 
-	<subclass name="SACallActivityInstanceImpl" discriminator-value="call" extends="SAActivityInstanceImpl" />
+    <subclass name="SAAutomaticTaskInstanceImpl" discriminator-value="auto" extends="SAActivityInstanceImpl" />
 
-	<subclass name="SASubProcessActivityInstanceImpl" discriminator-value="subProc" extends="SAActivityInstanceImpl">
-		<property name="triggeredByEvent" column="triggeredByEvent" />
-	</subclass>
+    <subclass name="SAReceiveTaskInstanceImpl" discriminator-value="receive" extends="SAActivityInstanceImpl" />
 
-	<subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEventInstanceImpl" extends="SAFlowNodeInstanceImpl" abstract="true" />
+    <subclass name="SASendTaskInstanceImpl" discriminator-value="send" extends="SAActivityInstanceImpl" />
 
-	<subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEventInstanceImpl" >
-		<property name="interrupting" column="interrupting" />
-	</subclass>
+    <subclass name="SACallActivityInstanceImpl" discriminator-value="call" extends="SAActivityInstanceImpl" />
 
-	<subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" discriminator-value="startEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl" />
+    <subclass name="SASubProcessActivityInstanceImpl" discriminator-value="subProc" extends="SAActivityInstanceImpl">
+        <property name="triggeredByEvent" column="triggeredByEvent" />
+    </subclass>
 
-	<subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAIntermediateCatchEventInstanceImpl" discriminator-value="intermediateCatchEvent"
-		extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEventInstanceImpl" extends="SAFlowNodeInstanceImpl" abstract="true" />
 
-	<subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SABoundaryEventInstanceImpl" discriminator-value="boundaryEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl">
-		<property name="activityInstanceId" column="activityInstanceId" />
-	</subclass>
-	
-	<subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAThrowEventInstanceImpl" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEventInstanceImpl" />
-		
-	<subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAIntermediateThrowEventInstanceImpl" discriminator-value="intermediateThrowEvent"
-		extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAThrowEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEventInstanceImpl">
+        <property name="interrupting" column="interrupting" />
+    </subclass>
 
-	<subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" discriminator-value="endEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAThrowEventInstanceImpl" />
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" discriminator-value="startEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl" />
 
-	<class name="SATransitionInstanceImpl" table="arch_transition_instance">
-		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-			<key-property name="tenantId" column="tenantid" type="long" />
-			<key-property name="id" column="id" type="long" />
-		</composite-id>
-		<property name="rootContainerId" column="rootContainerId" />
-		<property name="parentContainerId" column="parentContainerId" />
-		<property name="source" column="source" type="long" />
-		<property name="target" column="target" type="long" />
-		<property name="state" column="state">
-			<type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
-				<param name="enumClass">
-					org.bonitasoft.engine.core.process.definition.model.TransitionState
-				</param>
-			</type>
-		</property>
-		<property name="terminal" column="terminal" type="boolean" />
-		<property name="stable" column="stable" type="boolean" />
-		<property name="stateCategory" column="stateCategory">
-			<type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
-				<param name="enumClass">
-					org.bonitasoft.engine.core.process.instance.model.SStateCategory
-				</param>
-			</type>
-		</property>
-		<property name="logicalGroup1" column="logicalGroup1" />
-		<property name="logicalGroup2" column="logicalGroup2" />
-		<property name="logicalGroup3" column="logicalGroup3" />
-		<property name="logicalGroup4" column="logicalGroup4" />
-		<property name="description" column="description" />
-		<property name="archiveDate" column="archiveDate" />
-		<property name="sourceObjectId" column="sourceObjectId" type="long" />
-		<filter name="tenantFilter" />
-	</class>
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAIntermediateCatchEventInstanceImpl" discriminator-value="intermediateCatchEvent"
+              extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl" />
+
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SABoundaryEventInstanceImpl" discriminator-value="boundaryEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SACatchEventInstanceImpl">
+        <property name="activityInstanceId" column="activityInstanceId" />
+    </subclass>
+
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAThrowEventInstanceImpl" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEventInstanceImpl" />
+
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAIntermediateThrowEventInstanceImpl" discriminator-value="intermediateThrowEvent"
+              extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAThrowEventInstanceImpl" />
+
+    <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" discriminator-value="endEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAThrowEventInstanceImpl" />
+
+    <class name="SATransitionInstanceImpl" table="arch_transition_instance">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long" />
+            <key-property name="id" column="id" type="long" />
+        </composite-id>
+        <property name="rootContainerId" column="rootContainerId" />
+        <property name="parentContainerId" column="parentContainerId" />
+        <property name="source" column="source" type="long" />
+        <property name="target" column="target" type="long" />
+        <property name="state" column="state">
+            <type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
+                <param name="enumClass">
+                    org.bonitasoft.engine.core.process.definition.model.TransitionState
+                </param>
+            </type>
+        </property>
+        <property name="terminal" column="terminal" type="boolean" />
+        <property name="stable" column="stable" type="boolean" />
+        <property name="stateCategory" column="stateCategory">
+            <type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
+                <param name="enumClass">
+                    org.bonitasoft.engine.core.process.instance.model.SStateCategory
+                </param>
+            </type>
+        </property>
+        <property name="logicalGroup1" column="logicalGroup1" />
+        <property name="logicalGroup2" column="logicalGroup2" />
+        <property name="logicalGroup3" column="logicalGroup3" />
+        <property name="logicalGroup4" column="logicalGroup4" />
+        <property name="description" column="description" />
+        <property name="archiveDate" column="archiveDate" />
+        <property name="sourceObjectId" column="sourceObjectId" type="long" />
+        <filter name="tenantFilter" />
+    </class>
 
 </hibernate-mapping>

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.business.data.impl;
 import static java.util.Arrays.asList;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +53,8 @@ import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtils;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -66,8 +69,6 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private static final String BDR_DEPENDENCY_NAME = "BDR";
 
-    private static final String CLIENT_BDM_ZIP_NAME = "client-bdm.zip";
-
     private static final String MODEL_JAR_NAME = "bdm-model.jar";
 
     private static final String DAO_JAR_NAME = "bdm-dao.jar";
@@ -78,30 +79,21 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private final SchemaManager schemaManager;
 
-    private final String clientStoragePath;
+    private final long tenantId;
 
-    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaManager schemaManager,
-            final String clientStoragePath) {
+    public BusinessDataModelRepositoryImpl(final DependencyService dependencyService, final SchemaManager schemaManager, final long tenantId) {
         this.dependencyService = dependencyService;
         this.schemaManager = schemaManager;
-        this.clientStoragePath = clientStoragePath;
+        this.tenantId = tenantId;
     }
 
     @Override
     public byte[] getClientBDMZip() throws SBusinessDataRepositoryException {
-        final File clientBDMJarFile = getClientBDMZipFile();
-        if (clientBDMJarFile.exists()) {
-            try {
-                return IOUtil.getAllContentFrom(clientBDMJarFile);
-            } catch (final IOException e) {
-                throw new SBusinessDataRepositoryException(e);
-            }
+        try {
+            return BonitaHomeServer.getInstance().getClientBDMZip(tenantId);
+        } catch (final Exception e) {
+            throw new SBusinessDataRepositoryException(e);
         }
-        throw new SBusinessDataRepositoryException(new FileNotFoundException(clientBDMJarFile.getAbsolutePath()));
-    }
-
-    private File getClientBDMZipFile() {
-        return new File(clientStoragePath, CLIENT_BDM_ZIP_NAME);
     }
 
     @Override
@@ -154,7 +146,7 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
     public String install(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModel model = getBusinessObjectModel(bdmZip);
 
-        createClientBDMZip(model);
+        createClientBDMZip(tenantId, model);
         final long bdmVersion = createAndDeployServerBDMJar(tenantId, model);
         return String.valueOf(bdmVersion);
     }
@@ -180,21 +172,12 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         }
     }
 
-    private void createClientBDMZip(final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
-        byte[] clientBdmJar = null;
+    private void createClientBDMZip(final long tenantId, final BusinessObjectModel model) throws SBusinessDataRepositoryDeploymentException {
         try {
-            clientBdmJar = generateClientBDMZip(model);
-        } catch (final IOException e) {
+            final byte[] clientBdmJar = generateClientBDMZip(model);
+            BonitaHomeServer.getInstance().writeClientBDMZip(tenantId, clientBdmJar);
+        } catch (final Exception e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
-        }
-        final File clientBDMJarFile = getClientBDMZipFile();
-        if (clientBDMJarFile.exists()) {
-            clientBDMJarFile.delete();
-        }
-        try {
-            IOUtil.write(clientBDMJarFile, clientBdmJar);
-        } catch (final IOException e1) {
-            throw new SBusinessDataRepositoryDeploymentException(e1);
         }
     }
 
@@ -269,7 +252,11 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
         } catch (final SDependencyException sde) {
             throw new SBusinessDataRepositoryException(sde);
         }
-        getClientBDMZipFile().delete();
+        try {
+            BonitaHomeServer.getInstance().removeBDMZip(tenantId);
+        } catch (Exception e) {
+            throw new SBusinessDataRepositoryException(e);
+        }
     }
 
     @Override

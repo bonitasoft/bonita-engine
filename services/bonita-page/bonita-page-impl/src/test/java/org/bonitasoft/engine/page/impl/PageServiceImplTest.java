@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -360,12 +361,11 @@ public class PageServiceImplTest {
         doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
         doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
         doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_home");
-        doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName("custompage_layout");
-        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(12);
-        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(13);
-        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(14);
+		doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName("custompage_layout");
+        doReturn(new byte[]	{1, 2, 3}).when(pageServiceImpl).getPageContent(12);
+        doReturn(new byte[]	{1, 2, 3}).when(pageServiceImpl).getPageContent(13);
+        doReturn(new byte[]	{1, 2, 3}).when(pageServiceImpl).getPageContent(14);
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(15);
-
         doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
         doReturn(null).when(pageServiceImpl).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
         doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
@@ -660,7 +660,6 @@ public class PageServiceImplTest {
         // when
         pageServiceImpl.readPageZip(content, false);
 
-
     }
 
     @Test
@@ -679,8 +678,8 @@ public class PageServiceImplTest {
 
         // given
         @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
+                getPagePropertiesContentPair());
 
         // when then
         pageServiceImpl.readPageZip(content, false);
@@ -695,7 +694,7 @@ public class PageServiceImplTest {
 
         // given
         @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
                 pair(PAGE_PROPERTIES, "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
 
         // when then
@@ -709,7 +708,7 @@ public class PageServiceImplTest {
 
         // given
         @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
                 pair(PAGE_PROPERTIES, "displayName=mypage display name\ndescription=mypage description\n".getBytes()));
 
         // when then
@@ -723,7 +722,7 @@ public class PageServiceImplTest {
 
         // given
         @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=\ndescription=mypage description\n".getBytes()));
 
         // when then
@@ -738,7 +737,7 @@ public class PageServiceImplTest {
 
         // given
         @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndescription=mypage description\n".getBytes()));
 
         // when
@@ -755,7 +754,7 @@ public class PageServiceImplTest {
         // given
         @SuppressWarnings("unchecked")
         final byte[] content = IOUtil.zip(pair("index.groovy", "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+                getPagePropertiesContentPair());
 
         // when then
         pageServiceImpl.readPageZip(content, false);
@@ -816,8 +815,8 @@ public class PageServiceImplTest {
     public void checkPageContentIsValid_validZip() throws Exception {
         // given
         @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
+                getPagePropertiesContentPair());
         // when
         pageServiceImpl.readPageZip(content, false);
 
@@ -828,7 +827,7 @@ public class PageServiceImplTest {
     @Test
     public void should_redPageZip_call_the_internal_with_provided_false() throws SInvalidPageTokenException, SInvalidPageZipInconsistentException,
             SInvalidPageZipMissingAPropertyException, SInvalidPageZipMissingPropertiesException, SInvalidPageZipMissingIndexException {
-        byte[] content = {0, 1, 2};
+        byte[] content = { 0, 1, 2 };
         doReturn(null).when(pageServiceImpl).readPageZip(content, false);
 
         //when
@@ -858,8 +857,8 @@ public class PageServiceImplTest {
         //given
         final SPageImpl sPage = new SPageImpl("page", 123456, 45, true, CONTENT_NAME);
         sPage.setDisplayName("displayName1");
-        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
+                getPagePropertiesContentPair());
 
         //when
         pageServiceImpl.addPage(sPage, content);
@@ -871,8 +870,8 @@ public class PageServiceImplTest {
     @Test
     public void add_page_with_content_should_not_add_provided_page() throws Exception {
         //given
-        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(),
+                getPagePropertiesContentPair());
 
         //when
         pageServiceImpl.addPage(content, CONTENT_NAME, USER_ID);
@@ -881,4 +880,44 @@ public class PageServiceImplTest {
         SPage sPage;
         verify(pageServiceImpl).insertPage(any(SPage.class), eq(content));
     }
+
+    @Test
+    public void should_add_page_return_provided_content_type() throws Exception {
+        //given
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION));
+
+        //when
+        final SPage insertedPage = pageServiceImpl.addPage(content, CONTENT_NAME, USER_ID);
+
+        //then
+        SPageAssert.assertThat(insertedPage).hasContentType(SContentType.API_EXTENSION);
+
+    }
+
+    @Test
+    public void should_add_page_return_default_content_type() throws Exception {
+        //given
+        final byte[] content1 = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair());
+
+        //when
+        final SPage insertedPage1 = pageServiceImpl.addPage(content1, CONTENT_NAME, USER_ID);
+
+        //then
+        SPageAssert.assertThat(insertedPage1).hasContentType("apiExtension");
+
+    }
+
+    protected Pair<String, byte[]> getPagePropertiesContentPair(String... otherProperties) {
+        StringBuilder stringBuilder = new StringBuilder().append("name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n");
+        for (String property : otherProperties) {
+            stringBuilder.append(property).append("\n");
+        }
+
+        return pair(PAGE_PROPERTIES, stringBuilder.toString().getBytes());
+    }
+
+    protected Pair<String, byte[]> getIndexGroovyContentPair() {
+        return pair(INDEX_GROOVY, "content of the groovy".getBytes());
+    }
+
 }

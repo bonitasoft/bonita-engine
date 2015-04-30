@@ -36,6 +36,8 @@ public interface Parser {
 
     Object getObjectFromXML(File xmlFile) throws SXMLParseException, IOException;
 
+    Object getObjectFromXML(byte[] bytes) throws SXMLParseException, IOException;
+
     Object getObjectFromXML(InputStream xmlStream) throws SXMLParseException, IOException;
 
     Object getObjectFromXML(Reader xmlReader) throws SXMLParseException, IOException;

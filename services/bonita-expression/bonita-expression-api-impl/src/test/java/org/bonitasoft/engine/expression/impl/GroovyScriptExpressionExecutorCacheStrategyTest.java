@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
-import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -69,8 +68,7 @@ public class GroovyScriptExpressionExecutorCacheStrategyTest {
     public void setup() throws Exception {
         final CacheConfiguration cacheConfiguration = new CacheConfiguration();
         cacheConfiguration.setName("GROOVY_SCRIPT_CACHE_NAME");
-        final CacheConfigurations cacheConfigurations = new CacheConfigurations();
-        cacheConfigurations.setConfigurations(Arrays.asList(cacheConfiguration));
+        final List<CacheConfiguration> cacheConfigurations = Arrays.asList(cacheConfiguration);
         cacheService = new EhCacheCacheService(logger, sessionAccessor, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
         cacheService.start();
         groovyScriptExpressionExecutorCacheStrategy = new GroovyScriptExpressionExecutorCacheStrategy(cacheService, classLoaderService, logger);

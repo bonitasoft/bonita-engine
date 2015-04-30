@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
+import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProcessRuntimeAPI;
@@ -129,7 +129,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
                                 "new org.bonitasoft.engine.test.TheClassOfMyLibrary().aPublicMethod()", String.class.getName()));
         final DesignProcessDefinition done = pBuilder.done();
         final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(done);
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/mylibrary-jar.bak");
+        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/mylibrary-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
@@ -186,14 +186,14 @@ public class ProcessWithExpressionIT extends TestWithUser {
     }
 
     private BarResource getMyLibrary() throws IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/mylibrary-jar.bak");
+        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/mylibrary-jar.bak");
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
         return new BarResource("mylibrary.jar", byteArray);
     }
 
     private BarResource getMyLibrary2() throws IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/mylibrary2-jar.bak");
+        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/mylibrary2-jar.bak");
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
         return new BarResource("mylibrary.jar", byteArray);

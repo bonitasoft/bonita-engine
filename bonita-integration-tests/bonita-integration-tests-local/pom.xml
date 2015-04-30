@@ -11,7 +11,7 @@
     <artifactId>bonita-integration-tests-local</artifactId>
 
     <properties>
-        <bonita.home>${project.build.directory}/home</bonita.home>
+        <bonita.home>${project.build.directory}/bonita-home</bonita.home>
         <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
     </properties>
 
@@ -93,12 +93,37 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack</id>
-                        <phase>generate-resources</phase>
+                        <id>unpack-server-tests-util</id>
+                        <phase>process-test-resources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.bonitasoft.engine.test</groupId>
+                                    <artifactId>bonita-server-test-utils</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-bonita-home</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/bonita-home-community</outputDirectory>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.bonitasoft.engine</groupId>
@@ -107,29 +132,24 @@
                                     <type>zip</type>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
                         </configuration>
                     </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
                     <execution>
-                        <id>unpack server test util</id>
-                        <phase>generate-resources</phase>
+                        <id>complete test conf setup</id>
+                        <phase>process-test-resources</phase>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>run</goal>
                         </goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.bonitasoft.engine.test</groupId>
-                                    <artifactId>bonita-server-test-utils</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <target name="build-home">
+                                <ant antfile="build-home.xml" target="build"/>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
@@ -155,28 +175,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>configure-bdm-repository</id>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <target>
-                                <!-- Change Dialect of BDR -->
-                                <property file="${bonita.home}/server/platform/conf/bonita-platform.properties" />
-                                <property file="${project.build.directory}/jdbc-${sysprop.bonita.db.vendor}.properties" />
-                                <replaceregexp file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties" match="businessdata.hibernate.dialect=(.*)"
-                                               replace="businessdata.hibernate.dialect=${db.hibernate.dialect}" byline="true" />
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
@@ -195,6 +193,24 @@
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>distrib-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

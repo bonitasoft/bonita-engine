@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
+import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -1009,7 +1009,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
             final BusinessArchiveBuilder bizArchive = new BusinessArchiveBuilder();
             bizArchive.createNewBusinessArchive();
             bizArchive.setProcessDefinition(processDefBuilder.done());
-            bizArchive.addConnectorImplementation(new BarResource("TestConnectorWithOutput.impl", IOUtils.toByteArray(BPMRemoteTests.class
+            bizArchive.addConnectorImplementation(new BarResource("TestConnectorWithOutput.impl", IOUtils.toByteArray(CommonAPIIT.class
                     .getResourceAsStream("/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl"))));
             bizArchive.addClasspathResource(new BarResource("TestConnectorWithOutput.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
             callingProcessDefinition = deployAndEnableProcessWithActor(bizArchive.done(), ACTOR_NAME, cascao);
@@ -1078,6 +1078,53 @@ public class CallActivityIT extends TestWithTechnicalUser {
             if (inputStream != null) {
                 inputStream.close();
             }
+        }
+    }
+
+    @Test
+    public void callActivity_classloader_handling_on_child_process() throws Exception {
+        /*
+            BS-12674: issue when archiving called process, it's done in the wrong classloader
+         */
+        ProcessDefinition targetProcessDefinition = null;
+        ProcessDefinition callingProcessDefinition = null;
+        try {
+
+            // Build target process
+            final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
+            targetProcessDefBuilder.addActor(ACTOR_NAME);
+            targetProcessDefBuilder.addData("subProcessData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("subDefault"));
+            targetProcessDefBuilder.addData("dataActivity", java.lang.Object.class.getName(),
+                    new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", java.lang.Object.class.getName()));
+            targetProcessDefBuilder.addAutomaticTask("tStep1").addOperation(
+                    new OperationBuilder().createSetDataOperation("subProcessData", new ExpressionBuilder().createConstantStringExpression("subModified")));
+            BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
+            businessArchiveBuilder.setProcessDefinition(targetProcessDefBuilder.done());
+            //add a jar that is not known from the parent process
+            businessArchiveBuilder.addClasspathResource(getResource("/org.bonitasoft.dfgdfg.bak", "org.bonitasoft.dfgdfg.jar"));
+            targetProcessDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, cebolinha);
+            // Build and start calling process
+            final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
+            final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+            processDefBuilder.addActor(ACTOR_NAME);
+            processDefBuilder.addData("parentProcessData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("parentDefault"));
+            final CallActivityBuilder callActivityBuilder = processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr);
+            callActivityBuilder.addDataOutputOperation(new OperationBuilder().createSetDataOperation("parentProcessData",
+                    new ExpressionBuilder().createDataExpression("subProcessData", String.class.getName())));
+            processDefBuilder.addUserTask("end", ACTOR_NAME);
+            processDefBuilder.addTransition("callActivity", "end");
+            final BusinessArchiveBuilder bizArchive = new BusinessArchiveBuilder();
+            bizArchive.createNewBusinessArchive();
+            bizArchive.setProcessDefinition(processDefBuilder.done());
+            callingProcessDefinition = deployAndEnableProcessWithActor(bizArchive.done(), ACTOR_NAME, cascao);
+
+
+            final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
+            waitForUserTask(callingProcessInstance, "end");
+        } finally {
+            disableAndDeleteProcess(callingProcessDefinition);
+            disableAndDeleteProcess(targetProcessDefinition);
         }
     }
 

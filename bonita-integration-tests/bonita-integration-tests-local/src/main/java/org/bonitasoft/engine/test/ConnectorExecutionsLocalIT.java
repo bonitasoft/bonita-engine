@@ -30,7 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
+import org.bonitasoft.engine.BPMRemoteTestsLocal;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -72,7 +73,10 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Baptiste Mesta
@@ -80,6 +84,8 @@ import org.junit.Test;
  * @author Elias Ricken de Medeiros
  */
 @SuppressWarnings("javadoc")
+@RunWith(BonitaTestRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
     protected TenantServiceAccessor getTenantAccessor() {
@@ -566,29 +572,18 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Missing class connector", "Process instance" }, story = "Execute connector with missing class on process instance.", jira = "")
     @Test
     public void executeMissingClassConnectorOnProcessInstance() throws Exception {
-        final PrintStream stdout = System.out;
-        final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(myOut));
-        try {
-            final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-            processDefBuilder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME)
-                    .addConnector("UnkownClassConnector", "unkownClassConnectorDef", "1.0.0", ConnectorEvent.ON_ENTER);
-            final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                    processDefBuilder.done());
-            businessArchiveBuilder.addConnectorImplementation(new BarResource("UnknownClassConnector.impl", IOUtils.toByteArray(BPMRemoteTests.class
-                    .getResourceAsStream("/org/bonitasoft/engine/connectors/UnknownClassConnector.impl"))));
-            final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
+        processDefBuilder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME)
+                .addConnector("UnkownClassConnector", "unkownClassConnectorDef", "1.0.0", ConnectorEvent.ON_ENTER);
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
+                processDefBuilder.done());
+        businessArchiveBuilder.addConnectorImplementation(new BarResource("UnknownClassConnector.impl", IOUtils.toByteArray(BPMRemoteTestsLocal.class
+                .getResourceAsStream("/org/bonitasoft/engine/connectors/UnknownClassConnector.impl"))));
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
 
-            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-            waitForFlowNodeInFailedState(processInstance, "step1");
-            disableAndDeleteProcess(processDefinition);
-        } finally {
-            System.setOut(stdout);
-        }
-        final String logs = myOut.toString();
-        System.out.println(logs);
-        assertTrue("should have written in logs an exception", logs.contains("SConnectorException"));
-        assertTrue("should have written in logs an exception", logs.contains("org.unknown.MyUnknownClass"));
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForFlowNodeInFailedState(processInstance, "step1");
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "ENGINE-773")

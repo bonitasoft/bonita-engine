@@ -13,9 +13,11 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
+import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.HumanTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
+import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Baptiste Mesta
@@ -67,6 +69,11 @@ public class UserTaskDefinitionBuilder extends ActivityDefinitionBuilder {
 
     public ContractDefinitionBuilder addContract() {
         return new ContractDefinitionBuilder(getProcessBuilder(), getContainer(), (UserTaskDefinitionImpl) getActivity());
+    }
+
+    public UserTaskDefinitionBuilder addContextEntry(String key, Expression expression) {
+        ((UserTaskDefinitionImpl) getActivity()).addContextEntry(new ContextEntryImpl(key, expression));
+        return this;
     }
 
 }

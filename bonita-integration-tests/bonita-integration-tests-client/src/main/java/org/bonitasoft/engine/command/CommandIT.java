@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
+import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -66,7 +66,7 @@ public class CommandIT extends TestWithTechnicalUser {
 
     @Test
     public void executeCommandWithParameters() throws BonitaException, IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/commands-jar.bak");
+        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/commands-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
@@ -82,7 +82,7 @@ public class CommandIT extends TestWithTechnicalUser {
 
     @Test(expected = CommandParameterizationException.class)
     public void commandThrowsCommandParameterizationException() throws BonitaException, IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/commands-jar.bak");
+        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/commands-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
@@ -100,7 +100,7 @@ public class CommandIT extends TestWithTechnicalUser {
 
     @Test(expected = CommandExecutionException.class)
     public void commandThrowsCommandExecutionException() throws BonitaException, IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/commands-jar.bak");
+        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/commands-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
@@ -369,7 +369,7 @@ public class CommandIT extends TestWithTechnicalUser {
 
     @Test
     public void executeCommandById() throws BonitaException, IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/commands-jar.bak");
+        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/commands-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
@@ -391,7 +391,7 @@ public class CommandIT extends TestWithTechnicalUser {
 
     @Test(expected = BonitaRuntimeException.class)
     public void executeCommandThrowsANPE() throws BonitaException, IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/npe-command-jar.bak");
+        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/npe-command-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();

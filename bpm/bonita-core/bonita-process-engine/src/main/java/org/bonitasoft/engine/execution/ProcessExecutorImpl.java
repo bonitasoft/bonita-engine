@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.execution;
 
 import java.io.File;
@@ -447,6 +447,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private void initializeBusinessData(SProcessDefinition sDefinition, SProcessInstance sInstance, SExpressionContext expressionContext)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException,
             SRefBusinessDataInstanceCreationException {
+        setContextContainerIfNotSet(expressionContext, sInstance);
         final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
         for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
             final SExpression expression = bdd.getDefaultValueExpression();
@@ -464,6 +465,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         .done();
                 refBusinessDataService.addRefBusinessDataInstance(instance);
             }
+        }
+    }
+
+    private void setContextContainerIfNotSet(SExpressionContext expressionContext, SProcessInstance sInstance) {
+        if (expressionContext != null && expressionContext.getContainerId() == null && sInstance != null && sInstance.getId() != 0) {
+            expressionContext.setContainerId(sInstance.getId());
+            expressionContext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
         }
     }
 
@@ -496,12 +504,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
         final List<SDocumentDefinition> documentDefinitions = processContainer.getDocumentDefinitions();
         if (!documentDefinitions.isEmpty()) {
-            final String processesFolder = BonitaHomeServer.getInstance().getProcessFolder(sessionAccessor.getTenantId(), sDefinition.getId());
-            final File documentsFolder = new File(processesFolder, DocumentsResourcesContribution.DOCUMENTS_FOLDER);
             for (final SDocumentDefinition document : documentDefinitions) {
                 if (document.getFile() != null) {
                     final String file = document.getFile();// should always exists...validation on businessarchive
-                    final byte[] content = FileUtils.readFileToByteArray(new File(documentsFolder, file));
+                    final byte[] content = BonitaHomeServer.getInstance().getProcessDocument(sessionAccessor.getTenantId(), sDefinition.getId(), file);
                     attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), content, authorId,
                             document.getDescription(), -1);
                 } else if (document.getUrl() != null) {
@@ -747,7 +753,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
             throws SArchivingException {
-        //FIXME HERRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEEE
+        //FIXME we archive the flow node instance here because it was not archived before because the flow node was interrupting the parent.. we should change that because it's not very easy to see how it works
         if (child.getId() != sProcessInstance.getInterruptingEventId() || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
             // Let's archive the final state of the child:
             flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
@@ -755,7 +761,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private boolean needToReevaluateInclusiveGateways(FlowNodeTransitionsWrapper transitionsDescriptor) {
-        int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size();
+        int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size() + (transitionsDescriptor.getDefaultTransition()!=null?1:0);
         int takenTransition = transitionsDescriptor.getValidOutgoingTransitionDefinitions().size();
         /*
          * Why this condition?

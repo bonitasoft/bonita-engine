@@ -14,8 +14,13 @@
 package org.bonitasoft.engine.home;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.io.PropertiesManager;
 
 /**
  * Utility class that handles the path to the client part of the bonita home
@@ -30,9 +35,9 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
  */
 public final class BonitaHomeClient extends BonitaHome {
 
-    public static final String BONITA_HOME_CLIENT = "client";
+    public static final String BONITA_HOME_CLIENT = "engine-client";
 
-    private String clientPath;
+    private File clientPath;
 
     public static final BonitaHomeClient INSTANCE = new BonitaHomeClient();
 
@@ -50,12 +55,12 @@ public final class BonitaHomeClient extends BonitaHome {
      *         when bonita.home system property is not set
      * @since 6.0.0
      */
-    public String getBonitaHomeClientFolder() throws BonitaHomeNotSetException {
+    protected File getBonitaHomeClientFolder() throws BonitaHomeNotSetException {
         if (clientPath == null) {
-            final StringBuilder path = new StringBuilder(getBonitaHomeFolder());
+            final StringBuilder path = new StringBuilder(getBonitaHomeFolderPath());
             path.append(File.separatorChar);
             path.append(BONITA_HOME_CLIENT);
-            clientPath = path.toString();
+            clientPath = new File(path.toString());
         }
         return clientPath;
     }
@@ -63,6 +68,21 @@ public final class BonitaHomeClient extends BonitaHome {
     @Override
     protected void refresh() {
         clientPath = null;
+    }
+
+    public static String getProperty(final String propertyName) throws BonitaHomeNotSetException, ServerAPIException, IOException {
+        final Properties properties = getProperties();
+        return properties.getProperty(propertyName);
+    }
+
+    public static Properties getProperties() throws BonitaHomeNotSetException, ServerAPIException, IOException {
+        final File clientFolder = getInstance().getBonitaHomeClientFolder();
+        final Properties defaultProperties = PropertiesManager.getProperties(FileUtils.getFile(clientFolder, "work", "bonita-client-community.properties"));
+        final Properties customProperties = PropertiesManager.getProperties(FileUtils.getFile(clientFolder, "conf", "bonita-client-custom.properties"));
+        final Properties result = new Properties();
+        result.putAll(defaultProperties);
+        result.putAll(customProperties);
+        return result;
     }
 
 }

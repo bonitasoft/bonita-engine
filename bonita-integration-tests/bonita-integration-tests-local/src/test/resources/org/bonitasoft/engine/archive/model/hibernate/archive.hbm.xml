@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.archive.model">
+
+	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
+		<filter-param name="tenantId" type="long" />
+	</filter-def>
+
+	<class name="Employee" table="p_employee">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="ID" type="long" />
+		</composite-id>
+		<property name="name" type="java.lang.String" column="name" />
+		<property name="age" type="int" column="age" />
+		<property name="laptopId" type="long" column="laptopid" />
+		<property name="archiveDate" type="long" column="archivedate" />
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="SAEmployee" table="saemployee">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="ID" type="long" />
+		</composite-id>
+		<property name="employeeId" type="long" column="employeeid" />
+		<property name="archiveDate" type="long" column="archivedate" />
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="Address" table="p_address">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="ID" type="long" />
+		</composite-id>
+		<property name="address" type="java.lang.String" column="address" />
+		<property name="employeeId" type="long" column="employeeid" />
+		<property name="archiveDate" type="long" column="archivedate" />
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="Laptop" table="laptop">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="ID" type="long" />
+		</composite-id>
+		<property name="brand" type="java.lang.String" column="brand" />
+		<property name="model" type="java.lang.String" column="model" />
+		<property name="archiveDate" type="long" column="archivedate" />
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="Project" table="project">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="ID" type="long" />
+		</composite-id>
+		<property name="name" type="java.lang.String" column="name" />
+		<property name="archiveDate" type="long" column="archivedate" />
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="EmployeeProjectMapping" table="employeeprojectmapping">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="ID" type="long" />
+		</composite-id>
+		<property name="employeeId" type="long" column="employeeid" />
+		<property name="projectId" type="long" column="projectid" />
+		<property name="archiveDate" type="long" column="archivedate" />
+		<filter name="tenantFilter" />
+	</class>
+
+</hibernate-mapping>

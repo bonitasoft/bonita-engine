@@ -16,7 +16,11 @@ package org.bonitasoft.engine.service.impl;
 import groovy.lang.GroovyClassLoader;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
+import groovy.lang.GroovyResourceLoader;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.api.permission.PermissionRule;
@@ -24,6 +28,8 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -44,17 +50,15 @@ public class PermissionServiceImpl implements PermissionService {
     private final TechnicalLoggerService logger;
     private final SessionAccessor sessionAccessor;
     private final SessionService sessionService;
-    private final String scriptFolder;
     private final long tenantId;
     private GroovyClassLoader groovyClassLoader;
 
     public PermissionServiceImpl(final ClassLoaderService classLoaderService, final TechnicalLoggerService logger,
-            final SessionAccessor sessionAccessor, final SessionService sessionService, final String scriptFolder, final long tenantId) {
+            final SessionAccessor sessionAccessor, final SessionService sessionService, final long tenantId) {
         this.classLoaderService = classLoaderService;
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
-        this.scriptFolder = scriptFolder;
         this.tenantId = tenantId;
     }
 
@@ -98,13 +102,13 @@ public class PermissionServiceImpl implements PermissionService {
     public void start() throws SBonitaException {
         groovyClassLoader = new GroovyClassLoader(classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId));
         groovyClassLoader.setShouldRecompile(true);
-
-        final File file = new File(scriptFolder);
-        if (file.exists() && file.isDirectory()) {
-            groovyClassLoader.addClasspath(file.getAbsolutePath());
-        } else {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The security script folder " + file
-                    + " does not exists or is a file, PermissionRules will be loaded only from the tenant classloader");
+        try {
+            final File folder = BonitaHomeServer.getInstance().getSecurityScriptsFolder(tenantId);
+            groovyClassLoader.addClasspath(folder.getAbsolutePath());
+        } catch (BonitaHomeNotSetException e) {
+            throw new SExecutionException(e);
+        } catch (IOException e) {
+            throw new SExecutionException(e);
         }
     }
 

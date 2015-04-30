@@ -27,11 +27,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public interface UserFilterService {
 
-    String DEFINITION_EXT = ".def";
-
     String IMPLEMENTATION_EXT = ".impl";
-
-    String USER_FILTER_FOLDER = "userFilters";
 
     FilterResult executeFilter(long processDefinitionId, SUserFilterDefinition sUserFilterDefinition, Map<String, SExpression> inputs, ClassLoader classLoader,
             SExpressionContext expressionContext, final String actorName) throws SUserFilterExecutionException;

@@ -44,4 +44,9 @@ public class TestWithCustomPage extends TestWithApplication {
         return page;
     }
 
+    protected Page createPage(final String pageName) throws Exception {
+        return getPageAPI().createPage(new PageCreator(pageName, "content.zip").setDisplayName(pageName),
+                createTestPageContent(pageName, "no display name", "empty desc"));
+    }
+
 }

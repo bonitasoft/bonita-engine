@@ -16,7 +16,7 @@
     <properties>
         <distrib.dir>${project.build.directory}/bonita-engine-deploy</distrib.dir>
         <report.results>${distrib.dir}/target/testresults</report.results>
-        <bonita.home>${distrib.dir}/resources/home/</bonita.home>
+        <bonita.home>${distrib.dir}/resources/bonita-home/</bonita.home>
         <report.xml>${report.results}/xml</report.xml>
         <report.xml>${report.results}/xml</report.xml>
         <surefire.reports>${project.build.directory}/surefire-reports</surefire.reports>

@@ -63,19 +63,19 @@ public class PlatformLoginIT extends CommonAPIIT {
 
         @Override
         public void starting(final Description d) {
-            LOGGER.info("Starting test: " + getClass().getName() + "." + d.getMethodName());
+            LOGGER.warn("Starting test: " + d.getClassName() + "." + d.getMethodName());
         }
 
         @Override
         public void failed(final Throwable cause, final Description d) {
-            LOGGER.info("Failed test: " + getClass().getName() + "." + d.getMethodName());
-            LOGGER.info("-------------------------------------------------------------------------------------");
+            LOGGER.warn("Failed test: " + d.getClassName() + "." + d.getMethodName());
+            LOGGER.warn("-------------------------------------------------------------------------------------");
         }
 
         @Override
         public void succeeded(final Description d) {
-            LOGGER.info("Succeeded test: " + getClass().getName() + "." + d.getMethodName());
-            LOGGER.info("-------------------------------------------------------------------------------------");
+            LOGGER.warn("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
+            LOGGER.warn("-------------------------------------------------------------------------------------");
         }
 
     };

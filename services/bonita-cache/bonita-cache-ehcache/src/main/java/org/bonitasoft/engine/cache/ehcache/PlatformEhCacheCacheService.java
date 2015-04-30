@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
-import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
@@ -32,7 +31,7 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 public class PlatformEhCacheCacheService extends CommonEhCacheCacheService implements PlatformCacheService {
 
     public PlatformEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-            final CacheConfigurations cacheConfigurations, final CacheConfiguration defaultCacheConfiguration, final String diskStorePath) {
+            final List<CacheConfiguration> cacheConfigurations, final CacheConfiguration defaultCacheConfiguration, final String diskStorePath) {
         super(logger, sessionAccessor, cacheConfigurations, defaultCacheConfiguration, diskStorePath);
     }
 
@@ -59,7 +58,7 @@ public class PlatformEhCacheCacheService extends CommonEhCacheCacheService imple
     }
 
     @Override
-    public synchronized void start() {
+    public synchronized void start() throws SCacheException {
         buildCacheManagerWithDefaultConfiguration();
     }
 
@@ -78,7 +77,7 @@ public class PlatformEhCacheCacheService extends CommonEhCacheCacheService imple
     }
 
     @Override
-    public void resume() {
+    public void resume() throws SCacheException {
         if (cacheManager == null) {
             start();
         }

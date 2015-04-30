@@ -42,7 +42,7 @@ public class FormMappingModel implements Serializable {
     private List<FormMappingDefinition> formMappings;
 
     public FormMappingModel() {
-        formMappings = new ArrayList<FormMappingDefinition>();
+        formMappings = new ArrayList<>();
     }
 
     public List<FormMappingDefinition> getFormMappings() {

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
+import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
@@ -199,7 +199,7 @@ public class ActivityCommandIT extends TestWithUser {
     private BusinessArchive buildBusinessArchiveWithoutConnector() throws Exception {
         final DesignProcessDefinition designProcessDefinition = buildProcessDefinitionWithActorAnd2HumanTasksAndLongTextDataNotTransient(false).done();
         final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition);
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/mylibrary-jar.bak");
+        final InputStream stream = CommonAPIIT.class.getResourceAsStream("/mylibrary-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();

@@ -43,7 +43,7 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
 
     private final DataInstanceService dataService;
 
-    private final ParentContainerResolver parentContainerResolver;
+    private ParentContainerResolver parentContainerResolver;
 
     public DataExpressionExecutorStrategy(final DataInstanceService dataService, final ParentContainerResolver parentContainerResolver) {
         this.dataService = dataService;
