@@ -64,7 +64,7 @@ public class OperationServiceImpl implements OperationService {
         this.persistRightOperandResolver = persistRightOperandResolver;
         this.logger = logger;
         final List<LeftOperandHandler> leftOperandHandlers = leftOperandHandlerProvider.getLeftOperandHandlers();
-        leftOperandHandlersMap = new HashMap<String, LeftOperandHandler>(leftOperandHandlers.size());
+        leftOperandHandlersMap = new HashMap<>(leftOperandHandlers.size());
         for (final LeftOperandHandler leftOperandHandler : leftOperandHandlers) {
             leftOperandHandlersMap.put(leftOperandHandler.getType(), leftOperandHandler);
         }
@@ -98,7 +98,7 @@ public class OperationServiceImpl implements OperationService {
 
     Map<SLeftOperand, LeftOperandUpdateStatus> executeOperators(final List<SOperation> operations, final SExpressionContext expressionContext)
             throws SOperationExecutionException {
-        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperandsToUpdate = new HashMap<SLeftOperand, LeftOperandUpdateStatus>();
+        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperandsToUpdate = new HashMap<>();
         for (int i = 0; i < operations.size(); i++) {
             SOperation currentOperation = operations.get(i);
             boolean shouldPersistValue = persistRightOperandResolver.shouldPersist(i, operations);
@@ -163,7 +163,7 @@ public class OperationServiceImpl implements OperationService {
         if (containerId == null || containerId != dataContainerId || containerType == null || !containerType.equals(dataContainerType)) {
             return;
         }
-        HashMap<String, List<SLeftOperand>> leftOperandHashMap = new HashMap<String, List<SLeftOperand>>();
+        HashMap<String, List<SLeftOperand>> leftOperandHashMap = new HashMap<>();
         for (final SOperation operation : operations) {
             // this operation will set a data, we retrieve it and put it in context
             final SLeftOperand leftOperand = operation.getLeftOperand();

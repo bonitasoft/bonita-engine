@@ -72,7 +72,7 @@ public class JavaMethodOperationExecutorStrategyTest {
         when(rightOperand.getReturnType()).thenReturn(Object.class.getName());
 
         final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
-        final Map<String, Object> map = new HashMap<String, Object>();
+        final Map<String, Object> map = new HashMap<>();
         map.put("myData", new MyClassThatThrowException());
         expressionContext.setInputValues(map);
 
@@ -93,7 +93,7 @@ public class JavaMethodOperationExecutorStrategyTest {
         when(rightOperand.getReturnType()).thenReturn(Integer.class.getName());
 
         final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
-        final Map<String, Object> map = new HashMap<String, Object>();
+        final Map<String, Object> map = new HashMap<>();
         map.put("myData", new MyClass());
         expressionContext.setInputValues(map);
         final MyClass updated = (MyClass) strategy.computeNewValueForLeftOperand(operation, 12, expressionContext, false);

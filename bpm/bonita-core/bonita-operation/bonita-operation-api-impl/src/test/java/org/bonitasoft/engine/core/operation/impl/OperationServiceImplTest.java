@@ -192,11 +192,11 @@ public class OperationServiceImplTest {
     @Test
     public void should_UpdateLeftOperands_call_leftOperandHandlers() throws Exception {
         // given
-        final Map<String, Object> inputValues = new HashMap<String, Object>();
+        final Map<String, Object> inputValues = new HashMap<>();
         inputValues.put("data1", "value1");
         inputValues.put("data2", "value2");
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
-        final Map<SLeftOperand, LeftOperandUpdateStatus> updates = new HashMap<SLeftOperand, LeftOperandUpdateStatus>();
+        final Map<SLeftOperand, LeftOperandUpdateStatus> updates = new HashMap<>();
         updates.put(buildLeftOperand(TYPE_1, "data1"), new LeftOperandUpdateStatus(SOperatorType.ASSIGNMENT));
         updates.put(buildLeftOperand(TYPE_2, "data2"), new LeftOperandUpdateStatus(SOperatorType.DELETION));
 
@@ -215,7 +215,7 @@ public class OperationServiceImplTest {
         final SOperation op1 = buildOperation(TYPE_1, "data1", SOperatorType.ASSIGNMENT, mock(SExpression.class));
         final SOperation op2 = buildOperation(TYPE_2, "data2", SOperatorType.XPATH_UPDATE_QUERY, mock(SExpression.class));
         final SOperation op3 = buildOperation(TYPE_2, "data2", SOperatorType.JAVA_METHOD, mock(SExpression.class));
-        final Map<String, Object> inputValues = new HashMap<String, Object>();
+        final Map<String, Object> inputValues = new HashMap<>();
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
 
         List<SOperation> operations = Arrays.asList(op1, op2, op3);
@@ -273,7 +273,7 @@ public class OperationServiceImplTest {
     @Test
     public void executeOperatorsShouldReturnATwoUpdatesForTheDifferentDataOfTheSameOperator() throws Exception {
         // given
-        final List<SOperation> operations = new ArrayList<SOperation>();
+        final List<SOperation> operations = new ArrayList<>();
         operations.add(buildOperation(TYPE_1, "data2", SOperatorType.JAVA_METHOD));
         operations.add(buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD));
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
@@ -296,13 +296,13 @@ public class OperationServiceImplTest {
     @Test
     public void executeOperationShouldDoBatchGet() throws SOperationExecutionException, SBonitaReadException {
         //given
-        final List<SOperation> operations = new ArrayList<SOperation>();
+        final List<SOperation> operations = new ArrayList<>();
         operations.add(buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD));
         operations.add(buildOperation(TYPE_1, "data2", SOperatorType.ASSIGNMENT));
         operations.add(buildOperation(TYPE_2, "data3", SOperatorType.ASSIGNMENT));
         operations.add(buildOperation(TYPE_2, "data4", SOperatorType.ASSIGNMENT));
         operations.add(buildOperation(TYPE_2, "data5", SOperatorType.ASSIGNMENT));
-        HashMap<String, Object> inputValues = new HashMap<String, Object>();
+        HashMap<String, Object> inputValues = new HashMap<>();
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
 
         //when
@@ -320,10 +320,10 @@ public class OperationServiceImplTest {
     @Test
     public void executeOperationShouldNotGetWhenInAnOtherContainer() throws SOperationExecutionException, SBonitaReadException {
         //given
-        final List<SOperation> operations = new ArrayList<SOperation>();
+        final List<SOperation> operations = new ArrayList<>();
         operations.add(buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD));
         operations.add(buildOperation(TYPE_1, "data2", SOperatorType.ASSIGNMENT));
-        HashMap<String, Object> inputValues = new HashMap<String, Object>();
+        HashMap<String, Object> inputValues = new HashMap<>();
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
 
         //when

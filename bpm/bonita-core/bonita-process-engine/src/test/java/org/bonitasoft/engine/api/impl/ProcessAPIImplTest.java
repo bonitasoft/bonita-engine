@@ -37,7 +37,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -280,14 +279,14 @@ public class ProcessAPIImplTest {
     @Test
     public void getFlownodeStateCounters_should_build_proper_journal_and_archived_counters() throws Exception {
         final long processInstanceId = 9811L;
-        final List<SFlowNodeInstanceStateCounter> flownodes = new ArrayList<SFlowNodeInstanceStateCounter>(4);
+        final List<SFlowNodeInstanceStateCounter> flownodes = new ArrayList<>(4);
         flownodes.add(new SFlowNodeInstanceStateCounter("step1", "completed", 2L));
         flownodes.add(new SFlowNodeInstanceStateCounter("step2", "completed", 4L));
         flownodes.add(new SFlowNodeInstanceStateCounter("step1", "ready", 1L));
         flownodes.add(new SFlowNodeInstanceStateCounter("step3", "failed", 8L));
         when(activityInstanceService.getNumberOfFlownodesInAllStates(processInstanceId)).thenReturn(flownodes);
 
-        final List<SFlowNodeInstanceStateCounter> archivedFlownodes = new ArrayList<SFlowNodeInstanceStateCounter>(1);
+        final List<SFlowNodeInstanceStateCounter> archivedFlownodes = new ArrayList<>(1);
         archivedFlownodes.add(new SFlowNodeInstanceStateCounter("step2", "aborted", 3L));
         when(activityInstanceService.getNumberOfArchivedFlownodesInAllStates(processInstanceId)).thenReturn(archivedFlownodes);
 

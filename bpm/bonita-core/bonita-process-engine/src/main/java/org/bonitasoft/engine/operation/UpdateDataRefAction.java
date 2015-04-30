@@ -1,10 +1,15 @@
 /**
  * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft is a trademark of BonitaSoft SA.
- * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
- * For commercial licensing information, contact:
- * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
- * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
  **/
 
 package org.bonitasoft.engine.operation;
@@ -14,13 +19,13 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 
-import com.bonitasoft.engine.bdm.Entity;
-import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
-import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
-import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.bdm.Entity;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -97,7 +102,7 @@ public class UpdateDataRefAction implements EntityAction {
     }
 
     private ArrayList<Long> buildDataIdsList(final List<Entity> entities) throws SEntityActionExecutionException {
-        ArrayList<Long> businessDataIds = new ArrayList<Long>(entities.size());
+        ArrayList<Long> businessDataIds = new ArrayList<>(entities.size());
         for (Entity entity : entities) {
             checkNotNull(entity);
             businessDataIds.add(entity.getPersistenceId());

@@ -30,7 +30,7 @@ public class OperationExecutorStrategyProvider {
     private final Map<String, OperationExecutorStrategy> operationStrategies;
     
     public OperationExecutorStrategyProvider(final List<OperationExecutorStrategy> operationExecutors) {
-        operationStrategies = new HashMap<String, OperationExecutorStrategy>(operationExecutors.size());
+        operationStrategies = new HashMap<>(operationExecutors.size());
         for (final OperationExecutorStrategy operationExecutorStrategy : operationExecutors) {
             operationStrategies.put(operationExecutorStrategy.getOperationType(), operationExecutorStrategy);
         }

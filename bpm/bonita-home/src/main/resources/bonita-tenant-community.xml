@@ -810,10 +810,17 @@
         <constructor-arg name="workTerminationTimeout" value="${bonita.tenant.work.terminationTimeout}" />
     </bean>
 
+     <bean id="operationsAnalyzer" class="org.bonitasoft.engine.core.operation.impl.OperationsAnalyzer"/>
+
+    <bean id="persistRightOperandResolver" class="org.bonitasoft.engine.core.operation.impl.PersistRightOperandResolver">
+        <constructor-arg name="operationsAnalyzer" ref="operationsAnalyzer" />
+    </bean>
+
     <bean id="operationService" class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
         <constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider" />
         <constructor-arg name="leftOperandHandlerProvider" ref="leftOperandHandlerProvider" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="persistRightOperandResolver" ref="persistRightOperandResolver"/>
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
@@ -848,6 +855,8 @@
         <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="entitiesActionsExecutor" ref="entitiesActionsExecutor"/>
+        <constructor-arg name="updateDataRefAction" ref="updateDataRefAction"/>
     </bean>
 
     <bean id="assignmentOperationExecutorStrategy"
@@ -869,9 +878,23 @@
     <bean id="externalDataLeftOperandHandler"
           class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler" />
 
+    <bean id="mergeEntityAction" class="com.bonitasoft.engine.operation.MergeEntityAction">
+        <constructor-arg name="repository" ref="businessDataRepository"/>
+
+    </bean>
+
+    <bean id="entitiesActionsExecutor" class="com.bonitasoft.engine.operation.EntitiesActionsExecutor"/>
+
     <bean id="javaMethodOperationExecutorStrategy"
           class="org.bonitasoft.engine.operation.BusinessDataJavaMethodOperationExecutorStrategy">
         <constructor-arg name="businessDataService" ref="businessDataService" />
+        <constructor-arg name="entitiesActionsExecutor" ref="entitiesActionsExecutor"/>
+        <constructor-arg name="mergeEntityAction" ref="mergeEntityAction"/>
+    </bean>
+
+    <bean id="businessDataAssignmentStrategy" class="org.bonitasoft.engine.operation.BusinessDataAssignmentStrategy">
+        <constructor-arg name="actionsExecutor" ref="entitiesActionsExecutor"/>
+        <constructor-arg name="mergeEntityAction" ref="mergeEntityAction"/>
     </bean>
 
     <bean id="xpathUpdateQueryOperationExecutorStrategy"
