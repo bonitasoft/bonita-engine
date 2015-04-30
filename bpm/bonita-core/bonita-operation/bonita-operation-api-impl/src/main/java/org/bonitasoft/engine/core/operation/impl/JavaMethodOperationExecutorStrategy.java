@@ -32,7 +32,8 @@ public class JavaMethodOperationExecutorStrategy implements OperationExecutorStr
     }
 
     @Override
-    public Object computeNewValueForLeftOperand(final SOperation operation, final Object valueToSetObjectWith, final SExpressionContext expressionContext)
+    public Object computeNewValueForLeftOperand(final SOperation operation, final Object valueToSetObjectWith, final SExpressionContext expressionContext,
+            final boolean shouldPersistValue)
             throws SOperationExecutionException {
         final Object objectToInvokeJavaMethodOn;
         objectToInvokeJavaMethodOn = extractObjectToInvokeFromContext(operation, expressionContext);
