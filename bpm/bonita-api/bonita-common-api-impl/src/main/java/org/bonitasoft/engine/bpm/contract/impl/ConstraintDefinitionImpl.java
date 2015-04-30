@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
-import org.bonitasoft.engine.bpm.contract.ConstraintType;
 
 /**
  * @author Matthieu Chaffotte
@@ -28,7 +27,6 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (constraintType == null ? 0 : constraintType.hashCode());
         result = prime * result + (explanation == null ? 0 : explanation.hashCode());
         result = prime * result + (expression == null ? 0 : expression.hashCode());
         result = prime * result + (inputNames == null ? 0 : inputNames.hashCode());
@@ -48,9 +46,6 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
                 break;
         }
         final ConstraintDefinitionImpl other = (ConstraintDefinitionImpl) obj;
-        if (constraintType != other.constraintType) {
-            return false;
-        }
         if (explanation == null) {
             if (other.explanation != null) {
                 return false;
@@ -88,15 +83,9 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
     private final String expression;
     private final String explanation;
     private final List<String> inputNames;
-    private final ConstraintType constraintType;
 
     public ConstraintDefinitionImpl(final String name, final String expression, final String explanation) {
-        this(name, expression, explanation, ConstraintType.CUSTOM);
-    }
-
-    public ConstraintDefinitionImpl(final String name, final String expression, final String explanation, final ConstraintType constraintType) {
         this.name = name;
-        this.constraintType = constraintType;
         this.explanation = explanation;
         this.expression = expression;
         inputNames = new ArrayList<String>();
@@ -124,11 +113,6 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
 
     public void addInputName(final String inputName) {
         inputNames.add(inputName);
-    }
-
-    @Override
-    public ConstraintType getConstraintType() {
-        return constraintType;
     }
 
 }

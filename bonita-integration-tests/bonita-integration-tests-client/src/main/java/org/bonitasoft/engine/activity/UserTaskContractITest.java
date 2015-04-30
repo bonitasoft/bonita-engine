@@ -150,12 +150,8 @@ public class UserTaskContractITest extends CommonAPIIT {
         assertThat(input.getType()).isEqualTo(Type.INTEGER);
         assertThat(input.getDescription()).isNull();
 
-        assertThat(contract.getConstraints()).hasSize(2);
-        final ConstraintDefinition rule = contract.getConstraints().get(0);
-        assertThat(rule.getName()).isEqualTo("numberOfDays");
-        assertThat(rule.getInputNames()).containsExactly("numberOfDays");
-        assertThat(rule.getExplanation()).isEqualTo("input numberOfDays is mandatory");
-        final ConstraintDefinition mysticRule = contract.getConstraints().get(1);
+        assertThat(contract.getConstraints()).hasSize(1);
+        final ConstraintDefinition mysticRule = contract.getConstraints().get(0);
         assertThat(mysticRule.getName()).isEqualTo("Mystical constraint");
         assertThat(mysticRule.getInputNames()).containsExactly("numberOfDays");
         assertThat(mysticRule.getExplanation()).isNull();
@@ -309,18 +305,14 @@ public class UserTaskContractITest extends CommonAPIIT {
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         final List<Map<String, Serializable>> expenseReport = new ArrayList<>();
-        expenseReport.add(createExpenseLine("hotel", 150.3f, new Date(System.currentTimeMillis()), null));
+        expenseReport.add(createExpenseLine("hotel", 150.3f, new Date(System.currentTimeMillis()), new byte[0]));
         expenseReport.add(createExpenseLine("taxi", 25, new Date(System.currentTimeMillis()), new byte[0]));
-        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 }));
+        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[]{0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 }));
 
         final Map<String, Serializable> taskInput = new HashMap<>();
         taskInput.put("expenseReport", (Serializable) expenseReport);
 
-        try {
-            getProcessAPI().executeUserTask(userTask.getId(), taskInput);
-        } catch (final ContractViolationException e) {
-            System.err.println(e.getExplanations());
-        }
+        getProcessAPI().executeUserTask(userTask.getId(), taskInput);
 
         //then
         waitForUserTaskAndGetIt(TASK2);

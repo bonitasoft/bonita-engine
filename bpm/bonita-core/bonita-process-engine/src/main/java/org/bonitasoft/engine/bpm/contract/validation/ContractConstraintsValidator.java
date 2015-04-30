@@ -20,9 +20,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.mvel2.MVEL;
@@ -30,59 +28,20 @@ import org.mvel2.MVEL;
 public class ContractConstraintsValidator {
 
     private final TechnicalLoggerService logger;
-    private final ConstraintsDefinitionHelper constraintsDefinitionHelper;
-    private final ContractVariableHelper contractVariableHelper;
 
-    public ContractConstraintsValidator(final TechnicalLoggerService logger, final ConstraintsDefinitionHelper constraintsDefinitionHelper,
-            final ContractVariableHelper contractVariableHelper) {
+    public ContractConstraintsValidator(final TechnicalLoggerService logger) {
         this.logger = logger;
-        this.constraintsDefinitionHelper = constraintsDefinitionHelper;
-        this.contractVariableHelper = contractVariableHelper;
     }
 
     public void validate(final SContractDefinition contract, final Map<String, Serializable> variables) throws ContractViolationException {
         final List<String> comments = new ArrayList<String>();
         for (final SConstraintDefinition constraint : contract.getConstraints()) {
             log(TechnicalLogSeverity.DEBUG, "Evaluating constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames());
-            if (isMandatoryConstraint(constraint)) {
-                if (constraint.getInputNames().size() != 1) {
-                    log(TechnicalLogSeverity.WARNING, "Constraint [" + constraint.getName() + "] inputNames are not valid");
-                    comments.add("Constraint [" + constraint.getName() + "] inputNames are not valid");
-                }
-                else {
-                    validateMandatoryContraint(comments, constraintsDefinitionHelper.getInputDefinition(contract, constraint.getInputNames().get(0)),
-                            constraint, variables);
-                }
-            } else {
-                validateContraint(comments, constraint, variables);
-            }
+            validateContraint(comments, constraint, variables);
         }
         if (!comments.isEmpty()) {
             throw new ContractViolationException("Error while validating constraints", comments);
         }
-    }
-
-    private void validateMandatoryContraint(final List<String> comments, final SInputDefinition sInputDefinition, final SConstraintDefinition constraint,
-            final Map<String, Serializable> variables) {
-        final List<Map<String, Serializable>> inputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(constraint, variables);
-        for (final Map<String, Serializable> inputVariable : inputVariables) {
-            if (sInputDefinition.isMultiple()) {
-                final List<Map<String, Serializable>> multipleVariables = contractVariableHelper.convertMultipleToList(inputVariable);
-                for (final Map<String, Serializable> multipleVariable : multipleVariables) {
-                    validateContraint(comments, constraint, multipleVariable);
-                }
-            }
-            else {
-                validateContraint(comments, constraint, inputVariable);
-            }
-        }
-    }
-
-    private boolean isMandatoryConstraint(final SConstraintDefinition constraint) {
-        if (constraint.getConstraintType() == null) {
-            return false;
-        }
-        return constraint.getConstraintType().equals(SConstraintType.MANDATORY);
     }
 
     private void validateContraint(final List<String> comments, final SConstraintDefinition constraint, final Map<String, Serializable> variables) {

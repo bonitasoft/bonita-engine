@@ -26,6 +26,4 @@ public interface SConstraintDefinition extends SNamedElement {
 
     List<String> getInputNames();
 
-    SConstraintType getConstraintType();
-
 }
