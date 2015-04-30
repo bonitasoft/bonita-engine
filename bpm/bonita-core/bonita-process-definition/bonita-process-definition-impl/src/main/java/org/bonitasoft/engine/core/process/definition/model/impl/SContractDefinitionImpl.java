@@ -52,7 +52,7 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
     }
 
     @Override
-    public List<SInputDefinition> getInputs() {
+    public List<SInputDefinition> getInputDefinitions() {
         return inputDefinitions;
     }
 

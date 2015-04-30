@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2015 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,18 +11,28 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  */
-package org.bonitasoft.engine.core.process.definition.model;
+
+package org.bonitasoft.engine.bpm.contract.validation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
-public interface SInputDefinition extends SNamedElement, SInputContainerDefinition {
+public class ErrorReporter {
 
-    String getDescription();
+    private final List<String> errors = new ArrayList<>();
 
-    boolean isMultiple();
+    public void addError(String error) {
+        errors.add(error);
+    }
 
-    SType getType();
+    public List<String> getErrors() {
+        return errors;
+    }
 
-    boolean hasChildren();
+    public boolean hasError() {
+        return !errors.isEmpty();
+    }
 }
