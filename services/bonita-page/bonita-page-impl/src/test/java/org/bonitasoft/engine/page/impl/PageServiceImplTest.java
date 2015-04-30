@@ -903,7 +903,7 @@ public class PageServiceImplTest {
         final SPage insertedPage1 = pageServiceImpl.addPage(content1, CONTENT_NAME, USER_ID);
 
         //then
-        SPageAssert.assertThat(insertedPage1).hasContentType("apiExtension");
+        SPageAssert.assertThat(insertedPage1).hasContentType(SContentType.PAGE);
 
     }
 
