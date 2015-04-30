@@ -60,7 +60,6 @@ import com.bonitasoft.engine.tenant.TenantIT;
         BDRepositoryIT.class,
         ExecuteBDMQueryCommandIT.class
 })
-@Initializer(TestsInitializerSP.class)
 public class BPMRemoteSPTests {
 
 }

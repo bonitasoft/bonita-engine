@@ -1,0 +1,425 @@
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor" />
+
+    <bean id="flowNodeStateManager" class="com.bonitasoft.engine.execution.FlowNodeStateManagerExt">
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="operationService" ref="operationService" />
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+        <constructor-arg name="containerRegistry" ref="containerRegistry" />
+        <constructor-arg name="archiveService" ref="archiveService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="commentService" ref="commentService" />
+        <constructor-arg name="eventsHandler" ref="eventsHandler" />
+        <constructor-arg name="userFilterService" ref="userFilterService" />
+        <constructor-arg name="actorMappingService" ref="actorMappingService" />
+        <constructor-arg name="workService" ref="workService" />
+        <constructor-arg name="identityService" ref="identityService" />
+        <constructor-arg name="breakpointService" ref="breakpointService" />
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver" />
+        <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+    </bean>
+
+    <bean id="processExecutor" class="com.bonitasoft.engine.execution.ProcessExecutorExt">
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="flowNodeExecutor" ref="flowNodeExecutor" />
+        <constructor-arg name="workService" ref="workService" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
+        <constructor-arg name="transitionService" ref="transitionService" />
+        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="connectorService" ref="connectorService" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+        <constructor-arg name="operationService" ref="operationService" />
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="handlers">
+            <map>
+                <entry key="PROCESSINSTANCE_STATE_UPDATED">
+                    <bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
+                        <constructor-arg name="tenantId" value="${tenantId}" />
+                        <constructor-arg name="identifier"
+                                         value="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler" />
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+        <constructor-arg name="documentService" ref="documentService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="containerRegistry" ref="containerRegistry" />
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
+        <constructor-arg name="eventsHandler" ref="eventsHandler" />
+        <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+        <constructor-arg name="transitionEvaluator" ref="transitionEvaluator" />
+        <constructor-arg name="contractDataService" ref="contractDataService" />
+    </bean>
+    <!--
+        <bean id="casAuthenticatorDelegate"
+              class="com.bonitasoft.engine.authentication.impl.cas.CASAuthenticatorImpl" lazy-init="true">
+            <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+            <property name="casServerUrlPrefix"
+                      value="${authentication.delegate.cas.server.url.prefix:http://cas.internal.bonitasoft.com/}" />
+            <property name="casService"
+                      value="${authentication.delegate.cas.service.url:http://internal.bonitasoft.com/bonita/loginservice}" />
+        </bean>
+
+        <bean id="nullAuthenticationDelegate"
+              class="com.bonitasoft.engine.authentication.impl.NullAuthenticationDelegate"  lazy-init="true"/>
+
+        <bean id="authenticationService"
+              class="com.bonitasoft.engine.authentication.impl.JAASGenericAuthenticationServiceImpl" lazy-init="true">
+            <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+            <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+            <property name="authenticatorDelegate"
+                      ref="${authenticator.delegate:nullAuthenticationDelegate}" />
+        </bean>
+    -->
+    <bean id="defaultCommands" parent="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+                <ref bean="executeActionsAndTerminateExt" />
+                <ref bean="executeActionsAndStartInstanceExt" />
+                <ref bean="addBreakpointCommand" />
+                <ref bean="removeBreakpointCommand" />
+                <ref bean="getBreakpointsCommand" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="executeActionsAndStartInstanceExt" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>executeActionsAndStartInstanceExt</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>execute actions and start a process instance</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>com.bonitasoft.engine.external.web.forms.ExecuteActionsAndStartInstanceExt</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="executeActionsAndTerminateExt" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>executeActionsAndTerminateExt</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>execute actions and terminate a user task instance ext</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>com.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTaskExt</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="addBreakpointCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>addBreakpoint</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Add the breakpoint.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>com.bonitasoft.engine.command.AddBreakpointCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="removeBreakpointCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>removeBreakpoint</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Remove the breakpoint.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>com.bonitasoft.engine.command.RemoveBreakpointCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="getBreakpointsCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
+        <constructor-arg name="name">
+            <value>getBreakpoints</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Get breakpoints.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>com.bonitasoft.engine.command.GetBreakpointsCommand</value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="connectorExecutor" class="com.bonitasoft.engine.connector.impl.ConnectorExecutorTimedOut">
+        <constructor-arg name="queueCapacity" value="${bonita.tenant.connector.queueCapacity}" />
+        <constructor-arg name="corePoolSize" value="${bonita.tenant.connector.corePoolSize}" />
+        <constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
+        <!-- timeout in seconds, default = 5 minutes -->
+        <constructor-arg name="timeout" value="${bonita.tenant.connector.timeout}" />
+        <constructor-arg name="maximumPoolSize" value="${bonita.tenant.connector.maximumPoolSize}" />
+        <constructor-arg name="keepAliveTimeSeconds" value="${bonita.tenant.connector.keepAliveTimeSeconds}" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="timeTracker" ref="timeTracker" />
+    </bean>
+
+    <bean id="eventHandlers" class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="targetMapClass">
+            <value>java.util.HashMap</value>
+        </property>
+        <property name="sourceMap">
+            <map>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="tenantEventService" class="com.bonitasoft.engine.events.impl.ConfigurableEventServiceImpl">
+        <constructor-arg name="handlers" ref="eventHandlers" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="engineConstantExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy">
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+    </bean>
+
+    <bean id="queriableLoggerStrategy" class="com.bonitasoft.engine.log.api.impl.MapQueriableLoggerStrategy">
+        <constructor-arg name="loggableLevels">
+            <map>
+                <entry key="ACTOR_CREATED:INTERNAL" value="true" />
+                <entry key="ACTOR_DELETED:INTERNAL" value="true" />
+                <entry key="ACTOR_UPDATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_CREATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_DELETED:INTERNAL" value="true" />
+                <entry key="APPLICATION_UPDATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_CREATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_DELETED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_UPDATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_CREATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_DELETED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_UPDATED:INTERNAL" value="true" />
+                <entry key="BREAKPOINT_CREATED:INTERNAL" value="true" />
+                <entry key="BREAKPOINT_DELETED:INTERNAL" value="true" />
+                <entry key="CATEGORY_CREATED:INTERNAL" value="true" />
+                <entry key="CATEGORY_DELETED:INTERNAL" value="true" />
+                <entry key="CATEGORY_UPDATED:INTERNAL" value="true" />
+                <entry key="COMMAND_CREATED:INTERNAL" value="true" />
+                <entry key="COMMAND_DELETED:INTERNAL" value="true" />
+                <entry key="COMMAND_UPDATED:INTERNAL" value="true" />
+                <entry key="COMMENT_CREATED:INTERNAL" value="true" />
+                <entry key="COMMENT_DELETED:INTERNAL" value="true" />
+                <entry key="USERTASK_CONTRACT_DATA_CREATED:INTERNAL" value="true" />
+                <entry key="PROCESS_CONTRACT_DATA_CREATED:INTERNAL" value="true" />
+                <entry key="CONNECTOR_INSTANCE_CREATED:INTERNAL" value="true" />
+                <entry key="CONNECTOR_INSTANCE_UPDATED:INTERNAL" value="true" />
+                <entry key="CONNECTOR_INSTANCE_DELETED:INTERNAL" value="true" />
+                <entry key="DATA_SOURCE_CREATED:INTERNAL" value="true" />
+                <entry key="DATA_INSTANCE_CREATED:INTERNAL" value="true" />
+                <entry key="DATA_INSTANCE_DELETED:INTERNAL" value="true" />
+                <entry key="DATA_INSTANCE_UPDATED:INTERNAL" value="true" />
+                <entry key="DEPENDENCY_CREATED:INTERNAL" value="true" />
+                <entry key="DEPENDENCY_DELETED:INTERNAL" value="true" />
+                <entry key="DEPENDENCY_UPDATED:INTERNAL" value="true" />
+                <entry key="DEPENDENCY_MAPPING_CREATED:INTERNAL" value="true" />
+                <entry key="DEPENDENCY_MAPPING_DELETED:INTERNAL" value="true" />
+                <entry key="DOCUMENT_CREATED:INTERNAL" value="true" />
+                <entry key="DOCUMENT_DELETED:INTERNAL" value="true" />
+                <entry key="DOCUMENTMAPPING_CREATED:INTERNAL" value="true" />
+                <entry key="DOCUMENTMAPPING_DELETED:INTERNAL" value="true" />
+                <entry key="DOCUMENTMAPPING_UPDATED:INTERNAL" value="true" />
+                <entry key="EVENT_INSTANCE_TRIGGER_CREATED:INTERNAL" value="true" />
+                <entry key="EVENT_INSTANCE_TRIGGER_DELETED:INTERNAL" value="true" />
+                <entry key="EVENT_INSTANCE_TRIGGER_UPDATED:INTERNAL" value="true" />
+                <entry key="EXTERNAL_IDENTITY_MAPPING_CREATED:INTERNAL" value="true" />
+                <entry key="EXTERNAL_IDENTITY_MAPPING_DELETED:INTERNAL" value="true" />
+                <entry key="FLOW_INSTANCE_CREATED:INTERNAL" value="true" />
+                <entry key="FLOW_INSTANCE_DELETED:INTERNAL" value="true" />
+                <entry key="FLOW_INSTANCE_UPDATED:INTERNAL" value="true" />
+                <entry key="GATEWAY_INSTANCE_CREATED:INTERNAL" value="true" />
+                <entry key="GATEWAY_INSTANCE_UPDATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_GROUP_CREATED:INTERNAL" value="false" />
+                <entry key="IDENTITY_GROUP_DELETED:INTERNAL" value="false" />
+                <entry key="IDENTITY_GROUP_UPDATED:INTERNAL" value="false" />
+                <entry key="IDENTITY_ROLE_CREATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_ROLE_DELETED:INTERNAL" value="true" />
+                <entry key="IDENTITY_ROLE_UPDATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_CREATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_DELETED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_UPDATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_CONTACT_INFO_CREATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_CONTACT_INFO_UPDATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_MEMBERSHIP_CREATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_MEMBERSHIP_DELETED:INTERNAL" value="true" />
+                <entry key="IDENTITY_USER_MEMBERSHIP_UPDATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_CREATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_DELETED:INTERNAL" value="true" />
+                <entry key="IDENTITY_CUSTOM_USER_INFO_DEFINITION_UPDATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_CUSTOM_USER_INFO_VALUE_CREATED:INTERNAL" value="true" />
+                <entry key="IDENTITY_CUSTOM_USER_INFO_VALUE_DELETED:INTERNAL" value="true" />
+                <entry key="IDENTITY_CUSTOM_USER_INFO_VALUE_UPDATED:INTERNAL" value="true" />
+                <entry key="JOB_CREATED:INTERNAL" value="false" />
+                <entry key="JOB_PARAMETER_CREATED:INTERNAL" value="true" />
+                <entry key="MESSAGE_INSTANCE_CREATED:INTERNAL" value="true" />
+                <entry key="MESSAGE_INSTANCE_UPDATED:INTERNAL" value="true" />
+                <entry key="PAGE_CREATED:INTERNAL" value="true" />
+                <entry key="PAGE_DELETED:INTERNAL" value="true" />
+                <entry key="PAGE_UPDATED:INTERNAL" value="true" />
+                <entry key="PENDING_ACTIVITY_MAPPING_CREATED:INTERNAL" value="true" />
+                <entry key="PAGE_CREATED:INTERNAL" value="true" />
+                <entry key="PAGE_DELETED:INTERNAL" value="true" />
+                <entry key="PAGE_UPDATED:INTERNAL" value="true" />
+                <entry key="PROCESS_DEFINITION_CREATED:INTERNAL" value="true" />
+                <entry key="PROCESS_DEFINITION_DELETED:INTERNAL" value="true" />
+                <entry key="PROCESS_DEFINITION_UPDATED:INTERNAL" value="true" />
+                <entry key="PROCESS_INSTANCE_CREATED:INTERNAL" value="true" />
+                <entry key="PROCESS_INSTANCE_DELETED:INTERNAL" value="true" />
+                <entry key="PROCESS_INSTANCE_UPDATED:INTERNAL" value="true" />
+                <entry key="PROFILE_CREATED:INTERNAL" value="true" />
+                <entry key="PROFILE_DELETED:INTERNAL" value="true" />
+                <entry key="PROFILE_UPDATED:INTERNAL" value="true" />
+                <entry key="PROFILE_MEMBER_CREATED:INTERNAL" value="true" />
+                <entry key="PROFILE_MEMBER_DELETED:INTERNAL" value="true" />
+                <entry key="PROFILE_MEMBER_UPDATED:INTERNAL" value="true" />
+                <entry key="PROFILE_ENTRY_CREATED:INTERNAL" value="true" />
+                <entry key="PROFILE_ENTRY_DELETED:INTERNAL" value="true" />
+                <entry key="PROFILE_ENTRY_UPDATED:INTERNAL" value="true" />
+                <entry key="REF_BUSINESS_DATA_INSTANCE_CREATED:INTERNAL" value="true" />
+                <entry key="REF_BUSINESS_DATA_INSTANCE_UPDATED:INTERNAL" value="true" />
+                <entry key="REF_BUSINESS_DATA_INSTANCE_DELETED:INTERNAL" value="true" />
+                <entry key="REPORT_CREATED:INTERNAL" value="true" />
+                <entry key="REPORT_DELETED:INTERNAL" value="true" />
+                <entry key="REPORT_UPDATED:INTERNAL" value="true" />
+                <entry key="SCHEDULER_SCHEDULED:INTERNAL" value="false" />
+                <entry key="SUPERVISOR_CREATED:INTERNAL" value="true" />
+                <entry key="SUPERVISOR_DELETED:INTERNAL" value="true" />
+                <entry key="THEME_CREATED:INTERNAL" value="true" />
+                <entry key="THEME_DELETED:INTERNAL" value="true" />
+                <entry key="THEME_UPDATED:INTERNAL" value="true" />
+                <entry key="TRANSITION_INSTANCE_CREATED:INTERNAL" value="true" />
+                <entry key="TRANSITION_INSTANCE_DELETED:INTERNAL" value="true" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="syncQueriableLoggerService" class="com.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="transactionService" ref="transactionService" />
+        <constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
+        <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="platformService" ref="platformService" />
+        <constructor-arg name="delayable" value="${bonita.tenant.queriablelog.delayable}" />
+    </bean>
+
+    <bean id="batchLogRegister" class="com.bonitasoft.engine.log.api.impl.InsertBatchLogsJobRegister">
+        <constructor-arg name="cronExpression" value="${bonita.tenant.queriablelog.batch.cronExpression}" />
+    </bean>
+
+    <bean id="monitoringService" class="com.bonitasoft.engine.monitoring.impl.TenantMonitoringServiceImpl">
+        <constructor-arg name="allowMbeansRegistration" value="${bonita.tenant.monitoring.allowMbeansRegistration}" />
+        <constructor-arg name="identityService" ref="identityService" />
+        <constructor-arg name="transactionService" ref="transactionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="technicalLog" ref="tenantTechnicalLoggerService" />
+    </bean>
+
+    <bean id="breakpointService" class="com.bonitasoft.engine.core.process.instance.impl.BreakpointServiceImpl">
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="persistenceRead" ref="persistenceService" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="cacheService" ref="cacheService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+        <constructor-arg name="transactionService" ref="transactionService" />
+    </bean>
+
+    <bean id="bonitaDSJNDI" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${database.journal.datasource.name}" />
+    </bean>
+
+
+    <bean id="reportingService" class="com.bonitasoft.engine.core.reporting.ReportingServiceImpl">
+        <constructor-arg name="dataSource" ref="bonitaDSJNDI" />
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="queryPreProcessor" ref="queryPreProcessor" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="eventService" ref="tenantEventService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
+    </bean>
+
+    <bean id="queryPreProcessor" class="com.bonitasoft.engine.core.reporting.processor.QueryPreProcessor" />
+
+    <bean id="workSynchronizationFactory" class="com.bonitasoft.engine.work.ParallelWorkSynchronizationFactory" />
+
+    <bean id="leftOperandHandlers" parent="communityLeftOperandHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+                <ref bean="stringIndexLeftOperandHandler" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="stringIndexLeftOperandHandler" class="com.bonitasoft.engine.operation.StringIndexLeftOperandHandler">
+        <constructor-arg name="processInstanceService" ref="processInstanceService" />
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
+    </bean>
+
+    <!-- override community -->
+    <bean id="externalUrlAdapter" class="com.bonitasoft.engine.core.form.ExternalURLAdapterExt">
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+    </bean>
+
+    <beans profile="performance">
+        <bean id="archivingStrategy" class="com.bonitasoft.engine.archive.impl.ListArchivingStrategy">
+            <constructor-arg name="archives" ref="archivingStrategyMap" />
+        </bean>
+
+        <bean id="archivingStrategyMap" parent="archivingStrategyMapBase" class="org.springframework.beans.factory.config.MapFactoryBean">
+            <property name="sourceMap">
+                <map merge="true" />
+            </property>
+        </bean>
+
+        <bean id="archivingStrategyMapBase" class="org.springframework.beans.factory.config.MapFactoryBean">
+            <property name="sourceMap">
+                <map>
+                    <entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="${bonita.tenant.archive.SComment}" />
+                    <entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="${bonita.tenant.archive.SDocumentMapping}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="${bonita.tenant.archive.SProcessInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="${bonita.tenant.archive.SAutomaticTaskInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" value="${bonita.tenant.archive.SManualTaskInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="${bonita.tenant.archive.SUserTaskInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance" value="${bonita.tenant.archive.SReceiveTaskInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="${bonita.tenant.archive.SLoopActivityInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="${bonita.tenant.archive.SMultiInstanceActivityInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="${bonita.tenant.archive.SCallActivityInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="${bonita.tenant.archive.SGatewayInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="${bonita.tenant.archive.SSubProcessActivityInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="${bonita.tenant.archive.SConnectorInstance}" />
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance" value="${bonita.tenant.archive.SSendTaskInstance}" />
+                    <entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="${bonita.tenant.archive.SDataInstance}" />
+                    <!-- archived version because there is no not archived one -->
+                    <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="${bonita.tenant.archive.SATransitionInstance}" />
+                </map>
+            </property>
+        </bean>
+    </beans>
+
+
+</beans>

@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -609,7 +608,7 @@ public class ActivityCommandExtTest extends CommonAPISPIT {
 
     private void addConnectorImplemWithDependency(final BusinessArchiveBuilder bizArchive, final String implemPath, final String implemName,
             final Class<? extends AbstractConnector> dependencyClassName, final String dependencyJarName) throws IOException {
-        bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
+        bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(this.getClass().getResourceAsStream(implemPath))));
         bizArchive.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
     }
 
@@ -626,7 +625,7 @@ public class ActivityCommandExtTest extends CommonAPISPIT {
         processBuilder.addTransition("Request", "Approval");
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
         final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition);
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/mylibrary-jar.bak");
+        final InputStream stream = this.getClass().getResourceAsStream("/mylibrary-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         builder.addClasspathResource(new BarResource("mylibrary.jar", byteArray));

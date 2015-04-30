@@ -10,6 +10,7 @@ package com.bonitasoft.engine.monitoring;
 
 import java.util.Map;
 
+import com.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
@@ -22,6 +23,8 @@ public interface PlatformMonitoringService extends MonitoringService {
     String JVM_MBEAN_NAME = "Bonitasoft:name=JVM,type=JVMMBean";
 
     String SERVICE_MBEAN_NAME = "Bonitasoft:name=Service,type=ServiceMBean";
+
+    SJvmMXBean getJvmMBean();
 
     /**
      * Get true if the scheduler service is started, false if it is stopped.
@@ -229,5 +232,14 @@ public interface PlatformMonitoringService extends MonitoringService {
      * @since 6.0
      */
     Map<String, SGcInfo> getLastGcInfo();
+
+
+    /**
+     * Get the current number of executing jobs.
+     *
+     * @return the current number of executing jobs.
+     * @since 6.0
+     */
+    long getNumberOfExecutingJobs();
 
 }

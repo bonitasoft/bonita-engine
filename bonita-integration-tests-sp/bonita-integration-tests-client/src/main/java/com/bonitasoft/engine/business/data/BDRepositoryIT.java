@@ -28,7 +28,52 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.xml.bind.JAXBException;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.ExpressionConstants;
+import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.expression.ExpressionType;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
+import org.bonitasoft.engine.home.BonitaHome;
+import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.operation.LeftOperandBuilder;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.test.BuildTestUtil;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bdm.BusinessObjectDAOFactory;
@@ -47,47 +92,11 @@ import com.bonitasoft.engine.businessdata.BusinessDataReference;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.expression.ExpressionConstants;
-import org.bonitasoft.engine.expression.ExpressionEvaluationException;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.home.BonitaHome;
-import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.operation.LeftOperandBuilder;
-import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.operation.OperatorType;
-import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.xml.sax.SAXException;
 
+/**
+ * @deprecated From 7.0.0 on, please report changes to this class in org.bonitasoft.engine.business.data.BDRepositoryIT
+ */
+@Deprecated
 public class BDRepositoryIT extends CommonAPISPIT {
 
     private static final String BDM_PACKAGE_PREFIX = "com.company.model";
@@ -134,6 +143,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final BusinessObject countryBO = new BusinessObject();
         countryBO.setQualifiedName(COUNTRY_QUALIFIED_NAME);
         countryBO.addField(name);
+        countryBO.addUniqueConstraint("uk_name", "name");
 
         final SimpleField street = new SimpleField();
         street.setName("street");
@@ -231,7 +241,6 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         employee.addIndex("IDX_LSTNM", "lastName");
         employee.addIndex("IDX_LSTNM", "address");
-
 
         final BusinessObject person = new BusinessObject();
         person.setQualifiedName(PERSON_QUALIFIED_NAME);
@@ -826,15 +835,29 @@ public class BDRepositoryIT extends CommonAPISPIT {
     }
 
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "java setter operation", "mandatory field",
-            "intermixed" }, jira = "BS-8591", story = "Create business datas using intermixed java setter operations.")
+            "intermixed" }, jira = "BS-8591", story = "Create business data using intermixed java setter operations.")
     @Test
+    @Ignore("Commented as JIRA BS-13090 is not fully reported in 7.0.0 YET. REMOVE ME soon !!!!!!!!!!!!!!!!!!!!!")
     public void shouldBeAbleToCreate2BusinessDataUsingIntermixedBizDataJavaSetterOperations() throws Exception {
+        Expression countryQueryNameParameter = new ExpressionBuilder().createExpression("name", "France", String.class.getName(), ExpressionType.TYPE_CONSTANT);
+        Expression countryQueryExpression = new ExpressionBuilder().createQueryBusinessDataExpression("country", "Country.findByName",
+                COUNTRY_QUALIFIED_NAME, countryQueryNameParameter);
+        final Expression createNewAddressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
+                "import " + ADDRESS_QUALIFIED_NAME + "; Address a = new Address(street:'32, rue Gustave Eiffel', city:'Grenoble'); a;",
+                ADDRESS_QUALIFIED_NAME);
+        final Expression createNewCountryExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewCountry", "import "
+                + COUNTRY_QUALIFIED_NAME
+                + "; Country c = new Country(name:'France'); c;",
+                COUNTRY_QUALIFIED_NAME);
+
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
                 "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", PROCESS_VERSION);
         final String businessDataName = "newBornBaby";
         final String businessDataName2 = "data2";
         processDefinitionBuilder.addBusinessData(businessDataName, EMPLOYEE_QUALIFIED_NAME, null);
         processDefinitionBuilder.addBusinessData(businessDataName2, EMPLOYEE_QUALIFIED_NAME, null);
+        processDefinitionBuilder.addBusinessData("address", ADDRESS_QUALIFIED_NAME, createNewAddressExpression);
+        processDefinitionBuilder.addBusinessData("country", COUNTRY_QUALIFIED_NAME, createNewCountryExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder
                 .addAutomaticTask("step1")
@@ -849,7 +872,10 @@ public class BDRepositoryIT extends CommonAPISPIT {
                                 new ExpressionBuilder().createConstantStringExpression("Péuigrec")))
                 .addOperation(
                         new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName2, "setLastName", String.class.getName(),
-                                new ExpressionBuilder().createConstantStringExpression("Plip")));
+                                new ExpressionBuilder().createConstantStringExpression("Plip")))
+                .addOperation(
+                        new OperationBuilder().createBusinessDataSetAttributeOperation("address", "setCountry", COUNTRY_QUALIFIED_NAME,
+                                countryQueryExpression));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
@@ -1174,9 +1200,13 @@ public class BDRepositoryIT extends CommonAPISPIT {
     public void should_return_the_list_of_entities_from_the_multiple_instance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression(
                 "createNewEmployees",
-                new StringBuilder().append("import ").append(EMPLOYEE_QUALIFIED_NAME)
-                        .append("; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';")
-                        .append(" Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john]").toString(),
+                "import " + EMPLOYEE_QUALIFIED_NAME + ";" +
+                        " Employee john = new Employee();" +
+                        " john.firstName = 'John';" +
+                        " john.lastName = 'Doe';" +
+                        " Employee jane = new Employee();" +
+                        " jane.firstName = 'Jane'; jane.lastName = 'Doe';" +
+                        " [jane, john]",
                 List.class.getName());
 
         final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("MBIMI", "1.2-beta");
@@ -1195,10 +1225,20 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
-        waitForUserTask(instance, "step2");
+        long step2 = waitForUserTask(instance, "step2");
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("names", instance.getId());
         assertThat(dataInstance.getValue().toString()).isEqualTo("[Doe, Doe]");
+        Map<String, Serializable> employee = getProcessAPI().evaluateExpressionsOnProcessInstance(
+                instance.getId(),
+                Collections.singletonMap(new ExpressionBuilder().createBusinessDataReferenceExpression("myEmployees"),
+                        Collections.<String, Serializable> emptyMap()));
+        assertThat(employee).hasSize(1);
+        assertThat(employee.get("myEmployees")).isInstanceOf(MultipleBusinessDataReference.class);
+        MultipleBusinessDataReference myEmployees = (MultipleBusinessDataReference) employee.get("myEmployees");
+        assertThat(myEmployees.getName()).isEqualTo("myEmployees");
+        assertThat(myEmployees.getType()).isEqualTo(EMPLOYEE_QUALIFIED_NAME);
+        assertThat(myEmployees.getStorageIds()).hasSize(2);
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -1218,6 +1258,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
     }
 
     @Test
+    @Ignore("BS-13108 is being fixed")
     public void getBusinessDataCommand_should_return_json_entities() throws Exception {
         final ProcessDefinition processDefinition;
         final ProcessDefinitionBuilderExt processDefinitionBuilder;
@@ -1232,7 +1273,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
                 new StringBuilder().append("import ").append(ADDRESS_QUALIFIED_NAME).append("; import ").append(COUNTRY_QUALIFIED_NAME).append("; ")
                         .append("Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; a.country = myCountry ; a;").toString(),
-                ADDRESS_QUALIFIED_NAME);
+                ADDRESS_QUALIFIED_NAME, new ExpressionBuilder().createBusinessDataExpression("myCountry", COUNTRY_QUALIFIED_NAME));
         final Expression countryExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewCountry",
                 new StringBuilder().append("import ").append(COUNTRY_QUALIFIED_NAME).append("; ").append("Country c = new Country(); c.name='France'; ")
                         .append(" c;").toString(),
@@ -1245,12 +1286,14 @@ public class BDRepositoryIT extends CommonAPISPIT {
         processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIFIED_NAME, null);
         processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIFIED_NAME, null);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addAutomaticTask("step1")
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myCountry"), OperatorType.ASSIGNMENT, null, null, countryExpression)
+        processDefinitionBuilder.addAutomaticTask("auto1")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myCountry"), OperatorType.ASSIGNMENT, null, null, countryExpression);
+        processDefinitionBuilder.addAutomaticTask("auto2")
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, addressExpression)
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
-        processDefinitionBuilder.addTransition("step1", "step2");
+        processDefinitionBuilder.addTransition("auto1", "auto2");
+        processDefinitionBuilder.addTransition("auto2", "step2");
 
         processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -1473,10 +1516,10 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(definition.getId());
     }
 
-    private String getClientBdmJarClassPath(final String bonitaHomePath) {
+    private String getClientBdmJarClassPath(String bonitaHomePath) {
         String clientBdmJarPath;
-        clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("server").append(File.separator).append("tenants")
-                .append(File.separator).append(tenantId).append(File.separator).append("data-management").append(File.separator).append("client").toString();
+        clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("engine-server").append(File.separator).append("work").append(File.separator).append("tenants")
+                .append(File.separator).append(tenantId).append(File.separator).append("data-management-client").toString();
         return clientBdmJarPath;
     }
 
@@ -1499,7 +1542,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
                 .addConnector("myConnector1", "connectorInJar", "1.0.0", ConnectorEvent.ON_ENTER);
         final DesignProcessDefinition done = pBuilder.done();
         final BusinessArchiveBuilder builder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(done);
-        builder.addConnectorImplementation(getBarResource("/com/bonitasoft/engine/business/data/TestConnectorInJar.impl", "TestConnectorInJar.impl", BDRepositoryIT.class));
+        builder.addConnectorImplementation(getBarResource("/com/bonitasoft/engine/business/data/TestConnectorInJar.impl", "TestConnectorInJar.impl",
+                BDRepositoryIT.class));
         builder.addClasspathResource(getBarResource("/com/bonitasoft/engine/business/data/test-connector-with-bdm-0.0.1-SNAPSHOT.jar.bak",
                 "test-connector-with-bdm-0.0.1-SNAPSHOT.jar", BDRepositoryIT.class));
         final BusinessArchive businessArchive = builder.done();

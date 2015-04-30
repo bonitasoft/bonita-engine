@@ -8,22 +8,24 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import org.bonitasoft.engine.test.BPMLocalSuiteTests;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite.SuiteClasses;
-
 import com.bonitasoft.engine.connector.ConnectorExecutionTimeOutTest;
 import com.bonitasoft.engine.connector.ConnectorImplementationLocalSPTest;
 import com.bonitasoft.engine.form.FormMappingSPIT;
 import com.bonitasoft.engine.tenant.TenantLocalIT;
 import com.bonitasoft.engine.tenant.TenantMaintenanceLocalIT;
 import com.bonitasoft.engine.theme.ThemeTest;
+import org.bonitasoft.engine.BPMRemoteTestsLocal;
+import org.bonitasoft.engine.test.BPMLocalSuiteTests;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
-@SuiteClasses({ BPMSPTests.class,
+@SuiteClasses({BPMSPTests.class,
         BPMLocalSuiteTests.class,
+        BPMRemoteTestsLocal.class,
+        BPMRemoteSPTests.class,
         LocalLogTest.class,
         APIMethodSPIT.class,
         ConnectorExecutionTimeOutTest.class,
@@ -33,9 +35,10 @@ import com.bonitasoft.engine.theme.ThemeTest;
         FormMappingSPIT.class,
         PageAPILocalIT.class,
         TenantLocalIT.class,
-        BDRepositoryLocalIT.class
+        BDRepositoryLocalIT.class,
+        AllBPMSPTests.class
 })
-@Initializer(TestsInitializerSP.class)
+@Initializer(LocalServerTestsInitializerSP.class)
 public class LocalIntegrationTestsSP {
 
 }

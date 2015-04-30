@@ -8,18 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.junit.After;
-import org.junit.Before;
-
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.junit.After;
+import org.junit.Before;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -59,32 +52,8 @@ public class TestWithCustomPage extends TestWithApplication {
         return page;
     }
 
-    private byte[] createPageContent(final String pageName)
-            throws BonitaException {
-        try {
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            final ZipOutputStream zos = new ZipOutputStream(baos);
-            zos.putNextEntry(new ZipEntry("Index.groovy"));
-            zos.write("return \"\";".getBytes());
-
-            zos.putNextEntry(new ZipEntry("page.properties"));
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("name=");
-            stringBuilder.append(pageName);
-            stringBuilder.append("\n");
-            stringBuilder.append("displayName=");
-            stringBuilder.append("no display name");
-            stringBuilder.append("\n");
-            stringBuilder.append("description=");
-            stringBuilder.append("empty desc");
-            stringBuilder.append("\n");
-            zos.write(stringBuilder.toString().getBytes());
-
-            zos.closeEntry();
-            return baos.toByteArray();
-        } catch (final IOException e) {
-            throw new BonitaException(e);
-        }
+    private byte[] createPageContent(final String pageName) throws Exception {
+        return createTestPageContent(pageName, "no display name", "empty desc");
     }
 
 }

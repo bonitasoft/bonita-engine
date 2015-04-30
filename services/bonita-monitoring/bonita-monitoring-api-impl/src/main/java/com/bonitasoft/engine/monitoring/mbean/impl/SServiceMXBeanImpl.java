@@ -103,27 +103,6 @@ public class SServiceMXBeanImpl implements SServiceMXBean {
         return transactionSvc.getNumberOfActiveTransactions();
     }
 
-    @Override
-    public long getNumberOfExecutingJobs() throws SMonitoringException {
-        long sessionId = -1;
-        try {
-            sessionId = MBeanUtil.createSession(transactionSvc, sessionAccessor, sessionService, tenantId, username);
-            numberOfExecutingJobs = monitoringService.getNumberOfExecutingJobs();
-        } catch (final Exception e) {
-            throw new SMonitoringException("Impossible to retrieve number of executing jobs", e);
-        } finally {
-            if (sessionId != -1) {
-                try {
-                    sessionAccessor.deleteSessionId();
-                    sessionService.deleteSession(sessionId);
-                } catch (final SSessionNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
-        return numberOfExecutingJobs;
-    }
 
     @Override
     public String getName() {

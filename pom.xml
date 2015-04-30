@@ -50,12 +50,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <build>
-        <pluginManagement>
-
-        </pluginManagement>
-    </build>
-
     <profiles>
         <profile>
             <id>deploy</id>
