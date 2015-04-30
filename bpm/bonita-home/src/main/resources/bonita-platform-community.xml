@@ -1,11 +1,7 @@
 <beans
         xmlns="http://www.springframework.org/schema/beans"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:util="http://www.springframework.org/schema/util"
-        xsi:schemaLocation="
-        http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
-        ">
+        xsi:schemaLocation="http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl">
         <constructor-arg name="initialCapacity" value="${bonita.platform.synchro.initialcapacity}" />
@@ -965,6 +961,7 @@
                 <entry key="org.bonitasoft.engine.business.application.model.SApplicationMenu" value="applicationMenu" />
                 <!-- form mapping -->
                 <entry key="org.bonitasoft.engine.core.form.SFormMapping" value="formmap" />
+                <entry key="org.bonitasoft.engine.page.SPageMapping" value="pagemap" />
                 <!-- contract -->
                 <entry key="org.bonitasoft.engine.core.contract.data.STaskContractData" value="tcd"/>
                 <entry key="org.bonitasoft.engine.core.contract.data.SATaskContractData" value="atcd"/>

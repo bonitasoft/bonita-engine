@@ -28,6 +28,8 @@ public final class FormMappingSearchDescriptor {
      */
     public static final String TYPE = "type";
 
-    public static final String TASK  = "task";
+    public static final String TASK = "task";
+
+    public static final String PAGE_ID = "pageId";
 
 }
