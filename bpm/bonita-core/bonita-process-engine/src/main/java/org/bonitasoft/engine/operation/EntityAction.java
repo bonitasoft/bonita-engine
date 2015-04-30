@@ -27,7 +27,7 @@ public interface EntityAction {
      * Executes an action against an entity.
      * 
      * @param entity the entity
-     * @param businessDataContext the business data context
+     * @param businessDataContext the  business data context
      * @return the entity after the action execution.
      */
     Entity execute(Entity entity, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException;
