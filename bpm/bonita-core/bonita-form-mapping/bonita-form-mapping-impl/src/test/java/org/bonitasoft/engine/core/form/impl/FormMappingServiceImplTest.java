@@ -122,7 +122,7 @@ public class FormMappingServiceImplTest {
 
         formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId(), SFormMapping.TARGET_URL, null);
 
-        verify(pageMappingService).create("keye", null, EXTERNAL, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_PROCESS_INITIATOR));
+        verify(pageMappingService).create("keye", null, EXTERNAL, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_ACTOR_INITIATOR));
     }
 
 
@@ -141,7 +141,8 @@ public class FormMappingServiceImplTest {
 
         formMappingService.create(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_OVERVIEW.getId(), SFormMapping.TARGET_URL, null);
 
-        verify(pageMappingService).create("clave", null, EXTERNAL, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_INVOLVED_IN_PROCESS_INSTANCE));
+        verify(pageMappingService).create("clave", null, EXTERNAL,
+                Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_PROCESS_INITIATOR, IS_TASK_PERFORMER, IS_INVOLVED_IN_PROCESS_INSTANCE));
     }
 
     @Test(expected = IllegalArgumentException.class)
