@@ -13,6 +13,18 @@
  **/
 package org.bonitasoft.engine.page.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -73,18 +85,6 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * @author Baptiste Mesta
@@ -184,7 +184,8 @@ public class PageServiceImpl implements PageService {
             SInvalidPageTokenException, SObjectAlreadyExistsException, SObjectCreationException {
         final Properties pageProperties = readPageZip(content, provided);
         final SPage page = createPage(pageProperties.getProperty(PageService.PROPERTIES_NAME), pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
-                pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), contentName, userId, provided, SContentType.PAGE);
+                pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), contentName, userId, provided,
+                pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
         return insertPage(page, content);
     }
 

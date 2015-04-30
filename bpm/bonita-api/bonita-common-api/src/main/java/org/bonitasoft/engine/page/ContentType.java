@@ -9,4 +9,5 @@ public interface ContentType {
 
     String FORM = "form";
 
+    String API_EXTENSION= "apiExtension";
 }
