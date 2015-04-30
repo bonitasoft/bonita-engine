@@ -1,18 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
-    <application profile="ApplicationProfile" state="ACTIVATED" token="HR-dashboard" version="2.0" homePage="my-new-custom-page" layout="custompage_layout">
+    <application profile="ThisProfileDoesNotExist" state="ACTIVATED" token="HR-dashboard" version="2.0" layout="ThisLayoutDoesNotExist">
         <displayName>My HR dashboard</displayName>
         <description>This is the HR dashboard.</description>
         <iconPath>/icon.jpg</iconPath>
         <applicationPages>
+            <applicationPage customPage="custompage_notexists" token="will-not-be-imported" />
             <applicationPage customPage="custompage_mynewcustompage" token="my-new-custom-page" />
         </applicationPages>
         <applicationMenus>
             <applicationMenu>
                 <displayName>HR follow-up</displayName>
                 <applicationMenus>
+                    <applicationMenu applicationPage="will-not-be-imported">
+                        <displayName>Wrong menu 1</displayName>
+                    </applicationMenu>
                     <applicationMenu applicationPage="my-new-custom-page">
                         <displayName>Daily HR follow-up</displayName>
+                    </applicationMenu>
+                    <applicationMenu applicationPage="never-existed">
+                        <displayName>Wrong menu 2</displayName>
                     </applicationMenu>
                 </applicationMenus>
             </applicationMenu>
@@ -20,8 +26,5 @@
                 <displayName>Empty menu</displayName>
             </applicationMenu>
         </applicationMenus>
-    </application>
-    <application state="ACTIVATED" token="My" version="2.0" layout="custompage_layout">
-        <displayName>Marketing</displayName>
     </application>
 </applications>

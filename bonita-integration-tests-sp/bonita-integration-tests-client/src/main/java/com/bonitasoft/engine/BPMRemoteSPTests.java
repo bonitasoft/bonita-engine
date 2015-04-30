@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import com.bonitasoft.engine.business.application.ApplicationAPIExtITs;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
@@ -39,6 +40,7 @@ import com.bonitasoft.engine.tenant.TenantIT;
         PageAPIIT.class,
         ApplicationAPIITs.class,
 
+        ApplicationAPIExtITs.class,
         TenantIT.class,
         NodeAPITest.class,
         LogTest.class,
