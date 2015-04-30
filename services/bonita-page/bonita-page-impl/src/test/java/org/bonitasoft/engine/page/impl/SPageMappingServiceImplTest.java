@@ -256,7 +256,7 @@ public class SPageMappingServiceImplTest {
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         pageMapping.setPageId(56l);
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
 
         assertThat(sPageURL.getPageId()).isEqualTo(56l);
         assertThat(sPageURL.getUrl()).isEqualTo(null);
@@ -267,7 +267,7 @@ public class SPageMappingServiceImplTest {
         SPageMappingImpl pageMapping = new SPageMappingImpl();
         pageMapping.setUrl("theUrl");
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
 
         assertThat(sPageURL.getPageId()).isEqualTo(null);
         assertThat(sPageURL.getUrl()).isEqualTo("theUrl");
@@ -279,7 +279,7 @@ public class SPageMappingServiceImplTest {
         pageMapping.setUrl(null);
         pageMapping.setUrlAdapter("testAdapter");
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
 
         assertThat(sPageURL.getPageId()).isEqualTo(null);
         assertThat(sPageURL.getUrl()).isEqualTo("null_adapted_0");
@@ -291,7 +291,7 @@ public class SPageMappingServiceImplTest {
         pageMapping.setUrl("theUrl");
         pageMapping.setUrlAdapter("testAdapter");
 
-        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> singletonMap("test", "test"));
+        SPageURL sPageURL = pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> singletonMap("test", "test"), true);
 
         assertThat(sPageURL.getPageId()).isEqualTo(null);
         assertThat(sPageURL.getUrl()).isEqualTo("theUrl_adapted_1");/* 1 is the map size */
@@ -303,7 +303,7 @@ public class SPageMappingServiceImplTest {
         pageMapping.setUrl("theUrl");
         pageMapping.setUrlAdapter("unknown");
 
-        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> singletonMap("test", "test"));
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> singletonMap("test", "test"), true);
     }
 
     class ValidRule implements AuthorizationRule {
@@ -355,9 +355,25 @@ public class SPageMappingServiceImplTest {
         final AuthorizationRule authorizationRule = spy(new ValidRule(validRuleKey));
         pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(authorizationRule));
 
-        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
 
         verify(authorizationRule).isAllowed(anyString(), anyMap());
+    }
+    
+    @Test
+    public void resolvePageURL_shouldNotExecuteAuthorizationRule() throws Exception {
+        SPageMappingImpl pageMapping = new SPageMappingImpl();
+        final String validRuleKey = "validRule";
+        final List<String> rules = new ArrayList<>(1);
+        rules.add(validRuleKey);
+        pageMapping.setPageAuthorizationRules(rules);
+
+        final AuthorizationRule authorizationRule = spy(new ValidRule(validRuleKey));
+        pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(authorizationRule));
+
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), false);
+
+        verify(authorizationRule, never()).isAllowed(anyString(), anyMap());
     }
 
     @Test(expected = SAuthorizationException.class)
@@ -371,7 +387,7 @@ public class SPageMappingServiceImplTest {
         final AuthorizationRule authorizationRule = new NeverValidRule(invalidRuleKey);
         pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(authorizationRule));
 
-        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
     }
 
     @Test
@@ -390,7 +406,7 @@ public class SPageMappingServiceImplTest {
         final NeverValidRule neverValidRule2 = spy(new NeverValidRule(invalidRuleKey2));
         pageMappingService.setAuthorizationRules(Arrays.<AuthorizationRule> asList(neverValidRule, validRule));
 
-        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
 
         verify(neverValidRule).isAllowed(anyString(), anyMap());
         verify(validRule).isAllowed(anyString(), anyMap());
@@ -408,6 +424,6 @@ public class SPageMappingServiceImplTest {
         expectedException.expect(SExecutionException.class);
         expectedException.expectMessage("Authorization rule " + unknownRuleKey);
 
-        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap());
+        pageMappingService.resolvePageURL(pageMapping, Collections.<String, Serializable> emptyMap(), true);
     }
 }
