@@ -28,9 +28,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.xml.bind.JAXBException;
 
+import com.bonitasoft.engine.CommonAPISPIT;
+import com.bonitasoft.engine.bdm.BusinessObjectDAOFactory;
+import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
+import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
+import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.model.Query;
+import com.bonitasoft.engine.bdm.model.field.FieldType;
+import com.bonitasoft.engine.bdm.model.field.RelationField;
+import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
+import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
+import com.bonitasoft.engine.bdm.model.field.SimpleField;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
+import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -71,7 +87,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -123,6 +138,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private static final String COUNT_EMPLOYEE = "countEmployee";
 
+    private static final String COUNT_ADDRESS = "countAddress";
+
     private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
 
     public static final String BUSINESS_DATA_CLASS_NAME_ID_FIELD = "/businessdata/{className}/{id}/{field}";
@@ -166,6 +183,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         addressBO.addField(street);
         addressBO.addField(city);
         addressBO.addField(country);
+        addressBO.addQuery(COUNT_ADDRESS, "SELECT count(a) FROM Address a", Long.class.getName());
 
         final RelationField addresses = new RelationField();
         addresses.setType(Type.AGGREGATION);
@@ -617,11 +635,13 @@ public class BDRepositoryIT extends CommonAPISPIT {
         processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIFIED_NAME, null);
         processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIFIED_NAME, null);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addAutomaticTask("step1")
+        processDefinitionBuilder.addAutomaticTask("auto1")
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, addressExpression)
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employee1Expression);
+        processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
-        processDefinitionBuilder.addTransition("step1", "step2");
+        processDefinitionBuilder.addTransition("auto1", "auto2");
+        processDefinitionBuilder.addTransition("auto2", "step2");
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
@@ -632,12 +652,20 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(1);
         final String getLastNameWithDAOExpression = "retrieveEmployeeByFirstName";
         expressions.put(
-                new ExpressionBuilder().createGroovyScriptExpression(getLastNameWithDAOExpression, "import " + EMPLOYEE_QUALIFIED_NAME + "; Employee e = "
-                        + employeeDAOName + ".findByFirstName('" + firstName + "', 0, 10).get(0); e.getAddresses().get(0).city", String.class.getName(),
-                        new ExpressionBuilder().buildBusinessObjectDAOExpression(employeeDAOName, EMPLOYEE_QUALIFIED_NAME + "DAO")), null);
+                new ExpressionBuilder().createGroovyScriptExpression(getLastNameWithDAOExpression, "import " + EMPLOYEE_QUALIF_CLASSNAME + "; Employee e = "
+                        + employeeDAOName + ".findByFirstName('" + firstNameEmployee1 + "', 0, 10).get(0); e.getAddresses().get(0).city", String.class.getName(),
+                        new ExpressionBuilder().buildBusinessObjectDAOExpression(employeeDAOName, EMPLOYEE_QUALIF_CLASSNAME + "DAO")), null);
+        expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression(COUNT_ADDRESS, "Address." + COUNT_ADDRESS, Long.class.getName()), null);
+        expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression(COUNT_EMPLOYEE, "Employee." + COUNT_EMPLOYEE, Long.class.getName()), null);
         Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         String returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
         assertThat(returnedLastName).isEqualTo("Grenoble");
+
+        Serializable nbOfAddress = evaluatedExpressions.get(COUNT_ADDRESS);
+        Serializable nbOfEmployee = evaluatedExpressions.get(COUNT_EMPLOYEE);
+
+        assertThat(nbOfAddress).isEqualTo(1L);
+        assertThat(nbOfEmployee).isEqualTo(1L);
 
         logoutOnTenant();
 
@@ -1243,7 +1271,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    public void getProcessBusinessDataReferencesShoulReturnTheListOfReferences() throws Exception {
+    @Test
+    public void getProcessBusinessDataReferencesShouldReturnTheListOfReferences() throws Exception {
         final String taskName = "step";
         final ProcessDefinition definition = buildProcessThatUpdateBizDataInsideConnector(taskName);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
@@ -1258,7 +1287,6 @@ public class BDRepositoryIT extends CommonAPISPIT {
     }
 
     @Test
-    @Ignore("BS-13108 is being fixed")
     public void getBusinessDataCommand_should_return_json_entities() throws Exception {
         final ProcessDefinition processDefinition;
         final ProcessDefinitionBuilderExt processDefinitionBuilder;
@@ -1286,14 +1314,12 @@ public class BDRepositoryIT extends CommonAPISPIT {
         processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIFIED_NAME, null);
         processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIFIED_NAME, null);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addAutomaticTask("auto1")
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myCountry"), OperatorType.ASSIGNMENT, null, null, countryExpression);
-        processDefinitionBuilder.addAutomaticTask("auto2")
+        processDefinitionBuilder.addAutomaticTask("step1")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myCountry"), OperatorType.ASSIGNMENT, null, null, countryExpression)
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, addressExpression)
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
-        processDefinitionBuilder.addTransition("auto1", "auto2");
-        processDefinitionBuilder.addTransition("auto2", "step2");
+        processDefinitionBuilder.addTransition("step1", "step2");
 
         processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
