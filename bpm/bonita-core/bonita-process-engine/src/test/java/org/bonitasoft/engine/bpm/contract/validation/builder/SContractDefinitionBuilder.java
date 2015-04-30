@@ -17,10 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
 
 public class SContractDefinitionBuilder {
@@ -46,13 +44,6 @@ public class SContractDefinitionBuilder {
     }
 
     public SContractDefinitionBuilder withConstraint(final SConstraintDefinition constraint) {
-        constraints.add(constraint);
-        return this;
-    }
-
-    public SContractDefinitionBuilder withMandatoryConstraint(final String inputName) {
-        final SConstraintDefinition constraint = new SConstraintDefinitionImpl(inputName, inputName + "!=null" + " && !" + inputName + ".toString().isEmpty()", "input " + inputName + " is mandatory", SConstraintType.MANDATORY);
-        constraint.getInputNames().add(inputName);
         constraints.add(constraint);
         return this;
     }

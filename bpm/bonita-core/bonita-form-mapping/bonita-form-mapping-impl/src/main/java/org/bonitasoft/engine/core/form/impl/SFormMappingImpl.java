@@ -133,4 +133,16 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
     public int hashCode() {
         return Objects.hash(super.hashCode(), processDefinitionId, task, pageMapping, type, lastUpdateDate, lastUpdatedBy);
     }
+
+    @Override
+    public String toString() {
+        return "SFormMappingImpl{" +
+                "processDefinitionId=" + processDefinitionId +
+                ", task='" + task + '\'' +
+                ", pageMapping=" + pageMapping +
+                ", type=" + type +
+                ", lastUpdateDate=" + lastUpdateDate +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                "} " + super.toString();
+    }
 }

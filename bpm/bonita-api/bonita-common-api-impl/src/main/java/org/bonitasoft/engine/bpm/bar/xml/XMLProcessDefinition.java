@@ -592,11 +592,10 @@ public class XMLProcessDefinition {
         return contractNode;
     }
 
-
-    private XMLNode createContextNode(List<ContextEntry> context) {
+    private XMLNode createContextNode(final List<ContextEntry> context) {
         final XMLNode contextNode = new XMLNode(CONTEXT_NODE);
-        for (ContextEntry contextEntry : context) {
-            XMLNode node = new XMLNode(CONTEXT_ENTRY_NODE);
+        for (final ContextEntry contextEntry : context) {
+            final XMLNode node = new XMLNode(CONTEXT_ENTRY_NODE);
             node.addAttribute(CONTEXT_ENTRY_KEY, contextEntry.getKey());
             addExpressionNode(node, EXPRESSION_NODE, contextEntry.getExpression());
             contextNode.addChild(node);
@@ -604,11 +603,9 @@ public class XMLProcessDefinition {
         return contextNode;
     }
 
-
     private XMLNode createConstraintNode(final ConstraintDefinition constraintDefinition) {
         final XMLNode xmlNode = new XMLNode(CONTRACT_CONSTRAINT_NODE);
         xmlNode.addAttribute(NAME, constraintDefinition.getName());
-        xmlNode.addAttribute(CONSTRAINT_TYPE, constraintDefinition.getConstraintType().toString());
         xmlNode.addChild(CONSTRAINT_EXPRESSION, constraintDefinition.getExpression());
         xmlNode.addChild(CONSTRAINT_EXPLANATION, constraintDefinition.getExplanation());
         final XMLNode namesNode = new XMLNode(INPUT_NAMES);
@@ -624,7 +621,7 @@ public class XMLProcessDefinition {
         inputNode.addAttribute(NAME, input.getName());
         inputNode.addAttribute(MULTIPLE, String.valueOf(input.isMultiple()));
         inputNode.addAttribute(DESCRIPTION, input.getDescription());
-        Type type = input.getType();
+        final Type type = input.getType();
         if (type != null) {
             inputNode.addAttribute(TYPE, type.toString());
         }

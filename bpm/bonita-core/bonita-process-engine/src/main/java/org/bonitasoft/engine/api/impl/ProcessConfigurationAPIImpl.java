@@ -74,10 +74,10 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
     }
 
     @Override
-    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context) throws NotFoundException, ExecutionException, UnauthorizedAccessException {
+    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, ExecutionException, UnauthorizedAccessException {
         PageMappingService pageMappingService = retrievePageMappingService();
         try {
-            return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context));
+            return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context, executeAuthorizationRules));
         } catch (SObjectNotFoundException e) {
             throw new NotFoundException(e);
         } catch (SBonitaReadException e) {

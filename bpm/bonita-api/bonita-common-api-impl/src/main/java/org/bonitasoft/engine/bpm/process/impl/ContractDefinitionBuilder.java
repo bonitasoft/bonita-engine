@@ -16,7 +16,6 @@ package org.bonitasoft.engine.bpm.process.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.contract.ConstraintType;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
@@ -35,7 +34,7 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     private final ContractDefinitionImpl contract;
 
     public ContractDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
-                                     final UserTaskDefinitionImpl activity) {
+            final UserTaskDefinitionImpl activity) {
         super(container, processDefinitionBuilder);
         contract = new ContractDefinitionImpl();
         activity.setContract(contract);
@@ -62,7 +61,7 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     }
 
     public ContractDefinitionBuilder addInput(final String name, final String description, final boolean multiple,
-                                              final List<InputDefinition> inputDefinitions) {
+            final List<InputDefinition> inputDefinitions) {
         final InputDefinitionImpl input = new InputDefinitionImpl(name, description, multiple, inputDefinitions);
         contract.addInput(input);
         return this;
@@ -82,24 +81,11 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     }
 
     public ContractDefinitionBuilder addConstraint(final String name, final String expression, final String explanation, final String... inputNames) {
-        final ConstraintDefinitionImpl constraintDefinition = new ConstraintDefinitionImpl(name, expression, explanation, ConstraintType.CUSTOM);
+        final ConstraintDefinitionImpl constraintDefinition = new ConstraintDefinitionImpl(name, expression, explanation);
         for (final String inputName : inputNames) {
             constraintDefinition.addInputName(inputName);
         }
         contract.addConstraint(constraintDefinition);
-        return this;
-    }
-
-    public ContractDefinitionBuilder addMandatoryConstraint(final String inputName) {
-        final StringBuilder expression = new StringBuilder().append(inputName).append("!=null");
-        expression.append(" && !");
-        expression.append(inputName);
-        expression.append(".toString().isEmpty()");
-
-        final ConstraintDefinitionImpl constraint = new ConstraintDefinitionImpl(inputName, expression.toString(), new StringBuilder().append("input ")
-                .append(inputName).append(" is mandatory").toString(), ConstraintType.MANDATORY);
-        constraint.addInputName(inputName);
-        contract.addConstraint(constraint);
         return this;
     }
 }

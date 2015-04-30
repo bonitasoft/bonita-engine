@@ -16,20 +16,20 @@ package org.bonitasoft.engine.page;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 
 /**
- * author Emmanuel Duchastenier, Anthony Birembaut
+ * author Anthony Birembaut
  */
-public class IsProcessOwnerRule implements AuthorizationRule {
+public class IsActorInitiatorRule implements AuthorizationRule {
 
-    SupervisorMappingService supervisorMappingService;
+    ActorMappingService actorMappingService;
 
     SessionAccessor sessionAccessor;
 
@@ -37,9 +37,9 @@ public class IsProcessOwnerRule implements AuthorizationRule {
 
     FormMappingService formMappingService;
 
-    public IsProcessOwnerRule(SupervisorMappingService supervisorMappingService, SessionAccessor sessionAccessor, SessionService sessionService,
+    public IsActorInitiatorRule(ActorMappingService actorMappingService, SessionAccessor sessionAccessor, SessionService sessionService,
             FormMappingService formMappingService) {
-        this.supervisorMappingService = supervisorMappingService;
+        this.actorMappingService = actorMappingService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
         this.formMappingService = formMappingService;
@@ -51,14 +51,14 @@ public class IsProcessOwnerRule implements AuthorizationRule {
             SFormMapping formMapping = formMappingService.get(key);
             long processDefinitionId = formMapping.getProcessDefinitionId();
             final long userId = sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
-            return supervisorMappingService.isProcessSupervisor(processDefinitionId, userId);
+            return actorMappingService.canUserStartProcessDefinition(userId, processDefinitionId);
         } catch (final SBonitaException e) {
-            throw new SExecutionException("Unable to figure out if the logged user is a process owner.", e);
+            throw new SExecutionException("Unable to figure out if the logged user is an actor initiator for the process.", e);
         }
     }
 
     @Override
     public String getId() {
-        return AuthorizationRuleConstants.IS_PROCESS_OWNER;
+        return AuthorizationRuleConstants.IS_ACTOR_INITIATOR;
     }
 }

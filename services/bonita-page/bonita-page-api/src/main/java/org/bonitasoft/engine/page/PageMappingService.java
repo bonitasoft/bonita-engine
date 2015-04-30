@@ -67,11 +67,12 @@ public interface PageMappingService {
     /**
      * @param pageMapping
      * @param context
+     * @param executeAuthorizationRules 
      * @return
      * @throws SExecutionException
      * @throws SAuthorizationException
      */
-    SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context) throws SExecutionException, SAuthorizationException;
+    SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context, boolean executeAuthorizationRules) throws SExecutionException, SAuthorizationException;
 
     /**
      * delete this page mapping

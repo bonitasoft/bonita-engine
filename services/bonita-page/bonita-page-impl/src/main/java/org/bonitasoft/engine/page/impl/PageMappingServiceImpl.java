@@ -130,14 +130,10 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context) throws SExecutionException, SAuthorizationException {
-        final List<String> pageAuthorizationRules = pageMapping.getPageAuthorizationRules();
-        for (String rule : pageAuthorizationRules) {
-            final AuthorizationRule authorizationRule = authorizationRuleMap.get(rule);
-            if (authorizationRule == null) {
-                throw new SExecutionException("Authorization rule " + rule + " is not known. Cannot check if authorized or not.");
-            }
-            if (!authorizationRule.isAllowed(context)) {
+    public SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context, boolean executeAuthorizationRules) throws SExecutionException, SAuthorizationException {
+        if (executeAuthorizationRules) {
+            final List<String> pageAuthorizationRules = pageMapping.getPageAuthorizationRules();
+            if (!isAllowedToAccess(pageMapping, context, pageAuthorizationRules)) {
                 throw new SAuthorizationException("Access to Page or URL with key " + pageMapping.getKey() + " is not allowed");
             }
         }
@@ -148,6 +144,24 @@ public class PageMappingServiceImpl implements PageMappingService {
             url = getUrlAdapter(urlAdapter).adapt(url, pageMapping.getKey(), context);
         }
         return new SPageURL(url, pageMapping.getPageId());
+    }
+
+    protected boolean isAllowedToAccess(SPageMapping pageMapping, Map<String, Serializable> context, List<String> pageAuthorizationRules)
+            throws SExecutionException {
+        boolean authorized = true;
+        for (String rule : pageAuthorizationRules) {
+            final AuthorizationRule authorizationRule = authorizationRuleMap.get(rule);
+            if (authorizationRule == null) {
+                throw new SExecutionException("Authorization rule " + rule + " is not known. Cannot check if authorized or not.");
+            }
+            if (authorizationRule.isAllowed(pageMapping.getKey(), context)) {
+                return true;
+            }
+            else {
+                authorized = false;
+            }
+        }
+        return authorized;
     }
 
     private URLAdapter getUrlAdapter(String urlAdapterName) throws SExecutionException {
@@ -210,7 +224,6 @@ public class PageMappingServiceImpl implements PageMappingService {
     void update(SPageMapping pageMapping, EntityUpdateDescriptor descriptor) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(pageMapping, descriptor);
         recorder.recordUpdate(updateRecord, getUpdateEvent(pageMapping));
-
     }
 
     SUpdateEvent getUpdateEvent(SPageMapping sPageMapping) {

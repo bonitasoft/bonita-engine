@@ -54,8 +54,7 @@ public interface ProcessConfigurationAPI {
      * @throws NotFoundException if the key does not match anything.
      * @see PageURL the structured PageURL that points to the Page or URL
      */
-    //TODO add something like a boolean to ask if we check for secu or not if we get only web resources
-    PageURL resolvePageOrURL(String key, Map<String, Serializable> context) throws NotFoundException, UnauthorizedAccessException, ExecutionException;
+    PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, UnauthorizedAccessException, ExecutionException;
 
     /**
      * @param formMappingId
