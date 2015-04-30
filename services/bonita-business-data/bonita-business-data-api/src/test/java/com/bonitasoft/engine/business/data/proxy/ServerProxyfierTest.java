@@ -11,9 +11,13 @@ package com.bonitasoft.engine.business.data.proxy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
@@ -45,7 +49,7 @@ public class ServerProxyfierTest {
 
     @Test
     public void should_proxify_an_entity() throws Exception {
-        PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
+        final PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
 
         assertThat(proxy).isInstanceOf(ProxyObject.class);
         assertThat(proxy.getClass().getSuperclass()).isEqualTo(PersonEntity.class);
@@ -53,8 +57,8 @@ public class ServerProxyfierTest {
 
     @Test
     public void should_not_reproxify_a_server_proxy() throws Exception {
-        PersonEntity originalProxy = serverProxyfier.proxify(new PersonEntity());
-        PersonEntity proxy = serverProxyfier.proxify(originalProxy);
+        final PersonEntity originalProxy = serverProxyfier.proxify(new PersonEntity());
+        final PersonEntity proxy = serverProxyfier.proxify(originalProxy);
 
         assertThat(proxy).isSameAs(originalProxy);
     }
@@ -63,14 +67,14 @@ public class ServerProxyfierTest {
     public void should_reproxify_an_hibernate_proxy() throws Exception {
         final ProxyFactory factory = new ProxyFactory();
         factory.setSuperclass(PersonEntity.class);
-        Entity aProxy = (Entity) factory.create(new Class[0], new Object[0], new MethodHandler() {
+        final Entity aProxy = (Entity) factory.create(new Class[0], new Object[0], new MethodHandler() {
 
             @Override
-            public Object invoke(Object self, Method thisMethod, Method proceed, Object[] args) throws Throwable {
+            public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args) throws Throwable {
                 return null;
             }
         });
-        PersonEntity proxy = (PersonEntity) serverProxyfier.proxify(aProxy);
+        final PersonEntity proxy = (PersonEntity) serverProxyfier.proxify(aProxy);
 
         assertThat(proxy).isNotSameAs(aProxy);
     }
@@ -78,13 +82,13 @@ public class ServerProxyfierTest {
     @Test
     public void should_call_on_lazy_loaded_getter_use_lazyLoader() throws Exception {
         //given
-        PersonEntity personEntity = new PersonEntity();
+        final PersonEntity personEntity = new PersonEntity();
 
         final Method method = PersonEntity.class.getMethod("getWithLazyLoadedAnnotation");
         doReturn("lazyResult").when(lazyLoader).load(any(Method.class), anyLong());
 
         //when
-        PersonEntity proxy = serverProxyfier.proxify(personEntity);
+        final PersonEntity proxy = serverProxyfier.proxify(personEntity);
         final String withLazyLoadedAnnotation = proxy.getWithLazyLoadedAnnotation();
 
         //
@@ -95,11 +99,11 @@ public class ServerProxyfierTest {
     @Test
     public void should_not_call_lazyLoader() throws Exception {
         //given
-        PersonEntity personEntity = new PersonEntity();
+        final PersonEntity personEntity = new PersonEntity();
         final Method method = PersonEntity.class.getMethod("getWithoutLazyLoadedAnnotation");
 
         //when
-        PersonEntity proxy = serverProxyfier.proxify(personEntity);
+        final PersonEntity proxy = serverProxyfier.proxify(personEntity);
         final String withLazyLoadedAnnotation = proxy.getWithoutLazyLoadedAnnotation();
 
         //
@@ -110,12 +114,64 @@ public class ServerProxyfierTest {
     @Test
     public void should_retrieve_real_class() throws Exception {
         //given
-        PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
+        final PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
 
         //when
-        Class<? extends Entity> realClass = ServerProxyfier.getRealClass(proxy);
+        final Class<? extends Entity> realClass = ServerProxyfier.getRealClass(proxy);
 
         //then
         assertThat(realClass.getName()).isEqualTo(PersonEntity.class.getName());
     }
+
+    @Test
+    public void unProxy_should_not_remove_a_proxy_on_a_null_entity() throws Exception {
+        final Entity entity = ServerProxyfier.unProxy(null);
+
+        assertThat(entity).isNull();
+    }
+
+    @Test
+    public void unProxy_should_not_remove_a_proxy_on_an_entity() throws Exception {
+        final PersonEntity proxy = new PersonEntity();
+
+        final Entity entity = ServerProxyfier.unProxy(proxy);
+
+        assertThat(ServerProxyfier.isLazyMethodProxyfied(entity)).isFalse();
+    }
+
+    @Test
+    public void unProxy_should_remove_a_proxy_on_an_entity() throws Exception {
+        final PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
+
+        final Entity entity = ServerProxyfier.unProxy(proxy);
+
+        assertThat(ServerProxyfier.isLazyMethodProxyfied(entity)).isFalse();
+    }
+
+    @Test
+    public void unProxy_should_remove_a_proxy_on_an_ref_attribute_of_an_entity() throws Exception {
+        final Address proxy = serverProxyfier.proxify(new Address());
+        final Employee employee = new Employee(10L, 45L, "John", "Doe");
+        employee.setAddress(proxy);
+
+        final Employee entity = (Employee) ServerProxyfier.unProxy(employee);
+
+        assertThat(ServerProxyfier.isLazyMethodProxyfied(entity.getAddress())).isFalse();
+    }
+
+    @Test
+    public void unProxy_should_remove_a_proxy_on_an_list_attribute_of_an_entity() throws Exception {
+        final List<Address> addresses = new ArrayList<Address>();
+        addresses.add(new Address());
+        addresses.add(serverProxyfier.proxify(new Address()));
+        final Employee employee = new Employee(10L, 45L, "John", "Doe");
+        employee.setAddresses(addresses);
+
+        final Employee entity = (Employee) ServerProxyfier.unProxy(employee);
+
+        for (final Address address : entity.getAddresses()) {
+            assertThat(ServerProxyfier.isLazyMethodProxyfied(address)).isFalse();
+        }
+    }
+
 }

@@ -646,8 +646,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         String returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
         assertThat(returnedLastName).isEqualTo("Grenoble");
 
-        Serializable nbOfAddress = evaluatedExpressions.get(COUNT_ADDRESS);
-        Serializable nbOfEmployee = evaluatedExpressions.get(COUNT_EMPLOYEE);
+        final Serializable nbOfAddress = evaluatedExpressions.get(COUNT_ADDRESS);
+        final Serializable nbOfEmployee = evaluatedExpressions.get(COUNT_EMPLOYEE);
 
         assertThat(nbOfAddress).isEqualTo(1L);
         assertThat(nbOfEmployee).isEqualTo(1L);
@@ -1540,7 +1540,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         uninstallBusinessObjectModel();
 
-        BusinessObjectModel businessObjectModel = aBOM().
+        final BusinessObjectModel businessObjectModel = aBOM().
                 withBO(aBO("org.test.Restaurant").withField(aStringField("name").ofType(FieldType.STRING).build())
                         .build())
                 .build();
@@ -1563,6 +1563,125 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask(processInstance, "step1");
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void should_associate_the_right_address() throws Exception {
+        final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
+                "import org.bonita.pojo.Address; new Address(street:'32, rue Gustave Eiffel', city:'Grenoble')",
+                ADDRESS_QUALIF_NAME);
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; new Employee(firstName:'John', lastName:'Doe', address:myAddress)", EMPLOYEE_QUALIF_CLASSNAME,
+                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME));
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+                "theProcess", "6.3.1");
+        final String bizDataName = "myEmployee";
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
+        processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIF_NAME, addressExpression);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addAutomaticTask("step1")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTask(processInstance, "step2");
+
+        final Long numberOfAddresses = getNumberOfAddresses(processInstance.getId());
+        assertThat(numberOfAddresses).isEqualTo(1L);
+        final String address = getAddressAsAString("myAddress", processInstance.getId());
+        assertThat(address).isEqualTo("Address [street=32, rue Gustave Eiffel, city=Grenoble]");
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
+    @Test
+    public void should_associate_the_right_addresses() throws Exception {
+        final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
+                "import org.bonita.pojo.Address; new Address(street:'32, rue Gustave Eiffel', city:'Grenoble')",
+                ADDRESS_QUALIF_NAME);
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; new Employee(firstName:'John', lastName:'Doe', addresses:[myAddress])", EMPLOYEE_QUALIF_CLASSNAME,
+                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME));
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+                "theProcess", "6.3.1");
+        final String bizDataName = "myEmployee";
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
+        processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIF_NAME, addressExpression);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addAutomaticTask("step1")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME)
+                .addOperation(
+                        new OperationBuilder().createBusinessDataSetAttributeOperation(bizDataName, "addToAddresses", ADDRESS_QUALIF_NAME,
+                                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME)))
+                .addOperation(
+                        new OperationBuilder().createBusinessDataSetAttributeOperation(bizDataName, "setLastName", String.class.getName(),
+                                new ExpressionBuilder().createConstantStringExpression("Smith")));
+        processDefinitionBuilder.addUserTask("step3", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
+        processDefinitionBuilder.addTransition("step2", "step3");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        final long userTaskId = waitForUserTask(processInstance, "step2");
+
+        Long numberOfAddresses = getNumberOfAddresses(processInstance.getId());
+        assertThat(numberOfAddresses).isEqualTo(1L);
+        String address = getAddressAsAString("myAddress", processInstance.getId());
+        assertThat(address).isEqualTo("Address [street=32, rue Gustave Eiffel, city=Grenoble]");
+
+        assignAndExecuteStep(userTaskId, matti);
+        waitForUserTask(processInstance, "step3");
+
+        numberOfAddresses = getNumberOfAddresses(processInstance.getId());
+        assertThat(numberOfAddresses).isEqualTo(1L);
+        address = getAddressAsAString("myAddress", processInstance.getId());
+        assertThat(address).isEqualTo("Address [street=32, rue Gustave Eiffel, city=Grenoble]");
+        final String employee = getEmployeeAsAString(bizDataName, processInstance.getId());
+        assertThat(employee).isEqualTo("Employee [firstName=John, lastName=Smith, address=null, addresses.count=2 ]");
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
+    public Long getNumberOfAddresses(final long processInstanceId) throws Exception {
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression("countAddresses", "Address.countAddress", Long.class.getName()),
+                Collections.<String, Serializable> emptyMap());
+
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        return (Long) result.get("countAddresses");
+    }
+
+    public String getAddressAsAString(final String addressName, final long processInstanceId) throws Exception {
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        expressions.put(
+                new ExpressionBuilder().createGroovyScriptExpression("getAddress", "\"Address [street=\" + " + addressName
+                        + ".street + \", city=\" + " + addressName + ".city + \"]\";", String.class.getName(),
+                        new ExpressionBuilder().createBusinessDataExpression(addressName, ADDRESS_QUALIF_NAME)), null);
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        return (String) result.get("getAddress");
+    }
+
+    private String getEmployeeAsAString(final String businessDataName, final long processInstanceId) throws InvalidExpressionException {
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(5);
+        final String expressionEmployee = "retrieve_Employee";
+        expressions.put(
+                new ExpressionBuilder().createGroovyScriptExpression(expressionEmployee,
+                        "\"Employee [firstName=\" + " + businessDataName + ".firstName + \", lastName=\" + " + businessDataName
+                                + ".lastName + \", address=\" + " + businessDataName + ".address + \", addresses.count=\" + "
+                                + businessDataName + ".addresses.size() + \" ]\";", String.class.getName(),
+                        new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIF_CLASSNAME)), null);
+        try {
+            final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+            return (String) evaluatedExpressions.get(expressionEmployee);
+        } catch (final ExpressionEvaluationException eee) {
+            System.err.println(eee.getMessage());
+            return null;
+        }
     }
 
 }
