@@ -600,7 +600,7 @@ public class XMLSProcessDefinition {
     private XMLNode createContractNode(final SContractDefinition contract) {
         final XMLNode contractNode = new XMLNode(CONTRACT_NODE);
         final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
-        for (final SInputDefinition input : contract.getInputs()) {
+        for (final SInputDefinition input : contract.getInputDefinitions()) {
             inputsNode.addChild(createInputNode(input));
         }
         if (!inputsNode.getChildNodes().isEmpty()) {
