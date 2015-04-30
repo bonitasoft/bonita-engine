@@ -6,7 +6,6 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  **/
-
 package com.bonitasoft.engine.operation;
 
 import java.util.ArrayList;
@@ -32,15 +31,22 @@ public class MergeEntityAction implements EntityAction {
         if (entity == null) {
             throw new SEntityActionExecutionException("Unable to insert/update a null business data");
         }
-        return repository.merge(ServerProxyfier.unProxyfyIfNeeded(entity));
+        try {
+            return repository.merge(ServerProxyfier.unProxy(entity));
+        } catch (final IllegalArgumentException iae) {
+            throw new SEntityActionExecutionException(iae);
+        } catch (final IllegalAccessException iae) {
+            throw new SEntityActionExecutionException(iae);
+        }
     }
 
     @Override
     public List<Entity> execute(final List<Entity> entities, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
-        List<Entity> mergedEntities = new ArrayList<Entity>();
-        for (Entity entity : entities) {
+        final List<Entity> mergedEntities = new ArrayList<Entity>();
+        for (final Entity entity : entities) {
             mergedEntities.add(execute(entity, businessDataContext));
         }
         return mergedEntities;
     }
+
 }
