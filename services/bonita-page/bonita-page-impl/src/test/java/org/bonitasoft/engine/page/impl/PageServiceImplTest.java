@@ -324,24 +324,7 @@ public class PageServiceImplTest {
         pageServiceImpl.start();
 
         // then
-        verify(pageServiceImpl, times(3)).insertPage(any(SPage.class), any(byte[].class));
-        verify(pageServiceImpl, times(0)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
-        verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(byte[].class), anyString());
-
-    }
-
-    @Test
-    public void start_should_import_provided_page_with_business_app() throws SBonitaException {
-        // given
-        // resource in the classpath bonita-groovy-example-page.zip
-        doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
-        pageServiceImpl = spy(new PageServiceImpl(readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService,
-                profileService));
-        // when
-        pageServiceImpl.start();
-
-        // then
-        verify(pageServiceImpl, times(3)).insertPage(any(SPage.class), any(byte[].class));
+        verify(pageServiceImpl, times(4)).insertPage(any(SPage.class), any(byte[].class));
         verify(pageServiceImpl, times(0)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
         verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(byte[].class), anyString());
 
@@ -369,13 +352,20 @@ public class PageServiceImplTest {
                 CONTENT_NAME);
         currentHomePage.setId(14);
 
+        final SPageImpl currentLayoutPage = new SPageImpl("custompage_layout", "example of layout", "Layout Example", System.currentTimeMillis(), -1, true,
+                System.currentTimeMillis(),
+                -1,
+                CONTENT_NAME);
+        currentLayoutPage.setId(15);
+
         doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
         doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
         doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_home");
-        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(12);
-        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(13);
-        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(14);
-
+		doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName("custompage_layout");
+        doReturn(new byte[]	{1, 2, 3}).when(pageServiceImpl).getPageContent(12);
+        doReturn(new byte[]	{1, 2, 3}).when(pageServiceImpl).getPageContent(13);
+        doReturn(new byte[]	{1, 2, 3}).when(pageServiceImpl).getPageContent(14);
+        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(15);
         doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
         doReturn(null).when(pageServiceImpl).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
         doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
@@ -386,6 +376,7 @@ public class PageServiceImplTest {
         verify(pageServiceImpl, times(1)).updatePageContent(eq(13L), any(byte[].class), eq("bonita-html-page-example.zip"));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(12L), any(byte[].class), eq("bonita-groovy-page-example.zip"));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(14L), any(byte[].class), eq("bonita-home-page.zip"));
+        verify(pageServiceImpl, times(1)).updatePageContent(eq(15L), any(byte[].class), eq("bonita-layout-page.zip"));
     }
 
     @Test
@@ -475,16 +466,25 @@ public class PageServiceImplTest {
                 CONTENT_NAME);
         currentHomePage.setId(14);
 
+        final SPageImpl currentLayoutPage = new SPageImpl("custompage_layout", "example of layout", "Layout Example", System.currentTimeMillis(), -1, true,
+                System.currentTimeMillis(),
+                -1,
+                CONTENT_NAME);
+        currentLayoutPage.setId(15);
+
         doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
         doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
         doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_home");
+        doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName("custompage_layout");
 
         final InputStream resourceGroovyAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-groovy-page-example.zip");
         final InputStream resourceHtmlAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-html-page-example.zip");
         final InputStream resourceHomeAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-home-page.zip");
+        final InputStream resourceLayoutAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-layout-page.zip");
         doReturn(IOUtil.getAllContentFrom(resourceGroovyAsStream)).when(pageServiceImpl).getPageContent(12);
         doReturn(IOUtil.getAllContentFrom(resourceHtmlAsStream)).when(pageServiceImpl).getPageContent(13);
         doReturn(IOUtil.getAllContentFrom(resourceHomeAsStream)).when(pageServiceImpl).getPageContent(14);
+        doReturn(IOUtil.getAllContentFrom(resourceLayoutAsStream)).when(pageServiceImpl).getPageContent(15);
         doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
         // when
         pageServiceImpl.start();

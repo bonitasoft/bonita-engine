@@ -311,7 +311,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage getPage(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
-        final SPage page = persistenceService.selectById(new SelectByIdDescriptor<SPage>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
+        final SPage page = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
         if (page == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
         }
@@ -362,7 +362,7 @@ public class PageServiceImpl implements PageService {
     private void deleteProfileEntry(final SPage sPage) throws SBonitaReadException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
         final List<OrderByOption> orderByOptions = Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        final List<FilterOption> filters = new ArrayList<>();
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE, sPage.getName()));
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.CUSTOM, new Boolean(true)));
 
@@ -381,7 +381,7 @@ public class PageServiceImpl implements PageService {
             SProfileEntryDeletionException {
         final List<OrderByOption> orderByOptions = Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        final List<FilterOption> filters = new ArrayList<>();
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PROFILE_ID, sProfileEntry.getProfileId()));
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PARENT_ID, sProfileEntry.getParentId()));
 
@@ -437,7 +437,7 @@ public class PageServiceImpl implements PageService {
     @Override
     public byte[] getPageContent(final long pageId) throws SBonitaReadException, SObjectNotFoundException {
         final SPage page = getPage(pageId);
-        final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>(QUERY_GET_PAGE_CONTENT,
+        final SPageContent pageContent = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_CONTENT,
                 SPageContent.class, pageId));
         if (pageContent == null) {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
@@ -470,7 +470,7 @@ public class PageServiceImpl implements PageService {
         try {
             checkPageDuplicate(pageId, entityUpdateDescriptor, logBuilder, logMethodName);
 
-            final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<SPage>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
+            final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
             final String oldPageName = sPage.getName();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage,
                     entityUpdateDescriptor);
@@ -513,7 +513,7 @@ public class PageServiceImpl implements PageService {
         if (newPageName.equals(oldPageName)) {
             return;
         }
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        final List<FilterOption> filters = new ArrayList<>();
         filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PAGE, oldPageName));
         final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC)), filters, null);
@@ -541,7 +541,7 @@ public class PageServiceImpl implements PageService {
         final Properties pageProperties = readPageZip(content, false);
         try {
 
-            final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>(QUERY_GET_PAGE_CONTENT,
+            final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_CONTENT,
                     SPageContent.class, pageId));
             final SPageUpdateContentBuilder builder = BuilderFactory.get(SPageUpdateContentBuilderFactory.class)
                     .createNewInstance(new EntityUpdateDescriptor());
@@ -573,9 +573,9 @@ public class PageServiceImpl implements PageService {
         importProvidedPage("bonita-html-page-example.zip");
         importProvidedPage("bonita-groovy-page-example.zip");
         importProvidedPage("bonita-home-page.zip");
+		importProvidedPage("bonita-layout-page.zip");
         importProvidedPage("step-autogenerated-form.zip");
-        importProvidedPage("process-autogenerated-form.zip");
-    }
+        importProvidedPage("process-autogenerated-form.zip");    }
 
     private void importProvidedPage(final String zipName) throws SBonitaReadException, SObjectCreationException, SObjectAlreadyExistsException,
             SObjectNotFoundException,

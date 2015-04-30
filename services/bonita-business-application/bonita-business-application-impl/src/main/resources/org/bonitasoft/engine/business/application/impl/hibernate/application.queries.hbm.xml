@@ -97,9 +97,15 @@
         FROM org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl as applicationPage,
         org.bonitasoft.engine.business.application.model.impl.SApplicationImpl as application,
         org.bonitasoft.engine.page.impl.SPageImpl as page
-        WHERE applicationPage.applicationId = application.id
-        AND application.profileId = :profileId
-        AND applicationPage.pageId = page.id
+        WHERE application.profileId = :profileId
+        AND (
+            application.layoutId = page.id
+            OR (
+                applicationPage.applicationId = application.id
+                AND applicationPage.pageId = page.id
+            )
+        )
+
         ORDER BY page.name
     </query>
 

@@ -59,7 +59,7 @@ public class ApplicationAPIDelegateTest {
     private TenantServiceAccessor accessor;
 
     @Mock
-    private ApplicationModelConverter convertor;
+    private ApplicationModelConverter converter;
 
     @Mock
     private SearchApplications searchApplications;
@@ -76,6 +76,8 @@ public class ApplicationAPIDelegateTest {
 
     private static final long LOGGED_USER_ID = 10;
 
+    private static final long LAYOUT_ID = 60;
+
     private static final String APP_TOKEN = "app";
 
     private static final String APP_DISP_NAME = "My app";
@@ -87,7 +89,7 @@ public class ApplicationAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationAPIDelegate(accessor, convertor, LOGGED_USER_ID);
+        delegate = new ApplicationAPIDelegate(accessor, converter, LOGGED_USER_ID);
     }
 
     @Test
@@ -98,8 +100,8 @@ public class ApplicationAPIDelegateTest {
         final SApplicationImpl sApp = getDefaultApplication();
         sApp.setDescription(DESCRIPTION);
         final ApplicationImpl application = new ApplicationImpl(APP_TOKEN, VERSION, DESCRIPTION);
-        given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
-        given(convertor.toApplication(sApp)).willReturn(application);
+        given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
+        given(converter.toApplication(sApp)).willReturn(application);
         given(applicationService.createApplication(sApp)).willReturn(sApp);
 
         //when
@@ -111,7 +113,7 @@ public class ApplicationAPIDelegateTest {
 
     private SApplicationImpl getDefaultApplication() {
         final SApplicationImpl sApp = new SApplicationImpl(APP_TOKEN, APP_DISP_NAME, VERSION, System.currentTimeMillis(), LOGGED_USER_ID,
-                SApplicationState.DEACTIVATED.name());
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID);
         return sApp;
     }
 
@@ -120,7 +122,7 @@ public class ApplicationAPIDelegateTest {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
         final SApplicationImpl sApp = getDefaultApplication();
-        given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
+        given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectAlreadyExistsException(""));
 
         //when
@@ -134,7 +136,7 @@ public class ApplicationAPIDelegateTest {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
         final SApplicationImpl sApp = getDefaultApplication();
-        given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
+        given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectCreationException(""));
 
         //when
@@ -263,7 +265,7 @@ public class ApplicationAPIDelegateTest {
         final SApplicationImpl sApp = getDefaultApplication();
         final ApplicationImpl application = new ApplicationImpl(APP_TOKEN, VERSION, null);
         given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApp);
-        given(convertor.toApplication(sApp)).willReturn(application);
+        given(converter.toApplication(sApp)).willReturn(application);
 
         //when
         final Application retriedApp = delegate.getApplication(APPLICATION_ID);
@@ -303,9 +305,9 @@ public class ApplicationAPIDelegateTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willReturn(sApplication);
-        given(convertor.toApplication(sApplication)).willReturn(application);
+        given(converter.toApplication(sApplication)).willReturn(application);
 
         //when
         final Application updatedApplication = delegate.updateApplication(APPLICATION_ID, updater);
@@ -321,9 +323,9 @@ public class ApplicationAPIDelegateTest {
         final Application application = mock(Application.class);
         final ApplicationUpdater updater = new ApplicationUpdater();
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApplication);
-        given(convertor.toApplication(sApplication)).willReturn(application);
+        given(converter.toApplication(sApplication)).willReturn(application);
 
         //when
         final Application updatedApplication = delegate.updateApplication(APPLICATION_ID, updater);
@@ -338,7 +340,7 @@ public class ApplicationAPIDelegateTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectModificationException());
 
         //when
@@ -353,7 +355,7 @@ public class ApplicationAPIDelegateTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectAlreadyExistsException());
 
         //when
@@ -368,7 +370,7 @@ public class ApplicationAPIDelegateTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectNotFoundException());
 
         //when

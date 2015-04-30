@@ -534,6 +534,7 @@ CREATE TABLE business_app (
   state VARCHAR2(30 CHAR) NOT NULL,
   homePageId NUMBER(19, 0),
   profileId NUMBER(19, 0),
+  layoutId NUMBER(19, 0),
   displayName VARCHAR2(255 CHAR) NOT NULL
 );
 

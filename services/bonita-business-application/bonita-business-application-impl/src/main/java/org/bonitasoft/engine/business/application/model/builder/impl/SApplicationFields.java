@@ -43,4 +43,7 @@ public class SApplicationFields {
     public static final String HOME_PAGE_ID = "homePageId";
 
     public static final String PROFILE_ID = "profileId";
+
+    public static final String LAYOUT_ID = "layoutId";
+
 }

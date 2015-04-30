@@ -36,7 +36,7 @@ public class SearchApplicationDescriptor extends SearchEntityDescriptor {
 
     SearchApplicationDescriptor() {
         final SApplicationBuilderFactory keyProvider = BuilderFactory.get(SApplicationBuilderFactory.class);
-        keys = new HashMap<String, FieldDescriptor>(11);
+        keys = new HashMap<>(12);
         keys.put(ApplicationSearchDescriptor.ID, new FieldDescriptor(SApplication.class, keyProvider.getIdKey()));
         keys.put(ApplicationSearchDescriptor.TOKEN, new FieldDescriptor(SApplication.class, keyProvider.getTokenKey()));
         keys.put(ApplicationSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SApplication.class, keyProvider.getDisplayNameKey()));
@@ -48,8 +48,9 @@ public class SearchApplicationDescriptor extends SearchEntityDescriptor {
         keys.put(ApplicationSearchDescriptor.UPDATED_BY, new FieldDescriptor(SApplication.class, keyProvider.getUpdatedByKey()));
         keys.put(ApplicationSearchDescriptor.STATE, new FieldDescriptor(SApplication.class, keyProvider.getStateKey()));
         keys.put(ApplicationSearchDescriptor.PROFILE_ID, new FieldDescriptor(SApplication.class, keyProvider.getProfileIdKey()));
+        keys.put(ApplicationSearchDescriptor.LAYOUT_ID, new FieldDescriptor(SApplication.class, keyProvider.getLayoutIdKey()));
 
-        allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
+        allFields = new HashMap<>(1);
 
         final Set<String> pageFields = new HashSet<String>(5);
         pageFields.add(keyProvider.getTokenKey());

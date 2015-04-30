@@ -13,14 +13,10 @@
  **/
 package org.bonitasoft.engine.business.application.converter;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
-import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
-import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.ExportException;
 
 /**
@@ -40,14 +36,6 @@ public class ApplicationContainerConverter {
             container.addApplication(applicationNodeConverter.toNode(application));
         }
         return container;
-    }
-
-    public List<ImportResult> toSApplications(final ApplicationNodeContainer applicationContainer, final long createdBy) throws ExecutionException {
-        final List<ImportResult> applications = new ArrayList<ImportResult>();
-        for (final ApplicationNode applicationNode : applicationContainer.getApplications()) {
-            applications.add(applicationNodeConverter.toSApplication(applicationNode, createdBy));
-        }
-        return applications;
     }
 
 }

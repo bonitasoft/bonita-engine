@@ -23,7 +23,6 @@ import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -231,7 +230,7 @@ public class ApplicationPageIT extends TestWithCustomPage {
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "thirdPage");
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.TOKEN, "secondPage");
         final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
@@ -255,7 +254,7 @@ public class ApplicationPageIT extends TestWithCustomPage {
         final ApplicationPage appPage3 = getApplicationAPI().createApplicationPage(application1.getId(), getPage().getId(), "thirdPage");
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, application1.getId());
         final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
@@ -279,7 +278,7 @@ public class ApplicationPageIT extends TestWithCustomPage {
         final ApplicationPage appPage3 = getApplicationAPI().createApplicationPage(application.getId(), page2.getId(), "thirdPage");
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.PAGE_ID, page2.getId());
         final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
@@ -288,7 +287,9 @@ public class ApplicationPageIT extends TestWithCustomPage {
         assertThat(searchResult.getCount()).isEqualTo(2);
         assertThat(searchResult.getResult()).containsExactly(appPage2, appPage3);
 
+        //clean
         getApplicationAPI().deleteApplication(application.getId());
+        getPageAPI().deletePage(page2.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
@@ -302,7 +303,7 @@ public class ApplicationPageIT extends TestWithCustomPage {
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "thirdPage");
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.ID, appPage2.getId());
         final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
@@ -315,15 +316,7 @@ public class ApplicationPageIT extends TestWithCustomPage {
     }
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
-        final SearchOptions options = builder.done();
-        return options;
-    }
-
-    private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationPageSearchDescriptor.TOKEN, Order.ASC);
-        return builder;
+        return getAppSearchBuilderOrderByToken(startIndex, maxResults).done();
     }
 
     @Test
@@ -354,12 +347,18 @@ public class ApplicationPageIT extends TestWithCustomPage {
         List<String> allPagesForProfile2 = getApplicationAPI().getAllPagesForProfile(profile2.getId());
 
         //then
-        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_page1", "custompage_page2", "custompage_page3"));
-        assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_page4"));
+        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_layout", "custompage_page1", "custompage_page2", "custompage_page3"));
+        assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_layout", "custompage_page4"));
 
+        //clean
         getApplicationAPI().deleteApplication(app1.getId());
         getApplicationAPI().deleteApplication(app2.getId());
         getApplicationAPI().deleteApplication(app3.getId());
+        getPageAPI().deletePage(page1.getId());
+        getPageAPI().deletePage(page2.getId());
+        getPageAPI().deletePage(page3.getId());
+        getPageAPI().deletePage(page4.getId());
+
     }
 
 }

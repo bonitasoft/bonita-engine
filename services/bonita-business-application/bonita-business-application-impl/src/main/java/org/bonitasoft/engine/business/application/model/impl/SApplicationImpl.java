@@ -16,10 +16,8 @@ package org.bonitasoft.engine.business.application.model.impl;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SApplicationImpl extends PersistentObjectId implements SApplication {
 
@@ -49,11 +47,14 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     private Long profileId;
 
+    private Long layoutId;
+
     public SApplicationImpl() {
         super();
     }
 
-    public SApplicationImpl(final String token, final String displayName, final String version, final long creationDate, final long createdBy, final String state) {
+    public SApplicationImpl(final String token, final String displayName, final String version, final long creationDate, final long createdBy,
+                            final String state, final Long layoutId) {
         super();
         this.token = token;
         this.displayName = displayName;
@@ -63,6 +64,7 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         this.createdBy = createdBy;
         updatedBy = createdBy;
         this.state = state;
+        this.layoutId = layoutId;
     }
 
     @Override
@@ -142,6 +144,11 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         return profileId;
     }
 
+    @Override
+    public Long getLayoutId() {
+        return layoutId;
+    }
+
     public void setProfileId(final Long profileId) {
         this.profileId = profileId;
     }
@@ -170,54 +177,16 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         this.displayName = displayName;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SApplicationImpl)) return false;
-        if (!super.equals(o)) return false;
-
-        SApplicationImpl that = (SApplicationImpl) o;
-
-        if (createdBy != that.createdBy) return false;
-        if (creationDate != that.creationDate) return false;
-        if (lastUpdateDate != that.lastUpdateDate) return false;
-        if (updatedBy != that.updatedBy) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (displayName != null ? !displayName.equals(that.displayName) : that.displayName != null) return false;
-        if (homePageId != null ? !homePageId.equals(that.homePageId) : that.homePageId != null) return false;
-        if (iconPath != null ? !iconPath.equals(that.iconPath) : that.iconPath != null) return false;
-        if (profileId != null ? !profileId.equals(that.profileId) : that.profileId != null) return false;
-        if (state != null ? !state.equals(that.state) : that.state != null) return false;
-        if (token != null ? !token.equals(that.token) : that.token != null) return false;
-        if (version != null ? !version.equals(that.version) : that.version != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (token != null ? token.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (iconPath != null ? iconPath.hashCode() : 0);
-        result = 31 * result + (int) (creationDate ^ (creationDate >>> 32));
-        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
-        result = 31 * result + (int) (lastUpdateDate ^ (lastUpdateDate >>> 32));
-        result = 31 * result + (int) (updatedBy ^ (updatedBy >>> 32));
-        result = 31 * result + (state != null ? state.hashCode() : 0);
-        result = 31 * result + (homePageId != null ? homePageId.hashCode() : 0);
-        result = 31 * result + (displayName != null ? displayName.hashCode() : 0);
-        result = 31 * result + (profileId != null ? profileId.hashCode() : 0);
-        return result;
+    public void setLayoutId(final Long layoutId) {
+        this.layoutId = layoutId;
     }
 
     @Override
     public String toString() {
         return "SApplicationImpl [token=" + token + ", description=" + description + ", version=" + version + ", iconPath=" + iconPath
                 + ", creationDate=" + creationDate + ", createdBy=" + createdBy + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy
-                + ", state=" + state + ", homePageId=" + homePageId + ", displayName=" + displayName + ", profileId=" + profileId + ", getId()=" + getId()
-                + ", getTenantId()=" + getTenantId() + "]";
+                + ", state=" + state + ", homePageId=" + homePageId + ", displayName=" + displayName + ", profileId=" + profileId + ", layoutId=" + layoutId
+                + ", getId()=" + getId() + ", getTenantId()=" + getTenantId() + "]";
     }
 
 }

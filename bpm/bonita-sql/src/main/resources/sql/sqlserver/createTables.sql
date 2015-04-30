@@ -598,6 +598,7 @@ CREATE TABLE business_app (
   state NVARCHAR(30) NOT NULL,
   homePageId NUMERIC(19, 0),
   profileId NUMERIC(19, 0),
+  layoutId NUMERIC(19, 0),
   displayName NVARCHAR(255) NOT NULL
 )
 GO

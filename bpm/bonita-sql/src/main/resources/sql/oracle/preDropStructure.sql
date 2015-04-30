@@ -22,7 +22,7 @@ ALTER TABLE business_app_page DROP CONSTRAINT fk_bus_app_id;
 ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id;
 ALTER TABLE business_app DROP CONSTRAINT fk_app_profileId;
 ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId;
-
+ALTER TABLE business_app DROP CONSTRAINT fk_app_layoutId;
 
 
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_ADocMap_tenId;

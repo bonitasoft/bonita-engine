@@ -110,7 +110,8 @@ ALTER TABLE business_app DROP CONSTRAINT fk_app_profileId
 GO
 ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId
 GO
-
+ALTER TABLE business_app DROP CONSTRAINT fk_app_layoutId
+GO
 
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------

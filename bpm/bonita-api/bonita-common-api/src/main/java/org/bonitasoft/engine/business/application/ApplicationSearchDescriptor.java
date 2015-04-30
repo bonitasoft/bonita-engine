@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.business.application;
 
+import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.search.SearchOptions;
 
 /**
@@ -88,4 +89,12 @@ public class ApplicationSearchDescriptor {
      */
     public static final String PROFILE_ID = "profileId";
 
+    /**
+     * Used to filter or order by the identifier of {@link Page} set as {@link Application} layout.
+     * 
+     * @since 7.0.0
+     * @see Page
+     * @see Application
+     */
+    public static final String LAYOUT_ID = "layoutId";
 }
