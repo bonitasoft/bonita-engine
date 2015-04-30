@@ -39,7 +39,7 @@ public class ContractStructureValidator {
 
     public void validate(final SContractDefinition contract, final Map<String, Serializable> inputs) throws ContractViolationException {
         final List<String> messages = new ArrayList<>();
-        Map<String, Serializable> inputsToValidate = inputs != null ? inputs : Collections.<String, Serializable>emptyMap();
+        final Map<String, Serializable> inputsToValidate = inputs != null ? inputs : Collections.<String, Serializable> emptyMap();
         messages.addAll(recursive(contract.getInputs(), inputsToValidate));
         if (!messages.isEmpty()) {
             throw new ContractViolationException("Error while validating expected inputs", messages);
@@ -47,7 +47,7 @@ public class ContractStructureValidator {
     }
 
     private List<String> recursive(final List<SInputDefinition> inputDefinitions,
-                                   final Map<String, Serializable> inputs) {
+            final Map<String, Serializable> inputs) {
 
         logInputsWhichAreNotInContract(DEBUG, inputDefinitions, inputs);
 
@@ -73,7 +73,7 @@ public class ContractStructureValidator {
     }
 
     private void validateComplexItem(final Map<String, Serializable> complexItem, final List<String> message, final SInputDefinition def,
-                                     final SInputDefinition complex) {
+            final SInputDefinition complex) {
         message.addAll(recursive(complex.getInputDefinitions(), complexItem));
     }
 
@@ -81,13 +81,15 @@ public class ContractStructureValidator {
         final String inputName = definition.getName();
         if (!inputs.containsKey(inputName)) {
             throw new InputValidationException("Expected input [" + inputName + "] is missing");
-        } else {
-            typeValidator.validate(definition, inputs.get(inputName));
         }
+        if (inputs.get(inputName) == null) {
+            throw new InputValidationException("Input [" + inputName + "] has a null value.");
+        }
+        typeValidator.validate(definition, inputs.get(inputName));
     }
 
     private void logInputsWhichAreNotInContract(final TechnicalLogSeverity severity, final List<SInputDefinition> simpleInputs,
-                                                final Map<String, Serializable> inputs) {
+            final Map<String, Serializable> inputs) {
         if (logger.isLoggable(ContractStructureValidator.class, severity)) {
             for (final String input : getInputsWhichAreNotInContract(simpleInputs, inputs)) {
                 logger.log(ContractStructureValidator.class, severity, "Unexpected input [" + input + "] provided");

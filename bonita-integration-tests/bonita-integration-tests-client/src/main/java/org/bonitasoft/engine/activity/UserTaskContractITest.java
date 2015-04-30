@@ -84,7 +84,7 @@ public class UserTaskContractITest extends CommonAPIIT {
     @Test
     public void shouldHandleContractInputsAtProcessLevel() throws Exception {
         //given
-        String numberOfDaysProcessContractData = "numberOfDaysProcessContractData";
+        final String numberOfDaysProcessContractData = "numberOfDaysProcessContractData";
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         // have a initial data value using process input, so that we ensure inputs are treated before data at process instantiation:
@@ -94,33 +94,33 @@ public class UserTaskContractITest extends CommonAPIIT {
         builder.addData("complexData", Map.class.getName(), new ExpressionBuilder().createContractInputExpression("complex", Map.class.getName()));
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME);
-        ContractDefinitionBuilder contract = builder.addContract();
-        contract.addInput(numberOfDaysProcessContractData, Type.INTEGER, null).addMandatoryConstraint(numberOfDaysProcessContractData);
+        final ContractDefinitionBuilder contract = builder.addContract();
+        contract.addInput(numberOfDaysProcessContractData, Type.INTEGER, null);
         contract.addInput("multipleText", Type.TEXT, "a multiple text", true);
-        contract.addInput("complex", "a complex input", Collections.<InputDefinition>singletonList(new InputDefinitionImpl("text", Type.TEXT, "text in complex")));
-
+        contract.addInput("complex", "a complex input",
+                Collections.<InputDefinition> singletonList(new InputDefinitionImpl("text", Type.TEXT, "text in complex")));
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
-        ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
         assertThat(processDeploymentInfo.getActivationState()).isEqualTo(ActivationState.ENABLED);
 
-        Map<String, Serializable> inputs = new HashMap<>(1);
-        int value = 14;
+        final Map<String, Serializable> inputs = new HashMap<>(1);
+        final int value = 14;
         inputs.put(numberOfDaysProcessContractData, value);
-        ArrayList<String> multiples = new ArrayList<>(Arrays.asList("String1", "String2"));
+        final ArrayList<String> multiples = new ArrayList<>(Arrays.asList("String1", "String2"));
         inputs.put("multipleText", multiples);
-        HashMap<Object, Object> map = new HashMap<>();
+        final HashMap<Object, Object> map = new HashMap<>();
         map.put("text", "textValue");
         inputs.put("complex", map);
-        ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), inputs);
+        final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), inputs);
         waitForUserTask(processInstance, TASK1);
-        DataInstance processDataValueInitializedFromInput = getProcessAPI().getProcessDataInstance("nbDaysProcessData", processInstance.getId());
+        final DataInstance processDataValueInitializedFromInput = getProcessAPI().getProcessDataInstance("nbDaysProcessData", processInstance.getId());
         assertThat(getProcessAPI().getProcessDataInstance("multipleTextData", processInstance.getId()).getValue()).isEqualTo(multiples);
         assertThat(getProcessAPI().getProcessDataInstance("complexData", processInstance.getId()).getValue()).isEqualTo(map);
         assertThat(processDataValueInitializedFromInput.getValue()).isEqualTo(value);
 
-        Serializable processInstanciationInputValue = getProcessAPI().getProcessInputValueAfterInitialization(processInstance.getId(),
+        final Serializable processInstanciationInputValue = getProcessAPI().getProcessInputValueAfterInitialization(processInstance.getId(),
                 numberOfDaysProcessContractData);
         assertThat(processInstanciationInputValue).isEqualTo(value);
 
@@ -134,7 +134,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME).addContract().addInput("numberOfDays", Type.INTEGER, null)
-                .addMandatoryConstraint("numberOfDays").addConstraint("Mystical constraint", "true", null, "numberOfDays");
+                .addConstraint("Mystical constraint", "true", null, "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -196,7 +196,7 @@ public class UserTaskContractITest extends CommonAPIIT {
 
     @Test
     public void should_create_a_contract_with_special_char() throws Exception {
-        final long[] badValues = {0, 366};
+        final long[] badValues = { 0, 366 };
         for (final long badValue : badValues) {
             check_invalid_contract_with_special_char(badValue);
         }
@@ -293,10 +293,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         userTaskDefinitionBuilder.addContract()
                 .addInput("expenseReport", "expense report with several expense lines", true,
-                        Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof))
-                .addMandatoryConstraint("expenseAmount")
-                .addMandatoryConstraint("expenseReport")
-                .addMandatoryConstraint("expenseDate");
+                        Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof));
 
         final List<Map<String, Object>> expenses = new ArrayList<Map<String, Object>>();
         userTaskDefinitionBuilder.addData("expenseData", expenses.getClass().getName(), null);
@@ -314,7 +311,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final List<Map<String, Serializable>> expenseReport = new ArrayList<>();
         expenseReport.add(createExpenseLine("hotel", 150.3f, new Date(System.currentTimeMillis()), null));
         expenseReport.add(createExpenseLine("taxi", 25, new Date(System.currentTimeMillis()), new byte[0]));
-        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[]{0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}));
+        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 }));
 
         final Map<String, Serializable> taskInput = new HashMap<>();
         taskInput.put("expenseReport", (Serializable) expenseReport);
@@ -395,8 +392,6 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
-        userTaskBuilder.addContract().addInput("numberOfDays", Type.INTEGER, null)
-                .addMandatoryConstraint("numberOfDays");
         userTaskBuilder.addData("result", BigDecimal.class.getName(), null);
         userTaskBuilder.addOperation(new OperationBuilder().createSetDataOperation("result",
                 new ExpressionBuilder().createContractInputExpression("numberOfDays", Long.class.getName())));

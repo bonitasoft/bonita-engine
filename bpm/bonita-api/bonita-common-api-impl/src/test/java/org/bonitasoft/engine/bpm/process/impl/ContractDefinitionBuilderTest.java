@@ -16,13 +16,8 @@ package org.bonitasoft.engine.bpm.process.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
-import org.bonitasoft.engine.bpm.contract.ConstraintType;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
@@ -33,7 +28,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mvel2.MVEL;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ContractDefinitionBuilderTest {
@@ -69,7 +63,7 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addContractOnProcess() throws Exception {
         //when
-        ProcessDefinitionBuilder myProcess = new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0");
+        final ProcessDefinitionBuilder myProcess = new ProcessDefinitionBuilder().createNewInstance("myProcess", "1.0");
         myProcess.addContract();
 
         //then
@@ -159,63 +153,6 @@ public class ContractDefinitionBuilderTest {
         //then
         assertThat(activity.getContract().getConstraints()).hasSize(1);
         checkBuilder(builder);
-
-    }
-
-    @Test
-    public void addMandatoryConstraintTest() throws Exception {
-        //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addMandatoryConstraint("inputName");
-
-        //then
-        assertThat(activity.getContract().getConstraints()).hasSize(1);
-        final ConstraintDefinition definition = activity.getContract().getConstraints().get(0);
-        assertThat(definition.getInputNames()).containsExactly("inputName");
-        assertThat(definition.getExplanation()).as("bad explanation").isEqualTo("input inputName is mandatory");
-        assertThat(definition.getConstraintType()).as("constraint should be a MANDATORY one").isEqualTo(ConstraintType.MANDATORY);
-
-        checkBuilder(builder);
-    }
-
-    @Test
-    public void addMandatoryConstraint_should_fail() throws Exception {
-        //given
-        final List<Object> failingValues = new ArrayList<Object>();
-        failingValues.add(null);
-        failingValues.add("");
-
-        //when then
-        checkConstraintShouldGiveExpectedResult(failingValues, false);
-    }
-
-    @Test
-    public void addMandatoryConstraint_should_success() throws Exception {
-        //given
-        final List<Object> successValues = new ArrayList<Object>();
-        successValues.add("not null value");
-        successValues.add(0);
-        successValues.add(new Date());
-
-        //when then
-        checkConstraintShouldGiveExpectedResult(successValues, true);
-    }
-
-    private void checkConstraintShouldGiveExpectedResult(final List<Object> values, final Boolean expectedResult) {
-        for (final Object failingValue : values) {
-            final Map<String, Object> variables = new HashMap<String, Object>();
-            variables.put("inputName", failingValue);
-
-            //when
-            contractDefinitionBuilder.addMandatoryConstraint("inputName");
-
-            //then
-            checkConstraintGivesExpectedResult(variables, expectedResult);
-        }
-    }
-
-    private void checkConstraintGivesExpectedResult(final Map<String, Object> variables, final Boolean expectedResult) {
-        final Boolean result = MVEL.evalToBoolean(activity.getContract().getConstraints().get(0).getExpression(), variables);
-        assertThat(result).as("mandatory rule failure with value:" + variables.toString()).isEqualTo(expectedResult);
     }
 
     private void checkBuilder(final ContractDefinitionBuilder builder) {

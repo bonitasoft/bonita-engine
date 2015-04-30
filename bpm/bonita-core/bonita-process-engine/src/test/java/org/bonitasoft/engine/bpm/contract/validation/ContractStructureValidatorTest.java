@@ -13,15 +13,22 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.*;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.SComplexInputDefinitionBuilder.*;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.*;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.*;
-import static org.bonitasoft.engine.core.process.definition.model.SType.*;
-import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.fail;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.aMap;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.contractInputMap;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.SComplexInputDefinitionBuilder.aComplexInput;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.aContract;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.aSimpleInput;
+import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
+import static org.bonitasoft.engine.core.process.definition.model.SType.INTEGER;
+import static org.bonitasoft.engine.core.process.definition.model.SType.TEXT;
+import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -206,10 +213,7 @@ public class ContractStructureValidatorTest {
     }
 
     @Test
-    public void validate_should_handle_null_inputs_as_empty_map() throws Exception {
-
-        validator.validate(aContract().build(), null);
-
+    public void validate_should_handle_null_inputs_map_argument_as_empty_map() throws Exception {
         final SContractDefinition contract = aContract()
                 .withInput(aSimpleInput(INTEGER).withName("anInteger"))
                 .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
@@ -223,4 +227,29 @@ public class ContractStructureValidatorTest {
             assertThat(e.getExplanations()).containsOnly("Expected input [anInteger] is missing", "Expected input [complex] is missing");
         }
     }
+
+    @Test
+    public void should_throw_a_ContractViolationException_for_present_simple_input_with_null_value() throws Exception {
+        final SContractDefinition contract = aContract().withInput(aSimpleInput(TEXT).withName("firstName")).build();
+
+        try {
+            validator.validate(contract, contractInputMap(entry("firstName", null)));
+            fail("ContractViolationException expected but not thrown.");
+        } catch (final ContractViolationException e) {
+            assertThat(e.getExplanations()).containsOnly("Input [firstName] has a null value.");
+        }
+    }
+
+    @Test
+    public void should_throw_a_ContractViolationException_for_present_complex_input_with_null_value() throws Exception {
+        final SContractDefinition contract = aContract().withInput(aComplexInput().withName("employee")).build();
+
+        try {
+            validator.validate(contract, contractInputMap(entry("employee", null)));
+            fail("ContractViolationException expected but not thrown.");
+        } catch (final ContractViolationException e) {
+            assertThat(e.getExplanations()).containsOnly("Input [employee] has a null value.");
+        }
+    }
+
 }

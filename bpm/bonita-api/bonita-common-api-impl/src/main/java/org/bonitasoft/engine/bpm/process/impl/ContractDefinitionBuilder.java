@@ -19,9 +19,9 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.contract.ConstraintType;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
@@ -82,19 +82,6 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
             constraintDefinition.addInputName(inputName);
         }
         contract.addConstraint(constraintDefinition);
-        return this;
-    }
-
-    public ContractDefinitionBuilder addMandatoryConstraint(final String inputName) {
-        final StringBuilder expression = new StringBuilder().append(inputName).append("!=null");
-        expression.append(" && !");
-        expression.append(inputName);
-        expression.append(".toString().isEmpty()");
-
-        final ConstraintDefinitionImpl constraint = new ConstraintDefinitionImpl(inputName, expression.toString(), new StringBuilder().append("input ")
-                .append(inputName).append(" is mandatory").toString(), ConstraintType.MANDATORY);
-        constraint.addInputName(inputName);
-        contract.addConstraint(constraint);
         return this;
     }
 }
