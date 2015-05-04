@@ -15,6 +15,7 @@ package org.bonitasoft.engine.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -40,6 +41,7 @@ import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
@@ -285,7 +287,8 @@ public class UserTaskContractITest extends CommonAPIIT {
         final InputDefinition expenseAmount = new InputDefinitionImpl("expenseAmount", Type.DECIMAL, "expense amount");
         final InputDefinition expenseDate = new InputDefinitionImpl("expenseDate", Type.DATE, "expense date");
         final InputDefinition expenseProof = new InputDefinitionImpl("expenseProof", Type.BYTE_ARRAY, "expense proof");
-
+        builder.addDocumentDefinition("reportAsDoc");
+        builder.addDocumentListDefinition("receiptsAsDoc");
         //given
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         userTaskDefinitionBuilder.addContract()
@@ -303,10 +306,14 @@ public class UserTaskContractITest extends CommonAPIIT {
                 new ExpressionBuilder().createContractInputExpression("report", FileInputValue.class.getName())));
         userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDataOperation("receiptsData",
                 new ExpressionBuilder().createContractInputExpression("receipts", List.class.getName())));
+        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocument("reportAsDoc",
+                new ExpressionBuilder().createContractInputExpression("report", FileInputValue.class.getName())));
+        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("receiptsAsDoc",
+                new ExpressionBuilder().createContractInputExpression("receipts", List.class.getName())));
         builder.addUserTask(TASK2, ACTOR_NAME).addTransition(TASK1, TASK2);
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
-        getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         //when
         final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
@@ -333,6 +340,15 @@ public class UserTaskContractITest extends CommonAPIIT {
         final Serializable reportData = getProcessAPI().getArchivedActivityDataInstance("reportData", userTask.getId()).getValue();
         assertThat(reportData).as("should have single file").isEqualTo(reportFile);
         assertThat((List<Object>) getProcessAPI().getArchivedActivityDataInstance("receiptsData", userTask.getId()).getValue()).as("should have multiple file").containsExactly(receipt1, receipt2);
+        final List<Document> receiptsAsDoc = getProcessAPI().getDocumentList(processInstance.getId(), "receiptsAsDoc", 0, 100);
+        Document reportAsDoc = getProcessAPI().getLastDocument(processInstance.getId(), "reportAsDoc");
+
+        assertThat(reportAsDoc.getContentFileName()).as("document file name").isEqualTo("report.pdf");
+        assertThat(getProcessAPI().getDocumentContent(reportAsDoc.getContentStorageId())).as("document content").isEqualTo(new byte[]{0, 1, 2, 3});
+        assertThat(receiptsAsDoc).hasSize(2);
+        assertThat(receiptsAsDoc).extracting("contentFileName", "index").containsExactly(tuple("receipt1.pdf", 0), tuple("receipt2.pdf", 1));
+        assertThat(getProcessAPI().getDocumentContent(receiptsAsDoc.get(0).getContentStorageId())).as("document content").isEqualTo(new byte[]{0, 1, 2, 4});
+        assertThat(getProcessAPI().getDocumentContent(receiptsAsDoc.get(1).getContentStorageId())).as("document content").isEqualTo(new byte[]{0, 1, 2, 5});
 
         //clean up
         disableAndDeleteProcess(processDefinition);

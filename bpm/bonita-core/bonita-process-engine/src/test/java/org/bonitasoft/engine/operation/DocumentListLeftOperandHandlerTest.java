@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
@@ -146,10 +147,11 @@ public class DocumentListLeftOperandHandlerTest {
     }
 
     @Test
-    public void should_toCheckedList_returns_the_list_if_ok() throws Exception {
-        final List<DocumentValue> inputList = Arrays.asList(new DocumentValue("theUrl"));
+    public void should_toCheckedList_returns_the_list_if_contains_FileInputValue() throws Exception {
+        final List<FileInputValue> inputList = Collections.singletonList(new FileInputValue("report.pdf", "The report content".getBytes()));
         final List<DocumentValue> result = handler.toCheckedList(inputList);
-        assertThat(result).isEqualTo(inputList);
+        assertThat(result.get(0).getContent()).isEqualTo("The report content".getBytes());
+        assertThat(result.get(0).getFileName()).isEqualTo("report.pdf");
     }
 
 }
