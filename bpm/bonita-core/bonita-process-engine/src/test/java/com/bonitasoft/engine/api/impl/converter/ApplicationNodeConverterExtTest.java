@@ -42,8 +42,7 @@ public class ApplicationNodeConverterExtTest {
 
     @Before
     public void setUp() throws Exception {
-
-
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
     }
 
     @Test

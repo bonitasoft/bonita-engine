@@ -15,19 +15,20 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Map;
 
+import com.bonitasoft.engine.business.application.ApplicationCreatorExt;
 import com.bonitasoft.engine.business.application.ApplicationUpdaterExt;
+import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import com.bonitasoft.engine.business.application.ApplicationCreatorExt;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationModelConverterExtTest {
@@ -42,6 +43,14 @@ public class ApplicationModelConverterExtTest {
 
     @InjectMocks
     private ApplicationModelConverterExt converter;
+
+    @Mock
+    private SPage defaultTheme;
+
+    @Before
+    public void setUp() throws Exception {
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
+    }
 
     @Test
     public void toSApplication_should_create_application_with_specified_layout() throws Exception {
