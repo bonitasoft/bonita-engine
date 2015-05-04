@@ -64,7 +64,6 @@ public class ContractStructureValidatorTest {
     public void setUp() {
         when(logger.isLoggable(ContractStructureValidator.class, DEBUG)).thenReturn(true);
         doReturn(true).when(typeValidator).validate(any(SInputDefinition.class), anyObject(), any(ErrorReporter.class));
-
     }
 
     @Test
