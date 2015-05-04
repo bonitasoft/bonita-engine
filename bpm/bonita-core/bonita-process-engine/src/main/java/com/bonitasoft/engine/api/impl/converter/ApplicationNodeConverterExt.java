@@ -35,8 +35,8 @@ public class ApplicationNodeConverterExt extends ApplicationNodeConverter {
     }
 
     @Override
-    protected Long handleMissingLayout(final ApplicationNode applicationNode, final ImportStatus importStatus) throws ImportException {
-        importStatus.addError(new ImportError(applicationNode.getLayout(), ImportError.Type.PAGE));
+    protected Long handleMissingPage(final String pageName, final String applicationToken, final ImportStatus importStatus) throws ImportException {
+        importStatus.addError(new ImportError(pageName, ImportError.Type.PAGE));
         return null;
     }
 }
