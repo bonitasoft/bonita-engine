@@ -40,9 +40,13 @@ public class ApplicationNodeConverterExtTest {
     @Mock
     private SPage defaultTheme;
 
+    @Mock
+    private SPage defaultLayout;
+
     @Before
     public void setUp() throws Exception {
         given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(defaultLayout);
     }
 
     @Test
@@ -54,8 +58,7 @@ public class ApplicationNodeConverterExtTest {
         node.setLayout(layoutName);
 
         long layoutId = 15L;
-        SPage layout = mock(SPage.class);
-        given(layout.getId()).willReturn(layoutId);
+        SPage layout = buildMockPage(layoutId);
         given(pageService.getPageByName(layoutName)).willReturn(layout);
 
         //when
@@ -74,6 +77,12 @@ public class ApplicationNodeConverterExtTest {
         assertThat(importStatus.getErrors()).isEmpty();
     }
 
+    private SPage buildMockPage(final long layoutId) {
+        SPage layout = mock(SPage.class);
+        given(layout.getId()).willReturn(layoutId);
+        return layout;
+    }
+
     @Test
     public void toSApplication_should_use_default_layout_when_layout_is_not_defined_in_ApplicationNode() throws Exception {
         //given
@@ -81,8 +90,7 @@ public class ApplicationNodeConverterExtTest {
         node.setToken("app");
 
         long layoutId = 15L;
-        SPage layout = mock(SPage.class);
-        given(layout.getId()).willReturn(layoutId);
+        SPage layout = buildMockPage(layoutId);
         given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(layout);
 
         //when

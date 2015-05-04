@@ -46,11 +46,12 @@ public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business
         Profile userProfile = getProfileUser();
 
         Page layout = createPage("custompage_mainLayout");
+        Page theme = createPage("custompage_mainTheme");
 
         final byte[] applicationsByteArray = IOUtils.toByteArray(this.getClass().getResourceAsStream("applications_with_layout.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
 
-        final ApplicationCreatorExt hrCreator = new ApplicationCreatorExt("HR-dashboard", "My HR dashboard", "2.0", layout.getId());
+        final ApplicationCreatorExt hrCreator = new ApplicationCreatorExt("HR-dashboard", "My HR dashboard", "2.0", layout.getId(), theme.getId());
         hrCreator.setDescription("This is the HR dashboard.");
         hrCreator.setIconPath("/icon.jpg");
         hrCreator.setProfileId(userProfile.getId());
@@ -87,6 +88,7 @@ public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business
         getApplicationAPI().deleteApplication(hr.getId());
         getPageAPI().deletePage(myPage.getId());
         getPageAPI().deletePage(layout.getId());
+        getPageAPI().deletePage(theme.getId());
     }
 
     @Ignore

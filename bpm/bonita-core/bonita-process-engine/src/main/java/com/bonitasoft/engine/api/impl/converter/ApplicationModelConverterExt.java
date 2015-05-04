@@ -30,9 +30,18 @@ public class ApplicationModelConverterExt extends ApplicationModelConverter {
     protected Long getLayoutId(final ApplicationCreator creator) throws CreationException {
         Long layoutId = (Long) creator.getFields().get(ApplicationField.LAYOUT_ID);
         if (layoutId == null) {
-            return super.getLayoutId(creator);
+            layoutId = super.getLayoutId(creator);
         }
         return layoutId;
+    }
+
+    @Override
+    protected Long getThemeId(final ApplicationCreator creator) throws CreationException {
+        Long themeId = (Long) creator.getFields().get(ApplicationField.THEME_ID);
+        if (themeId == null) {
+            themeId = super.getThemeId(creator);
+        }
+        return themeId;
     }
 
     @Override
