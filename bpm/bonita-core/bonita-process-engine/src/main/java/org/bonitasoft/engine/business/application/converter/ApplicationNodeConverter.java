@@ -135,8 +135,10 @@ public class ApplicationNodeConverter {
     public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) throws SBonitaReadException, ImportException {
         final ImportStatus importStatus = new ImportStatus(applicationNode.getToken());
 
+        Long layoutId = getPageId(getLayoutName(applicationNode), applicationNode.getToken(), importStatus);
+        Long themeId = getPageId(getThemeName(applicationNode), applicationNode.getToken(), importStatus);
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
-                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, getLayoutId(applicationNode, importStatus), null);
+                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, layoutId, themeId);
         builder.setIconPath(applicationNode.getIconPath());
         builder.setDescription(applicationNode.getDescription());
         builder.setState(applicationNode.getState());
@@ -150,21 +152,25 @@ public class ApplicationNodeConverter {
         return new ImportResult(application, importStatus);
     }
 
-    private Long getLayoutId(final ApplicationNode applicationNode, final ImportStatus importStatus) throws SBonitaReadException, ImportException {
-        SPage layout = pageService.getPageByName(getLayoutName(applicationNode));
+    private Long getPageId(final String pageName, final String applicationToken, final ImportStatus importStatus) throws SBonitaReadException, ImportException {
+        SPage layout = pageService.getPageByName(pageName);
         if (layout == null) {
-            return handleMissingLayout(applicationNode, importStatus);
+            return handleMissingPage(pageName, applicationToken, importStatus);
         }
         return layout.getId();
     }
 
-    protected Long handleMissingLayout(final ApplicationNode applicationNode, final ImportStatus importStatus) throws ImportException {
-        throw new ImportException(String.format("Unable to import application with token '%s' because the default layout '%s' was not found.",
-                applicationNode.getToken(), getLayoutName(applicationNode)));
+    protected Long handleMissingPage(final String pageName, final String applicationToken, final ImportStatus importStatus) throws ImportException {
+        throw new ImportException(String.format("Unable to import application with token '%s' because the page '%s' was not found.",
+                applicationToken, pageName));
     }
 
     protected String getLayoutName(final ApplicationNode applicationNode) {
         return ApplicationService.DEFAULT_LAYOUT_NAME;
+    }
+
+    protected String getThemeName(final ApplicationNode applicationNode) {
+        return ApplicationService.DEFAULT_THEME_NAME;
     }
 
     private ImportError setProfile(final ApplicationNode applicationNode, final SApplicationBuilder builder) {

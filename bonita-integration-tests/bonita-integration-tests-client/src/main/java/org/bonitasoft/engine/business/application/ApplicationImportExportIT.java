@@ -36,6 +36,7 @@ import org.junit.Test;
 public class ApplicationImportExportIT extends TestWithApplication {
 
     public static final String DEFAULT_LAYOUT_NAME = "custompage_layout";
+    public static final String DEFAULT_THEME_NAME = "custompage_theme";
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
         return getAppSearchBuilderOrderById(startIndex, maxResults).done();
@@ -98,6 +99,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used", IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
         final Page defaultLayout = getPageAPI().getPageByName(DEFAULT_LAYOUT_NAME);
+        final Page defaultTheme = getPageAPI().getPageByName(DEFAULT_THEME_NAME);
 
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationIT.class.getResourceAsStream("applications.xml"));
 
@@ -113,7 +115,7 @@ public class ApplicationImportExportIT extends TestWithApplication {
         final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
         Application hrApp = searchResult.getResult().get(0);
-        assertIsHRApplication(profile, defaultLayout, hrApp);
+        assertIsHRApplication(profile, defaultLayout, defaultTheme, hrApp);
         assertIsMarketingApplication(searchResult.getResult().get(1));
 
         //check pages were created

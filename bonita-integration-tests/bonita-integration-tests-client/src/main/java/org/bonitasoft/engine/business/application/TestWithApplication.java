@@ -144,7 +144,7 @@ public class TestWithApplication extends CommonAPIIT {
         assertThat(app.getProfileId()).isNull();
     }
 
-    protected void assertIsHRApplication(final Profile profile, final Page layout, final Application app) {
+    protected void assertIsHRApplication(final Profile profile, final Page layout, final Page theme, final Application app) {
         assertThat(app.getToken()).isEqualTo("HR-dashboard");
         assertThat(app.getVersion()).isEqualTo("2.0");
         assertThat(app.getDisplayName()).isEqualTo("My HR dashboard");
@@ -153,6 +153,7 @@ public class TestWithApplication extends CommonAPIIT {
         assertThat(app.getState()).isEqualTo("ACTIVATED");
         assertThat(app.getProfileId()).isEqualTo(profile.getId());
         assertThat(app.getLayoutId()).isEqualTo(layout.getId());
+        assertThat(app.getThemeId()).isEqualTo(theme.getId());
     }
 
     protected void assertIsMyNewCustomPage(final Page myPage, final Application hrApp, final ApplicationPage applicationPage) {

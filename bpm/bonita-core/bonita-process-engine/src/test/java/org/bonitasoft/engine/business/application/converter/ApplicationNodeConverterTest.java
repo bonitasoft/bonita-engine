@@ -77,7 +77,12 @@ public class ApplicationNodeConverterTest {
     @Mock
     private SPage defaultLayout;
 
+    @Mock
+    private SPage defaultTheme;
+
     public static final long DEFAULT_LAYOUT_ID = 101;
+
+    public static final long DEFAULT_THEME_ID = 102;
 
     @InjectMocks
     private ApplicationNodeConverter converter;
@@ -87,6 +92,10 @@ public class ApplicationNodeConverterTest {
         given(defaultLayout.getId()).willReturn(DEFAULT_LAYOUT_ID);
         given(defaultLayout.getName()).willReturn(ApplicationService.DEFAULT_LAYOUT_NAME);
         given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(defaultLayout);
+
+        given(defaultTheme.getId()).willReturn(DEFAULT_THEME_ID);
+        given(defaultTheme.getName()).willReturn(ApplicationService.DEFAULT_THEME_NAME);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
     }
 
     @Test
@@ -344,6 +353,32 @@ public class ApplicationNodeConverterTest {
     }
 
     @Test
+    public void toSApplication_should_always_use_default_theme() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        node.setToken("app");
+        node.setTheme("dummyTheme"); // will not be used, the theme will be always the default one
+
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
+
+        //when
+        long createdBy = 1L;
+        final ImportResult importResult = converter.toSApplication(node, createdBy);
+
+        //then
+        assertThat(importResult).isNotNull();
+
+        final SApplication application = importResult.getApplication();
+        assertThat(application.getThemeId()).isEqualTo(DEFAULT_THEME_ID);
+
+        final ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).isEmpty();
+
+    }
+
+    @Test
     public void toSApplication_should_return_application_with_null_profile_id_when_node_has_no_profile() throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
@@ -389,6 +424,22 @@ public class ApplicationNodeConverterTest {
         node.setState("ENABLED");
 
         given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(null);
+
+        //when
+        converter.toSApplication(node, 1L);
+
+        //then exception
+    }
+
+    @Test(expected = ImportException.class)
+    public void toSApplication_should_throw_ImportException_when_theme_is_not_found() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        node.setVersion("1.0");
+        node.setToken("app");
+        node.setState("ENABLED");
+
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(null);
 
         //when
         converter.toSApplication(node, 1L);
