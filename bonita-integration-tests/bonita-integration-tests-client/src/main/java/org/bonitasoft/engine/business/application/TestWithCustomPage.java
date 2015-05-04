@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.business.application;
 
 import org.bonitasoft.engine.page.Page;
+import org.bonitasoft.engine.page.PageCreator;
 import org.junit.After;
 import org.junit.Before;
 
