@@ -1149,6 +1149,7 @@ public class XMLProcessDefinition {
         expressionNode.addAttribute(NAME, expression.getName());
         expressionNode.addAttribute(EXPRESSION_RETURN_TYPE, expression.getReturnType());
         expressionNode.addAttribute(EXPRESSION_INTERPRETER, expression.getInterpreter());
+        expressionNode.addAttribute(ID, String.valueOf(expression.getId()));
         expressionNode.addChild(EXPRESSION_CONTENT, expression.getContent());
         for (final Expression dependency : expression.getDependencies()) {
             final XMLNode dependencyExpression = new XMLNode(EXPRESSION_NODE);

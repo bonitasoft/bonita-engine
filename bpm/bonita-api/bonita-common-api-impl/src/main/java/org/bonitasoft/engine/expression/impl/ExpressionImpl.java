@@ -15,14 +15,16 @@ package org.bonitasoft.engine.expression.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
+import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Feng Hui
  * @author Matthieu Chaffotte
  */
-public class ExpressionImpl implements Expression {
+public class ExpressionImpl extends BaseElementImpl implements Expression {
 
     private static final long serialVersionUID = 1663953453575781859L;
 
@@ -37,6 +39,14 @@ public class ExpressionImpl implements Expression {
     private String interpreter;
 
     private List<Expression> dependencies = Collections.emptyList();
+
+    public ExpressionImpl() {
+        this(Math.abs(UUID.randomUUID().getMostSignificantBits()));
+    }
+
+    public ExpressionImpl(long id) {
+        setId(id);
+    }
 
     @Override
     public String getName() {
@@ -116,73 +126,39 @@ public class ExpressionImpl implements Expression {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (content == null ? 0 : content.hashCode());
-        result = prime * result + (dependencies == null ? 0 : dependencies.hashCode());
-        result = prime * result + (expressionType == null ? 0 : expressionType.hashCode());
-        result = prime * result + (interpreter == null ? 0 : interpreter.hashCode());
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (returnType == null ? 0 : returnType.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ExpressionImpl))
+            return false;
+        if (!super.equals(o))
+            return false;
+
+        ExpressionImpl that = (ExpressionImpl) o;
+
+        if (name != null ? !name.equals(that.name) : that.name != null)
+            return false;
+        if (content != null ? !content.equals(that.content) : that.content != null)
+            return false;
+        if (expressionType != null ? !expressionType.equals(that.expressionType) : that.expressionType != null)
+            return false;
+        if (returnType != null ? !returnType.equals(that.returnType) : that.returnType != null)
+            return false;
+        if (interpreter != null ? !interpreter.equals(that.interpreter) : that.interpreter != null)
+            return false;
+        return !(dependencies != null ? !dependencies.equals(that.dependencies) : that.dependencies != null);
+
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ExpressionImpl other = (ExpressionImpl) obj;
-        if (content == null) {
-            if (other.content != null) {
-                return false;
-            }
-        } else if (!content.equals(other.content)) {
-            return false;
-        }
-        if (dependencies == null) {
-            if (other.dependencies != null) {
-                return false;
-            }
-        } else if (!dependencies.equals(other.dependencies)) {
-            return false;
-        }
-        if (expressionType == null) {
-            if (other.expressionType != null) {
-                return false;
-            }
-        } else if (!expressionType.equals(other.expressionType)) {
-            return false;
-        }
-        if (interpreter == null) {
-            if (other.interpreter != null) {
-                return false;
-            }
-        } else if (!interpreter.equals(other.interpreter)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (returnType == null) {
-            if (other.returnType != null) {
-                return false;
-            }
-        } else if (!returnType.equals(other.returnType)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (content != null ? content.hashCode() : 0);
+        result = 31 * result + (expressionType != null ? expressionType.hashCode() : 0);
+        result = 31 * result + (returnType != null ? returnType.hashCode() : 0);
+        result = 31 * result + (interpreter != null ? interpreter.hashCode() : 0);
+        result = 31 * result + (dependencies != null ? dependencies.hashCode() : 0);
+        return result;
     }
-
 }

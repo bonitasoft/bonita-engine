@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.xml.bind.ValidationException;
 
 import org.apache.commons.codec.binary.Base64;
@@ -95,7 +96,7 @@ import org.bonitasoft.engine.bpm.bar.xml.TransitionDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.UserFilterDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.UserTaskDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
+import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.io.IOUtil;
@@ -292,7 +293,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     }
 
     protected String generateInfosFromDefinition(final DesignProcessDefinition processDefinition) {
-        final FlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+        final FlowElementContainerDefinition processContainer = processDefinition.getFlowElementContainer();
         return new StringBuilder("key1:").append(processDefinition.getActorsList().size()).append(",key2:").append(processContainer.getTransitions().size())
                 .append(",key3:").append(processContainer.getActivities().size()).toString();
     }
