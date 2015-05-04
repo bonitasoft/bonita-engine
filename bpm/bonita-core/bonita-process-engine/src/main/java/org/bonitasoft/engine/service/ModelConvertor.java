@@ -2162,7 +2162,7 @@ public class ModelConvertor {
 
     public static ContractDefinition toContract(final SContractDefinition sContract) {
         final ContractDefinitionImpl contract = new ContractDefinitionImpl();
-        for (final SInputDefinition input : sContract.getInputs()) {
+        for (final SInputDefinition input : sContract.getInputDefinitions()) {
             contract.addInput(toInput(input));
         }
         for (final SConstraintDefinition sConstraintDefinition : sContract.getConstraints()) {

@@ -21,7 +21,7 @@ import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 public class ConstraintsDefinitionHelper {
 
     protected SInputDefinition getInputDefinition(final SContractDefinition contract, final String inputName) {
-        final List<SInputDefinition> inputs = contract.getInputs();
+        final List<SInputDefinition> inputs = contract.getInputDefinitions();
         return getInputDefinition(inputName, inputs);
 
     }

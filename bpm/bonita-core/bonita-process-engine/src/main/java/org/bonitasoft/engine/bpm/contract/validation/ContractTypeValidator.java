@@ -26,18 +26,20 @@ import org.bonitasoft.engine.core.process.definition.model.SType;
  */
 public class ContractTypeValidator {
 
-    public void validate(final SInputDefinition definition, final Object object) throws InputValidationException {
+    public boolean validate(final SInputDefinition definition, final Object object, ErrorReporter errorReporter) {
 
         if (definition.hasChildren()) {
-            if (!isValidForComplexType(definition, object)) {
-                throw new InputValidationException(object + " cannot be assigned to COMPLEX type");
+            if (!isValidForComplexType(definition, object, errorReporter)) {
+                errorReporter.addError(object + " cannot be assigned to COMPLEX type");
+                return false;
             }
         } else {
             if (!isValidForSimpleType(definition, object)) {
-                throw new InputValidationException(object + " cannot be assigned to " + definition.getType());
+                errorReporter.addError(object + " cannot be assigned to " + definition.getType());
+                return false;
             }
-
         }
+        return true;
     }
 
     private boolean isValidForSimpleType(final SInputDefinition definition, final Object object) {
@@ -62,33 +64,33 @@ public class ContractTypeValidator {
         return true;
     }
 
-    private boolean isValidForComplexType(final SInputDefinition definition, final Object object) throws InputValidationException {
+    private boolean isValidForComplexType(final SInputDefinition definition, final Object object, ErrorReporter errorReporter) {
         if (definition.isMultiple()) {
-            return isValidForMultipleComplexType(definition, object);
+            return isValidForMultipleComplexType(definition, object, errorReporter);
         } else {
-            return isValidForSimpleComplexType(definition, object);
+            return isValidForSimpleComplexType(definition, object, errorReporter);
 
         }
     }
 
     @SuppressWarnings("unchecked")
-    private boolean isValidForMultipleComplexType(final SInputDefinition definition, final Object object) throws InputValidationException {
+    private boolean isValidForMultipleComplexType(final SInputDefinition definition, final Object object, ErrorReporter errorReporter) {
         if (!(object instanceof List<?>)) {
             return false;
         }
         for (final Object item : (List<Object>) object) {
             //throws exception if invalid
-            isValidForSimpleComplexType(definition, item);
+            isValidForSimpleComplexType(definition, item, errorReporter);
         }
         return true;
     }
 
-    private boolean isValidForSimpleComplexType(final SInputDefinition definition, final Object object) throws InputValidationException {
+    private boolean isValidForSimpleComplexType(final SInputDefinition definition, final Object object, ErrorReporter errorReporter) {
         try {
             @SuppressWarnings("unchecked")
             final Map<String, Object> map = (Map<String, Object>) object;
             for (final SInputDefinition sInputDefinition : definition.getInputDefinitions()) {
-                validate(sInputDefinition, map.get(sInputDefinition.getName()));
+                validate(sInputDefinition, map.get(sInputDefinition.getName()), errorReporter);
             }
             return map != null;
         } catch (final ClassCastException e) {

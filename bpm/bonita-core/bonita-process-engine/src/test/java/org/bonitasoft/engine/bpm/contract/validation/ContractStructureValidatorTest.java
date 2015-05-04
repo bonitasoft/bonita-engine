@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.contract.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +26,9 @@ import static org.bonitasoft.engine.core.process.definition.model.SType.INTEGER;
 import static org.bonitasoft.engine.core.process.definition.model.SType.TEXT;
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,17 +54,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ContractStructureValidatorTest {
 
     @Mock
-    private TechnicalLoggerService logger;
-
-    @Mock
     ContractTypeValidator typeValidator;
-
+    @Mock
+    private TechnicalLoggerService logger;
     @InjectMocks
     private ContractStructureValidator validator;
 
     @Before
     public void setUp() {
         when(logger.isLoggable(ContractStructureValidator.class, DEBUG)).thenReturn(true);
+        doReturn(true).when(typeValidator).validate(any(SInputDefinition.class), anyObject(), any(ErrorReporter.class));
     }
 
     @Test
@@ -184,7 +185,6 @@ public class ContractStructureValidatorTest {
         final SContractDefinition contract = aContract()
                 .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
         final Map<String, Serializable> map = aMap().put("complex", aMap().build()).build();
-
         try {
             validator.validate(contract, map);
             fail("expected exception has not been thrown");
@@ -195,31 +195,28 @@ public class ContractStructureValidatorTest {
     }
 
     @Test
-    public void should_throw_exception_with_explanation_when_types_are_not_valid() throws Exception {
+    public void should_call_type_validator_when_types_are_not_valid() throws Exception {
         final SContractDefinition contract = aContract()
                 .withInput(aSimpleInput(INTEGER).withName("anInteger"))
                 .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
-        doThrow(new InputValidationException("type error explanation"))
-                .when(typeValidator).validate(any(SInputDefinition.class), any(Object.class));
+        doReturn(false).when(typeValidator).validate(any(SInputDefinition.class), any(Object.class), any(ErrorReporter.class));
         final Map<String, Serializable> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger").put("complex", "thisIsNotAComplex").build();
 
-        try {
-            validator.validate(contract, taskInputs);
-            fail("expected exception has not been thrown");
-        } catch (final ContractViolationException e) {
-            assertThat(e.getExplanations())
-                    .containsOnly("type error explanation", "type error explanation");
-        }
+        validator.validate(contract, taskInputs);
+
+        verify(typeValidator).validate(any(SInputDefinition.class), eq("thisIsNotAComplex"), any(ErrorReporter.class));
     }
+
+
 
     @Test
     public void validate_should_handle_null_inputs_map_argument_as_empty_map() throws Exception {
         final SContractDefinition contract = aContract()
                 .withInput(aSimpleInput(INTEGER).withName("anInteger"))
                 .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
-        doThrow(new InputValidationException("type error explanation"))
-                .when(typeValidator).validate(any(SInputDefinition.class), any(Object.class));
-
+        final ErrorReporter errorReporter = new ErrorReporter();
+        doReturn(false).when(typeValidator).validate(any(SInputDefinition.class), any(Object.class), any(ErrorReporter.class));
+        errorReporter.addError("plop");
         try {
             validator.validate(contract, null);
             fail("expected exception has not been thrown");
