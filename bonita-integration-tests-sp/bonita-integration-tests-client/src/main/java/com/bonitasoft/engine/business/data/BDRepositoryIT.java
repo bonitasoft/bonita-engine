@@ -1569,16 +1569,16 @@ public class BDRepositoryIT extends CommonAPISPIT {
     public void should_associate_the_right_address() throws Exception {
         final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
                 "import org.bonita.pojo.Address; new Address(street:'32, rue Gustave Eiffel', city:'Grenoble')",
-                ADDRESS_QUALIF_NAME);
-        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; new Employee(firstName:'John', lastName:'Doe', address:myAddress)", EMPLOYEE_QUALIF_CLASSNAME,
-                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME));
+                ADDRESS_QUALIFIED_NAME);
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIFIED_NAME
+                + "; new Employee(firstName:'John', lastName:'Doe', address:myAddress)", EMPLOYEE_QUALIFIED_NAME,
+                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIFIED_NAME));
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
                 "theProcess", "6.3.1");
         final String bizDataName = "myEmployee";
-        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
-        processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIF_NAME, addressExpression);
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIFIED_NAME, null);
+        processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIFIED_NAME, addressExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addAutomaticTask("step1")
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
@@ -1601,23 +1601,23 @@ public class BDRepositoryIT extends CommonAPISPIT {
     public void should_associate_the_right_addresses() throws Exception {
         final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
                 "import org.bonita.pojo.Address; new Address(street:'32, rue Gustave Eiffel', city:'Grenoble')",
-                ADDRESS_QUALIF_NAME);
-        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; new Employee(firstName:'John', lastName:'Doe', addresses:[myAddress])", EMPLOYEE_QUALIF_CLASSNAME,
-                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME));
+                ADDRESS_QUALIFIED_NAME);
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIFIED_NAME
+                + "; new Employee(firstName:'John', lastName:'Doe', addresses:[myAddress])", EMPLOYEE_QUALIFIED_NAME,
+                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIFIED_NAME));
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
                 "theProcess", "6.3.1");
         final String bizDataName = "myEmployee";
-        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
-        processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIF_NAME, addressExpression);
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIFIED_NAME, null);
+        processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIFIED_NAME, addressExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addAutomaticTask("step1")
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME)
                 .addOperation(
-                        new OperationBuilder().createBusinessDataSetAttributeOperation(bizDataName, "addToAddresses", ADDRESS_QUALIF_NAME,
-                                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME)))
+                        new OperationBuilder().createBusinessDataSetAttributeOperation(bizDataName, "addToAddresses", ADDRESS_QUALIFIED_NAME,
+                                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIFIED_NAME)))
                 .addOperation(
                         new OperationBuilder().createBusinessDataSetAttributeOperation(bizDataName, "setLastName", String.class.getName(),
                                 new ExpressionBuilder().createConstantStringExpression("Smith")));
@@ -1661,7 +1661,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression("getAddress", "\"Address [street=\" + " + addressName
                         + ".street + \", city=\" + " + addressName + ".city + \"]\";", String.class.getName(),
-                        new ExpressionBuilder().createBusinessDataExpression(addressName, ADDRESS_QUALIF_NAME)), null);
+                        new ExpressionBuilder().createBusinessDataExpression(addressName, ADDRESS_QUALIFIED_NAME)), null);
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         return (String) result.get("getAddress");
     }
@@ -1674,7 +1674,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
                         "\"Employee [firstName=\" + " + businessDataName + ".firstName + \", lastName=\" + " + businessDataName
                                 + ".lastName + \", address=\" + " + businessDataName + ".address + \", addresses.count=\" + "
                                 + businessDataName + ".addresses.size() + \" ]\";", String.class.getName(),
-                        new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIF_CLASSNAME)), null);
+                        new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIFIED_NAME)), null);
         try {
             final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
             return (String) evaluatedExpressions.get(expressionEmployee);
