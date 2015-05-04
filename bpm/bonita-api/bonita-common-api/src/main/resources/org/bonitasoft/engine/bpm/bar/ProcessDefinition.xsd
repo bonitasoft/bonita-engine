@@ -421,6 +421,7 @@
                             <xs:enumeration value="INTEGER" />
                             <xs:enumeration value="DECIMAL" />
                             <xs:enumeration value="BYTE_ARRAY" />
+                            <xs:enumeration value="FILE" />
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>

@@ -28,7 +28,7 @@ public class ContractViolationException extends BonitaException {
 
     private static final long serialVersionUID = -5733414795158022044L;
 
-    private List<String> explanations;
+    private final List<String> explanations;
 
     /**
      * Constructs an <code>ContractViolationException</code> with the specified detail message and the explanations.
@@ -37,11 +37,12 @@ public class ContractViolationException extends BonitaException {
      * @param explanations the explanations
      */
     public ContractViolationException(final String message, final List<String> explanations) {
-        super(message);
+        super(message + explanations);
         if (explanations == null) {
-            this.explanations = new ArrayList<String>();
+            this.explanations = new ArrayList<>();
+        }else{
+            this.explanations = new ArrayList<>(explanations);
         }
-        this.explanations = new ArrayList<String>(explanations);
     }
 
     /**

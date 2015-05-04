@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
@@ -133,6 +134,19 @@ public class ContractTypeValidatorTest {
 
         //when
         contractTypeValidator.validate(definition, Arrays.asList("input1", "input2"), errorReporter);
+
+        // then
+        assertThat(errorReporter.hasError()).isFalse();
+
+    }
+
+    @Test
+    public void should_validate_file_input() throws Exception {
+        //given
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("theFile", SType.FILE, "description", false, Arrays.<SInputDefinition>asList(new SInputDefinitionImpl("","")));
+
+        //when
+        contractTypeValidator.validate(definition, new FileInputValue("theFile",new byte[]{0,1}), errorReporter);
 
         // then
         assertThat(errorReporter.hasError()).isFalse();

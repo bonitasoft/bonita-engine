@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.process.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -135,9 +135,29 @@ public class ContractDefinitionBuilderTest {
 
         final List<InputDefinition> complexInputs = activity.getContract().getInputs();
         assertThat(complexInputs).hasSize(1);
+        assertThat(complexInputs.get(0).getType()).isEqualTo(Type.FILE);
+        assertThat(complexInputs.get(0).isMultiple()).isFalse();
         final List<InputDefinition> simpleInputs = complexInputs.get(0).getInputs();
         assertThat(simpleInputs).hasSize(2);
-        assertThat(simpleInputs.get(0).getName()).isEqualTo("name");
+        assertThat(simpleInputs.get(0).getName()).isEqualTo("fileName");
+        assertThat(simpleInputs.get(0).getType()).isEqualTo(Type.TEXT);
+        assertThat(simpleInputs.get(1).getName()).isEqualTo("content");
+        assertThat(simpleInputs.get(1).getType()).isEqualTo(Type.BYTE_ARRAY);
+
+        checkBuilder(builder);
+    }
+
+    @Test
+    public void addMultipleFileInputTest() throws Exception {
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addFileInput("document", "It is a simple document", true);
+
+        final List<InputDefinition> complexInputs = activity.getContract().getInputs();
+        assertThat(complexInputs).hasSize(1);
+        assertThat(complexInputs.get(0).getType()).isEqualTo(Type.FILE);
+        assertThat(complexInputs.get(0).isMultiple()).isTrue();
+        final List<InputDefinition> simpleInputs = complexInputs.get(0).getInputs();
+        assertThat(simpleInputs).hasSize(2);
+        assertThat(simpleInputs.get(0).getName()).isEqualTo("fileName");
         assertThat(simpleInputs.get(0).getType()).isEqualTo(Type.TEXT);
         assertThat(simpleInputs.get(1).getName()).isEqualTo("content");
         assertThat(simpleInputs.get(1).getType()).isEqualTo(Type.BYTE_ARRAY);

@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.process.impl;
 
 import java.util.Arrays;
@@ -68,10 +68,14 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     }
 
     public ContractDefinitionBuilder addFileInput(final String name, final String description) {
-        final InputDefinitionImpl nameInput = new InputDefinitionImpl("name", Type.TEXT, "The file name");
-        final InputDefinitionImpl contentInput = new InputDefinitionImpl("content", Type.BYTE_ARRAY, "The file content");
-        final InputDefinitionImpl fileInput = new InputDefinitionImpl(name, description,
-                Arrays.<InputDefinition> asList(nameInput, contentInput));
+        return addFileInput(name, description, false);
+    }
+
+    public ContractDefinitionBuilder addFileInput(final String name, final String description, boolean multiple) {
+        final InputDefinitionImpl nameInput = new InputDefinitionImpl(InputDefinition.FILE_INPUT_FILENAME, Type.TEXT, "Name of the file");
+        final InputDefinitionImpl contentInput = new InputDefinitionImpl(InputDefinition.FILE_INPUT_CONTENT, Type.BYTE_ARRAY, "Content of the file");
+        final InputDefinitionImpl fileInput = new InputDefinitionImpl(name, description, multiple, Type.FILE,
+                Arrays.<InputDefinition>asList(nameInput, contentInput));
         contract.addInput(fileInput);
         return this;
     }

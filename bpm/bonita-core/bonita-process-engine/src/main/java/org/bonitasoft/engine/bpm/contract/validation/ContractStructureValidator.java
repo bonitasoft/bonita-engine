@@ -62,7 +62,7 @@ public class ContractStructureValidator {
     }
 
     private void validateChildren(Map<String, Serializable> inputs, ErrorReporter errorReporter, SInputDefinition inputDefinition) {
-        if (inputDefinition.hasChildren()) {
+        if (inputDefinition.hasChildren() && inputDefinition.getType() == null) {
             if (inputDefinition.isMultiple()) {
                 for (final Map<String, Serializable> complexItem : (List<Map<String, Serializable>>) inputs.get(inputDefinition.getName())) {
                     validateInputContainer(inputDefinition, complexItem, errorReporter);
