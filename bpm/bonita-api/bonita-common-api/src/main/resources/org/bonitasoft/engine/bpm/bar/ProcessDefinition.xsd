@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:definition="http://www.bonitasoft.org/ns/process/client/6.3" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/process/client/6.3"
-    elementFormDefault="qualified">
+           elementFormDefault="qualified">
 
     <xs:element name="processDefinition" type="definition:ProcessDefinition" />
 
@@ -434,7 +434,7 @@
             <xs:extension base="definition:NamedElement">
                 <xs:sequence>
                     <xs:element name="conditionalExpression" type="xs:string" />
-                    <xs:element name="explanation" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="explanation" type="xs:string" minOccurs="0" maxOccurs="1" />
                     <xs:element name="inputDefinitionNames" minOccurs="0" maxOccurs="1">
                         <xs:complexType>
                             <xs:sequence minOccurs="1" maxOccurs="unbounded">
@@ -774,14 +774,18 @@
     </xs:complexType>
 
     <xs:complexType name="Expression">
-        <xs:sequence>
-            <xs:element name="content" type="xs:string" minOccurs="1" />
-            <xs:element name="expression" type="definition:Expression" minOccurs="0" maxOccurs="unbounded" />
-        </xs:sequence>
-        <xs:attribute name="name" type="xs:string" />
-        <xs:attribute name="expressionType" />
-        <xs:attribute name="returnType" />
-        <xs:attribute name="interpreter" />
+        <xs:complexContent>
+            <xs:extension base="definition:BaseElement">
+                <xs:sequence>
+                    <xs:element name="content" type="xs:string" minOccurs="1" />
+                    <xs:element name="expression" type="definition:Expression" minOccurs="0" maxOccurs="unbounded" />
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string" />
+                <xs:attribute name="expressionType" />
+                <xs:attribute name="returnType" />
+                <xs:attribute name="interpreter" />
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
 
     <xs:complexType name="Operation">
