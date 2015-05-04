@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
 
+import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 import org.junit.Test;
 
 public class SAProcessContractDataTest {
@@ -47,8 +48,8 @@ public class SAProcessContractDataTest {
     public void setValue_serialize_to_xml() throws Exception {
         final SAProcessContractData saProcessContractData = new SAProcessContractData();
 
-        final MyPojo theName = new MyPojo("theName", "theValue".getBytes());
-        saProcessContractData.setValue(theName);
+        final MyPojo myPojo = new MyPojo("theName", "theValue".getBytes());
+        saProcessContractData.setValue(myPojo);
 
 
         final Serializable value = saProcessContractData.value;
@@ -57,7 +58,7 @@ public class SAProcessContractDataTest {
         assertThat(unserializedValue).isInstanceOf(MyPojo.class);
         assertThat(((MyPojo) unserializedValue).getName()).isEqualTo("theName");
         assertThat(((MyPojo) unserializedValue).getContent()).isEqualTo("theValue".getBytes());
-        assertThat(value).isEqualTo("<?xml version=\"1.0\" ?><org.bonitasoft.engine.core.contract.data.MyPojo><name>theName</name><content>dGhlVmFsdWU=</content></org.bonitasoft.engine.core.contract.data.MyPojo>");
+        assertThat(value).isEqualTo(XStreamFactory.getXStream().toXML(myPojo));
     }
 
 }
