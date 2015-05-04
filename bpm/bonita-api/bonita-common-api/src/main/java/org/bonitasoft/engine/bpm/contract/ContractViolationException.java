@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.contract;
 
 import java.util.ArrayList;
@@ -29,18 +29,20 @@ public class ContractViolationException extends BonitaException {
     private static final long serialVersionUID = -5733414795158022044L;
 
     private final List<String> explanations;
+    private final String simpleMessage;
 
     /**
      * Constructs an <code>ContractViolationException</code> with the specified detail message and the explanations.
      *
-     * @param message the specified detail message
+     * @param message      the specified detail message
      * @param explanations the explanations
      */
     public ContractViolationException(final String message, final List<String> explanations) {
-        super(message + explanations);
+        super(message + ": " + explanations);
+        this.simpleMessage = message;
         if (explanations == null) {
             this.explanations = new ArrayList<>();
-        }else{
+        } else {
             this.explanations = new ArrayList<>(explanations);
         }
     }
@@ -54,4 +56,7 @@ public class ContractViolationException extends BonitaException {
         return explanations;
     }
 
+    public String getSimpleMessage() {
+        return simpleMessage;
+    }
 }
