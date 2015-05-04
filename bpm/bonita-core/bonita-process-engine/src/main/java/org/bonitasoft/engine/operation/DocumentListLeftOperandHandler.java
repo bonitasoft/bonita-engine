@@ -10,12 +10,14 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.operation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -42,15 +44,15 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     final DocumentService documentService;
 
     public DocumentListLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
-            final SessionAccessor sessionAccessor, final SessionService sessionService, final ProcessDefinitionService processDefinitionService,
-            final ProcessInstanceService processInstanceService) {
+                                          final SessionAccessor sessionAccessor, final SessionService sessionService, final ProcessDefinitionService processDefinitionService,
+                                          final ProcessInstanceService processInstanceService) {
         super(activityInstanceService, sessionAccessor, sessionService);
         this.documentService = documentService;
         documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
     }
 
     public DocumentListLeftOperandHandler(final ActivityInstanceService activityInstanceService, final SessionAccessor sessionAccessor,
-            final SessionService sessionService, final DocumentService documentService, final DocumentHelper documentHelper) {
+                                          final SessionService sessionService, final DocumentService documentService, final DocumentHelper documentHelper) {
         super(activityInstanceService, sessionAccessor, sessionService);
         this.documentHelper = documentHelper;
         this.documentService = documentService;
@@ -76,12 +78,21 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
         if (!(newValue instanceof List)) {
             throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
         }
+        List<DocumentValue> newList = new ArrayList<>(((List) newValue).size());
         for (final Object item : (List<?>) newValue) {
-            if (!(item instanceof DocumentValue)) {
-                throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
+            if (item instanceof FileInputValue) {
+                newList.add(toDocumentValue((FileInputValue) item));
+                continue;
             }
+            if (item instanceof DocumentValue) {
+                newList.add((DocumentValue) item);
+                continue;
+
+            }
+            throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
+
         }
-        return (List<DocumentValue>) newValue;
+        return newList;
     }
 
     @Override

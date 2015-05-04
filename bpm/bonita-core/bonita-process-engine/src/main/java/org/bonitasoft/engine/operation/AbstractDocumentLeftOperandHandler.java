@@ -57,7 +57,7 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
             final boolean isFileInput = newValue instanceof FileInputValue;
             if (isFileInput) {
                 FileInputValue fileInput = ((FileInputValue) newValue);
-                return new DocumentValue(fileInput.getContent(), null, fileInput.getFileName());
+                return toDocumentValue(fileInput);
             }
             final boolean isDocumentWithContent = newValue instanceof DocumentValue;
             if (!isDocumentWithContent) {
@@ -66,6 +66,10 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
             }
         }
         return (DocumentValue) newValue;
+    }
+
+    protected DocumentValue toDocumentValue(FileInputValue fileInput) {
+        return new DocumentValue(fileInput.getContent(), null, fileInput.getFileName());
     }
 
     protected long getAuthorId() {
