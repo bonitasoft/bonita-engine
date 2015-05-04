@@ -39,6 +39,8 @@ public interface ApplicationService {
 
     String DEFAULT_LAYOUT_NAME="custompage_layout";
 
+    String DEFAULT_THEME_NAME="custompage_theme";
+
     SApplication createApplication(SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException;
 
     SApplication getApplication(long applicationId) throws SBonitaReadException, SObjectNotFoundException;

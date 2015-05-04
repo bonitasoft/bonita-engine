@@ -57,6 +57,7 @@ ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id;
 ALTER TABLE business_app DROP CONSTRAINT fk_app_profileId;
 ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId;
 ALTER TABLE business_app DROP CONSTRAINT fk_app_layoutId;
+ALTER TABLE business_app DROP CONSTRAINT fk_app_themeId;
 
 
 

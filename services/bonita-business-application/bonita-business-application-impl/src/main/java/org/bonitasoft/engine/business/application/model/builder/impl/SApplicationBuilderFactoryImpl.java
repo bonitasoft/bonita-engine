@@ -26,9 +26,9 @@ import org.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
 public class SApplicationBuilderFactoryImpl implements SApplicationBuilderFactory {
 
     @Override
-    public SApplicationBuilder createNewInstance(final String token, final String displayName, final String version, final long createdBy, final Long layoutId) {
+    public SApplicationBuilder createNewInstance(final String token, final String displayName, final String version, final long createdBy, final Long layoutId, final Long themeId) {
         final long currentDate = System.currentTimeMillis();
-        return new SApplicationBuilderImpl(new SApplicationImpl(token, displayName, version, currentDate, createdBy, SApplicationState.ACTIVATED.name(), layoutId));
+        return new SApplicationBuilderImpl(new SApplicationImpl(token, displayName, version, currentDate, createdBy, SApplicationState.ACTIVATED.name(), layoutId, themeId));
     }
 
     @Override
@@ -94,5 +94,10 @@ public class SApplicationBuilderFactoryImpl implements SApplicationBuilderFactor
     @Override
     public String getLayoutIdKey() {
         return SApplicationFields.LAYOUT_ID;
+    }
+
+    @Override
+    public String getThemeIdKey() {
+        return SApplicationFields.THEME_ID;
     }
 }

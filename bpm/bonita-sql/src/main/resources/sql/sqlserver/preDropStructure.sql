@@ -112,7 +112,8 @@ ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId
 GO
 ALTER TABLE business_app DROP CONSTRAINT fk_app_layoutId
 GO
-
+ALTER TABLE business_app DROP CONSTRAINT fk_app_themeId
+GO
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_arch_document_mapping_tenantId

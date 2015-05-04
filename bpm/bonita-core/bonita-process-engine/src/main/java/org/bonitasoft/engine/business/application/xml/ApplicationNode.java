@@ -53,6 +53,9 @@ public class ApplicationNode {
     @XmlAttribute
     private String layout;
 
+    @XmlAttribute
+    private String theme;
+
     @XmlElement
     private String iconPath;
 
@@ -134,6 +137,14 @@ public class ApplicationNode {
 
     public void setLayout(final String layout) {
         this.layout = layout;
+    }
+
+    public String getTheme() {
+        return theme;
+    }
+
+    public void setTheme(final String theme) {
+        this.theme = theme;
     }
 
     public List<ApplicationPageNode> getApplicationPages() {

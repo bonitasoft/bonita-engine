@@ -40,4 +40,6 @@ public interface SApplicationUpdateBuilder {
 
     public SApplicationUpdateBuilder updateLayoutId(final Long layoutId);
 
+    public SApplicationUpdateBuilder updateThemeId(final Long themeId);
+
 }

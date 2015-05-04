@@ -275,7 +275,7 @@ public class PageServiceImplTest {
         final long pageId = 15;
         final SPage expected = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(expected);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(expected);
         // when
         final SPage page = pageServiceImpl.getPage(pageId);
         // then
@@ -288,7 +288,7 @@ public class PageServiceImplTest {
         final long pageId = 15;
         final SPage expected = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(null);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(null);
 
         pageServiceImpl.getPage(pageId);
     }
@@ -308,7 +308,7 @@ public class PageServiceImplTest {
         final long pageId = 15;
         final SPage expected = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
         expected.setId(pageId);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenThrow(
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenThrow(
                 new SBonitaReadException("ouch!"));
 
         pageServiceImpl.getPage(pageId);
@@ -324,7 +324,7 @@ public class PageServiceImplTest {
         pageServiceImpl.start();
 
         // then
-        verify(pageServiceImpl, times(4)).insertPage(any(SPage.class), any(byte[].class));
+        verify(pageServiceImpl, times(5)).insertPage(any(SPage.class), any(byte[].class));
         verify(pageServiceImpl, times(0)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
         verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(byte[].class), anyString());
 
@@ -358,14 +358,23 @@ public class PageServiceImplTest {
                 CONTENT_NAME);
         currentLayoutPage.setId(15);
 
+        final SPageImpl currentThemePage = new SPageImpl("custompage_theme", "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
+                System.currentTimeMillis(),
+                -1,
+                CONTENT_NAME);
+        currentThemePage.setId(16);
+
         doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
         doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
         doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_home");
-		doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName("custompage_layout");
-        doReturn(new byte[]	{1, 2, 3}).when(pageServiceImpl).getPageContent(12);
-        doReturn(new byte[]	{1, 2, 3}).when(pageServiceImpl).getPageContent(13);
-        doReturn(new byte[]	{1, 2, 3}).when(pageServiceImpl).getPageContent(14);
+        doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName("custompage_layout");
+        doReturn(currentThemePage).when(pageServiceImpl).getPageByName("custompage_theme");
+        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(12);
+        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(13);
+        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(14);
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(15);
+        doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(16);
+
         doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
         doReturn(null).when(pageServiceImpl).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
         doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
@@ -377,6 +386,7 @@ public class PageServiceImplTest {
         verify(pageServiceImpl, times(1)).updatePageContent(eq(12L), any(byte[].class), eq("bonita-groovy-page-example.zip"));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(14L), any(byte[].class), eq("bonita-home-page.zip"));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(15L), any(byte[].class), eq("bonita-layout-page.zip"));
+        verify(pageServiceImpl, times(1)).updatePageContent(eq(16L), any(byte[].class), eq("bonita-theme-page.zip"));
     }
 
     @Test
@@ -389,7 +399,7 @@ public class PageServiceImplTest {
         page.setId(12);
         final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
         doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
-                new SelectByIdDescriptor<SPageContent>("getPageContent",
+                new SelectByIdDescriptor<>("getPageContent",
                         SPageContent.class, 12));
         doReturn(page).when(pageServiceImpl).getPage(12);
         // when
@@ -419,7 +429,7 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES,
                         "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\naCustomProperty=plop\n".getBytes()));
         doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
-                new SelectByIdDescriptor<SPageContent>("getPageContent",
+                new SelectByIdDescriptor<>("getPageContent",
                         SPageContent.class, 12));
         doReturn(page).when(pageServiceImpl).getPage(12);
         // when
@@ -439,7 +449,7 @@ public class PageServiceImplTest {
     @Test(expected = SObjectNotFoundException.class)
     public void should_getPageContent_throw_not_found() throws SBonitaException, IOException {
         //given
-        doReturn(null).when(readPersistenceService).selectById(new SelectByIdDescriptor<SPageContent>("getPageContent", SPageContent.class, 12));
+        doReturn(null).when(readPersistenceService).selectById(new SelectByIdDescriptor<>("getPageContent", SPageContent.class, 12));
         //when
         pageServiceImpl.getPageContent(12);
     }
@@ -472,19 +482,28 @@ public class PageServiceImplTest {
                 CONTENT_NAME);
         currentLayoutPage.setId(15);
 
+        final SPageImpl currentThemePage = new SPageImpl("custompage_theme", "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
+                System.currentTimeMillis(),
+                -1,
+                CONTENT_NAME);
+        currentThemePage.setId(16);
+
         doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
         doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
         doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_home");
         doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName("custompage_layout");
+        doReturn(currentThemePage).when(pageServiceImpl).getPageByName("custompage_theme");
 
         final InputStream resourceGroovyAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-groovy-page-example.zip");
         final InputStream resourceHtmlAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-html-page-example.zip");
         final InputStream resourceHomeAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-home-page.zip");
         final InputStream resourceLayoutAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-layout-page.zip");
+        final InputStream resourceThemeAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-theme-page.zip");
         doReturn(IOUtil.getAllContentFrom(resourceGroovyAsStream)).when(pageServiceImpl).getPageContent(12);
         doReturn(IOUtil.getAllContentFrom(resourceHtmlAsStream)).when(pageServiceImpl).getPageContent(13);
         doReturn(IOUtil.getAllContentFrom(resourceHomeAsStream)).when(pageServiceImpl).getPageContent(14);
         doReturn(IOUtil.getAllContentFrom(resourceLayoutAsStream)).when(pageServiceImpl).getPageContent(15);
+        doReturn(IOUtil.getAllContentFrom(resourceThemeAsStream)).when(pageServiceImpl).getPageContent(16);
         doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
         // when
         pageServiceImpl.start();
@@ -510,7 +529,7 @@ public class PageServiceImplTest {
             }
 
         }).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(expected);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(expected);
         doReturn(expected).when(pageServiceImpl).getPage(pageId);
 
         pageServiceImpl.deletePage(pageId);
@@ -534,7 +553,7 @@ public class PageServiceImplTest {
             }
 
         }).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(expected);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(expected);
 
         pageServiceImpl.deletePage(pageId);
     }
@@ -544,7 +563,7 @@ public class PageServiceImplTest {
         // given
         final long pageId = 15;
         final SPage sPage = new SPageImpl("page1", 123456, 45, true, CONTENT_NAME);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(sPage);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(sPage);
 
         // when
         pageServiceImpl.updatePageContent(pageId, "aaa".getBytes(), CONTENT_NAME);
@@ -565,7 +584,7 @@ public class PageServiceImplTest {
         page2.setDisplayName("displayName2");
 
         final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
-        final Map<String, Object> fields = new HashMap<String, Object>();
+        final Map<String, Object> fields = new HashMap<>();
 
         doReturn(fields).when(entityUpdateDescriptor).getFields();
         doAnswer(new Answer<Object>() {
@@ -576,7 +595,7 @@ public class PageServiceImplTest {
             }
 
         }).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId2))).thenReturn(page2);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId2))).thenReturn(page2);
         when(pageServiceImpl.getPageByName(page1.getName())).thenReturn(page1);
 
         // given
@@ -604,12 +623,12 @@ public class PageServiceImplTest {
 
         // given
         final long pageId = 15;
-        final Map<String, Object> fields = new HashMap<String, Object>();
+        final Map<String, Object> fields = new HashMap<>();
         final SPage sPage = new SPageImpl("page1", 123456, 45, false, CONTENT_NAME);
         sPage.setId(pageId);
         final byte[] content = "invalid content".getBytes();
         fields.put(SPageContentFields.PAGE_CONTENT, content);
-        when(readPersistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(sPage);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, pageId))).thenReturn(sPage);
         doReturn(fields).when(entityUpdateDescriptor).getFields();
 
         // when

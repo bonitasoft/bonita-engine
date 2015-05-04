@@ -599,6 +599,7 @@ CREATE TABLE business_app (
   homePageId NUMERIC(19, 0),
   profileId NUMERIC(19, 0),
   layoutId NUMERIC(19, 0),
+  themeId NUMERIC(19, 0),
   displayName NVARCHAR(255) NOT NULL
 )
 GO

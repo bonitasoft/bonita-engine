@@ -11,41 +11,26 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.application.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+package org.bonitasoft.engine.business.application.impl;
 
-/**
- * @author Elias Ricken de Medeiros
- */
-public interface SApplication extends PersistentObject {
+import static org.bonitasoft.engine.business.application.impl.ApplicationPageImplAssert.assertThat;
 
-    String getToken();
+import org.junit.Test;
 
-    String getDisplayName();
+public class ApplicationPageImplTest {
 
-    String getVersion();
+    @Test
+    public void setters_and_getters_are_ok() throws Exception {
+        //given
+        long applicationId = 1L;
+        long pageId = 20L;
+        String token = "home";
 
-    String getDescription();
+        //when
+        ApplicationPageImpl page = new ApplicationPageImpl(applicationId, pageId, token);
 
-    String getIconPath();
-
-    long getCreationDate();
-
-    long getCreatedBy();
-
-    long getLastUpdateDate();
-
-    long getUpdatedBy();
-
-    String getState();
-
-    Long getHomePageId();
-
-    Long getProfileId();
-
-    Long getLayoutId();
-
-    Long getThemeId();
-
+        //then
+        assertThat(page).hasApplicationId(applicationId).hasPageId(pageId).hasToken(token);
+    }
 }

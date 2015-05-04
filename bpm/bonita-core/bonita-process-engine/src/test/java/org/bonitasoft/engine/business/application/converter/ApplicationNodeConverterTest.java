@@ -77,7 +77,12 @@ public class ApplicationNodeConverterTest {
     @Mock
     private SPage defaultLayout;
 
+    @Mock
+    private SPage defaultTheme;
+
     public static final long DEFAULT_LAYOUT_ID = 101;
+
+    public static final long DEFAULT_THEME_ID = 102;
 
     @InjectMocks
     private ApplicationNodeConverter converter;
@@ -87,13 +92,17 @@ public class ApplicationNodeConverterTest {
         given(defaultLayout.getId()).willReturn(DEFAULT_LAYOUT_ID);
         given(defaultLayout.getName()).willReturn(ApplicationService.DEFAULT_LAYOUT_NAME);
         given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(defaultLayout);
+
+        given(defaultTheme.getId()).willReturn(DEFAULT_THEME_ID);
+        given(defaultTheme.getName()).willReturn(ApplicationService.DEFAULT_THEME_NAME);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
     }
 
     @Test
     public void toNode_should_return_convert_all_string_fields() throws Exception {
         //given
         long createdBy = 11L;
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), createdBy, "enabled", null);
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), createdBy, "enabled", null, null);
         application.setDescription("this is my app");
         application.setIconPath("/icon.jpg");
 
@@ -116,7 +125,7 @@ public class ApplicationNodeConverterTest {
     @Test
     public void toNode_should_replace_profile_id_by_profile_name() throws Exception {
         //given
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10, "enabled", null);
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10, "enabled", null, null);
         application.setProfileId(7L);
         final SProfile profile = mock(SProfile.class);
         given(profile.getName()).willReturn("admin");
@@ -134,7 +143,7 @@ public class ApplicationNodeConverterTest {
     @Test(expected = ExportException.class)
     public void toNode_should_throw_ExportException_when_profileService_throws_exception() throws Exception {
         //given
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null);
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, null);
         application.setProfileId(7L);
 
         given(profileService.getProfile(7L)).willThrow(new SProfileNotFoundException(""));
@@ -148,7 +157,7 @@ public class ApplicationNodeConverterTest {
     @Test
     public void toNode_should_replaceHomePageId_by_application_page_token() throws Exception {
         //given
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null);
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, null);
         application.setHomePageId(8L);
         final SApplicationPage homePage = mock(SApplicationPage.class);
         given(homePage.getToken()).willReturn("home");
@@ -166,7 +175,7 @@ public class ApplicationNodeConverterTest {
     @Test(expected = ExportException.class)
     public void toNode_should_throw_ExportException_when_applicationService_throws_exception() throws Exception {
         //given
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null);
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, null);
         application.setHomePageId(8L);
 
         final SApplicationPage homePage = mock(SApplicationPage.class);
@@ -183,8 +192,7 @@ public class ApplicationNodeConverterTest {
     @Test
     public void toNode_should_replaceLayoutId_by_page_name() throws Exception {
         //given
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null);
-        application.setLayoutId(9L);
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", 9L, null);
         final SPage layout = mock(SPage.class);
         given(layout.getName()).willReturn("mainLayout");
 
@@ -198,10 +206,28 @@ public class ApplicationNodeConverterTest {
         assertThat(applicationNode.getLayout()).isEqualTo("mainLayout");
     }
 
+    @Test
+    public void toNode_should_replaceThemeId_by_page_name() throws Exception {
+        //given
+        long themeId = 20L;
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, themeId);
+        final SPage layout = mock(SPage.class);
+        given(layout.getName()).willReturn("mainTheme");
+
+        given(pageService.getPage(themeId)).willReturn(layout);
+
+        //when
+        final ApplicationNode applicationNode = converter.toNode(application);
+
+        //then
+        assertThat(applicationNode).isNotNull();
+        assertThat(applicationNode.getTheme()).isEqualTo("mainTheme");
+    }
+
     @Test(expected = ExportException.class)
     public void toNodeShouldThrowExceptionAtMenuConversion() throws Exception {
         //given
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null);
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, null);
 
         doThrow(new SBonitaReadException("")).when(menuConverter).addMenusToApplicationNode(anyLong(), anyLong(), any(ApplicationNode.class),
                 any(ApplicationMenuNode.class));
@@ -213,7 +239,7 @@ public class ApplicationNodeConverterTest {
     public void toNodeShouldAddConvertedMenus() throws Exception {
         //given
         final long applicationId = 1191L;
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null);
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, null);
         application.setId(applicationId);
 
         doNothing().when(menuConverter).addMenusToApplicationNode(eq(applicationId), isNull(Long.class), any(ApplicationNode.class),
@@ -229,7 +255,7 @@ public class ApplicationNodeConverterTest {
     @Test(expected = ExportException.class)
     public void toNodeShouldAddThrowExceptionAtPageConversion() throws Exception {
         //given
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null);
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, null);
 
         given(applicationService.searchApplicationPages(any(QueryOptions.class))).willThrow(new SBonitaReadException(""));
 
@@ -239,7 +265,7 @@ public class ApplicationNodeConverterTest {
     @Test
     public void toNodeShouldAddConvertedPages() throws Exception {
         //given
-        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null);
+        final SApplicationImpl application = new SApplicationImpl("app", "my app", "1.0", new Date().getTime(), 10L, "enabled", null, null);
         final List<SApplicationPage> pages = new ArrayList<>(1);
         final SApplicationPage page = mock(SApplicationPage.class);
         pages.add(page);
@@ -327,6 +353,32 @@ public class ApplicationNodeConverterTest {
     }
 
     @Test
+    public void toSApplication_should_always_use_default_theme() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        node.setToken("app");
+        node.setTheme("dummyTheme"); // will not be used, the theme will be always the default one
+
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
+
+        //when
+        long createdBy = 1L;
+        final ImportResult importResult = converter.toSApplication(node, createdBy);
+
+        //then
+        assertThat(importResult).isNotNull();
+
+        final SApplication application = importResult.getApplication();
+        assertThat(application.getThemeId()).isEqualTo(DEFAULT_THEME_ID);
+
+        final ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).isEmpty();
+
+    }
+
+    @Test
     public void toSApplication_should_return_application_with_null_profile_id_when_node_has_no_profile() throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
@@ -372,6 +424,22 @@ public class ApplicationNodeConverterTest {
         node.setState("ENABLED");
 
         given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(null);
+
+        //when
+        converter.toSApplication(node, 1L);
+
+        //then exception
+    }
+
+    @Test(expected = ImportException.class)
+    public void toSApplication_should_throw_ImportException_when_theme_is_not_found() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        node.setVersion("1.0");
+        node.setToken("app");
+        node.setState("ENABLED");
+
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(null);
 
         //when
         converter.toSApplication(node, 1L);

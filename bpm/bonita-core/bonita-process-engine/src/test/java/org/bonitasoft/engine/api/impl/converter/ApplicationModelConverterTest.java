@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
+import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.ApplicationState;
 import org.bonitasoft.engine.business.application.ApplicationUpdater;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -55,6 +56,7 @@ public class ApplicationModelConverterTest {
     private static final String APP_DISPLAY_NAME = "My application";
     private static final long LOGGED_USER_ID = 10;
     public static final long LAYOUT_ID = 55L;
+    public static final long THEME_ID = 56L;
     public static final String APP_NAME2 = "app2";
 
     @Mock
@@ -73,9 +75,13 @@ public class ApplicationModelConverterTest {
         final long userId = 10;
         final long before = System.currentTimeMillis();
 
-        SPage page = mock(SPage.class);
-        given(page.getId()).willReturn(LAYOUT_ID);
-        given(pageService.getPageByName("custompage_layout")).willReturn(page);
+        SPage layout = mock(SPage.class);
+        given(layout.getId()).willReturn(LAYOUT_ID);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(layout);
+
+        SPage theme = mock(SPage.class);
+        given(theme.getId()).willReturn(THEME_ID);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(theme);
 
         //when
         final SApplication application = converter.buildSApplication(creator, userId);
@@ -94,6 +100,7 @@ public class ApplicationModelConverterTest {
         assertThat(application.getState()).isEqualTo(SApplicationState.ACTIVATED.name());
         assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
         assertThat(application.getLayoutId()).isEqualTo(LAYOUT_ID);
+        assertThat(application.getThemeId()).isEqualTo(THEME_ID);
     }
 
     @Test(expected = CreationException.class)
@@ -102,7 +109,29 @@ public class ApplicationModelConverterTest {
         final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
         final long userId = 10;
 
-        given(pageService.getPageByName("custompage_layout")).willReturn(null);
+        SPage theme = mock(SPage.class);
+        given(theme.getId()).willReturn(THEME_ID);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(theme);
+
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(null);
+
+        //when
+        converter.buildSApplication(creator, userId);
+
+        //then exception
+    }
+
+    @Test(expected = CreationException.class)
+    public void buildSApplication_should_throw_CreationException_when_the_default_theme_is_not_available() throws Exception {
+        //given
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
+        final long userId = 10;
+
+        SPage layout = mock(SPage.class);
+        given(layout.getId()).willReturn(LAYOUT_ID);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(layout);
+
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(null);
 
         //when
         converter.buildSApplication(creator, userId);
@@ -115,8 +144,7 @@ public class ApplicationModelConverterTest {
         //given
         final long currentDate = System.currentTimeMillis();
         final String state = SApplicationState.DEACTIVATED.name();
-        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID,
-                state, LAYOUT_ID);
+        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID, state, LAYOUT_ID, THEME_ID);
         sApp.setDescription(APP_DESC);
         sApp.setId(ID);
         sApp.setTenantId(TENANT_ID);
@@ -143,15 +171,16 @@ public class ApplicationModelConverterTest {
         assertThat(application.getHomePageId()).isEqualTo(HOME_PAGE_ID);
         assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
         assertThat(application.getLayoutId()).isEqualTo(LAYOUT_ID);
+        assertThat(application.getThemeId()).isEqualTo(THEME_ID);
     }
 
     @Test
     public void toApplicationList_should_call_toApplication_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
         //given
         final SApplicationImpl sApp1 = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
-                SApplicationState.DEACTIVATED.name(), LAYOUT_ID);
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
         final SApplicationImpl sApp2 = new SApplicationImpl(APP_NAME2, " my app2", APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
-                SApplicationState.DEACTIVATED.name(), LAYOUT_ID);
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
 
         //when
         final List<Application> applications = converter.toApplication(Arrays.<SApplication> asList(sApp1, sApp2));
