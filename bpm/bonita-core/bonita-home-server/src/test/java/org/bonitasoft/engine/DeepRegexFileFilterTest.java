@@ -11,13 +11,12 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl;
+package org.bonitasoft.engine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 
-import org.bonitasoft.engine.DeepRegexFileFilter;
 import org.junit.Test;
 
 public class DeepRegexFileFilterTest {
