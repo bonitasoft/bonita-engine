@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.contract.data;
 
 import java.io.Serializable;
 
+import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 
@@ -27,7 +28,7 @@ public abstract class SContractData extends PersistentObjectId implements Persis
 
     private String name;
 
-    private Serializable value;
+    String value;
 
     public long getScopeId() {
         return scopeId;
@@ -46,7 +47,7 @@ public abstract class SContractData extends PersistentObjectId implements Persis
     public SContractData(final String name, final Serializable value, long scopeId) {
         super();
         this.name = name;
-        this.value = value;
+        this.value = convert(value);
         this.scopeId = scopeId;
     }
 
@@ -59,11 +60,23 @@ public abstract class SContractData extends PersistentObjectId implements Persis
     }
 
     public Serializable getValue() {
-        return value;
+        return revert(value);
     }
 
     public void setValue(final Serializable value) {
-        this.value = value;
+        this.value = convert(value);
+    }
+
+
+    private String convert(final Serializable value) {
+        return XStreamFactory.getXStream().toXML(value);
+    }
+
+    private Serializable revert(final String value) {
+        if (value != null) {
+            return (Serializable) XStreamFactory.getXStream().fromXML(value);
+        }
+        return null;
     }
 
     @Override
