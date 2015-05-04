@@ -21,6 +21,7 @@ import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -35,6 +36,15 @@ public class ApplicationNodeConverterExtTest {
 
     @InjectMocks
     private ApplicationNodeConverterExt converter;
+
+    @Mock
+    private SPage defaultTheme;
+
+    @Before
+    public void setUp() throws Exception {
+
+
+    }
 
     @Test
     public void toSApplication_should_use_layout_defined_in_ApplicationNode() throws Exception {
