@@ -11,6 +11,8 @@ package com.bonitasoft.engine.tenant;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.bonitasoft.engine.CommonAPISPIT;
+import com.bonitasoft.engine.LocalServerTestsInitializerSP;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -25,15 +27,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.bonitasoft.engine.CommonAPISPIT;
-import com.bonitasoft.engine.TestsInitializerSP;
-
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
 @RunWith(BonitaTestRunner.class)
-@Initializer(TestsInitializerSP.class)
+@Initializer(LocalServerTestsInitializerSP.class)
 public class TenantMaintenanceLocalIT extends CommonAPISPIT {
 
     protected User USER;

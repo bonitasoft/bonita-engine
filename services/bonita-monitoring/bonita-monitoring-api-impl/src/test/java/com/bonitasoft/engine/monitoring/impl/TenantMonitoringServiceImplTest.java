@@ -34,9 +34,6 @@ public class TenantMonitoringServiceImplTest {
     private IdentityService identityService;
 
     @Mock
-    private EventService eventService;
-
-    @Mock
     private SessionService sessionService;
 
     @Mock
@@ -55,8 +52,8 @@ public class TenantMonitoringServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        monitoringService = new TenantMonitoringServiceImpl(false, identityService, eventService, transactionService, sessionAccessor, sessionService,
-                jobHandler, loggerService);
+        monitoringService = new TenantMonitoringServiceImpl(false, identityService, transactionService, sessionAccessor, sessionService,
+                 loggerService);
     }
 
     @Test
@@ -68,14 +65,6 @@ public class TenantMonitoringServiceImplTest {
         assertThat(numberOfActiveTransactions).isEqualTo(6L);
     }
 
-    @Test
-    public void getNumberOfExecutingJobs() {
-        when(jobHandler.getExecutingJobs()).thenReturn(64);
-
-        final long numberOfActiveTransactions = monitoringService.getNumberOfExecutingJobs();
-
-        assertThat(numberOfActiveTransactions).isEqualTo(64L);
-    }
 
     @Test
     public void getNumberOfUsers() throws SMonitoringException, SIdentityException {

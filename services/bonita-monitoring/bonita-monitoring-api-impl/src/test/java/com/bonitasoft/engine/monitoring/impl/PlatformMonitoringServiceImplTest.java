@@ -38,11 +38,14 @@ public class PlatformMonitoringServiceImplTest {
     @Mock
     private TechnicalLoggerService loggerService;
 
+    @Mock
+    private SJobHandlerImpl jobHandler;
+
     private PlatformMonitoringServiceImpl platformMonitoringService;
 
     @Before
     public void setUp() throws Exception {
-        platformMonitoringService = new PlatformMonitoringServiceImpl(true, jvmMBean, transactionService, schedulerService, loggerService);
+        platformMonitoringService = new PlatformMonitoringServiceImpl(true, jvmMBean, transactionService, schedulerService, jobHandler, loggerService);
     }
 
     @Test
@@ -79,6 +82,16 @@ public class PlatformMonitoringServiceImplTest {
 
         // then:
         assertThat(optional).isTrue();
+    }
+
+
+    @Test
+    public void getNumberOfExecutingJobs() {
+        when(jobHandler.getExecutingJobs()).thenReturn(64);
+
+        final long numberOfActiveTransactions = platformMonitoringService.getNumberOfExecutingJobs();
+
+        assertThat(numberOfActiveTransactions).isEqualTo(64L);
     }
 
 }

@@ -113,4 +113,8 @@ public class DelegatingCacheService implements CacheService {
         // nothing to do
     }
 
+    @Override
+    public boolean isStopped() {
+        return false;
+    }
 }

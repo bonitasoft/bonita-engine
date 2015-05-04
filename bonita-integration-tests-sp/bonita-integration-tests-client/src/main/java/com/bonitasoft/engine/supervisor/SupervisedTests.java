@@ -9,14 +9,10 @@
 package com.bonitasoft.engine.supervisor;
 
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.TestsInitializerSP;
-
 @RunWith(BonitaSuiteRunner.class)
-@Initializer(TestsInitializerSP.class)
 @SuiteClasses({ ProcessSupervisedTest.class, SupervisorTest.class })
 public class SupervisedTests {
 

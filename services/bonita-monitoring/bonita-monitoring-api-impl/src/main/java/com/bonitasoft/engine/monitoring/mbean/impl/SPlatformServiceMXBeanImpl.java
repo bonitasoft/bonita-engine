@@ -12,6 +12,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import com.bonitasoft.engine.monitoring.SMonitoringException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
@@ -83,4 +84,8 @@ public class SPlatformServiceMXBeanImpl implements SPlatformServiceMXBean {
         return monitoringService.getNumberOfActiveTransactions();
     }
 
+    @Override
+    public long getNumberOfExecutingJobs() throws SMonitoringException {
+        return monitoringService.getNumberOfExecutingJobs();
+    }
 }

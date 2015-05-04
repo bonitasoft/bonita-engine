@@ -28,7 +28,6 @@
         </dependency>
 
 
-
         <dependency>
             <groupId>com.bonitasoft.engine</groupId>
             <artifactId>bonita-common-sp</artifactId>
@@ -59,11 +58,6 @@
             <groupId>org.bonitasoft.engine.page</groupId>
             <artifactId>bonita-page-api</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.18.1-GA</version>
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.data</groupId>
@@ -146,6 +140,12 @@
         <dependency>
             <groupId>org.bonitasoft.engine.application</groupId>
             <artifactId>bonita-business-application-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core</groupId>
+            <artifactId>bonita-form-mapping-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

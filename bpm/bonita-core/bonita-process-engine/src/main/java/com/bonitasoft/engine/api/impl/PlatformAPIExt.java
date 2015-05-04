@@ -8,39 +8,14 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
-import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
-import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
-import com.bonitasoft.engine.api.impl.transaction.RegisterTenantJobListeners;
-import com.bonitasoft.engine.platform.Tenant;
-import com.bonitasoft.engine.platform.TenantActivationException;
-import com.bonitasoft.engine.platform.TenantCreator;
-import com.bonitasoft.engine.platform.TenantCriterion;
-import com.bonitasoft.engine.platform.TenantDeactivationException;
-import com.bonitasoft.engine.platform.TenantNotFoundException;
-import com.bonitasoft.engine.platform.TenantUpdater;
-import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
-import com.bonitasoft.engine.profile.ProfilesImporterExt;
-import com.bonitasoft.engine.search.SearchTenants;
-import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
-import com.bonitasoft.engine.service.SPModelConvertor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.LicenseChecker;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.manager.Features;
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
@@ -72,8 +47,6 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
@@ -82,7 +55,6 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
-import org.bonitasoft.engine.platform.exception.STenantCreationException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
@@ -102,6 +74,29 @@ import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
+
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
+import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
+import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
+import com.bonitasoft.engine.api.impl.transaction.RegisterTenantJobListeners;
+import com.bonitasoft.engine.platform.Tenant;
+import com.bonitasoft.engine.platform.TenantActivationException;
+import com.bonitasoft.engine.platform.TenantCreator;
+import com.bonitasoft.engine.platform.TenantCriterion;
+import com.bonitasoft.engine.platform.TenantDeactivationException;
+import com.bonitasoft.engine.platform.TenantNotFoundException;
+import com.bonitasoft.engine.platform.TenantUpdater;
+import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
+import com.bonitasoft.engine.profile.ProfilesImporterExt;
+import com.bonitasoft.engine.search.SearchTenants;
+import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
+import com.bonitasoft.engine.service.PlatformServiceAccessor;
+import com.bonitasoft.engine.service.SPModelConvertor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import com.bonitasoft.manager.Features;
 
 /**
  * @author Matthieu Chaffotte
@@ -181,6 +176,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private long create(final TenantCreator creator) throws CreationException {
         final Map<com.bonitasoft.engine.platform.TenantCreator.TenantField, Serializable> tenantFields = creator.getFields();
+        Long tenantId = -1L;
+        boolean bhTenantCreated = false;
         try {
             final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
             final PlatformServiceAccessor platformAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
@@ -190,46 +187,23 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             // add tenant to database
             final STenant tenant = SPModelConvertor.constructTenant(creator);
 
-            final Long tenantId = transactionService.executeInTransaction(new Callable<Long>() {
+            tenantId = transactionService.executeInTransaction(new Callable<Long>() {
 
                 @Override
                 public Long call() throws Exception {
                     return platformService.createTenant(tenant);
                 }
             });
-
-            // add tenant folder
-            String targetDir = null;
-            String sourceDir = null;
-            try {
-                final BonitaHomeServer home = BonitaHomeServer.getInstance();
-                targetDir = home.getTenantsFolder() + File.separator + tenant.getId();
-                sourceDir = home.getTenantTemplateFolder();
-            } catch (final Exception e) {
-                deleteTenant(tenant.getId());
-                throw new STenantCreationException("Bonita home not set!");
-            }
-            // copy configuration file
-            try {
-                FileUtils.copyDirectory(new File(sourceDir), new File(targetDir));
-            } catch (final IOException e) {
-                IOUtil.deleteDir(new File(targetDir));
-                deleteTenant(tenant.getId());
-                throw new STenantCreationException("Copy File Exception!");
-            }
+            BonitaHomeServer.getInstance().createTenant(tenantId);
+            bhTenantCreated = true;
             // modify user name and password
             final String userName = (String) tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.USERNAME);
-            try {
-                final String password = (String) tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.PASSWORD);
-                modifyTechnicalUser(tenant.getId(), userName, password);
-            } catch (final Exception e) {
-                IOUtil.deleteDir(new File(targetDir));
-                deleteTenant(tenant.getId());
-                throw new STenantCreationException("Modify File Exception!");
-            }
+            final String password = (String) tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.PASSWORD);
+            BonitaHomeServer.getInstance().modifyTechnicalUser(tenant.getId(), userName, password);
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final SessionService sessionService = platformAccessor.getSessionService();
+            final SessionService sessionService = tenantServiceAccessor.getSessionService();
+            final Long finalTenantId = tenantId;
             final Callable<Long> initializeTenant = new Callable<Long>() {
 
                 @Override
@@ -239,7 +213,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                     try {
                         // Create session
                         sessionAccessor = serviceAccessorFactory.createSessionAccessor();
-                        final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
+                        final SSession session = sessionService.createSession(finalTenantId, -1L, userName, true);
                         platformSessionId = sessionAccessor.getSessionId();
                         sessionAccessor.deleteSessionId();
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
@@ -250,10 +224,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         // Create custom page examples: done by page service start
                         // Create default themes: done by theme service start
 
-                        registerTenantJobListeners(platformAccessor, tenantId);
+                        registerTenantJobListeners(platformAccessor, finalTenantId);
 
                         sessionService.deleteSession(session.getId());
-                        return tenantId;
+                        return finalTenantId;
                     } finally {
                         cleanSessionAccessor(sessionAccessor, platformSessionId);
                     }
@@ -262,6 +236,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             };
             return transactionService.executeInTransaction(initializeTenant);
         } catch (final Exception e) {
+            if (bhTenantCreated) {
+                try {
+                    BonitaHomeServer.getInstance().deleteTenant(tenantId);
+                } catch (Exception e1) {
+                    throw new CreationException("Unable to delete default tenant (after a STenantCreationException) that was being created", e1);
+                }
+            }
             throw new CreationException("Unable to create tenant " + tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.NAME), e);
         }
     }
@@ -277,23 +258,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final org.bonitasoft.engine.service.TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
         final PageService pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
         new ProfilesImporterExt(profileService, identityService, pageService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
-    }
-
-    // modify user name and password
-    private void modifyTechnicalUser(final long tenantId, final String userName, final String password) throws IOException, BonitaHomeNotSetException {
-        final String tenantPath = BonitaHomeServer.getInstance().getTenantConfFolder(tenantId) + File.separator + "bonita-server.properties";
-        final File file = new File(tenantPath);
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-        final Properties properties = PropertiesManager.getProperties(file);
-        if (userName != null) {
-            properties.setProperty("userName", userName);
-        }
-        if (password != null) {
-            properties.setProperty("userPassword", password);
-        }
-        PropertiesManager.saveProperties(properties, file);
     }
 
     @Override
@@ -322,8 +286,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             tenantServiceAccessor.destroy();
 
             // delete tenant folder
-            final String targetDir = BonitaHomeServer.getInstance().getTenantsFolder() + File.separator + tenantId;
-            IOUtil.deleteDir(new File(targetDir));
+            BonitaHomeServer.getInstance().deleteTenant(tenantId);
         } catch (final STenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
             throw new DeletionException(e);
@@ -349,7 +312,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final SessionService sessionService = platformAccessor.getSessionService();
+            final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
 
             final NodeConfiguration nodeConfiguration = platformAccessor.getPlatformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -422,7 +385,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final SessionService sessionService = platformAccessor.getSessionService();
+            final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
 
@@ -606,7 +569,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final String username = (String) updatedFields.get(TenantField.USERNAME);
             final String password = (String) updatedFields.get(TenantField.PASSWOWRD);
             if (username != null || password != null) {
-                modifyTechnicalUser(tenantId, username, password);
+                BonitaHomeServer.getInstance().modifyTechnicalUser(tenantId, username, password);
             }
             // update tenant in database
             final STenantUpdateBuilder tenantUpdateBuilder = getTenantUpdateDescriptor(udpater);

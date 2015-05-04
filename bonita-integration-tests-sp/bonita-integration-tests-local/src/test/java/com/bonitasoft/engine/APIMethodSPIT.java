@@ -8,9 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import org.bonitasoft.engine.test.APIMethodIT;
-import org.junit.Test;
-
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.impl.LogAPIExt;
 import com.bonitasoft.engine.api.impl.MonitoringAPIImpl;
@@ -19,9 +16,11 @@ import com.bonitasoft.engine.api.impl.PageAPIExt;
 import com.bonitasoft.engine.api.impl.PlatformMonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.ProcessAPIExt;
 import com.bonitasoft.engine.api.impl.ReportingAPIExt;
+import org.bonitasoft.engine.test.APIMethodLocalIT;
+import org.junit.Test;
 
 @SuppressWarnings("javadoc")
-public class APIMethodSPIT extends APIMethodIT {
+public class APIMethodSPIT extends APIMethodLocalIT {
 
     @Override
     @Test

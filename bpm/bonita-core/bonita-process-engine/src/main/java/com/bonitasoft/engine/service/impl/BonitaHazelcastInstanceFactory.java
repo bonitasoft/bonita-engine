@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
-import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 
 import com.hazelcast.config.Config;
@@ -25,6 +24,7 @@ import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 
 /**
  * @author Baptiste Mesta
@@ -37,23 +37,23 @@ public class BonitaHazelcastInstanceFactory implements PlatformLifecycleService 
     public BonitaHazelcastInstanceFactory() {
     }
 
-    public synchronized HazelcastInstance newHazelcastInstance(final Config config, final CacheConfigurations cacheConfigurations, final boolean enableStats,
-            final String statsPath, final long statsPrintInterval) throws IOException {
+    public synchronized HazelcastInstance newHazelcastInstance(final Config config, final List<CacheConfiguration> cacheConfigurations, final boolean enableStats,
+            final long statsPrintInterval) throws IOException, BonitaHomeNotSetException {
         if (hazelcastInstance == null) {
             hazelcastInstance = createNewInstance(config, cacheConfigurations);
             if (enableStats) {
-                initThreadThatDumpStats(hazelcastInstance, statsPath, statsPrintInterval);
+                initThreadThatDumpStats(hazelcastInstance, statsPrintInterval);
             }
         }
         return hazelcastInstance;
     }
 
-    private void initThreadThatDumpStats(final HazelcastInstance hazelcastInstance, final String statsPath, final long statsPrintInterval) throws IOException {
-        final Thread thread = new Thread(new HazelcastStatExtractor(hazelcastInstance, statsPath, statsPrintInterval));
+    private void initThreadThatDumpStats(final HazelcastInstance hazelcastInstance, final long statsPrintInterval) throws IOException, BonitaHomeNotSetException {
+        final Thread thread = new Thread(new HazelcastStatExtractor(hazelcastInstance, statsPrintInterval));
         thread.start();
     }
 
-    private HazelcastInstance createNewInstance(final Config config, final CacheConfigurations cacheConfigurations) {
+    private HazelcastInstance createNewInstance(final Config config, final List<CacheConfiguration> cacheConfigurations) {
         initializeCacheConfigurations(config, cacheConfigurations);
         // set classloader to null in order to use the context classloader instead
         config.setClassLoader(null);
@@ -62,9 +62,8 @@ public class BonitaHazelcastInstanceFactory implements PlatformLifecycleService 
         return hazelcastInstance2;
     }
 
-    private void initializeCacheConfigurations(final Config config, final CacheConfigurations cacheConfigurations) {
-        final List<CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
-        for (final CacheConfiguration cacheConfiguration : configurations) {
+    private void initializeCacheConfigurations(final Config config, final List<CacheConfiguration> cacheConfigurations) {
+        for (final CacheConfiguration cacheConfiguration : cacheConfigurations) {
             // use wildcard because name of caches are: "<tenant id>_<cache name>"
             final MapConfig mapConfig = new MapConfig("*" + cacheConfiguration.getName());
 

@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import java.io.IOException;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
@@ -15,7 +16,6 @@ import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.EJB3ServerAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
-import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
@@ -50,16 +50,29 @@ import org.bonitasoft.engine.util.APITypeManager;
 public final class TenantAPIAccessor {
 
     private static ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        final ApiAccessType apiType = APITypeManager.getAPIType();
+        final ApiAccessType apiType;
+        try {
+            apiType = APITypeManager.getAPIType();
+        } catch (IOException e) {
+            throw new ServerAPIException(e);
+        }
         Map<String, String> parameters = null;
         switch (apiType) {
             case LOCAL:
                 return LocalServerAPIFactory.getServerAPI();
             case EJB3:
-                parameters = APITypeManager.getAPITypeParameters();
+                try {
+                    parameters = APITypeManager.getAPITypeParameters();
+                } catch (IOException e) {
+                    throw new ServerAPIException(e);
+                }
                 return new EJB3ServerAPI(parameters);
             case HTTP:
-                parameters = APITypeManager.getAPITypeParameters();
+                try {
+                    parameters = APITypeManager.getAPITypeParameters();
+                } catch (IOException e) {
+                    throw new ServerAPIException(e);
+                }
                 return new HTTPServerAPI(parameters);
             default:
                 throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
@@ -117,7 +130,8 @@ public final class TenantAPIAccessor {
         return getAPI(CommandAPI.class, session);
     }
 
-    public static ProcessConfigurationAPI getProcessConfigurationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+    public static ProcessConfigurationAPI getProcessConfigurationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
+            UnknownAPITypeException {
         return getAPI(ProcessConfigurationAPI.class, session);
     }
 
@@ -168,4 +182,5 @@ public final class TenantAPIAccessor {
     public static ApplicationAPI getApplicationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ApplicationAPI.class, session);
     }
+
 }

@@ -15,8 +15,7 @@
 
 	<properties>
 		<distrib.dir>${project.build.directory}/bonita-engine-deploy</distrib.dir>
-		<bonita.home>${project.build.directory}/bonita</bonita.home>
-		<bonita.home.classifier>teamwork</bonita.home.classifier>
+		<bonita.home>${project.build.directory}/bonita-home</bonita.home>
 		<!-- TESTS DIRS -->
 		<test.class>com.bonitasoft.engine.BPMSPTestsForServers</test.class>
 		<report.results>${distrib.dir}/target/testresults</report.results>
