@@ -15,6 +15,7 @@ package org.bonitasoft.engine.theme;
 
 import java.util.List;
 
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -30,7 +31,7 @@ import org.bonitasoft.engine.theme.model.SThemeType;
 /**
  * @author Celine Souchet
  */
-public interface ThemeService {
+public interface ThemeService extends TenantLifecycleService {
 
     String THEME = "THEME";
 
