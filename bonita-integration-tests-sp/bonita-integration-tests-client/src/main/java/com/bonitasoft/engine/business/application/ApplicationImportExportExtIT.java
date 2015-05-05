@@ -38,7 +38,6 @@ import org.junit.Test;
  */
 public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business.application.TestWithApplication {
 
-    @Ignore
     @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "export", "layout" })
     @Test
     public void exportApplications_with_specific_layout_should_export_file_with_specific_layout() throws Exception {
@@ -51,11 +50,13 @@ public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business
         final byte[] applicationsByteArray = IOUtils.toByteArray(this.getClass().getResourceAsStream("applications_with_layout.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
 
+        //hr application
         final ApplicationCreatorExt hrCreator = new ApplicationCreatorExt("HR-dashboard", "My HR dashboard", "2.0", layout.getId(), theme.getId());
         hrCreator.setDescription("This is the HR dashboard.");
         hrCreator.setIconPath("/icon.jpg");
         hrCreator.setProfileId(userProfile.getId());
 
+        //enginering application
         final ApplicationCreator engineeringCreator = new org.bonitasoft.engine.business.application.ApplicationCreator("Engineering-dashboard",
                 "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("My", "Marketing", "2.0");
