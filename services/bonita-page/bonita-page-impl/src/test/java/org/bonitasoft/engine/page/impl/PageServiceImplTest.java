@@ -34,8 +34,10 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -51,6 +53,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.PageServiceListener;
 import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SInvalidPageTokenException;
 import org.bonitasoft.engine.page.SInvalidPageZipException;
@@ -144,6 +147,9 @@ public class PageServiceImplTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
+    @Mock
+    PageServiceListener apiExtensionPageServiceListener;
+
     @Before
     public void before() {
 
@@ -154,6 +160,10 @@ public class PageServiceImplTest {
                 profileService));
         doReturn(pageLogBuilder).when(pageServiceImpl).getPageLog(any(ActionType.class), anyString());
         doNothing().when(pageServiceImpl).initiateLogBuilder(anyLong(), anyInt(), any(SPersistenceLogBuilder.class), anyString());
+
+        final List<PageServiceListener> listeners = Arrays.asList(apiExtensionPageServiceListener);
+        pageServiceImpl.setPageServiceListeners(listeners);
+
 
     }
 
@@ -925,6 +935,20 @@ public class PageServiceImplTest {
         SPageAssert.assertThat(insertedPage1).hasContentType(SContentType.PAGE);
 
     }
+
+    @Test
+    public void should_rest_api_extsntion_record_page_mapping() throws Exception {
+        //given
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION));
+
+        //when
+        final SPage insertedPage = pageServiceImpl.addPage(content, CONTENT_NAME, USER_ID);
+
+        //then
+        SPageAssert.assertThat(insertedPage).hasContentType(SContentType.API_EXTENSION);
+
+    }
+
 
     protected Pair<String, byte[]> getPagePropertiesContentPair(String... otherProperties) {
         StringBuilder stringBuilder = new StringBuilder().append("name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n");
