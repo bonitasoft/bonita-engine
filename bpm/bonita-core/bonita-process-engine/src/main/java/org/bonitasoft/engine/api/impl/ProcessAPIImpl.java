@@ -3191,16 +3191,16 @@ public class ProcessAPIImpl implements ProcessAPI {
     private void throwContractViolationExceptionIfProcessContractIsInvalid(final Map<String, Serializable> inputs, long processDefinitionId)
             throws ContractViolationException, ProcessDefinitionNotFoundException {
         final SContractDefinition contractDefinition;
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            contractDefinition = getTenantAccessor().getProcessDefinitionService().getProcessDefinition(processDefinitionId)
+            contractDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processDefinitionId)
                     .getContract();
         } catch (SProcessDefinitionNotFoundException | SProcessDefinitionReadException e) {
             throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
         }
-        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(getTenantAccessor().getTechnicalLoggerService());
-        if (!validator.isValid(contractDefinition, inputs)) {
-            throw new ContractViolationException("Contract is not valid: ", validator.getComments());
-        }
+        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getExpressionService());
+        validator.isValid(processDefinitionId, contractDefinition, inputs);
+
     }
 
     @Override
@@ -5896,10 +5896,9 @@ public class ProcessAPIImpl implements ProcessAPI {
                 (SUserTaskInstance) flowNodeInstance);
         executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
         final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
-        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService());
-        if (!validator.isValid(contractDefinition, inputs)) {
-            throw new ContractViolationException("Contract is not valid: ", validator.getComments());
-        }
+        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getExpressionService());
+        validator.isValid(flowNodeInstance.getProcessDefinitionId(), contractDefinition, inputs);
+
     }
 
     @Override

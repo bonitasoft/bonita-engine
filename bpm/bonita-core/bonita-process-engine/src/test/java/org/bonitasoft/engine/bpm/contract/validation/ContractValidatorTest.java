@@ -10,15 +10,19 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import static java.util.Arrays.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.*;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.aMap;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.aContract;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,7 +32,11 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -37,12 +45,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ContractValidatorTest {
 
+    private static final long PROCESS_DEFINITION_ID = 1245l;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
     @Mock
     private ContractStructureValidator structureValidator;
-
     @Mock
     private ContractConstraintsValidator constraintValidator;
-
     @InjectMocks
     private ContractValidator contractValidator;
 
@@ -53,9 +62,9 @@ public class ContractValidatorTest {
     @Test
     public void should_have_an_empty_comments_list_if_validation_is_true() throws Exception {
 
-        final boolean valid = contractValidator.isValid(aContract().build(), aMap().build());
+        contractValidator.isValid(PROCESS_DEFINITION_ID, aContract().build(), aMap().build());
 
-        assertThat(valid).isTrue();
+
         assertThat(contractValidator.getComments()).isEmpty();
     }
 
@@ -64,11 +73,15 @@ public class ContractValidatorTest {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> inputs = aMap().build();
         doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
-        .when(structureValidator).validate(contract, inputs);
+                .when(structureValidator).validate(contract, inputs);
 
-        contractValidator.isValid(contract, inputs);
+        expectedException.expect(ContractViolationException.class);
+        try {
+            contractValidator.isValid(PROCESS_DEFINITION_ID, contract, inputs);
+        } finally {
+            verify(constraintValidator, never()).validate(anyLong(), any(SContractDefinition.class), anyVariables());
+        }
 
-        verify(constraintValidator, never()).validate(any(SContractDefinition.class), anyVariables());
     }
 
     @Test
@@ -76,11 +89,10 @@ public class ContractValidatorTest {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> variables = aMap().build();
         doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
-        .when(structureValidator).validate(contract, variables);
+                .when(structureValidator).validate(contract, variables);
 
-        final boolean valid = contractValidator.isValid(contract, variables);
-
-        assertThat(valid).isFalse();
+        expectedException.expect(ContractViolationException.class);
+        contractValidator.isValid(PROCESS_DEFINITION_ID, contract, variables);
     }
 
     @Test
@@ -89,11 +101,10 @@ public class ContractValidatorTest {
         final Map<String, Serializable> variables = aMap().build();
         final List<String> problems = Arrays.asList("There is problems with structure", "Might have issue with types too");
         doThrow(new ContractViolationException("bad structure", problems))
-        .when(structureValidator).validate(contract, variables);
+                .when(structureValidator).validate(contract, variables);
 
-        contractValidator.isValid(contract, variables);
-
-        assertThat(contractValidator.getComments()).isEqualTo(problems);
+        expectedException.expect(new ExceptionHavingExplanations(problems));
+        contractValidator.isValid(PROCESS_DEFINITION_ID, contract, variables);
     }
 
     @Test
@@ -101,11 +112,10 @@ public class ContractValidatorTest {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> variables = aMap().build();
         doThrow(new ContractViolationException("rule failure", new ArrayList<String>()))
-        .when(constraintValidator).validate(contract, variables);
+                .when(constraintValidator).validate(PROCESS_DEFINITION_ID, contract, variables);
 
-        final boolean valid = contractValidator.isValid(contract, variables);
-
-        assertThat(valid).isFalse();
+        expectedException.expect(ContractViolationException.class);
+        contractValidator.isValid(PROCESS_DEFINITION_ID, contract, variables);
     }
 
     @Test
@@ -114,11 +124,27 @@ public class ContractValidatorTest {
         final Map<String, Serializable> variables = aMap().build();
         final List<String> problems = asList("There is problems with a rule", "Might have issue with other rule too");
         doThrow(new ContractViolationException("rule failure", problems))
-        .when(constraintValidator).validate(contract, variables);
+                .when(constraintValidator).validate(PROCESS_DEFINITION_ID, contract, variables);
 
-        contractValidator.isValid(contract, variables);
-
-        assertThat(contractValidator.getComments()).isEqualTo(problems);
+        expectedException.expect(new ExceptionHavingExplanations(problems));
+        contractValidator.isValid(PROCESS_DEFINITION_ID, contract, variables);
     }
 
+    private static class ExceptionHavingExplanations extends BaseMatcher<Exception> {
+        private final List<String> problems;
+
+        public ExceptionHavingExplanations(List<String> problems) {
+            this.problems = problems;
+        }
+
+        @Override
+        public boolean matches(Object item) {
+            return (item instanceof ContractViolationException) && ((ContractViolationException) item).getExplanations().equals(problems);
+        }
+
+        @Override
+        public void describeTo(Description description) {
+
+        }
+    }
 }

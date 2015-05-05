@@ -527,7 +527,7 @@ public class UserTaskContractITest extends CommonAPIIT {
     }
 
     private ProcessDefinition deployAndEnableProcessWithTestConnectorWithAPICall(final ProcessDefinitionBuilder processDefinitionBuilder)
-            throws InvalidBusinessArchiveFormatException, BonitaException, IOException {
+            throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, ACTOR_NAME, matti, "TestConnectorWithAPICall.impl",
                 TestConnectorWithAPICall.class, "TestConnectorWithAPICall.jar");
     }
