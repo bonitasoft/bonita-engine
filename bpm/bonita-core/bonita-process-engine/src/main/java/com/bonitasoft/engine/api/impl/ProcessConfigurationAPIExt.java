@@ -66,7 +66,7 @@ public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl impl
     }
 
     @Override
-    public void updateGroovyExpression(long processDefintionId, long expressionDefinitionId, String content) {
+    public void updateExpressionContent(long processDefintionId, long expressionDefinitionId, String content) {
         // TODO implement me !
     }
 
