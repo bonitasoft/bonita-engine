@@ -117,7 +117,6 @@ public class ApplicationModelConverterExtTest {
         long layoutId = 20L;
         final ApplicationUpdaterExt updater = new ApplicationUpdaterExt();
         updater.setLayoutId(layoutId);
-        long before = System.currentTimeMillis();
 
         //when
         final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, userId);
@@ -125,9 +124,8 @@ public class ApplicationModelConverterExtTest {
         //then
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
-        assertThat(fields).hasSize(3); // field lastUpdateDate cannot be checked:
-        assertThat((Long)fields.get(SApplicationFields.LAST_UPDATE_DATE)).isGreaterThanOrEqualTo(before);
-        assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(userId);
+        assertThat(fields).hasSize(3); // fields updated by and last updated date are also updated
+        assertThat(fields).containsKeys(SApplicationFields.UPDATED_BY, SApplicationFields.LAST_UPDATE_DATE, SApplicationFields.LAYOUT_ID);
         assertThat(fields.get(SApplicationFields.LAYOUT_ID)).isEqualTo(layoutId);
     }
 
@@ -137,7 +135,22 @@ public class ApplicationModelConverterExtTest {
         long userId = 1L;
         final ApplicationUpdaterExt updater = new ApplicationUpdaterExt();
         updater.setToken("newToken");
-        long before = System.currentTimeMillis();
+
+        //when
+        final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, userId);
+
+        //then
+        assertThat(updateDescriptor).isNotNull();
+        assertThat(updateDescriptor.getFields()).doesNotContainKey(SApplicationFields.LAYOUT_ID);
+    }
+
+    @Test
+    public void toApplicationUpdateDescriptor_should_map_themeId() throws Exception {
+        //given
+        long userId = 1L;
+        long themeId = 20L;
+        final ApplicationUpdaterExt updater = new ApplicationUpdaterExt();
+        updater.setThemeId(themeId);
 
         //when
         final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, userId);
@@ -145,10 +158,24 @@ public class ApplicationModelConverterExtTest {
         //then
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
-        assertThat(fields).hasSize(3); // field lastUpdateDate cannot be checked:
-        assertThat((Long)fields.get(SApplicationFields.LAST_UPDATE_DATE)).isGreaterThanOrEqualTo(before);
-        assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(userId);
-        assertThat(fields.get(SApplicationFields.TOKEN)).isEqualTo("newToken");
+        assertThat(fields).hasSize(3); // fields updated by and last updated date are also updated
+        assertThat(fields).containsKeys(SApplicationFields.UPDATED_BY, SApplicationFields.LAST_UPDATE_DATE, SApplicationFields.THEME_ID);
+        assertThat(fields.get(SApplicationFields.THEME_ID)).isEqualTo(themeId);
+    }
+
+    @Test
+    public void toApplicationUpdateDescriptor_should_not_update_themeId_if_this_field_is_not_set_to_be_updated() throws Exception {
+        //given
+        long userId = 1L;
+        final ApplicationUpdaterExt updater = new ApplicationUpdaterExt();
+        updater.setToken("newToken");
+
+        //when
+        final EntityUpdateDescriptor updateDescriptor = converter.toApplicationUpdateDescriptor(updater, userId);
+
+        //then
+        assertThat(updateDescriptor).isNotNull();
+        assertThat(updateDescriptor.getFields()).doesNotContainKey(SApplicationFields.THEME_ID);
     }
 
 }

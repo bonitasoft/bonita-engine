@@ -50,5 +50,8 @@ public class ApplicationModelConverterExt extends ApplicationModelConverter {
         if (updater.getFields().containsKey(ApplicationField.LAYOUT_ID)) {
             builder.updateLayoutId((Long) updater.getFields().get(ApplicationField.LAYOUT_ID));
         }
+        if(updater.getFields().containsKey(ApplicationField.THEME_ID)) {
+            builder.updateThemeId((Long) updater.getFields().get(ApplicationField.THEME_ID));
+        }
     }
 }
