@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-platform-authentication</artifactId>
 		<groupId>org.bonitasoft.engine.platform.authentication</groupId>
-		<version>6.5.2-SNAPSHOT</version>
+		<version>6.5.2</version>
 	</parent>
 
 	<artifactId>bonita-platform-authentication-api</artifactId>
