@@ -258,11 +258,13 @@ public class PageAPIIT extends CommonAPIIT {
         // given
         final String pageName1 = generateUniquePageName(0);
         final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName1, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION,
-                "contentType=WillBeIgnored");
+                "contentType=WillBeIgnored", "apiExtensions=myGetResource", "myGetResource.method=POST", "myGetResource.pathTemplate=helloWorld",
+                "myGetResource.classFileName=Index.groovy");
 
         final String pageName2 = generateUniquePageName(1);
         final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName2, DISPLAY_NAME, "with page creator " + PAGE_DESCRIPTION, "contentType="
-                + ContentType.API_EXTENSION);
+                + ContentType.API_EXTENSION, "apiExtensions=myGetResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
+                "myGetResource.classFileName=Index.groovy");
 
         // when
         final Page pageWithCreator = getPageAPI().createPage(

@@ -1127,16 +1127,23 @@
         <constructor-arg name="tenantId" value="${tenantId}" />
     </bean>
 
+    <bean id="apiExtensionPageServiceListener" class="org.bonitasoft.engine.page.impl.ApiExtensionPageServiceListenerImpl">
+        <constructor-arg name="pageMappingService" ref="pageMappingService" />
+    </bean>
 
-    <bean id="pageService" class="org.bonitasoft.engine.page.impl.PageServiceImpl">
+    <bean id="pageService" class="org.bonitasoft.engine.page.impl.PageServiceImpl" autowire="byType">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="profileService" ref="profileService" />
+        <property name="pageServiceListeners">
+            <list>
+                <ref bean="apiExtensionPageServiceListener" />
+            </list>
+        </property>
     </bean>
-
 
     <bean id="loginService" class="org.bonitasoft.engine.core.login.SecuredLoginServiceImpl">
         <constructor-arg ref="${authentication.service.ref.name:authenticationService}" />
@@ -1144,7 +1151,6 @@
         <constructor-arg ref="sessionAccessor" />
         <constructor-arg ref="identityService" />
     </bean>
-
 
     <bean id="tenantTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl">
         <constructor-arg name="tenantId" value="${tenantId}" />
@@ -1528,7 +1534,6 @@
 
     <bean id="sessionProvider" class="org.bonitasoft.engine.session.impl.SessionProviderImpl" />
 
-
     <bean id="pageMappingService" class="org.bonitasoft.engine.page.impl.PageMappingServiceImpl">
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
@@ -1548,7 +1553,7 @@
         <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
         <constructor-arg name="formMappingService" ref="formMappingService" />
     </bean>
-    <bean id="externalUrlAdapter" class="org.bonitasoft.engine.core.form.ExternalURLAdapter" />
 
+    <bean id="externalUrlAdapter" class="org.bonitasoft.engine.core.form.ExternalURLAdapter" />
 
 </beans>

@@ -16,7 +16,6 @@ package org.bonitasoft.engine.page.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +40,7 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.PageServiceListener;
 import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SInvalidPageTokenException;
 import org.bonitasoft.engine.page.SInvalidPageZipException;
@@ -129,6 +129,10 @@ public class PageServiceImpl implements PageService {
 
     private final ProfileService profileService;
 
+    private List<PageServiceListener> pageServiceListeners;
+
+    private final SPageContentHelper helper;
+
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
             final ProfileService profileService) {
@@ -138,6 +142,7 @@ public class PageServiceImpl implements PageService {
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
         this.profileService = profileService;
+        helper = new SPageContentHelper();
     }
 
     @Override
@@ -163,19 +168,19 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public SPage getPageByNameAndProcessDefinitionId(String name, long processDefinitionId) throws SBonitaReadException {
-        Map<String, Object> inputParameters = new HashMap<>();
+    public SPage getPageByNameAndProcessDefinitionId(final String name, final long processDefinitionId) throws SBonitaReadException {
+        final Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("pageName", name);
         inputParameters.put("processDefinitionId", processDefinitionId);
         return persistenceService.selectOne(new SelectOneDescriptor<SPage>(QUERY_GET_PAGE_BY_NAME_AND_PROCESS_DEFINITION_ID, inputParameters, SPage.class));
     }
 
     @Override
-    public List<SPage> getPageByProcessDefinitionId(long processDefinitionId, int fromIndex, int numberOfResults) throws SBonitaReadException {
-        Map<String, Object> inputParameters = new HashMap<>();
+    public List<SPage> getPageByProcessDefinitionId(final long processDefinitionId, final int fromIndex, final int numberOfResults) throws SBonitaReadException {
+        final Map<String, Object> inputParameters = new HashMap<>();
         inputParameters.put("processDefinitionId", processDefinitionId);
         final OrderByOption orderByOption = new OrderByOption(SPage.class, SPageFields.PAGE_NAME, OrderByType.ASC);
-        QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults, Collections.singletonList(orderByOption));
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults, Collections.singletonList(orderByOption));
         return persistenceService.selectList(new SelectListDescriptor<SPage>(QUERY_GET_PAGE_BY_PROCESS_DEFINITION_ID, inputParameters, SPage.class,
                 queryOptions));
     }
@@ -204,7 +209,7 @@ public class PageServiceImpl implements PageService {
         try {
             final Map<String, byte[]> zipContent = IOUtil.unzip(content);
             checkZipContainsRequiredEntries(zipContent);
-            pageProperties = loadPageProperties(zipContent);
+            pageProperties = helper.loadPageProperties(zipContent);
             checkPageNameIsValid(pageProperties.getProperty(PageService.PROPERTIES_NAME), provided);
             checkPageDisplayNameIsValid(pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME));
         } catch (final IOException e) {
@@ -227,14 +232,21 @@ public class PageServiceImpl implements PageService {
             }
             recorder.recordInsert(insertContentRecord, insertContentEvent);
             page.setId(pageContent.getId());
-
+            notifyPageInsert(page,content);
             return page;
         } catch (SRecorderException | SBonitaReadException re) {
             throw new SObjectCreationException(re);
         }
     }
 
-    private SPage checkIfPageAlreadyExists(SPage page) throws SBonitaReadException {
+    private void notifyPageInsert(final SPage page, final byte[] content) throws SObjectCreationException {
+        for (final PageServiceListener pageServiceListener : pageServiceListeners) {
+            pageServiceListener.pageInserted(page,content);
+        }
+
+    }
+
+    private SPage checkIfPageAlreadyExists(final SPage page) throws SBonitaReadException {
         SPage existingPage;
         if (page.getProcessDefinitionId() != null) {
             existingPage = getPageByNameAndProcessDefinitionId(page.getName(), page.getProcessDefinitionId());
@@ -244,34 +256,13 @@ public class PageServiceImpl implements PageService {
         return existingPage;
     }
 
-    /**
-     * @param displayName
-     * @throws SInvalidPageTokenException
-     */
     private void checkPageDisplayNameIsValid(final String displayName) throws SInvalidPageZipMissingPropertiesException,
             SInvalidPageZipMissingAPropertyException {
-        if (displayName == null
-                || displayName.length() == 0) {
+        if (displayName == null || displayName.length() == 0) {
             throw new SInvalidPageZipMissingAPropertyException(PageService.PROPERTIES_DISPLAY_NAME);
         }
     }
 
-    private Properties loadPageProperties(final Map<String, byte[]> zipContent) throws SInvalidPageZipMissingPropertiesException, IOException {
-        final byte[] pagePropertiesContent = zipContent.get(PageService.PROPERTIES_FILE_NAME);
-        if (pagePropertiesContent == null) {
-            throw new SInvalidPageZipMissingPropertiesException();
-        }
-
-        final Properties pageProperties = new Properties();
-        pageProperties.load(new StringReader(new String(pagePropertiesContent, "UTF-8")));
-        return pageProperties;
-    }
-
-    /**
-     * @param name
-     * @param provided
-     * @throws SInvalidPageTokenException
-     */
     private void checkPageNameIsValid(final String name, final boolean provided) throws SInvalidPageTokenException {
         if (name == null || name.isEmpty() || !provided && !name.matches(PAGE_TOKEN_PREFIX + "\\p{Alnum}+")) {
             throw new SInvalidPageTokenException("Page name is not valid, it must contains only alpha numeric characters and start with " + PAGE_TOKEN_PREFIX);
@@ -288,16 +279,8 @@ public class PageServiceImpl implements PageService {
         throw new SInvalidPageZipMissingIndexException();
     }
 
-    /**
-     * @param name
-     * @param displayName
-     * @param description
-     * @param provided
-     * @param contentType
-     * @return
-     */
     private SPage createPage(final String name, final String displayName, final String description, final String contentName, final long creatorUserId,
-            final boolean provided, String contentType) {
+            final boolean provided, final String contentType) {
         return BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
                 System.currentTimeMillis(), creatorUserId, provided, contentName).setContentType(contentType).done();
     }
@@ -445,7 +428,7 @@ public class PageServiceImpl implements PageService {
         final byte[] content = pageContent.getContent();
         try {
             final Map<String, byte[]> contentAsMap = IOUtil.unzip(content);
-            byte[] bytes = contentAsMap.get("page.properties");
+            final byte[] bytes = contentAsMap.get("page.properties");
             final Properties pageProperties = new Properties();
             if (bytes != null) {
                 pageProperties.load(new ByteArrayInputStream(bytes));
@@ -488,7 +471,7 @@ public class PageServiceImpl implements PageService {
 
     }
 
-    protected void updatePageNameInProfileEntry(EntityUpdateDescriptor entityUpdateDescriptor, String oldPageName) throws SInvalidPageTokenException,
+    protected void updatePageNameInProfileEntry(final EntityUpdateDescriptor entityUpdateDescriptor, final String oldPageName) throws SInvalidPageTokenException,
             SBonitaReadException, SProfileEntryUpdateException {
         if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME)) {
             // page name has changed
@@ -498,7 +481,7 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    protected void checkPageDuplicate(long pageId, EntityUpdateDescriptor entityUpdateDescriptor, SPageLogBuilder logBuilder, String logMethodName)
+    protected void checkPageDuplicate(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor, final SPageLogBuilder logBuilder, final String logMethodName)
             throws SBonitaReadException, SObjectAlreadyExistsException {
         if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME)) {
             final SPage pageByName = getPageByName(entityUpdateDescriptor.getFields().get(SPageFields.PAGE_NAME).toString());
@@ -576,7 +559,7 @@ public class PageServiceImpl implements PageService {
 		importProvidedPage("bonita-layout-page.zip");
 		importProvidedPage("bonita-theme-page.zip");
         importProvidedPage("step-autogenerated-form.zip");
-        importProvidedPage("process-autogenerated-form.zip");    
+        importProvidedPage("process-autogenerated-form.zip");
 	}
 
     private void importProvidedPage(final String zipName) throws SBonitaReadException, SObjectCreationException, SObjectAlreadyExistsException,
@@ -628,4 +611,11 @@ public class PageServiceImpl implements PageService {
         // nothing to do
     }
 
+    public List<PageServiceListener> getPageServiceListeners() {
+        return pageServiceListeners;
+    }
+
+    public void setPageServiceListeners(final List<PageServiceListener> pageServiceListeners) {
+        this.pageServiceListeners = pageServiceListeners;
+    }
 }
