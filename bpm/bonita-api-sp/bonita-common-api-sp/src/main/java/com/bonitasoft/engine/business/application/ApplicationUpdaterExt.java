@@ -9,6 +9,8 @@
 
 package com.bonitasoft.engine.business.application;
 
+import org.bonitasoft.engine.business.application.ApplicationField;
+
 /**
  * Allows to define which {@link org.bonitasoft.engine.business.application.Application} fields will be updated
  * 
@@ -27,7 +29,21 @@ public class ApplicationUpdaterExt extends org.bonitasoft.engine.business.applic
      * @see org.bonitasoft.engine.business.application.Application
      */
     public ApplicationUpdaterExt setLayoutId(final Long layoutId) {
-        getFields().put(org.bonitasoft.engine.business.application.ApplicationField.LAYOUT_ID, layoutId);
+        getFields().put(ApplicationField.LAYOUT_ID, layoutId);
+        return this;
+    }
+
+    /**
+     * Defines the identifier of the new {@link org.bonitasoft.engine.page.Page} used as the {@link org.bonitasoft.engine.business.application.Application}
+     * theme.
+     *
+     * @param themeId the identifier of {@code Page} used as theme
+     * @return the current {@code ApplicationUpdater}
+     * @see org.bonitasoft.engine.page.Page
+     * @see org.bonitasoft.engine.business.application.Application
+     */
+    public ApplicationUpdaterExt setThemeId(final Long themeId) {
+        getFields().put(ApplicationField.THEME_ID, themeId);
         return this;
     }
 

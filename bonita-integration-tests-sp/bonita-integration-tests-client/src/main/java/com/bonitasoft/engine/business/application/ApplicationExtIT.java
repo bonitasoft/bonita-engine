@@ -78,29 +78,31 @@ public class ApplicationExtIT extends org.bonitasoft.engine.business.application
         getApplicationAPI().deleteApplication(application.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "update", "layout" })
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "update", "layout", "theme" })
     @Test
-    public void updateApplication_layout_should_return_application_up_with_new_layout() throws Exception {
+    public void updateApplication_layout_and_theme_should_return_application_with_new_layout_and_theme() throws Exception {
         //given
         Page layout = createPage("custompage_customizedLayout");
+        Page theme = createPage("custompage_customizedTheme");
         final ApplicationCreatorExt creator = new ApplicationCreatorExt("My-Application", "My application display name", "1.0");
         final org.bonitasoft.engine.business.application.Application application = getApplicationAPI().createApplication(creator);
 
         final ApplicationUpdaterExt updater = new ApplicationUpdaterExt();
-        updater.setToken("My-updated-app");
         updater.setLayoutId(layout.getId());
+        updater.setThemeId(theme.getId());
 
         //when
         final org.bonitasoft.engine.business.application.Application updatedApplication = getApplicationAPI().updateApplication(application.getId(), updater);
 
         //then
         assertThat(updatedApplication).isNotNull();
-        assertThat(updatedApplication.getToken()).isEqualTo("My-updated-app");
         assertThat(updatedApplication.getLayoutId()).isEqualTo(layout.getId());
+        assertThat(updatedApplication.getThemeId()).isEqualTo(theme.getId());
         assertThat(updatedApplication).isEqualTo(getApplicationAPI().getApplication(application.getId()));
 
         getApplicationAPI().deleteApplication(application.getId());
         getPageAPI().deletePage(layout.getId());
+        getPageAPI().deletePage(theme.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "search",
