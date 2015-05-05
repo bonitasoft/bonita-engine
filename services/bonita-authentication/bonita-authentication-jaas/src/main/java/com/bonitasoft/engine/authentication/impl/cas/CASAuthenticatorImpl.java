@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft is a trademark of BonitaSoft SA.
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
- * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
- * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ * Bonitasoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
 package com.bonitasoft.engine.authentication.impl.cas;
 
@@ -348,7 +348,9 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
 
             @Override
             public InputSource resolveEntity(final String publicId, final String systemId) {
-                return new InputSource(new StringReader(""));
+                InputSource inputSource = new InputSource(new StringReader(""));
+                inputSource.setEncoding("UTF-8");
+				return inputSource;
             }
         });
 
@@ -358,9 +360,9 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
         tidy.setMakeClean(true);
         tidy.setXmlOut(true);
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        tidy.parse(new ByteArrayInputStream(content.getBytes("UTF8")), byteArrayOutputStream);
-        final String contentUTF8 = new String(byteArrayOutputStream.toByteArray(), "UTF8");
-        return builder.parse(new ByteArrayInputStream(contentUTF8.getBytes("UTF8")));
+        tidy.parse(new ByteArrayInputStream(content.getBytes("UTF-8")), byteArrayOutputStream);
+        final String contentUTF8 = new String(byteArrayOutputStream.toByteArray(), "UTF-8");
+        return builder.parse(new ByteArrayInputStream(contentUTF8.getBytes("UTF-8")));
     }
 
     /**

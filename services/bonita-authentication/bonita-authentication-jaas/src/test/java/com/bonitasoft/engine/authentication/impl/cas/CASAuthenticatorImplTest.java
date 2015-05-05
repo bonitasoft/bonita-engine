@@ -1,9 +1,9 @@
 /*******************************************************************************
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft is a trademark of BonitaSoft SA.
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
- * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * Bonitasoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
 package com.bonitasoft.engine.authentication.impl.cas;
@@ -65,6 +65,7 @@ import org.w3c.dom.Document;
 public class CASAuthenticatorImplTest {
 
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    private static final String REGEX_LINEBREAK_ALL_PLATFORMS = "\\r\\n|\\r|\\n";
 
     private final String casService = "http://bonitasoft.com/bonita";
 
@@ -382,15 +383,15 @@ public class CASAuthenticatorImplTest {
     @Test
     public void testCreateDOMDocumentFromResponseWithLoginForm() throws Exception {
         final String content = FileUtils
-                .readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.html"), "UTF8");
+                .readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.html"), "UTF-8");
         final Document doc = casAuthenticatorImpl.createDOMDocumentFromResponse(content);
         final String xmlDoc = transformDocumentToString(doc).replaceAll(LINE_SEPARATOR, "");
         // uncomment to see diff in eclipse
         // assertEquals(sw.toString(), FileUtils.readFileToString(new
         // File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.xml")));
         final String readFileToString = FileUtils
-                .readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.xml"), "UTF8").replaceAll(
-                        LINE_SEPARATOR, "");
+                .readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.xml"), "UTF-8")
+                .replaceAll(REGEX_LINEBREAK_ALL_PLATFORMS, "");
         assertThat(xmlDoc).isEqualToIgnoringCase(readFileToString);
     }
 
