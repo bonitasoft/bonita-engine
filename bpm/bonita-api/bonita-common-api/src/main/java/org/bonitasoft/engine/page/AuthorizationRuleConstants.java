@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,14 +10,19 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.core.process.definition.model;
+ */
+package org.bonitasoft.engine.page;
 
 /**
- * @author Matthieu Chaffotte
+ * author Emmanuel Duchastenier
  */
-public interface SSimpleInputDefinition extends SInputDefinition {
+public class AuthorizationRuleConstants {
 
-    SType getType();
-
+    public static final String IS_ADMIN = "IS_ADMIN";
+    public static final String IS_PROCESS_OWNER = "IS_PROCESS_OWNER";
+    public static final String IS_PROCESS_INITIATOR = "IS_PROCESS_INITIATOR";
+    public static final String IS_INVOLVED_IN_PROCESS_INSTANCE = "IS_INVOLVED_IN_PROCESS_INSTANCE";
+    public static final String IS_TASK_AVAILABLE_FOR_USER = "IS_TASK_AVAILABLE_FOR_USER";
+    public static final String IS_ACTOR_INITIATOR = "IS_ACTOR_INITIATOR";
+    public static final String IS_TASK_PERFORMER = "IS_TASK_PERFORMER";
 }

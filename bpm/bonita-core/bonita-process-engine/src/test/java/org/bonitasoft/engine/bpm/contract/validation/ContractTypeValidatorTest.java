@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.contract.validation;
 
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SComplexInputDefinitionBuilder.aComplexInput;
@@ -20,16 +20,14 @@ import static org.bonitasoft.engine.core.process.definition.model.SType.DECIMAL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
-import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,14 +60,14 @@ public class ContractTypeValidatorTest {
 
     @Test(expected = InputValidationException.class)
     public void should_not_validate_null_for_a_complex_type() throws Exception {
-        final SComplexInputDefinitionImpl definition = new SComplexInputDefinitionImpl("a complex definition");
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a complex definition","");
 
         contractTypeValidator.validate(definition, null);
     }
 
     @Test(expected = InputValidationException.class)
     public void should_not_validate_non_map_object_for_complex_type() throws Exception {
-        final SComplexInputDefinitionImpl definition = new SComplexInputDefinitionImpl("a complex definition");
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a complex definition","");
 
         contractTypeValidator.validate(definition, "this is not a map");
     }
@@ -77,11 +75,11 @@ public class ContractTypeValidatorTest {
     @Test
     public void should_validate_map_object_for_complex_type() throws Exception {
         //given
-        final SComplexInputDefinitionImpl definition = new SComplexInputDefinitionImpl("a complex definition", "description", true,
-                Arrays.asList((SSimpleInputDefinition) new SSimpleInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description")), null);
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a complex definition", "description", true,
+                Arrays.<SInputDefinition>asList(new SInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description")));
 
-        definition.getSimpleInputDefinitions().add(
-                new SSimpleInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description"));
+        definition.getInputDefinitions().add(
+                new SInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description"));
 
         //when
         contractTypeValidator.validate(definition, new ArrayList<String>());
@@ -92,7 +90,7 @@ public class ContractTypeValidatorTest {
     @Test
     public void should_validate_multiple_simple_type_empty_list() throws Exception {
         //given
-        final SSimpleInputDefinitionImpl definition = new SSimpleInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description", true);
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description", true);
 
         //when
         contractTypeValidator.validate(definition, new ArrayList<String>());
@@ -104,7 +102,7 @@ public class ContractTypeValidatorTest {
     @Test
     public void should_validate_multiple_complex_type_empty_list() throws Exception {
         //given
-        final SSimpleInputDefinitionImpl definition = new SSimpleInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description", true);
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description", true);
 
         //when
         contractTypeValidator.validate(definition, new ArrayList<String>());
@@ -116,7 +114,7 @@ public class ContractTypeValidatorTest {
     @Test
     public void should_validate_multiple_simple_type() throws Exception {
         //given
-        final SSimpleInputDefinitionImpl definition = new SSimpleInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description", true);
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description", true);
 
         //when
         contractTypeValidator.validate(definition, Arrays.asList("input1", "input2"));
@@ -128,10 +126,10 @@ public class ContractTypeValidatorTest {
     @Test(expected = InputValidationException.class)
     public void should_not_validate_multiple_simple_type_with_bad_values() throws Exception {
         //given
-        final SSimpleInputDefinitionImpl definition = new SSimpleInputDefinitionImpl("a simple multiple definition", SType.DECIMAL, "description", true);
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a simple multiple definition", SType.DECIMAL, "description", true);
 
         //when then exception
-        contractTypeValidator.validate(definition, Arrays.asList("not a number"));
+        contractTypeValidator.validate(definition, Collections.singletonList("not a number"));
 
 
     }
@@ -139,7 +137,7 @@ public class ContractTypeValidatorTest {
     @Test(expected = InputValidationException.class)
     public void should_not_validate_multiple_simple_type() throws Exception {
         //given
-        final SSimpleInputDefinitionImpl definition = new SSimpleInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description", true);
+        final SInputDefinitionImpl definition = new SInputDefinitionImpl("a simple multiple definition", SType.TEXT, "description", true);
 
         //when then exception
         contractTypeValidator.validate(definition, "i am not a list");
@@ -149,8 +147,8 @@ public class ContractTypeValidatorTest {
     public void should_not_validate_multiple_complex_type_when_no_list() throws Exception {
         //given
 
-        final SSimpleInputDefinition simpleDefinition = new SSimpleInputDefinitionImpl("simpleInput", SType.TEXT, "description");
-        final SComplexInputDefinition complexDefinition = aComplexInput().withName("complexName").withDescription("complex multiple input").withMultiple(true)
+        final SInputDefinition simpleDefinition = new SInputDefinitionImpl("simpleInput", SType.TEXT, "description");
+        final SInputDefinition complexDefinition = aComplexInput().withName("complexName").withDescription("complex multiple input").withMultiple(true)
                 .withInput(simpleDefinition).build();
 
         //when then exception
@@ -160,14 +158,14 @@ public class ContractTypeValidatorTest {
     @Test
     public void should_validate_multiple_complex_type() throws Exception {
         //given
-        final SSimpleInputDefinition simpleDefinition = new SSimpleInputDefinitionImpl("simpleInput", SType.TEXT, "description");
-        final SComplexInputDefinition complexDefinition = aComplexInput().withName("complexName").withDescription("complex multiple input").withMultiple(true)
+        final SInputDefinition simpleDefinition = new SInputDefinitionImpl("simpleInput", SType.TEXT, "description");
+        final SInputDefinition complexDefinition = aComplexInput().withName("complexName").withDescription("complex multiple input").withMultiple(true)
                 .withInput(simpleDefinition).build();
 
         //when
-        final Map<String, Object> complexInput = new HashMap<String, Object>();
+        final Map<String, Object> complexInput = new HashMap<>();
         complexInput.put("simpleInput", "text value");
-        final List<Map<String, Object>> complexList = new ArrayList<Map<String, Object>>();
+        final List<Map<String, Object>> complexList = new ArrayList<>();
         complexList.add(complexInput);
         complexList.add(complexInput);
         complexList.add(complexInput);
@@ -180,25 +178,25 @@ public class ContractTypeValidatorTest {
     @Test
     public void should_validate_multiple_complex_with_multiple_complex_type() throws Exception {
         //given
-        final SSimpleInputDefinition simpleDefinition = new SSimpleInputDefinitionImpl("simpleInput", SType.INTEGER, "description");
-        final SComplexInputDefinition complexListDefinition = aComplexInput().withName("complexInComplex").withDescription("complex multiple input")
+        final SInputDefinition simpleDefinition = new SInputDefinitionImpl("simpleInput", SType.INTEGER, "description");
+        final SInputDefinition complexListDefinition = aComplexInput().withName("complexInComplex").withDescription("complex multiple input")
                 .withMultiple(true)
                 .withInput(simpleDefinition).build();
-        final SComplexInputDefinition complexDefinition = aComplexInput().withName("complexName").withDescription("complex multiple input")
+        final SInputDefinition complexDefinition = aComplexInput().withName("complexName").withDescription("complex multiple input")
                 .withInput(complexListDefinition).build();
 
         //when
-        final Map<String, Object> complexInput = new HashMap<String, Object>();
+        final Map<String, Object> complexInput = new HashMap<>();
         complexInput.put("simpleInput", 123);
-        final List<Map<String, Object>> complexList = new ArrayList<Map<String, Object>>();
+        final List<Map<String, Object>> complexList = new ArrayList<>();
         complexList.add(complexInput);
         complexList.add(complexInput);
         complexList.add(complexInput);
 
-        final Map<String, Object> taskInput = new HashMap<String, Object>();
+        final Map<String, Object> taskInput = new HashMap<>();
         taskInput.put("complexInComplex", complexList);
 
-        final List<Map<String, Object>> taskInputList = new ArrayList<Map<String, Object>>();
+        final List<Map<String, Object>> taskInputList = new ArrayList<>();
         taskInputList.add(taskInput);
         taskInputList.add(taskInput);
         taskInputList.add(taskInput);
@@ -211,22 +209,22 @@ public class ContractTypeValidatorTest {
     @Test(expected = InputValidationException.class)
     public void should_not_validate_complex_with_multiple_complex_type() throws Exception {
         //given
-        final SSimpleInputDefinition simpleDefinition = new SSimpleInputDefinitionImpl("simpleInput", SType.DATE, "description");
-        final SComplexInputDefinition complexListDefinition = aComplexInput().withName("complexInComplex").withDescription("complex multiple input")
+        final SInputDefinition simpleDefinition = new SInputDefinitionImpl("simpleInput", SType.DATE, "description");
+        final SInputDefinition complexListDefinition = aComplexInput().withName("complexInComplex").withDescription("complex multiple input")
                 .withMultiple(true)
                 .withInput(simpleDefinition).build();
-        final SComplexInputDefinition complexDefinition = aComplexInput().withName("complexName").withDescription("complex multiple input")
+        final SInputDefinition complexDefinition = aComplexInput().withName("complexName").withDescription("complex multiple input")
                 .withInput(complexListDefinition).withMultiple(true).build();
 
         //when
-        final Map<String, Object> complexInput = new HashMap<String, Object>();
+        final Map<String, Object> complexInput = new HashMap<>();
         complexInput.put("simpleInput", "not a date");
-        final List<Map<String, Object>> complexList = new ArrayList<Map<String, Object>>();
+        final List<Map<String, Object>> complexList = new ArrayList<>();
         complexList.add(complexInput);
         complexList.add(complexInput);
         complexList.add(complexInput);
 
-        final Map<String, Object> taskInput = new HashMap<String, Object>();
+        final Map<String, Object> taskInput = new HashMap<>();
         taskInput.put("complexInComplex", complexList);
 
         //then no exception
@@ -237,15 +235,15 @@ public class ContractTypeValidatorTest {
     @Test(expected = InputValidationException.class)
     public void should_not_validate_multiple_complex_type() throws Exception {
         //given
-        final SSimpleInputDefinition simpleDefinition = new SSimpleInputDefinitionImpl("simpleInput", SType.INTEGER, "description");
-        final SComplexInputDefinition complexDefinition = aComplexInput().withName("complexName").withDescription("complex multiple input").withMultiple(true)
+        final SInputDefinition simpleDefinition = new SInputDefinitionImpl("simpleInput", SType.INTEGER, "description");
+        final SInputDefinition complexDefinition = aComplexInput().withName("complexName").withDescription("complex multiple input").withMultiple(true)
                 .withInput(simpleDefinition).build();
 
         //when
-        final Map<String, Object> complexInput = new HashMap<String, Object>();
+        final Map<String, Object> complexInput = new HashMap<>();
 
         complexInput.put("simpleInput", "zz");
-        final List<Map<String, Object>> complexList = new ArrayList<Map<String, Object>>();
+        final List<Map<String, Object>> complexList = new ArrayList<>();
         complexList.add(complexInput);
         complexList.add(complexInput);
         complexList.add(complexInput);

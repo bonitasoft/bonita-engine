@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.contract;
 
+import java.util.List;
+
 import org.bonitasoft.engine.bpm.DescriptionElement;
 
 /**
@@ -25,4 +27,14 @@ public interface InputDefinition extends DescriptionElement {
 
     boolean isMultiple();
 
+    /**
+     * Gets the type of the input.
+     *
+     * @return the input {@link Type}
+     */
+    Type getType();
+
+    List<InputDefinition> getInputs();
+
+    boolean hasChildren();
 }

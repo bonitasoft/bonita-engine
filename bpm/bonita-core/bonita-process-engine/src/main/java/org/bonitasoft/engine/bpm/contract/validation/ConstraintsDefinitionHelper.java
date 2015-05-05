@@ -15,45 +15,40 @@ package org.bonitasoft.engine.bpm.contract.validation;
 
 import java.util.List;
 
-import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 
 public class ConstraintsDefinitionHelper {
 
     protected SInputDefinition getInputDefinition(final SContractDefinition contract, final String inputName) {
-        final List<SSimpleInputDefinition> simpleInputs = contract.getSimpleInputs();
-        final List<SComplexInputDefinition> complexInputs = contract.getComplexInputs();
-        return getInputDefinition(inputName, simpleInputs, complexInputs);
+        final List<SInputDefinition> inputs = contract.getInputs();
+        return getInputDefinition(inputName, inputs);
 
     }
 
-    private SInputDefinition getInputDefinition(final String inputName, final List<SSimpleInputDefinition> simpleInputs,
-            final List<SComplexInputDefinition> complexInputs) {
-        SInputDefinition inputDefinition = getInputDefinitionInSimple(inputName, simpleInputs);
+    private SInputDefinition getInputDefinition(final String inputName, final List<SInputDefinition> inputs) {
+        SInputDefinition inputDefinition = getInputDefinitionInSimple(inputName, inputs);
         if (inputDefinition == null) {
-            inputDefinition = getInputDefinitionInComplex(inputName, complexInputs);
+            inputDefinition = getInputDefinitionInComplex(inputName, inputs);
         }
         return inputDefinition;
     }
 
-    private SInputDefinition getInputDefinitionInSimple(final String inputName, final List<SSimpleInputDefinition> simpleInputs) {
-        for (final SSimpleInputDefinition sSimpleInputDefinition : simpleInputs) {
-            if (sSimpleInputDefinition.getName().equals(inputName)) {
-                return sSimpleInputDefinition;
+    private SInputDefinition getInputDefinitionInSimple(final String inputName, final List<SInputDefinition> simpleInputs) {
+        for (final SInputDefinition sInputDefinition : simpleInputs) {
+            if (sInputDefinition.getName().equals(inputName)) {
+                return sInputDefinition;
             }
         }
         return null;
     }
 
-    private SInputDefinition getInputDefinitionInComplex(final String inputName, final List<SComplexInputDefinition> complexInputs) {
-        for (final SComplexInputDefinition sComplexInputDefinition : complexInputs) {
-            if (sComplexInputDefinition.getName().equals(inputName)) {
-                return sComplexInputDefinition;
+    private SInputDefinition getInputDefinitionInComplex(final String inputName, final List<SInputDefinition> complexInputs) {
+        for (final SInputDefinition sInputDefinition : complexInputs) {
+            if (sInputDefinition.getName().equals(inputName)) {
+                return sInputDefinition;
             }
-            final SInputDefinition inputDefinition = getInputDefinition(inputName, sComplexInputDefinition.getSimpleInputDefinitions(),
-                    sComplexInputDefinition.getComplexInputDefinitions());
+            final SInputDefinition inputDefinition = getInputDefinition(inputName, sInputDefinition.getInputDefinitions());
             if (inputDefinition != null) {
                 return inputDefinition;
             }
