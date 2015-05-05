@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.api;
 
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
 
@@ -33,4 +34,14 @@ public interface ProcessConfigurationAPI extends org.bonitasoft.engine.api.Proce
      */
     FormMapping updateFormMapping(final long formMappingId, final String url, Long pageId) throws FormMappingNotFoundException, UpdateException;
 
+    /**
+     * Updates a groovy expression content at runtime, for all instances of a given process definition. Note that no check is done on the new content of the
+     * expression, no new dependency can be added, the return type will remain unchanged.
+     * 
+     * @param processDefintionId the ID of the process on which to change a groovy expression
+     * @param expressionDefinitionId the ID of the expression to update
+     * @param content the content to update
+     * @throws NotFoundException if the process or the expression is not found for the given ID
+     */
+    void updateGroovyExpression(long processDefintionId, long expressionDefinitionId, String content) throws NotFoundException, UpdateException;
 }
