@@ -100,6 +100,8 @@
         WHERE application.profileId = :profileId
         AND (
             application.layoutId = page.id
+            OR
+            application.themeId = page.id
             OR (
                 applicationPage.applicationId = application.id
                 AND applicationPage.pageId = page.id

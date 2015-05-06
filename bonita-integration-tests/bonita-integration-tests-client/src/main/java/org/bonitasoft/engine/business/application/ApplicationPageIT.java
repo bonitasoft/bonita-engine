@@ -328,8 +328,10 @@ public class ApplicationPageIT extends TestWithCustomPage {
         final Application app1 = getApplicationAPI().createApplication(new ApplicationCreator("app1", "My app1", "1.0").setProfileId(profile1.getId()));
         final Page page1 = createPage("custompage_page1");
         getApplicationAPI().createApplicationPage(app1.getId(), page1.getId(), "appPage1");
+
         final Page page2 = createPage("custompage_page2");
         getApplicationAPI().createApplicationPage(app1.getId(), page2.getId(), "appPage2");
+
         //app2
         final Application app2 = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My app2", "1.0").setProfileId(profile1.getId()));
         final Page page3 = createPage("custompage_page3");
@@ -347,8 +349,8 @@ public class ApplicationPageIT extends TestWithCustomPage {
         List<String> allPagesForProfile2 = getApplicationAPI().getAllPagesForProfile(profile2.getId());
 
         //then
-        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_layout", "custompage_page1", "custompage_page2", "custompage_page3"));
-        assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_layout", "custompage_page4"));
+        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_layout", "custompage_page1", "custompage_page2", "custompage_page3", "custompage_theme"));
+        assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_layout", "custompage_page4", "custompage_theme"));
 
         //clean
         getApplicationAPI().deleteApplication(app1.getId());
