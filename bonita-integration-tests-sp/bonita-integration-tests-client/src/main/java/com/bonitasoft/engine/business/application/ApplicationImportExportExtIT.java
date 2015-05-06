@@ -30,7 +30,6 @@ import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -38,7 +37,7 @@ import org.junit.Test;
  */
 public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business.application.TestWithApplication {
 
-    @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "export", "layout" })
+    @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "export", "layout", "theme" })
     @Test
     public void exportApplications_with_specific_layout_should_export_file_with_specific_layout() throws Exception {
         //given
@@ -56,7 +55,7 @@ public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business
         hrCreator.setIconPath("/icon.jpg");
         hrCreator.setProfileId(userProfile.getId());
 
-        //enginering application
+        //engineering application
         final ApplicationCreator engineeringCreator = new org.bonitasoft.engine.business.application.ApplicationCreator("Engineering-dashboard",
                 "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("My", "Marketing", "2.0");
@@ -92,8 +91,7 @@ public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business
         getPageAPI().deletePage(theme.getId());
     }
 
-    @Ignore
-    @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "import", "layout" })
+    @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "import", "layout","theme" })
     @Test
     public void importApplications_should_import_the_layout() throws Exception {
         //given
@@ -102,6 +100,7 @@ public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business
         // create page necessary to import application hr (real page name is defined in zip/page.properties):
         final Page myPage = createPage("custompage_mynewcustompage");
         final Page myLayout = createPage("custompage_mainLayout");
+        final Page myTheme = createPage("custompage_mainTheme");
 
         final byte[] applicationsByteArray = IOUtils.toByteArray(this.getClass().getResourceAsStream("applications_with_layout.xml"));
 
@@ -118,7 +117,7 @@ public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business
         final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(getAppSearchBuilderOrderById(0, 10).done());
         assertThat(searchResult.getCount()).isEqualTo(2);
         Application hrApp = searchResult.getResult().get(0);
-        assertIsHRApplication(profile, myLayout, null, hrApp);
+        assertIsHRApplication(profile, myLayout, myTheme, hrApp);
         assertIsMarketingApplication(searchResult.getResult().get(1));
 
         //check pages were created
@@ -145,6 +144,7 @@ public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business
         getApplicationAPI().deleteApplication(hrApp.getId());
         getPageAPI().deletePage(myPage.getId());
         getPageAPI().deletePage(myLayout.getId());
+        getPageAPI().deletePage(myTheme.getId());
 
     }
 
@@ -164,11 +164,12 @@ public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business
         assertThat(importStatus.get(0).getName()).isEqualTo("HR-dashboard");
         assertThat(importStatus.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         ImportError layoutError = new ImportError("ThisLayoutDoesNotExist", ImportError.Type.PAGE);
+        ImportError themeError = new ImportError("ThisThemeDoesNotExist", ImportError.Type.PAGE);
         ImportError profileError = new ImportError("ThisProfileDoesNotExist", ImportError.Type.PROFILE);
         ImportError customPageError = new ImportError("custompage_notexists", ImportError.Type.PAGE);
         ImportError appPageError1 = new ImportError("will-not-be-imported", ImportError.Type.APPLICATION_PAGE);
         ImportError appPageError2 = new ImportError("never-existed", ImportError.Type.APPLICATION_PAGE);
-        assertThat(importStatus.get(0).getErrors()).containsExactly(layoutError, profileError, customPageError, appPageError1, appPageError2);
+        assertThat(importStatus.get(0).getErrors()).containsExactly(layoutError, themeError, profileError, customPageError, appPageError1, appPageError2);
 
         // check applications ware created
         final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(getAppSearchBuilderOrderById(0, 10).done());
