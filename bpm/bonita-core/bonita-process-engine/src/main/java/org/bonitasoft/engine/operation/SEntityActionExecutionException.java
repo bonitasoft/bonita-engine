@@ -11,34 +11,21 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.operation;
 
-import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
-public class Address implements Entity {
+/**
+ * @author Elias Ricken de Medeiros
+ */
+public class SEntityActionExecutionException extends SBonitaException {
 
-    private static final long serialVersionUID = -7765232426654390190L;
-
-    private Long persistenceId;
-
-    public Address(final Long persistenceId) {
-        this.persistenceId = persistenceId;
+    public SEntityActionExecutionException(final String message) {
+        super(message);
     }
 
-    @Override
-    public Long getPersistenceId() {
-        return persistenceId;
-    }
-
-    @Override
-    public Long getPersistenceVersion() {
-        return 4687634L;
-    }
-
-    @Override
-    public String toString() {
-        return "Address{" +
-                "persistenceId=" + persistenceId +
-                '}';
+    public SEntityActionExecutionException(final Throwable cause) {
+        super(cause);
     }
 }

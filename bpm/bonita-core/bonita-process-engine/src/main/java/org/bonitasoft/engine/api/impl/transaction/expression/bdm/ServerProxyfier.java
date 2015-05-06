@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +80,7 @@ public class ServerProxyfier {
     }
 
     private List<Entity> proxifyEntities(final List<Entity> entities) {
-        final List<Entity> proxies = new ArrayList<Entity>();
+        final List<Entity> proxies = new ArrayList<>();
         for (final Entity entity : entities) {
             proxies.add(proxifyEntity(entity));
         }
@@ -114,7 +115,7 @@ public class ServerProxyfier {
             return proxifyIfNeeded(invocationResult);
         }
 
-        private boolean isMethodGetterOnLazyLoadedField(Method thisMethod) {
+        private boolean isMethodGetterOnLazyLoadedField(final Method thisMethod) {
             return isGetter(thisMethod) && thisMethod.isAnnotationPresent(LazyLoaded.class);
         }
 
@@ -163,10 +164,36 @@ public class ServerProxyfier {
     }
 
     public static Entity unProxyfyIfNeeded(final Entity entity) {
-        if (isLazyMethodProxyfied(entity)) {
+        if (entity != null && isLazyMethodProxyfied(entity)) {
             final LazyMethodHandler handler = (LazyMethodHandler) ProxyFactory.getHandler((Proxy) entity);
             return handler.getEntity();
         }
         return entity;
     }
+
+    public static Entity unProxy(final Entity entity) throws IllegalArgumentException, IllegalAccessException {
+        final Entity realEntity = unProxyfyIfNeeded(entity);
+        if (entity != null) {
+            final Field[] declaredFields = realEntity.getClass().getDeclaredFields();
+            for (final Field field : declaredFields) {
+                if (Entity.class.isAssignableFrom(field.getType())) {
+                    field.setAccessible(true);
+                    field.set(entity, unProxyfyIfNeeded((Entity) field.get(entity)));
+                } else if (List.class.isAssignableFrom(field.getType())) {
+                    field.setAccessible(true);
+                    final List list = (List) field.get(entity);
+                    if (list != null && !list.isEmpty() && Entity.class.isAssignableFrom(list.get(0).getClass())) {
+                        final List<Entity> entities = list;
+                        final List<Entity> realEntities = new ArrayList<>();
+                        for (final Entity e : entities) {
+                            realEntities.add(unProxyfyIfNeeded(e));
+                        }
+                        field.set(entity, realEntities);
+                    }
+                }
+            }
+        }
+        return realEntity;
+    }
+
 }
