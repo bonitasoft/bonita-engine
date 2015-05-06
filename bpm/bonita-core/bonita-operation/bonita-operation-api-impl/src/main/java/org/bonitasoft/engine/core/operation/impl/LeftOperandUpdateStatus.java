@@ -11,34 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.operation;
 
-import org.bonitasoft.engine.bdm.Entity;
+package org.bonitasoft.engine.core.operation.impl;
 
-public class Address implements Entity {
+import org.bonitasoft.engine.core.operation.model.SOperatorType;
 
-    private static final long serialVersionUID = -7765232426654390190L;
+/**
+ * @author Elias Ricken de Medeiros
+ */
+public class LeftOperandUpdateStatus {
 
-    private Long persistenceId;
+    private boolean shouldUpdate;
 
-    public Address(final Long persistenceId) {
-        this.persistenceId = persistenceId;
+    public LeftOperandUpdateStatus(SOperatorType operatorType) {
+        shouldUpdate = operatorType != SOperatorType.DELETION;
     }
 
-    @Override
-    public Long getPersistenceId() {
-        return persistenceId;
+    public boolean shouldUpdate() {
+        return shouldUpdate;
     }
 
-    @Override
-    public Long getPersistenceVersion() {
-        return 4687634L;
-    }
-
-    @Override
-    public String toString() {
-        return "Address{" +
-                "persistenceId=" + persistenceId +
-                '}';
+    public boolean shouldDelete() {
+        return !shouldUpdate;
     }
 }

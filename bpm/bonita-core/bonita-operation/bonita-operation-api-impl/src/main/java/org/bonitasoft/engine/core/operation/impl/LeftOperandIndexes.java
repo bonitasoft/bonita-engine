@@ -11,34 +11,31 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.operation;
 
-import org.bonitasoft.engine.bdm.Entity;
+package org.bonitasoft.engine.core.operation.impl;
 
-public class Address implements Entity {
+/**
+ * @author Elias Ricken de Medeiros
+ */
+public class LeftOperandIndexes {
 
-    private static final long serialVersionUID = -7765232426654390190L;
+    private int lastIndex = -1;
 
-    private Long persistenceId;
+    private int nextIndex = -1;
 
-    public Address(final Long persistenceId) {
-        this.persistenceId = persistenceId;
+    public int getLastIndex() {
+        return lastIndex;
     }
 
-    @Override
-    public Long getPersistenceId() {
-        return persistenceId;
+    public void setLastIndex(final int lastIndex) {
+        this.lastIndex = lastIndex;
     }
 
-    @Override
-    public Long getPersistenceVersion() {
-        return 4687634L;
+    public int getNextIndex() {
+        return nextIndex;
     }
 
-    @Override
-    public String toString() {
-        return "Address{" +
-                "persistenceId=" + persistenceId +
-                '}';
+    public void setNextIndex(final int nextIndex) {
+        this.nextIndex = nextIndex;
     }
 }
