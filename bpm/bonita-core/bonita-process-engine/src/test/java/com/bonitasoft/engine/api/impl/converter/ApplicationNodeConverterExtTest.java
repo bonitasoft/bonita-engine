@@ -43,8 +43,17 @@ public class ApplicationNodeConverterExtTest {
     @Mock
     private SPage defaultLayout;
 
+    private static final long DEFAULT_LAYOUT_ID = 100L;
+    private static final long DEFAULT_THEME_ID = 200L;
+
     @Before
     public void setUp() throws Exception {
+        given(defaultLayout.getName()).willReturn(ApplicationService.DEFAULT_LAYOUT_NAME);
+        given(defaultLayout.getId()).willReturn(DEFAULT_LAYOUT_ID);
+
+        given(defaultTheme.getName()).willReturn(ApplicationService.DEFAULT_THEME_NAME);
+        given(defaultTheme.getId()).willReturn(DEFAULT_THEME_ID);
+
         given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
         given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(defaultLayout);
     }
@@ -89,10 +98,6 @@ public class ApplicationNodeConverterExtTest {
         final ApplicationNode node = new ApplicationNode();
         node.setToken("app");
 
-        long layoutId = 15L;
-        SPage layout = buildMockPage(layoutId);
-        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(layout);
-
         //when
         long createdBy = 1L;
         final ImportResult importResult = converter.toSApplication(node, createdBy);
@@ -101,7 +106,7 @@ public class ApplicationNodeConverterExtTest {
         assertThat(importResult).isNotNull();
 
         final SApplication application = importResult.getApplication();
-        assertThat(application.getLayoutId()).isEqualTo(layoutId);
+        assertThat(application.getLayoutId()).isEqualTo(DEFAULT_LAYOUT_ID);
 
         final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");
@@ -128,6 +133,76 @@ public class ApplicationNodeConverterExtTest {
         assertThat(importStatus.getName()).isEqualTo("app");
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         assertThat(importStatus.getErrors()).containsExactly(new ImportError("notAvailableLayout", ImportError.Type.PAGE));
+    }
+
+    @Test
+    public void toSApplication_should_use_theme_defined_in_ApplicationNode() throws Exception {
+        //given
+        String themeName = "custompage_mainTheme";
+        final ApplicationNode node = new ApplicationNode();
+        node.setToken("app");
+        node.setTheme(themeName);
+
+        long themeId = 15L;
+        SPage theme = buildMockPage(themeId);
+        given(pageService.getPageByName(themeName)).willReturn(theme);
+
+        //when
+        long createdBy = 1L;
+        final ImportResult importResult = converter.toSApplication(node, createdBy);
+
+        //then
+        assertThat(importResult).isNotNull();
+
+        final SApplication application = importResult.getApplication();
+        assertThat(application.getThemeId()).isEqualTo(themeId);
+
+        final ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).isEmpty();
+    }
+
+    @Test
+    public void toSApplication_should_use_default_theme_when_layout_is_not_defined_in_ApplicationNode() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        node.setToken("app");
+
+        long createdBy = 1L;
+        final ImportResult importResult = converter.toSApplication(node, createdBy);
+
+        //then
+        assertThat(importResult).isNotNull();
+
+        final SApplication application = importResult.getApplication();
+        assertThat(application.getThemeId()).isEqualTo(DEFAULT_THEME_ID);
+
+        final ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).isEmpty();
+    }
+
+    @Test
+    public void toSApplication_should_return_Import_result_with_errors_when_theme_is_not_found() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        node.setTheme("notAvailable");
+        node.setToken("app");
+
+        given(pageService.getPageByName("notAvailable")).willReturn(null);
+
+        //when
+        final ImportResult importResult = converter.toSApplication(node, 1L);
+
+        //then
+        assertThat(importResult.getApplication().getThemeId()).isNull();
+
+        final ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).containsExactly(new ImportError("notAvailable", ImportError.Type.PAGE));
     }
 
 }

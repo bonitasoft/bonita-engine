@@ -31,7 +31,12 @@ public class ApplicationNodeConverterExt extends ApplicationNodeConverter {
 
     @Override
     protected String getLayoutName(final ApplicationNode applicationNode) {
-        return applicationNode.getLayout() != null? applicationNode.getLayout() : ApplicationService.DEFAULT_LAYOUT_NAME;
+        return applicationNode.getLayout() != null? applicationNode.getLayout() : super.getLayoutName(applicationNode);
+    }
+
+    @Override
+    protected String getThemeName(final ApplicationNode applicationNode) {
+        return applicationNode.getTheme() != null? applicationNode.getTheme() : super.getThemeName(applicationNode);
     }
 
     @Override
