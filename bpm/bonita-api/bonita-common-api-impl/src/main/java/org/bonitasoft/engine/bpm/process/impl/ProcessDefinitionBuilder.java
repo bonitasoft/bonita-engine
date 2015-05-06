@@ -28,10 +28,9 @@ import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.AutomaticTaskDefinition;
@@ -53,7 +52,6 @@ import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
@@ -316,7 +314,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     private void validateUserTask(final UserTaskDefinition userTaskDefinition) {
         final ContractDefinition contract = userTaskDefinition.getContract();
         if (contract != null) {
-            validateUserTaskContractInputs(contract.getSimpleInputs(), contract.getComplexInputs());
+            validateUserTaskContractInputs(contract.getInputs());
 
             for (final ConstraintDefinition constraint : contract.getConstraints()) {
                 if (constraint.getName() == null) {
@@ -329,23 +327,15 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         }
     }
 
-    private void validateUserTaskContractInputs(final List<SimpleInputDefinition> simpleInputDefinitions,
-            final List<ComplexInputDefinition> complexInputDefinitions) {
-        for (final SimpleInputDefinition simpleInputDefinition : simpleInputDefinitions) {
-            validateContractInput(simpleInputDefinition);
-        }
-        for (final ComplexInputDefinition complexInputDefinition : complexInputDefinitions) {
-            validateContractInput(complexInputDefinition);
+    private void validateUserTaskContractInputs(final List<InputDefinition> inputDefinitions) {
+        for (final InputDefinition inputDefinition : inputDefinitions) {
+            validateContractInput(inputDefinition);
         }
     }
 
-    private void validateContractInput(final ComplexInputDefinition complexInputDefinition) {
-        validateContractInputName(complexInputDefinition.getName());
-        validateUserTaskContractInputs(complexInputDefinition.getSimpleInputs(), complexInputDefinition.getComplexInputs());
-    }
-
-    private void validateContractInput(final SimpleInputDefinition inputDefinition) {
+    private void validateContractInput(final InputDefinition inputDefinition) {
         validateContractInputName(inputDefinition.getName());
+        validateUserTaskContractInputs(inputDefinition.getInputs());
     }
 
     private void validateContractInputName(final String name) {

@@ -15,11 +15,9 @@ package org.bonitasoft.engine.bpm.process.impl;
 
 import java.util.Arrays;
 
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.expression.Expression;
@@ -437,8 +435,8 @@ public class ProcessDefinitionBuilderTest {
         builder.addActor("mainActor");
 
         //given
-        builder.addUserTask("step1", "mainActor").addContract().addSimpleInput("innput", Type.TEXT, "should fail")
-                .addComplexInput("innput", "should fail", null, null).addConstraint("firstConstraint", "input != null", "mandatory", "input");
+        builder.addUserTask("step1", "mainActor").addContract().addInput("innput", Type.TEXT, "should fail")
+                .addInput("innput", "should fail", null).addConstraint("firstConstraint", "input != null", "mandatory", "input");
 
         //when
         builder.done();
@@ -452,13 +450,13 @@ public class ProcessDefinitionBuilderTest {
         builder.addActor("mainActor");
 
         //given
-        final SimpleInputDefinition badInput = new SimpleInputDefinitionImpl("bad input", Type.TEXT, "should fail");
-        final SimpleInputDefinition expenseType = new SimpleInputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
-        final SimpleInputDefinition expenseAmount = new SimpleInputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
-        final SimpleInputDefinition expenseDate = new SimpleInputDefinitionImpl("date", Type.DATE, "expense date");
-        final ComplexInputDefinition complexSubIput = new ComplexInputDefinitionImpl("date", "expense date", Arrays.asList(expenseType, badInput), null);
+        final InputDefinition badInput = new InputDefinitionImpl("bad input", Type.TEXT, "should fail");
+        final InputDefinition expenseType = new InputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
+        final InputDefinition expenseAmount = new InputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
+        final InputDefinition expenseDate = new InputDefinitionImpl("date", Type.DATE, "expense date");
+        final InputDefinition complexSubIput = new InputDefinitionImpl("date", "expense date", Arrays.asList(expenseType, badInput));
         builder.addUserTask("step1", "mainActor").addContract()
-        .addComplexInput("expenseLine", "expense report line", Arrays.asList(expenseDate, expenseAmount), Arrays.asList(complexSubIput));
+        .addInput("expenseLine", "expense report line", Arrays.asList(expenseDate, expenseAmount,complexSubIput));
 
         //when
         builder.done();
@@ -471,7 +469,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithBadContract", "1.0");
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor").addContract()
-                .addSimpleInput("input", Type.TEXT, "").addConstraint(null, "input != null", "mandatory", "input");
+                .addInput("input", Type.TEXT, "").addConstraint(null, "input != null", "mandatory", "input");
 
         builder.done();
     }
@@ -481,7 +479,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithBadContract", "1.0");
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor").addContract()
-                .addSimpleInput("input", Type.TEXT, "").addConstraint("firstConstraint", null, "mandatory", "input");
+                .addInput("input", Type.TEXT, "").addConstraint("firstConstraint", null, "mandatory", "input");
 
         builder.done();
     }

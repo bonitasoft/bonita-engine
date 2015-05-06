@@ -48,7 +48,7 @@ public class SUserTaskDefinitionImplTest {
     @Test
     public void aUserTaskWithAContractReturnsThatOne() throws Exception {
         final SContractDefinitionImpl contract = new SContractDefinitionImpl();
-        contract.addSimpleInput(new SSimpleInputDefinitionImpl("valid", SType.TEXT, "descripti"));
+        contract.addInput(new SInputDefinitionImpl("valid", SType.TEXT, "descripti"));
         final SUserTaskDefinitionImpl userTask = new SUserTaskDefinitionImpl(5, "name", "actorName");
         userTask.setContract(contract);
 

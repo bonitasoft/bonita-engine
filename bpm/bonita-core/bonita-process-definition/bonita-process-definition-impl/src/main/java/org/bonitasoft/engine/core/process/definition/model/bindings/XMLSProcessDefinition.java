@@ -20,8 +20,6 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bonitasoft.engine.bpm.connector.FailAction;
-import org.bonitasoft.engine.bpm.context.ContextEntry;
-import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -29,7 +27,6 @@ import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SAutomaticTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContextEntry;
@@ -40,6 +37,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SManualTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SMultiInstanceLoopCharacteristics;
@@ -47,9 +45,9 @@ import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SReceiveTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
@@ -355,9 +353,7 @@ public class XMLSProcessDefinition {
 
     public static final String CONTRACT_INPUTS_NODE = "inputDefinitions";
 
-    public static final String CONTRACT_SIMPLE_INPUT_NODE = "inputDefinition";
-
-    public static final String CONTRACT_COMPLEX_INPUT_NODE = "complexInputDefinition";
+    public static final String CONTRACT_INPUT_NODE = "inputDefinition";
 
     public static final String TYPE = "type";
 
@@ -604,11 +600,8 @@ public class XMLSProcessDefinition {
     private XMLNode createContractNode(final SContractDefinition contract) {
         final XMLNode contractNode = new XMLNode(CONTRACT_NODE);
         final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
-        for (final SSimpleInputDefinition input : contract.getSimpleInputs()) {
-            inputsNode.addChild(createSimpleInputNode(input));
-        }
-        for (final SComplexInputDefinition input : contract.getComplexInputs()) {
-            inputsNode.addChild(createComplexInputNode(input));
+        for (final SInputDefinition input : contract.getInputs()) {
+            inputsNode.addChild(createInputNode(input));
         }
         if (!inputsNode.getChildNodes().isEmpty()) {
             contractNode.addChild(inputsNode);
@@ -650,25 +643,17 @@ public class XMLSProcessDefinition {
         return constraintNode;
     }
 
-    private XMLNode createSimpleInputNode(final SSimpleInputDefinition input) {
-        final XMLNode inputNode = new XMLNode(CONTRACT_SIMPLE_INPUT_NODE);
+    private XMLNode createInputNode(final SInputDefinition input) {
+        final XMLNode inputNode = new XMLNode(CONTRACT_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
         inputNode.addAttribute(MULTIPLE, input.isMultiple());
-        inputNode.addAttribute(TYPE, input.getType().toString());
-        inputNode.addAttribute(DESCRIPTION, input.getDescription());
-        return inputNode;
-    }
-
-    private XMLNode createComplexInputNode(final SComplexInputDefinition input) {
-        final XMLNode inputNode = new XMLNode(CONTRACT_COMPLEX_INPUT_NODE);
-        inputNode.addAttribute(NAME, input.getName());
-        inputNode.addAttribute(MULTIPLE, input.isMultiple());
-        inputNode.addAttribute(DESCRIPTION, input.getDescription());
-        for (final SSimpleInputDefinition sInputDefinition : input.getSimpleInputDefinitions()) {
-            inputNode.addChild(createSimpleInputNode(sInputDefinition));
+        SType type = input.getType();
+        if(type != null){
+            inputNode.addAttribute(TYPE, type.toString());
         }
-        for (final SComplexInputDefinition sInputDefinition : input.getComplexInputDefinitions()) {
-            inputNode.addChild(createComplexInputNode(sInputDefinition));
+        inputNode.addAttribute(DESCRIPTION, input.getDescription());
+        for (final SInputDefinition sInputDefinition : input.getInputDefinitions()) {
+            inputNode.addChild(createInputNode(sInputDefinition));
         }
         return inputNode;
     }

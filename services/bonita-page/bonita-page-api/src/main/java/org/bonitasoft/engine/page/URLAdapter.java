@@ -24,12 +24,11 @@ import org.bonitasoft.engine.commons.exceptions.SExecutionException;
  */
 public interface URLAdapter {
 
-
     /**
      * adapt an url based on a context
      *
-     * @param url     the base url
-     * @param key     the url key
+     * @param url the base url
+     * @param key the url key
      * @param context the provided context
      * @return the new url
      * @throws SExecutionException when the URL rewriting fails

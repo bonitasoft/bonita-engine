@@ -124,10 +124,10 @@ public class CommonBPMServicesTest {
         return tenantId;
     }
 
-
     protected APISession getAPISession() {
         return this.apiSession;
     }
+
     protected SessionAccessor getSessionAccessor() {
         return sessionAccessor;
     }
@@ -163,22 +163,18 @@ public class CommonBPMServicesTest {
     }
 
     @Before
-    public final void doNotOverrideBefore() throws Exception {
+    public void doNotOverrideBefore() throws Exception {
         if (sessionAccessor == null) {
             sessionAccessor = getServiceAccessorFactory().createSessionAccessor();
         }
         if (platformServiceAccessor == null) {
             platformServiceAccessor = getServiceAccessorFactory().createPlatformServiceAccessor();
         }
-    }
 
-    @Before
-    public void before() throws Exception {
         apiSession = new LoginAPIImpl().login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
         tenantId = apiSession.getTenantId();
         sessionAccessor.setSessionInfo(apiSession.getId(), tenantId);
     }
-
 
     protected Group createGroup(final String groupName) throws CreationException {
         return createGroup(groupName, null);
@@ -194,8 +190,6 @@ public class CommonBPMServicesTest {
             throw new CreationException(e);
         }
     }
-
-
 
     @After
     public void after() throws Exception {
@@ -379,8 +373,9 @@ public class CommonBPMServicesTest {
         platformServiceAccessor.getTransactionService().complete();
     }
 
-    protected SUserTaskInstance createSUserTaskInstance(final String name, final long flowNodeDefinitionId, final long parentId, final long processDefinitionId,
-                                                        final long rootProcessInst, final long actorId) throws SBonitaException {
+    protected SUserTaskInstance createSUserTaskInstance(final String name, final long flowNodeDefinitionId, final long parentId,
+            final long processDefinitionId,
+            final long rootProcessInst, final long actorId) throws SBonitaException {
         final SUserTaskInstance taskInstance = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
                 .createNewUserTaskInstance(name, flowNodeDefinitionId, rootProcessInst, parentId, actorId, processDefinitionId, rootProcessInst, parentId)
                 .done();
@@ -619,7 +614,8 @@ public class CommonBPMServicesTest {
 
     protected List<SFlowNodeInstance> searchFlowNodeInstances(final QueryOptions searchOptions) throws SBonitaException {
         platformServiceAccessor.getTransactionService().begin();
-        final List<SFlowNodeInstance> flowNodes = getTenantAccessor().getActivityInstanceService().searchFlowNodeInstances(SFlowNodeInstance.class, searchOptions);
+        final List<SFlowNodeInstance> flowNodes = getTenantAccessor().getActivityInstanceService().searchFlowNodeInstances(SFlowNodeInstance.class,
+                searchOptions);
         platformServiceAccessor.getTransactionService().complete();
 
         return flowNodes;
@@ -630,7 +626,7 @@ public class CommonBPMServicesTest {
                 PlatformUtil.DEFAULT_CREATED_BY, PlatformUtil.TENANT_STATUS_ACTIVATED);
     }
 
-    protected void changeTenant(final long tenantId) throws  Exception {
+    protected void changeTenant(final long tenantId) throws Exception {
         getTransactionService().begin();
         TestUtil.createSessionOn(getSessionAccessor(), getTenantAccessor().getSessionService(), tenantId);
         getTransactionService().complete();

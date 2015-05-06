@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessConfigurationAPI;
@@ -29,6 +30,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.page.AuthorizationRuleConstants;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.Order;
@@ -42,6 +44,8 @@ import org.junit.rules.ExpectedException;
  * @author Baptiste Mesta
  */
 public class FormMappingIT extends TestWithUser {
+
+    private final Map<String, Serializable> context = Collections.singletonMap(AuthorizationRuleConstants.IS_ADMIN, (Serializable) true);
 
     @Test
     public void deployProcessesWithFormMappings() throws Exception {
@@ -148,10 +152,9 @@ public class FormMappingIT extends TestWithUser {
         assertThat(formMappingSearchResult.getResult()).extracting("processDefinitionId").containsExactly(p2.getId(), p1.getId());
 
         //resolve urls:
-        PageURL p1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("process/P1/1.0", Collections.<String, Serializable>emptyMap());
-        PageURL p1Overview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/P1/1.0", Collections.<String, Serializable>emptyMap());
-        PageURL p1step1Instanciation = getProcessConfigurationAPI()
-                .resolvePageOrURL("taskInstance/P1/1.0/step1", Collections.<String, Serializable>emptyMap());
+        PageURL p1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("process/P1/1.0", context, true);
+        PageURL p1Overview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/P1/1.0", context, true);
+        PageURL p1step1Instanciation = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/P1/1.0/step1", context, true);
         assertThat(p1Instanciation.getUrl()).isEqualTo("processStartForm");
         assertThat(p1Overview.getPageId()).isNull();
         assertThat(p1step1Instanciation.getUrl()).isEqualTo(null);
@@ -181,7 +184,7 @@ public class FormMappingIT extends TestWithUser {
 
         // try to resolve url:
         try {
-            getProcessConfigurationAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", Collections.<String, Serializable>emptyMap());
+            getProcessConfigurationAPI().resolvePageOrURL("taskInstance/CustomerSupport/1.0/step", Collections.<String, Serializable> emptyMap(), true);
         } finally {
             deleteProcess(processDefinition);
         }
@@ -193,8 +196,11 @@ public class FormMappingIT extends TestWithUser {
         ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("CustomerSupport", "1.12");
         final String custompage_startProcessForm = "custompage_startProcessForm";
         BusinessArchiveBuilder bar = new BusinessArchiveBuilder()
-                .createNewBusinessArchive().setProcessDefinition(processBuilder.done())
-                .setFormMappings(FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("custompage_startProcessForm", FormMappingTarget.INTERNAL).addProcessOverviewForm("custompage_globalpage", FormMappingTarget.INTERNAL).build())
+                .createNewBusinessArchive()
+                .setProcessDefinition(processBuilder.done())
+                .setFormMappings(
+                        FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("custompage_startProcessForm", FormMappingTarget.INTERNAL)
+                                .addProcessOverviewForm("custompage_globalpage", FormMappingTarget.INTERNAL).build())
                 .addExternalResource(
                         new BarResource("customPages/custompage_startProcessForm.zip", createTestPageContent(custompage_startProcessForm, "kikoo", "LOL")));
 
@@ -208,13 +214,12 @@ public class FormMappingIT extends TestWithUser {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertThat(processDeploymentInfo.getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
 
-        final PageURL pageURLStart = getProcessConfigurationAPI().resolvePageOrURL("process/CustomerSupport/1.12", Collections.<String, Serializable>emptyMap());
-        final PageURL pageURLOverview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/CustomerSupport/1.12", Collections.<String, Serializable>emptyMap());
+        final PageURL pageURLStart = getProcessConfigurationAPI().resolvePageOrURL("process/CustomerSupport/1.12", context, true);
+        final PageURL pageURLOverview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/CustomerSupport/1.12", context, true);
         assertThat(pageURLStart.getPageId()).isNotNull();
         assertThat(page.getId()).isEqualTo(pageURLStart.getPageId());
         assertThat(pageURLOverview.getPageId()).isNotNull();
         assertThat(custompage_globalpage.getId()).isEqualTo(pageURLOverview.getPageId());
-
 
         getPageAPI().deletePage(custompage_globalpage.getId());
         disableAndDeleteProcess(processDefinition);

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.xml.bind.ValidationException;
 
 import org.apache.commons.codec.binary.Base64;
@@ -38,7 +37,6 @@ import org.bonitasoft.engine.bpm.bar.xml.CallableElementVersionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CatchErrorEventTriggerDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CatchMessageEventTriggerDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CatchSignalEventTriggerDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ComplexInputDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConditionalExpressionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionInputBinding;
@@ -64,6 +62,7 @@ import org.bonitasoft.engine.bpm.bar.xml.ExpressionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.FlowElementBinding;
 import org.bonitasoft.engine.bpm.bar.xml.GatewayDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.IncomingTransitionRefBinding;
+import org.bonitasoft.engine.bpm.bar.xml.InputDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.IntermediateCatchEventBinding;
 import org.bonitasoft.engine.bpm.bar.xml.IntermediateThrowEventDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.LeftOperandBinding;
@@ -80,7 +79,6 @@ import org.bonitasoft.engine.bpm.bar.xml.ProcessDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ReceiveTaskDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.RightOperandBinding;
 import org.bonitasoft.engine.bpm.bar.xml.SendTaskDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.SimpleInputDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StandardLoopCharacteristicsBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StartEventDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StringIndexBinding;
@@ -186,8 +184,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(ContractDefinitionBinding.class);
         bindings.add(ContextDefinitionBinding.class);
         bindings.add(ContextEntryBinding.class);
-        bindings.add(SimpleInputDefinitionBinding.class);
-        bindings.add(ComplexInputDefinitionBinding.class);
+        bindings.add(InputDefinitionBinding.class);
         bindings.add(ConstraintDefinitionBinding.class);
 
         //        final InputStream schemaStream = ProcessDefinitionBARContribution.class.getResourceAsStream("ProcessDefinition.xsd");

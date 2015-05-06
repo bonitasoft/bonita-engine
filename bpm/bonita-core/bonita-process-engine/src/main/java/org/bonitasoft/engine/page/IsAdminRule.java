@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,21 +10,27 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.bpm.contract;
+ */
+package org.bonitasoft.engine.page;
 
-import java.util.List;
+import java.io.Serializable;
+import java.util.Map;
 
 /**
- * An <code>ComplexInputDefinition</code> defines
- *
- * @author Laurent Leseigneur
- * @since 7.0
+ * author Emmanuel Duchastenier, Anthony Birembaut
  */
-public interface ComplexInputDefinition extends InputDefinition {
+public class IsAdminRule implements AuthorizationRule {
 
-    List<SimpleInputDefinition> getSimpleInputs();
+    @Override
+    public boolean isAllowed(final String key, final Map<String, Serializable> context) {
+        if (context.containsKey(AuthorizationRuleConstants.IS_ADMIN)) {
+            return (Boolean) context.get(AuthorizationRuleConstants.IS_ADMIN);
+        }
+        return false;
+    }
 
-    List<ComplexInputDefinition> getComplexInputs();
-
+    @Override
+    public String getId() {
+        return AuthorizationRuleConstants.IS_ADMIN;
+    }
 }

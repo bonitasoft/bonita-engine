@@ -388,7 +388,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step0", "step1");
         processDefinitionBuilder.addTransition("step1", "step2");
-        processDefinitionBuilder.addContract().addSimpleInput(processContractInputName, Type.TEXT, null);
+        processDefinitionBuilder.addContract().addInput(processContractInputName, Type.TEXT, null);
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(definition.getId(),

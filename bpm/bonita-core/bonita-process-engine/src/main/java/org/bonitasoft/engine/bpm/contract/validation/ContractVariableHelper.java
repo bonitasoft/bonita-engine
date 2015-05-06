@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,10 +24,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
-
 public class ContractVariableHelper {
 
+    /**
+     * @param constraint
+     * @param contractVariables
+     * @return
+     *         list of elements that must be checked by this mandatory constraint
+     */
     public List<Map<String, Serializable>> buildMandatoryMultipleInputVariables(final SConstraintDefinition constraint,
             final Map<String, Serializable> contractVariables) {
         final List<Map<String, Serializable>> constraintVariablesList = new ArrayList<Map<String, Serializable>>();
@@ -60,8 +66,11 @@ public class ContractVariableHelper {
             }
             if (variableValue instanceof List<?>) {
                 //multiple case
-                for (final Map<String, Serializable> variableValueItem : (List<Map<String, Serializable>>) variableValue) {
-                    buildRecursiveVariableList(variableValueItem, constraintVariablesList, inputName);
+                for (final Serializable variableValueItem : (List<Serializable>) variableValue) {
+                    if (variableValueItem instanceof Map<?, ?>) {
+                        //complex case
+                        buildRecursiveVariableList((Map<String, Serializable>) variableValueItem, constraintVariablesList, inputName);
+                    }
                 }
             }
         }
