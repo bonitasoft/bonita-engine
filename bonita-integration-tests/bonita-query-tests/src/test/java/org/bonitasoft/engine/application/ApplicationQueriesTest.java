@@ -156,19 +156,20 @@ public class ApplicationQueriesTest {
         SProfile thirdProfile = repository.add(aProfile().withName("thirdProfile").build());
 
         SPageWithContent layoutApp1 = repository.add(aPage().withName("layoutApp1").withContent("The content".getBytes()).build());
-        SPageWithContent layoutApp2 = repository.add(aPage().withName("layoutApp2").withContent("The content".getBytes()).build());
+        SPageWithContent themeApp2 = repository.add(aPage().withName("themeApp2").withContent("The content".getBytes()).build());
         SPageWithContent layoutApp4 = repository.add(aPage().withName("layoutApp4").withContent("The content".getBytes()).build());
+        SPageWithContent themeApp4 = repository.add(aPage().withName("themeApp4").withContent("The content".getBytes()).build());
         final SApplication application1 = repository.add(anApplication().withToken("app1").withDisplayName("my app1").withDisplayName("my app1")
-                .withVersion("1.0").withPath("/app1").withProfile(firstProfile.getId()).withLayoutId(layoutApp1.getId())
+                .withVersion("1.0").withPath("/app1").withProfile(firstProfile.getId()).withLayout(layoutApp1.getId())
                 .build());
         final SApplication application2 = repository.add(anApplication().withToken("app2").withDisplayName("my app2").withDisplayName("my app2")
-                .withVersion("1.0").withPath("/app2").withProfile(firstProfile.getId()).withLayoutId(layoutApp2.getId())
+                .withVersion("1.0").withPath("/app2").withProfile(firstProfile.getId()).withTheme(themeApp2.getId())
                 .build());
         final SApplication application3 = repository.add(anApplication().withToken("app3").withDisplayName("my app3").withDisplayName("my app3")
                 .withVersion("1.0").withPath("/app3").withProfile(secondProfile.getId())
                 .build());
         final SApplication application4 = repository.add(anApplication().withToken("app4").withDisplayName("my app4").withDisplayName("my app4")
-                .withVersion("1.0").withPath("/app4").withLayoutId(layoutApp4.getId())
+                .withVersion("1.0").withPath("/app4").withLayout(layoutApp4.getId()).withTheme(themeApp4.getId())
                 .build());
 
         final SPage page1 = repository.add(aPage().withName("page1").withContent("The content".getBytes()).build());
@@ -183,7 +184,7 @@ public class ApplicationQueriesTest {
         repository.add(anApplicationPage().withToken("SecondPageApp1").withApplicationId(application1.getId()).withPageId(page1.getId()).build());
         repository.add(anApplicationPage().withToken("ThirdPageApp1").withApplicationId(application1.getId()).withPageId(page2.getId()).build());
 
-        //app2 has layout layoutApp2 and references page3 and page4
+        //app2 has layout themeApp2 and references page3 and page4
         repository.add(anApplicationPage().withToken("FirstPageApp2").withApplicationId(application2.getId()).withPageId(page3.getId()).build());
         repository.add(anApplicationPage().withToken("SecondPageApp2").withApplicationId(application2.getId()).withPageId(page4.getId()).build());
 
@@ -191,14 +192,14 @@ public class ApplicationQueriesTest {
         repository.add(anApplicationPage().withToken("FirstPageApp3").withApplicationId(application3.getId()).withPageId(page4.getId()).build());
         repository.add(anApplicationPage().withToken("SecondPageApp3").withApplicationId(application3.getId()).withPageId(page5.getId()).build());
 
-        //app3 has layout layoutApp4 and references page6
+        //app3 has layout layoutApp4, themeApp4 and references page6
         repository.add(anApplicationPage().withToken("FirstPageApp4").withApplicationId(application4.getId()).withPageId(page6.getId()).build());
 
         //when
         List<String> pagesForProfile = repository.getAllPagesForProfile(firstProfile.getId());
 
         //then
-        assertThat(pagesForProfile).containsExactly("layoutApp1", "layoutApp2", "page1", "page2", "page3", "page4");
+        assertThat(pagesForProfile).containsExactly("layoutApp1", "page1", "page2", "page3", "page4", "themeApp2");
 
         //when
         pagesForProfile = repository.getAllPagesForProfile(secondProfile.getId());
