@@ -11,34 +11,28 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.operation;
 
-import org.bonitasoft.engine.bdm.Entity;
+package org.bonitasoft.engine.commons;
 
-public class Address implements Entity {
+/**
+ * @author Elias Ricken de Medeiros
+ */
+public class Container {
 
-    private static final long serialVersionUID = -7765232426654390190L;
+    private long id;
 
-    private Long persistenceId;
+    private String type;
 
-    public Address(final Long persistenceId) {
-        this.persistenceId = persistenceId;
+    public Container(final long id, final String type) {
+        this.id = id;
+        this.type = type;
     }
 
-    @Override
-    public Long getPersistenceId() {
-        return persistenceId;
+    public long getId() {
+        return id;
     }
 
-    @Override
-    public Long getPersistenceVersion() {
-        return 4687634L;
-    }
-
-    @Override
-    public String toString() {
-        return "Address{" +
-                "persistenceId=" + persistenceId +
-                '}';
+    public String getType() {
+        return type;
     }
 }

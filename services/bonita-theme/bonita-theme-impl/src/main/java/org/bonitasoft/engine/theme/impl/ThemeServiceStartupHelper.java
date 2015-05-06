@@ -11,28 +11,29 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl;
+package org.bonitasoft.engine.theme.impl;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.theme.builder.SThemeBuilder;
 import org.bonitasoft.engine.theme.builder.SThemeBuilderFactory;
 import org.bonitasoft.engine.theme.exception.SThemeCreationException;
+import org.bonitasoft.engine.theme.exception.SThemeNotFoundException;
+import org.bonitasoft.engine.theme.exception.SThemeReadException;
 import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
 
 /**
  * @author Celine Souchet
+ * @author Philippe Ozil
  */
-public class PlatformAPIImplDelegate {
+public class ThemeServiceStartupHelper {
 
     private static final String BONITA_PORTAL_THEME_DEFAULT = "bonita-portal-theme";
 
@@ -43,18 +44,21 @@ public class PlatformAPIImplDelegate {
     private final String portalDefaultThemeFilename;
 
     private final String mobileDefaultThemeFilename;
+    
+    private final ThemeService themeService;
 
-    public PlatformAPIImplDelegate() {
-        this(BONITA_PORTAL_THEME_DEFAULT, BONITA_MOBILE_THEME_DEFAULT);
+    public ThemeServiceStartupHelper(final ThemeService themeService) {
+        this(themeService, BONITA_PORTAL_THEME_DEFAULT, BONITA_MOBILE_THEME_DEFAULT);
     }
 
-    public PlatformAPIImplDelegate(final String portalDefaultThemeFilename, final String mobileDefaultThemeFilename) {
+    public ThemeServiceStartupHelper(final ThemeService themeService, final String portalDefaultThemeFilename, final String mobileDefaultThemeFilename) {
         super();
+        this.themeService = themeService;
         this.portalDefaultThemeFilename = portalDefaultThemeFilename;
         this.mobileDefaultThemeFilename = mobileDefaultThemeFilename;
     }
 
-    private File unzipTheme() {
+    private File unzipDefaultPortalThemeCss() {
         InputStream defaultThemeCssZip = null;
         File unzippedCssPortalThemeFolder;
         try {
@@ -72,22 +76,37 @@ public class PlatformAPIImplDelegate {
                 try {
                     defaultThemeCssZip.close();
                 } catch (final IOException e) {
-                    throw new BonitaRuntimeException(e);
+                    throw new SBonitaRuntimeException(e);
                 }
             }
         }
         return unzippedCssPortalThemeFolder;
     }
 
-    public void createDefaultThemes(final TenantServiceAccessor tenantServiceAccessor) throws IOException, SThemeCreationException {
-        createDefaultMobileTheme(tenantServiceAccessor);
-        createDefaultPortalTheme(tenantServiceAccessor);
+    /**
+     * Create the default Portal and Mobile themes if they do not already exist else do nothing
+     * @throws IOException
+     * @throws SThemeCreationException
+     * @throws SThemeReadException 
+     */
+    public void createDefaultThemes() throws IOException, SThemeCreationException, SThemeReadException {
+    	// Create default Mobile theme if it does not exist
+    	try {
+ 			themeService.getTheme(SThemeType.MOBILE, true);
+ 		} catch (SThemeNotFoundException e) {
+ 			createDefaultMobileTheme();
+ 		}
+        // Create default Portal theme if it does not exist
+        try {
+			themeService.getTheme(SThemeType.PORTAL, true);
+		} catch (SThemeNotFoundException e) {
+			createDefaultPortalTheme();
+		}
     }
 
-    protected void createDefaultPortalTheme(final TenantServiceAccessor tenantServiceAccessor) throws IOException, SThemeCreationException {
-        final ThemeService themeService = tenantServiceAccessor.getThemeService();
-        final byte[] defaultThemeZip = getFileContent(portalDefaultThemeFilename + ZIP);
-        File unzippedCssPortalThemeFolder = unzipTheme();
+    void createDefaultPortalTheme() throws IOException, SThemeCreationException {
+    	final byte[] defaultThemeZip = getFileContent(portalDefaultThemeFilename + ZIP);
+        File unzippedCssPortalThemeFolder = unzipDefaultPortalThemeCss();
         if (unzippedCssPortalThemeFolder != null) {
             if (defaultThemeZip != null && defaultThemeZip.length > 0) {
                 final byte[] defaultThemeCss = IOUtil.getAllContentFrom(new File(unzippedCssPortalThemeFolder, "bonita.css"));
@@ -100,8 +119,7 @@ public class PlatformAPIImplDelegate {
         }
     }
 
-    protected void createDefaultMobileTheme(final TenantServiceAccessor tenantServiceAccessor) throws IOException, SThemeCreationException {
-        final ThemeService themeService = tenantServiceAccessor.getThemeService();
+    void createDefaultMobileTheme() throws IOException, SThemeCreationException {
         final byte[] defaultThemeZip = getFileContent(mobileDefaultThemeFilename + ZIP);
         if (defaultThemeZip != null && defaultThemeZip.length > 0) {
             final STheme sTheme = buildSTheme(defaultThemeZip, null, SThemeType.MOBILE);
@@ -109,7 +127,6 @@ public class PlatformAPIImplDelegate {
         }
     }
 
-    // default visibility for testing
     STheme buildSTheme(final byte[] defaultThemeZip, final byte[] defaultThemeCss, final SThemeType type) {
         final long lastUpdateDate = System.currentTimeMillis();
         final SThemeBuilder sThemeBuilder = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(defaultThemeZip, true, type, lastUpdateDate);
@@ -120,16 +137,14 @@ public class PlatformAPIImplDelegate {
     }
 
     byte[] getFileContent(final String fileName) throws IOException {
-        final InputStream inputStream = getResourceAsStream(fileName);
-
-        if (inputStream == null) {
-            // no file
-            return null;
-        }
-        try {
-            return IOUtils.toByteArray(inputStream);
-        } finally {
-            inputStream.close();
+        try (final InputStream inputStream = getResourceAsStream(fileName)) {
+        	if (inputStream == null) {
+                // no file
+                return null;
+            }
+        	else {
+        		return IOUtil.getAllContentFrom(inputStream);	
+        	}
         }
     }
 

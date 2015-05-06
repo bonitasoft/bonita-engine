@@ -18,6 +18,7 @@ import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.operation.model.SOperatorType;
 
 /**
  * AssignmentOperationExecutorStrategy is the default Bonita strategy to execute data assignment operations
@@ -30,19 +31,14 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 public class AssignmentOperationExecutorStrategy implements OperationExecutorStrategy {
 
     /**
-     * The Operation type of this strategy, as a String
-     */
-    public static final String TYPE_ASSIGNMENT = "ASSIGNMENT";
-
-    /**
      * Builds a new AssignmentOperationExecutorStrategy, which is the strategy to execute data assignment operations
-     *
      */
     public AssignmentOperationExecutorStrategy() {
     }
 
     @Override
-    public Object computeNewValueForLeftOperand(final SOperation operation, final Object value, final SExpressionContext expressionContext) throws SOperationExecutionException {
+    public Object computeNewValueForLeftOperand(final SOperation operation, final Object value, final SExpressionContext expressionContext,
+            final boolean shouldPersistValue) throws SOperationExecutionException {
         // do not check if value is external, see ENGINE-1739
         if (operation.getLeftOperand().getType().equals(SLeftOperand.TYPE_DATA)) {
             checkReturnType(value, operation, expressionContext);
@@ -73,6 +69,7 @@ public class AssignmentOperationExecutorStrategy implements OperationExecutorStr
 
     @Override
     public String getOperationType() {
-        return TYPE_ASSIGNMENT;
+        return SOperatorType.ASSIGNMENT.name();
     }
+
 }

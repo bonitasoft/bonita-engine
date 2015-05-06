@@ -13,13 +13,16 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import java.lang.reflect.Method;
-
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
@@ -111,4 +114,56 @@ public class ServerProxyfierTest {
         verify(lazyLoader, never()).load(method, personEntity.getPersistenceId());
         assertThat(withLazyLoadedAnnotation).isEqualTo("getWithoutLazyLoadedAnnotation");
     }
+
+    @Test
+    public void unProxy_should_not_remove_a_proxy_on_a_null_entity() throws Exception {
+        final Entity entity = ServerProxyfier.unProxy(null);
+
+        assertThat(entity).isNull();
+    }
+
+    @Test
+    public void unProxy_should_not_remove_a_proxy_on_an_entity() throws Exception {
+        final PersonEntity proxy = new PersonEntity();
+
+        final Entity entity = ServerProxyfier.unProxy(proxy);
+
+        assertThat(ServerProxyfier.isLazyMethodProxyfied(entity)).isFalse();
+    }
+
+    @Test
+    public void unProxy_should_remove_a_proxy_on_an_entity() throws Exception {
+        final PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
+
+        final Entity entity = ServerProxyfier.unProxy(proxy);
+
+        assertThat(ServerProxyfier.isLazyMethodProxyfied(entity)).isFalse();
+    }
+
+    @Test
+    public void unProxy_should_remove_a_proxy_on_an_ref_attribute_of_an_entity() throws Exception {
+        final Address proxy = serverProxyfier.proxify(new Address());
+        final Employee employee = new Employee(10L, 45L, "John", "Doe");
+        employee.setAddress(proxy);
+
+        final Employee entity = (Employee) ServerProxyfier.unProxy(employee);
+
+        assertThat(ServerProxyfier.isLazyMethodProxyfied(entity.getAddress())).isFalse();
+    }
+
+    @Test
+    public void unProxy_should_remove_a_proxy_on_an_list_attribute_of_an_entity() throws Exception {
+        final List<Address> addresses = new ArrayList<>();
+        addresses.add(new Address());
+        addresses.add(serverProxyfier.proxify(new Address()));
+        final Employee employee = new Employee(10L, 45L, "John", "Doe");
+        employee.setAddresses(addresses);
+
+        final Employee entity = (Employee) ServerProxyfier.unProxy(employee);
+
+        for (final Address address : entity.getAddresses()) {
+            assertThat(ServerProxyfier.isLazyMethodProxyfied(address)).isFalse();
+        }
+    }
+
 }

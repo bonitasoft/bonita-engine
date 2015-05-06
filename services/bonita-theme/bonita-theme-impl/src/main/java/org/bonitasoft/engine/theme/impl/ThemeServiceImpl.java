@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.theme.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -295,5 +297,29 @@ public class ThemeServiceImpl implements ThemeService {
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
         logBuilder.setActionType(actionType);
     }
+
+	@Override
+	public void start() throws SBonitaException {
+		try {
+			new ThemeServiceStartupHelper(this).createDefaultThemes();
+		} catch (IOException e) {
+			throw new SBonitaRuntimeException("Failed to start theme service due to: "+ e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public void stop() throws SBonitaException {
+		// nothing to do
+	}
+
+	@Override
+	public void pause() throws SBonitaException {
+		// nothing to do
+	}
+
+	@Override
+	public void resume() throws SBonitaException {
+		// nothing to do
+	}
 
 }

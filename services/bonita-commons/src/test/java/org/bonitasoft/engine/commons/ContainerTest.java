@@ -11,34 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.operation;
 
-import org.bonitasoft.engine.bdm.Entity;
+package org.bonitasoft.engine.commons;
 
-public class Address implements Entity {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    private static final long serialVersionUID = -7765232426654390190L;
+import org.junit.Test;
 
-    private Long persistenceId;
+public class ContainerTest {
 
-    public Address(final Long persistenceId) {
-        this.persistenceId = persistenceId;
-    }
+    @Test
+    public void constructor_should_create_container_based_on_given_information() throws Exception {
+        //when
+        Container container = new Container(10, "cType");
 
-    @Override
-    public Long getPersistenceId() {
-        return persistenceId;
-    }
-
-    @Override
-    public Long getPersistenceVersion() {
-        return 4687634L;
-    }
-
-    @Override
-    public String toString() {
-        return "Address{" +
-                "persistenceId=" + persistenceId +
-                '}';
+        //then
+        assertThat(container.getId()).isEqualTo(10);
+        assertThat(container.getType()).isEqualTo("cType");
     }
 }
