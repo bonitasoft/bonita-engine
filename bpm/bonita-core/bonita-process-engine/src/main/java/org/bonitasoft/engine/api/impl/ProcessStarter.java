@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
