@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.contract;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.BonitaException;
@@ -41,10 +42,16 @@ public class ContractViolationException extends BonitaException {
         super(message + ": " + explanations);
         this.simpleMessage = message;
         if (explanations == null) {
-            this.explanations = new ArrayList<>();
+            this.explanations = Collections.emptyList();
         } else {
             this.explanations = new ArrayList<>(explanations);
         }
+    }
+
+    public ContractViolationException(String message, Exception e) {
+        super(message, e);
+        this.simpleMessage = message;
+        this.explanations = Collections.emptyList();
     }
 
     /**
