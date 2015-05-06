@@ -3199,7 +3199,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
         }
         final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getExpressionService());
-        validator.isValid(processDefinitionId, contractDefinition, inputs);
+        validator.validate(processDefinitionId, contractDefinition, inputs);
 
     }
 
@@ -5897,7 +5897,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
         final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
         final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getExpressionService());
-        validator.isValid(flowNodeInstance.getProcessDefinitionId(), contractDefinition, inputs);
+        validator.validate(flowNodeInstance.getProcessDefinitionId(), contractDefinition, inputs);
 
     }
 

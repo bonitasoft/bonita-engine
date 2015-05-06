@@ -62,7 +62,7 @@ public class ContractValidatorTest {
     @Test
     public void should_have_an_empty_comments_list_if_validation_is_true() throws Exception {
 
-        contractValidator.isValid(PROCESS_DEFINITION_ID, aContract().build(), aMap().build());
+        contractValidator.validate(PROCESS_DEFINITION_ID, aContract().build(), aMap().build());
 
 
         assertThat(contractValidator.getComments()).isEmpty();
@@ -77,7 +77,7 @@ public class ContractValidatorTest {
 
         expectedException.expect(ContractViolationException.class);
         try {
-            contractValidator.isValid(PROCESS_DEFINITION_ID, contract, inputs);
+            contractValidator.validate(PROCESS_DEFINITION_ID, contract, inputs);
         } finally {
             verify(constraintValidator, never()).validate(anyLong(), any(SContractDefinition.class), anyVariables());
         }
@@ -92,7 +92,7 @@ public class ContractValidatorTest {
                 .when(structureValidator).validate(contract, variables);
 
         expectedException.expect(ContractViolationException.class);
-        contractValidator.isValid(PROCESS_DEFINITION_ID, contract, variables);
+        contractValidator.validate(PROCESS_DEFINITION_ID, contract, variables);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class ContractValidatorTest {
                 .when(structureValidator).validate(contract, variables);
 
         expectedException.expect(new ExceptionHavingExplanations(problems));
-        contractValidator.isValid(PROCESS_DEFINITION_ID, contract, variables);
+        contractValidator.validate(PROCESS_DEFINITION_ID, contract, variables);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class ContractValidatorTest {
                 .when(constraintValidator).validate(PROCESS_DEFINITION_ID, contract, variables);
 
         expectedException.expect(ContractViolationException.class);
-        contractValidator.isValid(PROCESS_DEFINITION_ID, contract, variables);
+        contractValidator.validate(PROCESS_DEFINITION_ID, contract, variables);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class ContractValidatorTest {
                 .when(constraintValidator).validate(PROCESS_DEFINITION_ID, contract, variables);
 
         expectedException.expect(new ExceptionHavingExplanations(problems));
-        contractValidator.isValid(PROCESS_DEFINITION_ID, contract, variables);
+        contractValidator.validate(PROCESS_DEFINITION_ID, contract, variables);
     }
 
     private static class ExceptionHavingExplanations extends BaseMatcher<Exception> {

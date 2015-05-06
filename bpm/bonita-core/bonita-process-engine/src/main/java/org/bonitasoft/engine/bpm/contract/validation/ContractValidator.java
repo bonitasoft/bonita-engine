@@ -40,7 +40,7 @@ public class ContractValidator {
         comments = new ArrayList<>();
     }
 
-    public void isValid(long processDefinitionId, final SContractDefinition contract, final Map<String, Serializable> variables) throws ContractViolationException {
+    public void validate(long processDefinitionId, final SContractDefinition contract, final Map<String, Serializable> variables) throws ContractViolationException {
         structureValidator.validate(contract, variables);
         rulesValidator.validate(processDefinitionId, contract, variables);
     }

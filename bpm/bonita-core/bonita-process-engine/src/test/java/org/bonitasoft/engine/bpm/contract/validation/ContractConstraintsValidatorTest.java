@@ -163,7 +163,7 @@ public class ContractConstraintsValidatorTest {
             fail("validation should fail");
         } catch (final ContractViolationException e) {
             assertThat(e.getMessage()).contains("Exception while");
-            assertThat(e.getCause()).isNotNull();
+            assertThat(e.getCause()).isNotNull().isInstanceOf(SExpressionEvaluationException.class);
         }
     }
 
