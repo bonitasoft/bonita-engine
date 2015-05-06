@@ -27,6 +27,9 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionException;
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
+import org.bonitasoft.engine.bpm.contract.validation.ContractValidator;
+import org.bonitasoft.engine.bpm.contract.validation.ContractValidatorFactory;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -57,6 +60,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -109,6 +113,7 @@ import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -156,6 +161,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected final ExpressionResolverService expressionResolverService;
 
+    protected final ExpressionService expressionService;
+
     protected final ConnectorService connectorService;
 
     private final OperationService operationService;
@@ -183,7 +190,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
             final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
-            final ExpressionResolverService expressionResolverService, final EventService eventService,
+            final ExpressionResolverService expressionResolverService, final ExpressionService expressionService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
             final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager, BusinessDataRepository businessDataRepository,
@@ -203,6 +210,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.classLoaderService = classLoaderService;
         this.operationService = operationService;
         this.expressionResolverService = expressionResolverService;
+        this.expressionService = expressionService;
         this.documentService = documentService;
         this.sessionAccessor = sessionAccessor;
         this.bpmInstancesCreator = bpmInstancesCreator;
@@ -758,7 +766,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private boolean needToReevaluateInclusiveGateways(FlowNodeTransitionsWrapper transitionsDescriptor) {
-        int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size() + (transitionsDescriptor.getDefaultTransition()!=null?1:0);
+        int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size()
+                + (transitionsDescriptor.getDefaultTransition() != null ? 1 : 0);
         int takenTransition = transitionsDescriptor.getValidOutgoingTransitionDefinitions().size();
         /*
          * Why this condition?
@@ -782,8 +791,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     @Override
     public SProcessInstance start(final long starterId, final long starterSubstituteId, final List<SOperation> operations, final Map<String, Object> context,
-            final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final FlowNodeSelector selector, Map<String, Serializable> processInputs)
-            throws SProcessInstanceCreationException {
+            final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final FlowNodeSelector selector, final Map<String, Serializable> processInputs)
+            throws SProcessInstanceCreationException, ContractViolationException {
         return start(starterId, starterSubstituteId, null, operations, context, connectorsWithInput, -1, selector, processInputs);
     }
 
@@ -791,7 +800,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     public SProcessInstance start(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final long starterId, final long starterSubstituteId,
             final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final long callerId, final long subProcessDefinitionId,
-            Map<String, Serializable> processInputs) throws SProcessInstanceCreationException {
+            final Map<String, Serializable> processInputs) throws SProcessInstanceCreationException, ContractViolationException {
         try {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, getFilter(targetSFlowNodeDefinitionId), subProcessDefinitionId);
@@ -813,10 +822,16 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     @Override
     public SProcessInstance start(final long starterId, final long starterSubstituteId, final SExpressionContext expressionContext,
             final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectors,
-            final long callerId, final FlowNodeSelector selector, Map<String, Serializable> processInputs) throws SProcessInstanceCreationException {
+            final long callerId, final FlowNodeSelector selector, Map<String, Serializable> processInputs) throws SProcessInstanceCreationException,
+            ContractViolationException {
+
+        final SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
+
+        // Validate start process contract inputs:
+        validateContractInputs(processInputs, sProcessDefinition);
+
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
             final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), sProcessDefinition.getId());
             Thread.currentThread().setContextClassLoader(localClassLoader);
             // initialize the process classloader by getting it one time
@@ -825,6 +840,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             } catch (final ClassNotFoundException e) {
                 // ignore, just to load
             }
+
             final SProcessInstance sProcessInstance = createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, callerId);
 
             final boolean isInitializing = initialize(starterId, sProcessDefinition, sProcessInstance, expressionContext,
@@ -856,6 +872,14 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             throw new SProcessInstanceCreationException(e);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+    }
+
+    protected void validateContractInputs(Map<String, Serializable> processInputs, SProcessDefinition sProcessDefinition) throws ContractViolationException {
+        final SContractDefinition contractDefinition = sProcessDefinition.getContract();
+        if (contractDefinition != null) {
+            final ContractValidator validator = new ContractValidatorFactory().createContractValidator(logger, expressionService);
+            validator.validate(sProcessDefinition.getId(), contractDefinition, processInputs);
         }
     }
 

@@ -923,7 +923,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     public DesignProcessDefinition getDesignProcessDefinition(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            final File processDesignFile = BonitaHomeServer.getInstance().getProcessDefinitionFile(tenantAccessor.getTenantId(), processDefinitionId, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
+            final File processDesignFile = BonitaHomeServer.getInstance().getProcessDefinitionFile(tenantAccessor.getTenantId(), processDefinitionId,
+                    ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
             final ProcessDefinitionBARContribution processDefinitionBARContribution = new ProcessDefinitionBARContribution();
             return processDefinitionBARContribution.deserializeProcessDefinition(processDesignFile);
         } catch (final BonitaHomeNotSetException e) {
@@ -3177,7 +3178,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessInstance startProcessWithInputs(final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
-        throwContractViolationExceptionIfProcessContractIsInvalid(instantiationInputs, processDefinitionId);
         return startProcessWithInputs(0, processDefinitionId, instantiationInputs);
     }
 
@@ -3185,21 +3185,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     public ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
         return new ProcessStarter(userId, processDefinitionId, instantiationInputs).start();
-    }
-
-    private void throwContractViolationExceptionIfProcessContractIsInvalid(final Map<String, Serializable> inputs, long processDefinitionId)
-            throws ContractViolationException, ProcessDefinitionNotFoundException {
-        final SContractDefinition contractDefinition;
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        try {
-            contractDefinition = tenantAccessor.getProcessDefinitionService().getProcessDefinition(processDefinitionId)
-                    .getContract();
-        } catch (SProcessDefinitionNotFoundException | SProcessDefinitionReadException e) {
-            throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
-        }
-        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getExpressionService());
-        validator.validate(processDefinitionId, contractDefinition, inputs);
-
     }
 
     @Override
@@ -3250,7 +3235,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     public ProcessInstance startProcess(final long userId, final long processDefinitionId, final List<Operation> operations,
             final Map<String, Serializable> context) throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
         final ProcessStarter starter = new ProcessStarter(userId, processDefinitionId, operations, context);
-        return starter.start();
+        try {
+            return starter.start();
+        } catch (ContractViolationException e) {
+            // To not have an API break, we need to wrapped this new Exception:
+            throw new ProcessExecutionException(e);
+        }
     }
 
     @Override
@@ -5895,7 +5885,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                 (SUserTaskInstance) flowNodeInstance);
         executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
         final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
-        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getExpressionService());
+        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService(),
+                tenantAccessor.getExpressionService());
         validator.validate(flowNodeInstance.getProcessDefinitionId(), contractDefinition, inputs);
 
     }

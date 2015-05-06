@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -367,8 +368,12 @@ public class EventsHandler {
                     processExecutor, logger);
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
-        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
-                null, null, subProcflowNodeInstance.getId(), subProcessId, null); // Should we support process contract inputs on EventSubProcess?
+        try {
+            processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(), null, null,
+                    subProcflowNodeInstance.getId(), subProcessId, null); // Process contract inputs on EventSubProcess are not supported.
+        } catch (ContractViolationException e) {
+            throw new SProcessInstanceCreationException("Process contracts are not allowed on Event sub process");
+        }
         unregisterEventSubProcess(processDefinition, parentProcessInstance);
     }
 
@@ -396,8 +401,12 @@ public class EventsHandler {
 
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)
             throws SProcessInstanceCreationException {
-        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
-                null, null, -1, -1, null);
+        try {
+            processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(), null, null, -1,
+                    -1, null);
+        } catch (ContractViolationException e) {
+            throw new SProcessInstanceCreationException("Process contracts are not allowed on Event sub process");
+        }
     }
 
     public EventHandlerStrategy getHandler(final SEventTriggerType triggerType) {

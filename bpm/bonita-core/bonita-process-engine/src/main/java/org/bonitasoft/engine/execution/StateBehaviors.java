@@ -24,6 +24,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -552,7 +553,7 @@ public class StateBehaviors {
                 final SCallActivityInstance callActivityInstance = (SCallActivityInstance) flowNodeInstance;
                 // update token count
                 activityInstanceService.setTokenCount(callActivityInstance, callActivityInstance.getTokenCount() + 1);
-            } catch (final SBonitaException e) {
+            } catch (final SBonitaException | ContractViolationException e) {
                 throw new SActivityStateExecutionException(e);
             }
         }
@@ -571,7 +572,7 @@ public class StateBehaviors {
     }
 
     private void instantiateProcess(final SProcessDefinition callerProcessDefinition, final SCallActivityDefinition callActivityDefinition,
-            final SFlowNodeInstance callActivityInstance, final long targetProcessDefinitionId) throws SProcessInstanceCreationException {
+            final SFlowNodeInstance callActivityInstance, final long targetProcessDefinitionId) throws SProcessInstanceCreationException, ContractViolationException {
         final long callerProcessDefinitionId = callerProcessDefinition.getId();
         final long callerId = callActivityInstance.getId();
         final List<SOperation> operationList = callActivityDefinition.getDataInputOperations();
