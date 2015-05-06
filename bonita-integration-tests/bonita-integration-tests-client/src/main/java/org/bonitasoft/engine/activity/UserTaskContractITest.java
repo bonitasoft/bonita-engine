@@ -274,6 +274,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         } catch (final ContractViolationException e) {
             final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
             assertThat(state).isEqualTo("ready");
+            assertThat(e.getExplanations()).containsExactly("Expected input [numberOfDays] is missing");
         }
         disableAndDeleteProcess(processDefinition);
     }
@@ -295,7 +296,8 @@ public class UserTaskContractITest extends CommonAPIIT {
                 .addInput("expenseReport", "expense report with several expense lines", true,
                         Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof))
                 .addFileInput("report", "the report")
-                .addFileInput("receipts", "the receipts", true);
+                .addFileInput("receipts", "the receipts", true)
+                .addConstraint("report content not empty", "report.content.length > 1","report content is empty","report");
 
         userTaskDefinitionBuilder.addData("expenseData", List.class.getName(), null);
         userTaskDefinitionBuilder.addData("reportData", List.class.getName(), null);
