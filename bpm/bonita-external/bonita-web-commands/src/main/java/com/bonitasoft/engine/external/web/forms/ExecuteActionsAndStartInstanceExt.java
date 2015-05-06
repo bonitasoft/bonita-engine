@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.ProcessStarter;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
@@ -60,7 +61,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
-        } catch (final SBonitaException e) {
+        } catch (final SBonitaException | ContractViolationException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndStartInstanceExt(Map<Operation, Map<String, Serializable>> operationsMap, long processDefinitionID)'",
                     e);
@@ -69,9 +70,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
     private ProcessInstance startProcess(final long processDefinitionId, final long userId, final List<Operation> operations,
             final Map<String, Serializable> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput)
-            throws SProcessDefinitionException, SProcessDefinitionReadException, SProcessInstanceCreationException {
-        final ProcessStarter starter = new ProcessStarter(userId, processDefinitionId, operations, context);
-        return starter.start(connectorsWithInput);
+            throws SProcessDefinitionException, SProcessDefinitionReadException, SProcessInstanceCreationException, ContractViolationException {
+        return new ProcessStarter(userId, processDefinitionId, operations, context).start(connectorsWithInput);
     }
 
 }
