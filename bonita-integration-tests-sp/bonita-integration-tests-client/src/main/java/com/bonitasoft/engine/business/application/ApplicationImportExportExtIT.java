@@ -55,7 +55,7 @@ public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business
         hrCreator.setIconPath("/icon.jpg");
         hrCreator.setProfileId(userProfile.getId());
 
-        //enginering application
+        //engineering application
         final ApplicationCreator engineeringCreator = new org.bonitasoft.engine.business.application.ApplicationCreator("Engineering-dashboard",
                 "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("My", "Marketing", "2.0");
