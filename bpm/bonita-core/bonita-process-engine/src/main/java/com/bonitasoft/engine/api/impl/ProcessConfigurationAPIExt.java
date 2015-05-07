@@ -63,7 +63,11 @@ public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl impl
         } catch (SObjectModificationException e) {
             throw new UpdateException("Unable to update the form mapping " + formMappingId, e);
         }
+    }
 
+    @Override
+    public void updateExpressionContent(long processDefintionId, long expressionDefinitionId, String content) {
+        // TODO implement me !
     }
 
 }
