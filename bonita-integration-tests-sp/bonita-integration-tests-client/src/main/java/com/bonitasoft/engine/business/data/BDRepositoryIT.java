@@ -71,7 +71,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -638,7 +637,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final String getLastNameWithDAOExpression = "retrieveEmployeeByFirstName";
         expressions.put(
                 new ExpressionBuilder().createGroovyScriptExpression(getLastNameWithDAOExpression, "import " + EMPLOYEE_QUALIFIED_NAME + "; Employee e = "
-                        + employeeDAOName + ".findByFirstName('" + firstNameEmployee1 + "', 0, 10).get(0); e.getAddresses().get(0).city", String.class.getName(),
+                        + employeeDAOName + ".findByFirstName('" + firstNameEmployee1 + "', 0, 10).get(0); e.getAddresses().get(0).city",
+                        String.class.getName(),
                         new ExpressionBuilder().buildBusinessObjectDAOExpression(employeeDAOName, EMPLOYEE_QUALIFIED_NAME + "DAO")), null);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression(COUNT_ADDRESS, "Address." + COUNT_ADDRESS, Long.class.getName()), null);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression(COUNT_EMPLOYEE, "Employee." + COUNT_EMPLOYEE, Long.class.getName()), null);
@@ -850,9 +850,9 @@ public class BDRepositoryIT extends CommonAPISPIT {
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "java setter operation", "mandatory field",
             "intermixed" }, jira = "BS-8591", story = "Create business data using intermixed java setter operations.")
     @Test
-    @Ignore("Commented as JIRA BS-13090 is not fully reported in 7.0.0 YET. REMOVE ME soon !!!!!!!!!!!!!!!!!!!!!")
     public void shouldBeAbleToCreate2BusinessDataUsingIntermixedBizDataJavaSetterOperations() throws Exception {
-        final Expression countryQueryNameParameter = new ExpressionBuilder().createExpression("name", "France", String.class.getName(), ExpressionType.TYPE_CONSTANT);
+        final Expression countryQueryNameParameter = new ExpressionBuilder().createExpression("name", "France", String.class.getName(),
+                ExpressionType.TYPE_CONSTANT);
         final Expression countryQueryExpression = new ExpressionBuilder().createQueryBusinessDataExpression("country", "Country.findByName",
                 COUNTRY_QUALIFIED_NAME, countryQueryNameParameter);
         final Expression createNewAddressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
@@ -1245,7 +1245,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final Map<String, Serializable> employee = getProcessAPI().evaluateExpressionsOnProcessInstance(
                 instance.getId(),
                 Collections.singletonMap(new ExpressionBuilder().createBusinessDataReferenceExpression("myEmployees"),
-                        Collections.<String, Serializable>emptyMap()));
+                        Collections.<String, Serializable> emptyMap()));
         assertThat(employee).hasSize(1);
         assertThat(employee.get("myEmployees")).isInstanceOf(MultipleBusinessDataReference.class);
         final MultipleBusinessDataReference myEmployees = (MultipleBusinessDataReference) employee.get("myEmployees");
@@ -1529,7 +1529,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
     private String getClientBdmJarClassPath(final String bonitaHomePath) {
         String clientBdmJarPath;
-        clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("engine-server").append(File.separator).append("work").append(File.separator).append("tenants")
+        clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("engine-server").append(File.separator).append("work")
+                .append(File.separator).append("tenants")
                 .append(File.separator).append(tenantId).append(File.separator).append("data-management-client").toString();
         return clientBdmJarPath;
     }
