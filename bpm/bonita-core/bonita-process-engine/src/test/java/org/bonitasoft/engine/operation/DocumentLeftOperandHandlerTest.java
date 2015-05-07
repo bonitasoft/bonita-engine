@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.operation;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
@@ -24,9 +25,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
 
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -92,12 +95,12 @@ public class DocumentLeftOperandHandlerTest {
     public void should_update_check_the_type() throws Exception {
         exception.expect(SOperationExecutionException.class);
         exception.expectMessage("Document operation only accepts an expression returning a DocumentValue and not java.util.HashMap");
-        handler.update(new SLeftOperandImpl(), Collections.<String,Object>emptyMap(), new HashMap<Object, Object>(), 45l, "container");
+        handler.update(new SLeftOperandImpl(), Collections.<String, Object>emptyMap(), new HashMap<Object, Object>(), 45l, "container");
     }
 
     @Test
     public void should_update_delete_if_type_is_null() throws Exception {
-        handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), null, 45l, "PROCESS_INSTANCE");
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object>emptyMap(), null, 45l, "PROCESS_INSTANCE");
         verify(documentService).removeCurrentVersion(45l, "myDoc");
     }
 
@@ -144,6 +147,17 @@ public class DocumentLeftOperandHandlerTest {
         handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), new DocumentValue(123l), 45l, "PROCESS_INSTANCE");
         //then
         verify(documentService, times(0)).updateDocument(any(SMappedDocument.class), any(SDocument.class));
+    }
+
+    @Test
+    public void should_toCheckedDocumentValue_return_new_DocumentValue_for_FileInput() throws Exception {
+        final FileInputValue fileInputValue = new FileInputValue("theFile.txt", "It's my file".getBytes());
+
+        final DocumentValue documentValue = handler.toCheckedDocumentValue(fileInputValue);
+
+
+        assertThat(documentValue).isEqualToIgnoringGivenFields(new DocumentValue(null, null, "theFile.txt"), "content");
+        assertThat(documentValue.getContent()).isEqualTo("It's my file".getBytes());
     }
 
 }

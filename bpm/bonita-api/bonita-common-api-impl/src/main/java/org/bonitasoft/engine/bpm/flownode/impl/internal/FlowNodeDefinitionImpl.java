@@ -58,7 +58,7 @@ public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements
     }
 
     public FlowNodeDefinitionImpl(final String name) {
-        this(UUID.randomUUID().getLeastSignificantBits(), name);
+        this(Math.abs(UUID.randomUUID().getLeastSignificantBits()), name);
     }
 
     @Override

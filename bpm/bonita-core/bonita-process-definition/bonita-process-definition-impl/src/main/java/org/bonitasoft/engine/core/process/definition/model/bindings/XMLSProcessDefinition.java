@@ -600,7 +600,7 @@ public class XMLSProcessDefinition {
     private XMLNode createContractNode(final SContractDefinition contract) {
         final XMLNode contractNode = new XMLNode(CONTRACT_NODE);
         final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
-        for (final SInputDefinition input : contract.getInputs()) {
+        for (final SInputDefinition input : contract.getInputDefinitions()) {
             inputsNode.addChild(createInputNode(input));
         }
         if (!inputsNode.getChildNodes().isEmpty()) {
@@ -617,11 +617,10 @@ public class XMLSProcessDefinition {
         return contractNode;
     }
 
-
-    private XMLNode createContextNode(List<SContextEntry> context) {
-        XMLNode contextNode = new XMLNode(CONTEXT_NODE);
-        for (SContextEntry contextEntry : context) {
-            XMLNode node = new XMLNode(CONTEXT_ENTRY_NODE);
+    private XMLNode createContextNode(final List<SContextEntry> context) {
+        final XMLNode contextNode = new XMLNode(CONTEXT_NODE);
+        for (final SContextEntry contextEntry : context) {
+            final XMLNode node = new XMLNode(CONTEXT_ENTRY_NODE);
             node.addAttribute(CONTEXT_ENTRY_KEY, contextEntry.getKey());
             addExpressionNode(node, EXPRESSION_NODE, contextEntry.getExpression());
             contextNode.addChild(node);
@@ -632,7 +631,6 @@ public class XMLSProcessDefinition {
     private XMLNode createContractConstraintNode(final SConstraintDefinition constraintDefinition) {
         final XMLNode constraintNode = new XMLNode(CONTRACT_CONSTRAINT_NODE);
         constraintNode.addAttribute(NAME, constraintDefinition.getName());
-        constraintNode.addAttribute(CONSTRAINT_TYPE, constraintDefinition.getConstraintType().toString());
         constraintNode.addChild(CONSTRAINT_EXPRESSION, constraintDefinition.getExpression());
         constraintNode.addChild(CONSTRAINT_EXPLANATION, constraintDefinition.getExplanation());
         final XMLNode namesNode = new XMLNode(INPUT_NAMES);
@@ -647,8 +645,8 @@ public class XMLSProcessDefinition {
         final XMLNode inputNode = new XMLNode(CONTRACT_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
         inputNode.addAttribute(MULTIPLE, input.isMultiple());
-        SType type = input.getType();
-        if(type != null){
+        final SType type = input.getType();
+        if (type != null) {
             inputNode.addAttribute(TYPE, type.toString());
         }
         inputNode.addAttribute(DESCRIPTION, input.getDescription());

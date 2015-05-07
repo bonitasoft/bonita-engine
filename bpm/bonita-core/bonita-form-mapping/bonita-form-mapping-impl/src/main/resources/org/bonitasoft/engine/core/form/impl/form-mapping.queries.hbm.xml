@@ -59,4 +59,11 @@
         FROM org.bonitasoft.engine.core.form.impl.SFormMappingImpl AS formmap
     </query>
 
+
+    <query name="searchSFormMappingwithSPageMapping">
+        SELECT formmap
+        FROM org.bonitasoft.engine.core.form.impl.SFormMappingImpl AS formmap
+        LEFT JOIN formmap.pageMapping AS pagemap
+    </query>
+
 </hibernate-mapping>

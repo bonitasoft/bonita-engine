@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 import org.bonitasoft.engine.xml.SXMLParseException;
 
@@ -33,16 +31,8 @@ public class SConstraintDefinitionBinding extends SNamedElementBinding {
 
     private final List<String> inputNames;
 
-    private SConstraintType sConstraintType;
-
     public SConstraintDefinitionBinding() {
         inputNames = new ArrayList<String>();
-    }
-
-    @Override
-    public void setAttributes(final Map<String, String> attributes) {
-        super.setAttributes(attributes);
-        sConstraintType = SConstraintType.valueOf(attributes.get(XMLProcessDefinition.CONSTRAINT_TYPE));
     }
 
     @Override
@@ -62,7 +52,7 @@ public class SConstraintDefinitionBinding extends SNamedElementBinding {
 
     @Override
     public Object getObject() {
-        final SConstraintDefinitionImpl rule = new SConstraintDefinitionImpl(name, expression, explanation, sConstraintType);
+        final SConstraintDefinitionImpl rule = new SConstraintDefinitionImpl(name, expression, explanation);
         for (final String inputName : inputNames) {
             rule.addInputName(inputName);
         }

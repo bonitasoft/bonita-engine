@@ -10,22 +10,27 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.api.impl.page;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.bonitasoft.engine.api.impl.converter.PageModelConverter;
+import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.page.SearchPages;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.core.form.FormMappingService;
+import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -40,8 +45,10 @@ import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
+import org.bonitasoft.engine.form.FormMappingSearchDescriptor;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageCreator;
+import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageNotFoundException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.PageUpdater;
@@ -52,10 +59,15 @@ import org.bonitasoft.engine.page.SInvalidPageZipMissingAPropertyException;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.SPageUpdateBuilder;
 import org.bonitasoft.engine.page.SPageUpdateBuilderFactory;
 import org.bonitasoft.engine.page.SPageUpdateContentBuilder;
 import org.bonitasoft.engine.page.SPageUpdateContentBuilderFactory;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -68,13 +80,21 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class PageAPIDelegate {
 
+    private final TenantServiceAccessor tenantAccessor;
     private final long userIdFromSession;
     private final PageService pageService;
     private final SearchEntitiesDescriptor searchEntitiesDescriptor;
+    private final PageMappingService pageMappingService;
+    private final FormMappingService formMappingService;
+    private final DependencyResolver dependencyResolver;
 
     public PageAPIDelegate(final TenantServiceAccessor tenantAccessor, final long userIdFromSession) {
+        this.tenantAccessor = tenantAccessor;
+        dependencyResolver = tenantAccessor.getDependencyResolver();
         this.userIdFromSession = userIdFromSession;
         pageService = tenantAccessor.getPageService();
+        pageMappingService = tenantAccessor.getPageMappingService();
+        formMappingService = tenantAccessor.getFormMappingService();
         searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
     }
 
@@ -148,21 +168,41 @@ public class PageAPIDelegate {
 
     public void deletePage(final long pageId) throws DeletionException {
         try {
+            final SPage page = pageService.getPage(pageId);
             pageService.deletePage(pageId);
-        } catch (final SBonitaException sBonitaException) {
-            throw new DeletionException(sBonitaException);
+            updatePageMappings(pageId);
+            final Long processDefinitionId = page.getProcessDefinitionId();
+            if (processDefinitionId != null) {
+                updateProcessResolution(processDefinitionId);
+            }
+        } catch (final SBonitaException e) {
+            throw new DeletionException(e);
         }
     }
 
-    public void deletePages(final List<Long> pageIds) throws DeletionException {
-        try {
-            for (final Long pageId : pageIds) {
-                pageService.deletePage(pageId);
+    protected void updatePageMappings(long pageId) throws SBonitaReadException, SObjectModificationException, SObjectNotFoundException {
+        List<SFormMapping> formMappings;
+        QueryOptions queryOptions = new QueryOptions(0, 20, Collections.singletonList(new OrderByOption(SFormMapping.class,
+                FormMappingSearchDescriptor.ID, OrderByType.ASC)), Arrays.asList(new FilterOption(SPageMapping.class,
+                FormMappingSearchDescriptor.PAGE_ID, pageId)), null);
+        do {
+            formMappings = formMappingService.searchFormMappings(queryOptions);
+            for (SFormMapping formMapping : formMappings) {
+                pageMappingService.update(formMapping.getPageMapping(), null);
             }
-        } catch (final SBonitaException sBonitaException) {
-            throw new DeletionException(sBonitaException);
-        }
+            queryOptions = QueryOptions.getNextPage(queryOptions);
+        } while (!formMappings.isEmpty());
 
+    }
+
+    private void updateProcessResolution(Long processDefinitionId) {
+        dependencyResolver.resolveDependencies(processDefinitionId, tenantAccessor);
+    }
+
+    public void deletePages(final List<Long> pageIds) throws DeletionException {
+        for (final Long pageId : pageIds) {
+            deletePage(pageId);
+        }
     }
 
     public Page getPageByName(final String name) throws PageNotFoundException {
@@ -317,7 +357,7 @@ public class PageAPIDelegate {
 
     public Page getPageByNameAndProcessDefinition(String name, long processDefinitionId) throws PageNotFoundException {
         try {
-            final SPage sPage = pageService.getPageByNameAndProcessDefinitionId(name,processDefinitionId);
+            final SPage sPage = pageService.getPageByNameAndProcessDefinitionId(name, processDefinitionId);
             if (sPage == null) {
                 throw new PageNotFoundException(name);
             }

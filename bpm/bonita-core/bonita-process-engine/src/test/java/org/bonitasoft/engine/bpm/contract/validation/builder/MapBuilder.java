@@ -14,14 +14,25 @@
 package org.bonitasoft.engine.bpm.contract.validation.builder;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.assertj.core.data.MapEntry;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
-
 
 public class MapBuilder {
 
     public static Builder<String, Serializable> aMap() {
         return ImmutableMap.<String, Serializable> builder();
+    }
+
+    public static Map<String, Serializable> contractInputMap(final MapEntry... entries) {
+        final Map<String, Serializable> result = new HashMap<>();
+        for (final MapEntry entry : entries) {
+            result.put((String) entry.key, (Serializable) entry.value);
+        }
+        return result;
     }
 }

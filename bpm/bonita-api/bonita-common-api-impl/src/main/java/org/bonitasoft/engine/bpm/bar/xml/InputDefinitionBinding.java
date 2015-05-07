@@ -35,9 +35,9 @@ public class InputDefinitionBinding extends NamedElementBinding {
     public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
         multiple = Boolean.parseBoolean(attributes.get(XMLProcessDefinition.MULTIPLE));
-        String name = attributes.get(XMLProcessDefinition.TYPE);
-        if (name != null) {
-            type = Type.valueOf(name);
+        String typeAsString = attributes.get(XMLProcessDefinition.TYPE);
+        if (typeAsString != null) {
+            type = Type.valueOf(typeAsString);
         }
     }
 

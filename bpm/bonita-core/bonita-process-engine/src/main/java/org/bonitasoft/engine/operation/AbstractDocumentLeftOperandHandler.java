@@ -10,9 +10,10 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.operation;
 
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -34,7 +35,7 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
     private final SessionService sessionService;
 
     public AbstractDocumentLeftOperandHandler(final ActivityInstanceService activityInstanceService, final SessionAccessor sessionAccessor,
-            final SessionService sessionService) {
+                                              final SessionService sessionService) {
         this.activityInstanceService = activityInstanceService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
@@ -52,12 +53,23 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
     }
 
     protected DocumentValue toCheckedDocumentValue(final Object newValue) throws SOperationExecutionException {
-        final boolean isDocumentWithContent = newValue instanceof DocumentValue;
-        if (!isDocumentWithContent && newValue != null) {
-            throw new SOperationExecutionException("Document operation only accepts an expression returning a DocumentValue and not "
-                    + newValue.getClass().getName());
+        if (newValue != null) {
+            final boolean isFileInput = newValue instanceof FileInputValue;
+            if (isFileInput) {
+                FileInputValue fileInput = ((FileInputValue) newValue);
+                return toDocumentValue(fileInput);
+            }
+            final boolean isDocumentWithContent = newValue instanceof DocumentValue;
+            if (!isDocumentWithContent) {
+                throw new SOperationExecutionException("Document operation only accepts an expression returning a DocumentValue and not "
+                        + newValue.getClass().getName());
+            }
         }
         return (DocumentValue) newValue;
+    }
+
+    protected DocumentValue toDocumentValue(FileInputValue fileInput) {
+        return new DocumentValue(fileInput.getContent(), null, fileInput.getFileName());
     }
 
     protected long getAuthorId() {

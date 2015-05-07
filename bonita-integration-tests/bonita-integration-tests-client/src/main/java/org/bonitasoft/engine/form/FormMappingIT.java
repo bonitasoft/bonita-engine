@@ -221,6 +221,9 @@ public class FormMappingIT extends TestWithUser {
         assertThat(pageURLOverview.getPageId()).isNotNull();
         assertThat(custompage_globalpage.getId()).isEqualTo(pageURLOverview.getPageId());
 
+        getPageAPI().deletePage(page.getId());
+        assertThat(getProcessAPI().getProcessResolutionProblems(processDefinition.getId())).hasSize(1);
+
         getPageAPI().deletePage(custompage_globalpage.getId());
         disableAndDeleteProcess(processDefinition);
     }

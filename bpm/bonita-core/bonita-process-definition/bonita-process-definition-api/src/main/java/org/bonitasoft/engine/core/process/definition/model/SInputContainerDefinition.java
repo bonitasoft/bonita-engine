@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,24 +11,15 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.contract.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
+package org.bonitasoft.engine.core.process.definition.model;
 
-import org.junit.Test;
+import java.util.List;
 
-public class ConstraintDefinitionImplTest {
+/**
+ * @author Baptiste Mesta
+ */
+public interface SInputContainerDefinition extends SBaseElement {
 
-    @Test
-    public void should_add_input_name() throws Exception {
-        //given
-        final ConstraintDefinitionImpl constraintDefinition = new ConstraintDefinitionImpl("name", "expression", "explanation");
-
-        //when
-        constraintDefinition.addInputName("inputName");
-
-        //then
-        assertThat(constraintDefinition.getInputNames()).isNotNull().hasSize(1).containsExactly("inputName");
-
-    }
+    List<SInputDefinition> getInputDefinitions();
 }
