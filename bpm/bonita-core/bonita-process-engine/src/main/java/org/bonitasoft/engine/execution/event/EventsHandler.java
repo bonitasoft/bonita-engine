@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -43,6 +42,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowM
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
@@ -368,12 +368,8 @@ public class EventsHandler {
                     processExecutor, logger);
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
-        try {
-            processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(), null, null,
-                    subProcflowNodeInstance.getId(), subProcessId, null); // Process contract inputs on EventSubProcess are not supported.
-        } catch (ContractViolationException e) {
-            throw new SProcessInstanceCreationException("Process contracts are not allowed on Event sub process");
-        }
+        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(), null, null,
+                subProcflowNodeInstance.getId(), subProcessId, null); // Process contract inputs on EventSubProcess are not supported.
         unregisterEventSubProcess(processDefinition, parentProcessInstance);
     }
 
@@ -400,13 +396,9 @@ public class EventsHandler {
     }
 
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)
-            throws SProcessInstanceCreationException {
-        try {
-            processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(), null, null, -1,
-                    -1, null);
-        } catch (ContractViolationException e) {
-            throw new SProcessInstanceCreationException("Process contracts are not allowed on Event sub process");
-        }
+            throws SProcessInstanceCreationException, SContractViolationException {
+        processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(), null, null, -1,
+                -1, null);
     }
 
     public EventHandlerStrategy getHandler(final SEventTriggerType triggerType) {

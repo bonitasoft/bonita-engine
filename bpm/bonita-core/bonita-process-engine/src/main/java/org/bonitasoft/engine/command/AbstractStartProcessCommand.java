@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.ProcessStarter;
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.execution.AdvancedStartProcessValidator;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -62,7 +62,7 @@ public abstract class AbstractStartProcessCommand extends CommandWithParameters 
 
     private ProcessInstance startProcess(final long processDefinitionId, final List<String> activityNames, final long startedBy,
             final Map<String, Serializable> context, final List<Operation> operations) throws ProcessDefinitionNotFoundException, ProcessActivationException,
-            ProcessExecutionException, ContractViolationException {
+            ProcessExecutionException, SContractViolationException {
         final ProcessStarter starter = new ProcessStarter(startedBy, processDefinitionId, operations, context, activityNames);
         return starter.start();
     }

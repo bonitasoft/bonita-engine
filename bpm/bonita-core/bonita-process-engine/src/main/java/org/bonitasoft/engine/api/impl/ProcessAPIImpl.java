@@ -270,6 +270,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInsta
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
@@ -2475,7 +2476,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void updateDataInstances(final List<SDataInstance> sDataInstances, final Map<String, Serializable> dataNameValues, ClassLoader classLoader) throws ClassNotFoundException,
+    protected void updateDataInstances(final List<SDataInstance> sDataInstances, final Map<String, Serializable> dataNameValues, ClassLoader classLoader)
+            throws ClassNotFoundException,
             UpdateException, SDataInstanceException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
@@ -2485,7 +2487,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void updateDataInstance(final DataInstanceService dataInstanceService, final SDataInstance sDataInstance, final Serializable dataNewValue, ClassLoader classLoader)
+    protected void updateDataInstance(final DataInstanceService dataInstanceService, final SDataInstance sDataInstance, final Serializable dataNewValue,
+            ClassLoader classLoader)
             throws UpdateException, SDataInstanceException {
         verifyTypeOfNewDataValue(sDataInstance, dataNewValue, classLoader);
 
@@ -2509,6 +2512,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw e;
         }
     }
+
     private EntityUpdateDescriptor buildEntityUpdateDescriptorForData(final Serializable dataValue) {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField("value", dataValue);
@@ -3184,7 +3188,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
-        return new ProcessStarter(userId, processDefinitionId, instantiationInputs).start();
+        try {
+            return new ProcessStarter(userId, processDefinitionId, instantiationInputs).start();
+        } catch (SContractViolationException e) {
+            throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause());
+        }
     }
 
     @Override
@@ -3237,9 +3245,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessStarter starter = new ProcessStarter(userId, processDefinitionId, operations, context);
         try {
             return starter.start();
-        } catch (ContractViolationException e) {
+        } catch (SContractViolationException e) {
             // To not have an API break, we need to wrapped this new Exception:
-            throw new ProcessExecutionException(e);
+            throw new ProcessExecutionException(new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause()));
         }
     }
 
@@ -5864,7 +5872,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance.getResult();
         if (flowNodeInstance instanceof SUserTaskInstance) {
-            throwContractViolationExceptionIfContractIsInvalid(wrapInTransaction, inputs, tenantAccessor, flowNodeInstance);
+            try {
+                throwContractViolationExceptionIfContractIsInvalid(wrapInTransaction, inputs, tenantAccessor, flowNodeInstance);
+            } catch (SContractViolationException e) {
+                throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause());
+            }
         }
 
         final LockService lockService = tenantAccessor.getLockService();
@@ -5879,8 +5891,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void throwContractViolationExceptionIfContractIsInvalid(final boolean wrapInTransaction, final Map<String, Serializable> inputs,
-            final TenantServiceAccessor tenantAccessor,
-            final SFlowNodeInstance flowNodeInstance) throws SBonitaException, ContractViolationException {
+            final TenantServiceAccessor tenantAccessor, final SFlowNodeInstance flowNodeInstance) throws SBonitaException, SContractViolationException {
         final GetContractOfUserTaskInstance contractOfUserTaskInstance = new GetContractOfUserTaskInstance(tenantAccessor.getProcessDefinitionService(),
                 (SUserTaskInstance) flowNodeInstance);
         executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);

@@ -20,9 +20,7 @@ import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDef
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,8 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Rule;
@@ -64,7 +62,6 @@ public class ContractValidatorTest {
 
         contractValidator.validate(PROCESS_DEFINITION_ID, aContract().build(), aMap().build());
 
-
         assertThat(contractValidator.getComments()).isEmpty();
     }
 
@@ -72,10 +69,10 @@ public class ContractValidatorTest {
     public void should_not_validate_rules_if_structure_validation_fail() throws Exception {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> inputs = aMap().build();
-        doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
+        doThrow(new SContractViolationException("bad structure", new ArrayList<String>()))
                 .when(structureValidator).validate(contract, inputs);
 
-        expectedException.expect(ContractViolationException.class);
+        expectedException.expect(SContractViolationException.class);
         try {
             contractValidator.validate(PROCESS_DEFINITION_ID, contract, inputs);
         } finally {
@@ -88,10 +85,10 @@ public class ContractValidatorTest {
     public void should_return_false_if_structure_validation_fail() throws Exception {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> variables = aMap().build();
-        doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
+        doThrow(new SContractViolationException("bad structure", new ArrayList<String>()))
                 .when(structureValidator).validate(contract, variables);
 
-        expectedException.expect(ContractViolationException.class);
+        expectedException.expect(SContractViolationException.class);
         contractValidator.validate(PROCESS_DEFINITION_ID, contract, variables);
     }
 
@@ -100,7 +97,7 @@ public class ContractValidatorTest {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> variables = aMap().build();
         final List<String> problems = Arrays.asList("There is problems with structure", "Might have issue with types too");
-        doThrow(new ContractViolationException("bad structure", problems))
+        doThrow(new SContractViolationException("bad structure", problems))
                 .when(structureValidator).validate(contract, variables);
 
         expectedException.expect(new ExceptionHavingExplanations(problems));
@@ -111,10 +108,10 @@ public class ContractValidatorTest {
     public void should_return_false_if_rule_validation_fail() throws Exception {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> variables = aMap().build();
-        doThrow(new ContractViolationException("rule failure", new ArrayList<String>()))
+        doThrow(new SContractViolationException("rule failure", new ArrayList<String>()))
                 .when(constraintValidator).validate(PROCESS_DEFINITION_ID, contract, variables);
 
-        expectedException.expect(ContractViolationException.class);
+        expectedException.expect(SContractViolationException.class);
         contractValidator.validate(PROCESS_DEFINITION_ID, contract, variables);
     }
 
@@ -123,7 +120,7 @@ public class ContractValidatorTest {
         final SContractDefinition contract = aContract().build();
         final Map<String, Serializable> variables = aMap().build();
         final List<String> problems = asList("There is problems with a rule", "Might have issue with other rule too");
-        doThrow(new ContractViolationException("rule failure", problems))
+        doThrow(new SContractViolationException("rule failure", problems))
                 .when(constraintValidator).validate(PROCESS_DEFINITION_ID, contract, variables);
 
         expectedException.expect(new ExceptionHavingExplanations(problems));
@@ -131,6 +128,7 @@ public class ContractValidatorTest {
     }
 
     private static class ExceptionHavingExplanations extends BaseMatcher<Exception> {
+
         private final List<String> problems;
 
         public ExceptionHavingExplanations(List<String> problems) {
@@ -139,7 +137,7 @@ public class ContractValidatorTest {
 
         @Override
         public boolean matches(Object item) {
-            return (item instanceof ContractViolationException) && ((ContractViolationException) item).getExplanations().equals(problems);
+            return (item instanceof SContractViolationException) && ((SContractViolationException) item).getExplanations().equals(problems);
         }
 
         @Override

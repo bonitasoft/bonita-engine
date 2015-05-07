@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 
 /**
  * Validate tasks inputs according to given contract
@@ -40,7 +40,7 @@ public class ContractValidator {
         comments = new ArrayList<>();
     }
 
-    public void validate(long processDefinitionId, final SContractDefinition contract, final Map<String, Serializable> variables) throws ContractViolationException {
+    public void validate(long processDefinitionId, final SContractDefinition contract, final Map<String, Serializable> variables) throws SContractViolationException {
         structureValidator.validate(contract, variables);
         rulesValidator.validate(processDefinitionId, contract, variables);
     }

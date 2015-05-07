@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015 Bonitasoft S.A.
  * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -11,8 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  */
-
-package org.bonitasoft.engine.bpm.contract;
+package org.bonitasoft.engine.core.process.instance.api.exceptions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,26 +20,28 @@ import java.util.Arrays;
 import org.junit.Test;
 
 /**
- * @author Baptiste Mesta
+ * author Emmanuel Duchastenier
  */
-public class ContractViolationExceptionTest {
+public class SContractViolationExceptionTest {
 
     @Test
-    public void should_return_explanation(){
-        final ContractViolationException contractViolationException = new ContractViolationException("Bad contract", Arrays.asList("issue1", "issue2"));
+    public void should_return_explanation() {
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", Arrays.asList("issue1", "issue2"));
 
         assertThat(contractViolationException.getExplanations()).containsExactly("issue1", "issue2");
     }
+
     @Test
-    public void should_print_stack_trace_show_explanations(){
-        final ContractViolationException contractViolationException = new ContractViolationException("Bad contract", Arrays.asList("issue1", "issue2"));
+    public void should_print_stack_trace_show_explanations() {
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", Arrays.asList("issue1", "issue2"));
 
         assertThat(contractViolationException.getMessage()).isEqualTo("Bad contract: [issue1, issue2]");
 
     }
+
     @Test
     public void should_getSimpleMessage_not_show_explanations() {
-        final ContractViolationException contractViolationException = new ContractViolationException("Bad contract", Arrays.asList("issue1", "issue2"));
+        final SContractViolationException contractViolationException = new SContractViolationException("Bad contract", Arrays.asList("issue1", "issue2"));
 
         assertThat(contractViolationException.getSimpleMessage()).isEqualTo("Bad contract");
 
