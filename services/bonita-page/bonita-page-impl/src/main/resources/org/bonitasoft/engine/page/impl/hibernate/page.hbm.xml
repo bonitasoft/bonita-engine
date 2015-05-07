@@ -63,6 +63,7 @@
         <property name="pageId" column="pageid" />
         <property name="url" column="url" />
         <property name="urlAdapter" column="urladapter" />
+        <property name="pageAuthorizRules" column="page_authoriz_rules" />
         <property name="lastUpdateDate" column="lastupdatedate" />
         <property name="lastUpdatedBy" column="lastupdatedby" />
         <filter name="tenantFilter" />

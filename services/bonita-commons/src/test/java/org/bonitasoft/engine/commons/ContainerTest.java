@@ -11,13 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.definition.model;
 
-/**
- * @author Matthieu Chaffotte
- */
-public interface SSimpleInputDefinition extends SInputDefinition {
+package org.bonitasoft.engine.commons;
 
-    SType getType();
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.Test;
+
+public class ContainerTest {
+
+    @Test
+    public void constructor_should_create_container_based_on_given_information() throws Exception {
+        //when
+        Container container = new Container(10, "cType");
+
+        //then
+        assertThat(container.getId()).isEqualTo(10);
+        assertThat(container.getType()).isEqualTo("cType");
+    }
 }

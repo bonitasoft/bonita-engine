@@ -1030,6 +1030,7 @@ CREATE TABLE page_mapping (
   pageId BIGINT NULL,
   url VARCHAR(1024) NULL,
   urladapter VARCHAR(255) NULL,
+  page_authoriz_rules TEXT NULL,
   lastUpdateDate BIGINT NULL,
   lastUpdatedBy BIGINT NULL,
   PRIMARY KEY (tenantId, id),

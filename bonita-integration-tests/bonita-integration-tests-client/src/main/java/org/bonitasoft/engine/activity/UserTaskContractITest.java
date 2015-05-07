@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.activity;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,14 +31,12 @@ import java.util.Map;
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
@@ -49,6 +48,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.bpm.process.impl.ContractDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnectorWithAPICall;
@@ -90,9 +90,15 @@ public class UserTaskContractITest extends CommonAPIIT {
         // have a initial data value using process input, so that we ensure inputs are treated before data at process instantiation:
         builder.addData("nbDaysProcessData", Integer.class.getName(),
                 new ExpressionBuilder().createContractInputExpression(numberOfDaysProcessContractData, Integer.class.getName()));
+        builder.addData("multipleTextData", List.class.getName(), new ExpressionBuilder().createContractInputExpression("multipleText", List.class.getName()));
+        builder.addData("complexData", Map.class.getName(), new ExpressionBuilder().createContractInputExpression("complex", Map.class.getName()));
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME);
-        builder.addContract().addSimpleInput(numberOfDaysProcessContractData, Type.INTEGER, null).addMandatoryConstraint(numberOfDaysProcessContractData);
+        ContractDefinitionBuilder contract = builder.addContract();
+        contract.addInput(numberOfDaysProcessContractData, Type.INTEGER, null).addMandatoryConstraint(numberOfDaysProcessContractData);
+        contract.addInput("multipleText", Type.TEXT, "a multiple text", true);
+        contract.addInput("complex", "a complex input", Collections.<InputDefinition>singletonList(new InputDefinitionImpl("text", Type.TEXT, "text in complex")));
+
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -102,9 +108,16 @@ public class UserTaskContractITest extends CommonAPIIT {
         Map<String, Serializable> inputs = new HashMap<>(1);
         int value = 14;
         inputs.put(numberOfDaysProcessContractData, value);
+        ArrayList<String> multiples = new ArrayList<>(Arrays.asList("String1", "String2"));
+        inputs.put("multipleText", multiples);
+        HashMap<Object, Object> map = new HashMap<>();
+        map.put("text", "textValue");
+        inputs.put("complex", map);
         ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), inputs);
         waitForUserTask(processInstance, TASK1);
         DataInstance processDataValueInitializedFromInput = getProcessAPI().getProcessDataInstance("nbDaysProcessData", processInstance.getId());
+        assertThat(getProcessAPI().getProcessDataInstance("multipleTextData", processInstance.getId()).getValue()).isEqualTo(multiples);
+        assertThat(getProcessAPI().getProcessDataInstance("complexData", processInstance.getId()).getValue()).isEqualTo(map);
         assertThat(processDataValueInitializedFromInput.getValue()).isEqualTo(value);
 
         Serializable processInstanciationInputValue = getProcessAPI().getProcessInputValueAfterInitialization(processInstance.getId(),
@@ -120,8 +133,8 @@ public class UserTaskContractITest extends CommonAPIIT {
         //given
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
-                .addMandatoryConstraint("numberOfDays").addConstraint("Mystical constraint","true",null,"numberOfDays");
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addInput("numberOfDays", Type.INTEGER, null)
+                .addMandatoryConstraint("numberOfDays").addConstraint("Mystical constraint", "true", null, "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -131,8 +144,8 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ContractDefinition contract = getProcessAPI().getUserTaskContract(userTask.getId());
 
         //then
-        assertThat(contract.getSimpleInputs()).hasSize(1);
-        final SimpleInputDefinition input = contract.getSimpleInputs().get(0);
+        assertThat(contract.getInputs()).hasSize(1);
+        final InputDefinition input = contract.getInputs().get(0);
         assertThat(input.getName()).isEqualTo("numberOfDays");
         assertThat(input.getType()).isEqualTo(Type.INTEGER);
         assertThat(input.getDescription()).isNull();
@@ -155,13 +168,13 @@ public class UserTaskContractITest extends CommonAPIIT {
     public void should_getUserTaskContract_return_contract_with_complex_inputs() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        final SimpleInputDefinition expenseType = new SimpleInputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
-        final SimpleInputDefinition expenseAmount = new SimpleInputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
-        final SimpleInputDefinition expenseDate = new SimpleInputDefinitionImpl("date", Type.DATE, "expense date");
-        final ComplexInputDefinition complexSubIput = new ComplexInputDefinitionImpl("date", "expense date", Arrays.asList(expenseType), null);
+        final InputDefinition expenseType = new InputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
+        final InputDefinition expenseAmount = new InputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
+        final InputDefinition expenseDate = new InputDefinitionImpl("date", Type.DATE, "expense date");
+        final InputDefinition complexSubIput = new InputDefinitionImpl("date", "expense date", Arrays.asList(expenseType));
         //given
         builder.addUserTask(TASK1, ACTOR_NAME).addContract()
-                .addComplexInput("expenseLine", "expense report line", true, Arrays.asList(expenseDate, expenseAmount), Arrays.asList(complexSubIput));
+                .addInput("expenseLine", "expense report line", true, Arrays.asList(expenseDate, expenseAmount, complexSubIput));
 
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -170,13 +183,12 @@ public class UserTaskContractITest extends CommonAPIIT {
 
         //then
         final ContractDefinition contract = getProcessAPI().getUserTaskContract(userTask.getId());
-        assertThat(contract.getComplexInputs()).hasSize(1);
-        final ComplexInputDefinition complexInput = contract.getComplexInputs().get(0);
+        assertThat(contract.getInputs()).hasSize(1);
+        final InputDefinition complexInput = contract.getInputs().get(0);
         assertThat(complexInput.getName()).isEqualTo("expenseLine");
         assertThat(complexInput.isMultiple()).as("should be multiple").isTrue();
         assertThat(complexInput.getDescription()).isEqualTo("expense report line");
-        assertThat(complexInput.getSimpleInputs()).as("should have 2 simples inputs").hasSize(2);
-        assertThat(complexInput.getComplexInputs()).as("should have 1 complex input").hasSize(1);
+        assertThat(complexInput.getInputs()).as("should have 3 inputs").hasSize(3);
 
         //clean up
         disableAndDeleteProcess(processDefinition);
@@ -184,7 +196,7 @@ public class UserTaskContractITest extends CommonAPIIT {
 
     @Test
     public void should_create_a_contract_with_special_char() throws Exception {
-        final long[] badValues = { 0, 366 };
+        final long[] badValues = {0, 366};
         for (final long badValue : badValues) {
             check_invalid_contract_with_special_char(badValue);
         }
@@ -196,7 +208,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final String expectedExplanation = "numberOfDays must between one day and one year";
-        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("comment", Type.TEXT, null)
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addInput("comment", Type.TEXT, null)
                 .addConstraint("mandatory", "comment.equals(\"<tag>\")", expectedExplanation, "comment");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -219,7 +231,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTask = builder.addUserTask(TASK1, ACTOR_NAME);
-        userTask.addContract().addSimpleInput("decimal", Type.DECIMAL, null);
+        userTask.addContract().addInput("decimal", Type.DECIMAL, null);
         userTask.addData("variable", Number.class.getName(), null);
         userTask.addOperation(new OperationBuilder().createSetDataOperation("variable",
                 new ExpressionBuilder().createContractInputExpression("decimal", Number.class.getName())));
@@ -243,7 +255,7 @@ public class UserTaskContractITest extends CommonAPIIT {
     public void should_invalid_contract_throw_ContractViolationException() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null);
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addInput("numberOfDays", Type.INTEGER, null);
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -272,16 +284,16 @@ public class UserTaskContractITest extends CommonAPIIT {
     public void use_a_multiple_complex_input_in_user_tasks() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        final SimpleInputDefinition expenseType = new SimpleInputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
-        final SimpleInputDefinition expenseAmount = new SimpleInputDefinitionImpl("expenseAmount", Type.DECIMAL, "expense amount");
-        final SimpleInputDefinition expenseDate = new SimpleInputDefinitionImpl("expenseDate", Type.DATE, "expense date");
-        final SimpleInputDefinition expenseProof = new SimpleInputDefinitionImpl("expenseProof", Type.BYTE_ARRAY, "expense proof");
+        final InputDefinition expenseType = new InputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
+        final InputDefinition expenseAmount = new InputDefinitionImpl("expenseAmount", Type.DECIMAL, "expense amount");
+        final InputDefinition expenseDate = new InputDefinitionImpl("expenseDate", Type.DATE, "expense date");
+        final InputDefinition expenseProof = new InputDefinitionImpl("expenseProof", Type.BYTE_ARRAY, "expense proof");
 
         //given
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         userTaskDefinitionBuilder.addContract()
-                .addComplexInput("expenseReport", "expense report with several expense lines", true,
-                        Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof), null)
+                .addInput("expenseReport", "expense report with several expense lines", true,
+                        Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof))
                 .addMandatoryConstraint("expenseAmount")
                 .addMandatoryConstraint("expenseReport")
                 .addMandatoryConstraint("expenseDate");
@@ -302,7 +314,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final List<Map<String, Serializable>> expenseReport = new ArrayList<>();
         expenseReport.add(createExpenseLine("hotel", 150.3f, new Date(System.currentTimeMillis()), null));
         expenseReport.add(createExpenseLine("taxi", 25, new Date(System.currentTimeMillis()), new byte[0]));
-        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 }));
+        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[]{0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}));
 
         final Map<String, Serializable> taskInput = new HashMap<>();
         taskInput.put("expenseReport", (Serializable) expenseReport);
@@ -340,7 +352,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         //given
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         userTaskDefinitionBuilder.addContract()
-                .addSimpleInput("input", Type.TEXT, "multiple input", true);
+                .addInput("input", Type.TEXT, "multiple input", true);
         final List<String> inputs = new ArrayList<String>();
         userTaskDefinitionBuilder.addData("inputListData", inputs.getClass().getName(), null);
         userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDataOperation("inputListData",
@@ -383,7 +395,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
-        userTaskBuilder.addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
+        userTaskBuilder.addContract().addInput("numberOfDays", Type.INTEGER, null)
                 .addMandatoryConstraint("numberOfDays");
         userTaskBuilder.addData("result", BigDecimal.class.getName(), null);
         userTaskBuilder.addOperation(new OperationBuilder().createSetDataOperation("result",
@@ -417,7 +429,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTaskBuilder = builder.addAutomaticTask("automaticTask").addUserTask(TASK1, ACTOR_NAME);
-        userTaskBuilder.addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
+        userTaskBuilder.addContract().addInput("numberOfDays", Type.INTEGER, null)
                 .addConstraint("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -442,7 +454,7 @@ public class UserTaskContractITest extends CommonAPIIT {
     public void should_ContractIsNotValidException_keep_task_ready() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addInput("numberOfDays", Type.INTEGER, null)
                 .addConstraint("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -478,7 +490,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         userTaskBuilder.addConnector("myConnector", "org.bonitasoft.engine.connectors.TestConnectorWithAPICall", "1.0", ConnectorEvent.ON_FINISH)
                 .addInput("processName", processNameExpression).addInput("processVersion", processVersionExpression)
                 .addOutput(new OperationBuilder().createSetDataOperation("processData", outputExpression));
-        userTaskBuilder.addContract().addSimpleInput("inputVersion", Type.TEXT, null).addSimpleInput("processInputId", Type.INTEGER, null);
+        userTaskBuilder.addContract().addInput("inputVersion", Type.TEXT, null).addInput("processInputId", Type.INTEGER, null);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnectorWithAPICall(designProcessDefinition);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -514,7 +526,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final String expectedExplanation = "numberOfDays must between one day and one year";
-        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addInput("numberOfDays", Type.INTEGER, null)
                 .addConstraint("mandatory", "numberOfDays>1 && numberOfDays<365", expectedExplanation, "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);

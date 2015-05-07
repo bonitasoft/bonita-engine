@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -63,6 +63,7 @@ public class PageAPIIT extends CommonAPIIT {
     private static final String PAGE_NAME2 = "custompage_page2";
 
     private static final String PAGE_NAME1 = "custompage_page1";
+    private static final String UTF8 = "UTF-8";
 
     @Before
     public void before() throws Exception {
@@ -416,7 +417,7 @@ public class PageAPIIT extends CommonAPIIT {
                 while ((bytesRead = zipInputstream.read(buffer)) > -1) {
                     byteArrayOutputStream.write(buffer, 0, bytesRead);
                 }
-                zipMap.put(zipEntry.getName(), new String(byteArrayOutputStream.toByteArray()));
+                zipMap.put(zipEntry.getName(), new String(byteArrayOutputStream.toByteArray(), UTF8));
             }
         } finally {
             zipInputstream.close();

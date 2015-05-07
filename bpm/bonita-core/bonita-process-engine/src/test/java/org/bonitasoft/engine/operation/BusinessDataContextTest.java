@@ -11,17 +11,25 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.definition.model;
 
-import java.util.List;
+package org.bonitasoft.engine.operation;
 
-/**
- * @author Matthieu Chaffotte
- */
-public interface SComplexInputDefinition extends SInputDefinition {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    List<SSimpleInputDefinition> getSimpleInputDefinitions();
+import org.bonitasoft.engine.commons.Container;
+import org.junit.Test;
 
-    List<SComplexInputDefinition> getComplexInputDefinitions();
+public class BusinessDataContextTest {
+
+    @Test
+    public void should_create_a_consistent_context() throws Exception {
+        //when
+        BusinessDataContext context = new BusinessDataContext("address", new Container(2L, "process"));
+
+        //then
+        assertThat(context.getName()).isEqualTo("address");
+        assertThat(context.getContainer().getId()).isEqualTo(2L);
+        assertThat(context.getContainer().getType()).isEqualTo("process");
+    }
 
 }

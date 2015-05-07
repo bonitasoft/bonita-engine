@@ -11,20 +11,31 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.contract;
 
-import java.util.List;
+package org.bonitasoft.engine.core.operation.impl;
 
 /**
- * An <code>ComplexInputDefinition</code> defines
- *
- * @author Laurent Leseigneur
- * @since 7.0
+ * @author Elias Ricken de Medeiros
  */
-public interface ComplexInputDefinition extends InputDefinition {
+public class LeftOperandIndexes {
 
-    List<SimpleInputDefinition> getSimpleInputs();
+    private int lastIndex = -1;
 
-    List<ComplexInputDefinition> getComplexInputs();
+    private int nextIndex = -1;
 
+    public int getLastIndex() {
+        return lastIndex;
+    }
+
+    public void setLastIndex(final int lastIndex) {
+        this.lastIndex = lastIndex;
+    }
+
+    public int getNextIndex() {
+        return nextIndex;
+    }
+
+    public void setNextIndex(final int nextIndex) {
+        this.nextIndex = nextIndex;
+    }
 }

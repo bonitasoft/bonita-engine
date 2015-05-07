@@ -810,10 +810,17 @@
         <constructor-arg name="workTerminationTimeout" value="${bonita.tenant.work.terminationTimeout}" />
     </bean>
 
+     <bean id="operationsAnalyzer" class="org.bonitasoft.engine.core.operation.impl.OperationsAnalyzer"/>
+
+    <bean id="persistRightOperandResolver" class="org.bonitasoft.engine.core.operation.impl.PersistRightOperandResolver">
+        <constructor-arg name="operationsAnalyzer" ref="operationsAnalyzer" />
+    </bean>
+
     <bean id="operationService" class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
         <constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider" />
         <constructor-arg name="leftOperandHandlerProvider" ref="leftOperandHandlerProvider" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="persistRightOperandResolver" ref="persistRightOperandResolver"/>
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
@@ -844,10 +851,17 @@
         <property name="leftOperandHandlers" ref="leftOperandHandlers" />
     </bean>
 
+    <bean id="updateDataRefAction" class="org.bonitasoft.engine.operation.UpdateDataRefAction">
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService"/>
+    </bean>
+
     <bean id="businessDataLeftOperandHandler" class="org.bonitasoft.engine.operation.BusinessDataLeftOperandHandler">
         <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
+        <constructor-arg name="entitiesActionsExecutor" ref="entitiesActionsExecutor"/>
+        <constructor-arg name="updateDataRefAction" ref="updateDataRefAction"/>
     </bean>
 
     <bean id="assignmentOperationExecutorStrategy"
@@ -869,9 +883,23 @@
     <bean id="externalDataLeftOperandHandler"
           class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler" />
 
+    <bean id="mergeEntityAction" class="org.bonitasoft.engine.operation.MergeEntityAction">
+        <constructor-arg name="repository" ref="businessDataRepository"/>
+
+    </bean>
+
+    <bean id="entitiesActionsExecutor" class="org.bonitasoft.engine.operation.EntitiesActionsExecutor"/>
+
     <bean id="javaMethodOperationExecutorStrategy"
           class="org.bonitasoft.engine.operation.BusinessDataJavaMethodOperationExecutorStrategy">
         <constructor-arg name="businessDataService" ref="businessDataService" />
+        <constructor-arg name="entitiesActionsExecutor" ref="entitiesActionsExecutor"/>
+        <constructor-arg name="mergeEntityAction" ref="mergeEntityAction"/>
+    </bean>
+
+    <bean id="businessDataAssignmentStrategy" class="org.bonitasoft.engine.operation.BusinessDataAssignmentStrategy">
+        <constructor-arg name="actionsExecutor" ref="entitiesActionsExecutor"/>
+        <constructor-arg name="mergeEntityAction" ref="mergeEntityAction"/>
     </bean>
 
     <bean id="xpathUpdateQueryOperationExecutorStrategy"
@@ -1545,9 +1573,51 @@
         <constructor-arg name="pageMappingService" ref="pageMappingService" />
     </bean>
 
+    <bean id="authorizationRulesInjector" class="org.bonitasoft.engine.page.impl.AuthorizationRulesInjector" autowire="byType" init-method="injectAuthorizationRules">
+        <constructor-arg name="pageMappingService" ref="pageMappingService" />
+    </bean>
 
-    <bean id="formMappingKeyGenerator" class="org.bonitasoft.engine.core.form.impl.FormMappingKeyGeneratorImpl">
-        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+    <!-- Authorization rules to register -->
+    <bean id="isAdmin" class="org.bonitasoft.engine.page.IsAdminRule" />
+    <bean id="isProcessOwner" class="org.bonitasoft.engine.page.IsProcessOwnerRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="formMappingService" ref="formMappingService" />
+        <constructor-arg name="supervisorMappingService"
+            ref="supervisorMappingService" />
+    </bean>
+    <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="activityInstanceService"
+            ref="activityInstanceService" />
+    </bean>
+    <bean id="isActorInitiatorRule" class="org.bonitasoft.engine.page.IsActorInitiatorRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="formMappingService" ref="formMappingService" />
+        <constructor-arg name="actorMappingService" ref="actorMappingService" />
+    </bean>
+    <bean id="isProcessInitiator" class="org.bonitasoft.engine.page.IsProcessInitiatorRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg ref="processInstanceService" />
+    </bean>
+    <bean id="isTaskPerformer" class="org.bonitasoft.engine.page.IsTaskPerformerRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg ref="activityInstanceService" />
+    </bean>
+    <bean id="isInvolvedInProcessInstance" class="org.bonitasoft.engine.page.IsInvolvedInProcessInstanceRule">
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg ref="activityInstanceService" />
+    </bean>
+
+    <bean id="formMappingKeyGenerator"
+        class="org.bonitasoft.engine.core.form.impl.FormMappingKeyGeneratorImpl">
+        <constructor-arg name="processDefinitionService"
+            ref="processDefinitionManager" />
     </bean>
     <bean class="org.bonitasoft.engine.core.form.LegacyURLAdapter">
         <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />

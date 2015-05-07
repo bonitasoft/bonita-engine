@@ -14,6 +14,8 @@
 
 package org.bonitasoft.engine.page;
 
+import java.util.List;
+
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -21,10 +23,11 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 public interface SPageMapping extends PersistentObject {
 
-
     String getKey();
 
     String getUrlAdapter();
+
+    List<String> getPageAuthorizationRules();
 
     Long getPageId();
 
