@@ -24,6 +24,7 @@ import org.bonitasoft.engine.form.FormMappingSearchDescriptor;
 import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.page.AuthorizationRuleConstants;
 import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.junit.After;
@@ -89,11 +90,11 @@ public class FormMappingSPIT extends CommonAPISPIT {
         assertThat(step2Form.getLastUpdateDate()).isNull();
 
         //resolve urls:
-        final Map<String, Serializable> context = Collections.emptyMap();
-        PageURL pInstanciation = getProcessConfigurationAPI().resolvePageOrURL("process/ProcessWithUpdatedFormMappings/1.0", context);
-        PageURL pOverview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/ProcessWithUpdatedFormMappings/1.0", context);
-        PageURL pStep1Execution = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step1", context);
-        PageURL pStep2Execution = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step2", context);
+        final Map<String, Serializable> context = Collections.singletonMap(AuthorizationRuleConstants.IS_ADMIN, (Serializable) true);
+        PageURL pInstanciation = getProcessConfigurationAPI().resolvePageOrURL("process/ProcessWithUpdatedFormMappings/1.0", context, true);
+        PageURL pOverview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/ProcessWithUpdatedFormMappings/1.0", context, true);
+        PageURL pStep1Execution = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step1", context, true);
+        PageURL pStep2Execution = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step2", context, true);
         assertThat(pInstanciation.getUrl()).isEqualTo("processStartForm?tenant=" + getSession().getTenantId());
         assertThat(pInstanciation.getPageId()).isNull();
         assertThat(pOverview.getPageId()).isNull();

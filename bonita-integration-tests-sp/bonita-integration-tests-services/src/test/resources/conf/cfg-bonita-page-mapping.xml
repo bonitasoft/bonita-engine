@@ -1,0 +1,25 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="pageMappingService" class="org.bonitasoft.engine.page.impl.PageMappingServiceImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
+        <constructor-arg name="sessionService" ref="sessionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+    </bean>
+
+    <bean id="urlAdapterInjector" class="org.bonitasoft.engine.page.impl.UrlAdapterInjector" autowire="byType" init-method="injectUrlAdapters">
+        <constructor-arg name="pageMappingService" ref="pageMappingService" />
+    </bean>
+
+    <bean id="authorizationRulesInjector" class="org.bonitasoft.engine.page.impl.AuthorizationRulesInjector" autowire="byType" init-method="injectAuthorizationRules">
+        <constructor-arg name="pageMappingService" ref="pageMappingService" />
+    </bean>
+
+    <!-- Authorization rules to register -->
+    <bean id="isAdmin" class="org.bonitasoft.engine.page.IsAdminRule" />
+    <bean id="isProcessOwner" class="org.bonitasoft.engine.page.IsProcessOwnerRule" />
+    <bean id="isInvolvedInProcessInstance" class="org.bonitasoft.engine.page.IsInvolvedInProcessInstanceRule" />
+    <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule" />
+
+</beans>
