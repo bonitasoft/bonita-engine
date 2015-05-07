@@ -13,11 +13,13 @@
  **/
 package org.bonitasoft.engine.operation;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -104,15 +106,16 @@ public class DocumentListLeftOperandHandlerTest {
 
     @Test
     public void should_update_check_it_is_a_list() throws Exception {
+        doThrow(SOperationExecutionException.class).when(documentHelper).toCheckedList(any());
         exception.expect(SOperationExecutionException.class);
-        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
-        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), new HashMap<Object, Object>(), 45l, "container");
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), new HashMap<>(), 45l, "container");
     }
 
     @Test
     public void should_update_setDocumentList() throws Exception {
         doNothing().when(documentHelper).setDocumentList(anyListOf(DocumentValue.class), anyString(), anyLong(), anyLong());
         List<DocumentValue> newValue = Arrays.asList(documentValue("doc1"), documentValue("doc2"));
+        doReturn(newValue).when(documentHelper).toCheckedList(newValue);
         handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), newValue, CONTAINER_ID, CONTAINER_TYPE);
         verify(documentHelper).setDocumentList(newValue, "myDoc", PROCESS_INSTANCE_ID, LOGGED_USER_ID);
     }

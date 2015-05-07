@@ -138,9 +138,6 @@ public class DocumentHelper {
 
     public void setDocumentList(final List<DocumentValue> documentList, final String documentName, final long processInstanceId, final long authorId)
             throws SBonitaReadException, SObjectCreationException, SObjectNotFoundException, SObjectModificationException, SObjectAlreadyExistsException {
-        if (documentList == null) {
-            return;
-        }
         // get the list having the name
         final List<SMappedDocument> currentList = getExistingDocumentList(documentName, processInstanceId);
         // iterate on elements
@@ -233,9 +230,6 @@ public class DocumentHelper {
     }
 
     public List<DocumentValue> toCheckedList(final Object newValue) throws SOperationExecutionException {
-        if (newValue == null) {
-            return null;
-        }
         if (!(newValue instanceof List)) {
             throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
         }

@@ -160,7 +160,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private final ConnectorInstanceService connectorInstanceService;
     private final TransitionEvaluator transitionEvaluator;
     private final ContractDataService contractDataService;
-    private final ContractDataService contractDataService;
     private final BusinessDataRepository businessDataRepository;
     private final RefBusinessDataService refBusinessDataService;
     private final DocumentHelper documentHelper;
@@ -548,8 +547,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (!documentListDefinitions.isEmpty()) {
             final List<Object> initialValues = evaluateInitialExpressionsOfDocumentLists(processInstance, expressionContext, context, documentListDefinitions);
             for (int i = 0; i < documentListDefinitions.size(); i++) {
+                final Object newValue = initialValues.get(i);
+                if(newValue == null){
+                    continue;
+                }
                 documentHelper.setDocumentList(
-                        documentHelper.toCheckedList(initialValues.get(i)), documentListDefinitions.get(i).getName(), processInstance.getId(), authorId);
+                        documentHelper.toCheckedList(newValue), documentListDefinitions.get(i).getName(), processInstance.getId(), authorId);
             }
         }
     }
