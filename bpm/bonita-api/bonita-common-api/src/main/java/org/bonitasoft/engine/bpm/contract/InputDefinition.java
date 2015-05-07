@@ -25,7 +25,7 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
  */
 public interface InputDefinition extends DescriptionElement {
 
-    String FILE_INPUT_FILENAME = "fileName";
+    String FILE_INPUT_FILENAME = "filename";
     String FILE_INPUT_CONTENT = "content";
 
     boolean isMultiple();

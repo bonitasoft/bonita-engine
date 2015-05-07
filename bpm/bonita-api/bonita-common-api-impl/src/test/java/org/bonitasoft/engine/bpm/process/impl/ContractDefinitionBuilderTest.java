@@ -139,7 +139,7 @@ public class ContractDefinitionBuilderTest {
         assertThat(complexInputs.get(0).isMultiple()).isFalse();
         final List<InputDefinition> simpleInputs = complexInputs.get(0).getInputs();
         assertThat(simpleInputs).hasSize(2);
-        assertThat(simpleInputs.get(0).getName()).isEqualTo("fileName");
+        assertThat(simpleInputs.get(0).getName()).isEqualTo("filename");
         assertThat(simpleInputs.get(0).getType()).isEqualTo(Type.TEXT);
         assertThat(simpleInputs.get(1).getName()).isEqualTo("content");
         assertThat(simpleInputs.get(1).getType()).isEqualTo(Type.BYTE_ARRAY);
@@ -157,7 +157,7 @@ public class ContractDefinitionBuilderTest {
         assertThat(complexInputs.get(0).isMultiple()).isTrue();
         final List<InputDefinition> simpleInputs = complexInputs.get(0).getInputs();
         assertThat(simpleInputs).hasSize(2);
-        assertThat(simpleInputs.get(0).getName()).isEqualTo("fileName");
+        assertThat(simpleInputs.get(0).getName()).isEqualTo("filename");
         assertThat(simpleInputs.get(0).getType()).isEqualTo(Type.TEXT);
         assertThat(simpleInputs.get(1).getName()).isEqualTo("content");
         assertThat(simpleInputs.get(1).getType()).isEqualTo(Type.BYTE_ARRAY);
