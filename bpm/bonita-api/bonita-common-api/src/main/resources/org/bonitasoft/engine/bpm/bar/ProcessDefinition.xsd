@@ -304,6 +304,7 @@
                     <xs:element type="definition:Expression" name="callableElement" minOccurs="1" maxOccurs="1" />
                     <xs:element type="definition:Expression" name="callableElementVersion" minOccurs="0" maxOccurs="1" />
                     <xs:element type="definition:Operation" name="dataInputOperation" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element type="definition:ContractInputs" name="contractInputs" minOccurs="0" maxOccurs="1" />
                     <xs:element type="definition:Operation" name="dataOutputOperation" minOccurs="0" maxOccurs="unbounded" />
                 </xs:sequence>
                 <xs:attribute name="callableElementType">
@@ -681,7 +682,8 @@
     <xs:complexType name="CatchErrorEventTriggerDefinition">
         <xs:complexContent>
             <xs:extension base="definition:EventTriggerDefinition">
-                <xs:attribute name="errorCode" type="xs:string" use="optional" /> <!-- for the catch event the error code is optional -->
+                <xs:attribute name="errorCode" type="xs:string" use="optional" />
+                <!-- for the catch event the error code is optional -->
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -814,6 +816,12 @@
 
     <xs:complexType name="BaseElement">
         <xs:attribute name="id" type="xs:long" />
+    </xs:complexType>
+
+    <xs:complexType name="ContractInputs">
+        <xs:sequence>
+            <xs:element name="contractInput" minOccurs="0" maxOccurs="unbounded" type="definition:IOExpression" />
+        </xs:sequence>
     </xs:complexType>
 
 </xs:schema>

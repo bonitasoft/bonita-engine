@@ -14,13 +14,13 @@
 package org.bonitasoft.engine.core.process.definition.model;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public interface SCallActivityDefinition extends SActivityDefinition {
 
@@ -34,4 +34,7 @@ public interface SCallActivityDefinition extends SActivityDefinition {
 
     SCallableElementType getCallableElementType();
 
+    void addProcessStartContractInput(String key, SExpression value);
+
+    Map<String, SExpression> getProcessStartContractInputs();
 }

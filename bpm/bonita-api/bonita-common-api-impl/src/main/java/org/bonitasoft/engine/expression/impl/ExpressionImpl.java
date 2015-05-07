@@ -107,22 +107,14 @@ public class ExpressionImpl extends BaseElementImpl implements Expression {
 
     @Override
     public String toString() {
-        final int maxLen = 5;
-        final StringBuilder builder = new StringBuilder();
-        builder.append("ExpressionImpl [name=");
-        builder.append(name);
-        builder.append(", content=");
-        builder.append(content);
-        builder.append(", expressionType=");
-        builder.append(expressionType);
-        builder.append(", returnType=");
-        builder.append(returnType);
-        builder.append(", interpreter=");
-        builder.append(interpreter);
-        builder.append(", dependencies=");
-        builder.append(dependencies != null ? dependencies.subList(0, Math.min(dependencies.size(), maxLen)) : null);
-        builder.append("]");
-        return builder.toString();
+        return "ExpressionImpl{" +
+                "name='" + name + '\'' +
+                ", content='" + content + '\'' +
+                ", expressionType='" + expressionType + '\'' +
+                ", returnType='" + returnType + '\'' +
+                ", interpreter='" + interpreter + '\'' +
+                ", dependencies=" + dependencies +
+                "} " + super.toString();
     }
 
     @Override
