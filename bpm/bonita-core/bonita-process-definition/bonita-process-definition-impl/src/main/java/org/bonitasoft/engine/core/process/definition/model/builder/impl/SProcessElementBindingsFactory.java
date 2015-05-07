@@ -30,9 +30,11 @@ import org.bonitasoft.engine.core.process.definition.model.bindings.SCatchSignal
 import org.bonitasoft.engine.core.process.definition.model.bindings.SConditionalExpressionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SConnectorDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SConnectorDefinitionInputBinding;
+import org.bonitasoft.engine.core.process.definition.model.bindings.SConstraintDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SContextDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SContextEntryBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SContractDefinitionBinding;
+import org.bonitasoft.engine.core.process.definition.model.bindings.SContractInputBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCorrelationBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCorrelationKeyBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SCorrelationValueBinding;
@@ -67,7 +69,6 @@ import org.bonitasoft.engine.core.process.definition.model.bindings.SParameterDe
 import org.bonitasoft.engine.core.process.definition.model.bindings.SProcessDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SReceiveTaskDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SRightOperandBinding;
-import org.bonitasoft.engine.core.process.definition.model.bindings.SConstraintDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SSendTaskDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SStandardLoopCharacteristicsBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SStartEventDefinitionBinding;
@@ -157,6 +158,7 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         bindings.add(new SCallableElementBinding());
         bindings.add(new SCallableElementVersionBinding());
         bindings.add(new SDataInputOperationBinding());
+        bindings.add(new SContractInputBinding());
         bindings.add(new SDataOutputOperationBinding());
         bindings.add(new STargetProcessBinding());
         bindings.add(new STargetFlowNodeBinding());
@@ -353,6 +355,9 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         }
         if (SDataInputOperationBinding.class.equals(binderClass)) {
             return new SDataInputOperationBinding();
+        }
+        if (SContractInputBinding.class.equals(binderClass)) {
+            return new SContractInputBinding();
         }
         if (SDataOutputOperationBinding.class.equals(binderClass)) {
             return new SDataOutputOperationBinding();

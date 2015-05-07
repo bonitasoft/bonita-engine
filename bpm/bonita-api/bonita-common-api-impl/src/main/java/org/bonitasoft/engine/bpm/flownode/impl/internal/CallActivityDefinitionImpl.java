@@ -10,12 +10,14 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CallableElementType;
@@ -37,20 +39,24 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
 
     private final List<Operation> dataInputOperations;
 
+    private final Map<String, Expression> contractInputs;
+
     private final List<Operation> dataOutputOperations;
 
     private CallableElementType callableElementType;
 
     public CallActivityDefinitionImpl(final String name) {
         super(name);
-        dataInputOperations = new ArrayList<Operation>(3);
-        dataOutputOperations = new ArrayList<Operation>(3);
+        dataInputOperations = new ArrayList<>(3);
+        dataOutputOperations = new ArrayList<>(3);
+        contractInputs = new HashMap<>();
     }
 
     public CallActivityDefinitionImpl(final long id, final String name) {
         super(id, name);
-        dataInputOperations = new ArrayList<Operation>(3);
-        dataOutputOperations = new ArrayList<Operation>(3);
+        dataInputOperations = new ArrayList<>(3);
+        dataOutputOperations = new ArrayList<>(3);
+        contractInputs = new HashMap<>();
     }
 
     @Override
@@ -96,6 +102,15 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
 
     public void setCallableElementType(final CallableElementType callableElementType) {
         this.callableElementType = callableElementType;
+    }
+
+    public void addProcessStartContractInput(String inputName, Expression value) {
+        contractInputs.put(inputName, value);
+    }
+
+    @Override
+    public Map<String, Expression> getProcessStartContractInputs() {
+        return contractInputs;
     }
 
     @Override

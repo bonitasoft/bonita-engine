@@ -14,11 +14,7 @@
 package org.bonitasoft.engine.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,6 +48,7 @@ import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.AutomaticTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
+import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
@@ -691,6 +688,9 @@ public class BusinessArchiveTest {
         builder.addIntegerData("var2", null);
         builder.addStartEvent("start1");
         final CallActivityBuilder callActivityBuilder = builder.addCallActivity("callActivity", targetProcess, processVersion);
+        final Expression supportCaseIdExpression = new ExpressionBuilder().createConstantLongExpression(206L);
+        final String supportCaseIdInputName = "supportCaseId";
+        callActivityBuilder.addProcessStartContractInput(supportCaseIdInputName, supportCaseIdExpression);
         callActivityBuilder.addDataInputOperation(dataInputOperation);
         callActivityBuilder.addDataOutputOperation(dataOutputOperation);
         builder.addEndEvent("end1");
@@ -701,6 +701,9 @@ public class BusinessArchiveTest {
         final DesignProcessDefinition result = getDesignProcessDefinition(builder);
 
         checkProcessForCallActivity(process, result);
+
+        final CallActivityDefinition callActivity = (CallActivityDefinition) result.getFlowElementContainer().getActivity("callActivity");
+        assertThat(callActivity.getProcessStartContractInputs().get(supportCaseIdInputName)).isEqualTo(supportCaseIdExpression);
     }
 
     @Test
