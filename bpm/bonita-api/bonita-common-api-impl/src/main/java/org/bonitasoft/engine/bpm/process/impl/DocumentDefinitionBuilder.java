@@ -45,7 +45,7 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
     /**
      * Sets description on this document
      * @param description description
-     * @return
+     * @return the builder
      */
     public DocumentDefinitionBuilder addDescription(final String description) {
         documentDefinitionImpl.setDescription(description);
