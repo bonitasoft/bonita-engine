@@ -13,9 +13,7 @@
  */
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.contractInputMap;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SConstraintDefinitionBuilder.aRuleFor;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.aContract;
@@ -26,15 +24,11 @@ import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -68,22 +62,25 @@ public class ContractConstraintsValidatorTest {
     private ContractConstraintsValidator validator;
 
     @Before
-    public void setUp() throws SExpressionTypeUnknownException, SExpressionDependencyMissingException, SExpressionEvaluationException, SInvalidExpressionException {
+    public void setUp() throws SExpressionTypeUnknownException, SExpressionDependencyMissingException, SExpressionEvaluationException,
+            SInvalidExpressionException {
         when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
         when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING)).thenReturn(true);
-        doReturn(false).when(expressionService).evaluate(any(SExpression.class), anyMapOf(String.class, Object.class), anyMapOf(Integer.class, Object.class), any(ContainerState.class));
+        doReturn(false).when(expressionService).evaluate(any(SExpression.class), anyMapOf(String.class, Object.class), anyMapOf(Integer.class, Object.class),
+                any(ContainerState.class));
         returnTrueForExpressionWithContent("isValid != null");
         returnTrueForExpressionWithContent("isValid || !isValid && comment != null");
         validator = new ContractConstraintsValidator(loggerService, expressionService);
     }
 
-    void returnTrueForExpressionWithContent(String content) throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
-        doReturn(true).when(expressionService).evaluate(expressionHavingContent(content), anyMapOf(String.class,Object.class), anyMapOf(Integer.class, Object.class), any(ContainerState.class));
+    void returnTrueForExpressionWithContent(String content) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+            SExpressionDependencyMissingException, SInvalidExpressionException {
+        doReturn(true).when(expressionService).evaluate(expressionHavingContent(content), anyMapOf(String.class, Object.class),
+                anyMapOf(Integer.class, Object.class), any(ContainerState.class));
     }
 
     SExpression expressionHavingContent(String content) {
-        return argThat(new ExpressionWithContentMatcher(content)
-        );
+        return argThat(new ExpressionWithContentMatcher(content));
     }
 
     @Test
@@ -128,7 +125,7 @@ public class ContractConstraintsValidatorTest {
         try {
             validator.validate(PROCESS_DEFINITION_ID, contract, contractInputMap(entry(IS_VALID, false), entry(COMMENT, null)));
             fail("validation should fail");
-        } catch (final ContractViolationException e) {
+        } catch (final SContractViolationException e) {
             verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING,
                     "Constraint [false constraint] on input(s) [isValid] is not valid");
         }
@@ -145,7 +142,7 @@ public class ContractConstraintsValidatorTest {
         try {
             validator.validate(PROCESS_DEFINITION_ID, contract, contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
             fail("validation should fail");
-        } catch (final ContractViolationException e) {
+        } catch (final SContractViolationException e) {
             assertThat(e.getExplanations()).hasSize(1).containsExactly(badRule.getExplanation());
         }
 
@@ -155,13 +152,14 @@ public class ContractConstraintsValidatorTest {
     public void exception_during_evaluation_report_it() throws Exception {
         //given
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
-        doThrow(SExpressionEvaluationException.class).when(expressionService).evaluate(any(SExpression.class), anyMapOf(String.class, Object.class), anyMapOf(Integer.class, Object.class), any(ContainerState.class));
+        doThrow(SExpressionEvaluationException.class).when(expressionService).evaluate(any(SExpression.class), anyMapOf(String.class, Object.class),
+                anyMapOf(Integer.class, Object.class), any(ContainerState.class));
 
         //when
         try {
             validator.validate(PROCESS_DEFINITION_ID, contract, contractInputMap(entry(IS_VALID, false), entry(COMMENT, NICE_COMMENT)));
             fail("validation should fail");
-        } catch (final ContractViolationException e) {
+        } catch (final SContractViolationException e) {
             assertThat(e.getMessage()).contains("Exception while");
             assertThat(e.getCause()).isNotNull().isInstanceOf(SExpressionEvaluationException.class);
         }
@@ -178,14 +176,18 @@ public class ContractConstraintsValidatorTest {
     }
 
     private static class ExpressionWithContentMatcher extends BaseMatcher<SExpression> {
+
         private final String content;
+
         public ExpressionWithContentMatcher(String content) {
             this.content = content;
         }
+
         @Override
         public void describeTo(Description description) {
 
         }
+
         @Override
         public boolean matches(Object item) {
             return ((SExpression) item).getContent().equals(content);

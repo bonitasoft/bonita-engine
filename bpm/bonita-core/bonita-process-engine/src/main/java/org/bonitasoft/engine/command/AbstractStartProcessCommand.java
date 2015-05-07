@@ -24,6 +24,7 @@ import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.execution.AdvancedStartProcessValidator;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -32,6 +33,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Elias Ricken de Medeiros
  */
 public abstract class AbstractStartProcessCommand extends CommandWithParameters {
+
     public static final String STARTED_BY = "started_by";
     public static final String PROCESS_DEFINITION_ID = "process_definition_id";
     public static final String OPERATIONS = "operations";
@@ -60,7 +62,7 @@ public abstract class AbstractStartProcessCommand extends CommandWithParameters 
 
     private ProcessInstance startProcess(final long processDefinitionId, final List<String> activityNames, final long startedBy,
             final Map<String, Serializable> context, final List<Operation> operations) throws ProcessDefinitionNotFoundException, ProcessActivationException,
-            ProcessExecutionException {
+            ProcessExecutionException, SContractViolationException {
         final ProcessStarter starter = new ProcessStarter(startedBy, processDefinitionId, operations, context, activityNames);
         return starter.start();
     }
