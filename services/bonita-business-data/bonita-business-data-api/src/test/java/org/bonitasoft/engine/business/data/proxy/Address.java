@@ -11,45 +11,24 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
+
+package org.bonitasoft.engine.business.data.proxy;
 
 import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.bdm.lazy.LazyLoaded;
 
-/**
- * @author Romain Bioteau
- * @author Laurent Leseigneur
- */
-public class PersonEntity implements Entity {
 
-    public PersonEntity() {
+public class Address implements Entity {
 
-    }
+    private static final long serialVersionUID = 326174219656126594L;
 
-    /*
-     * (non-Javadoc)
-     * @see com.bonitasoft.engine.bdm.Entity#getPersistenceId()
-     */
     @Override
     public Long getPersistenceId() {
+        return 0L;
+    }
+
+    @Override
+    public Long getPersistenceVersion() {
         return 1L;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.bonitasoft.engine.bdm.Entity#getPersistenceVersion()
-     */
-    @Override
-    public Long getPersistenceVersion() {
-        return null;
-    }
-
-    @LazyLoaded
-    public String getWithLazyLoadedAnnotation() {
-        return "getWithLazyLoadedAnnotation";
-    }
-
-    public String getWithoutLazyLoadedAnnotation() {
-        return "getWithoutLazyLoadedAnnotation";
-    }
 }

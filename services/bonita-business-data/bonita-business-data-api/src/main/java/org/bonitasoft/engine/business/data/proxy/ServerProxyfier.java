@@ -11,7 +11,8 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
+
+package org.bonitasoft.engine.business.data.proxy;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -194,6 +195,15 @@ public class ServerProxyfier {
             }
         }
         return realEntity;
+    }
+
+    /**
+     * Retrieves the real class for the given entity. This result will be same as {@code entity.getClass()} if the entity is not a proxy.
+     * @param entity
+     * @return
+     */
+    public static Class<? extends Entity> getRealClass(final Entity entity) {
+        return unProxyfyIfNeeded(entity).getClass();
     }
 
 }
