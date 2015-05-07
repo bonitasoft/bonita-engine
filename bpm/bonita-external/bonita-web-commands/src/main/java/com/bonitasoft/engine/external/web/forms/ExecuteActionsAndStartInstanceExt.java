@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.ProcessStarter;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
@@ -22,6 +21,7 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
@@ -61,7 +61,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
-        } catch (final SBonitaException | ContractViolationException e) {
+        } catch (final SBonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndStartInstanceExt(Map<Operation, Map<String, Serializable>> operationsMap, long processDefinitionID)'",
                     e);
@@ -70,7 +70,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
     private ProcessInstance startProcess(final long processDefinitionId, final long userId, final List<Operation> operations,
             final Map<String, Serializable> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput)
-            throws SProcessDefinitionException, SProcessDefinitionReadException, SProcessInstanceCreationException, ContractViolationException {
+            throws SProcessDefinitionException, SProcessDefinitionReadException, SProcessInstanceCreationException, SContractViolationException {
         return new ProcessStarter(userId, processDefinitionId, operations, context).start(connectorsWithInput);
     }
 
