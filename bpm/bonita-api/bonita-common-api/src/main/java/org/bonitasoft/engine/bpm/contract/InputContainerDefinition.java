@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,31 +11,20 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.bpm.contract;
 
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.DescriptionElement;
-
 /**
- * An <code>InputDefinition</code> defines
- *
- * @author Matthieu Chaffotte
- * @since 7.0
+ * @author Baptiste Mesta
  */
-public interface InputDefinition extends DescriptionElement, InputContainerDefinition {
-
-    String FILE_INPUT_FILENAME = "filename";
-    String FILE_INPUT_CONTENT = "content";
-
-    boolean isMultiple();
+public interface InputContainerDefinition {
 
     /**
-     * Gets the type of the input.
+     * Lists the inputs of the container.
      *
-     * @return the input {@link Type}
+     * @return the inputs of the container
      */
-    Type getType();
-
-    boolean hasChildren();
+    List<InputDefinition> getInputs();
 }

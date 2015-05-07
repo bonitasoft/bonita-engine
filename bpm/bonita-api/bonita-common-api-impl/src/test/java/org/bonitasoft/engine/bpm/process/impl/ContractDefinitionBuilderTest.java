@@ -21,6 +21,7 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 import org.junit.Before;
@@ -115,6 +116,29 @@ public class ContractDefinitionBuilderTest {
         assertThat(activity.getContract().getInputs().get(0).isMultiple()).as("should not be multiple").isFalse();
         checkBuilder(builder);
 
+    }
+
+    @Test
+    public void addComplexInputWithChildren() throws Exception {
+        //when
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput("name", Type.TEXT, "the name of the user");
+        builder.addInput("addresses", "the addresses");
+        builder.addChildren().addInput("address", Type.TEXT, "the address", true);
+
+        //then
+        assertThat(activity.getContract().getInputs()).hasSize(2);
+        assertThat(activity.getContract().getInputs().get(0)).isEqualTo(new InputDefinitionImpl("name", Type.TEXT, "the name of the user", false));
+        assertThat(activity.getContract().getInputs().get(1)).isEqualToIgnoringGivenFields(new InputDefinitionImpl("addresses", "the addresses", false),
+                "inputs");
+        assertThat(activity.getContract().getInputs().get(1).getInputs()).hasSize(1);
+        assertThat(activity.getContract().getInputs().get(1).getInputs().get(0)).isEqualTo(new InputDefinitionImpl("address", Type.TEXT, "the address", true));
+        checkBuilder(builder);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void addChildren_when_no_inputs() throws Exception {
+        //when
+        contractDefinitionBuilder.addChildren();
     }
 
     @Test
