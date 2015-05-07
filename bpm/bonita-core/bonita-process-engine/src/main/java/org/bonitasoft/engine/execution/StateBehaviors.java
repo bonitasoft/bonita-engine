@@ -24,7 +24,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -409,7 +408,7 @@ public class StateBehaviors {
      */
     public BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorToExecuteAndFlag(final SProcessDefinition processDefinition,
             final SFlowNodeInstance flowNodeInstance, final boolean executeConnectorsOnEnter, final boolean executeConnectorsOnFinish)
-                    throws SActivityStateExecutionException {
+            throws SActivityStateExecutionException {
         try {
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SFlowNodeDefinition flowNodeDefinition = processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
@@ -492,7 +491,7 @@ public class StateBehaviors {
 
     private BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorWithFlagIfIsNextToExecute(final SFlowNodeInstance flowNodeInstance,
             final List<SConnectorDefinition> sConnectorDefinitions, final SConnectorInstance nextConnectorInstanceToExecute, final int flag)
-                    throws SActivityStateExecutionException {
+            throws SActivityStateExecutionException {
         for (final SConnectorDefinition sConnectorDefinition : sConnectorDefinitions) {
             if (sConnectorDefinition.getName().equals(nextConnectorInstanceToExecute.getName())) {
                 return getConnectorWithFlag(nextConnectorInstanceToExecute, sConnectorDefinition, flag);
@@ -553,14 +552,14 @@ public class StateBehaviors {
                 final SCallActivityInstance callActivityInstance = (SCallActivityInstance) flowNodeInstance;
                 // update token count
                 activityInstanceService.setTokenCount(callActivityInstance, callActivityInstance.getTokenCount() + 1);
-            } catch (final SBonitaException | ContractViolationException e) {
+            } catch (final SBonitaException e) {
                 throw new SActivityStateExecutionException(e);
             }
         }
     }
 
     private long getTargetProcessDefinitionId(final String callableElement, final String callableElementVersion) throws SProcessDefinitionReadException,
-    SProcessDefinitionNotFoundException {
+            SProcessDefinitionNotFoundException {
         if (callableElementVersion != null) {
             return processDefinitionService.getProcessDefinitionId(callableElement, callableElementVersion);
         }
@@ -709,7 +708,7 @@ public class StateBehaviors {
 
     public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId,
             final long flowNodeInstanceId, final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition)
-                    throws SActivityStateExecutionException {
+            throws SActivityStateExecutionException {
         final long connectorInstanceId = connector.getId();
         // final Long connectorDefinitionId = sConnectorDefinition.getId();// FIXME: Uncomment when generate id
         final String connectorDefinitionName = sConnectorDefinition.getName();
@@ -754,7 +753,7 @@ public class StateBehaviors {
 
     private void createBoundaryEvent(final SProcessDefinition processDefinition, final SActivityInstance activityInstance, final long rootProcessInstanceId,
             final long parentProcessInstanceId, final SFlowElementsContainerType containerType, final SBoundaryEventDefinition boundaryEventDefinition)
-                    throws SBonitaException {
+            throws SBonitaException {
         final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(),
                 rootProcessInstanceId, activityInstance.getParentContainerId(), containerType, boundaryEventDefinition,
                 rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId()

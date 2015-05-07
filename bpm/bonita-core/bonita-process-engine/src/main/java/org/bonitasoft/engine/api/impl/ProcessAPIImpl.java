@@ -3189,10 +3189,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     public ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
         try {
-        return new ProcessStarter(userId, processDefinitionId, instantiationInputs).start();
+            return new ProcessStarter(userId, processDefinitionId, instantiationInputs).start();
         } catch (SContractViolationException e) {
             throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause());
+        }
     }
+
     @Override
     public ProcessInstance startProcess(final long userId, final long processDefinitionId, final Map<String, Serializable> initialVariables)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
@@ -3242,7 +3244,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Map<String, Serializable> context) throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
         final ProcessStarter starter = new ProcessStarter(userId, processDefinitionId, operations, context);
         try {
-        return starter.start();
+            return starter.start();
         } catch (SContractViolationException e) {
             // To not have an API break, we need to wrapped this new Exception:
             throw new ProcessExecutionException(new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause()));
@@ -5871,10 +5873,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance.getResult();
         if (flowNodeInstance instanceof SUserTaskInstance) {
             try {
-            throwContractViolationExceptionIfContractIsInvalid(wrapInTransaction, inputs, tenantAccessor, flowNodeInstance);
+                throwContractViolationExceptionIfContractIsInvalid(wrapInTransaction, inputs, tenantAccessor, flowNodeInstance);
             } catch (SContractViolationException e) {
                 throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause());
-        }
+            }
         }
 
         final LockService lockService = tenantAccessor.getLockService();
