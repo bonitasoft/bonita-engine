@@ -47,6 +47,7 @@
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="expressionService" ref="expressionService" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="handlers">
             <map>
