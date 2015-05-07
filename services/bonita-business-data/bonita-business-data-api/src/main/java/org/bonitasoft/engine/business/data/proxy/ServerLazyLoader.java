@@ -11,17 +11,17 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
 
-import org.bonitasoft.engine.api.impl.transaction.expression.bdm.internal.EntityGetter;
-import org.bonitasoft.engine.bdm.model.field.Field;
-import org.bonitasoft.engine.business.data.BusinessDataRepository;
-import org.bonitasoft.engine.business.data.NonUniqueResultException;
+package org.bonitasoft.engine.business.data.proxy;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.bonitasoft.engine.bdm.model.field.Field;
+import org.bonitasoft.engine.business.data.BusinessDataRepository;
+import org.bonitasoft.engine.business.data.NonUniqueResultException;
 
 public class ServerLazyLoader {
 
@@ -34,7 +34,7 @@ public class ServerLazyLoader {
     
     public Object load(final Method method, final long persistenceId) {
         EntityGetter getter = new EntityGetter(method);
-        final Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> queryParameters = new HashMap<>();
         queryParameters.put(Field.PERSISTENCE_ID, persistenceId);
         if (getter.returnsList()) {
             return businessDataRepository.findListByNamedQuery(getter.getAssociatedNamedQuery(), (Class<? extends Serializable>) getter.getTargetEntityClass(), queryParameters, 0, Integer.MAX_VALUE);

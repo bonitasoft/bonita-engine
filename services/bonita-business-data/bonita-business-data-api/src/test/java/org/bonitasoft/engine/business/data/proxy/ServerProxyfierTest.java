@@ -11,7 +11,8 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
+
+package org.bonitasoft.engine.business.data.proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -164,6 +165,18 @@ public class ServerProxyfierTest {
         for (final Address address : entity.getAddresses()) {
             assertThat(ServerProxyfier.isLazyMethodProxyfied(address)).isFalse();
         }
+    }
+
+    @Test
+    public void should_retrieve_real_class() throws Exception {
+        //given
+        PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
+
+        //when
+        Class<? extends Entity> realClass = ServerProxyfier.getRealClass(proxy);
+
+        //then
+        assertThat(realClass.getName()).isEqualTo(PersonEntity.class.getName());
     }
 
 }

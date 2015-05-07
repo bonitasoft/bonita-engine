@@ -27,23 +27,10 @@ import static org.mockito.Mockito.verify;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.CascadeType;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
-import org.bonitasoft.engine.commons.TypeConverterUtil;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bdm.model.BusinessObject;
@@ -55,6 +42,17 @@ import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.proxy.ServerLazyLoader;
+import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
+import org.bonitasoft.engine.commons.TypeConverterUtil;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
 import com.fasterxml.jackson.core.JsonGenerationException;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -68,121 +66,6 @@ public class BusinessDataServiceImplTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-
-    public class EntityPojo implements Entity {
-
-        private static final long serialVersionUID = 1L;
-        private String name;
-        private Boolean bool;
-        private Date date;
-        private List<Long> numbers;
-
-        @OneToOne(cascade = CascadeType.MERGE)
-        private Entity aggregationEntity;
-
-        @OneToOne(cascade = CascadeType.ALL)
-        private Entity compositionEntity;
-
-        @OneToOne(cascade = CascadeType.ALL)
-        private Entity nullChildEntity;
-
-        @OneToMany(cascade = CascadeType.MERGE)
-        private List<Entity> aggregationEntities;
-
-        @OneToMany(cascade = CascadeType.ALL)
-        private List<Entity> compositionEntities;
-
-        private final Long persistenceId;
-
-        public EntityPojo(final Long persistenceId) {
-            this.persistenceId = persistenceId;
-            aggregationEntities = new ArrayList<Entity>();
-            compositionEntities = new ArrayList<Entity>();
-
-        }
-
-        @Override
-        public Long getPersistenceId() {
-            return persistenceId;
-        }
-
-        @Override
-        public Long getPersistenceVersion() {
-            return 2L;
-        }
-
-        public Date getDate() {
-            return date;
-        }
-
-        public void setDate(final Date date) {
-            this.date = date;
-        }
-
-        public Boolean getBool() {
-            return bool;
-        }
-
-        public void setBool(final Boolean bool) {
-            this.bool = bool;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(final String name) {
-            this.name = name;
-        }
-
-        public List<Long> getNumbers() {
-            return numbers;
-        }
-
-        public void setNumbers(final List<Long> numbers) {
-            this.numbers = numbers;
-        }
-
-        public Entity getCompositionEntity() {
-            return compositionEntity;
-        }
-
-        public void setCompositionEntity(final Entity compositionEntity) {
-            this.compositionEntity = compositionEntity;
-        }
-
-        public Entity getAggregationEntity() {
-            return aggregationEntity;
-        }
-
-        public void setAggregationEntity(final Entity aggregationEntity) {
-            this.aggregationEntity = aggregationEntity;
-        }
-
-        public Entity getNullChildEntity() {
-            return null;
-        }
-
-        public void setNullChildEntity(final Entity nullChildEntity) {
-            this.nullChildEntity = nullChildEntity;
-        }
-
-        public List<Entity> getAggregationEntities() {
-            return aggregationEntities;
-        }
-
-        public void setAggregationEntities(List<Entity> aggregationEntities) {
-            this.aggregationEntities = aggregationEntities;
-        }
-
-        public List<Entity> getCompositionEntities() {
-            return compositionEntities;
-        }
-
-        public void setCompositionEntities(List<Entity> compositionEntities) {
-            this.compositionEntities = compositionEntities;
-        }
-    }
 
     private final Entity pojo = new EntityPojo(1L);
     private BusinessDataServiceImpl businessDataService;
@@ -333,6 +216,41 @@ public class BusinessDataServiceImplTest {
         assertThat(pojoObject).as("should return object").isNotNull();
         assertThat(pojoObject.getCompositionEntity()).as("should have set entity").isEqualTo(compositionEntity);
         verify(businessDataRepository, never()).findById(compositionEntity.getClass(), compositionEntity.getPersistenceId());
+    }
+
+    @Test
+    public void callJavaOperationShouldWithProxyfiedEntityShouldUsedRealEntityClass() throws Exception {
+        //given
+        final EntityPojo entity = new EntityPojo(2L);
+        ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
+        EntityPojo proxyfiedEntity = proxyfier.proxify(entity);
+
+        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataRepository).merge(pojo);
+
+        //when
+        businessDataService.callJavaOperation(pojo, proxyfiedEntity, "setAggregationEntity",
+                Entity.class.getName());
+
+        verify(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        verify(businessDataRepository).findById(entity.getClass(), entity.getPersistenceId());
+    }
+
+    @Test
+    public void callJavaOperationShouldWithListOfProxyfiedEntitiesShouldUsedRealEntityClass() throws Exception {
+        //given
+        final EntityPojo entity = new EntityPojo(2L);
+        ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
+        EntityPojo proxyfiedEntity = proxyfier.proxify(entity);
+
+        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataRepository).merge(pojo);
+
+        //when
+        businessDataService.callJavaOperation(pojo, Collections.singletonList(proxyfiedEntity), "setAggregationEntities",
+                List.class.getName());
+
+        verify(businessDataRepository).findByIds(entity.getClass(), Collections.singletonList(2L));
     }
 
     @Test
