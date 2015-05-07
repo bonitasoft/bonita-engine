@@ -212,7 +212,7 @@ public class DocumentHelperTest {
         doReturn(docToUpdate).when(documentService).getMappedDocument(PROCESS_INSTANCE_ID, "myDoc");
         //when
         DocumentValue docValue = new DocumentValue("myUrl");
-        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID);
+        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID, null);
         //then
         verify(documentService).updateDocument(eq(docToUpdate), any(SDocument.class));
     }
@@ -223,7 +223,7 @@ public class DocumentHelperTest {
         doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(PROCESS_INSTANCE_ID, "myDoc");
         //when
         DocumentValue docValue = new DocumentValue("myUrl");
-        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID);
+        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID, null);
         //then
         verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("myDoc"), anyString());
     }

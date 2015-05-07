@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.document.api.impl;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class DocumentHelper {
     private final ProcessInstanceService processInstanceService;
 
     public DocumentHelper(final DocumentService documentService, final ProcessDefinitionService processDefinitionService,
-            final ProcessInstanceService processInstanceService) {
+                          final ProcessInstanceService processInstanceService) {
         this.documentService = documentService;
         this.processDefinitionService = processDefinitionService;
         this.processInstanceService = processInstanceService;
@@ -84,13 +84,11 @@ public class DocumentHelper {
         } catch (final SProcessInstanceNotFoundException e) {
             throw new SObjectNotFoundException("Unable to find the list " + documentName + ", nothing in database and the process instance "
                     + processInstanceId + " is not found", e);
-        } catch (final SProcessInstanceReadException e) {
+        } catch (final SProcessInstanceReadException | SProcessDefinitionReadException e) {
             throw new SBonitaReadException(e);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new SObjectNotFoundException("Unable to find the list " + documentName + " on process instance " + processInstanceId
                     + ", nothing in database and the process definition is not found", e);
-        } catch (final SProcessDefinitionReadException e) {
-            throw new SBonitaReadException(e);
         }
         return false;
     }
@@ -112,7 +110,18 @@ public class DocumentHelper {
         }
     }
 
-    public void createOrUpdateDocument(final DocumentValue newValue, final String documentName, final long processInstanceId, final long authorId)
+    /**
+     *
+     * @param newValue the new value
+     * @param documentName the name of the document
+     * @param processInstanceId the id of the process instance
+     * @param authorId the author id
+     * @param description used only when creating a document
+     * @throws SBonitaReadException
+     * @throws SObjectCreationException
+     * @throws SObjectModificationException
+     */
+    public void createOrUpdateDocument(final DocumentValue newValue, final String documentName, final long processInstanceId, final long authorId, String description)
             throws SBonitaReadException, SObjectCreationException, SObjectModificationException {
         final SDocument document = createDocumentObject(newValue, authorId);
         try {
@@ -121,12 +130,15 @@ public class DocumentHelper {
             // a document exist, update it with the new values
             documentService.updateDocument(mappedDocument, document);
         } catch (final SObjectNotFoundException e) {
-            documentService.attachDocumentToProcessInstance(document, processInstanceId, documentName, null);
+            documentService.attachDocumentToProcessInstance(document, processInstanceId, documentName, description);
         }
     }
 
     public void setDocumentList(final List<DocumentValue> documentList, final String documentName, final long processInstanceId, final long authorId)
             throws SBonitaReadException, SObjectCreationException, SObjectNotFoundException, SObjectModificationException, SObjectAlreadyExistsException {
+        if (documentList == null) {
+            return;
+        }
         // get the list having the name
         final List<SMappedDocument> currentList = getExistingDocumentList(documentName, processInstanceId);
         // iterate on elements
@@ -152,7 +164,7 @@ public class DocumentHelper {
     }
 
     SMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(final List<SMappedDocument> currentList, final Long documentId, final String documentName,
-            final Long processInstanceId) throws SObjectNotFoundException {
+                                                                 final Long processInstanceId) throws SObjectNotFoundException {
         final Iterator<SMappedDocument> iterator = currentList.iterator();
         while (iterator.hasNext()) {
             final SMappedDocument next = iterator.next();
@@ -185,7 +197,7 @@ public class DocumentHelper {
     }
 
     void processDocumentOnIndex(final DocumentValue documentValue, final String documentName, final long processInstanceId,
-            final List<SMappedDocument> currentList, final int index, final long authorId) throws SObjectCreationException, SObjectAlreadyExistsException,
+                                final List<SMappedDocument> currentList, final int index, final long authorId) throws SObjectCreationException, SObjectAlreadyExistsException,
             SObjectNotFoundException, SObjectModificationException {
         if (documentValue.getDocumentId() != null) {
             // if hasChanged update

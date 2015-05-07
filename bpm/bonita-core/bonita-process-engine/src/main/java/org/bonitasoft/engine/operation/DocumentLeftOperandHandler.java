@@ -66,7 +66,7 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
                     //do not update if the document value say it did not changed
                     return newValue;
                 }
-                documentHelper.createOrUpdateDocument(documentValue, documentName, processInstanceId, getAuthorId());
+                documentHelper.createOrUpdateDocument(documentValue, documentName, processInstanceId, getAuthorId(), null);
             }
             return newValue;
         } catch (final SBonitaException e) {

@@ -47,9 +47,7 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadExce
 import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.contract.data.SContractDataCreationException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.model.SDocument;
-import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
+import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
@@ -123,6 +121,7 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
@@ -140,50 +139,29 @@ import org.bonitasoft.engine.work.WorkService;
 public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected final ActivityInstanceService activityInstanceService;
-
-    private final FlowNodeExecutor flowNodeExecutor;
-
-    private final TechnicalLoggerService logger;
-
     protected final ProcessInstanceService processInstanceService;
-
-    private final WorkService workService;
-
-    private final ProcessDefinitionService processDefinitionService;
-
-    private final GatewayInstanceService gatewayInstanceService;
-
-    private final TransitionService transitionService;
-
-    private final EventInstanceService eventInstanceService;
-
     protected final ClassLoaderService classLoaderService;
-
     protected final ExpressionResolverService expressionResolverService;
-
     protected final ExpressionService expressionService;
-
     protected final ConnectorService connectorService;
-
-    private final OperationService operationService;
-
-    private final DocumentService documentService;
-
-    private final ReadSessionAccessor sessionAccessor;
-
     protected final BPMInstancesCreator bpmInstancesCreator;
-
     protected final EventsHandler eventsHandler;
-
+    private final FlowNodeExecutor flowNodeExecutor;
+    private final TechnicalLoggerService logger;
+    private final WorkService workService;
+    private final ProcessDefinitionService processDefinitionService;
+    private final GatewayInstanceService gatewayInstanceService;
+    private final TransitionService transitionService;
+    private final EventInstanceService eventInstanceService;
+    private final OperationService operationService;
+    private final DocumentService documentService;
+    private final ReadSessionAccessor sessionAccessor;
     private final ConnectorInstanceService connectorInstanceService;
 
     private final TransitionEvaluator transitionEvaluator;
-
-    private BusinessDataRepository businessDataRepository;
-
-    private RefBusinessDataService refBusinessDataService;
-
     private final ContractDataService contractDataService;
+    private BusinessDataRepository businessDataRepository;
+    private RefBusinessDataService refBusinessDataService;
 
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
             final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
@@ -505,25 +483,30 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     protected void createDocuments(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance, final long authorId)
-            throws SObjectCreationException, BonitaHomeNotSetException, STenantIdNotSetException, IOException, SObjectAlreadyExistsException {
+            throws SObjectCreationException, BonitaHomeNotSetException, STenantIdNotSetException, IOException, SObjectAlreadyExistsException, SBonitaReadException, SObjectModificationException {
         final SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
         final List<SDocumentDefinition> documentDefinitions = processContainer.getDocumentDefinitions();
         if (!documentDefinitions.isEmpty()) {
             for (final SDocumentDefinition document : documentDefinitions) {
-                if (document.getFile() != null) {
-                    final String file = document.getFile();// should always exists...validation on businessarchive
+                DocumentValue documentValue = null;
+                if (document.getInitialValue() != null) {
+                    //TODO evaluate expression
+                } else if (document.getFile() != null) {
+                    final String file = document.getFile();// should always exists...validation on BusinessArchive
                     final byte[] content = BonitaHomeServer.getInstance().getProcessDocument(sessionAccessor.getTenantId(), sDefinition.getId(), file);
-                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getMimeType(), content, authorId,
-                            document.getDescription(), -1);
+                    documentValue = new DocumentValue(content, document.getMimeType(), document.getFileName());
                 } else if (document.getUrl() != null) {
-                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getMimeType(), document.getUrl(),
-                            authorId, document.getDescription(), -1);
+                    documentValue = new DocumentValue(document.getUrl());
+                    documentValue.setFileName(document.getFileName());
+                    documentValue.setMimeType(document.getMimeType());
+                }
+                if (documentValue != null) {
+                    new DocumentHelper(documentService, processDefinitionService, processInstanceService).createOrUpdateDocument(documentValue, document.getName(), sProcessInstance.getId(), authorId, document.getDescription());
                 }
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
     protected void createDocumentLists(final SProcessDefinition sDefinition, final SProcessInstance processInstance, final long authorId,
             final SExpressionContext expressionContext, final Map<String, Object> context)
             throws SBonitaException {
@@ -532,30 +515,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (!documentListDefinitions.isEmpty()) {
             final List<Object> initialValues = evaluateInitialExpressionsOfDocumentLists(processInstance, expressionContext, context, documentListDefinitions);
             for (int i = 0; i < documentListDefinitions.size(); i++) {
-                attachDocumentForList(processInstance, authorId, (List<DocumentValue>) initialValues.get(i), documentListDefinitions.get(i));
-            }
-        }
-    }
-
-    private void attachDocumentForList(final SProcessInstance processInstance, final long authorId, final List<DocumentValue> initialValue,
-            final SDocumentListDefinition documentListDefinition) throws SObjectCreationException, SObjectAlreadyExistsException {
-        if (initialValue != null) {
-            for (int index = 0; index < initialValue.size(); index++) {
-                attacheDocument(processInstance, authorId, initialValue, documentListDefinition, index);
-            }
-        }
-    }
-
-    private void attacheDocument(final SProcessInstance processInstance, final long authorId, final List<DocumentValue> initialValue,
-            final SDocumentListDefinition documentListDefinition, final int index) throws SObjectCreationException, SObjectAlreadyExistsException {
-        final DocumentValue documentValue = initialValue.get(index);
-        if (documentValue != null) {
-            if (documentValue.hasContent()) {
-                attachDocument(processInstance.getId(), documentListDefinition.getName(), documentValue.getFileName(), documentValue.getMimeType(),
-                        documentValue.getContent(), authorId, documentListDefinition.getDescription(), index);
-            } else {
-                attachDocument(processInstance.getId(), documentListDefinition.getName(), documentValue.getFileName(), documentValue.getMimeType(),
-                        documentValue.getUrl(), authorId, documentListDefinition.getDescription(), index);
+                new DocumentHelper(documentService, processDefinitionService, processInstanceService).setDocumentList((List<DocumentValue>) initialValues.get(i), documentListDefinitions.get(i).getName(), processInstance.getId(), authorId);
             }
         }
     }
@@ -583,21 +543,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             currentExpressionContext.setInputValues(context);
         }
         return currentExpressionContext;
-    }
-
-    protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final String url, final long authorId, final String description, final int index) throws SObjectCreationException, SObjectAlreadyExistsException {
-        final SDocument attachment = BuilderFactory.get(SDocumentBuilderFactory.class)
-                .createNewExternalProcessDocumentReference(fileName, mimeType, authorId, url).done();
-        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
-    }
-
-    protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final byte[] documentContent, final long authorId, final String description, final int index) throws SObjectCreationException,
-            SObjectAlreadyExistsException {
-        final SDocument attachment = BuilderFactory.get(SDocumentBuilderFactory.class).createNewProcessDocument(fileName, mimeType, authorId, documentContent)
-                .done();
-        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
     }
 
     @Override
@@ -699,8 +644,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      * Evaluate the split of the element
      * The element contains the current token it received
      *
-     * @return
-     *         number of token of the process
+     * @return number of token of the process
      */
     private boolean executeValidOutgoingTransitionsAndUpdateTokens(final SProcessDefinition processDefinition, final SFlowNodeInstance child,
             final SProcessInstance sProcessInstance) throws SBonitaException {
