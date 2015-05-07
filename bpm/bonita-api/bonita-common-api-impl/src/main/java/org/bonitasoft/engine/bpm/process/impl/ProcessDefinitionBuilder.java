@@ -507,7 +507,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     private void validateBoundaryOutgoingTransitions(final BoundaryEventDefinition boundaryEvent) {
         for (final TransitionDefinition transition : boundaryEvent.getOutgoingTransitions()) {
             if (transition.getCondition() != null) {
-                designErrors.add("A boundary event must have not inconditional transitions: " + transition.getSource() + "->" + transition.getTarget());
+                designErrors.add("A boundary event must have not unconditional transitions: " + transition.getSource() + "->" + transition.getTarget());
             }
         }
     }

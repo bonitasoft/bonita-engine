@@ -13,7 +13,6 @@
  */
 package org.bonitasoft.engine.execution;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,11 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.bpm.bar.DocumentsResourcesContribution;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -508,10 +505,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 if (document.getFile() != null) {
                     final String file = document.getFile();// should always exists...validation on businessarchive
                     final byte[] content = BonitaHomeServer.getInstance().getProcessDocument(sessionAccessor.getTenantId(), sDefinition.getId(), file);
-                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), content, authorId,
+                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getMimeType(), content, authorId,
                             document.getDescription(), -1);
                 } else if (document.getUrl() != null) {
-                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), document.getUrl(),
+                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getMimeType(), document.getUrl(),
                             authorId, document.getDescription(), -1);
                 }
             }

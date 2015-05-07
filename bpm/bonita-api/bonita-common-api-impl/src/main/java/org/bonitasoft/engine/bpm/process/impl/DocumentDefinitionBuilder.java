@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.document.impl.DocumentDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Baptiste Mesta
@@ -26,9 +27,10 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
 
     private final DocumentDefinitionImpl documentDefinitionImpl;
 
+    @Deprecated
     public DocumentDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
             final String name, final String fileName) {
-        this(processDefinitionBuilder, container, fileName); // FIXME : filename must be replaced by name ??
+        this(processDefinitionBuilder, container, name);
         documentDefinitionImpl.setFileName(fileName);
     }
 
@@ -94,6 +96,18 @@ public class DocumentDefinitionBuilder extends FlowElementContainerBuilder {
 
     public DocumentDefinitionBuilder addMimeType(final String mimeType) {
         documentDefinitionImpl.setMimeType(mimeType);
+        return this;
+    }
+
+    /**
+     * Adds an initial value to the document, the initial value must be a {@link org.bonitasoft.engine.bpm.document.DocumentValue} or a {@link org.bonitasoft.engine.bpm.contract.FileInputValue}
+     * It overrides any value put in mime type, file, url or filename.
+     * @param expression that is the initial value
+     * @return the builder
+     * @since 7.0.0
+     */
+    public DocumentDefinitionBuilder addInitialValue(final Expression expression) {
+        documentDefinitionImpl.setInitialValue(expression);
         return this;
     }
 

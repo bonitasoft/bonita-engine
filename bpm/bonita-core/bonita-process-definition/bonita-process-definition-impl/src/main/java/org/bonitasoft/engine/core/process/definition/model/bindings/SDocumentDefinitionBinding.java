@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SDocumentDefinitionImpl;
+import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Baptiste Mesta
@@ -32,6 +33,7 @@ public class SDocumentDefinitionBinding extends SNamedElementBinding {
     private String file;
 
     private String fileName;
+    private SExpression initialValue;
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
@@ -57,6 +59,9 @@ public class SDocumentDefinitionBinding extends SNamedElementBinding {
 
     @Override
     public void setChildObject(final String name, final Object value) {
+        if (XMLSProcessDefinition.EXPRESSION_NODE.equals(name)) {
+            initialValue = (SExpression) value;
+        }
     }
 
     @Override
@@ -74,6 +79,9 @@ public class SDocumentDefinitionBinding extends SNamedElementBinding {
         }
         if (fileName != null) {
             documentDefinitionImpl.setFileName(fileName);
+        }
+        if (initialValue != null) {
+            documentDefinitionImpl.setInitialValue(initialValue);
         }
         return documentDefinitionImpl;
     }
