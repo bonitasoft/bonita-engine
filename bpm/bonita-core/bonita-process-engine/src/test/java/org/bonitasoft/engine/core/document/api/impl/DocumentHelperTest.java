@@ -10,11 +10,18 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.document.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,12 +60,12 @@ public class DocumentHelperTest {
 
     public static final long AUTHOR_ID = 12l;
     public static final long PROCESS_INSTANCE_ID = 45l;
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
     @Mock
     private ProcessDefinitionService processDefinitionService;
     @Mock
     private ProcessInstanceService processInstanceService;
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
     @Mock
     private SProcessInstance processInstance;
     @Mock
@@ -231,7 +238,7 @@ public class DocumentHelperTest {
     @Test
     public void should_setDocumentList_set_the_list() throws Exception {
         DocumentHelper documentHelperSpy = spy(documentHelper);
-        List<SMappedDocument> existingList = Arrays.<SMappedDocument> asList(new SMappedDocumentImpl());
+        List<SMappedDocument> existingList = Arrays.<SMappedDocument>asList(new SMappedDocumentImpl());
         doReturn(existingList).when(documentHelperSpy).getExistingDocumentList("theList", PROCESS_INSTANCE_ID);
 
         DocumentValue docValue1 = new DocumentValue("url1");
@@ -286,7 +293,7 @@ public class DocumentHelperTest {
         //when
         documentHelper.processDocumentOnIndex(documentValue, "theList", PROCESS_INSTANCE_ID, list, 3, AUTHOR_ID);
         //then
-        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("theList"),anyString(),eq(3));
+        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("theList"), anyString(), eq(3));
     }
 
     @Test
@@ -294,7 +301,7 @@ public class DocumentHelperTest {
         //given
         DocumentHelper documentHelperSpy = spy(documentHelper);
         List<SMappedDocument> list = createList(5);
-        SMappedDocument documentToUpdate = list.get(list.size()-1);
+        SMappedDocument documentToUpdate = list.get(list.size() - 1);
         DocumentValue documentValue = new DocumentValue(documentToUpdate.getId(), "new url");
         //when
         documentHelperSpy.processDocumentOnIndex(documentValue, "theList", PROCESS_INSTANCE_ID, list, 3, AUTHOR_ID);
@@ -321,9 +328,9 @@ public class DocumentHelperTest {
         SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
         documentToUpdate.setIndex(1);
         //when
-        documentHelper.updateExistingDocument(documentToUpdate,2,documentValue,AUTHOR_ID);
+        documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
         //then
-        verify(documentService).updateDocumentIndex(documentToUpdate,2);
+        verify(documentService).updateDocumentIndex(documentToUpdate, 2);
     }
 
 
@@ -334,9 +341,9 @@ public class DocumentHelperTest {
         SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
         documentToUpdate.setIndex(2);
         //when
-        documentHelper.updateExistingDocument(documentToUpdate,2,documentValue,AUTHOR_ID);
+        documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
         //then
-        verify(documentService,times(0)).updateDocumentIndex(documentToUpdate,2);
+        verify(documentService, times(0)).updateDocumentIndex(documentToUpdate, 2);
     }
 
 
@@ -347,9 +354,77 @@ public class DocumentHelperTest {
         SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
         documentToUpdate.setIndex(1);
         //when
-        documentHelper.updateExistingDocument(documentToUpdate,2,documentValue,AUTHOR_ID);
+        documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
         //then
-        verify(documentService).updateDocumentOfList(eq(documentToUpdate),any(SDocument.class),eq(2));
+        verify(documentService).updateDocumentOfList(eq(documentToUpdate), any(SDocument.class), eq(2));
+    }
+
+    @Test
+    public void should_getMimeTypeOrGuessIt_return_the_original_mime_type_if_not_null() {
+        //given
+        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, "myMimeType", "theFile.bin");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isEqualTo("myMimeType");
+
+    }
+
+    @Test
+    public void should_getMimeTypeOrGuessIt_guess_plain_text_mime_type() {
+        //given
+        final DocumentValue documentValue = new DocumentValue("content".getBytes(), null, "theFile.txt");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isEqualTo("text/plain");
+    }
+
+    @Test
+    public void should_getMimeTypeOrGuessIt_guess_plain_text_mime_type_when_empty() {
+        //given
+        final DocumentValue documentValue = new DocumentValue("content".getBytes(), "", "theFile.txt");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isEqualTo("text/plain");
+    }
+
+
+    @Test
+    public void should_getMimeTypeOrGuessIt_guess_xml_mime_type() {
+        //given
+        final String xmlFileContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<note>\n" +
+                "\t<to>Tove</to>\n" +
+                "\t<from>Jani</from>\n" +
+                "\t<heading>Reminder</heading>\n" +
+                "\t<body>Don't forget me this weekend!</body>\n" +
+                "</note>";
+        final DocumentValue documentValue = new DocumentValue(xmlFileContent.getBytes(), null, "theFile.xml");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isEqualTo("application/xml");
+    }
+
+    @Test
+    public void should_getMimeTypeOrGuessIt_guess_application_octet_stream_if_byte_array() {
+        //given
+        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, null, "theFile.bin");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isEqualTo("application/octet-stream");
+    }
+    @Test
+    public void should_getMimeTypeOrGuessIt_do_not_fail_with_bad_filename() {
+        //given
+        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, null, "the\0File.bin");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isNull();
     }
 
 }
