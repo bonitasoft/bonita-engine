@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.operation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyByte;
-import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -28,7 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
@@ -50,17 +47,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentListLeftOperandHandlerTest {
 
-    private static final long LOGGED_USER_ID = 125;
     public static final long CONTAINER_ID = 45l;
     public static final String CONTAINER_TYPE = "container";
     public static final long PROCESS_INSTANCE_ID = 45l;
+    private static final long LOGGED_USER_ID = 125;
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
@@ -110,48 +106,19 @@ public class DocumentListLeftOperandHandlerTest {
     public void should_update_check_it_is_a_list() throws Exception {
         exception.expect(SOperationExecutionException.class);
         exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
-        handler.update(createLeftOperand("myDoc"), Collections.<String, Object>emptyMap(), new HashMap<Object, Object>(), 45l, "container");
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), new HashMap<Object, Object>(), 45l, "container");
     }
 
     @Test
     public void should_update_setDocumentList() throws Exception {
-        doNothing().when(documentHelper).setDocumentList(anyList(), anyString(), anyLong(), anyLong());
+        doNothing().when(documentHelper).setDocumentList(anyListOf(DocumentValue.class), anyString(), anyLong(), anyLong());
         List<DocumentValue> newValue = Arrays.asList(documentValue("doc1"), documentValue("doc2"));
-        handler.update(createLeftOperand("myDoc"), Collections.<String, Object>emptyMap(), newValue, CONTAINER_ID, CONTAINER_TYPE);
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object> emptyMap(), newValue, CONTAINER_ID, CONTAINER_TYPE);
         verify(documentHelper).setDocumentList(newValue, "myDoc", PROCESS_INSTANCE_ID, LOGGED_USER_ID);
     }
 
     private DocumentValue documentValue(String name) {
         return new DocumentValue(name);
-    }
-
-    @Test
-    public void should_toCheckedList_check_null() throws Exception {
-        exception.expect(SOperationExecutionException.class);
-        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
-        handler.toCheckedList(null);
-    }
-
-    @Test
-    public void should_toCheckedList_check_not_list() throws Exception {
-        exception.expect(SOperationExecutionException.class);
-        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
-        handler.toCheckedList(new Object());
-    }
-
-    @Test
-    public void should_toCheckedList_check_not_all_doc() throws Exception {
-        exception.expect(SOperationExecutionException.class);
-        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
-        handler.toCheckedList(Arrays.asList(new DocumentValue("theUrl"), new Object()));
-    }
-
-    @Test
-    public void should_toCheckedList_returns_the_list_if_contains_FileInputValue() throws Exception {
-        final List<FileInputValue> inputList = Collections.singletonList(new FileInputValue("report.pdf", "The report content".getBytes()));
-        final List<DocumentValue> result = handler.toCheckedList(inputList);
-        assertThat(result.get(0).getContent()).isEqualTo("The report content".getBytes());
-        assertThat(result.get(0).getFileName()).isEqualTo("report.pdf");
     }
 
 }
