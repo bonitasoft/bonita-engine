@@ -557,6 +557,7 @@
                     <xs:element name="url" type="xs:string" minOccurs="0" />
                     <xs:element name="file" type="xs:string" minOccurs="0" />
                     <xs:element name="fileName" type="xs:string" minOccurs="0" />
+                    <xs:element name="expression" type="definition:Expression" minOccurs="0" />
                 </xs:all>
                 <xs:attribute name="mimeType" type="xs:string" use="required" />
             </xs:extension>

@@ -358,7 +358,7 @@ public class BusinessArchiveTest {
         final Expression trueExpression = new ExpressionBuilder().createConstantBooleanExpression(true);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addDocumentDefinition("testDoc").addContentFileName("testFile.txt").addFile("testFile.txt").addDescription("desc")
-                .addMimeType("text/plain");
+                .addMimeType("text/plain").addInitialValue(new ExpressionBuilder().createConstantStringExpression("plop"));
         processDefinitionBuilder.addDocumentDefinition("testDocUrl").addContentFileName("testFile.txt").addUrl("http://test.com/testFile.txt")
                 .addDescription("desc");
         processDefinitionBuilder.addDescription("a very good description");
@@ -410,12 +410,9 @@ public class BusinessArchiveTest {
                 .addDocumentResource(new BarResource("testFile.txt", new byte[] { 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })).done();
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
 
-        final InputStream inputStream = new FileInputStream(barFile);
         final BusinessArchive businessArchive2;
-        try {
+        try (InputStream inputStream = new FileInputStream(barFile)) {
             businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        } finally {
-            inputStream.close();
         }
 
         final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
@@ -425,6 +422,7 @@ public class BusinessArchiveTest {
         assertEquals("desc", testDoc1.getDescription());
         assertEquals("testFile.txt", testDoc1.getFile());
         assertEquals("text/plain", testDoc1.getContentMimeType());
+        assertEquals("plop", testDoc1.getInitialValue().getContent());
         final DocumentDefinition testDoc2 = documentDefinitions.get(1);
         assertEquals("testDocUrl", testDoc2.getName());
         assertEquals("desc", testDoc2.getDescription());

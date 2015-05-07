@@ -1061,6 +1061,9 @@ public class XMLProcessDefinition {
         if (documentDefinition.getFile() != null) {
             documentDefinitionNode.addChild(DOCUMENT_DEFINITION_FILE, documentDefinition.getFile());
         }
+        if (documentDefinition.getInitialValue() != null) {
+            addExpressionNode(documentDefinitionNode, EXPRESSION_NODE, documentDefinition.getInitialValue());
+        }
     }
 
     private void fillDocumentListDefinitionNode(final XMLNode documentListDefinitionNode, final DocumentListDefinition documentListDefinition) {

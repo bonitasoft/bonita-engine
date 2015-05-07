@@ -1037,7 +1037,7 @@ public class XMLSProcessDefinition {
 
     private void fillDocumentDefinitionNode(final XMLNode documentDefinitionNode, final SDocumentDefinition documentDefinition) {
         documentDefinitionNode.addAttribute(NAME, documentDefinition.getName());
-        documentDefinitionNode.addAttribute(DOCUMENT_DEFINITION_MIME_TYPE, documentDefinition.getContentMimeType());
+        documentDefinitionNode.addAttribute(DOCUMENT_DEFINITION_MIME_TYPE, documentDefinition.getMimeType());
         if (documentDefinition.getFileName() != null) {
             documentDefinitionNode.addChild(DOCUMENT_DEFINITION_FILE_NAME, documentDefinition.getFileName());
         }
@@ -1049,6 +1049,9 @@ public class XMLSProcessDefinition {
         }
         if (documentDefinition.getFile() != null) {
             documentDefinitionNode.addChild(DOCUMENT_DEFINITION_FILE, documentDefinition.getFile());
+        }
+        if (documentDefinition.getInitialValue() != null) {
+            addExpressionNode(documentDefinitionNode, EXPRESSION_NODE, documentDefinition.getInitialValue());
         }
     }
 

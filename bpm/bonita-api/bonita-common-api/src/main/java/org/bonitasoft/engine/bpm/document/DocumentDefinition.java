@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.document;
 
 import org.bonitasoft.engine.bpm.NamedElement;
+import org.bonitasoft.engine.expression.Expression;
 
 /**
  * The definition of a document attached to a process definition
@@ -48,5 +49,10 @@ public interface DocumentDefinition extends NamedElement {
      * @return The name of the file of the document
      */
     String getFileName();
+
+    /**
+     * @return the initial value expression
+     */
+    Expression getInitialValue();
 
 }
