@@ -169,7 +169,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             return new ArrayList<Entity>();
         }
         if (Type.AGGREGATION.equals(type)) {
-            return businessDataRepository.findByIds(entities.get(0).getClass(), getPrimaryKeys(entities));
+            return businessDataRepository.findByIds(ServerProxyfier.getRealClass(entities.get(0)), getPrimaryKeys(entities));
         } else {
             return copyForServer(entities);
         }
