@@ -115,8 +115,6 @@ public class ContractDefinitionBuilderTest {
         assertThat(activity.getContract().getInputs()).hasSize(2);
         assertThat(activity.getContract().getInputs().get(0).isMultiple()).as("should not be multiple").isFalse();
         assertThat(activity.getContract().getInputs().get(1).getName()).isEqualTo("theInput2");
-
-        checkBuilder(builder);
     }
 
     @Test
