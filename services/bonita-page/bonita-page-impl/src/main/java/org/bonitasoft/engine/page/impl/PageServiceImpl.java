@@ -234,7 +234,7 @@ public class PageServiceImpl implements PageService {
             }
             recorder.recordInsert(insertContentRecord, insertContentEvent);
             page.setId(pageContent.getId());
-            notifyPageInsert(page,content);
+            notifyPageInsert(page, content);
             return page;
         } catch (SRecorderException | SBonitaReadException re) {
             throw new SObjectCreationException(re);
@@ -243,7 +243,7 @@ public class PageServiceImpl implements PageService {
 
     private void notifyPageInsert(final SPage page, final byte[] content) throws SObjectCreationException {
         for (final PageServiceListener pageServiceListener : pageServiceListeners) {
-            pageServiceListener.pageInserted(page,content);
+            pageServiceListener.pageInserted(page, content);
         }
 
     }
@@ -455,9 +455,9 @@ public class PageServiceImpl implements PageService {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, "Update a page with id " + pageId);
         final String logMethodName = METHOD_UPDATE_PAGE;
         try {
-            checkPageDuplicate(pageId, entityUpdateDescriptor, logBuilder, logMethodName);
 
             final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
+            checkPageDuplicate(sPage, entityUpdateDescriptor, logBuilder, logMethodName);
             final String oldPageName = sPage.getName();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage,
                     entityUpdateDescriptor);
@@ -475,7 +475,8 @@ public class PageServiceImpl implements PageService {
 
     }
 
-    protected void updatePageNameInProfileEntry(final EntityUpdateDescriptor entityUpdateDescriptor, final String oldPageName) throws SInvalidPageTokenException,
+    protected void updatePageNameInProfileEntry(final EntityUpdateDescriptor entityUpdateDescriptor, final String oldPageName)
+            throws SInvalidPageTokenException,
             SBonitaReadException, SProfileEntryUpdateException {
         if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME)) {
             // page name has changed
@@ -485,13 +486,30 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    protected void checkPageDuplicate(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor, final SPageLogBuilder logBuilder, final String logMethodName)
+    protected void checkPageDuplicate(final SPage sPage, final EntityUpdateDescriptor entityUpdateDescriptor,
+            final SPageLogBuilder logBuilder,
+            final String logMethodName)
             throws SBonitaReadException, SObjectAlreadyExistsException {
-        if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME)) {
-            final SPage pageByName = getPageByName(entityUpdateDescriptor.getFields().get(SPageFields.PAGE_NAME).toString());
-            if (null != pageByName && pageByName.getId() != pageId) {
-                initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
-                throwAlreadyExistsException(pageByName.getName());
+        if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME)
+                || entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_PROCESS_DEFINITION_ID)) {
+            String sPageName = sPage.getName();
+            Long sPageProcessDefinitionId = sPage.getProcessDefinitionId();
+            if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_NAME)) {
+                sPageName = entityUpdateDescriptor.getFields().get(SPageFields.PAGE_NAME).toString();
+            }
+            if (entityUpdateDescriptor.getFields().containsKey(SPageFields.PAGE_PROCESS_DEFINITION_ID)) {
+                sPageProcessDefinitionId = Long.parseLong(entityUpdateDescriptor.getFields().get(SPageFields.PAGE_PROCESS_DEFINITION_ID).toString());
+            }
+
+            final SPage page;
+            if (sPageProcessDefinitionId != null) {
+                page = getPageByNameAndProcessDefinitionId(sPageName, sPageProcessDefinitionId);
+            } else {
+                page = getPageByName(sPageName);
+            }
+            if (null != page && page.getId() != sPage.getId()) {
+                initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
+                throwAlreadyExistsException(page.getName());
             }
         }
     }
@@ -560,11 +578,11 @@ public class PageServiceImpl implements PageService {
         importProvidedPage("bonita-html-page-example.zip");
         importProvidedPage("bonita-groovy-page-example.zip");
         importProvidedPage("bonita-home-page.zip");
-		importProvidedPage("bonita-layout-page.zip");
-		importProvidedPage("bonita-theme-page.zip");
+        importProvidedPage("bonita-layout-page.zip");
+        importProvidedPage("bonita-theme-page.zip");
         importProvidedPage("step-autogenerated-form.zip");
         importProvidedPage("process-autogenerated-form.zip");
-	}
+    }
 
     private void importProvidedPage(final String zipName) throws SBonitaReadException, SObjectCreationException, SObjectAlreadyExistsException,
             SObjectNotFoundException,

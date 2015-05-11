@@ -171,6 +171,45 @@ public class PageAPIIT extends CommonAPIIT {
 
     }
 
+    @Test(expected = AlreadyExistsException.class)
+    public void updateForm_with_existing_name_should_fail() throws Exception {
+        final PageUpdater pageUpdater = new PageUpdater();
+
+        // given
+        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setProcessDefinitionId(PROCESS_DEFINITION_ID),
+                CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
+        final Page page2 = getPageAPI().createPage(new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setProcessDefinitionId(PROCESS_DEFINITION_ID),
+                CommonTestUtil.createTestPageContent(PAGE_NAME2, DISPLAY_NAME, PAGE_DESCRIPTION));
+
+        // when
+        pageUpdater.setName(PAGE_NAME1);
+        getPageAPI().updatePage(page2.getId(), pageUpdater);
+
+        // then
+        // exception
+
+    }
+
+
+    @Test(expected = AlreadyExistsException.class)
+    public void updateForm_with_existing_process_definitionId_should_fail() throws Exception {
+        final PageUpdater pageUpdater = new PageUpdater();
+
+        // given
+        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setProcessDefinitionId(PROCESS_DEFINITION_ID),
+                CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
+        final Page page2 = getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
+
+        // when
+        pageUpdater.setProcessDefinitionId(PROCESS_DEFINITION_ID);
+        getPageAPI().updatePage(page2.getId(), pageUpdater);
+
+        // then
+        // exception
+
+    }
+
     @Test(expected = UpdatingWithInvalidPageZipContentException.class)
     public void updatePageContent_with_bad_content_should_fail() throws Exception {
         // given
