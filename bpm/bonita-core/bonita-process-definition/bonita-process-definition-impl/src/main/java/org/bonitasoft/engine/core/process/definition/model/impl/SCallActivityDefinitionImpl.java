@@ -60,7 +60,7 @@ public class SCallActivityDefinitionImpl extends SActivityDefinitionImpl impleme
         callableElement = ServerModelConvertor.convertExpression(activityDefinition.getCallableElement());
         callableElementVersion = ServerModelConvertor.convertExpression(activityDefinition.getCallableElementVersion());
         dataInputOperations = ServerModelConvertor.convertOperations(activityDefinition.getDataInputOperations());
-        contractInputs = new HashMap<>();
+        contractInputs = ServerModelConvertor.convertContractInputs(activityDefinition.getProcessStartContractInputs());
         dataOutputOperations = ServerModelConvertor.convertOperations(activityDefinition.getDataOutputOperations());
         callableElementType = SCallableElementType.valueOf(activityDefinition.getCallableElementType().name());
     }
@@ -115,7 +115,6 @@ public class SCallActivityDefinitionImpl extends SActivityDefinitionImpl impleme
         return SFlowNodeType.CALL_ACTIVITY;
     }
 
-    @Override
     public void addProcessStartContractInput(String inputName, SExpression value) {
         contractInputs.put(inputName, value);
     }

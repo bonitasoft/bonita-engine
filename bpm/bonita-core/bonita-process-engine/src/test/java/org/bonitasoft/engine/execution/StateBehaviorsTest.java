@@ -16,25 +16,16 @@ package org.bonitasoft.engine.execution;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.EXECUTING;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_BE_EXECUTED;
-import static org.bonitasoft.engine.execution.StateBehaviors.AFTER_ON_FINISH;
-import static org.bonitasoft.engine.execution.StateBehaviors.BEFORE_ON_ENTER;
-import static org.bonitasoft.engine.execution.StateBehaviors.BEFORE_ON_FINISH;
-import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_ENTER;
-import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_FINISH;
+import static org.bonitasoft.engine.execution.StateBehaviors.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyMap;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,37 +37,33 @@ import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
+import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
-import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException;
+import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConnectorDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -109,6 +96,8 @@ public class StateBehaviorsTest {
     private SUserFilterDefinition userFilterDefinition;
     @Mock
     private ClassLoaderService classLoaderService;
+    @Mock
+    private ExpressionResolverService expressionResolverService;
     @InjectMocks
     private StateBehaviors behaviors;
 
@@ -446,14 +435,14 @@ public class StateBehaviorsTest {
                 connectorInstance);
     }
 
-
     @Test
     public void should_mapUsingUserFilters_map_user_id_only_once() throws Exception {
         //given
         final FilterResult result = new FilterResult() {
+
             @Override
             public List<Long> getResult() {
-                return Arrays.asList(1L,2L,3L,2L);
+                return Arrays.asList(1L, 2L, 3L, 2L);
             }
 
             @Override
@@ -464,20 +453,21 @@ public class StateBehaviorsTest {
         doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
                 any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
         //when
-        behaviors.mapUsingUserFilters(flowNodeInstance,flowNodeDefinition,"actor",processDefinitionId,userFilterDefinition);
+        behaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
         //then
         ArgumentCaptor<SPendingActivityMapping> argumentCaptor = ArgumentCaptor.forClass(SPendingActivityMapping.class);
         verify(activityInstanceService, times(3)).addPendingActivityMappings(argumentCaptor.capture());
-        verify(activityInstanceService,never()).assignHumanTask(anyLong(), anyLong());
+        verify(activityInstanceService, never()).assignHumanTask(anyLong(), anyLong());
         List<SPendingActivityMapping> allValues = argumentCaptor.getAllValues();
         assertThat(allValues).hasSize(3);
-        assertThat(allValues).extracting("userId").containsOnly(1L,2L,3L);
+        assertThat(allValues).extracting("userId").containsOnly(1L, 2L, 3L);
     }
 
     @Test
     public void should_mapUsingUserFilters_assign_if_only_one_and_auto_assign() throws Exception {
         //given
         final FilterResult result = new FilterResult() {
+
             @Override
             public List<Long> getResult() {
                 return Arrays.asList(1L);
@@ -491,11 +481,11 @@ public class StateBehaviorsTest {
         doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
                 any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
         //when
-        behaviors.mapUsingUserFilters(flowNodeInstance,flowNodeDefinition,"actor",processDefinitionId,userFilterDefinition);
+        behaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
         //then
         ArgumentCaptor<SPendingActivityMapping> argumentCaptor = ArgumentCaptor.forClass(SPendingActivityMapping.class);
         verify(activityInstanceService, times(1)).addPendingActivityMappings(argumentCaptor.capture());
-        verify(activityInstanceService,times(1)).assignHumanTask(anyLong(), eq(1l));
+        verify(activityInstanceService, times(1)).assignHumanTask(anyLong(), eq(1l));
         List<SPendingActivityMapping> allValues = argumentCaptor.getAllValues();
         assertThat(allValues).extracting("userId").containsOnly(1L);
     }
@@ -507,18 +497,19 @@ public class StateBehaviorsTest {
         doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
                 any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
         //when
-        behaviors.mapUsingUserFilters(flowNodeInstance,flowNodeDefinition,"actor",processDefinitionId,userFilterDefinition);
+        behaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
         //then
         ArgumentCaptor<SPendingActivityMapping> argumentCaptor = ArgumentCaptor.forClass(SPendingActivityMapping.class);
         verify(activityInstanceService, times(1)).addPendingActivityMappings(argumentCaptor.capture());
-        verify(activityInstanceService,never()).assignHumanTask(anyLong(), anyLong());
+        verify(activityInstanceService, never()).assignHumanTask(anyLong(), anyLong());
         List<SPendingActivityMapping> allValues = argumentCaptor.getAllValues();
         assertThat(allValues).extracting("userId").containsOnly(1L);
     }
+
     @Test
     public void should_mapUsingUserFilters_throw_exception_when_empty_return() throws Exception {
         //given
-        final FilterResult result = getFilterResult(Collections.<Long>emptyList());
+        final FilterResult result = getFilterResult(Collections.<Long> emptyList());
         doReturn(result).when(userFilterService).executeFilter(eq(processDefinitionId), eq(userFilterDefinition), anyMapOf(String.class, SExpression.class),
                 any(ClassLoader.class), any(SExpressionContext.class), eq("actor"));
         expectedException.expect(SActivityStateExecutionException.class);
@@ -526,6 +517,7 @@ public class StateBehaviorsTest {
         //when
         behaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
     }
+
     @Test
     public void should_mapUsingUserFilters_throw_exception_when_null_return() throws Exception {
         //given
@@ -547,7 +539,7 @@ public class StateBehaviorsTest {
         expectedException.expect(SActivityStateExecutionException.class);
         expectedException.expectMessage("no user id returned by the user filter");
         //when
-        behaviors.mapUsingUserFilters(flowNodeInstance,flowNodeDefinition,"actor",processDefinitionId,userFilterDefinition);
+        behaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
     }
 
     @Test
@@ -559,20 +551,61 @@ public class StateBehaviorsTest {
         expectedException.expect(SActivityStateExecutionException.class);
         expectedException.expectMessage("no user id returned by the user filter");
         //when
-        behaviors.mapUsingUserFilters(flowNodeInstance,flowNodeDefinition,"actor",processDefinitionId,userFilterDefinition);
+        behaviors.mapUsingUserFilters(flowNodeInstance, flowNodeDefinition, "actor", processDefinitionId, userFilterDefinition);
     }
 
     FilterResult getFilterResult(final List<Long> theResult) {
         return new FilterResult() {
-                @Override
-                public List<Long> getResult() {
-                    return theResult;
-                }
 
-                @Override
-                public boolean shouldAutoAssignTaskIfSingleResult() {
-                    return false;
-                }
-            };
+            @Override
+            public List<Long> getResult() {
+                return theResult;
+            }
+
+            @Override
+            public boolean shouldAutoAssignTaskIfSingleResult() {
+                return false;
+            }
+        };
+    }
+
+    @Test
+    public void getEvaluatedInputExpressionsShouldEvaluateExpressionForDeclaredCallActivityInputs() throws Exception {
+        final HashMap<String, SExpression> contractInputs = new HashMap<>(1);
+        final String input = "someContractInput";
+        final SExpressionImpl expression = new SExpressionImpl();
+        contractInputs.put(input, expression);
+        final SExpressionContext context = mock(SExpressionContext.class);
+
+        behaviors.getEvaluatedInputExpressions(contractInputs, context);
+
+        verify(expressionResolverService).evaluate(expression, context);
+    }
+
+    @Test
+    public void instantiateProcessShouldCallStartWithInputs() throws Exception {
+
+        final SFlowNodeInstance callActivityInstance = mock(SFlowNodeInstance.class);
+        final long callerId = 444L;
+        doReturn(callerId).when(callActivityInstance).getId();
+        final SProcessDefinition callerProcessDefinition = mock(SProcessDefinition.class);
+        final long callerProcessDefinitionId = 555L;
+        doReturn(callerProcessDefinitionId).when(callerProcessDefinition).getId();
+        final StateBehaviors spy = spy(behaviors);
+        final SExpressionContext context = new SExpressionContext(callerId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
+
+        final SCallActivityDefinition callActivityDefinition = mock(SCallActivityDefinition.class);
+        final List operations = mock(List.class);
+        doReturn(operations).when(callActivityDefinition).getDataInputOperations();
+
+        final Map evaluatedExpressions = mock(Map.class);
+        doReturn(evaluatedExpressions).when(spy).getEvaluatedInputExpressions(anyMap(), eq(context));
+
+        final ProcessExecutor processExecutor = mock(ProcessExecutor.class);
+        spy.setProcessExecutor(processExecutor);
+
+        spy.instantiateProcess(callerProcessDefinition, callActivityDefinition, callActivityInstance, 147L);
+
+        verify(processExecutor).start(147L, -1, 0, 0, context, operations, null, null, callerId, -1, evaluatedExpressions);
     }
 }

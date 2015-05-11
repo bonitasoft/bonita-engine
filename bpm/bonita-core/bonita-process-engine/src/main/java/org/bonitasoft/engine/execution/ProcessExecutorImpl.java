@@ -28,7 +28,6 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionException;
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidator;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidatorFactory;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
