@@ -649,9 +649,17 @@ public class BDRepositoryIT extends CommonAPIIT {
                 new ExpressionBuilder().createGroovyScriptExpression(getLastNameWithDAOExpression, "import " + EMPLOYEE_QUALIFIED_NAME + "; Employee e = "
                         + employeeDAOName + ".findByFirstName('" + firstName + "', 0, 10).get(0); e.getAddresses().get(0).city", String.class.getName(),
                         new ExpressionBuilder().buildBusinessObjectDAOExpression(employeeDAOName, EMPLOYEE_QUALIFIED_NAME + "DAO")), null);
+        expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression(COUNT_ADDRESS, "Address." + COUNT_ADDRESS, Long.class.getName()), null);
+        expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression(COUNT_EMPLOYEE, "Employee." + COUNT_EMPLOYEE, Long.class.getName()), null);
         Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         String returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
         assertThat(returnedLastName).isEqualTo("Grenoble");
+
+        Serializable nbOfAddress = evaluatedExpressions.get(COUNT_ADDRESS);
+        Serializable nbOfEmployee = evaluatedExpressions.get(COUNT_EMPLOYEE);
+
+        assertThat(nbOfAddress).isEqualTo(1L);
+        assertThat(nbOfEmployee).isEqualTo(1L);
 
         logoutOnTenant();
 
@@ -1249,6 +1257,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Test
     public void getProcessBusinessDataReferencesShoulReturnTheListOfReferences() throws Exception {
         final String taskName = "step";
         final ProcessDefinition definition = buildProcessThatUpdateBizDataInsideConnector(taskName);
