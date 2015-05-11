@@ -13,19 +13,27 @@
  */
 package org.bonitasoft.engine.page.impl;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
+import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
+import org.bonitasoft.engine.page.SPageMapping;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -80,8 +88,8 @@ public class ApiExtensionPageServiceListenerImplTest {
 
         listener.pageInserted(page, content);
 
-        verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.EMPTY_LIST);
-        verify(pageMappingService).create("apiExtension|GET|employees/{employeeId}/address", pageId,Collections.EMPTY_LIST);
+        verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.<String> emptyList());
+        verify(pageMappingService).create("apiExtension|GET|employees/{employeeId}/address", pageId, Collections.<String> emptyList());
         verifyNoMoreInteractions(pageMappingService);
     }
 
@@ -173,6 +181,58 @@ public class ApiExtensionPageServiceListenerImplTest {
         when(helper.loadPageProperties(content)).thenReturn(properties);
 
         listener.pageInserted(page, content);
+    }
+
+    @Test
+    public void pageDeleted_should_only_care_of_api_extension() throws Exception {
+        final SPageImpl page = new SPageImpl();
+        page.setId(2L);
+        page.setContentType(SContentType.PAGE);
+
+        listener.pageDeleted(page);
+
+        verifyZeroInteractions(pageMappingService, helper);
+    }
+
+    @Test
+    public void pageDeleted_should_delete_all_mappings() throws Exception {
+        final long pageId = 10L;
+        final SPageImpl page = buildPage(pageId);
+        final List<SPageMapping> mappings = buildPageMappings(100);
+        final List<SPageMapping> mappings2 = buildPageMappings(53);
+        when(pageMappingService.get(pageId, 0, 100)).thenReturn(mappings, mappings2);
+
+        listener.pageDeleted(page);
+
+        verify(pageMappingService, times(153)).delete(any(SPageMapping.class));
+    }
+
+    private List<SPageMapping> buildPageMappings(final int numberOfResults) {
+        final List<SPageMapping> mappings = new ArrayList<>();
+        for (int i = 0; i < numberOfResults; i++) {
+            mappings.add(new SPageMappingImpl());
+        }
+        return mappings;
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void pageDeleted_should_throw_an_exception_when_an_exception_occurs_when_getting_mappings() throws Exception {
+        final long pageId = 10L;
+        final SPageImpl page = buildPage(pageId);
+        when(pageMappingService.get(pageId, 0, 100)).thenThrow(new SBonitaReadException("exception"));
+
+        listener.pageDeleted(page);
+    }
+
+    @Test(expected = SDeletionException.class)
+    public void pageDeleted_should_throw_an_exception_when_an_exception_occurs_when_deleting_mappings() throws Exception {
+        final long pageId = 10L;
+        final SPageImpl page = buildPage(pageId);
+        final List<SPageMapping> mappings = buildPageMappings(10);
+        when(pageMappingService.get(pageId, 0, 100)).thenReturn(mappings);
+        doThrow(new SDeletionException()).when(pageMappingService).delete(any(SPageMapping.class));
+
+        listener.pageDeleted(page);
     }
 
 }

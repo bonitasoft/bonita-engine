@@ -50,4 +50,10 @@
 		WHERE pagemapping.key = :key
 	</query>
 
+	<query name="getPageMappingByPageId">
+		SELECT pagemapping
+		FROM org.bonitasoft.engine.page.impl.SPageMappingImpl AS pagemapping
+		WHERE pagemapping.pageId = :pageId
+	</query>
+
 </hibernate-mapping>

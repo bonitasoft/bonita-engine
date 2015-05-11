@@ -13,14 +13,19 @@
  */
 package org.bonitasoft.engine.page;
 
+import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Laurent Leseigneur
+ * @author Matthieu Chaffotte
  * @since 7.0
  */
 public interface PageServiceListener {
 
     void pageInserted(SPage page, byte[] content) throws SObjectCreationException;
+
+    void pageDeleted(SPage page) throws SDeletionException, SBonitaReadException;
 
 }

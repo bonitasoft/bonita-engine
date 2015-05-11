@@ -279,7 +279,24 @@ public class PageAPIIT extends CommonAPIIT {
         PageAssert.assertThat(pageWithCreator).hasContentType(ContentType.API_EXTENSION);
     }
 
+    @Test
+    public void should_create_delete_create_page_with_same_values() throws Exception {
+        // given
+        final String pageName = generateUniquePageName(1);
+        final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with page creator " + PAGE_DESCRIPTION, "contentType="
+                + ContentType.API_EXTENSION, "apiExtensions=myGetResource, myPostResource", "myGetResource.method=GET",
+                "myGetResource.pathTemplate=helloWorld", "myGetResource.classFileName=Index.groovy", "myPostResource.method=POST",
+                "myPostResource.pathTemplate=helloWorld", "myPostResource.classFileName=Index.groovy");
 
+        // when
+        Page pageWithContent = getPageAPI().createPage(pageName, pageContent);
+        getPageAPI().deletePage(pageWithContent.getId());
+
+        pageWithContent = getPageAPI().createPage(pageName, pageContent);
+
+        // then
+        PageAssert.assertThat(pageWithContent).hasContentType(ContentType.API_EXTENSION);
+    }
 
     @Test
     public void should_getPage_by_name_return_the_page() throws Exception {
@@ -446,7 +463,7 @@ public class PageAPIIT extends CommonAPIIT {
         // given
         final String pageName = generateUniquePageName(0);
         final byte[] bytes = createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(
+        getPageAPI().createPage(
                 new PageCreator(pageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 bytes);
 

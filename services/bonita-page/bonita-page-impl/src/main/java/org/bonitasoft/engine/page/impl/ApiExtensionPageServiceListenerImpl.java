@@ -15,19 +15,26 @@ package org.bonitasoft.engine.page.impl;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
+import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageServiceListener;
 import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.page.SPageMapping;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Laurent Leseigneur
+ * @author Matthieu Chaffotte
  */
 public class ApiExtensionPageServiceListenerImpl implements PageServiceListener {
+
+    private static final int MAX_RESULTS = 100;
 
     private final PageMappingService pageMappingService;
 
@@ -64,7 +71,7 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
             final String method = getProperty(apiProperties, resourceName + ".method");
             final String pathTemplate = getProperty(apiProperties, resourceName + ".pathTemplate");
             getProperty(apiProperties, resourceName + ".classFileName");
-            pageMappingService.create("apiExtension|" + method + "|" + pathTemplate, sPage.getId(), Collections.EMPTY_LIST);
+            pageMappingService.create("apiExtension|" + method + "|" + pathTemplate, sPage.getId(), Collections.<String> emptyList());
         }
     }
 
@@ -73,7 +80,20 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
         if (property == null || property.trim().length() == 0) {
             throw new SObjectCreationException("the property '" + propertyName + "' is missing or is empty");
         }
-        return property;
+        return property.trim();
+    }
+
+    @Override
+    public void pageDeleted(final SPage page) throws SBonitaReadException, SDeletionException {
+        if (SContentType.API_EXTENSION.equals(page.getContentType())) {
+            List<SPageMapping> mappings;
+            do {
+                mappings = pageMappingService.get(page.getId(), 0, MAX_RESULTS);
+                for (final SPageMapping mapping : mappings) {
+                    pageMappingService.delete(mapping);
+                }
+            } while (mappings.size() == MAX_RESULTS);
+        }
     }
 
 }

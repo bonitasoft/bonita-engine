@@ -11,7 +11,6 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  */
-
 package org.bonitasoft.engine.page;
 
 import java.io.Serializable;
@@ -33,6 +32,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
  * @see URLAdapter
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
+ * @author Matthieu Chaffotte
  */
 public interface PageMappingService {
 
@@ -48,8 +48,8 @@ public interface PageMappingService {
 
     /**
      * @param key the key used to retrieve the mapping
-     * @param url the external url the mapping points to
-     * @param urlAdapter the name of the url adapter that transform the url in case of an external url. i.e. it can add parameters
+     * @param url the external URL the mapping points to
+     * @param urlAdapter the name of the URL adapter that transform the URL in case of an external URL. i.e. it can add parameters
      * @param authorizationRules the names of the authorization rules to execute
      * @return the created page mapping
      * @throws SObjectCreationException when there is an issue while creating this object
@@ -67,7 +67,7 @@ public interface PageMappingService {
     /**
      * @param pageMapping
      * @param context
-     * @param executeAuthorizationRules 
+     * @param executeAuthorizationRules
      * @return
      * @throws SExecutionException
      * @throws SAuthorizationException
@@ -94,9 +94,21 @@ public interface PageMappingService {
      * update the given page mapping
      *
      * @param pageMapping the pageMapping to update
-     * @param url the url or null
-     * @param urlAdapter the new url adapter to use
+     * @param url the URL or null
+     * @param urlAdapter the new URL adapter to use
      * @throws SObjectModificationException
      */
     void update(SPageMapping pageMapping, String url, String urlAdapter) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException;
+
+    /**
+     * Gets the paginated mappings of the page.
+     *
+     * @param pageId the page identifier
+     * @param startIndex the start index
+     * @param maxResults the max results
+     * @return the paginated mappings of the page
+     * @throws SBonitaReadException
+     */
+    List<SPageMapping> get(long pageId, int startIndex, int maxResults) throws SBonitaReadException;
+
 }
