@@ -88,9 +88,7 @@ public class FormMappingAndPageDependencyDeployerTest {
     @Mock
     private TechnicalLoggerService technicalLoggerService;
 
-
     private BusinessArchiveBuilder barBuilder;
-
 
     @Before
     public void before() {
@@ -122,7 +120,8 @@ public class FormMappingAndPageDependencyDeployerTest {
         formMappings.add(new SFormMappingImpl(PROCESS_DEFINITION_ID, FormMappingType.PROCESS_OVERVIEW.getId(), "task"));
         doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
         doReturn(null).when(pageService).getPageByNameAndProcessDefinitionId(PAGE, PROCESS_DEFINITION_ID);
-        BusinessArchive bar = new BusinessArchiveBuilder().createNewBusinessArchive().setFormMappings(buildFormMappingModel().build()).setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("mockProcess", "1.0").done()).done();
+        BusinessArchive bar = new BusinessArchiveBuilder().createNewBusinessArchive().setFormMappings(buildFormMappingModel().build())
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("mockProcess", "1.0").done()).done();
         doReturn(new ArrayList<Problem>()).when(formMappingAndPageDependencyDeployer).checkResolution(eq(tenantServiceAccessor), any(SProcessDefinition.class));
         //when then
         formMappingAndPageDependencyDeployer.deploy(tenantServiceAccessor, bar, sDefinition);
@@ -148,7 +147,6 @@ public class FormMappingAndPageDependencyDeployerTest {
                 .hasLevel(Problem.Level.ERROR);
 
     }
-
 
     @Test
     public void should_check_resolution_report_problem_when_formMapping_on_page_has_no_pageMapping() throws Exception {
@@ -188,7 +186,6 @@ public class FormMappingAndPageDependencyDeployerTest {
 
     }
 
-
     @Test
     public void should_format_message_when_form_mapping_page_is_null() throws Exception {
         //given
@@ -223,7 +220,6 @@ public class FormMappingAndPageDependencyDeployerTest {
         assertThat(problems).as("should return a problem").hasSize(1);
 
     }
-
 
     @Test
     public void should_deploy_process_insert_pages() throws Exception {

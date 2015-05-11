@@ -34,22 +34,23 @@ public interface ProcessDependencyDeployer {
      * Must throw an exception is something is not resolved in the process
      *
      * @param tenantAccessor
-     *      the tenantAccessor to access services
+     *        the tenantAccessor to access services
      * @param businessArchive
-     *      the business archive containing the dependency
+     *        the business archive containing the dependency
      * @param processDefinition
-     *      the process definition
+     *        the process definition
+     * @return true if the process is resolved for this deployer, false otherwise
      * @throws BonitaException
      */
     boolean deploy(TenantServiceAccessor tenantAccessor, BusinessArchive businessArchive, SProcessDefinition processDefinition) throws BonitaException;
 
     /**
      * @param tenantAccessor
-     *      the tenantAccessor to access services
+     *        the tenantAccessor to access services
      * @param processDefinition
-     *      the process definition
+     *        the process definition
      * @return
-     *      a list of resolution problems or an empty list is there is no issue for this artefact
+     *         a list of resolution problems or an empty list is there is no issue for this artefact
      */
     List<Problem> checkResolution(TenantServiceAccessor tenantAccessor, final SProcessDefinition processDefinition);
 
