@@ -165,11 +165,11 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     private void validateContractInput(String containerIdentifier, InputDefinition inputDefinition) {
         validateContractInputName(inputDefinition.getName());
         if (inputDefinition.hasChildren() && (inputDefinition.getType() != null && !inputDefinition.getType().equals(Type.FILE))) {
-            addError("Can't have a type set on the contract input <" + inputDefinition.getName() + "> of contract of " + containerIdentifier
+            addError("Can't have a type set on the contract input <" + inputDefinition.getName() + "> on contract of " + containerIdentifier
                     + " because it has children");
         }
         if (!inputDefinition.hasChildren() && inputDefinition.getType() == null) {
-            addError("Type not set on the contract input <" + inputDefinition.getName() + "> of contract of " + containerIdentifier);
+            addError("Type not set on the contract input <" + inputDefinition.getName() + "> on contract of " + containerIdentifier);
         }
         if (inputDefinition.hasChildren()) {
             for (InputDefinition definition : inputDefinition.getInputs()) {
