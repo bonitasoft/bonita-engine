@@ -16,8 +16,6 @@ package org.bonitasoft.engine.bpm.process.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.expression.Expression;
@@ -458,12 +456,10 @@ public class ProcessDefinitionBuilderTest {
 
         //given
         builder.addUserTask("step1", "mainActor").addContract()
-                .addInput("expenseLine", "expense report line")
-                .addChildren()
+                .addComplexInput("expenseLine", "expense report line")
                 .addInput("date", Type.DATE, "expense date")
                 .addInput("amount", Type.DECIMAL, "expense amount")
-                .addInput("date", "expense date")
-                .addChildren()
+                .addComplexInput("date", "expense date")
                 .addInput("expenseType", Type.TEXT, "describe expense type")
                 .addInput("bad input", Type.TEXT, "should fail");
 
@@ -497,7 +493,7 @@ public class ProcessDefinitionBuilderTest {
     public void validate_contract_with_no_type() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
 
-        builder.addContract().addInput("name", "desc");
+        builder.addContract().addComplexInput("name", "desc");
 
         expectedException.expect(InvalidProcessDefinitionException.class);
         expectedException.expectMessage("Type not set on the contract input <name> on the process-level contract");
@@ -508,7 +504,7 @@ public class ProcessDefinitionBuilderTest {
     public void validate_contract_with_no_type_on_user_task() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
 
-        builder.addActor("john").addUserTask("step1", "john").addContract().addInput("name", "desc");
+        builder.addActor("john").addUserTask("step1","john").addContract().addComplexInput("name", "desc");
 
         expectedException.expect(InvalidProcessDefinitionException.class);
         expectedException.expectMessage("Type not set on the contract input <name> on the task-level contract for task <step1>");
@@ -519,21 +515,10 @@ public class ProcessDefinitionBuilderTest {
     public void validate_contract_with_no_type_sub_children() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
 
-        builder.addContract().addInput("name", "desc").addChildren().addInput("name", "desc");
+        builder.addContract().addComplexInput("name", "desc").addComplexInput("name", "desc");
 
         expectedException.expect(InvalidProcessDefinitionException.class);
         expectedException.expectMessage("Type not set on the contract input <name> on the process-level contract");
-        builder.done();
-    }
-
-    @Test
-    public void validate_contract_with_type_set_on_complex() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
-
-        builder.addContract().addInput("name", Type.TEXT, "desc").addChildren().addInput("child", Type.TEXT, "desc");
-
-        expectedException.expect(InvalidProcessDefinitionException.class);
-        expectedException.expectMessage("Can't have a type set on the contract input <name> on the process-level contract because it has children");
         builder.done();
     }
 

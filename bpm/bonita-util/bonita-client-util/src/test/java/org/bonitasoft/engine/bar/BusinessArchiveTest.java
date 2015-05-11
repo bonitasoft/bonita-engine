@@ -39,9 +39,7 @@ import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
@@ -557,8 +555,7 @@ public class BusinessArchiveTest {
 
     void createContract(final ContractDefinitionBuilder contractDefinitionBuilder) {
         contractDefinitionBuilder.addInput("numberOfDays", Type.INTEGER, null).addConstraint("Mystical constraint", "true", null, "numberOfDays");
-        contractDefinitionBuilder.addInput("complex", "a complex input")
-                .addChildren()
+        contractDefinitionBuilder.addComplexInput("complex", "a complex input")
                 .addInput("childText", Type.TEXT, "a text simple input")
                 .addInput("childDecimal", Type.DECIMAL, "a decimal simple input");
     }
