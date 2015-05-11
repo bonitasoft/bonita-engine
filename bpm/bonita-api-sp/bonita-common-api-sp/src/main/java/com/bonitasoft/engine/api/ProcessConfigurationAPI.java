@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.api;
 
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
 
@@ -33,4 +34,16 @@ public interface ProcessConfigurationAPI extends org.bonitasoft.engine.api.Proce
      */
     FormMapping updateFormMapping(final long formMappingId, final String url, Long pageId) throws FormMappingNotFoundException, UpdateException;
 
+    /**
+     * Updates an expression content at runtime, for all instances of a given process definition. Note that no check is done on the new content of the
+     * expression, no new dependency can be added, the return type will remain unchanged. Only scripts and constant expression content can be updated.
+     * 
+     * @param processDefintionId the ID of the process on which to change the expression content
+     * @param expressionDefinitionId the ID of the expression to update
+     * @param content the new content of the expression
+     * @throws NotFoundException if the process or the expression is not found for the given ID
+     * @throws UpdateException if a problem occurs during updating, or if the expression type does not support update. Only scripts and constant expression
+     *         content can be updated.
+     */
+    void updateExpressionContent(long processDefintionId, long expressionDefinitionId, String content) throws NotFoundException, UpdateException;
 }
