@@ -170,10 +170,10 @@ public class UserTaskContractITest extends CommonAPIIT {
         final InputDefinition expenseType = new InputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
         final InputDefinition expenseAmount = new InputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
         final InputDefinition expenseDate = new InputDefinitionImpl("date", Type.DATE, "expense date");
-        final InputDefinition complexSubIput = new InputDefinitionImpl("date", "expense date", Arrays.asList(expenseType));
+        final InputDefinition complexSubInput = new InputDefinitionImpl("date", "expense date", Collections.singletonList(expenseType));
         //given
         builder.addUserTask(TASK1, ACTOR_NAME).addContract()
-                .addInput("expenseLine", "expense report line", true, Arrays.asList(expenseDate, expenseAmount, complexSubIput));
+                .addInput("expenseLine", "expense report line", true, Arrays.asList(expenseDate, expenseAmount, complexSubInput)).addFileInput("report","myReport");
 
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -182,12 +182,15 @@ public class UserTaskContractITest extends CommonAPIIT {
 
         //then
         final ContractDefinition contract = getProcessAPI().getUserTaskContract(userTask.getId());
-        assertThat(contract.getInputs()).hasSize(1);
+        assertThat(contract.getInputs()).hasSize(2);
         final InputDefinition complexInput = contract.getInputs().get(0);
         assertThat(complexInput.getName()).isEqualTo("expenseLine");
         assertThat(complexInput.isMultiple()).as("should be multiple").isTrue();
         assertThat(complexInput.getDescription()).isEqualTo("expense report line");
         assertThat(complexInput.getInputs()).as("should have 3 inputs").hasSize(3);
+        final InputDefinition fileInput = contract.getInputs().get(1);
+        assertThat(fileInput.getInputs()).hasSize(2);
+        assertThat(fileInput.getInputs()).containsExactly(new InputDefinitionImpl("filename", "Name of the file"), new InputDefinitionImpl("content", "Content of the file"));
 
         //clean up
         disableAndDeleteProcess(processDefinition);
