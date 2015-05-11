@@ -149,15 +149,4 @@ public class DocumentLeftOperandHandlerTest {
         verify(documentService, times(0)).updateDocument(any(SMappedDocument.class), any(SDocument.class));
     }
 
-    @Test
-    public void should_toCheckedDocumentValue_return_new_DocumentValue_for_FileInput() throws Exception {
-        final FileInputValue fileInputValue = new FileInputValue("theFile.txt", "It's my file".getBytes());
-
-        final DocumentValue documentValue = handler.toCheckedDocumentValue(fileInputValue);
-
-
-        assertThat(documentValue).isEqualToIgnoringGivenFields(new DocumentValue(null, null, "theFile.txt"), "content");
-        assertThat(documentValue.getContent()).isEqualTo("It's my file".getBytes());
-    }
-
 }
