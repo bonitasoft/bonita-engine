@@ -19,6 +19,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Properties;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -79,8 +80,8 @@ public class ApiExtensionPageServiceListenerImplTest {
 
         listener.pageInserted(page, content);
 
-        verify(pageMappingService).create("apiExtension|GET|employees", pageId);
-        verify(pageMappingService).create("apiExtension|GET|employees/{employeeId}/address", pageId);
+        verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.EMPTY_LIST);
+        verify(pageMappingService).create("apiExtension|GET|employees/{employeeId}/address", pageId,Collections.EMPTY_LIST);
         verifyNoMoreInteractions(pageMappingService);
     }
 

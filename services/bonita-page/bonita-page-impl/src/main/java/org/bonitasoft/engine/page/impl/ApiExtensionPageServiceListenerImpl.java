@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.page.impl;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Properties;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -63,7 +64,7 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
             final String method = getProperty(apiProperties, resourceName + ".method");
             final String pathTemplate = getProperty(apiProperties, resourceName + ".pathTemplate");
             getProperty(apiProperties, resourceName + ".classFileName");
-            pageMappingService.create("apiExtension|" + method + "|" + pathTemplate, sPage.getId());
+            pageMappingService.create("apiExtension|" + method + "|" + pathTemplate, sPage.getId(), Collections.EMPTY_LIST);
         }
     }
 
