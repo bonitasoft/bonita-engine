@@ -48,9 +48,10 @@ public class ContractConstraintsValidator {
 
     public void validate(long processDefinitionId, final SContractDefinition contract, final Map<String, Serializable> variables)
             throws SContractViolationException {
-        final List<String> comments = new ArrayList<String>();
-        Map<String, Object> context = new HashMap<>(variables.size());
-        context.putAll(variables);
+        final Map<String, Serializable> vars = (variables == null ? Collections.EMPTY_MAP : variables);
+        final List<String> comments = new ArrayList<>();
+        Map<String, Object> context = new HashMap<>(vars.size());
+        context.putAll(vars);
         context.put(ExpressionExecutorStrategy.DEFINITION_ID, processDefinitionId);
         for (final SConstraintDefinition constraint : contract.getConstraints()) {
             if (logger.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)) {

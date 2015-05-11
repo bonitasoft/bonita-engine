@@ -13,11 +13,9 @@
  */
 package org.bonitasoft.engine.operation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -44,24 +42,24 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     final DocumentService documentService;
 
     public DocumentListLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
-                                          final SessionAccessor sessionAccessor, final SessionService sessionService, final ProcessDefinitionService processDefinitionService,
-                                          final ProcessInstanceService processInstanceService) {
-        super(activityInstanceService, sessionAccessor, sessionService);
-        this.documentService = documentService;
-        documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
+            final SessionAccessor sessionAccessor, final SessionService sessionService, final ProcessDefinitionService processDefinitionService,
+            final ProcessInstanceService processInstanceService) {
+        this(activityInstanceService, sessionAccessor, sessionService, documentService, new DocumentHelper(documentService, processDefinitionService,
+                processInstanceService));
     }
 
     public DocumentListLeftOperandHandler(final ActivityInstanceService activityInstanceService, final SessionAccessor sessionAccessor,
-                                          final SessionService sessionService, final DocumentService documentService, final DocumentHelper documentHelper) {
+            final SessionService sessionService, final DocumentService documentService, final DocumentHelper documentHelper) {
         super(activityInstanceService, sessionAccessor, sessionService);
         this.documentHelper = documentHelper;
         this.documentService = documentService;
     }
 
     @Override
-    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId,
+            final String containerType)
             throws SOperationExecutionException {
-        final List<DocumentValue> documentList = toCheckedList(newValue);
+        final List<DocumentValue> documentList = documentHelper.toCheckedList(newValue);
         final String documentName = sLeftOperand.getName();
         try {
             final long processInstanceId = getProcessInstanceId(containerId, containerType);
@@ -71,28 +69,6 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
             throw new SOperationExecutionException(e.getMessage(), e);
         }
 
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DocumentValue> toCheckedList(final Object newValue) throws SOperationExecutionException {
-        if (!(newValue instanceof List)) {
-            throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
-        }
-        List<DocumentValue> newList = new ArrayList<>(((List) newValue).size());
-        for (final Object item : (List<?>) newValue) {
-            if (item instanceof FileInputValue) {
-                newList.add(toDocumentValue((FileInputValue) item));
-                continue;
-            }
-            if (item instanceof DocumentValue) {
-                newList.add((DocumentValue) item);
-                continue;
-
-            }
-            throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
-
-        }
-        return newList;
     }
 
     @Override
@@ -111,7 +87,8 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     }
 
     @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet)
+            throws SBonitaReadException {
         //do nothing
     }
 
