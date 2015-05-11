@@ -500,7 +500,7 @@ public class ProcessDefinitionBuilderTest {
         builder.addContract().addInput("name", "desc");
 
         expectedException.expect(InvalidProcessDefinitionException.class);
-        expectedException.expectMessage("Type not set on the contract input <name> of contract of the process");
+        expectedException.expectMessage("Type not set on the contract input <name> on the process-level contract");
         builder.done();
     }
 
@@ -508,10 +508,10 @@ public class ProcessDefinitionBuilderTest {
     public void validate_contract_with_no_type_on_user_task() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
 
-        builder.addActor("john").addUserTask("step1","john").addContract().addInput("name", "desc");
+        builder.addActor("john").addUserTask("step1", "john").addContract().addInput("name", "desc");
 
         expectedException.expect(InvalidProcessDefinitionException.class);
-        expectedException.expectMessage("Type not set on the contract input <name> of contract of user task <step1>");
+        expectedException.expectMessage("Type not set on the contract input <name> on the task-level contract for task <step1>");
         builder.done();
     }
 
@@ -522,7 +522,7 @@ public class ProcessDefinitionBuilderTest {
         builder.addContract().addInput("name", "desc").addChildren().addInput("name", "desc");
 
         expectedException.expect(InvalidProcessDefinitionException.class);
-        expectedException.expectMessage("Type not set on the contract input <name> of contract of the process");
+        expectedException.expectMessage("Type not set on the contract input <name> on the process-level contract");
         builder.done();
     }
 
@@ -530,10 +530,10 @@ public class ProcessDefinitionBuilderTest {
     public void validate_contract_with_type_set_on_complex() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
 
-        builder.addContract().addInput("name",Type.TEXT, "desc").addChildren().addInput("child", Type.TEXT, "desc");
+        builder.addContract().addInput("name", Type.TEXT, "desc").addChildren().addInput("child", Type.TEXT, "desc");
 
         expectedException.expect(InvalidProcessDefinitionException.class);
-        expectedException.expectMessage("Can't have a type set on the contract input <name> of contract of the process because it has children");
+        expectedException.expectMessage("Can't have a type set on the contract input <name> on the process-level contract because it has children");
         builder.done();
     }
 

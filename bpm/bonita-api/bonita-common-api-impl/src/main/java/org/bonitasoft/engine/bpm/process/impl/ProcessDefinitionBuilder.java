@@ -131,7 +131,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     private void validateUserTask(final UserTaskDefinition userTaskDefinition) {
-        validateContract(userTaskDefinition.getContract(), "user task <" + userTaskDefinition.getName() + ">");
+        validateContract(userTaskDefinition.getContract(), "the task-level contract for task <" + userTaskDefinition.getName() + ">");
     }
 
     private void validateContractInputName(final String name) {
@@ -142,7 +142,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     void validateProcessContract() {
         final ContractDefinition contract = process.getContract();
-        validateContract(contract, "the process");
+        validateContract(contract, "the process-level contract");
     }
 
     void validateContract(ContractDefinition contract, String containerIdentifier) {
@@ -165,11 +165,11 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     private void validateContractInput(String containerIdentifier, InputDefinition inputDefinition) {
         validateContractInputName(inputDefinition.getName());
         if (inputDefinition.hasChildren() && (inputDefinition.getType() != null && !inputDefinition.getType().equals(Type.FILE))) {
-            addError("Can't have a type set on the contract input <" + inputDefinition.getName() + "> on contract of " + containerIdentifier
+            addError("Can't have a type set on the contract input <" + inputDefinition.getName() + "> on " + containerIdentifier
                     + " because it has children");
         }
         if (!inputDefinition.hasChildren() && inputDefinition.getType() == null) {
-            addError("Type not set on the contract input <" + inputDefinition.getName() + "> on contract of " + containerIdentifier);
+            addError("Type not set on the contract input <" + inputDefinition.getName() + "> on " + containerIdentifier);
         }
         if (inputDefinition.hasChildren()) {
             for (InputDefinition definition : inputDefinition.getInputs()) {
