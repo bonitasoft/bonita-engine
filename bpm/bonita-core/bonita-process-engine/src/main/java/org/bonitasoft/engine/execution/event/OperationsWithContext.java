@@ -35,7 +35,7 @@ public class OperationsWithContext implements Serializable {
     private final String containerType;
 
     /**
-     * @param context
+     * @param context the list of operations
      * @param operations
      */
     public OperationsWithContext(final SExpressionContext context, final List<SOperation> operations) {
@@ -45,9 +45,9 @@ public class OperationsWithContext implements Serializable {
     }
 
     /**
-     * @param object
-     * @param object2
-     * @param containerType
+     * @param context
+     * @param operations the list of operations
+     * @param containerType the type of container on which to execute the operations
      */
     public OperationsWithContext(final SExpressionContext context, final List<SOperation> operations, final String containerType) {
         this.context = context;

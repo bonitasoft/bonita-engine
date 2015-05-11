@@ -34,7 +34,5 @@ public interface SCallActivityDefinition extends SActivityDefinition {
 
     SCallableElementType getCallableElementType();
 
-    void addProcessStartContractInput(String key, SExpression value);
-
     Map<String, SExpression> getProcessStartContractInputs();
 }

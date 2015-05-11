@@ -15,7 +15,9 @@ package org.bonitasoft.engine.execution;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
@@ -108,8 +110,12 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.execution.event.OperationsWithContext;
 import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SExpressionException;
+import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
@@ -570,15 +576,27 @@ public class StateBehaviors {
         return SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType());
     }
 
-    private void instantiateProcess(final SProcessDefinition callerProcessDefinition, final SCallActivityDefinition callActivityDefinition,
+    protected void instantiateProcess(final SProcessDefinition callerProcessDefinition, final SCallActivityDefinition callActivityDefinition,
             final SFlowNodeInstance callActivityInstance, final long targetProcessDefinitionId) throws SProcessInstanceCreationException,
-            SContractViolationException {
+            SContractViolationException, SExpressionException {
         final long callerProcessDefinitionId = callerProcessDefinition.getId();
         final long callerId = callActivityInstance.getId();
         final List<SOperation> operationList = callActivityDefinition.getDataInputOperations();
         final SExpressionContext context = new SExpressionContext(callerId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), callerProcessDefinitionId);
-        final OperationsWithContext operations = new OperationsWithContext(context, operationList);
-        processExecutor.start(targetProcessDefinitionId, -1, 0, 0, operations.getContext(), operations.getOperations(), null, null, callerId, -1, null); // Change this last NULL when inputs are supported in CallActivity
+
+        final Map<String, Serializable> processInputs = getEvaluatedInputExpressions(callActivityDefinition.getProcessStartContractInputs(), context);
+
+        processExecutor
+                .start(targetProcessDefinitionId, -1, 0, 0, context, operationList, null, null, callerId, -1, processInputs);
+    }
+
+    protected Map<String, Serializable> getEvaluatedInputExpressions(Map<String, SExpression> contractInputs, SExpressionContext context)
+            throws SExpressionTypeUnknownException, SExpressionDependencyMissingException, SExpressionEvaluationException, SInvalidExpressionException {
+        final Map<String, Serializable> inputExpressionsMap = new HashMap<>(contractInputs.size());
+        for (Map.Entry<String, SExpression> entry : contractInputs.entrySet()) {
+            inputExpressionsMap.put(entry.getKey(), (Serializable) expressionResolverService.evaluate(entry.getValue(), context));
+        }
+        return inputExpressionsMap;
     }
 
     public void updateDisplayNameAndDescription(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)

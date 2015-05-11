@@ -15,7 +15,9 @@ package org.bonitasoft.engine.core.process.definition.model.builder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
@@ -130,4 +132,11 @@ public class ServerModelConvertor {
         return fact.createNewInstance(businessDataDefinition.getName(), businessDataDefinition.getClassName());
     }
 
+    public static Map<String, SExpression> convertContractInputs(Map<String, Expression> processStartContractInputs) {
+        final HashMap<String, SExpression> serverContractInputs = new HashMap<>(processStartContractInputs.size());
+        for (Map.Entry<String, Expression> entry : processStartContractInputs.entrySet()) {
+            serverContractInputs.put(entry.getKey(), convertExpression(entry.getValue()));
+        }
+        return serverContractInputs;
+    }
 }
