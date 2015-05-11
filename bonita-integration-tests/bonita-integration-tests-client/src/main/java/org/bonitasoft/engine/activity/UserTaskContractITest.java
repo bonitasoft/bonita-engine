@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -99,7 +98,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ContractDefinitionBuilder contract = builder.addContract();
         contract.addInput(numberOfDaysProcessContractData, Type.INTEGER, null);
         contract.addInput("multipleText", Type.TEXT, "a multiple text", true);
-        contract.addInput("complex", "a complex input").addChildren().addInput("text", Type.TEXT, "text in complex");
+        contract.addComplexInput("complex", "a complex input").addInput("text", Type.TEXT, "text in complex");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -168,10 +167,10 @@ public class UserTaskContractITest extends CommonAPIIT {
         //given
         final ContractDefinitionBuilder contractDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME).addContract();
         contractDefinitionBuilder
-                .addInput("expenseLine", "expense report line", true).addChildren()
+                .addComplexInput("expenseLine", "expense report line", true)
                 .addInput("date", Type.DATE, "expense date")
                 .addInput("amount", Type.DECIMAL, "expense amount")
-                .addInput("date", "expense date").addChildren().addInput("expenseType", Type.TEXT, "describe expense type");
+                .addComplexInput("date", "expense date").addInput("expenseType", Type.TEXT, "describe expense type");
         contractDefinitionBuilder.addFileInput("report", "myReport");
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -292,8 +291,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         final ContractDefinitionBuilder contractDefinitionBuilder = userTaskDefinitionBuilder.addContract();
         contractDefinitionBuilder
-                .addInput("expenseReport", "expense report with several expense lines", true);
-        contractDefinitionBuilder.addChildren().addInput("expenseType", Type.TEXT, "describe expense type")
+                .addComplexInput("expenseReport", "expense report with several expense lines", true).addInput("expenseType", Type.TEXT, "describe expense type")
                 .addInput("expenseAmount", Type.DECIMAL, "expense amount")
                 .addInput("expenseDate", Type.DATE, "expense date")
                 .addInput("expenseProof", Type.BYTE_ARRAY, "expense proof");

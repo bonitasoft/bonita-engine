@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
@@ -28,8 +27,6 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefi
  */
 public abstract class InputContainerDefinitionBuilder extends FlowElementContainerBuilder {
 
-    private InputDefinitionImpl lastInput;
-
     public InputContainerDefinitionBuilder(FlowElementContainerDefinitionImpl container, ProcessDefinitionBuilder processDefinitionBuilder) {
         super(container, processDefinitionBuilder);
     }
@@ -41,19 +38,17 @@ public abstract class InputContainerDefinitionBuilder extends FlowElementContain
     public InputContainerDefinitionBuilder addInput(final String name, final Type type, final String description, final boolean multiple) {
         final InputDefinitionImpl input = new InputDefinitionImpl(name, type, description, multiple);
         getInputContainerDefinition().addInput(input);
-        this.lastInput = input;
         return this;
     }
 
-    public InputContainerDefinitionBuilder addInput(final String name, final String description) {
-        return addInput(name, description, false);
+    public ContractInputDefinitionBuilder addComplexInput(final String name, final String description) {
+        return addComplexInput(name, description, false);
     }
 
-    public InputContainerDefinitionBuilder addInput(final String name, final String description, final boolean multiple) {
+    public ContractInputDefinitionBuilder addComplexInput(final String name, final String description, final boolean multiple) {
         final InputDefinitionImpl input = new InputDefinitionImpl(name, description, multiple);
         getInputContainerDefinition().addInput(input);
-        this.lastInput = input;
-        return this;
+        return new ContractInputDefinitionBuilder(getProcessBuilder(), getContainer(), input);
     }
 
     public InputContainerDefinitionBuilder addFileInput(final String name, final String description) {
@@ -66,20 +61,7 @@ public abstract class InputContainerDefinitionBuilder extends FlowElementContain
         final InputDefinitionImpl fileInput = new InputDefinitionImpl(name, description, multiple, Type.FILE,
                 Arrays.<InputDefinition> asList(nameInput, contentInput));
         getInputContainerDefinition().addInput(fileInput);
-        this.lastInput = fileInput;
         return this;
-    }
-
-    /**
-     * add children elements on the last added input
-     * @return
-     *      the builder to add children
-     */
-    public ContractInputDefinitionBuilder addChildren() {
-        if(lastInput == null){
-            throw new IllegalStateException("An input must be added before addChildren can be called");
-        }
-        return new ContractInputDefinitionBuilder(getProcessBuilder(), getContainer(), lastInput);
     }
 
     protected abstract InputContainerDefinitionImpl getInputContainerDefinition();

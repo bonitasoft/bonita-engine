@@ -66,21 +66,18 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addUserTask("taskWithConstraint", ACTOR_NAME).addContract().addInput("simpleInput", Type.INTEGER, DESCRIPTION)
                 .addConstraint("Mandatory", "in != null", "in must be set", "in");
         processBuilder.addUserTask("taskWithComplexInput", ACTOR_NAME).addContract()
-                .addInput("complexInput", DESCRIPTION).addChildren().addInput("simple", Type.TEXT, DESCRIPTION);
+                .addComplexInput("complexInput", DESCRIPTION).addInput("simple", Type.TEXT, DESCRIPTION);
         processBuilder
                 .addUserTask("taskWithComplexComplexInput", ACTOR_NAME)
                 .addContract()
-                .addInput("complexInput", DESCRIPTION)
-                .addChildren()
+                .addComplexInput("complexInput", DESCRIPTION)
                 .addInput("simple", Type.TEXT, DESCRIPTION)
-                .addInput("expense", DESCRIPTION)
-                .addChildren()
+                .addComplexInput("expense", DESCRIPTION)
                 .addInput("name", Type.TEXT, DESCRIPTION)
                 .addInput("amount", Type.DECIMAL, DESCRIPTION)
                 .addInput("date", Type.DATE, DESCRIPTION)
                 .addInput("proof", Type.BYTE_ARRAY, DESCRIPTION)
-                .addInput("adress", DESCRIPTION)
-                .addChildren()
+                .addComplexInput("adress", DESCRIPTION)
                 .addInput("city", Type.TEXT, DESCRIPTION)
                 .addInput("zip", Type.INTEGER, DESCRIPTION);
 
