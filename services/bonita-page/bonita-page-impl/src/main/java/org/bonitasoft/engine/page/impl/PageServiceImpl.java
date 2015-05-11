@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -88,6 +89,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class PageServiceImpl implements PageService {
 
@@ -331,12 +333,14 @@ public class PageServiceImpl implements PageService {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.DELETED, "Deleting page named: " + sPage.getName());
         try {
             deleteProfileEntry(sPage);
-
+            for (final PageServiceListener pageServiceListener : pageServiceListeners) {
+                pageServiceListener.pageDeleted(sPage);
+            }
             final DeleteRecord deleteRecord = new DeleteRecord(sPage);
             final SDeleteEvent deleteEvent = getDeleteEvent(sPage, PAGE);
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_OK, logBuilder, METHOD_DELETE_PAGE);
-        } catch (SRecorderException | SBonitaReadException | SProfileEntryNotFoundException | SProfileEntryDeletionException re) {
+        } catch (SRecorderException | SBonitaReadException | SProfileEntryNotFoundException | SProfileEntryDeletionException | SDeletionException re) {
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(re);
         }
