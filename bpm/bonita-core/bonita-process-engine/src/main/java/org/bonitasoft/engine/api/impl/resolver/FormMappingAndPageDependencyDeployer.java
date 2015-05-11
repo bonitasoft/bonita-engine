@@ -155,7 +155,7 @@ public class FormMappingAndPageDependencyDeployer implements ProcessDependencyDe
     }
 
     private void addProblem(SFormMapping formMapping, List<Problem> problems) {
-        problems.add(new ProblemImpl(Problem.Level.ERROR, formMapping.getTask(), "form mapping", String.format(ERROR_MESSAGE, formMapping.toString())));
+        problems.add(new ProblemImpl(Problem.Level.ERROR, formMapping.getProcessElementName(), "form mapping", String.format(ERROR_MESSAGE, formMapping.toString())));
     }
 
     private boolean isMappingUndefined(SFormMapping formMapping) {
