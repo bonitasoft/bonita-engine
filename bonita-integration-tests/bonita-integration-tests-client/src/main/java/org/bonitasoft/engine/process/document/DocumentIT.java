@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.process.document;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -37,6 +38,7 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
 import org.bonitasoft.engine.bpm.document.ArchivedDocumentNotFoundException;
@@ -877,7 +879,7 @@ public class DocumentIT extends TestWithUser {
 
     @Cover(classes = DocumentValue.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-631", keywords = { "document", "operation", "update" }, story = "create a document document using operation")
     @Test
-    public void createDocumentWithOperation() throws Exception {
+    public void createDocumentWithOperationAndInitialValue() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("procWithStringIndexes", "1.0");
         designProcessDefinition.addData("documentValue", DocumentValue.class.getName(), null);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription("The doc'");
@@ -887,14 +889,18 @@ public class DocumentIT extends TestWithUser {
         final Expression groovyThatCreateDocumentContent = new ExpressionBuilder().createGroovyScriptExpression("script",
                 "return new org.bonitasoft.engine.bpm.document.DocumentValue(\"updated Content\".getBytes(), \"plain/text\", \"updatedContent.txt\");",
                 DocumentValue.class.getName());
-        // designProcessDefinition.addAutomaticTask("step2").addOperation(
-        // new OperationBuilder().createNewInstance().setRightOperand(groovyThatCreateDocumentContent).setType(OperatorType.DOCUMENT_CREATE_UPDATE)
-        // .setLeftOperand("textFile", false).done());
         designProcessDefinition.addAutomaticTask("step2").addOperation(new OperationBuilder().createSetDocument("textFile", groovyThatCreateDocumentContent));
         designProcessDefinition.addUserTask("step3", ACTOR_NAME);
         designProcessDefinition.addTransition("step0", "step1");
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
+        designProcessDefinition.addDocumentDefinition("docInitWithDocValue").addInitialValue(
+                new ExpressionBuilder().createGroovyScriptExpression("docValue",
+                        "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello3\".getBytes(),\"plain/text\",\"file1.txt\")",
+                        DocumentValue.class.getName()));
+        designProcessDefinition.addDocumentDefinition("docInitWithFileInput").addInitialValue(
+                new ExpressionBuilder().createGroovyScriptExpression("docValue2",
+                        "new org.bonitasoft.engine.bpm.contract.FileInputValue(\"file2.txt\", \"hello4\".getBytes())", FileInputValue.class.getName()));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -904,18 +910,20 @@ public class DocumentIT extends TestWithUser {
         assertNull(getProcessAPI().getProcessDataInstance("documentValue", processInstance.getId()).getValue());
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         searchOptionsBuilder.filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
+        searchOptionsBuilder.sort(DocumentsSearchDescriptor.DOCUMENT_CREATIONDATE, Order.ASC);
         final SearchOptions searchOptions = searchOptionsBuilder.done();
         SearchResult<Document> searchDocuments = getProcessAPI().searchDocuments(searchOptions);
-        assertEquals(0, searchDocuments.getCount());
-
+        assertEquals(2, searchDocuments.getCount());
+        assertThat(searchDocuments.getResult()).extracting("name", "contentFileName").containsExactly(tuple("docInitWithDocValue", "file1.txt"),
+                tuple("docInitWithFileInput", "file2.txt"));
         // update
         assignAndExecuteStep(step1Id, user);
         waitForUserTask(processInstance, "step3");
 
         // after update
         searchDocuments = getProcessAPI().searchDocuments(searchOptions);
-        assertEquals(1, searchDocuments.getCount());
-        final Document newDocument = searchDocuments.getResult().iterator().next();
+        assertEquals(3, searchDocuments.getCount());
+        final Document newDocument = searchDocuments.getResult().get(2);
         assertEquals("textFile", newDocument.getName());
         assertEquals("updatedContent.txt", newDocument.getContentFileName());
         assertEquals("plain/text", newDocument.getContentMimeType());
@@ -1333,7 +1341,8 @@ public class DocumentIT extends TestWithUser {
         final String script = "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"http://www.myrul.com/mydoc.txt\"), " +
                 "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello1\".getBytes(),\"plain/text\",\"file.txt\")," +
                 "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello2\".getBytes(),\"plain/text\",\"file.txt\")," +
-                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello3\".getBytes(),\"plain/text\",\"file.txt\")" +
+                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello3\".getBytes(),\"plain/text\",\"file.txt\")," +
+                "new org.bonitasoft.engine.bpm.contract.FileInputValue(\"file.txt\", \"hello4\".getBytes())" +
                 "]";
         invoices.addInitialValue(new ExpressionBuilder().createGroovyScriptExpression("initialDocs",
                 script,
@@ -1348,13 +1357,13 @@ public class DocumentIT extends TestWithUser {
 
         //check with api methods
         List<Document> invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices", 0, 100);
-        assertThat(invoices1).hasSize(4);
+        assertThat(invoices1).hasSize(5);
         final Document urlDocument = invoices1.get(0);
         assertThat(urlDocument.getUrl()).isEqualTo("http://www.myrul.com/mydoc.txt");
         final Document fileDocument = invoices1.get(1);
-        assertThat(fileDocument.hasContent()).isTrue();
-        assertThat(fileDocument.getContentFileName()).isEqualTo("file.txt");
         assertThat(getProcessAPI().getDocumentContent(fileDocument.getContentStorageId())).isEqualTo("hello1".getBytes());
+        final Document fileFromFileInput = invoices1.get(4);
+        assertThat(getProcessAPI().getDocumentContent(fileFromFileInput.getContentStorageId())).isEqualTo("hello4".getBytes());
         List<Document> emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList", 0, 100);
         assertThat(emptyList).isEmpty();
         try {
@@ -1405,7 +1414,7 @@ public class DocumentIT extends TestWithUser {
         //        assertThat(unknown).hasSize(1);
 
         //modify list with api method
-        getProcessAPI().setDocumentList(processInstance.getId(), "invoices", Arrays.asList(new DocumentValue(updatedUrlFile.getId())));
+        getProcessAPI().setDocumentList(processInstance.getId(), "invoices", Collections.singletonList(new DocumentValue(updatedUrlFile.getId())));
 
         final List<Document> invoices2 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices", 0, 100);
         assertThat(invoices2).hasSize(1);
@@ -1430,7 +1439,7 @@ public class DocumentIT extends TestWithUser {
                 .sort(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC)
                 .sort(ArchivedDocumentsSearchDescriptor.DOCUMENT_VERSION, Order.ASC).done());
 
-        assertThat(searchAllVersions.getCount()).isEqualTo(8);
+        assertThat(searchAllVersions.getCount()).isEqualTo(9);
         final List<ArchivedDocument> result = searchAllVersions.getResult();
         assertThat(result.get(0).getName()).isEqualTo("emptyList");
         assertThat(result.get(0).getVersion()).isEqualTo("1");

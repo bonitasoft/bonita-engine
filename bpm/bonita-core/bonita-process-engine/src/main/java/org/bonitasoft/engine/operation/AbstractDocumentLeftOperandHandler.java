@@ -13,10 +13,7 @@
  */
 package org.bonitasoft.engine.operation;
 
-import org.bonitasoft.engine.bpm.contract.FileInputValue;
-import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
-import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -35,7 +32,7 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
     private final SessionService sessionService;
 
     public AbstractDocumentLeftOperandHandler(final ActivityInstanceService activityInstanceService, final SessionAccessor sessionAccessor,
-                                              final SessionService sessionService) {
+            final SessionService sessionService) {
         this.activityInstanceService = activityInstanceService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
@@ -50,26 +47,6 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
             processInstanceId = flowNodeInstance.getParentProcessInstanceId();
         }
         return processInstanceId;
-    }
-
-    protected DocumentValue toCheckedDocumentValue(final Object newValue) throws SOperationExecutionException {
-        if (newValue != null) {
-            final boolean isFileInput = newValue instanceof FileInputValue;
-            if (isFileInput) {
-                FileInputValue fileInput = ((FileInputValue) newValue);
-                return toDocumentValue(fileInput);
-            }
-            final boolean isDocumentWithContent = newValue instanceof DocumentValue;
-            if (!isDocumentWithContent) {
-                throw new SOperationExecutionException("Document operation only accepts an expression returning a DocumentValue and not "
-                        + newValue.getClass().getName());
-            }
-        }
-        return (DocumentValue) newValue;
-    }
-
-    protected DocumentValue toDocumentValue(FileInputValue fileInput) {
-        return new DocumentValue(fileInput.getContent(), null, fileInput.getFileName());
     }
 
     protected long getAuthorId() {

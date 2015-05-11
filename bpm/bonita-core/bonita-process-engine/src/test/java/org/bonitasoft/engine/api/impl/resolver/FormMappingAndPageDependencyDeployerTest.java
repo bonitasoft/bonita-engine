@@ -8,13 +8,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,9 +85,7 @@ public class FormMappingAndPageDependencyDeployerTest {
     @Mock
     private TechnicalLoggerService technicalLoggerService;
 
-
     private BusinessArchiveBuilder barBuilder;
-
 
     @Before
     public void before() {
@@ -125,7 +117,8 @@ public class FormMappingAndPageDependencyDeployerTest {
         formMappings.add(new SFormMappingImpl(PROCESS_DEFINITION_ID, FormMappingType.PROCESS_OVERVIEW.getId(), "task"));
         doReturn(formMappings).when(formMappingService).list(eq(PROCESS_DEFINITION_ID), anyInt(), anyInt());
         doReturn(null).when(pageService).getPageByNameAndProcessDefinitionId(PAGE, PROCESS_DEFINITION_ID);
-        BusinessArchive bar = new BusinessArchiveBuilder().createNewBusinessArchive().setFormMappings(buildFormMappingModel().build()).setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("mockProcess", "1.0").done()).done();
+        BusinessArchive bar = new BusinessArchiveBuilder().createNewBusinessArchive().setFormMappings(buildFormMappingModel().build())
+                .setProcessDefinition(new ProcessDefinitionBuilder().createNewInstance("mockProcess", "1.0").done()).done();
 
         //when then
         assertThat(pageProcessDependencyResolver.deploy(tenantServiceAccessor, bar, sDefinition)).as("missing page should not block resolve step")
@@ -151,7 +144,6 @@ public class FormMappingAndPageDependencyDeployerTest {
                 .hasLevel(Problem.Level.ERROR);
 
     }
-
 
     @Test
     public void should_check_resolution_report_problem_when_formMapping_on_page_has_no_pageMapping() throws Exception {
@@ -191,7 +183,6 @@ public class FormMappingAndPageDependencyDeployerTest {
 
     }
 
-
     @Test
     public void should_format_message_when_form_mapping_page_is_null() throws Exception {
         //given
@@ -226,7 +217,6 @@ public class FormMappingAndPageDependencyDeployerTest {
         assertThat(problems).as("should return a problem").hasSize(1);
 
     }
-
 
     @Test
     public void should_deploy_process_insert_pages() throws Exception {
