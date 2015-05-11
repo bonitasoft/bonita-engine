@@ -25,8 +25,11 @@ import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -575,11 +578,17 @@ public class StateBehaviorsTest {
         final String input = "someContractInput";
         final SExpressionImpl expression = new SExpressionImpl();
         contractInputs.put(input, expression);
+
+        final ArrayList<SExpression> sExpressions = new ArrayList<>();
+        sExpressions.add(expression);
+
         final SExpressionContext context = mock(SExpressionContext.class);
+        final StateBehaviors behave = spy(behaviors);
+        doReturn(mock(Serializable.class)).when(behave).getExpressionResultWithDiscriminant(eq(expression.getDiscriminant()), eq(sExpressions), anyList());
 
-        behaviors.getEvaluatedInputExpressions(contractInputs, context);
+        behave.getEvaluatedInputExpressions(contractInputs, context);
 
-        verify(expressionResolverService).evaluate(expression, context);
+        verify(expressionResolverService).evaluate(sExpressions, context);
     }
 
     @Test

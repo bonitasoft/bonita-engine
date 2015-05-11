@@ -603,7 +603,7 @@ public class StateBehaviors {
     /**
      * Both lists have the same order.
      */
-    private Serializable getExpressionResultWithDiscriminant(int discriminant, List<SExpression> expressions, List<Object> exprResults) {
+    protected Serializable getExpressionResultWithDiscriminant(int discriminant, List<SExpression> expressions, List<Object> exprResults) {
         for (int i = 0; i < expressions.size(); i++) {
             if (expressions.get(i).getDiscriminant() == discriminant) {
                 return (Serializable) exprResults.get(i);
