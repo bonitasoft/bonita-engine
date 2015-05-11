@@ -222,6 +222,7 @@
     <bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
         <constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
         <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="eventService" ref="platformEventService" />
     </bean>
 
     <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
