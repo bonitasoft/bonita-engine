@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,29 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.bpm.contract;
 
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.BonitaObject;
-import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
-import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 
 /**
- * A <code>ContractDefinition</code> defines what the {@link UserTaskInstance} needs to be executed, or the Process to be started.
- * <p>
- * A <code>ContractDefinition</code> is part of a {@link UserTaskDefinition} or a of the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} </p>
- *
- * @author Matthieu Chaffotte
- * @since 7.0
+ * @author Baptiste Mesta
  */
-public interface ContractDefinition extends InputContainerDefinition {
+public interface InputContainerDefinition extends BonitaObject {
 
     /**
-     * Lists the validation rules of the contract.
+     * Lists the inputs of the container.
      *
-     * @return the validation rules of the contract
+     * @return the inputs of the container
      */
-    List<ConstraintDefinition> getConstraints();
-
+    List<InputDefinition> getInputs();
 }

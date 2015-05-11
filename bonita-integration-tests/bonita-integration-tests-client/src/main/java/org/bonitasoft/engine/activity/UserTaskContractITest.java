@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPIIT;
-import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
@@ -100,8 +99,7 @@ public class UserTaskContractITest extends CommonAPIIT {
         final ContractDefinitionBuilder contract = builder.addContract();
         contract.addInput(numberOfDaysProcessContractData, Type.INTEGER, null);
         contract.addInput("multipleText", Type.TEXT, "a multiple text", true);
-        contract.addInput("complex", "a complex input",
-                Collections.<InputDefinition>singletonList(new InputDefinitionImpl("text", Type.TEXT, "text in complex")));
+        contract.addInput("complex", "a complex input").addChildren().addInput("text", Type.TEXT, "text in complex");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -167,14 +165,14 @@ public class UserTaskContractITest extends CommonAPIIT {
     public void should_getUserTaskContract_return_contract_with_complex_inputs() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        final InputDefinition expenseType = new InputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
-        final InputDefinition expenseAmount = new InputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
-        final InputDefinition expenseDate = new InputDefinitionImpl("date", Type.DATE, "expense date");
-        final InputDefinition complexSubIput = new InputDefinitionImpl("date", "expense date", Arrays.asList(expenseType));
         //given
-        builder.addUserTask(TASK1, ACTOR_NAME).addContract()
-                .addInput("expenseLine", "expense report line", true, Arrays.asList(expenseDate, expenseAmount, complexSubIput));
-
+        final ContractDefinitionBuilder contractDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME).addContract();
+        contractDefinitionBuilder
+                .addInput("expenseLine", "expense report line", true).addChildren()
+                .addInput("date", Type.DATE, "expense date")
+                .addInput("amount", Type.DECIMAL, "expense amount")
+                .addInput("date", "expense date").addChildren().addInput("expenseType", Type.TEXT, "describe expense type");
+        contractDefinitionBuilder.addFileInput("report", "myReport");
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -182,12 +180,16 @@ public class UserTaskContractITest extends CommonAPIIT {
 
         //then
         final ContractDefinition contract = getProcessAPI().getUserTaskContract(userTask.getId());
-        assertThat(contract.getInputs()).hasSize(1);
+        assertThat(contract.getInputs()).hasSize(2);
         final InputDefinition complexInput = contract.getInputs().get(0);
         assertThat(complexInput.getName()).isEqualTo("expenseLine");
         assertThat(complexInput.isMultiple()).as("should be multiple").isTrue();
         assertThat(complexInput.getDescription()).isEqualTo("expense report line");
         assertThat(complexInput.getInputs()).as("should have 3 inputs").hasSize(3);
+        final InputDefinition fileInput = contract.getInputs().get(1);
+        assertThat(fileInput.getInputs()).hasSize(2);
+        assertThat(fileInput.getInputs()).containsExactly(new InputDefinitionImpl("filename", "Name of the file"),
+                new InputDefinitionImpl("content", "Content of the file"));
 
         //clean up
         disableAndDeleteProcess(processDefinition);
@@ -195,7 +197,7 @@ public class UserTaskContractITest extends CommonAPIIT {
 
     @Test
     public void should_create_a_contract_with_special_char() throws Exception {
-        final long[] badValues = {0, 366};
+        final long[] badValues = { 0, 366 };
         for (final long badValue : badValues) {
             check_invalid_contract_with_special_char(badValue);
         }
@@ -284,20 +286,20 @@ public class UserTaskContractITest extends CommonAPIIT {
     public void use_a_multiple_complex_input_in_user_tasks() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        final InputDefinition expenseType = new InputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
-        final InputDefinition expenseAmount = new InputDefinitionImpl("expenseAmount", Type.DECIMAL, "expense amount");
-        final InputDefinition expenseDate = new InputDefinitionImpl("expenseDate", Type.DATE, "expense date");
-        final InputDefinition expenseProof = new InputDefinitionImpl("expenseProof", Type.BYTE_ARRAY, "expense proof");
         builder.addDocumentDefinition("reportAsDoc");
         builder.addDocumentListDefinition("receiptsAsDoc");
         //given
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
-        userTaskDefinitionBuilder.addContract()
-                .addInput("expenseReport", "expense report with several expense lines", true,
-                        Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof))
-                .addFileInput("report", "the report")
+        final ContractDefinitionBuilder contractDefinitionBuilder = userTaskDefinitionBuilder.addContract();
+        contractDefinitionBuilder
+                .addInput("expenseReport", "expense report with several expense lines", true);
+        contractDefinitionBuilder.addChildren().addInput("expenseType", Type.TEXT, "describe expense type")
+                .addInput("expenseAmount", Type.DECIMAL, "expense amount")
+                .addInput("expenseDate", Type.DATE, "expense date")
+                .addInput("expenseProof", Type.BYTE_ARRAY, "expense proof");
+        contractDefinitionBuilder.addFileInput("report", "the report")
                 .addFileInput("receipts", "the receipts", true)
-                .addConstraint("report content not empty", "report.content.length > 1","report content is empty","report");
+                .addConstraint("report content not empty", "report.content.length > 1", "report content is empty", "report");
 
         userTaskDefinitionBuilder.addData("expenseData", List.class.getName(), null);
         userTaskDefinitionBuilder.addData("reportData", List.class.getName(), null);
@@ -324,33 +326,35 @@ public class UserTaskContractITest extends CommonAPIIT {
         final List<Map<String, Serializable>> expenseReport = new ArrayList<>();
         expenseReport.add(createExpenseLine("hotel", 150.3f, new Date(System.currentTimeMillis()), new byte[0]));
         expenseReport.add(createExpenseLine("taxi", 25, new Date(System.currentTimeMillis()), new byte[0]));
-        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[]{0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1}));
+        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 }));
 
         final Map<String, Serializable> taskInput = new HashMap<>();
         taskInput.put("expenseReport", (Serializable) expenseReport);
-        final FileInputValue reportFile = new FileInputValue("report.pdf", new byte[]{0, 1, 2, 3});
+        final FileInputValue reportFile = new FileInputValue("report.pdf", new byte[] { 0, 1, 2, 3 });
         taskInput.put("report", reportFile);
-        final FileInputValue receipt1 = new FileInputValue("receipt1.pdf", new byte[]{0, 1, 2, 4});
-        final FileInputValue receipt2 = new FileInputValue("receipt2.pdf", new byte[]{0, 1, 2, 5});
+        final FileInputValue receipt1 = new FileInputValue("receipt1.pdf", new byte[] { 0, 1, 2, 4 });
+        final FileInputValue receipt2 = new FileInputValue("receipt2.pdf", new byte[] { 0, 1, 2, 5 });
         taskInput.put("receipts", (Serializable) Arrays.asList(receipt1, receipt2));
 
         getProcessAPI().executeUserTask(userTask.getId(), taskInput);
 
         //then
         waitForUserTaskAndGetIt(TASK2);
-        assertThat((List<Map<String, Object>>) getProcessAPI().getArchivedActivityDataInstance("expenseData", userTask.getId()).getValue()).as("should have my expense report data").hasSize(3);
+        assertThat((List<Map<String, Object>>) getProcessAPI().getArchivedActivityDataInstance("expenseData", userTask.getId()).getValue()).as(
+                "should have my expense report data").hasSize(3);
         final Serializable reportData = getProcessAPI().getArchivedActivityDataInstance("reportData", userTask.getId()).getValue();
         assertThat(reportData).as("should have single file").isEqualTo(reportFile);
-        assertThat((List<Object>) getProcessAPI().getArchivedActivityDataInstance("receiptsData", userTask.getId()).getValue()).as("should have multiple file").containsExactly(receipt1, receipt2);
+        assertThat((List<Object>) getProcessAPI().getArchivedActivityDataInstance("receiptsData", userTask.getId()).getValue()).as("should have multiple file")
+                .containsExactly(receipt1, receipt2);
         final List<Document> receiptsAsDoc = getProcessAPI().getDocumentList(processInstance.getId(), "receiptsAsDoc", 0, 100);
         Document reportAsDoc = getProcessAPI().getLastDocument(processInstance.getId(), "reportAsDoc");
 
         assertThat(reportAsDoc.getContentFileName()).as("document file name").isEqualTo("report.pdf");
-        assertThat(getProcessAPI().getDocumentContent(reportAsDoc.getContentStorageId())).as("document content").isEqualTo(new byte[]{0, 1, 2, 3});
+        assertThat(getProcessAPI().getDocumentContent(reportAsDoc.getContentStorageId())).as("document content").isEqualTo(new byte[] { 0, 1, 2, 3 });
         assertThat(receiptsAsDoc).hasSize(2);
         assertThat(receiptsAsDoc).extracting("contentFileName", "index").containsExactly(tuple("receipt1.pdf", 0), tuple("receipt2.pdf", 1));
-        assertThat(getProcessAPI().getDocumentContent(receiptsAsDoc.get(0).getContentStorageId())).as("document content").isEqualTo(new byte[]{0, 1, 2, 4});
-        assertThat(getProcessAPI().getDocumentContent(receiptsAsDoc.get(1).getContentStorageId())).as("document content").isEqualTo(new byte[]{0, 1, 2, 5});
+        assertThat(getProcessAPI().getDocumentContent(receiptsAsDoc.get(0).getContentStorageId())).as("document content").isEqualTo(new byte[] { 0, 1, 2, 4 });
+        assertThat(getProcessAPI().getDocumentContent(receiptsAsDoc.get(1).getContentStorageId())).as("document content").isEqualTo(new byte[] { 0, 1, 2, 5 });
 
         //clean up
         disableAndDeleteProcess(processDefinition);

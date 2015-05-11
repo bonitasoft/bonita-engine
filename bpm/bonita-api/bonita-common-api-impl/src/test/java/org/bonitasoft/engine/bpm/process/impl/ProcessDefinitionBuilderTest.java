@@ -435,8 +435,10 @@ public class ProcessDefinitionBuilderTest {
         builder.addActor("mainActor");
 
         //given
-        builder.addUserTask("step1", "mainActor").addContract().addInput("innput", Type.TEXT, "should fail")
-                .addInput("innput", "should fail", null).addConstraint("firstConstraint", "input != null", "mandatory", "input");
+        builder.addUserTask("step1", "mainActor")
+                .addContract()
+                .addInput("innput", Type.TEXT, "should fail")
+                .addConstraint("firstConstraint", "input != null", "mandatory", "input");
 
         //when
         builder.done();
@@ -450,13 +452,16 @@ public class ProcessDefinitionBuilderTest {
         builder.addActor("mainActor");
 
         //given
-        final InputDefinition badInput = new InputDefinitionImpl("bad input", Type.TEXT, "should fail");
-        final InputDefinition expenseType = new InputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
-        final InputDefinition expenseAmount = new InputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
-        final InputDefinition expenseDate = new InputDefinitionImpl("date", Type.DATE, "expense date");
-        final InputDefinition complexSubIput = new InputDefinitionImpl("date", "expense date", Arrays.asList(expenseType, badInput));
         builder.addUserTask("step1", "mainActor").addContract()
-        .addInput("expenseLine", "expense report line", Arrays.asList(expenseDate, expenseAmount,complexSubIput));
+                .addInput("expenseLine", "expense report line")
+                .addChildren()
+                .addInput("date", Type.DATE, "expense date")
+                .addInput("amount", Type.DECIMAL, "expense amount")
+                .addInput("date", "expense date")
+                .addChildren()
+                .addInput("expenseType", Type.TEXT, "describe expense type")
+                .addInput("bad input", Type.TEXT, "should fail");
+
 
         //when
         builder.done();
