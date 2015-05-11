@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SInputContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -38,53 +39,56 @@ public class ContractStructureValidator {
     }
 
     public void validate(final SContractDefinition contract, final Map<String, Serializable> inputs) throws ContractViolationException {
-        final List<String> messages = new ArrayList<>();
-        Map<String, Serializable> inputsToValidate = inputs != null ? inputs : Collections.<String, Serializable>emptyMap();
-        messages.addAll(recursive(contract.getInputs(), inputsToValidate));
-        if (!messages.isEmpty()) {
-            throw new ContractViolationException("Error while validating expected inputs", messages);
+        final ErrorReporter errorReporter = new ErrorReporter();
+        validateInputContainer(contract, inputs != null ? inputs : Collections.<String, Serializable>emptyMap(), errorReporter);
+        if (errorReporter.hasError()) {
+            throw new ContractViolationException("Error while validating expected inputs", errorReporter.getErrors());
         }
     }
 
-    private List<String> recursive(final List<SInputDefinition> inputDefinitions,
-                                   final Map<String, Serializable> inputs) {
+    void validateInputContainer(SInputContainerDefinition inputContainer, Map<String, Serializable> inputs, ErrorReporter errorReporter) {
+        logInputsWhichAreNotInContract(DEBUG, inputContainer.getInputDefinitions(), inputs);
+        for (final SInputDefinition inputDefinition : inputContainer.getInputDefinitions()) {
+            validateInput(inputs, errorReporter, inputDefinition);
+        }
+    }
 
-        logInputsWhichAreNotInContract(DEBUG, inputDefinitions, inputs);
+    private void validateInput(Map<String, Serializable> inputs, ErrorReporter errorReporter, SInputDefinition inputDefinition) {
+        final String inputName = inputDefinition.getName();
+        if (!checkExists(inputs, errorReporter, inputName)) return;
+        if (!checkNotNull(inputs, errorReporter, inputName)) return;
+        if (!typeValidator.validate(inputDefinition, inputs.get(inputName), errorReporter)) return;
+        validateChildren(inputs, errorReporter, inputDefinition);
+    }
 
-        final List<String> message = new ArrayList<>();
-        for (final SInputDefinition def : inputDefinitions) {
-            try {
-                validateInput(def, inputs);
-                if (!def.hasChildren()) {
-                    continue;
+    private void validateChildren(Map<String, Serializable> inputs, ErrorReporter errorReporter, SInputDefinition inputDefinition) {
+        if (inputDefinition.hasChildren() && inputDefinition.getType() == null) {
+            if (inputDefinition.isMultiple()) {
+                for (final Map<String, Serializable> complexItem : (List<Map<String, Serializable>>) inputs.get(inputDefinition.getName())) {
+                    validateInputContainer(inputDefinition, complexItem, errorReporter);
                 }
-                if (def.isMultiple()) {
-                    for (final Map<String, Serializable> complexItem : (List<Map<String, Serializable>>) inputs.get(def.getName())) {
-                        validateComplexItem(complexItem, message, def, def);
-                    }
-                } else {
-                    validateComplexItem((Map<String, Serializable>) inputs.get(def.getName()), message, def, def);
-                }
-            } catch (final InputValidationException e) {
-                message.add(e.getMessage());
+            } else {
+                validateInputContainer(inputDefinition, (Map<String, Serializable>) inputs.get(inputDefinition.getName()), errorReporter);
             }
         }
-        return message;
     }
 
-    private void validateComplexItem(final Map<String, Serializable> complexItem, final List<String> message, final SInputDefinition def,
-                                     final SInputDefinition complex) {
-        message.addAll(recursive(complex.getInputDefinitions(), complexItem));
-    }
-
-    private void validateInput(final SInputDefinition definition, final Map<String, Serializable> inputs) throws InputValidationException {
-        final String inputName = definition.getName();
-        if (!inputs.containsKey(inputName)) {
-            throw new InputValidationException("Expected input [" + inputName + "] is missing");
-        } else {
-            typeValidator.validate(definition, inputs.get(inputName));
+    private boolean checkNotNull(Map<String, Serializable> inputs, ErrorReporter errorReporter, String inputName) {
+        if (inputs.get(inputName) == null) {
+            errorReporter.addError("Input [" + inputName + "] has a null value.");
+            return false;
         }
+        return true;
     }
+
+    private boolean checkExists(Map<String, Serializable> inputs, ErrorReporter errorReporter, String inputName) {
+        if (!inputs.containsKey(inputName)) {
+            errorReporter.addError("Expected input [" + inputName + "] is missing");
+            return false;
+        }
+        return true;
+    }
+
 
     private void logInputsWhichAreNotInContract(final TechnicalLogSeverity severity, final List<SInputDefinition> simpleInputs,
                                                 final Map<String, Serializable> inputs) {
@@ -96,6 +100,9 @@ public class ContractStructureValidator {
     }
 
     private List<String> getInputsWhichAreNotInContract(final List<SInputDefinition> simpleInputs, final Map<String, Serializable> inputs) {
+        if (inputs == null || inputs.isEmpty()) {
+            return Collections.emptyList();
+        }
         final List<String> keySet = new ArrayList<>(inputs.keySet());
         for (final SInputDefinition def : simpleInputs) {
             keySet.remove(def.getName());

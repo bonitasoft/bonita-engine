@@ -23,6 +23,7 @@ import java.util.Set;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.form.FormMappingSearchDescriptor;
 import org.bonitasoft.engine.form.FormMappingType;
+import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.profile.model.SProfile;
 
@@ -41,6 +42,7 @@ public class SearchFormMappingDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SFormMapping.class, "processDefinitionId"));
         searchEntityKeys.put(FormMappingSearchDescriptor.TYPE, new FieldDescriptor(SFormMapping.class, "type"));
         searchEntityKeys.put(FormMappingSearchDescriptor.TASK, new FieldDescriptor(SFormMapping.class, "task"));
+        searchEntityKeys.put(FormMappingSearchDescriptor.PAGE_ID, new FieldDescriptor(SPageMapping.class, "pageId"));
 
         profileAllFields = new HashMap<>(1);
         profileAllFields.put(SProfile.class, new HashSet<String>(0));
@@ -58,7 +60,7 @@ public class SearchFormMappingDescriptor extends SearchEntityDescriptor {
 
     @Override
     protected Serializable convertFilterValue(String filterField, Serializable filterValue) {
-        if(filterValue instanceof FormMappingType){
+        if (filterValue instanceof FormMappingType) {
             return ((FormMappingType) filterValue).getId();
         }
         return super.convertFilterValue(filterField, filterValue);

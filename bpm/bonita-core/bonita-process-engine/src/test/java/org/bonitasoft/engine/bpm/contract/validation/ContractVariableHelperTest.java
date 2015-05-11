@@ -16,18 +16,17 @@ package org.bonitasoft.engine.bpm.contract.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.aMap;
 
-import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
-import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
+import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ContractVariableHelperTest {
 
@@ -118,7 +117,6 @@ public class ContractVariableHelperTest {
 
         final Map<String, Serializable> expenseReport = aMap().put("expenseReport", (Serializable) expenseLines).build();
 
-
         final List<Map<String, Serializable>> expenseReports = new ArrayList<Map<String, Serializable>>();
         expenseReports.add(expenseReport);
         expenseReports.add(expenseReport);
@@ -129,15 +127,15 @@ public class ContractVariableHelperTest {
         return variables;
     }
 
-    private Map<String, Serializable> buildMapWithComplexAndSimpleMultiple(){
-        Map<String, Serializable> map = new HashMap<>(buildMap());
-        map.put("comments",new ArrayList<>(Arrays.asList("good trip", "hello")));
-//        map.put("hotel",);
+    private Map<String, Serializable> buildMapWithComplexAndSimpleMultiple() {
+        final Map<String, Serializable> map = new HashMap<>(buildMap());
+        map.put("comments", new ArrayList<>(Arrays.asList("good trip", "hello")));
+        //        map.put("hotel",);
         return map;
     }
 
     private SConstraintDefinition getConstraintDefinitionWithName(final String inputName) {
-        final SConstraintDefinition constraintDefinition = new SConstraintDefinitionImpl(inputName, "fake", "fake", SConstraintType.MANDATORY);
+        final SConstraintDefinition constraintDefinition = new SConstraintDefinitionImpl(inputName, "fake", "fake");
         constraintDefinition.getInputNames().add(inputName);
         return constraintDefinition;
     }

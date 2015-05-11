@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
+
 /**
  * @author Matthieu Chaffotte
  */
@@ -28,7 +30,8 @@ public enum SType {
     DATE(Date.class),
     INTEGER(Integer.class, Long.class, BigInteger.class, Short.class, Byte.class),
     DECIMAL(Float.class, Double.class, BigDecimal.class, Integer.class, Long.class, BigInteger.class, Short.class, Byte.class),
-    BYTE_ARRAY(byte[].class);
+    BYTE_ARRAY(byte[].class),
+    FILE(FileInputValue.class);
 
     private final List<Class<?>> assignableTypes;
 

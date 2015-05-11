@@ -51,7 +51,7 @@ public class ExpressionBinding extends NamedElementBinding {
 
     @Override
     public Object getObject() {
-        final ExpressionImpl expressionImpl = new ExpressionImpl();
+        final ExpressionImpl expressionImpl = new ExpressionImpl(id);
         expressionImpl.setName(name);
         expressionImpl.setContent(content);
         expressionImpl.setExpressionType(type);

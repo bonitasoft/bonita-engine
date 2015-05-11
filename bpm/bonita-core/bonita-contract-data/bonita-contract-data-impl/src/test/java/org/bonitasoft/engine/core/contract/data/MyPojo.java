@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,13 +11,28 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.contract;
+
+package org.bonitasoft.engine.core.contract.data;
+
+import java.io.Serializable;
 
 /**
- * @author Laurent Leseigneur
- * @since 7.0
+ * @author Baptiste Mesta
  */
-public enum ConstraintType {
-    CUSTOM, MANDATORY
+class MyPojo implements Serializable {
+    private final String name;
+    private final byte[] content;
 
+    public MyPojo(String name, byte[] content) {
+        this.name = name;
+        this.content = content;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public String getName() {
+        return name;
+    }
 }
