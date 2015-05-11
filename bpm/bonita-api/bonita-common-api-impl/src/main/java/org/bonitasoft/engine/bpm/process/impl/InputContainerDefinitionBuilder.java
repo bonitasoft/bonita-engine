@@ -45,18 +45,6 @@ public abstract class InputContainerDefinitionBuilder extends FlowElementContain
         return this;
     }
 
-    public InputContainerDefinitionBuilder addInput(final String name, final String description, final List<InputDefinition> inputDefinitions) {
-        return addInput(name, description, false, inputDefinitions);
-    }
-
-    public InputContainerDefinitionBuilder addInput(final String name, final String description, final boolean multiple,
-                                                    final List<InputDefinition> inputDefinitions) {
-        final InputDefinitionImpl input = new InputDefinitionImpl(name, description, multiple, inputDefinitions);
-        getInputContainerDefinition().addInput(input);
-        this.lastInput = input;
-        return this;
-    }
-
     public InputContainerDefinitionBuilder addInput(final String name, final String description) {
         return addInput(name, description, false);
     }

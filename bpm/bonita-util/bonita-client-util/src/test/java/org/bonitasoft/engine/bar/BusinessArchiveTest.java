@@ -557,9 +557,10 @@ public class BusinessArchiveTest {
 
     void createContract(final ContractDefinitionBuilder contractDefinitionBuilder) {
         contractDefinitionBuilder.addInput("numberOfDays", Type.INTEGER, null).addConstraint("Mystical constraint", "true", null, "numberOfDays");
-        final InputDefinition childText = new InputDefinitionImpl("childText", Type.TEXT, "a text simple input");
-        final InputDefinition childDecimal = new InputDefinitionImpl("childDecimal", Type.DECIMAL, "a decimal simple input");
-        contractDefinitionBuilder.addInput("complex", "a complex input", Arrays.asList(childText, childDecimal));
+        contractDefinitionBuilder.addInput("complex", "a complex input")
+                .addChildren()
+                .addInput("childText", Type.TEXT, "a text simple input")
+                .addInput("childDecimal", Type.DECIMAL, "a decimal simple input");
     }
 
     @Test

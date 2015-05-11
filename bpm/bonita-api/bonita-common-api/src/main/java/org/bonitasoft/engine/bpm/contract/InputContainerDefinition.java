@@ -16,10 +16,12 @@ package org.bonitasoft.engine.bpm.contract;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.BonitaObject;
+
 /**
  * @author Baptiste Mesta
  */
-public interface InputContainerDefinition {
+public interface InputContainerDefinition extends BonitaObject {
 
     /**
      * Lists the inputs of the container.

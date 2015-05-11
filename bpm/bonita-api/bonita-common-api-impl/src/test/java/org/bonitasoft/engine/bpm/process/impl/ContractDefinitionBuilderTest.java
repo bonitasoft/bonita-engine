@@ -109,7 +109,7 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addComplexInputTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, description, new ArrayList<InputDefinition>());
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, description);
 
         //then
         assertThat(activity.getContract().getInputs()).hasSize(1);
@@ -144,7 +144,7 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addMultipleComplexInputTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, description, true, new ArrayList<InputDefinition>());
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, description, true);
 
         //then
         assertThat(activity.getContract().getInputs()).hasSize(1);

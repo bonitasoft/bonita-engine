@@ -13,9 +13,6 @@
  */
 package org.bonitasoft.engine.bpm.process.impl;
 
-import java.util.List;
-
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
@@ -80,12 +77,12 @@ public class ContractDefinitionBuilder extends InputContainerDefinitionBuilder {
     }
 
     @Override
-    public ContractDefinitionBuilder addInput(String name, String description, List<InputDefinition> inputDefinitions) {
-        return (ContractDefinitionBuilder) super.addInput(name, description, inputDefinitions);
+    public ContractDefinitionBuilder addInput(String name, String description) {
+        return (ContractDefinitionBuilder) super.addInput(name, description);
     }
 
     @Override
-    public ContractDefinitionBuilder addInput(String name, String description, boolean multiple, List<InputDefinition> inputDefinitions) {
-        return (ContractDefinitionBuilder) super.addInput(name, description, multiple, inputDefinitions);
+    public ContractDefinitionBuilder addInput(String name, String description, boolean multiple) {
+        return (ContractDefinitionBuilder) super.addInput(name, description, multiple);
     }
 }
