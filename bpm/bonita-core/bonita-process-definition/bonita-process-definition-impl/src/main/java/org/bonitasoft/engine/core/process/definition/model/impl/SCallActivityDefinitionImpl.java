@@ -70,54 +70,35 @@ public class SCallActivityDefinitionImpl extends SActivityDefinitionImpl impleme
         return callableElement;
     }
 
-    public void setCallableElement(final SExpression callableElement) {
-        this.callableElement = callableElement;
-    }
-
     @Override
     public SExpression getCallableElementVersion() {
         return callableElementVersion;
     }
 
-    public void setCallableElementVersion(final SExpression callableElementVersion) {
-        this.callableElementVersion = callableElementVersion;
-    }
 
     @Override
     public List<SOperation> getDataInputOperations() {
         return Collections.unmodifiableList(dataInputOperations);
     }
 
-    public void addDataInputOperation(final SOperation dataInputOperation) {
-        dataInputOperations.add(dataInputOperation);
-    }
 
     @Override
     public List<SOperation> getDataOutputOperations() {
         return Collections.unmodifiableList(dataOutputOperations);
     }
 
-    public void addDataOutputOperation(final SOperation dataOutputOperation) {
-        dataOutputOperations.add(dataOutputOperation);
-    }
 
     @Override
     public SCallableElementType getCallableElementType() {
         return callableElementType;
     }
 
-    public void setCallableElementType(final SCallableElementType callableElementType) {
-        this.callableElementType = callableElementType;
-    }
 
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.CALL_ACTIVITY;
     }
 
-    public void addProcessStartContractInput(String inputName, SExpression value) {
-        contractInputs.put(inputName, value);
-    }
 
     @Override
     public Map<String, SExpression> getProcessStartContractInputs() {

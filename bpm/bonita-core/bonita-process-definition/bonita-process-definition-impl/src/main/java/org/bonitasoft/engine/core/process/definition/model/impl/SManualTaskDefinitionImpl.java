@@ -38,15 +38,6 @@ public class SManualTaskDefinitionImpl extends SHumanTaskDefinitionImpl implemen
         super(manualTaskDefinition, transitionsMap);
     }
 
-    /**
-     * @param id
-     * @param name
-     * @param actorName
-     */
-    public SManualTaskDefinitionImpl(final long id, final String name, final String actorName) {
-        super(id, name, actorName);
-    }
-
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.MANUAL_TASK;

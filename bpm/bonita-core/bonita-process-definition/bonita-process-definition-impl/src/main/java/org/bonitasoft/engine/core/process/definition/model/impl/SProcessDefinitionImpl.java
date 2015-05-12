@@ -105,8 +105,8 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
     public SProcessDefinitionImpl(final String name, final String version) {
         super(name);
         this.version = version;
-        actors = new HashSet<SActorDefinition>();
-        parameters = new HashSet<SParameterDefinition>();
+        actors = new HashSet<>();
+        parameters = new HashSet<>();
         container = new SFlowElementContainerDefinitionImpl();
     }
 
@@ -142,17 +142,9 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
         actors.add(actor);
     }
 
-    public void addParameter(final SParameterDefinition parameter) {
-        parameters.add(parameter);
-    }
-
     @Override
     public SActorDefinition getActorInitiator() {
         return sActorInitiator;
-    }
-
-    public void setActorInitiator(final SActorDefinition sActorInitiator) {
-        this.sActorInitiator = sActorInitiator;
     }
 
     @Override

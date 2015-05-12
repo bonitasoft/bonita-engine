@@ -100,10 +100,6 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
         return sOperations;
     }
 
-    public void addSOperation(final SOperation operation) {
-        sOperations.add(operation);
-    }
-
     @Override
     public List<SDataDefinition> getSDataDefinitions() {
         return sDataDefinitions;
@@ -154,9 +150,6 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
         return businessDataDefinitions;
     }
 
-    public void addBusinessDataDefinition(final SBusinessDataDefinition businessDataDefinition) {
-        businessDataDefinitions.add(businessDataDefinition);
-    }
 
     @Override
     public SBusinessDataDefinition getBusinessDataDefinition(final String name) {

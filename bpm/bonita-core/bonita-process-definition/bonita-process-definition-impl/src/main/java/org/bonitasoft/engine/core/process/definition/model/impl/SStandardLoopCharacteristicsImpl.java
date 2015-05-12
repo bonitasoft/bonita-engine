@@ -39,13 +39,6 @@ public class SStandardLoopCharacteristicsImpl implements SStandardLoopCharacteri
         loopMax = null;
     }
 
-    public SStandardLoopCharacteristicsImpl(final SExpression loopCondition, final boolean testBefore, final SExpression loopMax) {
-        super();
-        this.loopCondition = loopCondition;
-        this.testBefore = testBefore;
-        this.loopMax = loopMax;
-    }
-
     public SStandardLoopCharacteristicsImpl(final StandardLoopCharacteristics loopCharacteristics) {
         super();
         testBefore = loopCharacteristics.isTestBefore();
