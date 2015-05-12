@@ -43,6 +43,14 @@
             </fileset>
         </copy>
 
+        <copy file="${resources.dir}/bonita-platform-sp.properties" tofile="${bh.dir}/engine-server/conf/platform/bonita-platform-sp-custom.properties">
+            <filterchain>
+                <filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+                    <param name="prefix" value="#" />
+                </filterreader>
+            </filterchain>
+        </copy>
+
         <copy file="${resources.dir}/bonita-tenant-sp.properties" tofile="${bh.dir}/engine-server/conf/tenants/template/bonita-tenant-sp-custom.properties">
             <filterchain>
                 <filterreader classname="org.apache.tools.ant.filters.PrefixLines">
