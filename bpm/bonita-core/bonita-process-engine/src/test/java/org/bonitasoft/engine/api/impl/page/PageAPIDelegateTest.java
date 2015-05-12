@@ -19,16 +19,24 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.page.SearchPages;
@@ -80,46 +88,42 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class PageAPIDelegateTest {
 
+    private static final long PAGE_ID = 4578;
+    private static final Long PROCESS_ID_1 = 566446515l;
+    private static final Long PROCESS_ID_2 = 566746515l;
+    private final long userId = 123L;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-
     @Mock
     SearchPages searchPages;
-
     @Mock
     TenantServiceAccessor serviceAccessor;
-
     @Mock
     SPage sPage;
     @Mock
     Page page;
-
     @Mock
     private PageUpdater pageUpdater;
-
     @Mock
     private SPageUpdateBuilder sPageUpdateBuilder;
-
     @Mock
     private SPageUpdateContentBuilder sPageUpdateContentBuilder;
-
     private PageAPIDelegate pageAPIDelegate;
-
     @Mock
     private PageService pageService;
     @Mock
     private PageMappingService pageMappingService;
     @Mock
     private FormMappingService formMappingService;
-
-    private final long userId = 123L;
+    @Mock
+    private DependencyResolver dependencyResolver;
 
     @Before
     public void before() {
         doReturn(pageService).when(serviceAccessor).getPageService();
         doReturn(pageMappingService).when(serviceAccessor).getPageMappingService();
         doReturn(formMappingService).when(serviceAccessor).getFormMappingService();
-        doReturn(mock(DependencyResolver.class)).when(serviceAccessor).getDependencyResolver();
+        doReturn(dependencyResolver).when(serviceAccessor).getDependencyResolver();
         doReturn(mock(SearchEntitiesDescriptor.class)).when(serviceAccessor).getSearchEntitiesDescriptor();
         pageAPIDelegate = spy(new PageAPIDelegate(serviceAccessor, userId));
     }
@@ -174,22 +178,48 @@ public class PageAPIDelegateTest {
         doReturn(sPage).when(pageService).getPage(pageId);
         final SFormMappingImpl formMapping = new SFormMappingImpl();
         formMapping.setPageMapping(new SPageMappingImpl());
-        when(formMappingService.searchFormMappings(any(QueryOptions.class))).thenReturn(Collections.<SFormMapping> singletonList(formMapping),
-                Collections.<SFormMapping> emptyList());
+        doReturn(Collections.<SFormMapping> singletonList(formMapping)).when(formMappingService).searchFormMappings(any(QueryOptions.class));
 
         pageAPIDelegate.deletePage(pageId);
 
         verify(pageService).deletePage(pageId);
         verify(pageMappingService).update(any(SPageMapping.class), isNull(Long.class)); // As the page has just been deleted
-        verify(formMappingService, times(2)).searchFormMappings(any(QueryOptions.class));
+        verify(formMappingService, times(1)).searchFormMappings(any(QueryOptions.class));
+    }
+
+    @Test
+    public void updatePageMapping_return_affected_processes() throws Exception {
+        doReturn(Arrays.asList(formMapping(PROCESS_ID_1), formMapping(PROCESS_ID_2), formMapping(PROCESS_ID_1))).when(formMappingService).searchFormMappings(
+                any(QueryOptions.class));
+
+        final Set<Long> processDefinitionIds = pageAPIDelegate.updatePageMappings(PAGE_ID);
+
+        assertThat(processDefinitionIds).containsOnly(PROCESS_ID_1, PROCESS_ID_2);
+    }
+
+    @Test
+    public void deletePage_update_resolution_of_related_processes() throws Exception {
+        doReturn(Arrays.asList(formMapping(PROCESS_ID_1), formMapping(PROCESS_ID_2), formMapping(PROCESS_ID_1))).when(formMappingService).searchFormMappings(
+                any(QueryOptions.class));
+
+        pageAPIDelegate.deletePage(PAGE_ID);
+
+        verify(dependencyResolver).resolveDependencies(PROCESS_ID_1, serviceAccessor);
+        verify(dependencyResolver).resolveDependencies(PROCESS_ID_2, serviceAccessor);
+    }
+
+    private SFormMapping formMapping(Long processId) {
+        final SFormMappingImpl sFormMapping = new SFormMappingImpl();
+        sFormMapping.setProcessDefinitionId(processId);
+        return sFormMapping;
     }
 
     @Test
     public void testDeletePages() throws Exception {
         // given
         final List<Long> pageIds = new ArrayList<Long>();
-        for (int pageId = 0; pageId < 10; pageId++) {
-            pageIds.add(new Long(pageId));
+        for (long pageId = 0; pageId < 10; pageId++) {
+            pageIds.add(pageId);
         }
         doNothing().when(pageAPIDelegate).deletePage(anyLong());
 
