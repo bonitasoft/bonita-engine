@@ -112,7 +112,8 @@
 			<map>
 				<entry key="net.sf.ehcache.configurationResourceName">
 					<bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
-						<property name="filePath" value="/engine-server/conf/platform/bonita-platform-hibernate-cache.xml" />
+						<property name="primaryFilePath" value="/engine-server/conf/platform/bonita-platform-hibernate-cache.xml" />
+						<property name="secondaryFilePath" value="/engine-server/work/platform/bonita-platform-hibernate-cache.xml" />
 						<property name="baseFolder" value="${bonita.home}" />
 					</bean>
 				</entry>
@@ -125,7 +126,8 @@
 			<map>
 				<entry key="net.sf.ehcache.configurationResourceName">
 					<bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
-						<property name="filePath" value="/engine-server/conf/platform/bonita-tenant-hibernate-cache.xml" />
+						<property name="primaryFilePath" value="/engine-server/conf/platform/bonita-tenant-hibernate-cache.xml" />
+						<property name="secondaryFilePath" value="/engine-server/work/platform/bonita-tenant-hibernate-cache.xml" />
 						<property name="baseFolder" value="${bonita.home}" />
 					</bean>
 				</entry>
