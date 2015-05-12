@@ -51,10 +51,12 @@ public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl impl
     @Override
     public FormMapping updateFormMapping(final long formMappingId, final String url, Long pageId) throws FormMappingNotFoundException, UpdateException {
         getLicenseChecker().checkLicenseAndFeature(Features.LIVE_UPDATE_FORM_MAPPING);
-        final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final FormMappingService formMappingService = tenantAccessor.getFormMappingService();
         try {
             SFormMapping sFormMapping = formMappingService.get(formMappingId);
             formMappingService.update(sFormMapping, url, pageId);
+            tenantAccessor.getDependencyResolver().resolveDependencies(sFormMapping.getProcessDefinitionId(), tenantAccessor);
             return ModelConvertor.toFormMapping(sFormMapping);
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
@@ -66,7 +68,7 @@ public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl impl
     }
 
     @Override
-    public void updateExpressionContent(long processDefintionId, long expressionDefinitionId, String content) {
+    public void updateExpressionContent(long processDefinitionId, long expressionDefinitionId, String content) {
         // TODO implement me !
     }
 

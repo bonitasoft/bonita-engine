@@ -10,6 +10,7 @@ package com.bonitasoft.engine.api.impl;
 
 import static org.mockito.Mockito.*;
 
+import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
@@ -41,7 +42,8 @@ public class ProcessConfigurationAPIExtTest {
 
     @Mock
     private LicenseChecker licenceChecker;
-
+    @Mock
+    private DependencyResolver dependencyResolver;
     @Mock
     public FormMappingService formMappingService;
     @Mock
@@ -54,6 +56,7 @@ public class ProcessConfigurationAPIExtTest {
         doReturn(licenceChecker).when(processConfigurationAPI).getLicenseChecker();
         doReturn(tenantServiceAccessor).when(processConfigurationAPI).getTenantAccessor();
         doReturn(formMappingService).when(tenantServiceAccessor).getFormMappingService();
+        doReturn(dependencyResolver).when(tenantServiceAccessor).getDependencyResolver();
 
     }
 
@@ -97,5 +100,14 @@ public class ProcessConfigurationAPIExtTest {
         processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", null);
         //then
         verify(formMappingService, times(1)).update(sFormMapping, "theNewForm", null);
+    }
+    @Test
+    public void updateFormMapping_call_resolution_of_process() throws Exception {
+        //given
+        doReturn(createSFormMapping(FormMappingType.PROCESS_START, FORM_MAPPING_ID, "theUrl", null, null, PROCESS_DEF_ID)).when(formMappingService).get(FORM_MAPPING_ID);
+        //when
+        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", null);
+        //then
+        verify(dependencyResolver).resolveDependencies(PROCESS_DEF_ID, tenantServiceAccessor);
     }
 }
