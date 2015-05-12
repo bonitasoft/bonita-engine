@@ -149,17 +149,11 @@ public class FormMappingAndPageDependencyDeployer implements ProcessDependencyDe
             if (pageId == null || tenantAccessor.getPageService().getPage(pageId) == null) {
                 addProblem(formMapping, problems);
             }
-        } else if (isMappingUndefined(formMapping)){
-            addProblem(formMapping, problems);
         }
     }
 
     private void addProblem(SFormMapping formMapping, List<Problem> problems) {
         problems.add(new ProblemImpl(Problem.Level.ERROR, formMapping.getProcessElementName(), "form mapping", String.format(ERROR_MESSAGE, formMapping.toString())));
-    }
-
-    private boolean isMappingUndefined(SFormMapping formMapping) {
-        return FormMappingTarget.UNDEFINED.name().equals(formMapping.getTarget());
     }
 
     private boolean isMappingRelatedToCustomPage(SFormMapping formMapping) {
