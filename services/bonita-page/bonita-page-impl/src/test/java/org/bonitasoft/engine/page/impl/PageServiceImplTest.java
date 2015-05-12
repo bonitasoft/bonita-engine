@@ -29,6 +29,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
@@ -694,7 +695,7 @@ public class PageServiceImplTest {
     @Test
     public void zipTest_Content_7_0_With_index_html_in_resources_folder() throws Exception {
         // given
-        Map<String, byte[]> zipContent = Collections.singletonMap("resources/index.html", "hello".getBytes());
+        final Map<String, byte[]> zipContent = Collections.singletonMap("resources/index.html", "hello".getBytes());
 
         // when
         pageServiceImpl.checkZipContainsRequiredEntries(zipContent);
@@ -856,7 +857,7 @@ public class PageServiceImplTest {
     @Test
     public void should_redPageZip_call_the_internal_with_provided_false() throws SInvalidPageTokenException, SInvalidPageZipInconsistentException,
             SInvalidPageZipMissingAPropertyException, SInvalidPageZipMissingPropertiesException, SInvalidPageZipMissingIndexException {
-        byte[] content = { 0, 1, 2 };
+        final byte[] content = { 0, 1, 2 };
         doReturn(null).when(pageServiceImpl).readPageZip(content, false);
 
         //when
@@ -906,7 +907,7 @@ public class PageServiceImplTest {
         pageServiceImpl.addPage(content, CONTENT_NAME, USER_ID);
 
         //then
-        SPage sPage;
+        final SPage sPage;
         verify(pageServiceImpl).insertPage(any(SPage.class), eq(content));
     }
 
@@ -946,13 +947,12 @@ public class PageServiceImplTest {
 
         //then
         SPageAssert.assertThat(insertedPage).hasContentType(SContentType.API_EXTENSION);
-
     }
 
 
-    protected Pair<String, byte[]> getPagePropertiesContentPair(String... otherProperties) {
-        StringBuilder stringBuilder = new StringBuilder().append("name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n");
-        for (String property : otherProperties) {
+    protected Pair<String, byte[]> getPagePropertiesContentPair(final String... otherProperties) {
+        final StringBuilder stringBuilder = new StringBuilder().append("name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n");
+        for (final String property : otherProperties) {
             stringBuilder.append(property).append("\n");
         }
 
@@ -961,6 +961,50 @@ public class PageServiceImplTest {
 
     protected Pair<String, byte[]> getIndexGroovyContentPair() {
         return pair(INDEX_GROOVY, "content of the groovy".getBytes());
+    }
+
+    @Test
+    public void addPage_should_execute_listener() throws Exception {
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION));
+
+        final SPage insertedPage = pageServiceImpl.addPage(content, CONTENT_NAME, USER_ID);
+
+        verify(apiExtensionPageServiceListener).pageInserted(insertedPage, content);
+    }
+
+    @Test
+    public void updatePage_should_not_execute_listener() throws Exception {
+        final SPageImpl page = new SPageImpl("name", 10201983L, 2005L, false, "contentName");
+        when(readPersistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(page);
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION));
+
+        pageServiceImpl.updatePage(page.getId(), entityUpdateDescriptor);
+
+        verifyZeroInteractions(apiExtensionPageServiceListener);
+    }
+
+    @Test
+    public void updatePage_should_execute_listener() throws Exception {
+        final SPageImpl page = new SPageImpl("name", 10201983L, 2005L, false, "contentName");
+        page.setId(45L);
+        final SPageContent pageContent = new SPageContentImpl();
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageContent", SPageContent.class, page.getId()))).thenReturn(pageContent);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, page.getId()))).thenReturn(page);
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION));
+
+        pageServiceImpl.updatePageContent(page.getId(), content, "contentName");
+
+        verify(apiExtensionPageServiceListener).pageUpdated(page, content);
+    }
+
+    @Test
+    public void deletePage_should_execute_listener() throws Exception {
+        final SPageImpl page = new SPageImpl("name", 10201983L, 2005L, false, "contentName");
+        when(readPersistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(page);
+
+        pageServiceImpl.deletePage(1983L);
+
+        verify(apiExtensionPageServiceListener).pageDeleted(page);
     }
 
 }

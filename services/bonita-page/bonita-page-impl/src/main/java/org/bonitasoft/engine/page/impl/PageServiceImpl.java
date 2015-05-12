@@ -459,8 +459,7 @@ public class PageServiceImpl implements PageService {
             final SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_BY_ID, SPage.class, pageId));
             checkPageDuplicate(sPage, entityUpdateDescriptor, logBuilder, logMethodName);
             final String oldPageName = sPage.getName();
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage,
-                    entityUpdateDescriptor);
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage, entityUpdateDescriptor);
 
             final SUpdateEvent updatePageEvent = getUpdateEvent(sPage, PAGE);
             recorder.recordUpdate(updateRecord, updatePageEvent);
@@ -529,7 +528,6 @@ public class PageServiceImpl implements PageService {
             entityUpdateDescriptor.addField(SProfileEntryBuilderFactory.PAGE, newPageName);
             profileService.updateProfileEntry(sProfileEntry, entityUpdateDescriptor);
         }
-
     }
 
     private void throwAlreadyExistsException(final String pageName) throws SObjectAlreadyExistsException {
@@ -545,7 +543,6 @@ public class PageServiceImpl implements PageService {
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, "Update a page with name " + pageId);
         final Properties pageProperties = readPageZip(content, false);
         try {
-
             final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<>(QUERY_GET_PAGE_CONTENT,
                     SPageContent.class, pageId));
             final SPageUpdateContentBuilder builder = BuilderFactory.get(SPageUpdateContentBuilderFactory.class)
@@ -563,14 +560,17 @@ public class PageServiceImpl implements PageService {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
             throw new SObjectModificationException(re);
         }
+
         final SPageUpdateBuilder pageBuilder = BuilderFactory.get(SPageUpdateBuilderFactory.class)
                 .createNewInstance(new EntityUpdateDescriptor());
         pageBuilder.updateContentName(contentName);
         pageBuilder.updateDescription(pageProperties.getProperty(PROPERTIES_DESCRIPTION));
         pageBuilder.updateDisplayName(pageProperties.getProperty(PROPERTIES_DISPLAY_NAME));
         pageBuilder.updateName(pageProperties.getProperty(PROPERTIES_NAME));
-        updatePage(pageId, pageBuilder.done());
-
+        final SPage sPage = updatePage(pageId, pageBuilder.done());
+        for (final PageServiceListener pageServiceListener : pageServiceListeners) {
+            pageServiceListener.pageUpdated(sPage, content);
+        }
     }
 
     @Override
@@ -640,4 +640,5 @@ public class PageServiceImpl implements PageService {
     public void setPageServiceListeners(final List<PageServiceListener> pageServiceListeners) {
         this.pageServiceListeners = pageServiceListeners;
     }
+
 }

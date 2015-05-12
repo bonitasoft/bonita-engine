@@ -20,6 +20,7 @@ import java.util.Properties;
 
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageServiceListener;
 import org.bonitasoft.engine.page.SContentType;
@@ -61,7 +62,7 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
         }
     }
 
-    private void addPageMapping(final SPage sPage, final byte[] content) throws SObjectCreationException, IOException,
+    private void addPageMapping(final SPage page, final byte[] content) throws SObjectCreationException, IOException,
             SInvalidPageZipMissingPropertiesException {
         final Properties apiProperties = helper.loadPageProperties(content);
         final String apiExtensions = getProperty(apiProperties, "apiExtensions");
@@ -71,7 +72,7 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
             final String method = getProperty(apiProperties, resourceName + ".method");
             final String pathTemplate = getProperty(apiProperties, resourceName + ".pathTemplate");
             getProperty(apiProperties, resourceName + ".classFileName");
-            pageMappingService.create("apiExtension|" + method + "|" + pathTemplate, sPage.getId(), Collections.<String> emptyList());
+            pageMappingService.create("apiExtension|" + method + "|" + pathTemplate, page.getId(), Collections.<String> emptyList());
         }
     }
 
@@ -93,6 +94,16 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
                     pageMappingService.delete(mapping);
                 }
             } while (mappings.size() == MAX_RESULTS);
+        }
+    }
+
+    @Override
+    public void pageUpdated(final SPage page, final byte[] content) throws SObjectModificationException {
+        try {
+            pageDeleted(page);
+            pageInserted(page, content);
+        } catch (SBonitaReadException | SDeletionException | SObjectCreationException e) {
+            throw new SObjectModificationException(e);
         }
     }
 

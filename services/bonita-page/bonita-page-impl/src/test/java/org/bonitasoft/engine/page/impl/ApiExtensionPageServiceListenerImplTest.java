@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import org.bonitasoft.engine.commons.exceptions.SDeletionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
@@ -233,6 +234,36 @@ public class ApiExtensionPageServiceListenerImplTest {
         doThrow(new SDeletionException()).when(pageMappingService).delete(any(SPageMapping.class));
 
         listener.pageDeleted(page);
+    }
+
+    @Test
+    public void pageUpdated_should_delete_old_mappings_and_add_new_ones() throws Exception {
+        final long pageId = 10L;
+        final SPageImpl page = buildPage(pageId);
+        final byte[] content = new byte[] { 1, 0, 0 };
+        final Properties properties = new Properties();
+        properties.setProperty("apiExtensions", "employee ");
+        properties.setProperty("employee.method", "GET");
+        properties.setProperty("employee.pathTemplate", "employees");
+        properties.setProperty("employee.classFileName", "Index.groovy");
+        when(helper.loadPageProperties(content)).thenReturn(properties);
+        final List<SPageMapping> mappings = buildPageMappings(1);
+        when(pageMappingService.get(pageId, 0, 100)).thenReturn(mappings);
+
+        listener.pageUpdated(page, content);
+
+        verify(pageMappingService).delete(any(SPageMapping.class));
+        verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.<String> emptyList());
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void pageUpdated_should_throw_an_update_exception_if_an_internal_exception_occurs() throws Exception {
+        final long pageId = 10L;
+        final SPageImpl page = buildPage(pageId);
+        final byte[] content = new byte[] { 1, 0, 0 };
+        when(pageMappingService.get(pageId, 0, 100)).thenThrow(new SBonitaReadException("exception"));
+
+        listener.pageUpdated(page, content);
     }
 
 }
