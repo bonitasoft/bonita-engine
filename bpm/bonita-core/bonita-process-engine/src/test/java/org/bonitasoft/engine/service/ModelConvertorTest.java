@@ -471,6 +471,14 @@ public class ModelConvertorTest {
         assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
         assertThat(contract.getInputs()).as("should convert inputs").containsExactly(expectedSimpleInput, expectedComplexInput);
     }
+    @Test
+    public void convertNullSContractDefinition() {
+        //when
+        final ContractDefinition contract = ModelConvertor.toContract(null);
+
+        //then
+        assertThat(contract).as("contract null").isNull();
+    }
 
     @Test
     public void convertMultipleSContractDefinition() {
