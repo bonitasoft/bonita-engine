@@ -36,6 +36,8 @@ public interface SFormMapping extends PersistentObject {
 
     String getTask();
 
+    String getProcessElementName();
+
     SPageMapping getPageMapping();
 
     Integer getType();

@@ -132,28 +132,28 @@ public class FormMappingAndPageDependencyDeployer implements ProcessDependencyDe
         do {
             formMappings = formMappingService.list(sProcessDefinition.getId(), 0, 100);
             for (SFormMapping formMapping : formMappings) {
-                checkFormMappingResolution(tenantAccessor, formMapping, sProcessDefinition.getId(), problems);
+                checkFormMappingResolution(tenantAccessor, formMapping, problems);
             }
         } while (formMappings.size() == 100);
         return problems;
     }
 
-    private void checkFormMappingResolution(TenantServiceAccessor tenantAccessor, SFormMapping formMapping, long processDefinitionId, List<Problem> problems)
+    protected void checkFormMappingResolution(TenantServiceAccessor tenantAccessor, SFormMapping formMapping, List<Problem> problems)
             throws SBonitaReadException, SObjectNotFoundException {
         if (isMappingRelatedToCustomPage(formMapping)) {
             SPageMapping pageMapping = formMapping.getPageMapping();
             if (pageMapping == null) {
-                addProblem(formMapping, processDefinitionId, problems);
+                addProblem(formMapping, problems);
             }
             final Long pageId = pageMapping.getPageId();
             if (pageId == null || tenantAccessor.getPageService().getPage(pageId) == null) {
-                addProblem(formMapping, processDefinitionId, problems);
+                addProblem(formMapping, problems);
             }
         }
     }
 
-    private void addProblem(SFormMapping formMapping, long processDefinitionId, List<Problem> problems) {
-        problems.add(new ProblemImpl(Problem.Level.ERROR, processDefinitionId, "form mapping", String.format(ERROR_MESSAGE, formMapping.toString())));
+    private void addProblem(SFormMapping formMapping, List<Problem> problems) {
+        problems.add(new ProblemImpl(Problem.Level.ERROR, formMapping.getProcessElementName(), "form mapping", String.format(ERROR_MESSAGE, formMapping.toString())));
     }
 
     private boolean isMappingRelatedToCustomPage(SFormMapping formMapping) {
