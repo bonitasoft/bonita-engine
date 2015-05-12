@@ -84,4 +84,11 @@ public class SEventImpl implements SEvent {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "SEventImpl{" +
+                "type='" + type + '\'' +
+                ", object=" + object +
+                '}';
+    }
 }
