@@ -1126,8 +1126,6 @@
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-        <constructor-arg name="parserFactory" ref="parserFactory" />
-        <constructor-arg name="xmlWriter" ref="xmlWriter" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />
     </bean>

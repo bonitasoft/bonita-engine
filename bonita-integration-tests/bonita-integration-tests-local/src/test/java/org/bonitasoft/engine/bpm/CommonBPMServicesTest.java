@@ -28,6 +28,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorBuilderFactory;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
+import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
@@ -396,9 +397,7 @@ public class CommonBPMServicesTest {
     }
 
     private SProcessDefinition buildSProcessDefinition(final String name, final String version) throws SProcessDefinitionException {
-        final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl(name, version);
-        sProcessDefinition.setProcessContainer(new SFlowElementContainerDefinitionImpl());
-        return getTenantAccessor().getProcessDefinitionService().store(sProcessDefinition, "", "");
+        return getTenantAccessor().getProcessDefinitionService().store(new DesignProcessDefinitionImpl(name,version));
     }
 
     private SActor buildSActor(final String name, final long scopeId, final boolean initiator) throws SActorCreationException {

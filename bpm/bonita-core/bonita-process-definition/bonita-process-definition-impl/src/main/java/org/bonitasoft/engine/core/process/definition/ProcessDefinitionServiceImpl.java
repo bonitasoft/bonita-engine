@@ -13,19 +13,19 @@
  **/
 package org.bonitasoft.engine.core.process.definition;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
@@ -51,9 +51,7 @@ import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefin
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionLogBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionLogBuilderFactory;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
-import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
@@ -64,6 +62,7 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.io.xml.XMLParseException;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -89,7 +88,8 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.xml.ElementBindingsFactory;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
-import org.bonitasoft.engine.xml.XMLWriter;
+import org.bonitasoft.engine.xml.SValidationException;
+import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -102,54 +102,28 @@ import org.bonitasoft.engine.xml.XMLWriter;
  */
 public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
-    private static final String SERVER_PROCESS_DEFINITION_XML = "server-process-definition.xml";
-
     private final CacheService cacheService;
-
     private final Recorder recorder;
-
     private final ReadPersistenceService persistenceService;
-
     private final EventService eventService;
-
     private final SessionService sessionService;
-
     private final ReadSessionAccessor sessionAccessor;
-
-    private final Parser parser;
-
-    private final XMLWriter xmlWriter;
-
     private final QueriableLoggerService queriableLoggerService;
-
     private final DependencyService dependencyService;
+    private final ProcessDefinitionBARContribution processDefinitionBARContribution;
 
     public ProcessDefinitionServiceImpl(final CacheService cacheService, final Recorder recorder, final ReadPersistenceService persistenceService,
-            final EventService eventService, final SessionService sessionService, final ReadSessionAccessor sessionAccessor, final ParserFactory parserFactory,
-            final XMLWriter xmlWriter, final QueriableLoggerService queriableLoggerService, final DependencyService dependencyService) {
+            final EventService eventService, final SessionService sessionService, final ReadSessionAccessor sessionAccessor,
+            final QueriableLoggerService queriableLoggerService, final DependencyService dependencyService) {
         this.cacheService = cacheService;
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.eventService = eventService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
-        this.xmlWriter = xmlWriter;
         this.queriableLoggerService = queriableLoggerService;
         this.dependencyService = dependencyService;
-        final ElementBindingsFactory bindings = BuilderFactory.get(SProcessDefinitionBuilderFactory.class).getElementsBindings();// FIXME
-        parser = parserFactory.createParser(bindings);
-        final InputStream schemaStream = BuilderFactory.get(SProcessDefinitionBuilderFactory.class).getModelSchema();
-        try {
-            parser.setSchema(schemaStream);
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException("Unable to configure process definition service", e);
-        } finally {
-            try {
-                schemaStream.close();
-            } catch (final IOException e) {
-                throw new BonitaRuntimeException(e);
-            }
-        }
+        processDefinitionBARContribution = new ProcessDefinitionBARContribution();
     }
 
     @Override
@@ -180,16 +154,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         } catch (final SCacheException e) {
             log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDefinitionNotFoundException(e, processDefinitionDeployInfo);
-        } catch (final SRecorderException e) {
-            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
-            throw new SProcessDeletionException(e, processDefinitionDeployInfo);
-        } catch (final SDependencyNotFoundException e) {
-            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
-            throw new SProcessDeletionException(e, processDefinitionDeployInfo);
-        } catch (final SDependencyDeletionException e) {
-            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
-            throw new SProcessDeletionException(e, processDefinitionDeployInfo);
-        } catch (final SDependencyException e) {
+        } catch (final SRecorderException | SDependencyException e) {
             log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDeletionException(e, processDefinitionDeployInfo);
         }
@@ -204,13 +169,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             throw new SProcessDisablementException(e);
         }
         if (ActivationState.DISABLED.name().equals(processDefinitionDeployInfo.getActivationState())) {
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Process ");
-            stringBuilder.append(processDefinitionDeployInfo.getName());
-            stringBuilder.append(" with version ");
-            stringBuilder.append(processDefinitionDeployInfo.getVersion());
-            stringBuilder.append(" is already disabled");
-            throw new SProcessDisablementException(stringBuilder.toString());
+            throw new SProcessDisablementException("Process " + processDefinitionDeployInfo.getName() + " with version "
+                    + processDefinitionDeployInfo.getVersion() + " is already disabled");
         }
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -242,22 +202,12 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             throw new SProcessEnablementException(e);
         }
         if (ActivationState.ENABLED.name().equals(processDefinitionDeployInfo.getActivationState())) {
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Process ");
-            stringBuilder.append(processDefinitionDeployInfo.getName());
-            stringBuilder.append(" with version ");
-            stringBuilder.append(processDefinitionDeployInfo.getVersion());
-            stringBuilder.append(" is already enabled");
-            throw new SProcessEnablementException(stringBuilder.toString());
+            throw new SProcessEnablementException("Process " + processDefinitionDeployInfo.getName() + " with version "
+                    + processDefinitionDeployInfo.getVersion() + " is already enabled");
         }
         if (ConfigurationState.UNRESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Process ");
-            stringBuilder.append(processDefinitionDeployInfo.getName());
-            stringBuilder.append(" with version ");
-            stringBuilder.append(processDefinitionDeployInfo.getVersion());
-            stringBuilder.append(" can't be enabled since all dependencies are not resolved yet");
-            throw new SProcessEnablementException(stringBuilder.toString());
+            throw new SProcessEnablementException("Process " + processDefinitionDeployInfo.getName() + " with version "
+                    + processDefinitionDeployInfo.getVersion() + " can't be enabled since all dependencies are not resolved yet");
         }
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getActivationStateKey(), ActivationState.ENABLED.name());
@@ -300,7 +250,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public long getNumberOfProcessDeploymentInfos() throws SProcessDefinitionReadException {
         final Map<String, Object> parameters = Collections.emptyMap();
-        final SelectOneDescriptor<Long> selectDescriptor = new SelectOneDescriptor<Long>("getNumberOfProcessDefinitions", parameters,
+        final SelectOneDescriptor<Long> selectDescriptor = new SelectOneDescriptor<>("getNumberOfProcessDefinitions", parameters,
                 SProcessDefinitionDeployInfo.class);
         try {
             return persistenceService.selectOne(selectDescriptor);
@@ -312,27 +262,23 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public SProcessDefinition getProcessDefinition(final long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         try {
-            final long tenantId = sessionAccessor.getTenantId();
             SProcessDefinition sProcessDefinition = (SProcessDefinition) cacheService.get(PROCESS_CACHE_NAME, processId);
             if (sProcessDefinition == null) {
-                getProcessDeploymentInfo(processId);
-                final File xmlFile = BonitaHomeServer.getInstance().getProcessDefinitionFile(tenantId, processId, SERVER_PROCESS_DEFINITION_XML);
-                parser.validate(xmlFile);
-                sProcessDefinition = (SProcessDefinition) parser.getObjectFromXML(xmlFile);
+                final SProcessDefinitionDeployInfo processDeploymentInfo = getProcessDeploymentInfo(processId);
+                final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.read(processDeploymentInfo.getContent());
+                sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
+                setIdOnProcessDefinition(sProcessDefinition, processId);
                 storeProcessDefinition(processId, sProcessDefinition);
             }
             return sProcessDefinition;
-        } catch (final SCacheException e) {
-            throw new SProcessDefinitionNotFoundException(e, processId);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw e;
-        } catch (final Exception e) {
+        } catch (SCacheException | XMLParseException | IOException | SReflectException e) {
             throw new SProcessDefinitionReadException(e);
         }
     }
 
     @Override
-    public SProcessDefinition getProcessDefinitionIfIsEnabled(final long processDefinitionId) throws SProcessDefinitionReadException, SProcessDefinitionException {
+    public SProcessDefinition getProcessDefinitionIfIsEnabled(final long processDefinitionId) throws SProcessDefinitionReadException,
+            SProcessDefinitionException {
         final SProcessDefinitionDeployInfo deployInfo = getProcessDeploymentInfo(processDefinitionId);
         if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
             throw new SProcessDefinitionException("The process definition is not enabled !!", deployInfo.getProcessId(), deployInfo.getName(),
@@ -341,10 +287,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return getProcessDefinition(processDefinitionId);
     }
 
-    private long setIdOnProcessDefinition(final SProcessDefinition sProcessDefinition) throws SReflectException {
-        final long id = generateId();
+    private void setIdOnProcessDefinition(final SProcessDefinition sProcessDefinition, long id) throws SReflectException {
         ClassReflector.invokeSetter(sProcessDefinition, "setId", Long.class, id);
-        return id;
     }
 
     protected long generateId() {
@@ -360,7 +304,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             SProcessDefinitionReadException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("processId", (Object) processId);
-            final SelectOneDescriptor<SProcessDefinitionDeployInfo> descriptor = new SelectOneDescriptor<SProcessDefinitionDeployInfo>(
+            final SelectOneDescriptor<SProcessDefinitionDeployInfo> descriptor = new SelectOneDescriptor<>(
                     "getDeployInfoByProcessDefId", parameters, SProcessDefinitionDeployInfo.class);
             final SProcessDefinitionDeployInfo processDefinitionDeployInfo = persistenceService.selectOne(descriptor);
             if (processDefinitionDeployInfo == null) {
@@ -377,36 +321,33 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public SProcessDefinition store(final SProcessDefinition definition, String displayName, String displayDescription) throws SProcessDefinitionException {
-        NullCheckingUtil.checkArgsNotNull(definition);
+    public SProcessDefinition store(final DesignProcessDefinition designProcessDefinition) throws SProcessDefinitionException {
+        NullCheckingUtil.checkArgsNotNull(designProcessDefinition);
+
+        // create the runtime process definition
+        final SProcessDefinition definition = convertDesignProcessDefinition(designProcessDefinition);
+
         final SProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new Process definition");
         try {
+            final String processDefinitionContent = getProcessContent(designProcessDefinition);
             final long tenantId = sessionAccessor.getTenantId();
-            final long processId = setIdOnProcessDefinition(definition);
-            // storeProcessDefinition(processId, tenantId, definition);// FIXME remove that to check the read of processes
-
+            final long processId = generateId();
+            setIdOnProcessDefinition(definition, processId);
+            //TODO should not be done here, we do not use FS anymore
             BonitaHomeServer.getInstance().createProcess(tenantId, processId);
-            FileOutputStream outputStream = null;
-
-            try {
-                outputStream = BonitaHomeServer.getInstance().getProcessDefinitionFileOutputstream(tenantId, processId, SERVER_PROCESS_DEFINITION_XML);
-                xmlWriter.write(BuilderFactory.get(SProcessDefinitionBuilderFactory.class).getXMLProcessDefinition(definition), outputStream);
-            } finally {
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            }
-
+            String displayName = designProcessDefinition.getDisplayName();
             if (displayName == null || displayName.isEmpty()) {
                 displayName = definition.getName();
             }
+            String displayDescription = designProcessDefinition.getDisplayDescription();
             if (displayDescription == null || displayDescription.isEmpty()) {
                 displayDescription = definition.getDescription();
             }
             final SProcessDefinitionDeployInfo definitionDeployInfo = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class)
                     .createNewInstance(definition.getName(), definition.getVersion()).setProcessId(processId).setDescription(definition.getDescription())
                     .setDeployedBy(getUserId()).setDeploymentDate(System.currentTimeMillis()).setActivationState(ActivationState.DISABLED.name())
-                    .setConfigurationState(ConfigurationState.UNRESOLVED.name()).setDisplayName(displayName).setDisplayDescription(displayDescription).done();
+                    .setConfigurationState(ConfigurationState.UNRESOLVED.name()).setDisplayName(displayName).setDisplayDescription(displayDescription)
+                    .setContent(processDefinitionContent).done();
 
             final InsertRecord record = new InsertRecord(definitionDeployInfo);
             SInsertEvent insertEvent = null;
@@ -416,14 +357,20 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             }
             recorder.recordInsert(record, insertEvent);
             log(definition.getId(), SQueriableLog.STATUS_OK, logBuilder, "store");
-        } catch (final SRecorderException e) {
-            log(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");
-            throw new SProcessDefinitionException(e);
         } catch (final Exception e) {
             log(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");
             throw new SProcessDefinitionException(e);
         }
         return definition;
+    }
+
+    String getProcessContent(DesignProcessDefinition designProcessDefinition) throws IOException {
+        return processDefinitionBARContribution.getProcessDefinitionContent(designProcessDefinition);
+    }
+
+    SProcessDefinition convertDesignProcessDefinition(DesignProcessDefinition designProcessDefinition) {
+        return BuilderFactory.get(SProcessDefinitionBuilderFactory.class).createNewInstance(designProcessDefinition)
+                .done();
     }
 
     private long getUserId() {
@@ -443,13 +390,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             throw new SProcessDisablementException(e);
         }
         if (!ConfigurationState.UNRESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Process ");
-            stringBuilder.append(processDefinitionDeployInfo.getName());
-            stringBuilder.append(" with version");
-            stringBuilder.append(processDefinitionDeployInfo.getVersion());
-            stringBuilder.append(" is not unresolved");
-            throw new SProcessDisablementException(stringBuilder.toString());
+            throw new SProcessDisablementException("Process " + processDefinitionDeployInfo.getName() + " with version"
+                    + processDefinitionDeployInfo.getVersion() + " is not unresolved");
         }
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -476,7 +418,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public long getNumberOfProcessDeploymentInfosByActivationState(final ActivationState activationState) throws SProcessDefinitionReadException {
         final Map<String, Object> parameters = Collections.singletonMap("activationState", (Object) activationState.name());
-        final SelectOneDescriptor<Long> selectDescriptor = new SelectOneDescriptor<Long>("getNumberOfProcessDefinitionsInActivationState", parameters,
+        final SelectOneDescriptor<Long> selectDescriptor = new SelectOneDescriptor<>("getNumberOfProcessDefinitionsInActivationState", parameters,
                 SProcessDefinitionDeployInfo.class);
         try {
             return persistenceService.selectOne(selectDescriptor);
@@ -488,10 +430,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public List<Long> getProcessDefinitionIds(final ActivationState activationState, final int fromIndex, final int numberOfResults)
             throws SProcessDefinitionReadException {
-        // FIXME
         final Map<String, Object> parameters = Collections.singletonMap("activationState", (Object) activationState.name());
-        final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SProcessDefinitionDeployInfo.class, "id", OrderByType.ASC));
-        final SelectListDescriptor<Long> selectDescriptor = new SelectListDescriptor<Long>("getProcessDefinitionsIdsInActivationState", parameters,
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SProcessDefinitionDeployInfo.class, "id", OrderByType.ASC));
+        final SelectListDescriptor<Long> selectDescriptor = new SelectListDescriptor<>("getProcessDefinitionsIdsInActivationState", parameters,
                 SProcessDefinitionDeployInfo.class, new QueryOptions(fromIndex, numberOfResults, orderByOptions));
         try {
             return persistenceService.selectList(selectDescriptor);
@@ -502,10 +443,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     @Override
     public List<Long> getProcessDefinitionIds(final int fromIndex, final int numberOfResults) throws SProcessDefinitionReadException {
-        // FIXME
         final Map<String, Object> parameters = Collections.emptyMap();
-        final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SProcessDefinitionDeployInfo.class, "id", OrderByType.ASC));
-        final SelectListDescriptor<Long> selectDescriptor = new SelectListDescriptor<Long>("getProcessDefinitionsIds", parameters,
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SProcessDefinitionDeployInfo.class, "id", OrderByType.ASC));
+        final SelectListDescriptor<Long> selectDescriptor = new SelectListDescriptor<>("getProcessDefinitionsIds", parameters,
                 SProcessDefinitionDeployInfo.class, new QueryOptions(fromIndex, numberOfResults, orderByOptions));
         try {
             return persistenceService.selectList(selectDescriptor);
@@ -531,9 +471,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         try {
             final Map<String, Object> emptyMap = Collections.singletonMap("processIds", (Object) processIds);
             final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfProcesses, SProcessDefinitionDeployInfo.class, field, order);
-            final List<SProcessDefinitionDeployInfo> results = persistenceService.selectList(new SelectListDescriptor<SProcessDefinitionDeployInfo>(
+            return persistenceService.selectList(new SelectListDescriptor<SProcessDefinitionDeployInfo>(
                     "getSubSetOfProcessDefinitionDeployInfos", emptyMap, SProcessDefinitionDeployInfo.class, queryOptions));
-            return results;
         } catch (final SBonitaReadException e) {
             throw new SProcessDefinitionReadException(e);
         }
@@ -567,7 +506,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             throws SProcessDefinitionReadException {
         final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, SProcessDefinitionDeployInfo.class, "deploymentDate", OrderByType.DESC);
         final Map<String, Object> parameters = Collections.singletonMap("name", (Object) processName);
-        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<SProcessDefinitionDeployInfo>(
+        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<>(
                 "getProcessDefinitionDeployInfosByName", parameters, SProcessDefinitionDeployInfo.class, queryOptions);
         try {
             return persistenceService.selectList(selectDescriptor);
@@ -579,10 +518,10 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public long getProcessDefinitionId(final String name, final String version) throws SProcessDefinitionReadException, SProcessDefinitionNotFoundException {
         try {
-            final Map<String, Object> parameters = new HashMap<String, Object>();
+            final Map<String, Object> parameters = new HashMap<>();
             parameters.put("name", name);
             parameters.put("version", version);
-            final Long processDefId = persistenceService.selectOne(new SelectOneDescriptor<Long>("getProcessDefinitionIdByNameAndVersion", parameters,
+            final Long processDefId = persistenceService.selectOne(new SelectOneDescriptor<>("getProcessDefinitionIdByNameAndVersion", parameters,
                     SProcessDefinitionDeployInfo.class, Long.class));
             if (processDefId == null) {
                 final SProcessDefinitionNotFoundException exception = new SProcessDefinitionNotFoundException("Process definition id not found.");
@@ -814,7 +753,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     private Map<Long, SProcessDefinitionDeployInfo> getProcessDeploymentInfosFromMap(final List<Map<String, Object>> sProcessDeploymentInfos) {
-        final Map<Long, SProcessDefinitionDeployInfo> mProcessDeploymentInfos = new HashMap<Long, SProcessDefinitionDeployInfo>();
+        final Map<Long, SProcessDefinitionDeployInfo> mProcessDeploymentInfos = new HashMap<>();
         for (final Map<String, Object> sProcessDeploymentInfo : sProcessDeploymentInfos) {
             final Long archivedProcessInstanceId = (Long) sProcessDeploymentInfo.get("archivedProcessInstanceId");
             final Long processInstanceId = (Long) sProcessDeploymentInfo.get("processInstanceId");
@@ -862,7 +801,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             final ProcessDeploymentInfoCriterion pagingCriterion) throws SProcessDefinitionReadException {
         final Map<String, Object> parameters = Collections.singletonMap("categoryId", (Object) categoryId);
         final QueryOptions queryOptions = createQueryOptions(pageIndex, numberPerPage, pagingCriterion);
-        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<SProcessDefinitionDeployInfo>(
+        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<>(
                 "searchSProcessDefinitionDeployInfoUnrelatedToCategory", parameters, SProcessDefinitionDeployInfo.class, queryOptions);
         try {
             return persistenceService.selectList(selectDescriptor);
@@ -874,7 +813,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public Long getNumberOfProcessDeploymentInfosUnrelatedToCategory(final long categoryId) throws SProcessDefinitionReadException {
         final Map<String, Object> parameters = Collections.singletonMap("categoryId", (Object) categoryId);
-        final SelectOneDescriptor<Long> selectDescriptor = new SelectOneDescriptor<Long>("getNumberOfSProcessDefinitionDeployInfoUnrelatedToCategory",
+        final SelectOneDescriptor<Long> selectDescriptor = new SelectOneDescriptor<>("getNumberOfSProcessDefinitionDeployInfoUnrelatedToCategory",
                 parameters, SProcessDefinitionDeployInfo.class);
         try {
             return persistenceService.selectOne(selectDescriptor);
@@ -887,24 +826,16 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosOfCategory(final long categoryId, final QueryOptions queryOptions)
             throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("categoryId", (Object) categoryId);
-        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<SProcessDefinitionDeployInfo>(
+        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<>(
                 "searchSProcessDeploymentInfosOfCategory", parameters, SProcessDefinitionDeployInfo.class, queryOptions);
         return persistenceService.selectList(selectDescriptor);
     }
 
     private QueryOptions createQueryOptions(final int pageIndex, final int numberPerPage, final ProcessDeploymentInfoCriterion pagingCriterion) {
-        String field = null;
-        OrderByType order = null;
+        String field;
+        OrderByType order;
         final SProcessDefinitionDeployInfoBuilderFactory fact = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class);
         switch (pagingCriterion) {
-            case LABEL_ASC:
-                field = pagingCriterion.getField();
-                order = OrderByType.ASC;
-                break;
-            case LABEL_DESC:
-                field = pagingCriterion.getField();
-                order = OrderByType.DESC;
-                break;
             case NAME_ASC:
                 field = fact.getNameKey();
                 order = OrderByType.ASC;
@@ -961,7 +892,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForGroup(final long groupId, final QueryOptions queryOptions)
             throws SProcessDefinitionReadException {
         final Map<String, Object> parameters = Collections.singletonMap(GROUP_ID, (Object) groupId);
-        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<SProcessDefinitionDeployInfo>(
+        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<>(
                 "getProcessesWithActorOnlyForGroup", parameters, SProcessDefinitionDeployInfo.class, queryOptions);
         try {
             return persistenceService.selectList(selectDescriptor);
@@ -974,7 +905,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForGroups(final List<Long> groupIds, final QueryOptions queryOptions)
             throws SProcessDefinitionReadException {
         final Map<String, Object> parameters = Collections.singletonMap("groupIds", (Object) groupIds);
-        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<SProcessDefinitionDeployInfo>(
+        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<>(
                 "getProcessesWithActorOnlyForGroups", parameters, SProcessDefinitionDeployInfo.class, queryOptions);
         try {
             return persistenceService.selectList(selectDescriptor);
@@ -987,7 +918,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForRole(final long roleId, final QueryOptions queryOptions)
             throws SProcessDefinitionReadException {
         final Map<String, Object> parameters = Collections.singletonMap(ROLE_ID, (Object) roleId);
-        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<SProcessDefinitionDeployInfo>(
+        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<>(
                 "getProcessesWithActorOnlyForRole", parameters, SProcessDefinitionDeployInfo.class, queryOptions);
         try {
             return persistenceService.selectList(selectDescriptor);
@@ -1000,7 +931,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForRoles(final List<Long> roleIds, final QueryOptions queryOptions)
             throws SProcessDefinitionReadException {
         final Map<String, Object> parameters = Collections.singletonMap("roleIds", (Object) roleIds);
-        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<SProcessDefinitionDeployInfo>(
+        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<>(
                 "getProcessesWithActorOnlyForRoles", parameters, SProcessDefinitionDeployInfo.class, queryOptions);
         try {
             return persistenceService.selectList(selectDescriptor);
@@ -1013,7 +944,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForUser(final long userId, final QueryOptions queryOptions)
             throws SProcessDefinitionReadException {
         final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
-        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<SProcessDefinitionDeployInfo>(
+        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<>(
                 "getProcessesWithActorOnlyForUser", parameters, SProcessDefinitionDeployInfo.class, queryOptions);
         try {
             return persistenceService.selectList(selectDescriptor);
@@ -1026,7 +957,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForUsers(final List<Long> userIds, final QueryOptions queryOptions)
             throws SProcessDefinitionReadException {
         final Map<String, Object> parameters = Collections.singletonMap("userIds", (Object) userIds);
-        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<SProcessDefinitionDeployInfo>(
+        final SelectListDescriptor<SProcessDefinitionDeployInfo> selectDescriptor = new SelectListDescriptor<>(
                 "getProcessesWithActorOnlyForUsers", parameters, SProcessDefinitionDeployInfo.class, queryOptions);
         try {
             return persistenceService.selectList(selectDescriptor);

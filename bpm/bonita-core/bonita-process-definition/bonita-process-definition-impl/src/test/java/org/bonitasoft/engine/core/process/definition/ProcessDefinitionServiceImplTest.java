@@ -112,7 +112,7 @@ public class ProcessDefinitionServiceImplTest {
         doReturn(parser).when(parserFactory).createParser(Matchers.<ElementBindingsFactory> any());
 
         processDefinitionServiceImpl = new ProcessDefinitionServiceImpl(cacheService, recorder, persistenceService, eventService, sessionService,
-                sessionAccessor, parserFactory, xmlWriter, queriableLoggerService, dependencyService);
+                sessionAccessor, queriableLoggerService, dependencyService);
     }
 
     /**

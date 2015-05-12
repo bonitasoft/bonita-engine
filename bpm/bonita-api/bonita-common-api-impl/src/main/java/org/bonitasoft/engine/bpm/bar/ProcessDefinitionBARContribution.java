@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -280,18 +282,28 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     public void serializeProcessDefinition(final File barFolder, final DesignProcessDefinition processDefinition) throws IOException {
         try {
-            final FileOutputStream fout = new FileOutputStream(new File(barFolder, PROCESS_DEFINITION_XML));
-            try {
-                final XMLNode rootNode = new XMLProcessDefinition().getXMLProcessDefinition(processDefinition);
-                handler.write(rootNode, fout);
-            } finally {
-                fout.close();
+            try (FileOutputStream outputStream = new FileOutputStream(new File(barFolder, PROCESS_DEFINITION_XML))) {
+                handler.write(getXMLNode(processDefinition), outputStream);
             }
             final String infos = generateInfosFromDefinition(processDefinition);
             IOUtil.writeContentToFile(getProcessInfos(infos), new File(barFolder, PROCESS_INFOS_FILE));
         } catch (final FileNotFoundException e) {
             throw new IOException(e);
         }
+    }
+
+    public String getProcessDefinitionContent(DesignProcessDefinition processDefinition) throws IOException {
+        final StringWriter writer = new StringWriter();
+        handler.write(getXMLNode(processDefinition), writer);
+        return writer.toString();
+    }
+
+    public DesignProcessDefinition read(String content) throws IOException, XMLParseException {
+        return (DesignProcessDefinition) handler.getObjectFromXML(new StringReader(content));
+    }
+
+    XMLNode getXMLNode(DesignProcessDefinition processDefinition) {
+        return new XMLProcessDefinition().getXMLProcessDefinition(processDefinition);
     }
 
     protected String generateInfosFromDefinition(final DesignProcessDefinition processDefinition) {

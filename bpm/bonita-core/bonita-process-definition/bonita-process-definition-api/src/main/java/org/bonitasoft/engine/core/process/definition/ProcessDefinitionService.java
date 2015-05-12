@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
@@ -79,16 +80,12 @@ public interface ProcessDefinitionService {
     /**
      * Store the processDefinition to file system and its deploy info to DB.
      * 
-     * @param definition
+     * @param designProcessDefinition
      *            the processDefinition will be stored
-     * @param displayName
-     *            display name of the process
-     * @param displayDescription
-     *            display description of the process
      * @return the definition will an id
      * @throws SProcessDefinitionException
      */
-    SProcessDefinition store(SProcessDefinition definition, String displayName, String displayDescription) throws SProcessDefinitionException;
+    SProcessDefinition store(DesignProcessDefinition designProcessDefinition) throws SProcessDefinitionException;
 
     /**
      * Get processDefinition by its id
