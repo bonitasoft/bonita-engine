@@ -51,7 +51,6 @@ import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.SValidationException;
 import org.bonitasoft.engine.xml.SXMLParseException;
@@ -298,7 +297,7 @@ public class ProfilesImporter {
         }
     }
 
-    public static File getFileContainingMD5(TenantServiceAccessor tenantServiceAccessor) throws BonitaHomeNotSetException, IOException {
-        return BonitaHomeServer.getInstance().getTenantWorkFile(tenantServiceAccessor.getTenantId(), "profiles.md5");
+    public static File getFileContainingMD5(long tenantId) throws BonitaHomeNotSetException, IOException {
+        return BonitaHomeServer.getInstance().getTenantWorkFile(tenantId, "profiles.md5");
     }
 }
