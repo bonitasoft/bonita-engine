@@ -186,12 +186,13 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         connectorsMap = new HashMap<>(2);
         connectorsMap.put(ConnectorEvent.ON_ENTER, new ArrayList<SConnectorDefinition>());
         connectorsMap.put(ConnectorEvent.ON_FINISH, new ArrayList<SConnectorDefinition>());
+        allConnectorsMap = new HashMap<>(2);
         for (final ConnectorDefinition connector : connectors2) {
             final SConnectorDefinitionImpl e = new SConnectorDefinitionImpl(connector);
             mConnectors.add(e);
             connectorsMap.get(e.getActivationEvent()).add(e);
+            allConnectorsMap.put(e.getName(), e);
         }
-        allConnectorsMap = new HashMap<>(2);
         connectors = Collections.unmodifiableList(mConnectors);
 
         sStartEvents = initializeStartEvents(container.getStartEvents(), transitionsMap);
