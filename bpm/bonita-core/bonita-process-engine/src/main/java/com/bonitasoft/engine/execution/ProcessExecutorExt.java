@@ -43,6 +43,7 @@ import org.bonitasoft.engine.execution.TransitionEvaluator;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -70,7 +71,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
             final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
-            final ExpressionResolverService expressionResolverService, final EventService eventService,
+            final ExpressionResolverService expressionResolverService, final ExpressionService expressionService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
             final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
@@ -78,7 +79,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final ContractDataService contractDataService) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
                 transitionService, eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
-                expressionResolverService, eventService, handlers, documentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
+                expressionResolverService, expressionService, eventService, handlers, documentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
                 eventsHandler, flowNodeStateManager, businessDataRepository, refBusinessDataService, transitionEvaluator, contractDataService);
     }
 
