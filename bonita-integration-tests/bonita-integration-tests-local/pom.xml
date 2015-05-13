@@ -147,8 +147,8 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <target name="build-home">
-                                <ant antfile="build-home.xml" target="build"/>
+                            <target name="build-home-tests">
+                                <ant antfile="build-home-tests.xml" target="build-home-tests"/>
                             </target>
                         </configuration>
                     </execution>
