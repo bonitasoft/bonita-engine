@@ -2161,6 +2161,9 @@ public class ModelConvertor {
     }
 
     public static ContractDefinition toContract(final SContractDefinition sContract) {
+        if (sContract == null) {
+            return null;
+        }
         final ContractDefinitionImpl contract = new ContractDefinitionImpl();
         for (final SInputDefinition input : sContract.getInputDefinitions()) {
             contract.addInput(toInput(input));

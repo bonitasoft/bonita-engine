@@ -13,23 +13,26 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import java.util.Arrays;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Celine Souchet
  */
 public class ProcessDefinitionBuilderTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test(expected = InvalidProcessDefinitionException.class)
     public void boundaryEventMustHaveOutgoingTransition() throws Exception {
@@ -453,15 +456,12 @@ public class ProcessDefinitionBuilderTest {
 
         //given
         builder.addUserTask("step1", "mainActor").addContract()
-                .addInput("expenseLine", "expense report line")
-                .addChildren()
+                .addComplexInput("expenseLine", "expense report line")
                 .addInput("date", Type.DATE, "expense date")
                 .addInput("amount", Type.DECIMAL, "expense amount")
-                .addInput("date", "expense date")
-                .addChildren()
+                .addComplexInput("date", "expense date")
                 .addInput("expenseType", Type.TEXT, "describe expense type")
                 .addInput("bad input", Type.TEXT, "should fail");
-
 
         //when
         builder.done();
@@ -486,6 +486,39 @@ public class ProcessDefinitionBuilderTest {
         builder.addUserTask("step1", "mainActor").addContract()
                 .addInput("input", Type.TEXT, "").addConstraint("firstConstraint", null, "mandatory", "input");
 
+        builder.done();
+    }
+
+    @Test
+    public void validate_contract_with_no_type() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+
+        builder.addContract().addComplexInput("name", "desc");
+
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage("Type not set on the contract input <name> on the process-level contract");
+        builder.done();
+    }
+
+    @Test
+    public void validate_contract_with_no_type_on_user_task() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+
+        builder.addActor("john").addUserTask("step1","john").addContract().addComplexInput("name", "desc");
+
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage("Type not set on the contract input <name> on the task-level contract for task <step1>");
+        builder.done();
+    }
+
+    @Test
+    public void validate_contract_with_no_type_sub_children() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("test", "1");
+
+        builder.addContract().addComplexInput("name", "desc").addComplexInput("name", "desc");
+
+        expectedException.expect(InvalidProcessDefinitionException.class);
+        expectedException.expectMessage("Type not set on the contract input <name> on the process-level contract");
         builder.done();
     }
 

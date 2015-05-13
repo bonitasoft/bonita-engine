@@ -25,7 +25,7 @@ public class ContractInputDefinitionBuilder extends InputContainerDefinitionBuil
     private final InputContainerDefinitionImpl inputContainerDefinition;
 
     public ContractInputDefinitionBuilder(final ProcessDefinitionBuilder processDefinitionBuilder, final FlowElementContainerDefinitionImpl container,
-            InputContainerDefinitionImpl inputContainerDefinition) {
+                                          InputContainerDefinitionImpl inputContainerDefinition) {
         super(container, processDefinitionBuilder);
         this.inputContainerDefinition = inputContainerDefinition;
     }

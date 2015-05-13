@@ -57,6 +57,7 @@ import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplemen
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
@@ -64,6 +65,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
@@ -564,7 +566,7 @@ public class ProcessAPIImplTest {
         // Given
         final String dataName = "dataName";
         ClassLoader processClassLoader = mock(ClassLoader.class);
-        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class)SBlobDataInstanceImpl.class);
+        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class) SBlobDataInstanceImpl.class);
         when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
         doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
         when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
@@ -1121,6 +1123,13 @@ public class ProcessAPIImplTest {
         when(contractDataService.getArchivedUserTaskDataValue(1983L, "id")).thenThrow(new SContractDataNotFoundException("exception"));
 
         processAPI.getUserTaskContractVariableValue(1983L, "id");
+    }
+
+    @Test
+    public void getProcessContract_should_return_null_when_no_contract() throws ProcessDefinitionNotFoundException {
+        final ContractDefinition processContract = processAPI.getProcessContract(PROCESS_DEFINITION_ID);
+
+        assertThat(processContract).as("process contract").isNull();
     }
 
     @Test

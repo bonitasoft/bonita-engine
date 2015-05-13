@@ -77,12 +77,12 @@ public class ContractDefinitionBuilder extends InputContainerDefinitionBuilder {
     }
 
     @Override
-    public ContractDefinitionBuilder addInput(String name, String description) {
-        return (ContractDefinitionBuilder) super.addInput(name, description);
+    public ContractInputDefinitionBuilder addComplexInput(String name, String description) {
+        return super.addComplexInput(name, description);
     }
 
     @Override
-    public ContractDefinitionBuilder addInput(String name, String description, boolean multiple) {
-        return (ContractDefinitionBuilder) super.addInput(name, description, multiple);
+    public ContractInputDefinitionBuilder addComplexInput(String name, String description, boolean multiple) {
+        return super.addComplexInput(name, description, multiple);
     }
 }

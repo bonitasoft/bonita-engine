@@ -15,7 +15,6 @@ package org.bonitasoft.engine.bpm.process.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
@@ -109,21 +108,20 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addComplexInputTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, description);
+        final InputContainerDefinitionBuilder builder = contractDefinitionBuilder.addComplexInput(name, description);
+        contractDefinitionBuilder.addInput("theInput2", Type.TEXT, "desc");
 
         //then
-        assertThat(activity.getContract().getInputs()).hasSize(1);
+        assertThat(activity.getContract().getInputs()).hasSize(2);
         assertThat(activity.getContract().getInputs().get(0).isMultiple()).as("should not be multiple").isFalse();
-        checkBuilder(builder);
-
+        assertThat(activity.getContract().getInputs().get(1).getName()).isEqualTo("theInput2");
     }
 
     @Test
     public void addComplexInputWithChildren() throws Exception {
         //when
         final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput("name", Type.TEXT, "the name of the user");
-        builder.addInput("addresses", "the addresses");
-        builder.addChildren().addInput("address", Type.TEXT, "the address", true);
+        builder.addComplexInput("addresses", "the addresses").addInput("address", Type.TEXT, "the address", true);
 
         //then
         assertThat(activity.getContract().getInputs()).hasSize(2);
@@ -135,21 +133,14 @@ public class ContractDefinitionBuilderTest {
         checkBuilder(builder);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void addChildren_when_no_inputs() throws Exception {
-        //when
-        contractDefinitionBuilder.addChildren();
-    }
-
     @Test
     public void addMultipleComplexInputTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, description, true);
+        contractDefinitionBuilder.addComplexInput(name, description, true);
 
         //then
         assertThat(activity.getContract().getInputs()).hasSize(1);
         assertThat(activity.getContract().getInputs().get(0).isMultiple()).as("should be multiple").isTrue();
-        checkBuilder(builder);
 
     }
 
@@ -199,7 +190,7 @@ public class ContractDefinitionBuilderTest {
         checkBuilder(builder);
     }
 
-    private void checkBuilder(final ContractDefinitionBuilder builder) {
+    private void checkBuilder(final InputContainerDefinitionBuilder builder) {
         assertThat(builder).as("should return a builder").isNotNull().isEqualTo(contractDefinitionBuilder);
     }
 
