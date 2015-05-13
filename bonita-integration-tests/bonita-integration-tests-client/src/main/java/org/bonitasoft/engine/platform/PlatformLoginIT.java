@@ -15,7 +15,11 @@ package org.bonitasoft.engine.platform;
 
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.CommonAPIIT;
+import org.bonitasoft.engine.PrintTestsStatusRule;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
@@ -59,25 +63,11 @@ public class PlatformLoginIT extends CommonAPIIT {
     }
 
     @Rule
-    public TestRule testWatcher = new TestWatcher() {
-
+    public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
         @Override
-        public void starting(final Description d) {
-            LOGGER.warn("Starting test: " + d.getClassName() + "." + d.getMethodName());
+        public List<String> clean() throws Exception {
+            return Collections.emptyList();
         }
-
-        @Override
-        public void failed(final Throwable cause, final Description d) {
-            LOGGER.warn("Failed test: " + d.getClassName() + "." + d.getMethodName());
-            LOGGER.warn("-------------------------------------------------------------------------------------");
-        }
-
-        @Override
-        public void succeeded(final Description d) {
-            LOGGER.warn("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
-            LOGGER.warn("-------------------------------------------------------------------------------------");
-        }
-
     };
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Login" }, story = "Try to log with wrong loggin.", jira = "")
