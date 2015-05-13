@@ -80,8 +80,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     public DesignProcessDefinitionImpl(final String name, final String version) {
         super(name, version);
-        parameters = new HashSet<ParameterDefinition>();
-        actors = new ArrayList<ActorDefinition>();
+        parameters = new HashSet<>();
+        actors = new ArrayList<>();
     }
 
     public void setDisplayName(final String name) {
@@ -110,7 +110,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     @Deprecated
     @Override
     public Set<ActorDefinition> getActors() {
-        return new HashSet<ActorDefinition>(actors);
+        return new HashSet<>(actors);
     }
 
     @Override

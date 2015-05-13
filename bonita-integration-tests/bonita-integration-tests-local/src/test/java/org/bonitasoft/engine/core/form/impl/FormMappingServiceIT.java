@@ -19,13 +19,11 @@ import static org.junit.Assert.fail;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
-import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.PageService;
@@ -42,11 +40,10 @@ import org.junit.Test;
  */
 public class FormMappingServiceIT extends CommonBPMServicesTest {
 
-    private PageService pageService;
-    public FormMappingService formMappingService;
-
-    private TransactionService transactionService;
     public static final String PAGE_NAME = "custompage_coucou";
+    public FormMappingService formMappingService;
+    private PageService pageService;
+    private TransactionService transactionService;
     private SPage page;
     private ProcessDefinitionService processDefinitionService;
     private SProcessDefinition p1;
@@ -60,8 +57,8 @@ public class FormMappingServiceIT extends CommonBPMServicesTest {
         pageService = getTenantAccessor().getPageService();
         transactionService.begin();
 
-        p1 = processDefinitionService.store(new DesignProcessDefinitionImpl("P1","1.0"));
-        p2 = processDefinitionService.store(new DesignProcessDefinitionImpl("P2","1.0"));
+        p1 = buildSProcessDefinition("P1", "1.0");
+        p2 = buildSProcessDefinition("P2", "1.0");
         page = pageService.addPage(
                 CommonTestUtil.createTestPageContent(PAGE_NAME, "coucou depuis la page", "C'était juste pour dire coucou"), "mySuperPage.zip",
                 54L);

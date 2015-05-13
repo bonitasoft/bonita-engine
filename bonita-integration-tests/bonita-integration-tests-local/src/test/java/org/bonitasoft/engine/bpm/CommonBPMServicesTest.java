@@ -396,7 +396,7 @@ public class CommonBPMServicesTest {
         return taskInstance;
     }
 
-    private SProcessDefinition buildSProcessDefinition(final String name, final String version) throws SProcessDefinitionException {
+    protected SProcessDefinition buildSProcessDefinition(final String name, final String version) throws SProcessDefinitionException {
         final DesignProcessDefinitionImpl designProcessDefinition = new DesignProcessDefinitionImpl(name, version);
         designProcessDefinition.setProcessContainer(new FlowElementContainerDefinitionImpl());
         return getTenantAccessor().getProcessDefinitionService().store(designProcessDefinition);
