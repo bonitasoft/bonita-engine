@@ -30,6 +30,7 @@
 	<bean id="normalClassLoader" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
 		<constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+		<constructor-arg name="eventService" ref="platformEventService" />
 	</bean>
 
 	<!-- configure the instance named bonita,it is the default instance used
