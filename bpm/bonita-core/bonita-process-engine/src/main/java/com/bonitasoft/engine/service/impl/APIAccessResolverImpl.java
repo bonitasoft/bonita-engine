@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.api.impl.ApplicationAPIExt;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
@@ -65,7 +66,7 @@ import com.bonitasoft.engine.api.impl.ThemeAPIExt;
  */
 public class APIAccessResolverImpl implements APIAccessResolver {
 
-    private static final Map<String, Object> apis = new HashMap<String, Object>(25);
+    private static final Map<String, Object> apis = new HashMap<>(25);
 
     private static final List<String> NO_SESSION_APIS = Arrays.asList(PlatformLoginAPI.class.getName(), LoginAPI.class.getName(),
             com.bonitasoft.engine.api.LoginAPI.class.getName(), NodeAPI.class.getName());
@@ -97,7 +98,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(com.bonitasoft.engine.api.PageAPI.class.getName(), new PageAPIExt());
         apis.put(PageAPI.class.getName(), new PageAPIImpl());
         apis.put(com.bonitasoft.engine.api.ApplicationAPI.class.getName(), new ApplicationAPIImpl());
-        apis.put(ApplicationAPI.class.getName(), new org.bonitasoft.engine.api.impl.ApplicationAPIImpl());
+        apis.put(ApplicationAPI.class.getName(), new ApplicationAPIExt());
         apis.put(PermissionAPI.class.getName(), new PermissionAPIImpl());
         apis.put(ProcessConfigurationAPI.class.getName(), new ProcessConfigurationAPIImpl());
         apis.put(com.bonitasoft.engine.api.ProcessConfigurationAPI.class.getName(), new ProcessConfigurationAPIExt());

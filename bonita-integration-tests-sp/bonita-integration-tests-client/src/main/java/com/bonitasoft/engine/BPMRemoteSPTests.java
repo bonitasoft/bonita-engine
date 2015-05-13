@@ -9,11 +9,11 @@
 package com.bonitasoft.engine;
 
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.activity.ActivityTests;
+import com.bonitasoft.engine.business.application.ApplicationAPIExtITs;
 import com.bonitasoft.engine.business.application.ApplicationAPIITs;
 import com.bonitasoft.engine.business.data.BDRepositoryIT;
 import com.bonitasoft.engine.command.ExecuteBDMQueryCommandIT;
@@ -39,6 +39,7 @@ import com.bonitasoft.engine.tenant.TenantIT;
         PageAPIIT.class,
         ApplicationAPIITs.class,
 
+        ApplicationAPIExtITs.class,
         TenantIT.class,
         NodeAPITest.class,
         LogTest.class,
