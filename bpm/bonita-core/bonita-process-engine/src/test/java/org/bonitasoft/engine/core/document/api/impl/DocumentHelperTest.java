@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -28,6 +29,7 @@ import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
+import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
@@ -212,7 +214,7 @@ public class DocumentHelperTest {
         doReturn(docToUpdate).when(documentService).getMappedDocument(PROCESS_INSTANCE_ID, "myDoc");
         //when
         DocumentValue docValue = new DocumentValue("myUrl");
-        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID);
+        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID, null);
         //then
         verify(documentService).updateDocument(eq(docToUpdate), any(SDocument.class));
     }
@@ -223,7 +225,7 @@ public class DocumentHelperTest {
         doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(PROCESS_INSTANCE_ID, "myDoc");
         //when
         DocumentValue docValue = new DocumentValue("myUrl");
-        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID);
+        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID, null);
         //then
         verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("myDoc"), anyString());
     }
@@ -286,7 +288,7 @@ public class DocumentHelperTest {
         //when
         documentHelper.processDocumentOnIndex(documentValue, "theList", PROCESS_INSTANCE_ID, list, 3, AUTHOR_ID);
         //then
-        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("theList"),anyString(),eq(3));
+        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("theList"), anyString(), eq(3));
     }
 
     @Test
@@ -294,7 +296,7 @@ public class DocumentHelperTest {
         //given
         DocumentHelper documentHelperSpy = spy(documentHelper);
         List<SMappedDocument> list = createList(5);
-        SMappedDocument documentToUpdate = list.get(list.size()-1);
+        SMappedDocument documentToUpdate = list.get(list.size() - 1);
         DocumentValue documentValue = new DocumentValue(documentToUpdate.getId(), "new url");
         //when
         documentHelperSpy.processDocumentOnIndex(documentValue, "theList", PROCESS_INSTANCE_ID, list, 3, AUTHOR_ID);
@@ -321,7 +323,7 @@ public class DocumentHelperTest {
         SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
         documentToUpdate.setIndex(1);
         //when
-        documentHelper.updateExistingDocument(documentToUpdate,2,documentValue,AUTHOR_ID);
+        documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
         //then
         verify(documentService).updateDocumentIndex(documentToUpdate,2);
     }
@@ -334,9 +336,9 @@ public class DocumentHelperTest {
         SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
         documentToUpdate.setIndex(2);
         //when
-        documentHelper.updateExistingDocument(documentToUpdate,2,documentValue,AUTHOR_ID);
+        documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
         //then
-        verify(documentService,times(0)).updateDocumentIndex(documentToUpdate,2);
+        verify(documentService,times(0)).updateDocumentIndex(documentToUpdate, 2);
     }
 
 
@@ -347,9 +349,50 @@ public class DocumentHelperTest {
         SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
         documentToUpdate.setIndex(1);
         //when
-        documentHelper.updateExistingDocument(documentToUpdate,2,documentValue,AUTHOR_ID);
+        documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
         //then
-        verify(documentService).updateDocumentOfList(eq(documentToUpdate),any(SDocument.class),eq(2));
+        verify(documentService).updateDocumentOfList(eq(documentToUpdate), any(SDocument.class), eq(2));
     }
 
+
+    @Test
+    public void should_toCheckedDocumentValue_return_new_DocumentValue_for_FileInput() throws Exception {
+        final FileInputValue fileInputValue = new FileInputValue("theFile.txt", "It's my file".getBytes());
+
+        final DocumentValue documentValue = documentHelper.toCheckedDocumentValue(fileInputValue);
+
+
+        assertThat(documentValue).isEqualToIgnoringGivenFields(new DocumentValue(null, null, "theFile.txt"), "content");
+        assertThat(documentValue.getContent()).isEqualTo("It's my file".getBytes());
+    }
+
+
+    @Test
+    public void should_toCheckedList_check_null() throws Exception {
+        exception.expect(SOperationExecutionException.class);
+        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
+        documentHelper.toCheckedList(null);
+    }
+
+    @Test
+    public void should_toCheckedList_check_not_list() throws Exception {
+        exception.expect(SOperationExecutionException.class);
+        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
+        documentHelper.toCheckedList(new Object());
+    }
+
+    @Test
+    public void should_toCheckedList_check_not_all_doc() throws Exception {
+        exception.expect(SOperationExecutionException.class);
+        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
+        documentHelper.toCheckedList(Arrays.asList(new DocumentValue("theUrl"), new Object()));
+    }
+
+    @Test
+    public void should_toCheckedList_returns_the_list_if_contains_FileInputValue() throws Exception {
+        final List<FileInputValue> inputList = Collections.singletonList(new FileInputValue("report.pdf", "The report content".getBytes()));
+        final List<DocumentValue> result = documentHelper.toCheckedList(inputList);
+        assertThat(result.get(0).getContent()).isEqualTo("The report content".getBytes());
+        assertThat(result.get(0).getFileName()).isEqualTo("report.pdf");
+    }
 }

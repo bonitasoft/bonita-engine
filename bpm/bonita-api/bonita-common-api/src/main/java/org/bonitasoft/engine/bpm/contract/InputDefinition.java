@@ -23,9 +23,9 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
  * @author Matthieu Chaffotte
  * @since 7.0
  */
-public interface InputDefinition extends DescriptionElement {
+public interface InputDefinition extends DescriptionElement, InputContainerDefinition {
 
-    String FILE_INPUT_FILENAME = "fileName";
+    String FILE_INPUT_FILENAME = "filename";
     String FILE_INPUT_CONTENT = "content";
 
     boolean isMultiple();
@@ -36,8 +36,6 @@ public interface InputDefinition extends DescriptionElement {
      * @return the input {@link Type}
      */
     Type getType();
-
-    List<InputDefinition> getInputs();
 
     boolean hasChildren();
 }

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,45 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.definition.model;
 
-import org.bonitasoft.engine.expression.model.SExpression;
+package org.bonitasoft.engine.bpm.contract;
+
+import java.util.List;
+
+import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
  * @author Baptiste Mesta
- * @author Matthieu Chaffotte
  */
-public interface SDocumentDefinition extends SNamedElement {
+public interface InputContainerDefinition extends BonitaObject {
 
     /**
-     * URL for an external document
-     * 
-     * @return
+     * Lists the inputs of the container.
+     *
+     * @return the inputs of the container
      */
-    String getUrl();
-
-    /**
-     * File reference in the process resources
-     * 
-     * @return
-     */
-    String getFile();
-
-    /**
-     * mime type of the document's content.
-     */
-    String getMimeType();
-
-    /**
-     * @return
-     */
-    String getDescription();
-
-    /**
-     * @return
-     */
-    String getFileName();
-
-    SExpression getInitialValue();
-
+    List<InputDefinition> getInputs();
 }

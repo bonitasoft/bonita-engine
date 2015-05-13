@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -201,5 +202,29 @@ public class SExpressionContext implements Serializable {
         this.parentProcessDefinitionId = parentProcessDefinitionId;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof SExpressionContext))
+            return false;
+        SExpressionContext that = (SExpressionContext) o;
+        return Objects.equals(time, that.time) &&
+                Objects.equals(evaluateInDefinition, that.evaluateInDefinition) &&
+                Objects.equals(containerId, that.containerId) &&
+                Objects.equals(containerType, that.containerType) &&
+                Objects.equals(containerState, that.containerState) &&
+                Objects.equals(processDefinitionId, that.processDefinitionId) &&
+                Objects.equals(parentProcessDefinitionId, that.parentProcessDefinitionId) &&
+                Objects.equals(processDefinition, that.processDefinition) &&
+                Objects.equals(inputValues, that.inputValues) &&
+                Objects.equals(dataMap, that.dataMap) &&
+                Objects.equals(invertedDataMap, that.invertedDataMap);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(containerId, containerType, containerState, time, processDefinitionId, parentProcessDefinitionId, processDefinition, inputValues,
+                evaluateInDefinition, dataMap, invertedDataMap);
+    }
 }

@@ -10,16 +10,16 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.process.definition.model.builder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
-import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
-import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
@@ -29,8 +29,6 @@ import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
@@ -105,7 +103,7 @@ public class ServerModelConvertor {
             return builder.done();
         }
         final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
-        SDataDefinitionBuilder builder = null;
+        SDataDefinitionBuilder builder;
         if (dataDefinition instanceof TextDataDefinition) {
             final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
             builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
@@ -134,4 +132,11 @@ public class ServerModelConvertor {
         return fact.createNewInstance(businessDataDefinition.getName(), businessDataDefinition.getClassName());
     }
 
+    public static Map<String, SExpression> convertContractInputs(Map<String, Expression> processStartContractInputs) {
+        final HashMap<String, SExpression> serverContractInputs = new HashMap<>(processStartContractInputs.size());
+        for (Map.Entry<String, Expression> entry : processStartContractInputs.entrySet()) {
+            serverContractInputs.put(entry.getKey(), convertExpression(entry.getValue()));
+        }
+        return serverContractInputs;
+    }
 }

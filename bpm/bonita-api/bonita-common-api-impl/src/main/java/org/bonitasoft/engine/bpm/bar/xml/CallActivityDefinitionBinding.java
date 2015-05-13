@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +33,11 @@ public class CallActivityDefinitionBinding extends ActivityDefinitionBinding {
 
     private Expression callableElementVersion;
 
-    private final List<Operation> dataInputOperations = new ArrayList<Operation>(3);
+    private final List<Operation> dataInputOperations = new ArrayList<>(3);
 
-    private final List<Operation> dataOutOperations = new ArrayList<Operation>(3);
+    private final Map<String, Expression> contractInputs = new HashMap<>();
+
+    private final List<Operation> dataOutOperations = new ArrayList<>(3);
 
     private CallableElementType callableElementType;
 
@@ -59,6 +62,9 @@ public class CallActivityDefinitionBinding extends ActivityDefinitionBinding {
             callableElementVersion = (Expression) value;
         } else if (XMLProcessDefinition.DATA_INPUT_OPERATION_NODE.equals(name)) {
             dataInputOperations.add((Operation) value);
+        } else if (XMLProcessDefinition.CONTRACT_INPUT_EXPRESSION_NODE.equals(name)) {
+            final Map.Entry<?, ?> entry = (Map.Entry<?, ?>) value;
+            contractInputs.put((String) entry.getKey(), (Expression) entry.getValue());
         } else if (XMLProcessDefinition.DATA_OUTPUT_OPERATION_NODE.equals(name)) {
             dataOutOperations.add((Operation) value);
         }
@@ -76,6 +82,9 @@ public class CallActivityDefinitionBinding extends ActivityDefinitionBinding {
         callActivity.setCallableElementVersion(callableElementVersion);
         for (final Operation operation : dataInputOperations) {
             callActivity.addDataInputOperation(operation);
+        }
+        for (Map.Entry<String, Expression> entry : contractInputs.entrySet()) {
+            callActivity.addProcessStartContractInput(entry.getKey(), entry.getValue());
         }
         for (final Operation operation : dataOutOperations) {
             callActivity.addDataOutputOperation(operation);

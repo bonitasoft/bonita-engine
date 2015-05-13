@@ -14,9 +14,11 @@
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SCallableElementType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SCallActivityDefinitionImpl;
@@ -32,9 +34,11 @@ public class SCallActivityDefinitionBinding extends SActivityDefinitionBinding {
 
     private SExpression callableElementVersion;
 
-    private final List<SOperation> dataInputOperations = new ArrayList<SOperation>(3);
+    private final List<SOperation> dataInputOperations = new ArrayList<>(3);
 
-    private final List<SOperation> dataOutOperations = new ArrayList<SOperation>(3);
+    private final Map<String, SExpression> contractInputs = new HashMap<>();
+
+    private final List<SOperation> dataOutOperations = new ArrayList<>(3);
 
     private SCallableElementType callableElementType;
 
@@ -59,6 +63,9 @@ public class SCallActivityDefinitionBinding extends SActivityDefinitionBinding {
             callableElementVersion = (SExpression) value;
         } else if (XMLSProcessDefinition.DATA_INPUT_OPERATION_NODE.equals(name)) {
             dataInputOperations.add((SOperation) value);
+        } else if (XMLProcessDefinition.CONTRACT_INPUT_EXPRESSION_NODE.equals(name)) {
+            final Map.Entry<?, ?> entry = (Map.Entry<?, ?>) value;
+            contractInputs.put((String) entry.getKey(), (SExpression) entry.getValue());
         } else if (XMLSProcessDefinition.DATA_OUTPUT_OPERATION_NODE.equals(name)) {
             dataOutOperations.add((SOperation) value);
         }
@@ -76,6 +83,9 @@ public class SCallActivityDefinitionBinding extends SActivityDefinitionBinding {
         callActivity.setCallableElementVersion(callableElementVersion);
         for (final SOperation operation : dataInputOperations) {
             callActivity.addDataInputOperation(operation);
+        }
+        for (Map.Entry<String, SExpression> entry : contractInputs.entrySet()) {
+            callActivity.addProcessStartContractInput(entry.getKey(), entry.getValue());
         }
         for (final SOperation operation : dataOutOperations) {
             callActivity.addDataOutputOperation(operation);

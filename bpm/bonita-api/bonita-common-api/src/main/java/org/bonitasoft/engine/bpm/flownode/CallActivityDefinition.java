@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.flownode;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
@@ -34,4 +35,5 @@ public interface CallActivityDefinition extends ActivityDefinition {
 
     CallableElementType getCallableElementType();
 
+    Map<String, Expression> getProcessStartContractInputs();
 }

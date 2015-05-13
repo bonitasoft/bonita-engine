@@ -185,6 +185,7 @@
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="operationService" ref="operationService" />
         <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
+        <constructor-arg name="expressionService" ref="expressionService" />
         <constructor-arg name="eventService" ref="tenantEventService" />
         <constructor-arg name="handlers">
             <map>
@@ -1579,13 +1580,13 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="formMappingService" ref="formMappingService" />
         <constructor-arg name="supervisorMappingService"
-            ref="supervisorMappingService" />
+                         ref="supervisorMappingService" />
     </bean>
     <bean id="isTaskAvailableForUser" class="org.bonitasoft.engine.page.IsTaskAvailableForUserRule">
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="activityInstanceService"
-            ref="activityInstanceService" />
+                         ref="activityInstanceService" />
     </bean>
     <bean id="isActorInitiatorRule" class="org.bonitasoft.engine.page.IsActorInitiatorRule">
         <constructor-arg name="sessionService" ref="sessionService" />
@@ -1610,9 +1611,9 @@
     </bean>
 
     <bean id="formMappingKeyGenerator"
-        class="org.bonitasoft.engine.core.form.impl.FormMappingKeyGeneratorImpl">
+          class="org.bonitasoft.engine.core.form.impl.FormMappingKeyGeneratorImpl">
         <constructor-arg name="processDefinitionService"
-            ref="processDefinitionManager" />
+                         ref="processDefinitionManager" />
     </bean>
     <bean class="org.bonitasoft.engine.core.form.LegacyURLAdapter">
         <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />

@@ -42,7 +42,7 @@ public class CallActivityBuilder extends ActivityDefinitionBuilder {
      * Sets the name of target process
      * 
      * @param callableElement
-     *            expression representing the process name
+     *        expression representing the process name
      * @return
      */
     public CallActivityBuilder setCallableElement(final Expression callableElement) {
@@ -54,7 +54,7 @@ public class CallActivityBuilder extends ActivityDefinitionBuilder {
      * Sets the version of target process
      * 
      * @param callableElementVersion
-     *            expression representing the process version
+     *        expression representing the process version
      * @return
      */
     public CallActivityBuilder setCallableElementVersion(final Expression callableElementVersion) {
@@ -67,7 +67,7 @@ public class CallActivityBuilder extends ActivityDefinitionBuilder {
      * transfer data from the caller process to the called one
      * 
      * @param dataInputOperation
-     *            data input operation
+     *        data input operation
      * @return
      */
     public CallActivityBuilder addDataInputOperation(final Operation dataInputOperation) {
@@ -76,10 +76,26 @@ public class CallActivityBuilder extends ActivityDefinitionBuilder {
     }
 
     /**
-     * Adds a data output operation on this call activity. Data output operations will be evaluated during the target process completion and can be used to transfer data from called process to the caller one
+     * Adds a process start contract input on this call activity. Process start contract inputs will be evaluated during the target process instantiation and
+     * can be used to
+     * transfer data or other types of Expressions from the caller process to the called one.
+     *
+     * @param inputName the name of the input, as defined in the target process
+     * @param value the Expression to evaluate to give the value of the input. It must return a value that is compatible to the target process contract input
+     *        type.
+     * @return this <code>CallActivityBuilder</code>
+     */
+    public CallActivityBuilder addProcessStartContractInput(final String inputName, Expression value) {
+        ((CallActivityDefinitionImpl) getActivity()).addProcessStartContractInput(inputName, value);
+        return this;
+    }
+
+    /**
+     * Adds a data output operation on this call activity. Data output operations will be evaluated during the target process completion and can be used to
+     * transfer data from called process to the caller one
      * 
      * @param dataOutputOperation
-     *            data output operation
+     *        data output operation
      * @return
      */
     public CallActivityBuilder addDataOutputOperation(final Operation dataOutputOperation) {

@@ -14,11 +14,7 @@
 package org.bonitasoft.engine.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,15 +39,14 @@ import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.AutomaticTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
+import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
@@ -358,7 +353,7 @@ public class BusinessArchiveTest {
         final Expression trueExpression = new ExpressionBuilder().createConstantBooleanExpression(true);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addDocumentDefinition("testDoc").addContentFileName("testFile.txt").addFile("testFile.txt").addDescription("desc")
-                .addMimeType("text/plain");
+                .addMimeType("text/plain").addInitialValue(new ExpressionBuilder().createConstantStringExpression("plop"));
         processDefinitionBuilder.addDocumentDefinition("testDocUrl").addContentFileName("testFile.txt").addUrl("http://test.com/testFile.txt")
                 .addDescription("desc");
         processDefinitionBuilder.addDescription("a very good description");
@@ -410,12 +405,9 @@ public class BusinessArchiveTest {
                 .addDocumentResource(new BarResource("testFile.txt", new byte[] { 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })).done();
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
 
-        final InputStream inputStream = new FileInputStream(barFile);
         final BusinessArchive businessArchive2;
-        try {
+        try (InputStream inputStream = new FileInputStream(barFile)) {
             businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        } finally {
-            inputStream.close();
         }
 
         final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
@@ -425,6 +417,7 @@ public class BusinessArchiveTest {
         assertEquals("desc", testDoc1.getDescription());
         assertEquals("testFile.txt", testDoc1.getFile());
         assertEquals("text/plain", testDoc1.getContentMimeType());
+        assertEquals("plop", testDoc1.getInitialValue().getContent());
         final DocumentDefinition testDoc2 = documentDefinitions.get(1);
         assertEquals("testDocUrl", testDoc2.getName());
         assertEquals("desc", testDoc2.getDescription());
@@ -562,9 +555,9 @@ public class BusinessArchiveTest {
 
     void createContract(final ContractDefinitionBuilder contractDefinitionBuilder) {
         contractDefinitionBuilder.addInput("numberOfDays", Type.INTEGER, null).addConstraint("Mystical constraint", "true", null, "numberOfDays");
-        final InputDefinition childText = new InputDefinitionImpl("childText", Type.TEXT, "a text simple input");
-        final InputDefinition childDecimal = new InputDefinitionImpl("childDecimal", Type.DECIMAL, "a decimal simple input");
-        contractDefinitionBuilder.addInput("complex", "a complex input", Arrays.asList(childText, childDecimal));
+        contractDefinitionBuilder.addComplexInput("complex", "a complex input")
+                .addInput("childText", Type.TEXT, "a text simple input")
+                .addInput("childDecimal", Type.DECIMAL, "a decimal simple input");
     }
 
     @Test
@@ -693,6 +686,9 @@ public class BusinessArchiveTest {
         builder.addIntegerData("var2", null);
         builder.addStartEvent("start1");
         final CallActivityBuilder callActivityBuilder = builder.addCallActivity("callActivity", targetProcess, processVersion);
+        final Expression supportCaseIdExpression = new ExpressionBuilder().createConstantLongExpression(206L);
+        final String supportCaseIdInputName = "supportCaseId";
+        callActivityBuilder.addProcessStartContractInput(supportCaseIdInputName, supportCaseIdExpression);
         callActivityBuilder.addDataInputOperation(dataInputOperation);
         callActivityBuilder.addDataOutputOperation(dataOutputOperation);
         builder.addEndEvent("end1");
@@ -703,6 +699,9 @@ public class BusinessArchiveTest {
         final DesignProcessDefinition result = getDesignProcessDefinition(builder);
 
         checkProcessForCallActivity(process, result);
+
+        final CallActivityDefinition callActivity = (CallActivityDefinition) result.getFlowElementContainer().getActivity("callActivity");
+        assertThat(callActivity.getProcessStartContractInputs().get(supportCaseIdInputName)).isEqualTo(supportCaseIdExpression);
     }
 
     @Test
