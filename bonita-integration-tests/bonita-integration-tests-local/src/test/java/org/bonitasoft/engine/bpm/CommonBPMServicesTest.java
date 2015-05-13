@@ -214,10 +214,10 @@ public class CommonBPMServicesTest {
             final List<String> messages = new ArrayList<>();
             cleanProcessesDefinitions(messages);
             cleanProcessInstance();
-            cleanMemberships(messages);
-            cleaRoles(messages);
-            cleanUsers(messages);
-            cleanGroups(messages);
+            cleanMemberships();
+            cleaRoles();
+            cleanUsers();
+            cleanGroups();
             getTenantAccessor().getLoginService().logout(apiSession.getId());
             return messages;
         } finally {
@@ -227,7 +227,8 @@ public class CommonBPMServicesTest {
         }
     }
 
-    private void cleanProcessesDefinitions(List<String> messages) throws SProcessDefinitionReadException, SProcessDefinitionNotFoundException, SProcessDeletionException, SDeletingEnabledProcessException {
+    private void cleanProcessesDefinitions(List<String> messages) throws SProcessDefinitionReadException, SProcessDefinitionNotFoundException,
+            SProcessDeletionException, SDeletingEnabledProcessException {
         final QueryOptions queryOptions = new QueryOptions(0, 200, SProcessDefinitionDeployInfo.class, "name", OrderByType.ASC);
         final List<SProcessDefinitionDeployInfo> processes = getTenantAccessor().getProcessDefinitionService().getProcessDeploymentInfos(queryOptions);
         if (processes.size() > 0) {
@@ -244,7 +245,8 @@ public class CommonBPMServicesTest {
         }
     }
 
-    private void cleanProcessInstance() throws SBonitaReadException, SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeReadException, SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException {
+    private void cleanProcessInstance() throws SBonitaReadException, SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeReadException,
+            SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException {
         // let's clean up All Process Instances:
         List<SProcessInstance> processInstances = getFirstProcessInstances(5000);
         while (processInstances.size() > 0) {
@@ -256,51 +258,27 @@ public class CommonBPMServicesTest {
         }
     }
 
-    private void cleanMemberships(List<String> messages) throws SIdentityException {
-        final List<SUserMembership> memberships = getTenantAccessor().getIdentityService().getUserMemberships(0, 5000);
-        if (memberships.size() > 0) {
-            final StringBuilder stringBuilder = new StringBuilder("Membership are still present: ");
-            for (final SUserMembership sMembership : memberships) {
-                stringBuilder.append(sMembership.getId()).append(", ");
-                getTenantAccessor().getIdentityService().deleteUserMembership(sMembership);
-            }
-            messages.add(stringBuilder.toString());
+    private void cleanMemberships() throws SIdentityException {
+        for (final SUserMembership sMembership : getTenantAccessor().getIdentityService().getUserMemberships(0, 5000)) {
+            getTenantAccessor().getIdentityService().deleteUserMembership(sMembership);
         }
     }
 
-    private void cleaRoles(List<String> messages) throws SIdentityException {
-        final List<SRole> roles = getTenantAccessor().getIdentityService().getRoles(0, 5000);
-        if (roles.size() > 0) {
-            final StringBuilder stringBuilder = new StringBuilder("Roles are still present: ");
-            for (final SRole sRole : roles) {
-                stringBuilder.append(sRole.getId()).append(", ");
-                getTenantAccessor().getIdentityService().deleteRole(sRole);
-            }
-            messages.add(stringBuilder.toString());
+    private void cleaRoles() throws SIdentityException {
+        for (final SRole sRole : getTenantAccessor().getIdentityService().getRoles(0, 5000)) {
+            getTenantAccessor().getIdentityService().deleteRole(sRole);
         }
     }
 
-    private void cleanUsers(List<String> messages) throws SIdentityException {
-        final List<SUser> users = getTenantAccessor().getIdentityService().getUsers(0, 5000);
-        if (users.size() > 0) {
-            final StringBuilder stringBuilder = new StringBuilder("Users are still present: ");
-            for (final SUser sUser : users) {
-                stringBuilder.append(sUser.getId()).append(", ");
-                getTenantAccessor().getIdentityService().deleteUser(sUser);
-            }
-            messages.add(stringBuilder.toString());
+    private void cleanUsers() throws SIdentityException {
+        for (final SUser sUser : getTenantAccessor().getIdentityService().getUsers(0, 5000)) {
+            getTenantAccessor().getIdentityService().deleteUser(sUser);
         }
     }
 
-    private void cleanGroups(List<String> messages) throws SIdentityException {
-        final List<SGroup> groups = getTenantAccessor().getIdentityService().getGroups(0, 5000);
-        if (groups.size() > 0) {
-            final StringBuilder stringBuilder = new StringBuilder("groups are still present: ");
-            for (final SGroup sGroup : groups) {
-                stringBuilder.append(sGroup.getId()).append(", ");
-                getTenantAccessor().getIdentityService().deleteGroup(sGroup);
-            }
-            messages.add(stringBuilder.toString());
+    private void cleanGroups() throws SIdentityException {
+        for (final SGroup sGroup : getTenantAccessor().getIdentityService().getGroups(0, 5000)) {
+            getTenantAccessor().getIdentityService().deleteGroup(sGroup);
         }
     }
 
