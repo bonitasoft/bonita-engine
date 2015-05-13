@@ -304,6 +304,7 @@
                     <xs:element type="definition:SExpression" name="callableElement" minOccurs="1" maxOccurs="1" />
                     <xs:element type="definition:SExpression" name="callableElementVersion" minOccurs="0" maxOccurs="1" />
                     <xs:element type="definition:SOperation" name="dataInputOperation" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element type="definition:SContractInputs" name="contractInputs" minOccurs="0" maxOccurs="1" />
                     <xs:element type="definition:SOperation" name="dataOutputOperation" minOccurs="0" maxOccurs="unbounded" />
                 </xs:sequence>
                 <xs:attribute name="callableElementType">
@@ -557,6 +558,7 @@
                     <xs:element name="url" type="xs:string" minOccurs="0" />
                     <xs:element name="file" type="xs:string" minOccurs="0" />
                     <xs:element name="fileName" type="xs:string" minOccurs="0" />
+                    <xs:element name="expression" type="definition:SExpression" minOccurs="0" />
                 </xs:all>
                 <xs:attribute name="mimeType" type="xs:string" use="required" />
             </xs:extension>
@@ -817,5 +819,11 @@
 
     <xs:complexType name="SBaseElement">
         <xs:attribute name="id" type="xs:long" />
+    </xs:complexType>
+
+    <xs:complexType name="SContractInputs">
+        <xs:sequence>
+            <xs:element name="contractInput" minOccurs="0" maxOccurs="unbounded" type="definition:SIOExpression" />
+        </xs:sequence>
     </xs:complexType>
 </xs:schema>

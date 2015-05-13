@@ -17,14 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -70,30 +66,22 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addUserTask("taskWithConstraint", ACTOR_NAME).addContract().addInput("simpleInput", Type.INTEGER, DESCRIPTION)
                 .addConstraint("Mandatory", "in != null", "in must be set", "in");
         processBuilder.addUserTask("taskWithComplexInput", ACTOR_NAME).addContract()
-                .addInput("complexInput", DESCRIPTION,
-                        Collections.<InputDefinition>singletonList(new InputDefinitionImpl("simple", Type.TEXT, DESCRIPTION)));
+                .addComplexInput("complexInput", DESCRIPTION).addInput("simple", Type.TEXT, DESCRIPTION);
         processBuilder
                 .addUserTask("taskWithComplexComplexInput", ACTOR_NAME)
                 .addContract()
-                .addInput("complexInput", DESCRIPTION,
-                        Arrays.asList(new InputDefinitionImpl("simple", Type.TEXT, DESCRIPTION), createComplexInputs()));
+                .addComplexInput("complexInput", DESCRIPTION)
+                .addInput("simple", Type.TEXT, DESCRIPTION)
+                .addComplexInput("expense", DESCRIPTION)
+                .addInput("name", Type.TEXT, DESCRIPTION)
+                .addInput("amount", Type.DECIMAL, DESCRIPTION)
+                .addInput("date", Type.DATE, DESCRIPTION)
+                .addInput("proof", Type.BYTE_ARRAY, DESCRIPTION)
+                .addComplexInput("adress", DESCRIPTION)
+                .addInput("city", Type.TEXT, DESCRIPTION)
+                .addInput("zip", Type.INTEGER, DESCRIPTION);
 
         checkSerializeDeserializeProcessDefinition(processBuilder.done());
-    }
-
-    private InputDefinition createComplexInputs() {
-        final InputDefinition name = new InputDefinitionImpl("name", Type.TEXT, DESCRIPTION);
-        final InputDefinition amount = new InputDefinitionImpl("amount", Type.DECIMAL, DESCRIPTION);
-        final InputDefinition date = new InputDefinitionImpl("date", Type.DATE, DESCRIPTION);
-        final InputDefinition proof = new InputDefinitionImpl("proof", Type.BYTE_ARRAY, DESCRIPTION);
-
-        final InputDefinition city = new InputDefinitionImpl("city", Type.TEXT, DESCRIPTION);
-        final InputDefinition zip = new InputDefinitionImpl("zip", Type.INTEGER, DESCRIPTION);
-
-        final InputDefinition adress = new InputDefinitionImpl("adress", DESCRIPTION, Arrays.asList(city, zip));
-
-        final InputDefinition expense = new InputDefinitionImpl("expense", DESCRIPTION, Arrays.asList(name, amount, date, proof,adress));
-        return expense;
     }
 
     @Test
@@ -170,7 +158,6 @@ public class ProcessDefinitionBARContributionTest {
         return processBuilder;
     }
 
-
     @Test
     public final void check_process_with_context() throws Exception {
         Expression value1 = new ExpressionBuilder().createConstantStringExpression("value1");
@@ -184,7 +171,8 @@ public class ProcessDefinitionBARContributionTest {
 
         DesignProcessDefinition designProcessDefinition = checkSerializeDeserializeProcessDefinition(processBuilder.done());
         assertThat(designProcessDefinition.getContext()).containsExactly(new ContextEntryImpl("processKey1", processValue1));
-        assertThat(((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithContext")).getContext()).containsExactly(new ContextEntryImpl("key1", value1), new ContextEntryImpl("key2", value2));
+        assertThat(((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithContext")).getContext()).containsExactly(
+                new ContextEntryImpl("key1", value1), new ContextEntryImpl("key2", value2));
         assertThat(((UserTaskDefinition) designProcessDefinition.getFlowElementContainer().getActivity("taskWithoutContext")).getContext()).isEmpty();
     }
 

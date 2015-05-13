@@ -16,6 +16,7 @@ package org.bonitasoft.engine.operation;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -53,7 +54,7 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
     @Override
     public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        final DocumentValue documentValue = toCheckedDocumentValue(newValue);
+        final DocumentValue documentValue = documentHelper.toCheckedDocumentValue(newValue);
         final String documentName = sLeftOperand.getName();
         long processInstanceId;
         try {
@@ -66,7 +67,7 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
                     //do not update if the document value say it did not changed
                     return newValue;
                 }
-                documentHelper.createOrUpdateDocument(documentValue, documentName, processInstanceId, getAuthorId());
+                documentHelper.createOrUpdateDocument(documentValue, documentName, processInstanceId, getAuthorId(), null);
             }
             return newValue;
         } catch (final SBonitaException e) {
@@ -97,5 +98,6 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
             loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
         }
     }
+
 
 }

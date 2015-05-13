@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -38,11 +38,11 @@ public class ContractStructureValidator {
         logger = loggerService;
     }
 
-    public void validate(final SContractDefinition contract, final Map<String, Serializable> inputs) throws ContractViolationException {
+    public void validate(final SContractDefinition contract, final Map<String, Serializable> inputs) throws SContractViolationException {
         final ErrorReporter errorReporter = new ErrorReporter();
-        validateInputContainer(contract, inputs != null ? inputs : Collections.<String, Serializable>emptyMap(), errorReporter);
+        validateInputContainer(contract, inputs != null ? inputs : Collections.<String, Serializable> emptyMap(), errorReporter);
         if (errorReporter.hasError()) {
-            throw new ContractViolationException("Error while validating expected inputs", errorReporter.getErrors());
+            throw new SContractViolationException("Error while validating expected inputs", errorReporter.getErrors());
         }
     }
 
@@ -55,9 +55,12 @@ public class ContractStructureValidator {
 
     private void validateInput(Map<String, Serializable> inputs, ErrorReporter errorReporter, SInputDefinition inputDefinition) {
         final String inputName = inputDefinition.getName();
-        if (!checkExists(inputs, errorReporter, inputName)) return;
-        if (!checkNotNull(inputs, errorReporter, inputName)) return;
-        if (!typeValidator.validate(inputDefinition, inputs.get(inputName), errorReporter)) return;
+        if (!checkExists(inputs, errorReporter, inputName))
+            return;
+        if (!checkNotNull(inputs, errorReporter, inputName))
+            return;
+        if (!typeValidator.validate(inputDefinition, inputs.get(inputName), errorReporter))
+            return;
         validateChildren(inputs, errorReporter, inputDefinition);
     }
 
@@ -89,9 +92,8 @@ public class ContractStructureValidator {
         return true;
     }
 
-
     private void logInputsWhichAreNotInContract(final TechnicalLogSeverity severity, final List<SInputDefinition> simpleInputs,
-                                                final Map<String, Serializable> inputs) {
+            final Map<String, Serializable> inputs) {
         if (logger.isLoggable(ContractStructureValidator.class, severity)) {
             for (final String input : getInputsWhichAreNotInContract(simpleInputs, inputs)) {
                 logger.log(ContractStructureValidator.class, severity, "Unexpected input [" + input + "] provided");

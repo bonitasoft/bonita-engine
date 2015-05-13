@@ -25,21 +25,15 @@ import org.bonitasoft.engine.bpm.contract.InputDefinition;
  * @author Matthieu Chaffotte
  * @author Laurent Leseigneur
  */
-public class ContractDefinitionImpl implements ContractDefinition {
+public class ContractDefinitionImpl extends InputContainerDefinitionImpl implements ContractDefinition {
 
     private static final long serialVersionUID = 786706819903231008L;
 
     private final List<ConstraintDefinition> constraints;
 
-    private final List<InputDefinition> inputs;
-
     public ContractDefinitionImpl() {
-        inputs = new ArrayList<>();
+        super();
         constraints = new ArrayList<>();
-    }
-
-    public void addInput(final InputDefinition input) {
-        inputs.add(input);
     }
 
     public void addConstraint(final ConstraintDefinition constraint) {
@@ -49,11 +43,6 @@ public class ContractDefinitionImpl implements ContractDefinition {
     @Override
     public List<ConstraintDefinition> getConstraints() {
         return constraints;
-    }
-
-    @Override
-    public List<InputDefinition> getInputs() {
-        return inputs;
     }
 
     @Override

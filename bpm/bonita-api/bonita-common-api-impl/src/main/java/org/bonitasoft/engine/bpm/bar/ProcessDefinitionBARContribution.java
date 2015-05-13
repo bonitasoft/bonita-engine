@@ -45,6 +45,7 @@ import org.bonitasoft.engine.bpm.bar.xml.ConstraintDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ContextDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ContextEntryBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ContractDefinitionBinding;
+import org.bonitasoft.engine.bpm.bar.xml.ContractInputBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationKeyBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationValueBinding;
@@ -155,6 +156,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(IncomingTransitionRefBinding.class);
         bindings.add(CatchMessageEventTriggerDefinitionBinding.class);
         bindings.add(OperationBinding.class);
+        bindings.add(ContractInputBinding.class);
         bindings.add(RightOperandBinding.class);
         bindings.add(LeftOperandBinding.class);
         bindings.add(ThrowMessageEventTriggerDefinitionBinding.class);

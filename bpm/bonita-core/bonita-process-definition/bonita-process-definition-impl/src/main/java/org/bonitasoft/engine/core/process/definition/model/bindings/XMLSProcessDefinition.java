@@ -149,6 +149,9 @@ public class XMLSProcessDefinition {
 
     public static final String DATA_INPUT_OPERATION_NODE = "dataInputOperation";
 
+    public static final String CONTRACT_INPUTS_EXPRESSION_NODE = "contractInputs";
+    public static final String CONTRACT_INPUT_EXPRESSION_NODE = "contractInput";
+
     public static final String DATA_OUTPUT_OPERATION_NODE = "dataOutputOperation";
 
     public static final String CALLABLE_ELEMENT_NODE = "callableElement";
@@ -691,8 +694,22 @@ public class XMLSProcessDefinition {
         addExpressionNode(activityNode, CALLABLE_ELEMENT_NODE, activity.getCallableElement());
         addExpressionNode(activityNode, CALLABLE_ELEMENT_VERSION_NODE, activity.getCallableElementVersion());
         createAndfillOperations(activityNode, activity.getDataInputOperations(), DATA_INPUT_OPERATION_NODE);
+        createAndfillContractInputs(activityNode, activity.getProcessStartContractInputs());
         createAndfillOperations(activityNode, activity.getDataOutputOperations(), DATA_OUTPUT_OPERATION_NODE);
         activityNode.addAttribute(CALLABLE_ELEMENT_TYPE, activity.getCallableElementType().name());
+    }
+
+    protected void createAndfillContractInputs(XMLNode node, Map<String, SExpression> contractInputs) {
+        final XMLNode contractInputsNode = new XMLNode(CONTRACT_INPUTS_EXPRESSION_NODE);
+        for (final Entry<String, SExpression> input : contractInputs.entrySet()) {
+            final XMLNode contractInputNode = new XMLNode(CONTRACT_INPUT_EXPRESSION_NODE);
+            contractInputNode.addAttribute(NAME, input.getKey());
+            final XMLNode expressionNode = new XMLNode(EXPRESSION_NODE);
+            fillExpressionNode(expressionNode, input.getValue());
+            contractInputNode.addChild(expressionNode);
+            contractInputsNode.addChild(contractInputNode);
+        }
+        node.addChild(contractInputsNode);
     }
 
     private void fillReceiveTask(final SReceiveTaskDefinition receiveTask, final XMLNode activityNode) {
@@ -1037,7 +1054,7 @@ public class XMLSProcessDefinition {
 
     private void fillDocumentDefinitionNode(final XMLNode documentDefinitionNode, final SDocumentDefinition documentDefinition) {
         documentDefinitionNode.addAttribute(NAME, documentDefinition.getName());
-        documentDefinitionNode.addAttribute(DOCUMENT_DEFINITION_MIME_TYPE, documentDefinition.getContentMimeType());
+        documentDefinitionNode.addAttribute(DOCUMENT_DEFINITION_MIME_TYPE, documentDefinition.getMimeType());
         if (documentDefinition.getFileName() != null) {
             documentDefinitionNode.addChild(DOCUMENT_DEFINITION_FILE_NAME, documentDefinition.getFileName());
         }
@@ -1049,6 +1066,9 @@ public class XMLSProcessDefinition {
         }
         if (documentDefinition.getFile() != null) {
             documentDefinitionNode.addChild(DOCUMENT_DEFINITION_FILE, documentDefinition.getFile());
+        }
+        if (documentDefinition.getInitialValue() != null) {
+            addExpressionNode(documentDefinitionNode, EXPRESSION_NODE, documentDefinition.getInitialValue());
         }
     }
 
