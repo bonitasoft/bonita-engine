@@ -98,6 +98,7 @@ import org.bonitasoft.engine.bpm.bar.xml.TimerEventTriggerDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.TransitionDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.UserFilterDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.UserTaskDefinitionBinding;
+import org.bonitasoft.engine.bpm.bar.xml.XMLDataDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -146,6 +147,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(ExpressionBinding.class);
         bindings.add(ConditionalExpressionBinding.class);
         bindings.add(DataDefinitionBinding.class);
+        bindings.add(XMLDataDefinitionBinding.class);
         bindings.add(BusinessDataDefinitionBinding.class);
         bindings.add(TextDataDefinitionBinding.class);
         bindings.add(DocumentDefinitionBinding.class);
