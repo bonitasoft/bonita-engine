@@ -229,6 +229,8 @@
 				<entry key="getCommandByName" value="true" />
 				<entry key="getUserByUserName" value="true" />
 				<entry key="getRoleByName" value="true" />
+				<entry key="getPageByName" value="true" />
+				<entry key="getReportByName" value="true" />
 			</map>
 		</property>
 	</bean>
