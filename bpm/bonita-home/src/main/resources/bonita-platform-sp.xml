@@ -112,7 +112,8 @@
 			<map>
 				<entry key="net.sf.ehcache.configurationResourceName">
 					<bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
-						<property name="filePath" value="/engine-server/conf/platform/bonita-platform-hibernate-cache.xml" />
+						<property name="primaryFilePath" value="/engine-server/conf/platform/bonita-platform-hibernate-cache.xml" />
+						<property name="secondaryFilePath" value="/engine-server/work/platform/bonita-platform-hibernate-cache.xml" />
 						<property name="baseFolder" value="${bonita.home}" />
 					</bean>
 				</entry>
@@ -125,7 +126,8 @@
 			<map>
 				<entry key="net.sf.ehcache.configurationResourceName">
 					<bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
-						<property name="filePath" value="/engine-server/conf/platform/bonita-tenant-hibernate-cache.xml" />
+						<property name="primaryFilePath" value="/engine-server/conf/platform/bonita-tenant-hibernate-cache.xml" />
+						<property name="secondaryFilePath" value="/engine-server/work/platform/bonita-tenant-hibernate-cache.xml" />
 						<property name="baseFolder" value="${bonita.home}" />
 					</bean>
 				</entry>
@@ -227,6 +229,8 @@
 				<entry key="getCommandByName" value="true" />
 				<entry key="getUserByUserName" value="true" />
 				<entry key="getRoleByName" value="true" />
+				<entry key="getPageByName" value="true" />
+				<entry key="getReportByName" value="true" />
 			</map>
 		</property>
 	</bean>
@@ -242,54 +246,38 @@
 	</bean>
 
 
-	<bean id="cacheConcurrencyStrategies" class="org.springframework.beans.factory.config.MapFactoryBean">
+	<bean id="cacheConcurrencyStrategiesExceptions" class="org.springframework.beans.factory.config.MapFactoryBean">
 		<property name="targetMapClass">
 			<value>java.util.HashMap</value>
 		</property>
 		<property name="sourceMap">
 			<map>
-				<entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.command.model.SCommandImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SGroupImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SRoleImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SUserLoginImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.theme.model.impl.SThemeImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="read-write" />
-			</map>
+				<!-- example
+				<entry key="entity_class" value="none/read-only/nonstrict-read-write/read-write" />
+				-->
+				<entry key="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" value="none" />
+				<entry key="org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl" value="none" />
+				<entry key="org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl" value="none" />
+				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" value="none" />
+				<entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="none" />
+				<entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl" value="none" />
+    			<entry key="com.bonitasoft.engine.core.reporting.SReportContentImpl" value="none" />
+    		</map>
 		</property>
 	</bean>
 
 	<bean id="hbmResourcesConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderExt" autowire="byType">
 		<!-- L2 cache -->
-		<constructor-arg name="cacheConcurrencyStrategies" ref="cacheConcurrencyStrategies"/>
+		<constructor-arg name="cacheConcurrencyStrategiesExceptions" ref="cacheConcurrencyStrategiesExceptions"/>
+		<constructor-arg name="defaultCacheConcurrencyStrategy" value="read-write"/>
 	</bean>
 
 </beans>
