@@ -259,15 +259,15 @@
 				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" value="none" />
 				<entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="none" />
 				<entry key="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" value="none" />
-        		<entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="none" />
-        		<entry key="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" value="none" />
-        		<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="none" />
-        		<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" value="none" />
-        		<entry key="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" value="none" />
-        		<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" value="none" />
-        		<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl" value="none" />
-        		<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl" value="none" />
-        		<entry key="com.bonitasoft.engine.core.reporting.SReportContentImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl" value="none" />
+    			<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl" value="none" />
+    			<entry key="com.bonitasoft.engine.core.reporting.SReportContentImpl" value="none" />
     		</map>
 		</property>
 	</bean>
