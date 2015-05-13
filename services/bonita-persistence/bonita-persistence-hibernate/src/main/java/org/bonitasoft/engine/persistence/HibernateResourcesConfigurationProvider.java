@@ -26,8 +26,6 @@ public interface HibernateResourcesConfigurationProvider {
 
     Set<String> getResources();
 
-    Map<String, String> getCacheConcurrencyStrategies();
-
     Map<String, String> getClassAliasMappings();
 
 }
