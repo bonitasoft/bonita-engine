@@ -118,6 +118,7 @@ CREATE TABLE process_definition (
   lastUpdateDate NUMBER(19, 0),
   categoryId NUMBER(19, 0),
   iconPath VARCHAR2(255 CHAR),
+  content CLOB NOT NULL,
   PRIMARY KEY (tenantId, id),
   CONSTRAINT UK_Process_Definition UNIQUE (tenantId, name, version)
 );
