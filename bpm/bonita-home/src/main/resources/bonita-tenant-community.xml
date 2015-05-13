@@ -1120,7 +1120,6 @@
     </bean>
 
     <bean id="processDefinitionManager" class="org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl">
-        <constructor-arg name="cacheService" ref="cacheService" />
         <constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="eventService" ref="tenantEventService" />
@@ -1351,19 +1350,6 @@
         <property name="copyOnRead" value="${bonita.tenant.cache.parameter.copyOnRead}" />
         <property name="copyOnWrite" value="${bonita.tenant.cache.parameter.copyOnWrite}" />
         <property name="readIntensive" value="${bonita.tenant.cache.parameter.readIntensive}" />
-    </bean>
-
-    <bean id="processDefCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="_PROCESSDEF" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.processdef.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.processdef.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.processdef.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.processdef.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.processdef.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.processdef.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.processdef.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.processdef.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.processdef.readIntensive}" />
     </bean>
 
     <bean id="userFilterCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">

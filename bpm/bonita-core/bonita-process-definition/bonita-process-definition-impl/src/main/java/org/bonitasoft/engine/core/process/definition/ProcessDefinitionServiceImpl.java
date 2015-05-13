@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.core.process.definition;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +26,6 @@ import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
@@ -59,7 +55,6 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.io.xml.XMLParseException;
@@ -85,11 +80,6 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.xml.ElementBindingsFactory;
-import org.bonitasoft.engine.xml.Parser;
-import org.bonitasoft.engine.xml.ParserFactory;
-import org.bonitasoft.engine.xml.SValidationException;
-import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
  * @author Baptiste Mesta
@@ -102,7 +92,6 @@ import org.bonitasoft.engine.xml.SXMLParseException;
  */
 public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
-    private final CacheService cacheService;
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
     private final EventService eventService;
@@ -112,10 +101,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     private final DependencyService dependencyService;
     private final ProcessDefinitionBARContribution processDefinitionBARContribution;
 
-    public ProcessDefinitionServiceImpl(final CacheService cacheService, final Recorder recorder, final ReadPersistenceService persistenceService,
+    public ProcessDefinitionServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
             final EventService eventService, final SessionService sessionService, final ReadSessionAccessor sessionAccessor,
             final QueriableLoggerService queriableLoggerService, final DependencyService dependencyService) {
-        this.cacheService = cacheService;
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.eventService = eventService;
@@ -141,7 +129,6 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
 
         try {
-            cacheService.remove(PROCESS_CACHE_NAME, processId);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROCESSDEFINITION, EventActionType.DELETED)) {
                 deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESSDEFINITION)
@@ -151,9 +138,6 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             recorder.recordDelete(deleteRecord, deleteEvent);
             log(processId, SQueriableLog.STATUS_OK, logBuilder, "delete");
             dependencyService.deleteDependencies(processId, ScopeType.PROCESS);
-        } catch (final SCacheException e) {
-            log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
-            throw new SProcessDefinitionNotFoundException(e, processDefinitionDeployInfo);
         } catch (final SRecorderException | SDependencyException e) {
             log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDeletionException(e, processDefinitionDeployInfo);
@@ -262,16 +246,12 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public SProcessDefinition getProcessDefinition(final long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         try {
-            SProcessDefinition sProcessDefinition = (SProcessDefinition) cacheService.get(PROCESS_CACHE_NAME, processId);
-            if (sProcessDefinition == null) {
-                final SProcessDefinitionDeployInfo processDeploymentInfo = getProcessDeploymentInfo(processId);
-                final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.read(processDeploymentInfo.getContent());
-                sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
-                setIdOnProcessDefinition(sProcessDefinition, processId);
-                storeProcessDefinition(processId, sProcessDefinition);
-            }
+            final SProcessDefinitionDeployInfo processDeploymentInfo = getProcessDeploymentInfo(processId);
+            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.read(processDeploymentInfo.getContent());
+            SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
+            setIdOnProcessDefinition(sProcessDefinition, processId);
             return sProcessDefinition;
-        } catch (SCacheException | XMLParseException | IOException | SReflectException e) {
+        } catch (XMLParseException | IOException | SReflectException e) {
             throw new SProcessDefinitionReadException(e);
         }
     }
@@ -293,10 +273,6 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     protected long generateId() {
         return Math.abs(UUID.randomUUID().getLeastSignificantBits());
-    }
-
-    private void storeProcessDefinition(final Long id, final SProcessDefinition sProcessDefinition) throws SCacheException {
-        cacheService.store(PROCESS_CACHE_NAME, id, sProcessDefinition);
     }
 
     @Override

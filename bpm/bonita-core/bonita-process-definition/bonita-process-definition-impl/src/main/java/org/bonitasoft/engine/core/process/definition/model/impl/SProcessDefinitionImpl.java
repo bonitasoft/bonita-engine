@@ -98,7 +98,7 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
         for (ContextEntry contextEntry : processDefinition.getContext()) {
             context.add(new SContextEntryImpl(contextEntry.getKey(), ServerModelConvertor.convertExpression(contextEntry.getExpression())));
         }
-        container = new SFlowElementContainerDefinitionImpl(this, processDefinition.getProcessContainer());
+        container = new SFlowElementContainerDefinitionImpl(this, processDefinition.getFlowElementContainer());
 
     }
 
