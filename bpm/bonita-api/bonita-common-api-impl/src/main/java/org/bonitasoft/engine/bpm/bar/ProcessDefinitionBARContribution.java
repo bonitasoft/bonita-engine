@@ -294,13 +294,13 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         }
     }
 
-    public String getProcessDefinitionContent(DesignProcessDefinition processDefinition) throws IOException {
+    public String convertProcessToXml(DesignProcessDefinition processDefinition) throws IOException {
         final StringWriter writer = new StringWriter();
         handler.write(getXMLNode(processDefinition), writer);
         return writer.toString();
     }
 
-    public DesignProcessDefinition read(String content) throws IOException, XMLParseException {
+    public DesignProcessDefinition convertXmlToProcess(String content) throws IOException, XMLParseException {
         return (DesignProcessDefinition) handler.getObjectFromXML(new StringReader(content));
     }
 

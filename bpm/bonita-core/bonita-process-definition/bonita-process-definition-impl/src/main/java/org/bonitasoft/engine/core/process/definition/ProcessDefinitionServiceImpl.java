@@ -247,7 +247,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public SProcessDefinition getProcessDefinition(final long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         try {
             final SProcessDefinitionDeployInfo processDeploymentInfo = getProcessDeploymentInfo(processId);
-            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.read(processDeploymentInfo.getContent());
+            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getContent());
             SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
             setIdOnProcessDefinition(sProcessDefinition, processId);
             return sProcessDefinition;
@@ -341,7 +341,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     String getProcessContent(DesignProcessDefinition designProcessDefinition) throws IOException {
-        return processDefinitionBARContribution.getProcessDefinitionContent(designProcessDefinition);
+        return processDefinitionBARContribution.convertProcessToXml(designProcessDefinition);
     }
 
     SProcessDefinition convertDesignProcessDefinition(DesignProcessDefinition designProcessDefinition) {
