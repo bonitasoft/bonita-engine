@@ -1,4 +1,4 @@
-<project name="bonita-integration-tests-local-sp" default="build-home-sp">
+<project name="bonita-integration-tests-local-sp" default="build-home-sp-tests">
 
 	<property name="target.dir" value="${basedir}/target"/>
 	<property name="resources.dir" value="${basedir}/src/test/resources"/>
@@ -10,7 +10,7 @@
 	<property name="bh.target.conf.tenant.dir" value="${bh.target.dir}/engine-server/conf/tenants/template"/>
 	<property name="bh.target.conf.platforminit.dir" value="${bh.target.dir}/engine-server/conf/platform-init"/>
 
-	<target name="build-home-sp">
+	<target name="build-home-sp-tests">
 		<delete dir="${bh.target.dir}" />
 		<copy todir="${bh.target.dir}">
 			<fileset dir="${bh.source.dir}">
