@@ -25,6 +25,7 @@ import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
 
 /**
  * Allows to access all flow elements (activities, gateways, events and transitions) of a process or sub-process.
+ * 
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
@@ -37,7 +38,6 @@ public interface FlowElementContainerDefinition extends BaseElement {
     Set<TransitionDefinition> getTransitions();
 
     /**
-     *
      * @return A set of GatewayDefinition
      * @see #getGatewaysList()
      * @since 6.0
@@ -47,7 +47,6 @@ public interface FlowElementContainerDefinition extends BaseElement {
     Set<GatewayDefinition> getGateways();
 
     /**
-     *
      * @return A list of GatewayDefinition
      * @since 6.1
      */

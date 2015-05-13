@@ -27,6 +27,7 @@ import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ElementFinder;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.expression.Expression;
@@ -226,7 +227,6 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
         }
     }
 
-
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(displayName).append(displayDescription).append(parameters).append(actors).append(actorInitiator)
@@ -281,5 +281,20 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     public void addContextEntry(ContextEntry contextEntry) {
         context.add(contextEntry);
+    }
+
+    @Override
+    public Expression getExpressionFromID(long expressionDefinitionId) {
+        for (int i = 1; i <=5 ; i++) {
+            final Expression expression = getStringIndexValue(i);
+            if (expression != null && expression.getId() == expressionDefinitionId){
+                return expression;
+            }
+        }
+        final ElementFinder elementFinder = new ElementFinder();
+        getFlowElementContainer().getFlowNode()
+
+
+        return null;
     }
 }
