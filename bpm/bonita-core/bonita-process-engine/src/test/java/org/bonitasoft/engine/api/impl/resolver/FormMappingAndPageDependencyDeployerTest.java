@@ -399,7 +399,7 @@ public class FormMappingAndPageDependencyDeployerTest {
     }
 
     @Test
-    public void checkFormMappingResolutionShouldAddProblemIfPageIdIsNull() throws Exception {
+    public void checkFormMappingResolutionShouldAddProblemsIfPageIdIsNull() throws Exception {
         ArrayList<Problem> problems = new ArrayList<>();
 
         SFormMappingImpl sFormMappingTask = new SFormMappingImpl(321324, FormMappingType.TASK.getId(), "Step1");
@@ -414,13 +414,13 @@ public class FormMappingAndPageDependencyDeployerTest {
         formMappingAndPageDependencyDeployer.checkFormMappingResolution(tenantServiceAccessor, sFormMappingTask, problems);
         formMappingAndPageDependencyDeployer.checkFormMappingResolution(tenantServiceAccessor, sFormMappingProcessOverview, problems);
         formMappingAndPageDependencyDeployer.checkFormMappingResolution(tenantServiceAccessor, sFormMappingProcessStart, problems);
-        assertThat(problems).as("the problem list should contain one mapping problem").hasSize(3).extracting("resource", "resourceId").contains(tuple("form mapping", "Step1"),
+        assertThat(problems).as("the problem list should contain three mapping problems").hasSize(3).extracting("resource", "resourceId").contains(tuple("form mapping", "Step1"),
                 tuple("form mapping", FormMappingType.PROCESS_OVERVIEW.name()),
                 tuple("form mapping", FormMappingType.PROCESS_START.name()));
     }
 
     @Test
-    public void checkFormMappingResolutionShouldLeaveProblemEmpty() throws Exception {
+    public void checkFormMappingResolutionShouldNotContainAnyProblem() throws Exception {
         ArrayList<Problem> problems = new ArrayList<>();
         SFormMappingImpl sFormMapping = new SFormMappingImpl(321324, 1, "Step1");
         SPageMappingImpl pageMapping = new SPageMappingImpl();
