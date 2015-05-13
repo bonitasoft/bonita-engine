@@ -431,7 +431,7 @@ public class FormMappingAndPageDependencyDeployerTest {
         sFormMapping.setPageMapping(pageMapping);
 
         formMappingAndPageDependencyDeployer.checkFormMappingResolution(tenantServiceAccessor, sFormMapping, problems);
-        assertThat(problems).as("the problem list should contain one mapping problem").hasSize(0);
+        assertThat(problems).as("the problem list should not contain any mapping problems").hasSize(0);
     }
 
 }
