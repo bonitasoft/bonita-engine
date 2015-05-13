@@ -18,8 +18,8 @@ import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -37,6 +37,8 @@ public class ApplicationIT extends TestWithApplication {
     public void createApplication_returns_application_based_on_ApplicationCreator_information() throws Exception {
         //given
         final Profile profile = getProfileUser();
+        Page defaultLayout = getPageAPI().getPageByName(DEFAULT_LAYOUT_NAME);
+        Page defaultTheme = getPageAPI().getPageByName(DEFAULT_THEME_NAME);
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
         creator.setDescription("This is my application");
         creator.setIconPath("/icon.jpg");
@@ -57,6 +59,8 @@ public class ApplicationIT extends TestWithApplication {
         assertThat(application.getUpdatedBy()).isEqualTo(getUser().getId());
         assertThat(application.getHomePageId()).isNull();
         assertThat(application.getProfileId()).isEqualTo(profile.getId());
+        assertThat(application.getLayoutId()).isEqualTo(defaultLayout.getId());
+        assertThat(application.getThemeId()).isEqualTo(defaultTheme.getId());
 
         getApplicationAPI().deleteApplication(application.getId());
     }
@@ -188,7 +192,7 @@ public class ApplicationIT extends TestWithApplication {
         getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.TOKEN, "Engineering-dashboard");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -212,7 +216,7 @@ public class ApplicationIT extends TestWithApplication {
         getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.DISPLAY_NAME, "HR dashboard");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -235,7 +239,7 @@ public class ApplicationIT extends TestWithApplication {
         final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.VERSION, "2.0");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -261,7 +265,7 @@ public class ApplicationIT extends TestWithApplication {
         final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.filter(ApplicationSearchDescriptor.PROFILE_ID, profile.getId());
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -288,7 +292,7 @@ public class ApplicationIT extends TestWithApplication {
         final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(0, 10);
         builder.searchTerm("My");
 
         final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
@@ -298,15 +302,8 @@ public class ApplicationIT extends TestWithApplication {
     }
 
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
-        final SearchOptions options = builder.done();
-        return options;
-    }
-
-    private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationSearchDescriptor.TOKEN, Order.ASC);
-        return builder;
+        final SearchOptionsBuilder builder = getAppSearchBuilderOrderByToken(startIndex, maxResults);
+        return builder.done();
     }
 
 }

@@ -53,8 +53,8 @@ public class ApplicationImporter {
     }
 
     public ImportStatus importApplication(ApplicationNode applicationNode, long createdBy) throws ImportException, AlreadyExistsException {
-        ImportResult importResult = applicationNodeConverter.toSApplication(applicationNode, createdBy);
         try {
+            ImportResult importResult = applicationNodeConverter.toSApplication(applicationNode, createdBy);
             SApplication application = importApplication(importResult.getApplication());
             importApplicationPages(applicationNode, importResult, application);
             importApplicationMenus(applicationNode, importResult, application);

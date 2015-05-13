@@ -23,6 +23,8 @@
 		<property name="state" column="state" />
 		<property name="homePageId" column="homePageId" />
 		<property name="profileId" column="profileId" />
+		<property name="layoutId" column="layoutId" />
+		<property name="themeId" column="themeId" />
 		<filter name="tenantFilter" />
 	</class>
 

@@ -56,6 +56,8 @@ import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
 import org.bonitasoft.engine.page.SPageWithContent;
 import org.bonitasoft.engine.page.impl.SPageWithContentImpl;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
+import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
@@ -238,6 +240,12 @@ public class TestRepository {
         getSession().save(applicationMenu);
         return (SApplicationMenu) getSession().get(applicationMenu.getClass(),
                 new PersistentObjectId(applicationMenu.getId(), applicationMenu.getTenantId()));
+    }
+
+    public SProfile add(final SProfileImpl profile) {
+        getSession().save(profile);
+        return (SProfile) getSession().get(profile.getClass(),
+                new PersistentObjectId(profile.getId(), profile.getTenantId()));
     }
 
     public void update(final SApplicationImpl application) {

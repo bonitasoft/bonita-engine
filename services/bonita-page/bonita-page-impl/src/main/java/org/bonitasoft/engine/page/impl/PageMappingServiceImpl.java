@@ -11,7 +11,6 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  */
-
 package org.bonitasoft.engine.page.impl;
 
 import java.io.Serializable;
@@ -36,8 +35,10 @@ import org.bonitasoft.engine.page.SAuthorizationException;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.SPageURL;
 import org.bonitasoft.engine.page.URLAdapter;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -63,8 +64,8 @@ public class PageMappingServiceImpl implements PageMappingService {
     private final Map<String, URLAdapter> urlAdapterMap;
     private final Map<String, AuthorizationRule> authorizationRuleMap;
 
-    public PageMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
-            ReadSessionAccessor sessionAccessor) {
+    public PageMappingServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final SessionService sessionService,
+                                  final ReadSessionAccessor sessionAccessor) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
@@ -73,40 +74,40 @@ public class PageMappingServiceImpl implements PageMappingService {
         authorizationRuleMap = new HashMap<>();
     }
 
-    public void setURLAdapters(List<URLAdapter> urlAdapters) {
-        for (URLAdapter urlAdapter : urlAdapters) {
+    public void setURLAdapters(final List<URLAdapter> urlAdapters) {
+        for (final URLAdapter urlAdapter : urlAdapters) {
             urlAdapterMap.put(urlAdapter.getId(), urlAdapter);
         }
     }
 
-    public void setAuthorizationRules(List<AuthorizationRule> authorizationRules) {
-        for (AuthorizationRule authorizationRule : authorizationRules) {
+    public void setAuthorizationRules(final List<AuthorizationRule> authorizationRules) {
+        for (final AuthorizationRule authorizationRule : authorizationRules) {
             authorizationRuleMap.put(authorizationRule.getId(), authorizationRule);
         }
     }
 
     @Override
-    public SPageMapping create(String key, Long pageId, List<String> authorizationRules) throws SObjectCreationException {
-        SPageMappingImpl entity = new SPageMappingImpl();
+    public SPageMapping create(final String key, final Long pageId, final List<String> authorizationRules) throws SObjectCreationException {
+        final SPageMappingImpl entity = new SPageMappingImpl();
         entity.setPageId(pageId);
         entity.setPageAuthorizationRules(authorizationRules);
         entity.setKey(key);
         return insert(entity);
     }
 
-    SPageMapping insert(SPageMappingImpl entity) throws SObjectCreationException {
-        InsertRecord record = new InsertRecord(entity);
+    SPageMapping insert(final SPageMappingImpl entity) throws SObjectCreationException {
+        final InsertRecord record = new InsertRecord(entity);
         try {
             recorder.recordInsert(record, getInsertEvent(entity));
-        } catch (SRecorderException e) {
+        } catch (final SRecorderException e) {
             throw new SObjectCreationException(e);
         }
         return entity;
     }
 
     @Override
-    public SPageMapping create(String key, String url, String urlAdapter, List<String> authorizationRules) throws SObjectCreationException {
-        SPageMappingImpl entity = new SPageMappingImpl();
+    public SPageMapping create(final String key, final String url, final String urlAdapter, final List<String> authorizationRules) throws SObjectCreationException {
+        final SPageMappingImpl entity = new SPageMappingImpl();
         entity.setUrl(url);
         entity.setUrlAdapter(urlAdapter);
         entity.setPageAuthorizationRules(authorizationRules);
@@ -115,13 +116,13 @@ public class PageMappingServiceImpl implements PageMappingService {
 
     }
 
-    SInsertEvent getInsertEvent(SPageMappingImpl entity) {
+    SInsertEvent getInsertEvent(final SPageMappingImpl entity) {
         return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PAGE_MAPPING).setObject(entity).done();
     }
 
     @Override
-    public SPageMapping get(String key) throws SObjectNotFoundException, SBonitaReadException {
-        SPageMapping sPageMapping = persistenceService.selectOne(new SelectOneDescriptor<SPageMapping>("getPageMappingByKey", Collections
+    public SPageMapping get(final String key) throws SObjectNotFoundException, SBonitaReadException {
+        final SPageMapping sPageMapping = persistenceService.selectOne(new SelectOneDescriptor<SPageMapping>("getPageMappingByKey", Collections
                 .<String, Object> singletonMap("key", key), SPageMapping.class));
         if (sPageMapping == null) {
             throw new SObjectNotFoundException("No page mapping found with key " + key);
@@ -130,26 +131,25 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public SPageURL resolvePageURL(SPageMapping pageMapping, Map<String, Serializable> context, boolean executeAuthorizationRules) throws SExecutionException, SAuthorizationException {
+    public SPageURL resolvePageURL(final SPageMapping pageMapping, final Map<String, Serializable> context, final boolean executeAuthorizationRules) throws SExecutionException, SAuthorizationException {
         if (executeAuthorizationRules) {
             final List<String> pageAuthorizationRules = pageMapping.getPageAuthorizationRules();
             if (!isAllowedToAccess(pageMapping, context, pageAuthorizationRules)) {
                 throw new SAuthorizationException("Access to Page or URL with key " + pageMapping.getKey() + " is not allowed");
             }
         }
-
         String url = pageMapping.getUrl();
-        String urlAdapter = pageMapping.getUrlAdapter();
+        final String urlAdapter = pageMapping.getUrlAdapter();
         if (urlAdapter != null) {
             url = getUrlAdapter(urlAdapter).adapt(url, pageMapping.getKey(), context);
         }
         return new SPageURL(url, pageMapping.getPageId());
     }
 
-    protected boolean isAllowedToAccess(SPageMapping pageMapping, Map<String, Serializable> context, List<String> pageAuthorizationRules)
+    protected boolean isAllowedToAccess(final SPageMapping pageMapping, final Map<String, Serializable> context, final List<String> pageAuthorizationRules)
             throws SExecutionException {
         boolean authorized = true;
-        for (String rule : pageAuthorizationRules) {
+        for (final String rule : pageAuthorizationRules) {
             final AuthorizationRule authorizationRule = authorizationRuleMap.get(rule);
             if (authorizationRule == null) {
                 throw new SExecutionException("Authorization rule " + rule + " is not known. Cannot check if authorized or not.");
@@ -164,8 +164,8 @@ public class PageMappingServiceImpl implements PageMappingService {
         return authorized;
     }
 
-    private URLAdapter getUrlAdapter(String urlAdapterName) throws SExecutionException {
-        URLAdapter urlAdapter = urlAdapterMap.get(urlAdapterName);
+    private URLAdapter getUrlAdapter(final String urlAdapterName) throws SExecutionException {
+        final URLAdapter urlAdapter = urlAdapterMap.get(urlAdapterName);
         if (urlAdapter == null) {
             throw new SExecutionException("unable to execute the url adapter " + urlAdapterName + " because it does not exists");
         }
@@ -173,25 +173,25 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public void delete(SPageMapping sPageMapping) throws SDeletionException {
+    public void delete(final SPageMapping sPageMapping) throws SDeletionException {
         try {
             recorder.recordDelete(new DeleteRecord(sPageMapping), getDeleteRecord(sPageMapping));
-        } catch (SRecorderException e) {
+        } catch (final SRecorderException e) {
             throw new SDeletionException("Unable to delete the page mapping with key " + sPageMapping.getKey(), e);
         }
     }
 
-    SDeleteEvent getDeleteRecord(SPageMapping sPageMapping) {
+    SDeleteEvent getDeleteRecord(final SPageMapping sPageMapping) {
         return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PAGE_MAPPING).setObject(sPageMapping).done();
     }
 
     @Override
-    public void update(SPageMapping pageMapping, Long pageId) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException {
+    public void update(final SPageMapping pageMapping, final Long pageId) throws SObjectModificationException, SObjectNotFoundException, SBonitaReadException {
         update(pageMapping, pageId, null, null);
 
     }
 
-    void update(SPageMapping pageMapping, Long pageId, String url, String urlAdapter) throws SObjectNotFoundException, SBonitaReadException,
+    void update(final SPageMapping pageMapping, final Long pageId, final String url, final String urlAdapter) throws SObjectNotFoundException, SBonitaReadException,
             SObjectModificationException {
         try {
             update(pageMapping, getEntityUpdateDescriptor(pageId, url, urlAdapter));
@@ -201,13 +201,13 @@ public class PageMappingServiceImpl implements PageMappingService {
     }
 
     @Override
-    public void update(SPageMapping pageMapping, String url, String urlAdapter) throws SObjectModificationException, SObjectNotFoundException,
+    public void update(final SPageMapping pageMapping, final String url, final String urlAdapter) throws SObjectModificationException, SObjectNotFoundException,
             SBonitaReadException {
         update(pageMapping, null, url, urlAdapter);
 
     }
 
-    EntityUpdateDescriptor getEntityUpdateDescriptor(Long pageId, String url, String urlAdapter) throws SSessionNotFoundException, SessionIdNotSetException {
+    EntityUpdateDescriptor getEntityUpdateDescriptor(final Long pageId, final String url, final String urlAdapter) throws SSessionNotFoundException, SessionIdNotSetException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField("pageId", pageId);
         descriptor.addField("url", url);
@@ -221,12 +221,21 @@ public class PageMappingServiceImpl implements PageMappingService {
         return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
-    void update(SPageMapping pageMapping, EntityUpdateDescriptor descriptor) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
+    void update(final SPageMapping pageMapping, final EntityUpdateDescriptor descriptor) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(pageMapping, descriptor);
         recorder.recordUpdate(updateRecord, getUpdateEvent(pageMapping));
     }
 
-    SUpdateEvent getUpdateEvent(SPageMapping sPageMapping) {
+    SUpdateEvent getUpdateEvent(final SPageMapping sPageMapping) {
         return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PAGE_MAPPING).setObject(sPageMapping).done();
     }
+
+    @Override
+    public List<SPageMapping> get(final long pageId, final int startIndex, final int maxResults) throws SBonitaReadException {
+        final QueryOptions options = new QueryOptions(startIndex, maxResults);
+        final SelectListDescriptor<SPageMapping> listDescriptor = new SelectListDescriptor<SPageMapping>("getPageMappingByPageId",
+                Collections.<String, Object> singletonMap("pageId", pageId), SPageMapping.class, options);
+        return persistenceService.selectList(listDescriptor);
+    }
+
 }

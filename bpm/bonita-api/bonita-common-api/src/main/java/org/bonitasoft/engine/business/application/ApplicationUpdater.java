@@ -24,6 +24,7 @@ import org.bonitasoft.engine.profile.Profile;
  *
  * @author Elias Ricken de Medeiros
  * @see Application
+ * @since 7.0.0
  */
 public class ApplicationUpdater implements Serializable {
 
@@ -35,7 +36,7 @@ public class ApplicationUpdater implements Serializable {
      * Creates an instance of <code>ApplicationUpdater</code>
      */
     public ApplicationUpdater() {
-        fields = new HashMap<ApplicationField, Serializable>(8);
+        fields = new HashMap<>(8);
     }
 
     /**

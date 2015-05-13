@@ -536,6 +536,8 @@ CREATE TABLE business_app (
   state VARCHAR(30) NOT NULL,
   homePageId BIGINT,
   profileId BIGINT,
+  layoutId BIGINT,
+  themeId BIGINT,
   displayName VARCHAR(255) NOT NULL
 );
 

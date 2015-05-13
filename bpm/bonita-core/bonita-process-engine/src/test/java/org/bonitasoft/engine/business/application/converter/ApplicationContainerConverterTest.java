@@ -18,9 +18,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
-import java.util.List;
 
-import org.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
@@ -59,27 +57,4 @@ public class ApplicationContainerConverterTest {
         assertThat(nodeContainer.getApplications()).containsExactly(appNode1, appNode2);
     }
 
-    @Test
-    public void toSApplications_should_return_a_ImportResult_for_each_contained_application() throws Exception {
-        //given
-        ApplicationNode appNode1 = mock(ApplicationNode.class);
-        ApplicationNode appNode2 = mock(ApplicationNode.class);
-
-        ApplicationNodeContainer container = mock(ApplicationNodeContainer.class);
-        given(container.getApplications()).willReturn(Arrays.asList(appNode1, appNode2));
-
-        ImportResult importResult1 = mock(ImportResult.class);
-        ImportResult importResult2 = mock(ImportResult.class);
-
-        long createdBy = 4L;
-
-        given(applicationNodeConverter.toSApplication(appNode1, createdBy)).willReturn(importResult1);
-        given(applicationNodeConverter.toSApplication(appNode2, createdBy)).willReturn(importResult2);
-
-        //when
-        List<ImportResult> applications = applicationContainerConverter.toSApplications(container, createdBy);
-
-        //then
-        assertThat(applications).containsExactly(importResult1, importResult2);
-    }
 }

@@ -38,4 +38,8 @@ public interface SApplicationUpdateBuilder {
 
     public SApplicationUpdateBuilder updateHomePageId(final Long homePageId);
 
+    public SApplicationUpdateBuilder updateLayoutId(final Long layoutId);
+
+    public SApplicationUpdateBuilder updateThemeId(final Long themeId);
+
 }

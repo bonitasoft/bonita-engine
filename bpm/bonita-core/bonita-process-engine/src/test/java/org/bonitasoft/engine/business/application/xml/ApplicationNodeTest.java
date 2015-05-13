@@ -13,24 +13,52 @@
  **/
 package org.bonitasoft.engine.business.application.xml;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.business.application.xml.ApplicationNodeAssert.assertThat;
 
-import java.util.List;
-
+import org.bonitasoft.engine.business.application.ApplicationState;
 import org.junit.Test;
 
 public class ApplicationNodeTest {
+
+    @Test
+    public void simple_setters_and_getters_are_working() throws Exception {
+        //given
+        String displayName = "My application";
+        String description = "This is my main application";
+        String homePage = "home";
+        String iconPath = "/icon.jpg";
+        String layout = "leftMenu";
+        String theme = "defaultTheme";
+        String profile = "User";
+        String token = "myapp";
+        String version = "1.0";
+        String state = ApplicationState.ACTIVATED.name();
+
+        //when
+        ApplicationNode app = new ApplicationNode();
+        app.setDisplayName(displayName);
+        app.setDescription(description);
+        app.setHomePage(homePage);
+        app.setIconPath(iconPath);
+        app.setLayout(layout);
+        app.setTheme(theme);
+        app.setProfile(profile);
+        app.setState(state);
+        app.setToken(token);
+        app.setVersion(version);
+
+        //then
+        assertThat(app).hasDisplayName(displayName).hasDescription(description).hasHomePage(homePage).hasIconPath(iconPath).hasLayout(layout)
+                .hasTheme(theme).hasProfile(profile).hasState(state).hasToken(token).hasVersion(version);
+    }
 
     @Test
     public void getApplicationPages_should_return_empty_list_when_no_elements_were_added() throws Exception {
         //given
         ApplicationNode applicationNode = new ApplicationNode();
 
-        //when
-        List<ApplicationPageNode> applicationPages = applicationNode.getApplicationPages();
-
         //then
-        assertThat(applicationPages).isEmpty();
+        assertThat(applicationNode).hasNoApplicationPages();
     }
 
     @Test
@@ -38,10 +66,44 @@ public class ApplicationNodeTest {
         //given
         ApplicationNode applicationNode = new ApplicationNode();
 
+        //then
+        assertThat(applicationNode).hasNoApplicationMenus();
+    }
+
+    @Test
+    public void addApplicationPage_should_add_a_new_element_in_the_current_page_list() throws Exception {
+        //given
+        ApplicationNode applicationNode = new ApplicationNode();
+        ApplicationPageNode applicationPage1 = new ApplicationPageNode();
+        applicationPage1.setToken("page1");
+
+        ApplicationPageNode applicationPage2 = new ApplicationPageNode();
+        applicationNode.setToken("page2");
+
         //when
-        List<ApplicationMenuNode> applicationMenus = applicationNode.getApplicationMenus();
+        applicationNode.addApplicationPage(applicationPage1);
+        applicationNode.addApplicationPage(applicationPage2);
 
         //then
-        assertThat(applicationMenus).isEmpty();
+        assertThat(applicationNode).hasApplicationPages(applicationPage1, applicationPage2);
     }
+
+    @Test
+    public void addApplicationMenu_should_add_a_new_element_in_the_current_menu_list() throws Exception {
+        //given
+        ApplicationNode applicationNode = new ApplicationNode();
+        ApplicationMenuNode menu1 = new ApplicationMenuNode();
+        menu1.setDisplayName("entry1");
+
+        ApplicationMenuNode menu2 = new ApplicationMenuNode();
+        menu2.setDisplayName("entry2");
+
+        //when
+        applicationNode.addApplicationMenu(menu1);
+        applicationNode.addApplicationMenu(menu2);
+
+        //then
+        assertThat(applicationNode).hasApplicationMenus(menu1, menu2);
+    }
+
 }
