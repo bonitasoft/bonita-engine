@@ -462,8 +462,8 @@ public class ModelConvertorTest {
         final SInputDefinition sComplexInput = new SInputDefinitionImpl(expectedComplexInput);
 
         contractDefinition.getConstraints().add(sRule);
-        contractDefinition.getInputs().add(sSimpleInput);
-        contractDefinition.getInputs().add(sComplexInput);
+        contractDefinition.getInputDefinitions().add(sSimpleInput);
+        contractDefinition.getInputDefinitions().add(sComplexInput);
 
         final ContractDefinition contract = ModelConvertor.toContract(contractDefinition);
 
@@ -492,8 +492,8 @@ public class ModelConvertorTest {
         final SInputDefinition sComplexInput = new SInputDefinitionImpl(expectedComplexWithComplexInput);
 
         contractDefinition.getConstraints().add(sRule);
-        contractDefinition.getInputs().add(sSimpleInput);
-        contractDefinition.getInputs().add(sComplexInput);
+        contractDefinition.getInputDefinitions().add(sSimpleInput);
+        contractDefinition.getInputDefinitions().add(sComplexInput);
 
         final ContractDefinition contract = ModelConvertor.toContract(contractDefinition);
 

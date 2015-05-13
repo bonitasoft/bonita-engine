@@ -18,7 +18,6 @@ import static java.util.Arrays.asList;
 import java.util.List;
 
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 
 public class SConstraintDefinitionBuilder {
@@ -27,7 +26,6 @@ public class SConstraintDefinitionBuilder {
     private String expression;
     private String explanation;
     private String name;
-    private SConstraintType sConstraintType;
 
     public SConstraintDefinitionBuilder(final String... inputNames) {
         this.inputNames = asList(inputNames);
@@ -52,13 +50,8 @@ public class SConstraintDefinitionBuilder {
         return this;
     }
 
-    public SConstraintDefinitionBuilder constraintType(final SConstraintType sConstraintType) {
-        this.sConstraintType = sConstraintType;
-        return this;
-    }
-
     public SConstraintDefinition build() {
-        final SConstraintDefinitionImpl rule = new SConstraintDefinitionImpl(name, expression, explanation, sConstraintType);
+        final SConstraintDefinitionImpl rule = new SConstraintDefinitionImpl(name, expression, explanation);
         for (final String inputName : inputNames) {
             rule.addInputName(inputName);
         }

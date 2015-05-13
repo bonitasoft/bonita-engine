@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -550,9 +549,9 @@ public class BusinessArchiveTest {
 
     @Test
     public void readProcessWithContract() throws Exception {
-            final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
-            builder.addActor("myActor");
-        ContractDefinitionBuilder contractDefinitionBuilder = builder.addUserTask("step1", "myActor").addContract();
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        builder.addActor("myActor");
+        final ContractDefinitionBuilder contractDefinitionBuilder = builder.addUserTask("step1", "myActor").addContract();
         createContract(contractDefinitionBuilder);
         createContract(builder.addContract());
         final DesignProcessDefinition process = builder.getProcess();
@@ -561,9 +560,8 @@ public class BusinessArchiveTest {
         assertThat(process).isEqualTo(result);
     }
 
-    void createContract(ContractDefinitionBuilder contractDefinitionBuilder) {
-        contractDefinitionBuilder.addInput("numberOfDays", Type.INTEGER, null)
-                    .addMandatoryConstraint("numberOfDays").addConstraint("Mystical constraint", "true", null, "numberOfDays");
+    void createContract(final ContractDefinitionBuilder contractDefinitionBuilder) {
+        contractDefinitionBuilder.addInput("numberOfDays", Type.INTEGER, null).addConstraint("Mystical constraint", "true", null, "numberOfDays");
         final InputDefinition childText = new InputDefinitionImpl("childText", Type.TEXT, "a text simple input");
         final InputDefinition childDecimal = new InputDefinitionImpl("childDecimal", Type.DECIMAL, "a decimal simple input");
         contractDefinitionBuilder.addInput("complex", "a complex input", Arrays.asList(childText, childDecimal));

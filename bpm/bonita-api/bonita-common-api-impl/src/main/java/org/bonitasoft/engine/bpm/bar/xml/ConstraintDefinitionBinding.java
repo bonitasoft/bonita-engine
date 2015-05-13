@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.ConstraintType;
 import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
 import org.bonitasoft.engine.io.xml.XMLParseException;
 
@@ -32,16 +31,8 @@ public class ConstraintDefinitionBinding extends NamedElementBinding {
 
     private final List<String> inputNames;
 
-    private ConstraintType constraintType;
-
     public ConstraintDefinitionBinding() {
         inputNames = new ArrayList<String>();
-    }
-
-    @Override
-    public void setAttributes(final Map<String, String> attributes) {
-        super.setAttributes(attributes);
-        constraintType = ConstraintType.valueOf(attributes.get(XMLProcessDefinition.CONSTRAINT_TYPE));
     }
 
     @Override
@@ -61,7 +52,7 @@ public class ConstraintDefinitionBinding extends NamedElementBinding {
 
     @Override
     public Object getObject() {
-        final ConstraintDefinitionImpl rule = new ConstraintDefinitionImpl(name, expression, explanation, constraintType);
+        final ConstraintDefinitionImpl rule = new ConstraintDefinitionImpl(name, expression, explanation);
         for (final String inputName : inputNames) {
             rule.addInputName(inputName);
         }

@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.expression;
 
-import java.io.Serializable;
 import java.util.List;
+
+import org.bonitasoft.engine.bpm.BaseElement;
 
 /**
  * @author Feng Hui
  */
-public interface Expression extends Serializable {
+public interface Expression extends BaseElement {
 
     String getName();
 

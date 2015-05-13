@@ -19,12 +19,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.isNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,9 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.page.SearchPages;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.io.IOUtil;
+import org.bonitasoft.engine.core.form.FormMappingService;
+import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipInconsistentException;
@@ -47,6 +47,7 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageCreator;
+import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageNotFoundException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.PageUpdater;
@@ -57,8 +58,11 @@ import org.bonitasoft.engine.page.SInvalidPageZipMissingAPropertyException;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.SPageUpdateBuilder;
 import org.bonitasoft.engine.page.SPageUpdateContentBuilder;
+import org.bonitasoft.engine.page.impl.SPageMappingImpl;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -103,12 +107,19 @@ public class PageAPIDelegateTest {
 
     @Mock
     private PageService pageService;
+    @Mock
+    private PageMappingService pageMappingService;
+    @Mock
+    private FormMappingService formMappingService;
 
     private final long userId = 123L;
 
     @Before
     public void before() {
         doReturn(pageService).when(serviceAccessor).getPageService();
+        doReturn(pageMappingService).when(serviceAccessor).getPageMappingService();
+        doReturn(formMappingService).when(serviceAccessor).getFormMappingService();
+        doReturn(mock(DependencyResolver.class)).when(serviceAccessor).getDependencyResolver();
         doReturn(mock(SearchEntitiesDescriptor.class)).when(serviceAccessor).getSearchEntitiesDescriptor();
         pageAPIDelegate = spy(new PageAPIDelegate(serviceAccessor, userId));
     }
@@ -159,8 +170,18 @@ public class PageAPIDelegateTest {
     @Test
     public void testDeletePage() throws Exception {
         final long pageId = 123;
+        final SPage sPage = mock(SPage.class);
+        doReturn(sPage).when(pageService).getPage(pageId);
+        final SFormMappingImpl formMapping = new SFormMappingImpl();
+        formMapping.setPageMapping(new SPageMappingImpl());
+        when(formMappingService.searchFormMappings(any(QueryOptions.class))).thenReturn(Collections.<SFormMapping> singletonList(formMapping),
+                Collections.<SFormMapping> emptyList());
+
         pageAPIDelegate.deletePage(pageId);
-        verify(pageService, times(1)).deletePage(pageId);
+
+        verify(pageService).deletePage(pageId);
+        verify(pageMappingService).update(any(SPageMapping.class), isNull(Long.class)); // As the page has just been deleted
+        verify(formMappingService, times(2)).searchFormMappings(any(QueryOptions.class));
     }
 
     @Test
@@ -170,12 +191,13 @@ public class PageAPIDelegateTest {
         for (int pageId = 0; pageId < 10; pageId++) {
             pageIds.add(new Long(pageId));
         }
+        doNothing().when(pageAPIDelegate).deletePage(anyLong());
 
         // when
         pageAPIDelegate.deletePages(pageIds);
 
         // then
-        verify(pageService, times(pageIds.size())).deletePage(anyLong());
+        verify(pageAPIDelegate, times(pageIds.size())).deletePage(anyLong());
     }
 
     @Test

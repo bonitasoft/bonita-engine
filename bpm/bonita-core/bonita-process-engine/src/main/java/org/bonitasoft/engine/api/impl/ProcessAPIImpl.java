@@ -5831,13 +5831,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SUserTaskDefinition userTask = (SUserTaskDefinition) processDefinition.getProcessContainer().getFlowNode(
                     taskInstance.getFlowNodeDefinitionId());
             return ModelConvertor.toContract(userTask.getContract());
-        } catch (final SActivityInstanceNotFoundException sainfe) {
-            throw new UserTaskNotFoundException(sainfe.getMessage());
-        } catch (final SProcessDefinitionNotFoundException spdnfe) {
-            throw new UserTaskNotFoundException(spdnfe.getMessage());
-        } catch (final SProcessDefinitionReadException spdre) {
-            throw new UserTaskNotFoundException(spdre.getMessage());
-        } catch (final SActivityReadException e) {
+        } catch (final SActivityInstanceNotFoundException | SProcessDefinitionNotFoundException | SActivityReadException | SProcessDefinitionReadException e) {
             throw new UserTaskNotFoundException(e.getMessage());
         }
     }
@@ -5847,10 +5841,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             final SProcessDefinition processDefinition = getTenantAccessor().getProcessDefinitionService().getProcessDefinition(processDefinitionId);
             return ModelConvertor.toContract(processDefinition.getContract());
-        } catch (final SProcessDefinitionNotFoundException spdnfe) {
-            throw new ProcessDefinitionNotFoundException(spdnfe.getMessage());
-        } catch (final SProcessDefinitionReadException spdre) {
-            throw new ProcessDefinitionNotFoundException(spdre.getMessage());
+        } catch (final SProcessDefinitionNotFoundException | SProcessDefinitionReadException e) {
+            throw new ProcessDefinitionNotFoundException(e.getMessage());
         }
     }
 
@@ -5876,7 +5868,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final Map<String, Serializable> inputs)
-            throws ContractViolationException, SBonitaException, SFlowNodeNotFoundException {
+            throws ContractViolationException, SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(tenantAccessor.getActivityInstanceService(), flownodeInstanceId);
         executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);

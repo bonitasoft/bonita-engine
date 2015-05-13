@@ -125,6 +125,7 @@ public class FormMappingServiceImplTest {
         verify(pageMappingService).create("keye", null, EXTERNAL, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_ACTOR_INITIATOR));
     }
 
+
     @Test
     public void createLegacyFormShouldNotAddCorrectAuthorizations() throws Exception {
         doReturn("keye").when(formMappingKeyGenerator).generateKey(PROCESS_DEFINITION_ID, null, FormMappingType.PROCESS_START.getId());

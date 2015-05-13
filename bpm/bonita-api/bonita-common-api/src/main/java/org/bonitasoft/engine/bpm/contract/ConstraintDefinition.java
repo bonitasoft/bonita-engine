@@ -50,11 +50,4 @@ public interface ConstraintDefinition extends NamedElement {
      */
     List<String> getInputNames();
 
-    /**
-     * Return the type of the of the constraint
-     *
-     * @return the {@link ConstraintType} of the constraint
-     */
-    ConstraintType getConstraintType();
-
 }
