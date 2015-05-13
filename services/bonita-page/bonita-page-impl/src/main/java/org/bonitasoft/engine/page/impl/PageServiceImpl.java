@@ -602,8 +602,10 @@ public class PageServiceImpl implements PageService {
             final SPage pageByName = getPageByName(pageProperties.getProperty(PROPERTIES_NAME));
             if (pageByName == null) {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page was not imported, importing it.");
-                insertPage(createPage(pageProperties.getProperty(PageService.PROPERTIES_NAME), pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
-                        pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), zipName, -1, true, SContentType.PAGE), providedPageContent);
+                insertPage(
+                        createPage(pageProperties.getProperty(PageService.PROPERTIES_NAME), pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
+                                pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), zipName, -1, true,
+                                pageProperties.getProperty(PageService.PROPERTIES_CONTENT_TYPE, SContentType.PAGE)), providedPageContent);
                 return;
             }
             final byte[] pageContent = getPageContent(pageByName.getId());

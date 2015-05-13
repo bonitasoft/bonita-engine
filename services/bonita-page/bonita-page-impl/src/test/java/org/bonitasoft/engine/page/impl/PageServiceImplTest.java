@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.page.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -164,7 +165,6 @@ public class PageServiceImplTest {
 
         final List<PageServiceListener> listeners = Arrays.asList(apiExtensionPageServiceListener);
         pageServiceImpl.setPageServiceListeners(listeners);
-
 
     }
 
@@ -330,6 +330,26 @@ public class PageServiceImplTest {
         // given
         // resource in the classpath bonita-groovy-example-page.zip
         doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
+
+        Answer<SPage> answer = new Answer<SPage>() {
+
+            @Override
+            public SPage answer(InvocationOnMock invocation) throws Throwable {
+                final SPage sPage = (SPage) invocation.getArguments()[0];
+
+                Map<String, String> map = new HashMap<>();
+                map.put("custompage_layout", "layout");
+                map.put("custompage_htmlexample", "page");
+                map.put("custompage_groovyexample", "page");
+                map.put("custompage_home", "page");
+                map.put("custompage_theme", "theme");
+
+                assertThat(map).contains(entry(sPage.getName(), sPage.getContentType()));
+
+                return sPage;
+            }
+        };
+        when(pageServiceImpl.insertPage(any(SPage.class), any(byte[].class))).then(answer);
 
         // when
         pageServiceImpl.start();
@@ -949,9 +969,9 @@ public class PageServiceImplTest {
         SPageAssert.assertThat(insertedPage).hasContentType(SContentType.API_EXTENSION);
     }
 
-
     protected Pair<String, byte[]> getPagePropertiesContentPair(final String... otherProperties) {
-        final StringBuilder stringBuilder = new StringBuilder().append("name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n");
+        final StringBuilder stringBuilder = new StringBuilder()
+                .append("name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n");
         for (final String property : otherProperties) {
             stringBuilder.append(property).append("\n");
         }
