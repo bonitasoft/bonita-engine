@@ -87,7 +87,10 @@ public class ExpressionFinder implements ModelFinderVisitor<Expression> {
 
     @Override
     public Expression find(Expression expression, long expressionDefinitionId) {
-        return (expression != null && expression.getId() == expressionDefinitionId) ? expression : null;
+        if (expression != null && expression.getId() == expressionDefinitionId)
+            return expression;
+        else
+            return null;
     }
 
     @Override
@@ -98,8 +101,14 @@ public class ExpressionFinder implements ModelFinderVisitor<Expression> {
                 return expression;
             }
         }
+        for (ContextEntry contextEntry : designProcessDefinition.getContext()) {
+            final Expression contextExpression = getExpressionFromContainer(contextEntry, expressionDefinitionId);
+            if (contextExpression != null) {
+                return contextExpression;
+            }
+        }
         final FlowElementContainerDefinition flowElementContainer = designProcessDefinition.getFlowElementContainer();
-        return flowElementContainer != null ? flowElementContainer.accept(this, expressionDefinitionId) : null;
+        return getExpressionFromContainer(flowElementContainer, expressionDefinitionId);
     }
 
     @Override
@@ -249,7 +258,7 @@ public class ExpressionFinder implements ModelFinderVisitor<Expression> {
 
     @Override
     public Expression find(HumanTaskDefinition humanTaskDefinition, long expressionDefinitionId) {
-        return humanTaskDefinition != null ? humanTaskDefinition.getUserFilter().accept(this, expressionDefinitionId) : null;
+        return humanTaskDefinition != null ? getExpressionFromContainer(humanTaskDefinition.getUserFilter(), expressionDefinitionId) : null;
     }
 
     @Override
