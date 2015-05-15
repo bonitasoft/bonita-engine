@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -42,7 +41,6 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -51,11 +49,9 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -74,10 +70,6 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
-import org.bonitasoft.engine.profile.ImportPolicy;
-import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.ProfilesImporter;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -103,8 +95,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
 public class PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
-
-    public static final String PROFILES_FILE = "profiles.xml";
 
     private static boolean isNodeStarted = false;
 
@@ -647,7 +637,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             }
 
             // Create session
-            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
             final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
             sessionAccessor = createSessionAccessor();
             final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
@@ -655,9 +644,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
 
-            // Create default profiles
-            createDefaultProfiles(tenantServiceAccessor);
-
+            // Create default profiles: done by profile updater restart handler
             // Create custom page examples: done by page service start
             // Create default themes: done by theme service start
 
@@ -689,21 +676,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (Exception e) {
             throw new STenantCreationException("Exception while creating tenant folder");
         }
-    }
-
-    protected void createDefaultProfiles(final TenantServiceAccessor tenantServiceAccessor) throws Exception {
-        File file = ProfilesImporter.getFileContainingMD5(tenantServiceAccessor);
-        String fileContent = IOUtil.readResource(getProfileFileName());
-        List<ExportedProfile> profilesFromXML = ProfilesImporter.getProfilesFromXML(fileContent, tenantServiceAccessor.getProfileParser());
-        importProfiles(tenantServiceAccessor.getProfileService(), tenantServiceAccessor.getIdentityService(), profilesFromXML, tenantServiceAccessor);
-        IOUtil.writeMD5(file, fileContent.getBytes());
-    }
-
-    protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
-            final TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
-        ProfilesImporter profilesImporter = new ProfilesImporter(tenantServiceAccessor.getProfileService(), tenantServiceAccessor.getIdentityService(),
-                profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES);
-        profilesImporter.importProfiles(-1);
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {
@@ -892,11 +864,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     @AvailableOnStoppedNode
     public boolean isNodeStarted() {
         return isNodeStarted;
-    }
-
-    // Overrided in SP
-    protected String getProfileFileName() {
-        return PROFILES_FILE;
     }
 
     @Override
