@@ -22,13 +22,15 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
+import org.bonitasoft.engine.bpm.process.Container;
 
 /**
  * Allows to access all flow elements (activities, gateways, events and transitions) of a process or sub-process.
+ * 
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface FlowElementContainerDefinition extends BaseElement {
+public interface FlowElementContainerDefinition extends BaseElement, Container {
 
     List<ActivityDefinition> getActivities();
 
@@ -37,7 +39,6 @@ public interface FlowElementContainerDefinition extends BaseElement {
     Set<TransitionDefinition> getTransitions();
 
     /**
-     *
      * @return A set of GatewayDefinition
      * @see #getGatewaysList()
      * @since 6.0
@@ -47,7 +48,6 @@ public interface FlowElementContainerDefinition extends BaseElement {
     Set<GatewayDefinition> getGateways();
 
     /**
-     *
      * @return A list of GatewayDefinition
      * @since 6.1
      */

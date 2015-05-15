@@ -13,14 +13,15 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.StandardLoopCharacteristics;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class StandardLoopCharacteristics implements LoopCharacteristics {
+public class StandardLoopCharacteristicsImpl implements StandardLoopCharacteristics {
 
     private static final long serialVersionUID = -8405419721405699090L;
 
@@ -30,14 +31,14 @@ public class StandardLoopCharacteristics implements LoopCharacteristics {
 
     private final Expression loopMax;
 
-    public StandardLoopCharacteristics(final Expression loopCondition, final boolean testBefore) {
+    public StandardLoopCharacteristicsImpl(final Expression loopCondition, final boolean testBefore) {
         super();
         this.loopCondition = loopCondition;
         this.testBefore = testBefore;
         loopMax = null;
     }
 
-    public StandardLoopCharacteristics(final Expression loopCondition, final boolean testBefore, final Expression loopMax) {
+    public StandardLoopCharacteristicsImpl(final Expression loopCondition, final boolean testBefore, final Expression loopMax) {
         super();
         this.loopCondition = loopCondition;
         this.testBefore = testBefore;
@@ -77,7 +78,7 @@ public class StandardLoopCharacteristics implements LoopCharacteristics {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final StandardLoopCharacteristics other = (StandardLoopCharacteristics) obj;
+        final StandardLoopCharacteristicsImpl other = (StandardLoopCharacteristicsImpl) obj;
         if (testBefore != other.testBefore) {
             return false;
         }
@@ -98,4 +99,8 @@ public class StandardLoopCharacteristics implements LoopCharacteristics {
         return true;
     }
 
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
+    }
 }

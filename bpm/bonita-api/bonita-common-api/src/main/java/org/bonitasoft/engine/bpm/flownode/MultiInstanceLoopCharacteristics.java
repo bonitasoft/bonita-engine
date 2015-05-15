@@ -11,49 +11,28 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.document;
+package org.bonitasoft.engine.bpm.flownode;
 
-import org.bonitasoft.engine.bpm.NamedElement;
-import org.bonitasoft.engine.bpm.process.Container;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
- * The definition of a document attached to a process definition
- * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
- * @author Celine Souchet
  */
-public interface DocumentDefinition extends NamedElement, Container {
+public interface MultiInstanceLoopCharacteristics extends LoopCharacteristics {
 
-    /**
-     * @return The URL for an external document
-     */
-    String getUrl();
+    boolean isSequential();
 
-    /**
-     * @return The file reference in the process resources
-     */
-    String getFile();
+    Expression getLoopCardinality();
 
-    /**
-     * @return The mime type of the document's content.
-     */
-    String getContentMimeType();
+    Expression getCompletionCondition();
 
-    /**
-     * @return The description of the document
-     */
-    String getDescription();
+    String getLoopDataInputRef();
 
-    /**
-     * @return The name of the file of the document
-     */
-    String getFileName();
+    String getLoopDataOutputRef();
 
-    /**
-     * @return the initial value expression
-     */
-    Expression getInitialValue();
+    String getDataInputItemRef();
+
+    String getDataOutputItemRef();
 
 }

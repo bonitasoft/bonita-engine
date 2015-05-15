@@ -15,13 +15,14 @@ package org.bonitasoft.engine.bpm.flownode;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.process.Container;
 
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
-public interface ThrowEventDefinition extends EventDefinition {
+public interface ThrowEventDefinition extends EventDefinition, Container {
 
     List<ThrowMessageEventTriggerDefinition> getMessageEventTriggerDefinitions();
 

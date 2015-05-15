@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
-import org.bonitasoft.engine.bpm.flownode.CorrelationDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
@@ -33,12 +33,7 @@ public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
 
     public CatchMessageEventTriggerDefinitionImpl(final String messageName) {
         super(messageName);
-        operations = new ArrayList<Operation>(1);
-    }
-
-    public CatchMessageEventTriggerDefinitionImpl(final String messageName, final List<CorrelationDefinition> correlations) {
-        super(messageName, correlations);
-        operations = new ArrayList<Operation>(1);
+        operations = new ArrayList<>(1);
     }
 
     public CatchMessageEventTriggerDefinitionImpl(final CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
@@ -85,4 +80,12 @@ public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
         return true;
     }
 
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        final T accept = super.accept(visitor, modelId);
+        if (accept != null) {
+            return accept;
+        }
+        return visitor.find(this, modelId);
+    }
 }

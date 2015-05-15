@@ -15,12 +15,13 @@
 package org.bonitasoft.engine.bpm.context;
 
 import org.bonitasoft.engine.bpm.BonitaObject;
+import org.bonitasoft.engine.bpm.process.Container;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Baptiste Mesta
  */
-public interface ContextEntry extends BonitaObject {
+public interface ContextEntry extends BonitaObject, Container {
 
     String getKey();
 

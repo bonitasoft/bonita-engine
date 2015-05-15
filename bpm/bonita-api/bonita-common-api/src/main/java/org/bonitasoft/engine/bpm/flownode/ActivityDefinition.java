@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
+import org.bonitasoft.engine.bpm.process.Container;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
@@ -29,7 +30,7 @@ import org.bonitasoft.engine.operation.Operation;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface ActivityDefinition extends FlowNodeDefinition {
+public interface ActivityDefinition extends FlowNodeDefinition, Container {
 
     /**
      * @return The list of loops on this activity

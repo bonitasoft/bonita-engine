@@ -1,6 +1,6 @@
-/**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+/*
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -10,22 +10,13 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.bpm.flownode.impl.internal;
-
-import org.bonitasoft.engine.bpm.flownode.TerminateEventTriggerDefinition;
-import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+ */
+package org.bonitasoft.engine.bpm.process;
 
 /**
- * @author Matthieu Chaffotte
+ * author Emmanuel Duchastenier
  */
-public class TerminateEventTriggerDefinitionImpl implements TerminateEventTriggerDefinition {
+public interface Container {
 
-    private static final long serialVersionUID = -1494352183532063268L;
-
-    @Override
-    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
-        // nothing to do here:
-        return null;
-    }
+    <T> T accept(ModelFinderVisitor<T> visitor, long modelId);
 }

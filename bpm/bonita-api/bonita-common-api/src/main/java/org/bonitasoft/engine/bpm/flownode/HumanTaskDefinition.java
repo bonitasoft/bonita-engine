@@ -13,10 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
-import java.util.Map;
-
+import org.bonitasoft.engine.bpm.process.Container;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
-import org.bonitasoft.engine.expression.Expression;
 
 /**
  * A Human task is a task having an actor and that can be assigned.
@@ -24,7 +22,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public interface HumanTaskDefinition extends TaskDefinition {
+public interface HumanTaskDefinition extends TaskDefinition, Container {
 
     String getActorName();
 

@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Baptiste Mesta
  */
-public class MultiInstanceLoopCharacteristics implements LoopCharacteristics {
+public class MultiInstanceLoopCharacteristicsImpl implements MultiInstanceLoopCharacteristics {
 
     private static final long serialVersionUID = 22281767220832906L;
 
@@ -37,12 +38,12 @@ public class MultiInstanceLoopCharacteristics implements LoopCharacteristics {
 
     private String dataOutputItemRef;
 
-    public MultiInstanceLoopCharacteristics(final boolean isSequential, final Expression loopCardinality) {
+    public MultiInstanceLoopCharacteristicsImpl(final boolean isSequential, final Expression loopCardinality) {
         this.isSequential = isSequential;
         this.loopCardinality = loopCardinality;
     }
 
-    public MultiInstanceLoopCharacteristics(final boolean isSequential, final String loopDataInputRef) {
+    public MultiInstanceLoopCharacteristicsImpl(final boolean isSequential, final String loopDataInputRef) {
         this.isSequential = isSequential;
         this.loopDataInputRef = loopDataInputRef;
     }
@@ -128,7 +129,7 @@ public class MultiInstanceLoopCharacteristics implements LoopCharacteristics {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final MultiInstanceLoopCharacteristics other = (MultiInstanceLoopCharacteristics) obj;
+        final MultiInstanceLoopCharacteristicsImpl other = (MultiInstanceLoopCharacteristicsImpl) obj;
         if (completionCondition == null) {
             if (other.completionCondition != null) {
                 return false;
@@ -196,6 +197,11 @@ public class MultiInstanceLoopCharacteristics implements LoopCharacteristics {
         builder.append(dataOutputItemRef);
         builder.append("]");
         return builder.toString();
+    }
+
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
     }
 
 }

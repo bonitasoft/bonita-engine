@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.data;
 
 import org.bonitasoft.engine.bpm.DescriptionElement;
+import org.bonitasoft.engine.bpm.process.Container;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -26,7 +27,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @since 6.0.0
  * @version 6.4.1
  */
-public interface DataDefinition extends DescriptionElement {
+public interface DataDefinition extends DescriptionElement, Container {
 
     /**
      * Get the class name of the type of the data.

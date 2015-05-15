@@ -25,9 +25,11 @@ import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
+import org.bonitasoft.engine.bpm.process.impl.internal.ExpressionFinder;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
@@ -44,6 +46,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilderFactory;
+import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionLogBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionLogBuilderFactory;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -55,6 +58,8 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.io.xml.XMLParseException;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -342,8 +347,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     SProcessDefinition convertDesignProcessDefinition(DesignProcessDefinition designProcessDefinition) {
-        return BuilderFactory.get(SProcessDefinitionBuilderFactory.class).createNewInstance(designProcessDefinition)
-                .done();
+        return BuilderFactory.get(SProcessDefinitionBuilderFactory.class).createNewInstance(designProcessDefinition).done();
     }
 
     private long getUserId() {
@@ -1016,6 +1020,37 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(final QueryOptions queryOptions)
             throws SBonitaReadException {
         return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", queryOptions, null);
+    }
+
+    protected DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws IOException, XMLParseException,
+            SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+        return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent());
+    }
+
+    @Override
+    public void updateExpressionContent(long processDefinitionId, long expressionDefinitionId, String content) throws SProcessDefinitionNotFoundException,
+            SObjectModificationException {
+        try {
+            final DesignProcessDefinition designProcessDefinition = getDesignProcessDefinition(processDefinitionId);
+            final ExpressionImpl expression = (ExpressionImpl) getExpression(designProcessDefinition, expressionDefinitionId);
+            if (expression == null) {
+                throw new SObjectModificationException("No expression with ID " + expressionDefinitionId + " found on process "
+                        + designProcessDefinition.getDisplayName() + " (" + designProcessDefinition.getVersion() + ")");
+            }
+            expression.setContent(content);
+            final String processDefinitionAsXMLString = getProcessContent(designProcessDefinition);
+            final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
+                    .createNewInstance().updateDesignContent(processDefinitionAsXMLString).done();
+            updateProcessDefinitionDeployInfo(processDefinitionId, updateDescriptor);
+        } catch (SProcessDefinitionReadException | IOException | XMLParseException e) {
+            throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
+        } catch (SProcessDeploymentInfoUpdateException e) {
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    protected Expression getExpression(DesignProcessDefinition processDefinition, long expressionDefinitionId) {
+        return new ExpressionFinder().find(processDefinition, expressionDefinitionId);
     }
 
 }

@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SMultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.model.SExpression;

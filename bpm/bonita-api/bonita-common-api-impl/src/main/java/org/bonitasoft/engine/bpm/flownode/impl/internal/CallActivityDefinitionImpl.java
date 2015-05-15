@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CallableElementType;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 
@@ -171,4 +172,12 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
         return true;
     }
 
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        final T element = super.accept(visitor, modelId);
+        if (element != null) {
+            return element;
+        }
+        return visitor.find(this, modelId);
+    }
 }
