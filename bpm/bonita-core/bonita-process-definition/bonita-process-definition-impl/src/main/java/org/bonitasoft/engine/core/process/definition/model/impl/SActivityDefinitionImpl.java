@@ -24,8 +24,8 @@ import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.StandardLoopCharacteristics;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SBoundaryEventNotFoundException;
@@ -149,7 +149,6 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
     public List<SBusinessDataDefinition> getBusinessDataDefinitions() {
         return businessDataDefinitions;
     }
-
 
     @Override
     public SBusinessDataDefinition getBusinessDataDefinition(final String name) {

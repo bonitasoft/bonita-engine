@@ -23,7 +23,7 @@ import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.LoopActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -40,6 +40,7 @@ import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 @RunWith(BonitaTestRunner.class)
 @BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {

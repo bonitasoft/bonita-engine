@@ -1023,9 +1023,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     protected DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws IOException, XMLParseException,
-            SProcessDefinitionNotFoundException,
-            SProcessDefinitionReadException {
-        return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getContent());
+            SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+        return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent());
     }
 
     @Override

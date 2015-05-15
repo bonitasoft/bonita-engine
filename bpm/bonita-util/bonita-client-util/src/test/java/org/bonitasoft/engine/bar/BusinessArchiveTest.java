@@ -50,13 +50,13 @@ import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
+import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.SendTaskDefinition;
+import org.bonitasoft.engine.bpm.flownode.StandardLoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -411,7 +411,7 @@ public class BusinessArchiveTest {
         }
 
         final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
-        final List<DocumentDefinition> documentDefinitions = result.getProcessContainer().getDocumentDefinitions();
+        final List<DocumentDefinition> documentDefinitions = result.getFlowElementContainer().getDocumentDefinitions();
         final DocumentDefinition testDoc1 = documentDefinitions.get(0);
         assertEquals("testDoc", testDoc1.getName());
         assertEquals("desc", testDoc1.getDescription());
@@ -428,17 +428,19 @@ public class BusinessArchiveTest {
         assertEquals(process.getDescription(), result.getDescription());
         assertEquals(process.getDisplayName(), result.getDisplayName());
         assertEquals(process.getDisplayDescription(), result.getDisplayDescription());
-        assertEquals(process.getProcessContainer().getStartEvents().size(), result.getProcessContainer().getStartEvents().size());
-        assertEquals(process.getProcessContainer().getStartEvents().get(0), result.getProcessContainer().getStartEvents().get(0));
-        assertEquals(process.getProcessContainer().getIntermediateCatchEvents().size(), result.getProcessContainer().getIntermediateCatchEvents().size());
-        assertEquals(process.getProcessContainer().getIntermediateCatchEvents().get(0), result.getProcessContainer().getIntermediateCatchEvents().get(0));
-        assertEquals(process.getProcessContainer().getEndEvents().size(), result.getProcessContainer().getEndEvents().size());
-        assertEquals(process.getProcessContainer().getEndEvents().get(0), result.getProcessContainer().getEndEvents().get(0));
+        assertEquals(process.getFlowElementContainer().getStartEvents().size(), result.getFlowElementContainer().getStartEvents().size());
+        assertEquals(process.getFlowElementContainer().getStartEvents().get(0), result.getFlowElementContainer().getStartEvents().get(0));
+        assertEquals(process.getFlowElementContainer().getIntermediateCatchEvents().size(), result.getFlowElementContainer().getIntermediateCatchEvents()
+                .size());
+        assertEquals(process.getFlowElementContainer().getIntermediateCatchEvents().get(0), result.getFlowElementContainer().getIntermediateCatchEvents()
+                .get(0));
+        assertEquals(process.getFlowElementContainer().getEndEvents().size(), result.getFlowElementContainer().getEndEvents().size());
+        assertEquals(process.getFlowElementContainer().getEndEvents().get(0), result.getFlowElementContainer().getEndEvents().get(0));
         assertEquals(process.getActorsList().size(), result.getActorsList().size());
         assertEquals(process.getActorsList().iterator().next(), result.getActorsList().iterator().next());
-        assertEquals(process.getProcessContainer().getActivities().size(), result.getProcessContainer().getActivities().size());
-        final Iterator<ActivityDefinition> iterator = result.getProcessContainer().getActivities().iterator();
-        final Iterator<ActivityDefinition> iterator2 = process.getProcessContainer().getActivities().iterator();
+        assertEquals(process.getFlowElementContainer().getActivities().size(), result.getFlowElementContainer().getActivities().size());
+        final Iterator<ActivityDefinition> iterator = result.getFlowElementContainer().getActivities().iterator();
+        final Iterator<ActivityDefinition> iterator2 = process.getFlowElementContainer().getActivities().iterator();
         final ActivityDefinition procAct1 = iterator2.next();
         final ActivityDefinition procAct2 = iterator2.next();
         final ActivityDefinition procAct3 = iterator2.next();
@@ -491,21 +493,22 @@ public class BusinessArchiveTest {
         assertEquals(1, auto1.getOperations().size());
         assertEquals(auto1.getOperations().get(0), auto1.getOperations().get(0));
         assertTrue(procAct2.equals(resAct1) || procAct2.equals(resAct2) || procAct2.equals(resAct3));
-        assertEquals(process.getProcessContainer().getGatewaysList().size(), result.getProcessContainer().getGatewaysList().size());
-        assertEquals(process.getProcessContainer().getGatewaysList().iterator().next(), result.getProcessContainer().getGatewaysList().iterator().next());
-        assertEquals(process.getProcessContainer().getTransitions().size(), result.getProcessContainer().getTransitions().size());
+        assertEquals(process.getFlowElementContainer().getGatewaysList().size(), result.getFlowElementContainer().getGatewaysList().size());
+        assertEquals(process.getFlowElementContainer().getGatewaysList().iterator().next(), result.getFlowElementContainer().getGatewaysList().iterator()
+                .next());
+        assertEquals(process.getFlowElementContainer().getTransitions().size(), result.getFlowElementContainer().getTransitions().size());
         boolean trWithConditionOk = false;
-        final long startId = result.getProcessContainer().getFlowNode("start1").getId();
-        for (final TransitionDefinition transition : result.getProcessContainer().getTransitions()) {
+        final long startId = result.getFlowElementContainer().getFlowNode("start1").getId();
+        for (final TransitionDefinition transition : result.getFlowElementContainer().getTransitions()) {
             if (startId == transition.getSource() && trueExpression.equals(transition.getCondition())) {
                 trWithConditionOk = true;
                 break;
             }
         }
         assertTrue("the condition on the transition was not kept", trWithConditionOk);
-        assertEquals(process.getProcessContainer().getConnectors().size(), result.getProcessContainer().getConnectors().size());
+        assertEquals(process.getFlowElementContainer().getConnectors().size(), result.getFlowElementContainer().getConnectors().size());
         boolean connectorWithInputOutputOk = false;
-        for (final ConnectorDefinition connector : result.getProcessContainer().getConnectors()) {
+        for (final ConnectorDefinition connector : result.getFlowElementContainer().getConnectors()) {
             final Operation operation = connector.getOutputs().get(0);
             if ("conn3".equals(connector.getName()) && trueExpression.equals(connector.getInputs().get("input1"))
                     && "testData".equals(operation.getLeftOperand().getName()) && OperatorType.ASSIGNMENT.equals(operation.getType())
@@ -515,20 +518,21 @@ public class BusinessArchiveTest {
             }
         }
         assertTrue("the input/output on the connector was not kept", connectorWithInputOutputOk);
-        final Iterator<ConnectorDefinition> resultConnectors = result.getProcessContainer().getConnectors().iterator();
-        for (final ConnectorDefinition connectorDef : process.getProcessContainer().getConnectors()) {
+        final Iterator<ConnectorDefinition> resultConnectors = result.getFlowElementContainer().getConnectors().iterator();
+        for (final ConnectorDefinition connectorDef : process.getFlowElementContainer().getConnectors()) {
             final ConnectorDefinition resultConn = resultConnectors.next();
             assertEquals(connectorDef, resultConn);
         }
-        assertEquals(process.getProcessContainer().getDataDefinitions().size(), result.getProcessContainer().getDataDefinitions().size());
-        assertEquals(process.getProcessContainer().getDataDefinitions().iterator().next(), result.getProcessContainer().getDataDefinitions().iterator().next());
-        final ActivityDefinition sourceActivity = process.getProcessContainer().getActivity("user1");
-        final ActivityDefinition resultActivity = result.getProcessContainer().getActivity("user1");
+        assertEquals(process.getFlowElementContainer().getDataDefinitions().size(), result.getFlowElementContainer().getDataDefinitions().size());
+        assertEquals(process.getFlowElementContainer().getDataDefinitions().iterator().next(), result.getFlowElementContainer().getDataDefinitions().iterator()
+                .next());
+        final ActivityDefinition sourceActivity = process.getFlowElementContainer().getActivity("user1");
+        final ActivityDefinition resultActivity = result.getFlowElementContainer().getActivity("user1");
         assertTrue(resultActivity instanceof UserTaskDefinition);
         assertEquals(((UserTaskDefinition) sourceActivity).getUserFilter(), ((UserTaskDefinition) resultActivity).getUserFilter());
 
-        final List<ActivityDefinition> processActivities = process.getProcessContainer().getActivities();
-        final Iterator<ActivityDefinition> itResultActs = result.getProcessContainer().getActivities().iterator();
+        final List<ActivityDefinition> processActivities = process.getFlowElementContainer().getActivities();
+        final Iterator<ActivityDefinition> itResultActs = result.getFlowElementContainer().getActivities().iterator();
         for (final ActivityDefinition processActivity : processActivities) {
             final ActivityDefinition resultAct = itResultActs.next();
             final List<ConnectorDefinition> processActivityConnectors = processActivity.getConnectors();
@@ -721,7 +725,7 @@ public class BusinessArchiveTest {
                 new ExpressionBuilder().createConstantIntegerExpression(5));
         final DesignProcessDefinition result = getDesignProcessDefinition(builder);
 
-        final AutomaticTaskDefinition auto1 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto1");
+        final AutomaticTaskDefinition auto1 = (AutomaticTaskDefinition) result.getFlowElementContainer().getFlowNode("auto1");
         final MultiInstanceLoopCharacteristics multi1 = (MultiInstanceLoopCharacteristics) auto1.getLoopCharacteristics();
         assertEquals(false, multi1.isSequential());
         assertEquals("inputList", multi1.getLoopDataInputRef());
@@ -729,13 +733,13 @@ public class BusinessArchiveTest {
         assertEquals("input", multi1.getDataInputItemRef());
         assertEquals("output", multi1.getDataOutputItemRef());
 
-        final AutomaticTaskDefinition auto2 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto2");
+        final AutomaticTaskDefinition auto2 = (AutomaticTaskDefinition) result.getFlowElementContainer().getFlowNode("auto2");
         final MultiInstanceLoopCharacteristics multi2 = (MultiInstanceLoopCharacteristics) auto2.getLoopCharacteristics();
         assertEquals(true, multi2.isSequential());
         assertEquals("5", multi2.getLoopCardinality().getContent());
         assertEquals("false", multi2.getCompletionCondition().getContent());
 
-        final AutomaticTaskDefinition auto3 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto3");
+        final AutomaticTaskDefinition auto3 = (AutomaticTaskDefinition) result.getFlowElementContainer().getFlowNode("auto3");
         final StandardLoopCharacteristics loop2 = (StandardLoopCharacteristics) auto3.getLoopCharacteristics();
         assertEquals(true, loop2.isTestBefore());
         assertEquals("true", loop2.getLoopCondition().getContent());
@@ -798,7 +802,7 @@ public class BusinessArchiveTest {
                 new ExpressionBuilder().createConstantStringExpression("dataValue"));
         final DesignProcessDefinition result = getDesignProcessDefinition(builder);
 
-        final SendTaskDefinition flowNode = (SendTaskDefinition) result.getProcessContainer().getFlowNode("sendTask");
+        final SendTaskDefinition flowNode = (SendTaskDefinition) result.getFlowElementContainer().getFlowNode("sendTask");
         assertEquals("sendTask", flowNode.getName());
         final ThrowMessageEventTriggerDefinition messageTrigger = flowNode.getMessageTrigger();
         assertEquals("processName", messageTrigger.getTargetProcess().getContent());
@@ -838,15 +842,15 @@ public class BusinessArchiveTest {
         assertEquals(process.getName(), result.getName());
         assertEquals(process.getVersion(), result.getVersion());
 
-        assertEquals(process.getProcessContainer().getStartEvents(), result.getProcessContainer().getStartEvents());
-        assertEquals(1, result.getProcessContainer().getStartEvents().size());
+        assertEquals(process.getFlowElementContainer().getStartEvents(), result.getFlowElementContainer().getStartEvents());
+        assertEquals(1, result.getFlowElementContainer().getStartEvents().size());
 
-        assertEquals(1, process.getProcessContainer().getActivities().size());
-        assertEquals(1, result.getProcessContainer().getActivities().size());
+        assertEquals(1, process.getFlowElementContainer().getActivities().size());
+        assertEquals(1, result.getFlowElementContainer().getActivities().size());
 
-        final List<EndEventDefinition> resultEndEvents = result.getProcessContainer().getEndEvents();
-        assertEquals(process.getProcessContainer().getEndEvents(), resultEndEvents);
-        assertEquals(1, result.getProcessContainer().getEndEvents().size());
+        final List<EndEventDefinition> resultEndEvents = result.getFlowElementContainer().getEndEvents();
+        assertEquals(process.getFlowElementContainer().getEndEvents(), resultEndEvents);
+        assertEquals(1, result.getFlowElementContainer().getEndEvents().size());
         final EndEventDefinition endEventDefinition = resultEndEvents.get(0);
         assertEquals(1, endEventDefinition.getEventTriggers().size());
         assertEquals(1, endEventDefinition.getErrorEventTriggerDefinitions().size());
@@ -865,27 +869,27 @@ public class BusinessArchiveTest {
         assertEquals(process.getName(), result.getName());
         assertEquals(process.getVersion(), result.getVersion());
 
-        assertEquals(process.getProcessContainer().getStartEvents(), result.getProcessContainer().getStartEvents());
-        assertEquals(1, result.getProcessContainer().getStartEvents().size());
+        assertEquals(process.getFlowElementContainer().getStartEvents(), result.getFlowElementContainer().getStartEvents());
+        assertEquals(1, result.getFlowElementContainer().getStartEvents().size());
 
-        assertEquals(1, result.getProcessContainer().getActivities().size());
-        assertEquals(1, process.getProcessContainer().getActivities().size());
-        assertEquals(process.getProcessContainer().getActivities().iterator().next(), result.getProcessContainer().getActivities().iterator().next());
+        assertEquals(1, result.getFlowElementContainer().getActivities().size());
+        assertEquals(1, process.getFlowElementContainer().getActivities().size());
+        assertEquals(process.getFlowElementContainer().getActivities().iterator().next(), result.getFlowElementContainer().getActivities().iterator().next());
 
-        assertEquals(process.getProcessContainer().getEndEvents(), result.getProcessContainer().getEndEvents());
-        assertEquals(1, result.getProcessContainer().getEndEvents().size());
+        assertEquals(process.getFlowElementContainer().getEndEvents(), result.getFlowElementContainer().getEndEvents());
+        assertEquals(1, result.getFlowElementContainer().getEndEvents().size());
     }
 
     private void checkProcessForBoundaryEvents(final DesignProcessDefinition process, final DesignProcessDefinition result, final boolean isInterrupting) {
         assertEquals(process.getName(), result.getName());
         assertEquals(process.getVersion(), result.getVersion());
 
-        assertEquals(process.getProcessContainer().getStartEvents(), result.getProcessContainer().getStartEvents());
-        assertEquals(1, result.getProcessContainer().getStartEvents().size());
+        assertEquals(process.getFlowElementContainer().getStartEvents(), result.getFlowElementContainer().getStartEvents());
+        assertEquals(1, result.getFlowElementContainer().getStartEvents().size());
 
-        assertEquals(process.getProcessContainer().getActivities().size(), result.getProcessContainer().getActivities().size());
-        final ActivityDefinition resultActivity = result.getProcessContainer().getActivity("userTask");
-        final ActivityDefinition origActivity = process.getProcessContainer().getActivity("userTask");
+        assertEquals(process.getFlowElementContainer().getActivities().size(), result.getFlowElementContainer().getActivities().size());
+        final ActivityDefinition resultActivity = result.getFlowElementContainer().getActivity("userTask");
+        final ActivityDefinition origActivity = process.getFlowElementContainer().getActivity("userTask");
         assertEquals(origActivity, resultActivity);
         assertEquals(origActivity.getBoundaryEventDefinitions().size(), resultActivity.getBoundaryEventDefinitions().size());
         for (final BoundaryEventDefinition boundary : resultActivity.getBoundaryEventDefinitions()) {
@@ -893,49 +897,55 @@ public class BusinessArchiveTest {
             assertEquals(isInterrupting, boundary.isInterrupting());
         }
 
-        assertEquals(process.getProcessContainer().getEndEvents(), result.getProcessContainer().getEndEvents());
-        assertEquals(1, result.getProcessContainer().getEndEvents().size());
+        assertEquals(process.getFlowElementContainer().getEndEvents(), result.getFlowElementContainer().getEndEvents());
+        assertEquals(1, result.getFlowElementContainer().getEndEvents().size());
     }
 
     private void checkProcessForMessagesEvents(final DesignProcessDefinition process, final DesignProcessDefinition result) {
         assertEquals(process.getName(), result.getName());
         assertEquals(process.getVersion(), result.getVersion());
 
-        assertEquals(process.getProcessContainer().getStartEvents().size(), result.getProcessContainer().getStartEvents().size());
-        assertEquals(1, result.getProcessContainer().getStartEvents().size());
-        assertEquals(process.getProcessContainer().getStartEvents().get(0), result.getProcessContainer().getStartEvents().get(0));
-        assertEquals(1, result.getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().size());
-        assertEquals(process.getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().get(0).getOperations(), result
-                .getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().get(0).getOperations());
-        assertEquals(1, result.getProcessContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().get(0).getOperations().size());
+        assertEquals(process.getFlowElementContainer().getStartEvents().size(), result.getFlowElementContainer().getStartEvents().size());
+        assertEquals(1, result.getFlowElementContainer().getStartEvents().size());
+        assertEquals(process.getFlowElementContainer().getStartEvents().get(0), result.getFlowElementContainer().getStartEvents().get(0));
+        assertEquals(1, result.getFlowElementContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().size());
+        assertEquals(process.getFlowElementContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().get(0).getOperations(), result
+                .getFlowElementContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().get(0).getOperations());
+        assertEquals(1, result.getFlowElementContainer().getStartEvents().get(0).getMessageEventTriggerDefinitions().get(0).getOperations().size());
 
-        assertEquals(process.getProcessContainer().getIntermediateCatchEvents().size(), result.getProcessContainer().getIntermediateCatchEvents().size());
-        assertEquals(1, result.getProcessContainer().getIntermediateCatchEvents().size());
-        assertEquals(process.getProcessContainer().getIntermediateCatchEvents().get(0), result.getProcessContainer().getIntermediateCatchEvents().get(0));
-        assertEquals(1, result.getProcessContainer().getIntermediateCatchEvents().get(0).getMessageEventTriggerDefinitions().size());
+        assertEquals(process.getFlowElementContainer().getIntermediateCatchEvents().size(), result.getFlowElementContainer().getIntermediateCatchEvents()
+                .size());
+        assertEquals(1, result.getFlowElementContainer().getIntermediateCatchEvents().size());
+        assertEquals(process.getFlowElementContainer().getIntermediateCatchEvents().get(0), result.getFlowElementContainer().getIntermediateCatchEvents()
+                .get(0));
+        assertEquals(1, result.getFlowElementContainer().getIntermediateCatchEvents().get(0).getMessageEventTriggerDefinitions().size());
 
-        final CatchMessageEventTriggerDefinition expectedCatchMessageEventTrigger = process.getProcessContainer().getIntermediateCatchEvents().get(0)
+        final CatchMessageEventTriggerDefinition expectedCatchMessageEventTrigger = process.getFlowElementContainer().getIntermediateCatchEvents().get(0)
                 .getMessageEventTriggerDefinitions().get(0);
-        final CatchMessageEventTriggerDefinition actualCatchMessageEventTrigger = result.getProcessContainer().getIntermediateCatchEvents().get(0)
+        final CatchMessageEventTriggerDefinition actualCatchMessageEventTrigger = result.getFlowElementContainer().getIntermediateCatchEvents().get(0)
                 .getMessageEventTriggerDefinitions().get(0);
         assertEquals(expectedCatchMessageEventTrigger.getCorrelations(), actualCatchMessageEventTrigger.getCorrelations());
         assertEquals(1, actualCatchMessageEventTrigger.getCorrelations().size());
         assertEquals(expectedCatchMessageEventTrigger.getOperations(), actualCatchMessageEventTrigger.getOperations());
         assertEquals(1, actualCatchMessageEventTrigger.getOperations().size());
 
-        assertEquals(process.getProcessContainer().getIntermediateThrowEvents().size(), result.getProcessContainer().getIntermediateThrowEvents().size());
-        assertEquals(1, result.getProcessContainer().getIntermediateThrowEvents().size());
-        assertEquals(process.getProcessContainer().getIntermediateThrowEvents().get(0), result.getProcessContainer().getIntermediateThrowEvents().get(0));
-        assertEquals(1, result.getProcessContainer().getIntermediateThrowEvents().get(0).getMessageEventTriggerDefinitions().size());
+        assertEquals(process.getFlowElementContainer().getIntermediateThrowEvents().size(), result.getFlowElementContainer().getIntermediateThrowEvents()
+                .size());
+        assertEquals(1, result.getFlowElementContainer().getIntermediateThrowEvents().size());
+        assertEquals(process.getFlowElementContainer().getIntermediateThrowEvents().get(0), result.getFlowElementContainer().getIntermediateThrowEvents()
+                .get(0));
+        assertEquals(1, result.getFlowElementContainer().getIntermediateThrowEvents().get(0).getMessageEventTriggerDefinitions().size());
 
-        assertEquals(process.getProcessContainer().getEndEvents().size(), result.getProcessContainer().getEndEvents().size());
-        assertEquals(1, result.getProcessContainer().getEndEvents().size());
-        assertEquals(process.getProcessContainer().getEndEvents().get(0), result.getProcessContainer().getEndEvents().get(0));
-        assertEquals(1, result.getProcessContainer().getEndEvents().get(0).getMessageEventTriggerDefinitions().size());
+        assertEquals(process.getFlowElementContainer().getEndEvents().size(), result.getFlowElementContainer().getEndEvents().size());
+        assertEquals(1, result.getFlowElementContainer().getEndEvents().size());
+        assertEquals(process.getFlowElementContainer().getEndEvents().get(0), result.getFlowElementContainer().getEndEvents().get(0));
+        assertEquals(1, result.getFlowElementContainer().getEndEvents().get(0).getMessageEventTriggerDefinitions().size());
 
-        final ThrowMessageEventTriggerDefinition actualThrowMessage = result.getProcessContainer().getEndEvents().get(0).getMessageEventTriggerDefinitions()
+        final ThrowMessageEventTriggerDefinition actualThrowMessage = result.getFlowElementContainer().getEndEvents().get(0)
+                .getMessageEventTriggerDefinitions()
                 .get(0);
-        final ThrowMessageEventTriggerDefinition expectedThrowMessage = process.getProcessContainer().getEndEvents().get(0).getMessageEventTriggerDefinitions()
+        final ThrowMessageEventTriggerDefinition expectedThrowMessage = process.getFlowElementContainer().getEndEvents().get(0)
+                .getMessageEventTriggerDefinitions()
                 .get(0);
         assertEquals(expectedThrowMessage.getCorrelations(), actualThrowMessage.getCorrelations());
         assertEquals(1, actualThrowMessage.getCorrelations().size());
@@ -943,10 +953,10 @@ public class BusinessArchiveTest {
         assertEquals(1, actualThrowMessage.getDataDefinitions().size());
 
         assertEquals(process.getActorsList().size(), result.getActorsList().size());
-        assertEquals(process.getProcessContainer().getActivities().size(), result.getProcessContainer().getActivities().size());
-        assertEquals(process.getProcessContainer().getGatewaysList().size(), result.getProcessContainer().getGatewaysList().size());
-        assertEquals(process.getProcessContainer().getTransitions().size(), result.getProcessContainer().getTransitions().size());
-        assertEquals(process.getProcessContainer().getDataDefinitions().size(), result.getProcessContainer().getDataDefinitions().size());
+        assertEquals(process.getFlowElementContainer().getActivities().size(), result.getFlowElementContainer().getActivities().size());
+        assertEquals(process.getFlowElementContainer().getGatewaysList().size(), result.getFlowElementContainer().getGatewaysList().size());
+        assertEquals(process.getFlowElementContainer().getTransitions().size(), result.getFlowElementContainer().getTransitions().size());
+        assertEquals(process.getFlowElementContainer().getDataDefinitions().size(), result.getFlowElementContainer().getDataDefinitions().size());
     }
 
     @Test
@@ -1020,26 +1030,27 @@ public class BusinessArchiveTest {
         final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
         assertEquals(process.getName(), result.getName());
         assertEquals(process.getVersion(), result.getVersion());
-        assertEquals(process.getProcessContainer().getStartEvents().size(), result.getProcessContainer().getStartEvents().size());
-        assertEquals(process.getProcessContainer().getStartEvents().get(0), result.getProcessContainer().getStartEvents().get(0));
-        assertEquals(process.getProcessContainer().getEndEvents().size(), result.getProcessContainer().getEndEvents().size());
-        assertEquals(process.getProcessContainer().getEndEvents().get(0), result.getProcessContainer().getEndEvents().get(0));
+        assertEquals(process.getFlowElementContainer().getStartEvents().size(), result.getFlowElementContainer().getStartEvents().size());
+        assertEquals(process.getFlowElementContainer().getStartEvents().get(0), result.getFlowElementContainer().getStartEvents().get(0));
+        assertEquals(process.getFlowElementContainer().getEndEvents().size(), result.getFlowElementContainer().getEndEvents().size());
+        assertEquals(process.getFlowElementContainer().getEndEvents().get(0), result.getFlowElementContainer().getEndEvents().get(0));
         assertEquals(process.getActorsList().size(), result.getActorsList().size());
         assertEquals(process.getActorsList().iterator().next(), result.getActorsList().iterator().next());
-        assertEquals(process.getProcessContainer().getActivities().size(), result.getProcessContainer().getActivities().size());
-        final Iterator<ActivityDefinition> iterator = result.getProcessContainer().getActivities().iterator();
-        final Iterator<ActivityDefinition> iterator2 = process.getProcessContainer().getActivities().iterator();
+        assertEquals(process.getFlowElementContainer().getActivities().size(), result.getFlowElementContainer().getActivities().size());
+        final Iterator<ActivityDefinition> iterator = result.getFlowElementContainer().getActivities().iterator();
+        final Iterator<ActivityDefinition> iterator2 = process.getFlowElementContainer().getActivities().iterator();
         final ActivityDefinition procAct1 = iterator2.next();
         final ActivityDefinition procAct2 = iterator2.next();
         final ActivityDefinition resAct1 = iterator.next();
         final ActivityDefinition resAct2 = iterator.next();
         assertTrue(procAct1.equals(resAct1) || procAct1.equals(resAct2));
         assertTrue(procAct2.equals(resAct1) || procAct2.equals(resAct2));
-        assertEquals(process.getProcessContainer().getGatewaysList().size(), result.getProcessContainer().getGatewaysList().size());
-        assertEquals(process.getProcessContainer().getGatewaysList().iterator().next(), result.getProcessContainer().getGatewaysList().iterator().next());
-        assertEquals(process.getProcessContainer().getTransitions().size(), result.getProcessContainer().getTransitions().size());
-        assertEquals(process.getProcessContainer().getConnectors().size(), result.getProcessContainer().getConnectors().size());
-        assertEquals(process.getProcessContainer().getConnectors().iterator().next(), result.getProcessContainer().getConnectors().iterator().next());
+        assertEquals(process.getFlowElementContainer().getGatewaysList().size(), result.getFlowElementContainer().getGatewaysList().size());
+        assertEquals(process.getFlowElementContainer().getGatewaysList().iterator().next(), result.getFlowElementContainer().getGatewaysList().iterator()
+                .next());
+        assertEquals(process.getFlowElementContainer().getTransitions().size(), result.getFlowElementContainer().getTransitions().size());
+        assertEquals(process.getFlowElementContainer().getConnectors().size(), result.getFlowElementContainer().getConnectors().size());
+        assertEquals(process.getFlowElementContainer().getConnectors().iterator().next(), result.getFlowElementContainer().getConnectors().iterator().next());
     }
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
@@ -1161,9 +1172,9 @@ public class BusinessArchiveTest {
                 .addBooleanData("created", createdExpression).addAutomaticTask("auto");
 
         final DesignProcessDefinition process = builder.getProcess();
-        assertEquals(1, process.getProcessContainer().getActivities().size());
+        assertEquals(1, process.getFlowElementContainer().getActivities().size());
         final DesignProcessDefinition result = getDesignProcessDefinition(builder);
-        assertEquals(1, result.getProcessContainer().getActivities().size());
+        assertEquals(1, result.getFlowElementContainer().getActivities().size());
     }
 
     @Test

@@ -20,6 +20,7 @@ import java.util.Iterator;
 import org.bonitasoft.engine.bpm.BaseElement;
 
 public class ElementFinder implements Serializable {
+
     public ElementFinder() {
     }
 
