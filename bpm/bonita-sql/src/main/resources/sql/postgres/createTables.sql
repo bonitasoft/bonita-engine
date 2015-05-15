@@ -120,7 +120,7 @@ CREATE TABLE process_definition (
   lastUpdateDate INT8,
   categoryId INT8,
   iconPath VARCHAR(255),
-  content TEXT,
+  designcontent TEXT NOT NULL,
   PRIMARY KEY (tenantid, id),
   UNIQUE (tenantid, name, version)
 );

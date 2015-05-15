@@ -122,7 +122,7 @@ CREATE TABLE process_definition (
   lastUpdateDate BIGINT,
   categoryId BIGINT,
   iconPath VARCHAR(255),
-  content CLOB,
+  designcontent CLOB NOT NULL,
   PRIMARY KEY (tenantid, id),
   UNIQUE (tenantid, name, version)
 ) ENGINE = INNODB;

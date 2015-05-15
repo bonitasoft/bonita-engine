@@ -62,5 +62,5 @@ public interface SProcessDefinitionDeployInfo extends PersistentObject {
      */
     String getActivationState();
 
-    String getContent();
+    String getDesignContent();
 }

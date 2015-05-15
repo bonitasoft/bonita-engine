@@ -743,7 +743,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 // ok
             }
             sProcessDefinition = processDefinitionService.store(designProcessDefinition);
-            unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
+            unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());
             final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(businessArchive, tenantAccessor, sProcessDefinition);
             if (isResolved) {
                 tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,

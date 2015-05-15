@@ -46,7 +46,7 @@ public interface SProcessDefinitionDeployInfoBuilder {
 
     SProcessDefinitionDeployInfoBuilder setIconPath(String iconPath);
 
-    SProcessDefinitionDeployInfoBuilder setContent(String content);
+    SProcessDefinitionDeployInfoBuilder setDesignContent(String designContent);
 
     SProcessDefinitionDeployInfo done();
 }

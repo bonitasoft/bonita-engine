@@ -60,7 +60,7 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
 
     private String displayDescription;
 
-    private String content;
+    private String designContent;
 
     public SProcessDefinitionDeployInfoImpl() {
         super();
@@ -217,12 +217,12 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
     }
 
     @Override
-    public String getContent() {
-        return content;
+    public String getDesignContent() {
+        return designContent;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setDesignContent(String designContent) {
+        this.designContent = designContent;
     }
 
     @Override

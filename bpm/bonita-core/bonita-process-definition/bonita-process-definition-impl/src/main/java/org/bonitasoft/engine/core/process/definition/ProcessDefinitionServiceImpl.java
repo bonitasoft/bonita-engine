@@ -55,7 +55,6 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.io.xml.XMLParseException;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -247,7 +246,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public SProcessDefinition getProcessDefinition(final long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         try {
             final SProcessDefinitionDeployInfo processDeploymentInfo = getProcessDeploymentInfo(processId);
-            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getContent());
+            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent());
             SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
             setIdOnProcessDefinition(sProcessDefinition, processId);
             return sProcessDefinition;
@@ -309,8 +308,6 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             final long tenantId = sessionAccessor.getTenantId();
             final long processId = generateId();
             setIdOnProcessDefinition(definition, processId);
-            //TODO should not be done here, we do not use FS anymore
-            BonitaHomeServer.getInstance().createProcess(tenantId, processId);
             String displayName = designProcessDefinition.getDisplayName();
             if (displayName == null || displayName.isEmpty()) {
                 displayName = definition.getName();
@@ -323,7 +320,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                     .createNewInstance(definition.getName(), definition.getVersion()).setProcessId(processId).setDescription(definition.getDescription())
                     .setDeployedBy(getUserId()).setDeploymentDate(System.currentTimeMillis()).setActivationState(ActivationState.DISABLED.name())
                     .setConfigurationState(ConfigurationState.UNRESOLVED.name()).setDisplayName(displayName).setDisplayDescription(displayDescription)
-                    .setContent(processDefinitionContent).done();
+                    .setDesignContent(processDefinitionContent).done();
 
             final InsertRecord record = new InsertRecord(definitionDeployInfo);
             SInsertEvent insertEvent = null;

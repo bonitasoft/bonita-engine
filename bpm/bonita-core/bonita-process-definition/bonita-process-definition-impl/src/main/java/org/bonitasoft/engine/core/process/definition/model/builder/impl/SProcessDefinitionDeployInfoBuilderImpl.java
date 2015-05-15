@@ -104,8 +104,8 @@ public class SProcessDefinitionDeployInfoBuilderImpl implements SProcessDefiniti
     }
 
     @Override
-    public SProcessDefinitionDeployInfoBuilder setContent(String content) {
-        entity.setContent(content);
+    public SProcessDefinitionDeployInfoBuilder setDesignContent(String designContent) {
+        entity.setDesignContent(designContent);
         return this;
     }
 }
