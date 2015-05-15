@@ -78,7 +78,7 @@ public class ExpressionFinder implements ModelFinderVisitor<Expression> {
     protected Expression getExpressionFromOperationList(List<Operation> operations, long expressionDefinitionId) {
         for (Operation operation : operations) {
             final Expression expression = getExpressionFromContainer(operation, expressionDefinitionId);
-            if (expression == null) {
+            if (expression != null) {
                 return expression;
             }
         }
@@ -239,7 +239,7 @@ public class ExpressionFinder implements ModelFinderVisitor<Expression> {
         }
         for (BoundaryEventDefinition boundaryEventDefinition : activityDefinition.getBoundaryEventDefinitions()) {
             final Expression expressionFromBoundary = getExpressionFromContainer(boundaryEventDefinition, expressionDefinitionId);
-            if (expressionFromBoundary == null) {
+            if (expressionFromBoundary != null) {
                 return expressionFromBoundary;
             }
         }
