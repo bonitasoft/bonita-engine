@@ -19,6 +19,6 @@ package org.bonitasoft.engine.page;
 public class SInvalidPageZipMissingPropertiesException extends SInvalidPageZipException {
 
     public SInvalidPageZipMissingPropertiesException() {
-        super("Missing page.propeties");
+        super("Missing page.properties");
     }
 }

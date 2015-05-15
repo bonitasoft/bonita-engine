@@ -826,7 +826,7 @@ public class PageServiceImplTest {
     @Test
     public void zipTest_no_page_properties() throws Exception {
         exception.expect(SInvalidPageZipMissingPropertiesException.class);
-        exception.expectMessage("Missing page.propeties");
+        exception.expectMessage("Missing page.properties");
 
         // given
         @SuppressWarnings("unchecked")

@@ -35,7 +35,9 @@ import org.bonitasoft.engine.page.SContentType;
 import org.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -60,6 +62,9 @@ public class ApiExtensionPageServiceListenerImplTest {
         return page;
     }
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     @Test
     public void pageInserted_should_only_care_of_api_extension() throws Exception {
         final SPageImpl page = new SPageImpl();
@@ -82,40 +87,53 @@ public class ApiExtensionPageServiceListenerImplTest {
         properties.setProperty("employee.method", "GET");
         properties.setProperty("employee.pathTemplate", "employees");
         properties.setProperty("employee.classFileName", "Index.groovy");
+        properties.setProperty("employee.permissions", "myPermission");
         properties.setProperty("address.method", "GET");
         properties.setProperty("address.pathTemplate", "employees/{employeeId}/address");
         properties.setProperty("address.classFileName", "Index1.groovy");
+        properties.setProperty("address.permissions", "myPermission");
         when(helper.loadPageProperties(content)).thenReturn(properties);
 
         listener.pageInserted(page, content);
 
-        verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.<String> emptyList());
-        verify(pageMappingService).create("apiExtension|GET|employees/{employeeId}/address", pageId, Collections.<String> emptyList());
+        verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.<String>emptyList());
+        verify(pageMappingService).create("apiExtension|GET|employees/{employeeId}/address", pageId, Collections.<String>emptyList());
         verifyNoMoreInteractions(pageMappingService);
     }
 
-    @Test(expected = SObjectCreationException.class)
+    @Test
     public void pageInserted_should_throw_an_exception_if_the_file_does_not_exists() throws Exception {
+        //given
         final SPageImpl page = buildPage(10L);
         final byte[] content = new byte[] { 1, 0, 0 };
-
         when(helper.loadPageProperties(content)).thenThrow(new SInvalidPageZipMissingPropertiesException());
 
+        //then
+        exception.expect(SObjectCreationException.class);
+        exception.expectMessage("Missing page.properties");
+
+        //when
         listener.pageInserted(page, content);
     }
 
-    @Test(expected = SObjectCreationException.class)
+    @Test
     public void pageInserted_should_throw_an_exception_if_an_io_exception_occurs() throws Exception {
+        //given
         final SPageImpl page = buildPage(10L);
         final byte[] content = new byte[] { 1, 0, 0 };
-
         when(helper.loadPageProperties(content)).thenThrow(new IOException());
 
+        //then
+        exception.expect(SObjectCreationException.class);
+
+        //when
         listener.pageInserted(page, content);
+
     }
 
-    @Test(expected = SObjectCreationException.class)
+    @Test
     public void pageInserted_should_throw_an_exception_if_the_resource_path_template_is_missing() throws Exception {
+        //given
         final long pageId = 1983L;
         final SPageImpl page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
@@ -125,11 +143,17 @@ public class ApiExtensionPageServiceListenerImplTest {
         properties.setProperty("employee.classFileName", "Index.groovy");
         when(helper.loadPageProperties(content)).thenReturn(properties);
 
+        //then
+        exception.expect(SObjectCreationException.class);
+        exception.expectMessage("the property 'employee.pathTemplate' is missing or is empty");
+
+        //when
         listener.pageInserted(page, content);
     }
 
-    @Test(expected = SObjectCreationException.class)
+    @Test
     public void pageInserted_should_throw_an_exception_if_the_resource_path_template_is_empty() throws Exception {
+        //given
         final long pageId = 1983L;
         final SPageImpl page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
@@ -140,11 +164,17 @@ public class ApiExtensionPageServiceListenerImplTest {
         properties.setProperty("employee.classFileName", "Index.groovy");
         when(helper.loadPageProperties(content)).thenReturn(properties);
 
+        //then
+        exception.expect(SObjectCreationException.class);
+        exception.expectMessage("the property 'employee.pathTemplate' is missing or is empty");
+
+        //when
         listener.pageInserted(page, content);
     }
 
-    @Test(expected = SObjectCreationException.class)
+    @Test
     public void pageInserted_should_throw_an_exception_if_the_method_is_missing() throws Exception {
+        //given
         final long pageId = 1983L;
         final SPageImpl page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
@@ -154,11 +184,17 @@ public class ApiExtensionPageServiceListenerImplTest {
         properties.setProperty("employee.classFileName", "Index.groovy");
         when(helper.loadPageProperties(content)).thenReturn(properties);
 
+        //then
+        exception.expect(SObjectCreationException.class);
+        exception.expectMessage("the property 'employee.method' is missing or is empty");
+
+        //when
         listener.pageInserted(page, content);
     }
 
-    @Test(expected = SObjectCreationException.class)
+    @Test
     public void pageInserted_should_throw_an_exception_if_the_class_file_name_is_missing() throws Exception {
+        //given
         final long pageId = 1983L;
         final SPageImpl page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
@@ -168,10 +204,36 @@ public class ApiExtensionPageServiceListenerImplTest {
         properties.setProperty("employee.pathTemplate", "employees");
         when(helper.loadPageProperties(content)).thenReturn(properties);
 
+        //then
+        exception.expect(SObjectCreationException.class);
+        exception.expectMessage("the property 'employee.classFileName' is missing or is empty");
+
+        //when
         listener.pageInserted(page, content);
     }
 
-    @Test(expected = SObjectCreationException.class)
+    @Test
+    public void pageInserted_should_throw_an_exception_if_the_permissions_are_missing() throws Exception {
+        //given
+        final long pageId = 1983L;
+        final SPageImpl page = buildPage(pageId);
+        final byte[] content = new byte[] { 1, 0, 0 };
+        final Properties properties = new Properties();
+        properties.setProperty("apiExtensions", "employee ");
+        properties.setProperty("employee.method", "GET");
+        properties.setProperty("employee.pathTemplate", "employees");
+        properties.setProperty("employee.classFileName", "Index.groovy");
+        when(helper.loadPageProperties(content)).thenReturn(properties);
+
+        //then
+        exception.expect(SObjectCreationException.class);
+        exception.expectMessage("the property 'employee.permissions' is missing or is empty");
+
+        //when
+        listener.pageInserted(page, content);
+    }
+
+    @Test
     public void pageInserted_should_throw_an_exception_if_api_extension_is_missing() throws Exception {
         final long pageId = 1983L;
         final SPageImpl page = buildPage(pageId);
@@ -181,6 +243,11 @@ public class ApiExtensionPageServiceListenerImplTest {
         properties.setProperty("employee.classFileName", "Index.groovy");
         when(helper.loadPageProperties(content)).thenReturn(properties);
 
+        //then
+        exception.expect(SObjectCreationException.class);
+        exception.expectMessage("the property 'apiExtensions' is missing or is empty");
+
+        //when
         listener.pageInserted(page, content);
     }
 
@@ -197,14 +264,17 @@ public class ApiExtensionPageServiceListenerImplTest {
 
     @Test
     public void pageDeleted_should_delete_all_mappings() throws Exception {
+        //given
         final long pageId = 10L;
         final SPageImpl page = buildPage(pageId);
         final List<SPageMapping> mappings = buildPageMappings(100);
         final List<SPageMapping> mappings2 = buildPageMappings(53);
         when(pageMappingService.get(pageId, 0, 100)).thenReturn(mappings, mappings2);
 
+        //when
         listener.pageDeleted(page);
 
+        //then
         verify(pageMappingService, times(153)).delete(any(SPageMapping.class));
     }
 
@@ -216,23 +286,35 @@ public class ApiExtensionPageServiceListenerImplTest {
         return mappings;
     }
 
-    @Test(expected = SBonitaReadException.class)
+    @Test
     public void pageDeleted_should_throw_an_exception_when_an_exception_occurs_when_getting_mappings() throws Exception {
+        //given
         final long pageId = 10L;
         final SPageImpl page = buildPage(pageId);
         when(pageMappingService.get(pageId, 0, 100)).thenThrow(new SBonitaReadException("exception"));
 
+        //then
+        exception.expect(SBonitaReadException.class);
+        exception.expectMessage("exception");
+
+        //when
         listener.pageDeleted(page);
     }
 
-    @Test(expected = SDeletionException.class)
+    @Test
     public void pageDeleted_should_throw_an_exception_when_an_exception_occurs_when_deleting_mappings() throws Exception {
+        //given
         final long pageId = 10L;
         final SPageImpl page = buildPage(pageId);
         final List<SPageMapping> mappings = buildPageMappings(10);
         when(pageMappingService.get(pageId, 0, 100)).thenReturn(mappings);
-        doThrow(new SDeletionException()).when(pageMappingService).delete(any(SPageMapping.class));
+        doThrow(new SDeletionException("message")).when(pageMappingService).delete(any(SPageMapping.class));
 
+        //then
+        exception.expect(SDeletionException.class);
+        exception.expectMessage("message");
+
+        //when
         listener.pageDeleted(page);
     }
 
@@ -246,6 +328,7 @@ public class ApiExtensionPageServiceListenerImplTest {
         properties.setProperty("employee.method", "GET");
         properties.setProperty("employee.pathTemplate", "employees");
         properties.setProperty("employee.classFileName", "Index.groovy");
+        properties.setProperty("employee.permissions", "myPermission");
         when(helper.loadPageProperties(content)).thenReturn(properties);
         final List<SPageMapping> mappings = buildPageMappings(1);
         when(pageMappingService.get(pageId, 0, 100)).thenReturn(mappings);
@@ -256,13 +339,19 @@ public class ApiExtensionPageServiceListenerImplTest {
         verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.<String> emptyList());
     }
 
-    @Test(expected = SObjectModificationException.class)
+    @Test
     public void pageUpdated_should_throw_an_update_exception_if_an_internal_exception_occurs() throws Exception {
+        //given
         final long pageId = 10L;
         final SPageImpl page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
         when(pageMappingService.get(pageId, 0, 100)).thenThrow(new SBonitaReadException("exception"));
 
+        //then
+        exception.expect(SObjectModificationException.class);
+        exception.expectMessage("exception");
+
+        //when
         listener.pageUpdated(page, content);
     }
 
