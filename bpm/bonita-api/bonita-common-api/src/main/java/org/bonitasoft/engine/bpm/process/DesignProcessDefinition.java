@@ -153,11 +153,4 @@ public interface DesignProcessDefinition extends ProcessDefinition {
 
     List<ContextEntry> getContext();
 
-    /**
-     * Finds and retrieves the unique Expression with the given ID.
-     * 
-     * @param expressionDefinitionId the ID of the expression to find.
-     * @return the Expression with the given identifier, or null if not found.
-     */
-    Expression getExpressionFromID(long expressionDefinitionId);
 }

@@ -27,9 +27,10 @@ import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.ElementFinder;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
+import org.bonitasoft.engine.bpm.process.Container;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -39,7 +40,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition {
+public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition, Container {
 
     private static final long serialVersionUID = -4719128363958199300L;
 
@@ -284,17 +285,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     }
 
     @Override
-    public Expression getExpressionFromID(long expressionDefinitionId) {
-        for (int i = 1; i <=5 ; i++) {
-            final Expression expression = getStringIndexValue(i);
-            if (expression != null && expression.getId() == expressionDefinitionId){
-                return expression;
-            }
-        }
-        final ElementFinder elementFinder = new ElementFinder();
-        getFlowElementContainer().getFlowNode()
-
-
-        return null;
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
     }
+
 }

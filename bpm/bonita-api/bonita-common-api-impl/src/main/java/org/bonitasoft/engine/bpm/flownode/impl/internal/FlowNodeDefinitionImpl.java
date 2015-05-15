@@ -22,6 +22,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -51,9 +52,9 @@ public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements
 
     public FlowNodeDefinitionImpl(final long id, final String name) {
         super(name);
-        incomings = new ArrayList<TransitionDefinition>();
-        outgoings = new ArrayList<TransitionDefinition>();
-        connectors = new ArrayList<ConnectorDefinition>();
+        incomings = new ArrayList<>();
+        outgoings = new ArrayList<>();
+        connectors = new ArrayList<>();
         setId(id);
     }
 
@@ -268,4 +269,8 @@ public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements
         return builder.toString();
     }
 
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
+    }
 }

@@ -25,6 +25,7 @@ import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
+import org.bonitasoft.engine.bpm.process.impl.internal.ExpressionFinder;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
@@ -1021,8 +1022,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", queryOptions, null);
     }
 
-
-    protected DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws IOException, XMLParseException, SProcessDefinitionNotFoundException,
+    protected DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws IOException, XMLParseException,
+            SProcessDefinitionNotFoundException,
             SProcessDefinitionReadException {
         return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getContent());
     }
@@ -1050,7 +1051,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     protected Expression getExpression(DesignProcessDefinition processDefinition, long expressionDefinitionId) {
-        return processDefinition.getExpressionFromID(expressionDefinitionId);
+        return new ExpressionFinder().find(processDefinition, expressionDefinitionId);
     }
 
 }
