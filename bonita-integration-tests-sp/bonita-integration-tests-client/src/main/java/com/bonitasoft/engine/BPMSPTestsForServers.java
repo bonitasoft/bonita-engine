@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import com.bonitasoft.engine.business.application.ApplicationAPIExtITs;
 import org.bonitasoft.engine.activity.PendingTasksIT;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
@@ -36,6 +37,7 @@ import com.bonitasoft.engine.tenant.TenantIT;
 @SuiteClasses({
         PageAPIIT.class,
         ApplicationAPIITs.class,
+        ApplicationAPIExtITs.class,
         TenantIT.class,
         NodeAPITest.class,
         LogTest.class,

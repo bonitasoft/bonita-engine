@@ -44,6 +44,7 @@ import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
@@ -87,33 +88,25 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     private ApplicationAPIDelegate getApplicationAPIDelegate() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationModelConverter converter = new ApplicationModelConverter();
-        final ApplicationAPIDelegate delegate = new ApplicationAPIDelegate(tenantAccessor, converter,
+        return new ApplicationAPIDelegate(getTenantAccessor(), new ApplicationModelConverter(getTenantAccessor().getPageService()),
                 SessionInfos.getUserIdFromSession());
-        return delegate;
     }
 
     private ApplicationPageAPIDelegate getApplicationPageAPIDelegate() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationPageModelConverter converter = new ApplicationPageModelConverter();
-        return new ApplicationPageAPIDelegate(tenantAccessor, converter, SessionInfos.getUserIdFromSession());
+        return new ApplicationPageAPIDelegate(getTenantAccessor(), new ApplicationPageModelConverter(), SessionInfos.getUserIdFromSession());
     }
 
     private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationMenuModelConverter converter = new ApplicationMenuModelConverter();
-        final ApplicationMenuCreatorValidator validator = new ApplicationMenuCreatorValidator();
-        final ApplicationMenuAPIDelegate delegate = new ApplicationMenuAPIDelegate(tenantAccessor, converter, validator,
-                SessionInfos.getUserIdFromSession());
-        return delegate;
+        return new ApplicationMenuAPIDelegate(getTenantAccessor(), new ApplicationMenuModelConverter(),
+                new ApplicationMenuCreatorValidator(), SessionInfos.getUserIdFromSession());
     }
 
     private ApplicationExporterDelegate getApplicationExporterDelegate() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        final PageService pageService = tenantAccessor.getPageService();
         final ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(),
-                applicationService, new ApplicationPageNodeConverter(tenantAccessor.getPageService()), new ApplicationMenuNodeConverter(applicationService));
+                applicationService, new ApplicationPageNodeConverter(pageService), new ApplicationMenuNodeConverter(applicationService), pageService);
         final ApplicationContainerConverter applicationContainerConverter = new ApplicationContainerConverter(applicationNodeConverter);
         final ApplicationContainerExporter applicationContainerExporter = new ApplicationContainerExporter();
         final ApplicationExporter applicationExporter = new ApplicationExporter(applicationContainerConverter, applicationContainerExporter);
@@ -122,20 +115,19 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     private ApplicationsImporter getApplicationImporter(final org.bonitasoft.engine.business.application.ApplicationImportPolicy policy) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final StrategySelector strategySelector = new StrategySelector();
-        final ApplicationContainerImporter containerImporter = new ApplicationContainerImporter();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        final ApplicationPageNodeConverter applicationPageNodeConverter = new ApplicationPageNodeConverter(tenantAccessor.getPageService());
+        final PageService pageService = tenantAccessor.getPageService();
+        final ApplicationPageNodeConverter applicationPageNodeConverter = new ApplicationPageNodeConverter(pageService);
         final ApplicationMenuNodeConverter applicationMenuNodeConverter = new ApplicationMenuNodeConverter(applicationService);
-        final ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(),
-                applicationService, applicationPageNodeConverter, applicationMenuNodeConverter);
         final ApplicationPageImporter applicationPageImporter = new ApplicationPageImporter(tenantAccessor.getApplicationService(),
                 applicationPageNodeConverter);
         final ApplicationMenuImporter applicationMenuImporter = new ApplicationMenuImporter(tenantAccessor.getApplicationService(),
                 applicationMenuNodeConverter);
         final ApplicationImporter applicationImporter = new ApplicationImporter(tenantAccessor.getApplicationService(),
-                strategySelector.selectStrategy(policy), applicationNodeConverter, applicationPageImporter, applicationMenuImporter);
-        return new ApplicationsImporter(containerImporter, applicationImporter);
+                new StrategySelector().selectStrategy(policy), new ApplicationNodeConverter(tenantAccessor.getProfileService(),
+                        applicationService, applicationPageNodeConverter, applicationMenuNodeConverter, pageService), applicationPageImporter,
+                applicationMenuImporter);
+        return new ApplicationsImporter(new ApplicationContainerImporter(), applicationImporter);
     }
 
     @Override
@@ -176,12 +168,12 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchApplicationDescriptor appSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationDescriptor();
-        final ApplicationModelConverter converter = new ApplicationModelConverter();
+        final ApplicationModelConverter converter = new ApplicationModelConverter(getTenantAccessor().getPageService());
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final SearchApplications searchApplications = new SearchApplications(applicationService, appSearchDescriptor, searchOptions, converter);
         final SearchResult<org.bonitasoft.engine.business.application.Application> searchResult = getApplicationAPIDelegate().searchApplications(
                 searchApplications);
-        return new SearchResultImpl<Application>(searchResult.getCount(), new CollectionConverter().convert(searchResult.getResult(),
+        return new SearchResultImpl<>(searchResult.getCount(), new CollectionConverter().convert(searchResult.getResult(),
                 new ApplicationConverter()));
     }
 
@@ -209,7 +201,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final SearchApplicationPages searchApplicationPages = new SearchApplicationPages(applicationService, converter, appPageSearchDescriptor, searchOptions);
         final SearchResult<org.bonitasoft.engine.business.application.ApplicationPage> applicationPages = getApplicationPageAPIDelegate()
                 .searchApplicationPages(searchApplicationPages);
-        return new SearchResultImpl<ApplicationPage>(applicationPages.getCount(), new CollectionConverter().convert(applicationPages.getResult(),
+        return new SearchResultImpl<>(applicationPages.getCount(), new CollectionConverter().convert(applicationPages.getResult(),
                 new ApplicationPageConverter()));
     }
 
@@ -283,7 +275,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final SearchApplicationMenus searchApplicationMenus = new SearchApplicationMenus(applicationService, converter, searchDescriptor, searchOptions);
         final SearchResult<org.bonitasoft.engine.business.application.ApplicationMenu> applicationMenus = getApplicationMenuAPIDelegate()
                 .searchApplicationMenus(searchApplicationMenus);
-        return new SearchResultImpl<ApplicationMenu>(applicationMenus.getCount(), new CollectionConverter().convert(applicationMenus.getResult(),
+        return new SearchResultImpl<>(applicationMenus.getCount(), new CollectionConverter().convert(applicationMenus.getResult(),
                 new ApplicationMenuConverter()));
     }
 

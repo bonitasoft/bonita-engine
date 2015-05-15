@@ -17,6 +17,9 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.BPMTestSPUtil;
+import com.bonitasoft.engine.CommonAPISPIT;
+import com.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
@@ -38,10 +41,6 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPIT;
-import com.bonitasoft.engine.api.ProcessConfigurationAPI;
 
 /**
  * author Emmanuel Duchastenier
