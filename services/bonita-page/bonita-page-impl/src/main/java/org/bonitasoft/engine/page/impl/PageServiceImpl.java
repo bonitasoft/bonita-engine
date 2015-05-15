@@ -567,6 +567,7 @@ public class PageServiceImpl implements PageService {
         pageBuilder.updateDescription(pageProperties.getProperty(PROPERTIES_DESCRIPTION));
         pageBuilder.updateDisplayName(pageProperties.getProperty(PROPERTIES_DISPLAY_NAME));
         pageBuilder.updateName(pageProperties.getProperty(PROPERTIES_NAME));
+        pageBuilder.updateContentType(pageProperties.getProperty(PROPERTIES_CONTENT_TYPE, SContentType.PAGE));
         final SPage sPage = updatePage(pageId, pageBuilder.done());
         for (final PageServiceListener pageServiceListener : pageServiceListeners) {
             pageServiceListener.pageUpdated(sPage, content);
