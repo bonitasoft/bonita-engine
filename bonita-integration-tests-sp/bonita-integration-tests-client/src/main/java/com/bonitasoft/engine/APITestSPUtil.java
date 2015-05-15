@@ -231,7 +231,7 @@ public class APITestSPUtil extends APITestUtil {
         setPageAPI(TenantAPIAccessor.getPageAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
-        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
+        setTenantManagementCommunityAPI(TenantAPIAccessor.getTenantAdministrationAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
         applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
     }
