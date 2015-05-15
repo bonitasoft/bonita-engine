@@ -27,9 +27,6 @@ public class SContextEntryImpl  implements SContextEntry{
     private String key;
     private SExpression expression;
 
-    public SContextEntryImpl() {
-    }
-
     public SContextEntryImpl(String key, SExpression expression) {
         this.key = key;
         this.expression = expression;

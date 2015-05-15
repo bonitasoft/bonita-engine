@@ -35,7 +35,7 @@ public class BusinessArchiveFactory {
     private static final List<BusinessArchiveContribution> contributions;
 
     static {
-        contributions = new ArrayList<BusinessArchiveContribution>();
+        contributions = new ArrayList<>();
         contributions.add(new ProcessDefinitionBARContribution());
         contributions.add(new ParameterContribution());
         contributions.add(new ConnectorContribution());

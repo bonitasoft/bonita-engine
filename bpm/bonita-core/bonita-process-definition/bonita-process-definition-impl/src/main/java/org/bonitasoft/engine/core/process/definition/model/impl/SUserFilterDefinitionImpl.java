@@ -43,23 +43,12 @@ public class SUserFilterDefinitionImpl extends SNamedElementImpl implements SUse
         super(userFilter.getName());
         filterId = userFilter.getUserFilterId();
         version = userFilter.getVersion();
-        inputs = new HashMap<String, SExpression>(userFilter.getInputs().size());
+        inputs = new HashMap<>(userFilter.getInputs().size());
         for (final Entry<String, Expression> input : userFilter.getInputs().entrySet()) {
             final Expression value = input.getValue();
             final SExpression sExpression = ServerModelConvertor.convertExpression(value);
             inputs.put(input.getKey(), sExpression);
         }
-    }
-
-    /**
-     * @param name
-     * @param userFilterId
-     */
-    public SUserFilterDefinitionImpl(final String name, final String userFilterId, final String version) {
-        super(name);
-        filterId = userFilterId;
-        this.version = version;
-        inputs = new HashMap<String, SExpression>();
     }
 
     @Override
@@ -70,10 +59,6 @@ public class SUserFilterDefinitionImpl extends SNamedElementImpl implements SUse
     @Override
     public Map<String, SExpression> getInputs() {
         return inputs;
-    }
-
-    public void addInput(final String name, final SExpression value) {
-        inputs.put(name, value);
     }
 
     @Override

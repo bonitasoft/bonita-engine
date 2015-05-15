@@ -39,9 +39,6 @@ public class SMultiInstanceLoopCharacteristicsImpl implements SMultiInstanceLoop
 
     private String dataOutputItemRef;
 
-    public SMultiInstanceLoopCharacteristicsImpl() {
-    }
-
     public SMultiInstanceLoopCharacteristicsImpl(final MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics) {
         isSequential = multiInstanceLoopCharacteristics.isSequential();
         loopDataInputRef = multiInstanceLoopCharacteristics.getLoopDataInputRef();
@@ -85,34 +82,6 @@ public class SMultiInstanceLoopCharacteristicsImpl implements SMultiInstanceLoop
     @Override
     public String getDataOutputItemRef() {
         return dataOutputItemRef;
-    }
-
-    public void setSequential(final boolean isSequential) {
-        this.isSequential = isSequential;
-    }
-
-    public void setLoopCardinality(final SExpression loopCardinality) {
-        this.loopCardinality = loopCardinality;
-    }
-
-    public void setCompletionCondition(final SExpression completionCondition) {
-        this.completionCondition = completionCondition;
-    }
-
-    public void setLoopDataInputRef(final String loopDataInputRef) {
-        this.loopDataInputRef = loopDataInputRef;
-    }
-
-    public void setLoopDataOutputRef(final String loopDataOutputRef) {
-        this.loopDataOutputRef = loopDataOutputRef;
-    }
-
-    public void setDataInputItemRef(final String dataInputItemRef) {
-        this.dataInputItemRef = dataInputItemRef;
-    }
-
-    public void setDataOutputItemRef(final String dataOutputItemRef) {
-        this.dataOutputItemRef = dataOutputItemRef;
     }
 
     @Override

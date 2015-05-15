@@ -24,6 +24,7 @@
 		<property name="displayDescription" column="displayDescription" />
 		<property name="lastUpdateDate" column="lastUpdateDate" />
 		<property name="iconPath" column="iconPath" />
+		<property name="designContent" column="designcontent" />
 		<filter name="tenantFilter" />
 	</class>
 

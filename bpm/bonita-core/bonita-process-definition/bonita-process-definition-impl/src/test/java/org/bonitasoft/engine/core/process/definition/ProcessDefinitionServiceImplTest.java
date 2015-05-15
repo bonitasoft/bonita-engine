@@ -111,8 +111,8 @@ public class ProcessDefinitionServiceImplTest {
         final Parser parser = mock(Parser.class);
         doReturn(parser).when(parserFactory).createParser(Matchers.<ElementBindingsFactory> any());
 
-        processDefinitionServiceImpl = new ProcessDefinitionServiceImpl(cacheService, recorder, persistenceService, eventService, sessionService,
-                sessionAccessor, parserFactory, xmlWriter, queriableLoggerService, dependencyService);
+        processDefinitionServiceImpl = new ProcessDefinitionServiceImpl(recorder, persistenceService, eventService, sessionService,
+                sessionAccessor, queriableLoggerService, dependencyService);
     }
 
     /**

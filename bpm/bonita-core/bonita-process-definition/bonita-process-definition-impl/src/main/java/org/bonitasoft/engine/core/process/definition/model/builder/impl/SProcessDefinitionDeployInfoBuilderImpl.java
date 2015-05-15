@@ -102,4 +102,10 @@ public class SProcessDefinitionDeployInfoBuilderImpl implements SProcessDefiniti
     public SProcessDefinitionDeployInfo done() {
         return entity;
     }
+
+    @Override
+    public SProcessDefinitionDeployInfoBuilder setDesignContent(String designContent) {
+        entity.setDesignContent(designContent);
+        return this;
+    }
 }

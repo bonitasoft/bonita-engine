@@ -33,11 +33,6 @@ public class SParameterDefinitionImpl extends SNamedElementImpl implements SPara
         type = parameterDefinition.getType();
     }
 
-    public SParameterDefinitionImpl(final String name, final String type) {
-        super(name);
-        this.type = type;
-    }
-
     @Override
     public String getDescription() {
         return description;

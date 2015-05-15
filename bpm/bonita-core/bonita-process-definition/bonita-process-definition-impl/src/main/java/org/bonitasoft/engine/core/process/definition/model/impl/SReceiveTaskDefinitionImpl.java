@@ -38,11 +38,6 @@ public class SReceiveTaskDefinitionImpl extends SActivityDefinitionImpl implemen
         trigger = new SCatchMessageEventTriggerDefinitionImpl(activityDefinition.getTrigger());
     }
 
-    public SReceiveTaskDefinitionImpl(final long id, final String name, final SCatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
-        super(id, name);
-        this.trigger = new SCatchMessageEventTriggerDefinitionImpl(catchMessageEventTriggerDefinition);
-    }
-
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.RECEIVE_TASK;
