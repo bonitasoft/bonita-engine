@@ -21,8 +21,8 @@ import org.bonitasoft.engine.api.impl.application.ApplicationAPIDelegate;
 import org.bonitasoft.engine.api.impl.application.ApplicationExporterDelegate;
 import org.bonitasoft.engine.api.impl.application.ApplicationMenuAPIDelegate;
 import org.bonitasoft.engine.api.impl.application.ApplicationPageAPIDelegate;
-import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.converter.ApplicationMenuModelConverter;
+import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
@@ -60,6 +60,8 @@ import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
@@ -81,55 +83,56 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     private ApplicationAPIDelegate getApplicationAPIDelegate() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationModelConverter converter = new ApplicationModelConverter();
-        final ApplicationAPIDelegate delegate = new ApplicationAPIDelegate(tenantAccessor, converter,
+        return new ApplicationAPIDelegate(getTenantAccessor(), getApplicationModelConverter(getTenantAccessor().getPageService()),
                 SessionInfos.getUserIdFromSession());
-        return delegate;
+    }
+
+    protected ApplicationModelConverter getApplicationModelConverter(final PageService pageService) {
+        return new ApplicationModelConverter(pageService);
     }
 
     private ApplicationPageAPIDelegate getApplicationPageAPIDelegate() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationPageModelConverter converter = new ApplicationPageModelConverter();
-        return new ApplicationPageAPIDelegate(tenantAccessor, converter, SessionInfos.getUserIdFromSession());
+        return new ApplicationPageAPIDelegate(getTenantAccessor(), new ApplicationPageModelConverter(), SessionInfos.getUserIdFromSession());
     }
 
     private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate() {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationMenuModelConverter converter = new ApplicationMenuModelConverter();
-        final ApplicationMenuCreatorValidator validator = new ApplicationMenuCreatorValidator();
-        final ApplicationMenuAPIDelegate delegate = new ApplicationMenuAPIDelegate(tenantAccessor, converter, validator,
+        return new ApplicationMenuAPIDelegate(getTenantAccessor(), new ApplicationMenuModelConverter(), new ApplicationMenuCreatorValidator(),
                 SessionInfos.getUserIdFromSession());
-        return delegate;
     }
 
     private ApplicationExporterDelegate getApplicationExporterDelegate() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        final ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(),
-                applicationService, new ApplicationPageNodeConverter(tenantAccessor.getPageService()), new ApplicationMenuNodeConverter(applicationService));
+        final PageService pageService = tenantAccessor.getPageService();
+        final ApplicationNodeConverter applicationNodeConverter = getApplicationNodeConverter(applicationService, pageService,
+                tenantAccessor.getProfileService(), new ApplicationPageNodeConverter(pageService), new ApplicationMenuNodeConverter(applicationService));
         final ApplicationContainerConverter applicationContainerConverter = new ApplicationContainerConverter(applicationNodeConverter);
         final ApplicationContainerExporter applicationContainerExporter = new ApplicationContainerExporter();
         final ApplicationExporter applicationExporter = new ApplicationExporter(applicationContainerConverter, applicationContainerExporter);
         return new ApplicationExporterDelegate(tenantAccessor.getApplicationService(), applicationExporter);
     }
 
+    protected ApplicationNodeConverter getApplicationNodeConverter(final ApplicationService applicationService, final PageService pageService,
+            final ProfileService profileService, final ApplicationPageNodeConverter applicationPageNodeConverter,
+            final ApplicationMenuNodeConverter applicationMenuNodeConverter) {
+        return new ApplicationNodeConverter(profileService,
+                applicationService, applicationPageNodeConverter, applicationMenuNodeConverter, pageService);
+    }
+
     private ApplicationsImporter getApplicationImporter(final ApplicationImportPolicy policy) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final StrategySelector strategySelector = new StrategySelector();
-        final ApplicationContainerImporter containerImporter = new ApplicationContainerImporter();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final ApplicationPageNodeConverter applicationPageNodeConverter = new ApplicationPageNodeConverter(tenantAccessor.getPageService());
         final ApplicationMenuNodeConverter applicationMenuNodeConverter = new ApplicationMenuNodeConverter(applicationService);
-        final ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(),
-                applicationService, applicationPageNodeConverter, applicationMenuNodeConverter);
         final ApplicationPageImporter applicationPageImporter = new ApplicationPageImporter(tenantAccessor.getApplicationService(),
                 applicationPageNodeConverter);
         final ApplicationMenuImporter applicationMenuImporter = new ApplicationMenuImporter(tenantAccessor.getApplicationService(),
                 applicationMenuNodeConverter);
         final ApplicationImporter applicationImporter = new ApplicationImporter(tenantAccessor.getApplicationService(),
-                strategySelector.selectStrategy(policy), applicationNodeConverter, applicationPageImporter, applicationMenuImporter);
-        return new ApplicationsImporter(containerImporter, applicationImporter);
+                new StrategySelector().selectStrategy(policy), getApplicationNodeConverter(applicationService, tenantAccessor.getPageService(),
+                        tenantAccessor.getProfileService(), applicationPageNodeConverter, applicationMenuNodeConverter),
+                applicationPageImporter, applicationMenuImporter);
+        return new ApplicationsImporter(new ApplicationContainerImporter(), applicationImporter);
     }
 
     @Override
@@ -148,7 +151,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return getApplicationAPIDelegate().updateApplication(applicationId, updater);
     }
 
-    private TenantServiceAccessor getTenantAccessor() {
+    protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -162,7 +165,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchApplicationDescriptor appSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationDescriptor();
-        final ApplicationModelConverter converter = new ApplicationModelConverter();
+        final ApplicationModelConverter converter = getApplicationModelConverter(tenantAccessor.getPageService());
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final SearchApplications searchApplications = new SearchApplications(applicationService, appSearchDescriptor, searchOptions, converter);
         return getApplicationAPIDelegate().searchApplications(searchApplications);

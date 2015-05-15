@@ -37,6 +37,10 @@ public interface ApplicationService {
 
     String APPLICATION_MENU = "APPLICATION_MENU";
 
+    String DEFAULT_LAYOUT_NAME="custompage_layout";
+
+    String DEFAULT_THEME_NAME="custompage_theme";
+
     SApplication createApplication(SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException;
 
     SApplication getApplication(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
@@ -83,7 +87,7 @@ public interface ApplicationService {
 
     SApplicationMenu deleteApplicationMenu(long applicationMenuId) throws SObjectModificationException, SObjectNotFoundException;
 
-    public void deleteApplicationMenu(SApplicationMenu applicationMenu) throws SObjectModificationException;
+    void deleteApplicationMenu(SApplicationMenu applicationMenu) throws SObjectModificationException;
 
     long getNumberOfApplicationMenus(QueryOptions options) throws SBonitaReadException;
 

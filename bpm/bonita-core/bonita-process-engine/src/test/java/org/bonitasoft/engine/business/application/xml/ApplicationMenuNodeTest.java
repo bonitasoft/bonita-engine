@@ -13,23 +13,48 @@
  **/
 package org.bonitasoft.engine.business.application.xml;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
+import static org.bonitasoft.engine.business.application.xml.ApplicationMenuNodeAssert.assertThat;
 
 import org.junit.Test;
 
 public class ApplicationMenuNodeTest {
 
     @Test
+    public void setter_and_getter_are_working() throws Exception {
+        //given
+        ApplicationMenuNode menuNode = new ApplicationMenuNode();
+        menuNode.setApplicationPage("app");
+        menuNode.setDisplayName("Main menu");
+
+        //then
+        assertThat(menuNode).hasApplicationPage("app");
+        assertThat(menuNode).hasDisplayName("Main menu");
+    }
+
+    @Test
     public void getApplicationMenus_should_return_empty_list_when_no_elements_were_added() throws Exception {
         //given
         ApplicationMenuNode menuNode = new ApplicationMenuNode();
 
+        //then
+        assertThat(menuNode).hasNoApplicationMenus();
+    }
+
+    @Test
+    public void addApplicationMenu_should_add_a_new_entry_in_the_current_application_menus() throws Exception {
+        //given
+        ApplicationMenuNode subMenu1 = new ApplicationMenuNode();
+        subMenu1.setDisplayName("support");
+        ApplicationMenuNode subMenu2 = new ApplicationMenuNode();
+        subMenu2.setDisplayName("commerce");
+
+        ApplicationMenuNode mainMenu = new ApplicationMenuNode();
+        mainMenu.addApplicationMenu(subMenu1);
+        mainMenu.addApplicationMenu(subMenu2);
+
         //when
-        List<ApplicationMenuNode> applicationMenus = menuNode.getApplicationMenus();
 
         //then
-        assertThat(applicationMenus).isEmpty();
+        assertThat(mainMenu).hasApplicationMenus(subMenu1, subMenu2);
     }
 }

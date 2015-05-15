@@ -25,6 +25,9 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
     private String version;
     private String path;
     private String displayName;
+    private Long layoutId;
+    private Long themeId;
+    private Long profileId;
 
     public static ApplicationBuilder anApplication() {
         return new ApplicationBuilder();
@@ -32,7 +35,10 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
 
     @Override
     SApplicationImpl _build() {
-        return new SApplicationImpl(name, displayName, version, System.currentTimeMillis(), 21, SApplicationState.DEACTIVATED.name());
+        SApplicationImpl application = new SApplicationImpl(name, displayName, version, System.currentTimeMillis(), 21, SApplicationState.DEACTIVATED.name(), layoutId, themeId);
+        application.setIconPath(path);
+        application.setProfileId(profileId);
+        return application;
     }
 
     public ApplicationBuilder withToken(final String name) {
@@ -40,7 +46,7 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
         return this;
     }
 
-    public ApplicationBuilder withDispalyName(final String displayName) {
+    public ApplicationBuilder withDisplayName(final String displayName) {
         this.displayName = displayName;
         return this;
     }
@@ -52,6 +58,21 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
 
     public ApplicationBuilder withPath(final String path) {
         this.path = path;
+        return this;
+    }
+
+    public ApplicationBuilder withLayout(final Long layoutId) {
+        this.layoutId = layoutId;
+        return this;
+    }
+
+    public ApplicationBuilder withTheme(final Long themeId) {
+        this.themeId = themeId;
+        return this;
+    }
+
+    public ApplicationBuilder withProfile(final long profileId) {
+        this.profileId = profileId;
         return this;
     }
 

@@ -44,4 +44,8 @@ public interface SApplication extends PersistentObject {
 
     Long getProfileId();
 
+    Long getLayoutId();
+
+    Long getThemeId();
+
 }

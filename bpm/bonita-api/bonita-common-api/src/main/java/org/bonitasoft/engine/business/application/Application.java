@@ -114,4 +114,26 @@ public interface Application extends BaseElement {
      */
     Long getProfileId();
 
+    /**
+     * Retrieves the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} layout. If no layout is associated to the current
+     * {@code Application} the result will be {@code null}.
+     *
+     * @return the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} layout or {@code null} if the current
+     *         {@code Application} has no layout.
+     * @see org.bonitasoft.engine.page.Page
+     * @since 7.0.0
+     */
+    Long getLayoutId();
+
+    /**
+     * Retrieves the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} theme. If no theme is associated to the current
+     * {@code Application} the result will be {@code null}.
+     *
+     * @return the identifier of the {@link org.bonitasoft.engine.page.Page} used as {@code Application} theme or {@code null} if the current
+     *         {@code Application} has no theme.
+     * @see org.bonitasoft.engine.page.Page
+     * @since 7.0.0
+     */
+    Long getThemeId();
+
 }

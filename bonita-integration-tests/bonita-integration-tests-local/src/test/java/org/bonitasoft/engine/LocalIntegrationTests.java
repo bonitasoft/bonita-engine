@@ -15,9 +15,9 @@ package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.activity.UserTaskContractITest;
 import org.bonitasoft.engine.business.application.ApplicationIT;
+import org.bonitasoft.engine.business.application.ApplicationImportExportIT;
 import org.bonitasoft.engine.business.application.ApplicationMenuIT;
 import org.bonitasoft.engine.business.application.ApplicationPageIT;
-import org.bonitasoft.engine.business.application.ImportExportIT;
 import org.bonitasoft.engine.business.data.BDRepositoryLocalIT;
 import org.bonitasoft.engine.form.FormMappingIT;
 import org.bonitasoft.engine.page.PageAPIIT;
@@ -41,7 +41,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ApplicationIT.class,
         ApplicationPageIT.class,
         ApplicationMenuIT.class,
-        ImportExportIT.class,
+        ApplicationImportExportIT.class,
         APIMethodLocalIT.class,
         TenantMaintenanceLocalIT.class,
         BDRepositoryLocalIT.class,

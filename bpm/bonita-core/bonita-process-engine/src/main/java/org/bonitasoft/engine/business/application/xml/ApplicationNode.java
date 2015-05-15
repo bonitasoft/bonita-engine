@@ -50,6 +50,12 @@ public class ApplicationNode {
     @XmlAttribute(required = true)
     private String state;
 
+    @XmlAttribute
+    private String layout;
+
+    @XmlAttribute
+    private String theme;
+
     @XmlElement
     private String iconPath;
 
@@ -125,13 +131,29 @@ public class ApplicationNode {
         this.token = token;
     }
 
+    public String getLayout() {
+        return layout;
+    }
+
+    public void setLayout(final String layout) {
+        this.layout = layout;
+    }
+
+    public String getTheme() {
+        return theme;
+    }
+
+    public void setTheme(final String theme) {
+        this.theme = theme;
+    }
+
     public List<ApplicationPageNode> getApplicationPages() {
         return applicationPages == null ? Collections.<ApplicationPageNode> emptyList() : Collections.unmodifiableList(applicationPages);
     }
 
     public void addApplicationPage(ApplicationPageNode applicationPage) {
         if (applicationPages == null) {
-            applicationPages = new ArrayList<ApplicationPageNode>();
+            applicationPages = new ArrayList<>();
         }
         this.applicationPages.add(applicationPage);
     }
@@ -142,7 +164,7 @@ public class ApplicationNode {
 
     public void addApplicationMenu(ApplicationMenuNode applicationMenu) {
         if (applicationMenus == null) {
-            applicationMenus = new ArrayList<ApplicationMenuNode>();
+            applicationMenus = new ArrayList<>();
         }
         applicationMenus.add(applicationMenu);
     }

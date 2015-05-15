@@ -23,27 +23,41 @@ import java.util.zip.ZipOutputStream;
  */
 public class CommonTestUtil {
 
-    public static byte[] createTestPageContent(final String pageName, final String displayName, final String description)
+    /**
+     * @param pageName
+     * @param displayName
+     * @param description
+     * @param extraProperties some property to add in page.properties file. eg: value=data
+     * @return
+     * @throws IOException
+     */
+    public static byte[] createTestPageContent(final String pageName, final String displayName, final String description, final String... extraProperties)
             throws IOException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ZipOutputStream zos = new ZipOutputStream(baos);
-        zos.putNextEntry(new ZipEntry("Index.groovy"));
-        zos.write("return \"\";".getBytes());
+        try (final ByteArrayOutputStream baos = new ByteArrayOutputStream(); ZipOutputStream zos = new ZipOutputStream(baos)) {
+            zos.putNextEntry(new ZipEntry("Index.groovy"));
+            zos.write("return \"\";".getBytes());
 
-        zos.putNextEntry(new ZipEntry("page.properties"));
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("name=");
-        stringBuilder.append(pageName);
-        stringBuilder.append("\n");
-        stringBuilder.append("displayName=");
-        stringBuilder.append(displayName);
-        stringBuilder.append("\n");
-        stringBuilder.append("description=");
-        stringBuilder.append(description);
-        stringBuilder.append("\n");
-        zos.write(stringBuilder.toString().getBytes());
+            zos.putNextEntry(new ZipEntry("page.properties"));
+            final StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("name=");
+            stringBuilder.append(pageName);
+            stringBuilder.append("\n");
+            stringBuilder.append("displayName=");
+            stringBuilder.append(displayName);
+            stringBuilder.append("\n");
+            stringBuilder.append("description=");
+            stringBuilder.append(description);
+            stringBuilder.append("\n");
+            for (final String extraProperty : extraProperties) {
+                stringBuilder.append(extraProperty);
+                stringBuilder.append("\n");
 
-        zos.closeEntry();
-        return baos.toByteArray();
+            }
+
+            zos.write(stringBuilder.toString().getBytes());
+
+            zos.closeEntry();
+            return baos.toByteArray();
+        }
     }
 }

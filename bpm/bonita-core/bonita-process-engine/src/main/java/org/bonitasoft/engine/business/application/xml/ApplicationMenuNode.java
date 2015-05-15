@@ -61,7 +61,7 @@ public class ApplicationMenuNode {
 
     public void addApplicationMenu(ApplicationMenuNode applicationMenu) {
         if (applicationMenus == null) {
-            applicationMenus = new ArrayList<ApplicationMenuNode>();
+            applicationMenus = new ArrayList<>();
         }
         applicationMenus.add(applicationMenu);
     }
