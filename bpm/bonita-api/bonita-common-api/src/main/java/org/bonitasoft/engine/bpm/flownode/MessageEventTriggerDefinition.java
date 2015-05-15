@@ -15,11 +15,12 @@ package org.bonitasoft.engine.bpm.flownode;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.process.Container;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface MessageEventTriggerDefinition extends EventTriggerDefinition {
+public interface MessageEventTriggerDefinition extends EventTriggerDefinition, Container {
 
     String getMessageName();
 

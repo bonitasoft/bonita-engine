@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bpm.userfilter;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.NamedElement;
+import org.bonitasoft.engine.bpm.process.Container;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -27,7 +28,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Baptiste Mesta
  * @see org.bonitasoft.engine.bpm.connector.ConnectorDefinition
  */
-public interface UserFilterDefinition extends NamedElement {
+public interface UserFilterDefinition extends NamedElement, Container {
 
     /**
      * @return the ID of its definition.

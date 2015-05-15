@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -196,6 +197,11 @@ public class MultiInstanceLoopCharacteristicsImpl implements MultiInstanceLoopCh
         builder.append(dataOutputItemRef);
         builder.append("]");
         return builder.toString();
+    }
+
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
     }
 
 }

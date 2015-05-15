@@ -15,12 +15,13 @@ package org.bonitasoft.engine.bpm.flownode;
 
 import java.io.Serializable;
 
+import org.bonitasoft.engine.bpm.process.Container;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Baptiste Mesta
  */
-public interface CorrelationDefinition extends Serializable {
+public interface CorrelationDefinition extends Serializable, Container {
 
     Expression getKey();
 
