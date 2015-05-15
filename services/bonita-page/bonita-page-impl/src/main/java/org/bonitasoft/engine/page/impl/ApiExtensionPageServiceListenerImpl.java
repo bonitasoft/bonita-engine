@@ -55,28 +55,32 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
     public void pageInserted(final SPage sPage, final byte[] content) throws SObjectCreationException {
         if (SContentType.API_EXTENSION.equals(sPage.getContentType())){
             try {
-                addPageMapping(sPage, content);
+                addPageMapping(sPage, helper.loadPageProperties(content));
             } catch (final IOException | SInvalidPageZipMissingPropertiesException e) {
                 throw new SObjectCreationException(e);
             }
         }
     }
 
-    private void addPageMapping(final SPage page, final byte[] content) throws SObjectCreationException, IOException,
+    private void addPageMapping(final SPage page, final Properties apiProperties) throws SObjectCreationException, IOException,
             SInvalidPageZipMissingPropertiesException {
-        final Properties apiProperties = helper.loadPageProperties(content);
-        final String apiExtensions = getProperty(apiProperties, "apiExtensions");
+        final String apiExtensions = getRequiredProperty(apiProperties, "apiExtensions");
         final String[] resourceNames = apiExtensions.split(",");
         for (final String resource : resourceNames) {
             final String resourceName = resource.trim();
-            final String method = getProperty(apiProperties, resourceName + ".method");
-            final String pathTemplate = getProperty(apiProperties, resourceName + ".pathTemplate");
-            getProperty(apiProperties, resourceName + ".classFileName");
-            pageMappingService.create("apiExtension|" + method + "|" + pathTemplate, page.getId(), Collections.<String> emptyList());
+            final String method = getRequiredProperty(apiProperties, resourceName + ".method");
+            final String pathTemplate = getRequiredProperty(apiProperties, resourceName + ".pathTemplate");
+            getRequiredProperty(apiProperties, resourceName + ".classFileName");
+            getRequiredProperty(apiProperties, resourceName + ".permissions");
+            pageMappingService.create(getMappingKey(method, pathTemplate), page.getId(), Collections.<String> emptyList());
         }
     }
 
-    private String getProperty(final Properties properties, final String propertyName) throws SObjectCreationException {
+    private String getMappingKey(String method, String pathTemplate) {
+        return new StringBuilder().append("apiExtension|").append(method).append("|").append(pathTemplate).toString();
+    }
+
+    private String getRequiredProperty(final Properties properties, final String propertyName) throws SObjectCreationException {
         final String property = (String) properties.get(propertyName);
         if (property == null || property.trim().length() == 0) {
             throw new SObjectCreationException("the property '" + propertyName + "' is missing or is empty");
