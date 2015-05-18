@@ -43,6 +43,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfoWithContent;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilderFactory;
@@ -250,12 +251,11 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public SProcessDefinition getProcessDefinition(final long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         try {
-            final SProcessDefinitionDeployInfo processDeploymentInfo = getProcessDeploymentInfo(processId);
-            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent());
+            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfoWithContent(processId).getDesignContent());
             SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
             setIdOnProcessDefinition(sProcessDefinition, processId);
             return sProcessDefinition;
-        } catch (XMLParseException | IOException | SReflectException e) {
+        } catch (XMLParseException | IOException | SReflectException | SBonitaReadException e) {
             throw new SProcessDefinitionReadException(e);
         }
     }
@@ -283,9 +283,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public SProcessDefinitionDeployInfo getProcessDeploymentInfo(final long processId) throws SProcessDefinitionNotFoundException,
             SProcessDefinitionReadException {
         try {
-            final Map<String, Object> parameters = Collections.singletonMap("processId", (Object) processId);
             final SelectOneDescriptor<SProcessDefinitionDeployInfo> descriptor = new SelectOneDescriptor<>(
-                    "getDeployInfoByProcessDefId", parameters, SProcessDefinitionDeployInfo.class);
+                    "getDeployInfoByProcessDefId", Collections.singletonMap("processId", (Object) processId), SProcessDefinitionDeployInfo.class);
             final SProcessDefinitionDeployInfo processDefinitionDeployInfo = persistenceService.selectOne(descriptor);
             if (processDefinitionDeployInfo == null) {
                 throw new SProcessDefinitionNotFoundException("Unable to find the process definition deployment info.", processId);
@@ -294,6 +293,17 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         } catch (final SBonitaReadException e) {
             throw new SProcessDefinitionReadException(e);
         }
+    }
+
+    public SProcessDefinitionDeployInfoWithContent getProcessDeploymentInfoWithContent(final long processId) throws SProcessDefinitionNotFoundException,
+            SBonitaReadException {
+        final SelectOneDescriptor<SProcessDefinitionDeployInfoWithContent> descriptor = new SelectOneDescriptor<>(
+                "getDeployInfoWithContentByProcessDefId", Collections.singletonMap("processId", (Object) processId), SProcessDefinitionDeployInfoWithContent.class);
+        final SProcessDefinitionDeployInfoWithContent processDefinitionDeployInfo = persistenceService.selectOne(descriptor);
+        if (processDefinitionDeployInfo == null) {
+            throw new SProcessDefinitionNotFoundException("Unable to find the process definition deployment info.", processId);
+        }
+        return processDefinitionDeployInfo;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
@@ -321,7 +331,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             if (displayDescription == null || displayDescription.isEmpty()) {
                 displayDescription = definition.getDescription();
             }
-            final SProcessDefinitionDeployInfo definitionDeployInfo = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class)
+            final SProcessDefinitionDeployInfoWithContent definitionDeployInfo = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class)
                     .createNewInstance(definition.getName(), definition.getVersion()).setProcessId(processId).setDescription(definition.getDescription())
                     .setDeployedBy(getUserId()).setDeploymentDate(System.currentTimeMillis()).setActivationState(ActivationState.DISABLED.name())
                     .setConfigurationState(ConfigurationState.UNRESOLVED.name()).setDisplayName(displayName).setDisplayDescription(displayDescription)
@@ -517,8 +527,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             throws SProcessDefinitionNotFoundException, SProcessDeploymentInfoUpdateException {
         SProcessDefinitionDeployInfo processDefinitionDeployInfo;
         try {
-            processDefinitionDeployInfo = getProcessDeploymentInfo(processId);
-        } catch (final SProcessDefinitionReadException e) {
+            processDefinitionDeployInfo = getProcessDeploymentInfoWithContent(processId);
+        } catch (final SBonitaReadException e) {
             throw new SProcessDefinitionNotFoundException(e, processId);
         }
         final SProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating a processDefinitionDeployInfo");
@@ -1023,8 +1033,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     protected DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws IOException, XMLParseException,
-            SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent());
+            SProcessDefinitionNotFoundException, SBonitaReadException {
+        return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfoWithContent(processDefinitionId).getDesignContent());
     }
 
     @Override
@@ -1042,7 +1052,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                     .createNewInstance().updateDesignContent(processDefinitionAsXMLString).done();
             updateProcessDefinitionDeployInfo(processDefinitionId, updateDescriptor);
-        } catch (SProcessDefinitionReadException | IOException | XMLParseException e) {
+        } catch (SBonitaReadException | IOException | XMLParseException e) {
             throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
         } catch (SProcessDeploymentInfoUpdateException e) {
             throw new SObjectModificationException(e);

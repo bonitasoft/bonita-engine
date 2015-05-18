@@ -60,8 +60,6 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
 
     private String displayDescription;
 
-    private String designContent;
-
     public SProcessDefinitionDeployInfoImpl() {
         super();
     }
@@ -214,15 +212,6 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
 
     public void setActivationState(final String activationState) {
         this.activationState = activationState;
-    }
-
-    @Override
-    public String getDesignContent() {
-        return designContent;
-    }
-
-    public void setDesignContent(String designContent) {
-        this.designContent = designContent;
     }
 
     @Override
