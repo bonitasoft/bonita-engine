@@ -41,14 +41,14 @@ import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
-import org.bonitasoft.engine.bpm.process.Container;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class FlowElementContainerDefinitionImpl extends BaseElementImpl implements FlowElementContainerDefinition, Container {
+public class FlowElementContainerDefinitionImpl extends BaseElementImpl implements FlowElementContainerDefinition, Visitable {
 
     private static final long serialVersionUID = 1L;
 

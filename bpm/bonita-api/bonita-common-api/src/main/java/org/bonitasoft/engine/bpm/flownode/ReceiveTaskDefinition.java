@@ -14,13 +14,13 @@
 package org.bonitasoft.engine.bpm.flownode;
 
 
-import org.bonitasoft.engine.bpm.process.Container;
+import org.bonitasoft.engine.bpm.process.Visitable;
 
 /**
  * @author Julien Molinaro
  * @author Matthieu Chaffotte
  */
-public interface ReceiveTaskDefinition extends TaskDefinition, Container {
+public interface ReceiveTaskDefinition extends TaskDefinition, Visitable {
 
     CatchMessageEventTriggerDefinition getTrigger();
 

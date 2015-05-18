@@ -45,7 +45,7 @@ import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
-import org.bonitasoft.engine.bpm.process.Container;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
@@ -58,8 +58,8 @@ import org.bonitasoft.engine.operation.Operation;
  */
 public class ExpressionFinder implements ModelFinderVisitor<Expression> {
 
-    protected Expression getExpressionFromContainer(Container container, long expressionDefinitionId) {
-        return container != null ? container.accept(this, expressionDefinitionId) : null;
+    protected Expression getExpressionFromContainer(Visitable visitable, long expressionDefinitionId) {
+        return visitable != null ? visitable.accept(this, expressionDefinitionId) : null;
     }
 
     protected Expression getExpressionFromOperationList(List<Operation> operations, long expressionDefinitionId) {

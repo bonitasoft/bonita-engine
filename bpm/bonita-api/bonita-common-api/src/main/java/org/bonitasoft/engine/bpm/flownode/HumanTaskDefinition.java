@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
-import org.bonitasoft.engine.bpm.process.Container;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 
 /**
@@ -22,7 +22,7 @@ import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public interface HumanTaskDefinition extends TaskDefinition, Container {
+public interface HumanTaskDefinition extends TaskDefinition, Visitable {
 
     String getActorName();
 

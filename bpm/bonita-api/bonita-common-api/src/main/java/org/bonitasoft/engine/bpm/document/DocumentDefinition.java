@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.bpm.document;
 
 import org.bonitasoft.engine.bpm.NamedElement;
-import org.bonitasoft.engine.bpm.process.Container;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -24,7 +24,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface DocumentDefinition extends NamedElement, Container {
+public interface DocumentDefinition extends NamedElement, Visitable {
 
     /**
      * @return The URL for an external document

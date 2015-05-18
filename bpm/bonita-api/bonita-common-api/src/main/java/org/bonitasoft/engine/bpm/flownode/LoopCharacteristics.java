@@ -15,11 +15,11 @@ package org.bonitasoft.engine.bpm.flownode;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.bpm.process.Container;
+import org.bonitasoft.engine.bpm.process.Visitable;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface LoopCharacteristics extends Serializable, Container {
+public interface LoopCharacteristics extends Serializable, Visitable {
 
 }
