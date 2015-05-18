@@ -38,6 +38,13 @@
         </copy>
 
         <!-- ENGINE SERVER CONF -->
+
+        <copy todir="${bh.dir}/engine-server/conf/tenants/template">
+            <fileset dir="${resources.dir}">
+                <include name="bonita-tenant-sp-custom.xml"/>
+            </fileset>
+        </copy>
+
         <copy file="${resources.dir}/bonita-platform-hibernate-cache.xml" tofile="${bh.dir}/engine-server/conf/platform/bonita-platform-hibernate-cache.xml.notused"/>
         <copy file="${resources.dir}/bonita-tenant-hibernate-cache.xml" tofile="${bh.dir}/engine-server/conf/platform/bonita-tenant-hibernate-cache.xml.notused"/>
 

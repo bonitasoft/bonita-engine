@@ -91,7 +91,7 @@
                       ref="${authenticator.delegate:nullAuthenticationDelegate}" />
         </bean>
     -->
-    <bean id="defaultCommands" parent="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
+    <bean id="spCommands" parent="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
         <property name="sourceList">
             <list merge="true">
                 <ref bean="executeActionsAndTerminateExt" />
@@ -99,6 +99,13 @@
                 <ref bean="addBreakpointCommand" />
                 <ref bean="removeBreakpointCommand" />
                 <ref bean="getBreakpointsCommand" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="commandsToDeployAtStartup" parent="spCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
             </list>
         </property>
     </bean>
