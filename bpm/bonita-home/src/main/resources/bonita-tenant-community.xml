@@ -288,7 +288,7 @@
         </property>
     </bean>
 
-    <bean id="defaultCommands" parent="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
+    <bean id="commandsToDeployAtStartup" parent="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
         <property name="sourceList">
             <list merge="true">
             </list>
@@ -308,7 +308,7 @@
     </bean>
 
     <bean id="defaultCommandProvider" class="org.bonitasoft.engine.command.api.impl.CommandProvider">
-        <property name="defaultCommands" ref="defaultCommands" />
+        <property name="defaultCommands" ref="commandsToDeployAtStartup" />
     </bean>
 
     <bean id="canStartProcessDefinition" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
