@@ -250,12 +250,11 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public SProcessDefinition getProcessDefinition(final long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         try {
-            final SProcessDefinitionDeployInfo processDeploymentInfo = getProcessDeploymentInfo(processId);
-            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent());
+            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processId).getDesignContent());
             SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
             setIdOnProcessDefinition(sProcessDefinition, processId);
             return sProcessDefinition;
-        } catch (XMLParseException | IOException | SReflectException e) {
+        } catch (XMLParseException | IOException | SReflectException | SProcessDefinitionReadException e) {
             throw new SProcessDefinitionReadException(e);
         }
     }
@@ -283,9 +282,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public SProcessDefinitionDeployInfo getProcessDeploymentInfo(final long processId) throws SProcessDefinitionNotFoundException,
             SProcessDefinitionReadException {
         try {
-            final Map<String, Object> parameters = Collections.singletonMap("processId", (Object) processId);
             final SelectOneDescriptor<SProcessDefinitionDeployInfo> descriptor = new SelectOneDescriptor<>(
-                    "getDeployInfoByProcessDefId", parameters, SProcessDefinitionDeployInfo.class);
+                    "getDeployInfoByProcessDefId", Collections.singletonMap("processId", (Object) processId), SProcessDefinitionDeployInfo.class);
             final SProcessDefinitionDeployInfo processDefinitionDeployInfo = persistenceService.selectOne(descriptor);
             if (processDefinitionDeployInfo == null) {
                 throw new SProcessDefinitionNotFoundException("Unable to find the process definition deployment info.", processId);
@@ -310,7 +308,6 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         final SProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new Process definition");
         try {
             final String processDefinitionContent = getProcessContent(designProcessDefinition);
-            final long tenantId = sessionAccessor.getTenantId();
             final long processId = generateId();
             setIdOnProcessDefinition(definition, processId);
             String displayName = designProcessDefinition.getDisplayName();

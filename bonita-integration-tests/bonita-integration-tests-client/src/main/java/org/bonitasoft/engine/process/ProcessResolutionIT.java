@@ -13,11 +13,15 @@
  **/
 package org.bonitasoft.engine.process;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
@@ -85,7 +89,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
 
         ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         long previousUpdate = deploymentInfo.getLastUpdateDate().getTime();
-        long lastUpdate = previousUpdate;
+        long lastUpdate;
         Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
 
         // add actor mapping on user
@@ -97,7 +101,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         Assert.assertEquals(ConfigurationState.RESOLVED, deploymentInfo.getConfigurationState());
         lastUpdate = deploymentInfo.getLastUpdateDate().getTime();
-        assertTrue("lastupdate date not changed", lastUpdate > previousUpdate);
+        assertThat(new Date(lastUpdate)).as("lastupdate date not changed").isAfter(new Date(previousUpdate));
         previousUpdate = lastUpdate;
         List<Problem> problems = getProcessAPI().getProcessResolutionProblems(definition.getId());
         Assert.assertEquals(0, problems.size());
@@ -112,7 +116,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
         lastUpdate = deploymentInfo.getLastUpdateDate().getTime();
-        assertTrue("lastupdate date not changed", lastUpdate > previousUpdate);
+        assertThat(new Date(lastUpdate)).as("lastupdate date not changed").isAfter(new Date(previousUpdate));
         previousUpdate = lastUpdate;
 
         Thread.sleep(10);
@@ -121,8 +125,7 @@ public class ProcessResolutionIT extends TestWithTechnicalUser {
         deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         Assert.assertEquals(ConfigurationState.RESOLVED, deploymentInfo.getConfigurationState());
         lastUpdate = deploymentInfo.getLastUpdateDate().getTime();
-        assertTrue("lastupdate date not changed", lastUpdate > previousUpdate);
-        previousUpdate = lastUpdate;
+        assertThat(new Date(lastUpdate)).as("lastupdate date not changed").isAfter(new Date(previousUpdate));
         problems = getProcessAPI().getProcessResolutionProblems(definition.getId());
         Assert.assertEquals(0, problems.size());
 

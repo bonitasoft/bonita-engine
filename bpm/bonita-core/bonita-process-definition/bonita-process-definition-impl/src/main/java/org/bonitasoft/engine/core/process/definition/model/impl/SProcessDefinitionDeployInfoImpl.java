@@ -60,7 +60,7 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
 
     private String displayDescription;
 
-    private String designContent;
+    private DesignContent designContent;
 
     public SProcessDefinitionDeployInfoImpl() {
         super();
@@ -212,17 +212,13 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
         return activationState;
     }
 
-    public void setActivationState(final String activationState) {
-        this.activationState = activationState;
-    }
-
     @Override
     public String getDesignContent() {
-        return designContent;
+        return designContent.getContent();
     }
 
-    public void setDesignContent(String designContent) {
-        this.designContent = designContent;
+    public void setActivationState(final String activationState) {
+        this.activationState = activationState;
     }
 
     @Override
@@ -276,5 +272,10 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
                 ", iconPath='" + iconPath + '\'' +
                 ", displayDescription='" + displayDescription + '\'' +
                 '}';
+    }
+
+    public void setDesignContent(String designContent) {
+        this.designContent = new DesignContent();
+        this.designContent.setContent(designContent);
     }
 }
