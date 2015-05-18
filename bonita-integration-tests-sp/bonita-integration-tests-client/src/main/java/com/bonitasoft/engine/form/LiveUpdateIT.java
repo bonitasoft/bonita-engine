@@ -9,26 +9,35 @@
 package com.bonitasoft.engine.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.form.FormMappingSearchDescriptor;
 import org.bonitasoft.engine.form.FormMappingTarget;
@@ -43,9 +52,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * author Emmanuel Duchastenier
+ * @author Emmanuel Duchastenier
+ * @author Baptiste Mesta
  */
-public class FormMappingSPIT extends CommonAPISPIT {
+public class LiveUpdateIT extends CommonAPISPIT {
 
     protected User user;
 
@@ -146,6 +156,43 @@ public class FormMappingSPIT extends CommonAPISPIT {
         return processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 10)
                 .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.TASK).filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p.getId())
                 .filter(FormMappingSearchDescriptor.TASK, step2).done()).getResult().get(0);
+    }
+
+    @Test
+    public void updateExpressions_of_process() throws Exception {
+        final User user = getIdentityAPI().createUser("userForLiveUpdate", "bpm");
+        ProcessDefinitionBuilderExt processWithExpression = new ProcessDefinitionBuilderExt().createNewInstance("LiveUpdateProcess", "4.0");
+        processWithExpression.addActor("theActor");
+        processWithExpression.addUserTask("step1","theActor").addDisplayName(new ExpressionBuilder().createGroovyScriptExpression("groovyExpr", "return 'before update'", String.class.getName()));
+        processWithExpression.addUserTask("step2", "theActor").addDisplayName(new ExpressionBuilder().createConstantStringExpression("the constant before update"));
+        ProcessDefinition processDefinition = getProcessAPI().deploy(processWithExpression.done());
+        getProcessAPI().addUserToActor("theActor", processDefinition, user.getId());
+        getProcessAPI().enableProcess(processDefinition.getId());
+
+        //start new instance and check
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
+        HumanTaskInstance step2 = waitForUserTaskAndGetIt(processInstance, "step2");
+        assertThat(step1.getDisplayName()).as("display name of step1 before update").isEqualTo("before update");
+        assertThat(step2.getDisplayName()).as("display name of step2 before update").isEqualTo("the constant before update");
+
+
+        //update expressions
+        final DesignProcessDefinition designProcessDefinition = getProcessAPI().getDesignProcessDefinition(processDefinition.getId());
+        Expression step1DisplayName = designProcessDefinition.getFlowElementContainer().getFlowNode("step1").getDisplayName();
+        Expression step2DisplayName = designProcessDefinition.getFlowElementContainer().getFlowNode("step2").getDisplayName();
+        getProcessConfigurationAPI().updateExpressionContent(processDefinition.getId(), step1DisplayName.getId(), "return 'groovy after update'");
+        getProcessConfigurationAPI().updateExpressionContent(processDefinition.getId(), step2DisplayName.getId(), "the constant after update");
+
+        //start new instance after update of expression and recheck
+        processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        step1 = waitForUserTaskAndGetIt(processInstance, "step1");
+        step2 = waitForUserTaskAndGetIt(processInstance, "step2");
+        assertThat(step1.getDisplayName()).as("display name of step1 before update").isEqualTo("groovy after update");
+        assertThat(step2.getDisplayName()).as("display name of step2 before update").isEqualTo("the constant after update");
+
+        disableAndDeleteProcess(processDefinition.getId());
+        deleteUser(user);
     }
 
 }
