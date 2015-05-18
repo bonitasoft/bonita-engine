@@ -180,6 +180,10 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
 
     @Override
     public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        final T accept = super.accept(visitor, modelId);
+        if (accept != null) {
+            return accept;
+        }
         return visitor.find(this, modelId);
     }
 }

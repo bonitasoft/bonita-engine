@@ -34,21 +34,24 @@ import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskDefinition;
+import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition;
+import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.MessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.ReceiveTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.SendTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.StandardLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
-import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
@@ -165,8 +168,26 @@ public class ExpressionFinder implements ModelFinderVisitor<Expression> {
                 return expression;
             }
         }
+        for (StartEventDefinition startEventDefinition : container.getStartEvents()) {
+            final Expression expression = getExpressionFromContainer(startEventDefinition, expressionDefinitionId);
+            if (expression != null) {
+                return expression;
+            }
+        }
         for (EndEventDefinition endEventDefinition : container.getEndEvents()) {
             final Expression expression = getExpressionFromContainer(endEventDefinition, expressionDefinitionId);
+            if (expression != null) {
+                return expression;
+            }
+        }
+        for (IntermediateCatchEventDefinition catchEventDefinition : container.getIntermediateCatchEvents()) {
+            final Expression expression = getExpressionFromContainer(catchEventDefinition, expressionDefinitionId);
+            if (expression != null) {
+                return expression;
+            }
+        }
+        for (IntermediateThrowEventDefinition throwEventDefinition : container.getIntermediateThrowEvents()) {
+            final Expression expression = getExpressionFromContainer(throwEventDefinition, expressionDefinitionId);
             if (expression != null) {
                 return expression;
             }
