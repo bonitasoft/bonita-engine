@@ -14,10 +14,8 @@
 package org.bonitasoft.engine.core.process.definition.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfoWithContent;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilder;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoWithContentImpl;
 
 /**
  * @author Baptiste Mesta
@@ -27,9 +25,9 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefiniti
  */
 public class SProcessDefinitionDeployInfoBuilderImpl implements SProcessDefinitionDeployInfoBuilder {
 
-    private final SProcessDefinitionDeployInfoWithContentImpl entity;
+    private final SProcessDefinitionDeployInfoImpl entity;
 
-    public SProcessDefinitionDeployInfoBuilderImpl(final SProcessDefinitionDeployInfoWithContentImpl entity) {
+    public SProcessDefinitionDeployInfoBuilderImpl(final SProcessDefinitionDeployInfoImpl entity) {
         super();
         this.entity = entity;
     }
@@ -101,7 +99,7 @@ public class SProcessDefinitionDeployInfoBuilderImpl implements SProcessDefiniti
     }
 
     @Override
-    public SProcessDefinitionDeployInfoWithContent done() {
+    public SProcessDefinitionDeployInfo done() {
         return entity;
     }
 
