@@ -477,7 +477,7 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10011:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoWithContentImpl" />
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" />
         <constructor-arg name="sequenceId" value="10012" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10012:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
@@ -904,7 +904,6 @@
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" value="ac" />
                 <!-- process definition -->
                 <entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo" value="process_definition" />
-                <entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployWithContentInfo" value="process_definition" />
                 <entry key="org.bonitasoft.engine.core.process.definition.model.SActor" value="actor" />
                 <entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="actormember" />
                 <entry key="org.bonitasoft.engine.identity.model.SUser" value="user" />
@@ -1179,7 +1178,6 @@
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo" value="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" />
-                <entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfoWithContent" value="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoWithContentImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo" value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceWithFailureInfoImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" />

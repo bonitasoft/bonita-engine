@@ -93,6 +93,7 @@ import org.bonitasoft.engine.api.impl.transaction.process.GetNumberOfProcessDepl
 import org.bonitasoft.engine.api.impl.transaction.process.GetNumberOfProcessDeploymentInfosUnrelatedToCategory;
 import org.bonitasoft.engine.api.impl.transaction.process.GetNumberOfProcessInstance;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
+import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfos;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForGroup;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinitionDeployInfosWithActorOnlyForGroups;
@@ -928,7 +929,9 @@ public class ProcessAPIImpl implements ProcessAPI {
                     ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
             final ProcessDefinitionBARContribution processDefinitionBARContribution = new ProcessDefinitionBARContribution();
             return processDefinitionBARContribution.deserializeProcessDefinition(processDesignFile);
-        } catch (final BonitaHomeNotSetException | InvalidBusinessArchiveFormatException e) {
+        } catch (final BonitaHomeNotSetException e) {
+            throw new ProcessDefinitionNotFoundException(e);
+        } catch (final InvalidBusinessArchiveFormatException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final IOException e) {
             throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
@@ -940,10 +943,13 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
-            return ModelConvertor.toProcessDeploymentInfo(processDefinitionService.getProcessDeploymentInfo(processDefinitionId));
+            final TransactionContentWithResult<SProcessDefinitionDeployInfo> transactionContentWithResult = new GetProcessDefinitionDeployInfo(
+                    processDefinitionId, processDefinitionService);
+            transactionContentWithResult.execute();
+            return ModelConvertor.toProcessDeploymentInfo(transactionContentWithResult.getResult());
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
-        } catch (SProcessDefinitionReadException e) {
+        } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
     }

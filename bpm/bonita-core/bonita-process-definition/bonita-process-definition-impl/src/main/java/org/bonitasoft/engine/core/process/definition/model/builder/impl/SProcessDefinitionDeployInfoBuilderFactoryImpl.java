@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.definition.model.builder.impl;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoWithContentImpl;
 
 /**
  * @author Baptiste Mesta
@@ -58,7 +57,7 @@ public class SProcessDefinitionDeployInfoBuilderFactoryImpl implements SProcessD
 
     @Override
     public SProcessDefinitionDeployInfoBuilder createNewInstance(final String name, final String version) {
-        final SProcessDefinitionDeployInfoWithContentImpl entity = new SProcessDefinitionDeployInfoWithContentImpl();
+        final SProcessDefinitionDeployInfoImpl entity = new SProcessDefinitionDeployInfoImpl();
         entity.setName(name);
         entity.setVersion(version);
         entity.setDisplayName(name); // default value for the displayName (when the process deployment info object is created) should be the process name

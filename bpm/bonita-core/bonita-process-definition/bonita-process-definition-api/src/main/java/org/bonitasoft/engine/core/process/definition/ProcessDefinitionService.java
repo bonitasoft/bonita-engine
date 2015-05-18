@@ -31,7 +31,6 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessEnablemen
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfoWithContent;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -78,7 +77,6 @@ public interface ProcessDefinitionService {
     String ROLE_ID = "roleId";
 
     String GROUP_ID = "groupId";
-
 
     /**
      * Store the processDefinition to file system and its deploy info to DB.

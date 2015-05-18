@@ -36,7 +36,6 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeploymentInfoUpdateException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfoWithContent;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -360,7 +359,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test
     public void updateProcessDefinitionDeployInfo() throws Exception {
         // Given
-        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfoWithContent.class);
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
         doReturn(3L).when(sProcessDefinitionDeployInfo).getId();
 
         final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
@@ -393,7 +392,7 @@ public class ProcessDefinitionServiceImplTest {
     @Test(expected = SProcessDeploymentInfoUpdateException.class)
     public final void updateProcessDefinitionDeployInfoThrowException() throws Exception {
         // Given
-        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfoWithContent.class);
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
         doReturn(3L).when(sProcessDefinitionDeployInfo).getId();
 
         final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
