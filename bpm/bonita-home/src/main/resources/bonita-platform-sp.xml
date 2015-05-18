@@ -224,6 +224,7 @@
 				<entry key="getDataSources" value="true" />
 				<entry key="getPlatform" value="true" />
 				<entry key="getDeployInfoByProcessDefId" value="true" />
+				<entry key="getDeployInfoWithContentByProcessDefId" value="true" />
 				<entry key="getCommandByName" value="true" />
 				<entry key="getUserByUserName" value="true" />
 				<entry key="getRoleByName" value="true" />
