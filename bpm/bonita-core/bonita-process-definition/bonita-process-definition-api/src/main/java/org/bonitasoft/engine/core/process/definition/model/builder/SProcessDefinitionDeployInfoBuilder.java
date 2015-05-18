@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.builder;
 
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfoWithContent;
 
 /**
  * @author Baptiste Mesta
@@ -48,5 +48,5 @@ public interface SProcessDefinitionDeployInfoBuilder {
 
     SProcessDefinitionDeployInfoBuilder setDesignContent(String designContent);
 
-    SProcessDefinitionDeployInfo done();
+    SProcessDefinitionDeployInfoWithContent done();
 }
