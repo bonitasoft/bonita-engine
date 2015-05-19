@@ -59,6 +59,7 @@ import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.io.xml.XMLParseException;
@@ -1037,6 +1038,10 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 throw new SObjectModificationException("No expression with ID " + expressionDefinitionId + " found on process "
                         + designProcessDefinition.getDisplayName() + " (" + designProcessDefinition.getVersion() + ")");
             }
+            if (!isValidExpressionTypeToUpdate(expression.getExpressionType())) {
+                throw new SObjectModificationException("Updating an Expression of type " + expression.getExpressionType()
+                        + " is not supported. Only Groovy scripts and constants are allowed.");
+            }
             expression.setContent(content);
             final String processDefinitionAsXMLString = getProcessContent(designProcessDefinition);
             final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
@@ -1047,6 +1052,10 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         } catch (SProcessDeploymentInfoUpdateException e) {
             throw new SObjectModificationException(e);
         }
+    }
+
+    protected boolean isValidExpressionTypeToUpdate(String type) {
+        return ExpressionType.TYPE_READ_ONLY_SCRIPT.name().equals(type) || ExpressionType.TYPE_CONSTANT.name().equals(type);
     }
 
     protected Expression getExpression(DesignProcessDefinition processDefinition, long expressionDefinitionId) {
