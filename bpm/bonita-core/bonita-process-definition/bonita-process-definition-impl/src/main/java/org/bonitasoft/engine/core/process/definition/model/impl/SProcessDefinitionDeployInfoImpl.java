@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 import java.util.Objects;
 
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent;
 
 /**
  * @author Baptiste Mesta
@@ -60,7 +61,7 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
 
     private String displayDescription;
 
-    private String designContent;
+    private SProcessDefinitionDesignContent designContent;
 
     public SProcessDefinitionDeployInfoImpl() {
         super();
@@ -217,11 +218,11 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
     }
 
     @Override
-    public String getDesignContent() {
+    public SProcessDefinitionDesignContent getDesignContent() {
         return designContent;
     }
 
-    public void setDesignContent(String designContent) {
+    public void setDesignContent(SProcessDefinitionDesignContent designContent) {
         this.designContent = designContent;
     }
 

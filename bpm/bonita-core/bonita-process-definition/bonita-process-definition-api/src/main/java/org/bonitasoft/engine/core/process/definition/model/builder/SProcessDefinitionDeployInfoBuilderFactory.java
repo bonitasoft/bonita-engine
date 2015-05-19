@@ -47,7 +47,7 @@ public interface SProcessDefinitionDeployInfoBuilderFactory {
 
     String getIconPathKey();
     
-    String getDesignContent();
+    String getDesignContentKey();
     
     String getActivationStateKey();
 

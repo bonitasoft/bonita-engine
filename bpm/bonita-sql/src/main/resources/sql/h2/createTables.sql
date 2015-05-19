@@ -120,10 +120,18 @@ CREATE TABLE process_definition (
   lastUpdateDate BIGINT,
   categoryId BIGINT,
   iconPath VARCHAR(255),
-  designcontent MEDIUMTEXT NOT NULL,
+  content_tenantid BIGINT NOT NULL,
+  content_id BIGINT NOT NULL,
   PRIMARY KEY (tenantid, id),
   UNIQUE (tenantid, name, version)
 );
+CREATE TABLE clob_storage (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  content MEDIUMTEXT NOT NULL,
+  PRIMARY KEY (tenantid, id)
+);
+
 CREATE TABLE arch_document_mapping (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
