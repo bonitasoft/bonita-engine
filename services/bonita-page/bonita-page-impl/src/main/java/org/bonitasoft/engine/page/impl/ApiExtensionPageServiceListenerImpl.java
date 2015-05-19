@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.page.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -64,19 +65,13 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
 
     private void addPageMapping(final SPage page, final Properties apiProperties) throws SObjectCreationException, IOException,
             SInvalidPageZipMissingPropertiesException {
-        final String apiExtensions = getRequiredProperty(apiProperties, "apiExtensions");
-        final String[] resourceNames = apiExtensions.split(",");
-        for (final String resource : resourceNames) {
-            final String resourceName = resource.trim();
-            final String method = getRequiredProperty(apiProperties, resourceName + ".method");
-            final String pathTemplate = getRequiredProperty(apiProperties, resourceName + ".pathTemplate");
-            getRequiredProperty(apiProperties, resourceName + ".classFileName");
-            getRequiredProperty(apiProperties, resourceName + ".permissions");
-            pageMappingService.create(getMappingKey(method, pathTemplate), page.getId(), Collections.<String> emptyList());
+        final List<String> mappings = getKeysOfPageMappings(apiProperties);
+        for (final String mapping : mappings) {
+            pageMappingService.create(mapping, page.getId(), Collections.<String> emptyList());
         }
     }
 
-    private String getMappingKey(String method, String pathTemplate) {
+    private String getMappingKey(final String method, final String pathTemplate) {
         return new StringBuilder().append("apiExtension|").append(method).append("|").append(pathTemplate).toString();
     }
 
@@ -103,12 +98,48 @@ public class ApiExtensionPageServiceListenerImpl implements PageServiceListener 
 
     @Override
     public void pageUpdated(final SPage page, final byte[] content) throws SObjectModificationException {
-        try {
-            pageDeleted(page);
-            pageInserted(page, content);
-        } catch (SBonitaReadException | SDeletionException | SObjectCreationException e) {
-            throw new SObjectModificationException(e);
+        if (SContentType.API_EXTENSION.equals(page.getContentType())) {
+            try {
+                updateMappings(page, helper.loadPageProperties(content));
+            } catch (SBonitaReadException | SDeletionException | SObjectCreationException | SInvalidPageZipMissingPropertiesException | IOException e) {
+                throw new SObjectModificationException(e);
+            }
         }
+    }
+
+    private void updateMappings(final SPage page, final Properties apiProperties) throws SObjectCreationException, SBonitaReadException, SDeletionException {
+        final List<String> keys = getKeysOfPageMappings(apiProperties);
+        final List<String> existingKeys = new ArrayList<>();
+        List<SPageMapping> mappings;
+        do {
+            mappings = pageMappingService.get(page.getId(), 0, MAX_RESULTS);
+            for (final SPageMapping mapping : mappings) {
+                if (keys.contains(mapping.getKey())) {
+                    existingKeys.add(mapping.getKey());
+                } else {
+                    pageMappingService.delete(mapping);
+                }
+            }
+        } while (mappings.size() == MAX_RESULTS);
+        keys.removeAll(existingKeys);
+        for (final String key : keys) {
+            pageMappingService.create(key, page.getId(), Collections.<String> emptyList());
+        }
+    }
+
+    private List<String> getKeysOfPageMappings(final Properties apiProperties) throws SObjectCreationException {
+        final List<String> keys = new ArrayList<>();
+        final String apiExtensions = getRequiredProperty(apiProperties, "apiExtensions");
+        final String[] resourceNames = apiExtensions.split(",");
+        for (final String resource : resourceNames) {
+            final String resourceName = resource.trim();
+            final String method = getRequiredProperty(apiProperties, resourceName + ".method");
+            final String pathTemplate = getRequiredProperty(apiProperties, resourceName + ".pathTemplate");
+            getRequiredProperty(apiProperties, resourceName + ".classFileName");
+            getRequiredProperty(apiProperties, resourceName + ".permissions");
+            keys.add(getMappingKey(method, pathTemplate));
+        }
+        return keys;
     }
 
 }
