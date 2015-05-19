@@ -1173,6 +1173,9 @@
         <constructor-arg ref="identityService" />
     </bean>
 
+    <bean id="genericAuthenticationServiceAccessor" class="org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor">
+        <constructor-arg ref="${authentication.service.ref.name:authenticationService}" />
+    </bean>
 
     <bean id="tenantTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl">
         <constructor-arg name="tenantId" value="${tenantId}" />
