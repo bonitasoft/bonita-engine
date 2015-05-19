@@ -670,4 +670,24 @@ public class PageAPIIT extends CommonAPIIT {
         assertThat(results.get(0)).isEqualToComparingFieldByField(expectedMatchingPage);
 
     }
+
+    @Test
+    public void updatePageContent_should_update_properties() throws Exception {
+        // given
+        final String pageName = generateUniquePageName(0);
+        final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION, "contentType="
+                + ContentType.API_EXTENSION, "apiExtensions=myGetResource, myPostResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission", "myPostResource.method=POST",
+                "myPostResource.pathTemplate=helloWorld", "myPostResource.classFileName=Index.groovy", "myPostResource.permissions = newPermission");
+
+        final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION, "contentType="
+                + ContentType.API_EXTENSION, "apiExtensions=myGetResource, myPutResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission", "myPutResource.method=PUT",
+                "myPutResource.pathTemplate=helloWorld", "myPutResource.classFileName=Index.groovy", "myPutResource.permissions = newPermission");
+
+        // when
+        final Page page = getPageAPI().createPage(pageName, pageContent1);
+        getPageAPI().updatePageContent(page.getId(), pageContent2);
+    }
+
 }
