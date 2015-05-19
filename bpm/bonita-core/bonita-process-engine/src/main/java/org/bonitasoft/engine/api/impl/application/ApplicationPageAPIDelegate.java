@@ -17,7 +17,8 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
-import org.bonitasoft.engine.api.impl.validator.TokenValidator;
+import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
+import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationPage;
@@ -90,9 +91,10 @@ public class ApplicationPageAPIDelegate {
     }
 
     private void validateToken(final String token) throws CreationException {
-        final TokenValidator tokenValidator = new TokenValidator(token);
-        if (!tokenValidator.validate()) {
-            throw new CreationException(tokenValidator.getError());
+        final ApplicationTokenValidator tokenValidator = new ApplicationTokenValidator();
+        ValidationStatus validationStatus = tokenValidator.validate(token);
+        if (!validationStatus.isValid()) {
+            throw new CreationException(validationStatus.getMessage());
         }
     }
 

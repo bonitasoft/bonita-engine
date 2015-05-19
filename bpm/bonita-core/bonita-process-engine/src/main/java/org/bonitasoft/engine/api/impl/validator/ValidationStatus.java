@@ -11,34 +11,48 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.validator;
 
+package org.bonitasoft.engine.api.impl.validator;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
-public class TokenValidator {
+public class ValidationStatus {
 
-    private String token;
+    boolean valid;
 
-    private String error;
+    private String message;
 
-    public TokenValidator(String token) {
-        this.token = token;
+    private ErrorType errorType;
+
+    public enum ErrorType {
+        INVALID_CHARACTER,
+
+        RESERVED_KEY_WORD,
+
+        NONE
     }
 
-    public boolean validate() {
-        if(token == null || !token.matches("((\\p{Alnum})|-|\\.|_|~)+")) {
-            error = "The token '"
-                    + token
-                    + "' is invalid: the token can not be null or empty and should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'";
-            return false;
-        }
-        return  true;
+    public ValidationStatus(final boolean valid) {
+        this.valid = valid;
+        errorType = valid? ErrorType.NONE : ErrorType.INVALID_CHARACTER;
     }
 
-    public String getError() {
-        return error;
+    public ValidationStatus(boolean valid, final String message, final ErrorType errorType) {
+        this.valid = valid;
+        this.message = message;
+        this.errorType = errorType;
+    }
+
+    public ErrorType getErrorType() {
+        return errorType;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public boolean isValid() {
+        return valid;
     }
 }
