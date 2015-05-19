@@ -19,11 +19,10 @@ import org.junit.Test;
 
 public class ApplicationTokenValidatorTest {
 
+    private ApplicationTokenValidator validator = new ApplicationTokenValidator();
+
     @Test
     public void isValid_should_return_true_if_value_is_alphanumeric() throws Exception {
-        //given
-        ApplicationTokenValidator validator = new ApplicationTokenValidator();
-
         //when
         final ValidationStatus valid = validator.validate("123name");
 
@@ -34,7 +33,6 @@ public class ApplicationTokenValidatorTest {
     @Test
     public void isValid_should_return_false_if_value_contains_special_characters() throws Exception {
         //given
-        ApplicationTokenValidator validator = new ApplicationTokenValidator();
         String token = "123/name";
 
         //when
@@ -50,9 +48,6 @@ public class ApplicationTokenValidatorTest {
 
     @Test
     public void isValid_should_return_false_if_value_contains_space() throws Exception {
-        //given
-        ApplicationTokenValidator validator = new ApplicationTokenValidator();
-
         //when
         final ValidationStatus valid = validator.validate("my name");
 
@@ -62,9 +57,6 @@ public class ApplicationTokenValidatorTest {
 
     @Test
     public void value_can_contains_hyphen() throws Exception {
-        //given
-        ApplicationTokenValidator validator = new ApplicationTokenValidator();
-
         //when
         final ValidationStatus valid = validator.validate("my-name");
 
@@ -74,9 +66,6 @@ public class ApplicationTokenValidatorTest {
 
     @Test
     public void value_can_contains_dot() throws Exception {
-        //given
-        ApplicationTokenValidator validator = new ApplicationTokenValidator();
-
         //when
         final ValidationStatus valid = validator.validate("my.name");
 
@@ -86,9 +75,6 @@ public class ApplicationTokenValidatorTest {
 
     @Test
     public void value_can_contains_underscore() throws Exception {
-        //given
-        ApplicationTokenValidator validator = new ApplicationTokenValidator();
-
         //when
         final ValidationStatus valid = validator.validate("my_name");
 
@@ -98,9 +84,6 @@ public class ApplicationTokenValidatorTest {
 
     @Test
     public void value_can_contains_tilde() throws Exception {
-        //given
-        ApplicationTokenValidator validator = new ApplicationTokenValidator();
-
         //when
         final ValidationStatus valid = validator.validate("my~name");
 
@@ -110,9 +93,6 @@ public class ApplicationTokenValidatorTest {
 
     @Test
     public void value_can_contains_all_authorized_symbols() throws Exception {
-        //given
-        ApplicationTokenValidator validator = new ApplicationTokenValidator();
-
         //when
         final ValidationStatus valid = validator.validate("m-y.n_a~-m.e");
 
@@ -122,9 +102,6 @@ public class ApplicationTokenValidatorTest {
 
     @Test
     public void value_cannot_be_empty() throws Exception {
-        //given
-        ApplicationTokenValidator validator = new ApplicationTokenValidator();
-
         //when
         final ValidationStatus valid = validator.validate("");
 
@@ -134,9 +111,6 @@ public class ApplicationTokenValidatorTest {
 
     @Test
     public void value_cannot_be_null() throws Exception {
-        //given
-        ApplicationTokenValidator validator = new ApplicationTokenValidator();
-
         //when
         final ValidationStatus valid = validator.validate(null);
 
