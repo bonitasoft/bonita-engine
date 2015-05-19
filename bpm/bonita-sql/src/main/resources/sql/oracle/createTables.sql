@@ -123,7 +123,7 @@ CREATE TABLE process_definition (
   PRIMARY KEY (tenantId, id),
   CONSTRAINT UK_Process_Definition UNIQUE (tenantId, name, version)
 );
-CREATE TABLE clob_storage (
+CREATE TABLE process_content (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   content CLOB NOT NULL,

@@ -125,7 +125,7 @@ CREATE TABLE process_definition (
   PRIMARY KEY (tenantid, id),
   UNIQUE (tenantid, name, version)
 );
-CREATE TABLE clob_storage (
+CREATE TABLE process_content (
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   content TEXT NOT NULL,

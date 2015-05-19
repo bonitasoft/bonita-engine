@@ -63,4 +63,4 @@ DROP TABLE platform;
 DROP TABLE platformCommand;
 DROP TABLE form_mapping;
 DROP TABLE page_mapping;
-DROP TABLE clob_storage;
+DROP TABLE process_content;

@@ -127,7 +127,7 @@ CREATE TABLE process_definition (
   PRIMARY KEY (tenantid, id),
   UNIQUE (tenantid, name, version)
 ) ENGINE = INNODB;
-CREATE TABLE clob_storage (
+CREATE TABLE process_content (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   content MEDIUMTEXT NOT NULL,

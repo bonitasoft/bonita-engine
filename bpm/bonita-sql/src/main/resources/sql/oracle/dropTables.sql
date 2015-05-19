@@ -63,4 +63,4 @@ DROP TABLE platform cascade constraints purge;
 DROP TABLE platformCommand cascade constraints purge;
 DROP TABLE form_mapping cascade constraints purge;
 DROP TABLE page_mapping cascade constraints purge;
-DROP TABLE clob_storage cascade constraints purge;
+DROP TABLE process_content cascade constraints purge;

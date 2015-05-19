@@ -144,7 +144,7 @@ CREATE TABLE process_definition (
   UNIQUE (tenantid, name, version)
 )
 GO
-CREATE TABLE clob_storage (
+CREATE TABLE process_content (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   content NVARCHAR(MAX) NOT NULL,

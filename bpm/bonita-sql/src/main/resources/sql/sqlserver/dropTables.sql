@@ -128,5 +128,5 @@ DROP TABLE form_mapping
 GO
 DROP TABLE page_mapping
 GO
-DROP TABLE clob_storage
+DROP TABLE process_content
 GO
