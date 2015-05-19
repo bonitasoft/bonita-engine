@@ -672,7 +672,7 @@ public class PageAPIIT extends CommonAPIIT {
     }
 
     @Test
-    public void updatePageContent_should_update_properties() throws Exception {
+    public void updatePageContent_should_update_mappings() throws Exception {
         // given
         final String pageName = generateUniquePageName(0);
         final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION, "contentType="
