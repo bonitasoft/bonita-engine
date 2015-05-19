@@ -82,8 +82,8 @@ public class ExpressionFinder implements ModelFinderVisitor<Expression> {
 
     @Override
     public Expression find(DesignProcessDefinition designProcessDefinition, long expressionDefinitionId) {
-        for (int i = 1; i <= 5; i++) {
-            final Expression expression = designProcessDefinition.getStringIndexValue(i);
+        final List<Expression> expressions = designProcessDefinition.getStringIndexValues();
+        for (Expression expression: expressions) {
             if (getExpressionFromContainer(expression, expressionDefinitionId) != null) {
                 return expression;
             }
