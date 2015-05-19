@@ -55,7 +55,7 @@
 						<prop key="hazelcast.shutdownhook.enabled">false</prop>
 					</props>
 				</property>
-				<property name="instanceName" value="bonita" />
+				<property name="instanceName" value="${bonita.cluster.name}" />
 				<property name="networkConfig">
 					<bean class="com.hazelcast.config.NetworkConfig">
 						<property name="join">
