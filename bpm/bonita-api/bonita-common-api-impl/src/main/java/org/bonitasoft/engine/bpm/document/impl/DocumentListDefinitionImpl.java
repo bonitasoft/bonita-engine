@@ -30,8 +30,7 @@ public class DocumentListDefinitionImpl extends NamedElementImpl implements Docu
     private Expression expression;
 
     /**
-     * @param name
-     *        the name of the document list
+     * @param name the name of the document list
      */
     public DocumentListDefinitionImpl(final String name) {
         super(name);
@@ -89,7 +88,8 @@ public class DocumentListDefinitionImpl extends NamedElementImpl implements Docu
     }
 
     @Override
-    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
-        return visitor.find(this, modelId);
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
     }
+
 }

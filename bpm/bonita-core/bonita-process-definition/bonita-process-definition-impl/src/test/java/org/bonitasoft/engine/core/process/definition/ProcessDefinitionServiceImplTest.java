@@ -71,6 +71,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionServiceImplTest {

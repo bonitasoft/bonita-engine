@@ -22,12 +22,29 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
 import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
+import org.bonitasoft.engine.bpm.document.impl.DocumentDefinitionImpl;
+import org.bonitasoft.engine.bpm.document.impl.DocumentListDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.GatewayType;
+import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.AutomaticTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.BoundaryEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CallActivityDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.CatchMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.EndEventDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.GatewayDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateCatchEventDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateThrowEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristicsImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ReceiveTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.SendTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristicsImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.StartEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.ThrowMessageEventTriggerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.TimerEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.TransitionDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
+import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
@@ -44,7 +61,7 @@ public class ExpressionFinderTest {
     private ExpressionFinder expressionFinder = spy(new ExpressionFinder());
 
     @Test
-    public void findShouldRecurseTreeUntilFound() throws Exception {
+    public void findShouldRecurseTreeForSeekedExpression() throws Exception {
         DesignProcessDefinitionImpl def = new DesignProcessDefinitionImpl("name", "version");
         final ContextEntryImpl contextEntry = new ContextEntryImpl();
         contextEntry.setExpression(new ExpressionImpl());
@@ -64,6 +81,16 @@ public class ExpressionFinderTest {
         final ExpressionImpl transitionCondition = new ExpressionImpl(333L);
         userTaskDefaultTransition.setCondition(transitionCondition);
         userTask.setDefaultTransition(userTaskDefaultTransition);
+        userTask.addIncomingTransition(new TransitionDefinitionImpl("incommingTransition"));
+        userTask.addOutgoingTransition(new TransitionDefinitionImpl("outgoingTransition"));
+        userTask.addConnector(new ConnectorDefinitionImpl("connectorOnTask", "connDefId_", "conneVersion_", ConnectorEvent.ON_FINISH));
+        userTask.addDataDefinition(new DataDefinitionImpl("myTaskData", new ExpressionImpl()));
+        userTask.addBusinessDataDefinition(new BusinessDataDefinitionImpl("myBizData", new ExpressionImpl()));
+        userTask.addBoundaryEventDefinition(new BoundaryEventDefinitionImpl("myBoundaryEvent"));
+        final UserFilterDefinitionImpl userFilterDefinition = new UserFilterDefinitionImpl("myUserFiler", "someId", "someVersion");
+        userFilterDefinition.addInput("input_name", new ExpressionImpl());
+        userTask.setUserFilter(userFilterDefinition);
+        userTask.setLoopCharacteristics(new MultiInstanceLoopCharacteristicsImpl(true, new ExpressionImpl()));
         processContainer.addActivity(userTask);
         final ExpressionImpl bizDataDefaultValue = new ExpressionImpl();
         processContainer.addBusinessDataDefinition(new BusinessDataDefinitionImpl("bizData", bizDataDefaultValue));
@@ -77,12 +104,41 @@ public class ExpressionFinderTest {
         operation.setRightOperand(connectorOperationRightOperand);
         connectorDefinition.addOutput(operation);
         processContainer.addConnector(connectorDefinition);
+        processContainer.addTransition(new TransitionDefinitionImpl("transition"));
+        processContainer.addGateway(new GatewayDefinitionImpl("myGate", GatewayType.EXCLUSIVE));
+        processContainer.addEndEvent(new EndEventDefinitionImpl("end_process"));
+        processContainer.addDocumentDefinition(new DocumentDefinitionImpl("myDoc"));
+        processContainer.addDocumentListDefinition(new DocumentListDefinitionImpl("myDocList"));
+        processContainer.addActivity(new SendTaskDefinitionImpl("sendTask", "messageName", new ExpressionImpl()));
+        final CatchMessageEventTriggerDefinitionImpl receiveMessage = new CatchMessageEventTriggerDefinitionImpl("receiveMessage");
+        receiveMessage.addCorrelation(new ExpressionImpl(), new ExpressionImpl());
+        final OperationImpl msgOperation = new OperationImpl();
+        msgOperation.setRightOperand(new ExpressionImpl());
+        receiveMessage.addOperation(msgOperation);
+        processContainer.addActivity(new ReceiveTaskDefinitionImpl(200L, "receiveTask", receiveMessage));
+        processContainer.addActivity(new SubProcessDefinitionImpl("subProcess", false));
+        final CallActivityDefinitionImpl calledProcess = new CallActivityDefinitionImpl("calledProcess");
+        calledProcess.setLoopCharacteristics(new StandardLoopCharacteristicsImpl(new ExpressionImpl(), false));
+        calledProcess.addProcessStartContractInput("contractInputName", new ExpressionImpl());
+        final BoundaryEventDefinitionImpl boundary = new BoundaryEventDefinitionImpl("boundary");
+        boundary.addTimerEventTrigger(new TimerEventTriggerDefinitionImpl(TimerType.CYCLE, new ExpressionImpl()));
+        calledProcess.addBoundaryEventDefinition(boundary);
+        processContainer.addActivity(calledProcess);
+        final ThrowMessageEventTriggerDefinitionImpl message = new ThrowMessageEventTriggerDefinitionImpl("message");
+        message.addDataDefinition(new DataDefinitionImpl("dataMsgName", new ExpressionImpl()));
+        processContainer.addActivity(new SendTaskDefinitionImpl(451L, "sendTask", message));
+        final AutomaticTaskDefinitionImpl autoTask = new AutomaticTaskDefinitionImpl("autoTask");
+        final IntermediateThrowEventDefinitionImpl intermediateThrow = new IntermediateThrowEventDefinitionImpl("intermediateThrow");
+        intermediateThrow.addMessageEventTriggerDefinition(new ThrowMessageEventTriggerDefinitionImpl("someMessage"));
+        processContainer.addIntermediateThrowEvent(intermediateThrow);
+        processContainer.addActivity(autoTask);
 
         final StartEventDefinitionImpl startEvent = new StartEventDefinitionImpl("start");
         startEvent.setDisplayName(new ExpressionImpl());
         processContainer.addStartEvent(startEvent);
 
         final IntermediateCatchEventDefinitionImpl intermediate_catch = new IntermediateCatchEventDefinitionImpl("intermediate_catch");
+        intermediate_catch.addMessageEventTrigger(new CatchMessageEventTriggerDefinitionImpl("blabla"));
         processContainer.addIntermediateCatchEvent(intermediate_catch);
 
         final IntermediateThrowEventDefinitionImpl intermediate_throw = new IntermediateThrowEventDefinitionImpl("intermediate_throw");
@@ -98,36 +154,27 @@ public class ExpressionFinderTest {
         verify(expressionFinder).find(dataDefaultValue, 999L);
         verify(expressionFinder).find(connectorDefinition, 999L);
         verify(expressionFinder).find(connectorInput, 999L);
-        verify(expressionFinder).find(operation, 999L);
+        verify(expressionFinder).find(msgOperation, 999L);
         verify(expressionFinder).find(connectorOperationRightOperand, 999L);
-        verify(expressionFinder).getExpressionFromContainer(startEvent, 999L);
-        verify(expressionFinder).getExpressionFromContainer(intermediate_catch, 999L);
-        verify(expressionFinder).getExpressionFromContainer(intermediate_throw, 999L);
+        verify(expressionFinder).findExpressionFromNotNullContainer(startEvent, 999L);
+        verify(expressionFinder).findExpressionFromNotNullContainer(intermediate_catch, 999L);
+        verify(expressionFinder).findExpressionFromNotNullContainer(intermediate_throw, 999L);
         verify(expressionFinder).find(userTaskDisplayDesc, 999L);
         verify(expressionFinder).find(displayDescriptionAfterCompletion, 999L);
         verify(expressionFinder).find(transitionCondition, 999L);
     }
 
     @Test
-    public void findShouldNotSearchAnymoreWhenFound() throws Exception {
+    public void findShouldFindElementIfExists() throws Exception {
         DesignProcessDefinitionImpl def = new DesignProcessDefinitionImpl("name", "version");
         final ContextEntryImpl contextEntry = new ContextEntryImpl();
         long expressionFinderId = 6987451354L;
         final ExpressionImpl expressionToBeFound = new ExpressionImpl(expressionFinderId);
         contextEntry.setExpression(expressionToBeFound);
         def.addContextEntry(contextEntry);
-        final ExpressionImpl stringIndex = new ExpressionImpl();
-        def.setStringIndex(1, "label1", stringIndex);
-        final FlowElementContainerDefinitionImpl processContainer = new FlowElementContainerDefinitionImpl();
-        def.setProcessContainer(processContainer);
-        final UserTaskDefinitionImpl userTask = new UserTaskDefinitionImpl("task", "actor");
-        final ContextEntryImpl taskContextEntry = new ContextEntryImpl();
-        userTask.addContextEntry(taskContextEntry);
-        processContainer.addActivity(userTask);
-        final ExpressionImpl bizDataDefaultValue = new ExpressionImpl();
-        processContainer.addBusinessDataDefinition(new BusinessDataDefinitionImpl("bizData", bizDataDefaultValue));
 
-        final Expression expression = expressionFinder.find(def, expressionFinderId);
+        expressionFinder.find(def, expressionFinderId);
+        final Expression expression = expressionFinder.getFoundExpression();
         assertThat(expression).isEqualTo(expressionToBeFound);
 
         verify(expressionFinder).find(contextEntry, expressionFinderId);

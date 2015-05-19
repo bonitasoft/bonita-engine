@@ -36,7 +36,6 @@ import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition;
-import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.MessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.ReceiveTaskDefinition;
@@ -59,446 +58,290 @@ import org.bonitasoft.engine.operation.Operation;
 /**
  * author Emmanuel Duchastenier
  */
-public class ExpressionFinder implements ModelFinderVisitor<Expression> {
+public class ExpressionFinder implements ModelFinderVisitor {
 
-    protected Expression getExpressionFromContainer(Visitable visitable, long expressionDefinitionId) {
-        return visitable != null ? visitable.accept(this, expressionDefinitionId) : null;
+    public Expression getFoundExpression() {
+        return toBeFound;
     }
 
-    protected Expression getExpressionFromOperationList(List<Operation> operations, long expressionDefinitionId) {
-        for (Operation operation : operations) {
-            final Expression expression = getExpressionFromContainer(operation, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+    private Expression toBeFound = null;
+
+    @Override
+    public void find(Expression expression, long expressionDefinitionId) {
+        if (expression.getId() == expressionDefinitionId) {
+            toBeFound = expression;
         }
-        return null;
+    }
+
+    protected void findExpressionFromNotNullContainer(Visitable visitable, long expressionDefinitionId) {
+        if (visitable != null) {
+            visitable.accept(this, expressionDefinitionId);
+        }
+    }
+
+    protected void getExpressionFromOperationList(List<Operation> operations, long expressionDefinitionId) {
+        for (Operation operation : operations) {
+            findExpressionFromNotNullContainer(operation, expressionDefinitionId);
+        }
     }
 
     @Override
-    public Expression find(Expression expression, long expressionDefinitionId) {
-        if (expression != null && expression.getId() == expressionDefinitionId)
-            return expression;
-        else
-            return null;
-    }
-
-    @Override
-    public Expression find(DesignProcessDefinition designProcessDefinition, long expressionDefinitionId) {
+    public void find(DesignProcessDefinition designProcessDefinition, long expressionDefinitionId) {
         for (int i = 1; i <= 5; i++) {
-            final Expression expression = designProcessDefinition.getStringIndexValue(i);
-            if (getExpressionFromContainer(expression, expressionDefinitionId) != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(designProcessDefinition.getStringIndexValue(i), expressionDefinitionId);
         }
         for (ContextEntry contextEntry : designProcessDefinition.getContext()) {
-            final Expression contextExpression = getExpressionFromContainer(contextEntry, expressionDefinitionId);
-            if (contextExpression != null) {
-                return contextExpression;
-            }
+            findExpressionFromNotNullContainer(contextEntry, expressionDefinitionId);
         }
         final FlowElementContainerDefinition flowElementContainer = designProcessDefinition.getFlowElementContainer();
-        return getExpressionFromContainer(flowElementContainer, expressionDefinitionId);
+        if (flowElementContainer != null) {
+            flowElementContainer.accept(this, expressionDefinitionId);
+        }
     }
 
     @Override
-    public Expression find(FlowNodeDefinition flowNodeDefinition, long expressionDefinitionId) {
-        if (flowNodeDefinition == null) {
-            return null;
-        }
+    public void find(FlowNodeDefinition flowNodeDefinition, long expressionDefinitionId) {
+        if (flowNodeDefinition != null) {
+            findExpressionFromNotNullContainer(flowNodeDefinition.getDisplayName(), expressionDefinitionId);
+            findExpressionFromNotNullContainer(flowNodeDefinition.getDisplayDescription(), expressionDefinitionId);
+            findExpressionFromNotNullContainer(flowNodeDefinition.getDisplayDescriptionAfterCompletion(), expressionDefinitionId);
 
-        Expression aExpression = flowNodeDefinition.getDisplayName();
-        if (getExpressionFromContainer(aExpression, expressionDefinitionId) != null) {
-            return aExpression;
-        }
-        aExpression = flowNodeDefinition.getDisplayDescription();
-        if (getExpressionFromContainer(aExpression, expressionDefinitionId) != null) {
-            return aExpression;
-        }
-        aExpression = flowNodeDefinition.getDisplayDescriptionAfterCompletion();
-        if (getExpressionFromContainer(aExpression, expressionDefinitionId) != null) {
-            return aExpression;
-        }
+            findExpressionFromNotNullContainer(flowNodeDefinition.getDefaultTransition(), expressionDefinitionId);
 
-        final Expression defaultTransition = getExpressionFromContainer(flowNodeDefinition.getDefaultTransition(), expressionDefinitionId);
-        if (defaultTransition != null) {
-            return defaultTransition;
-        }
+            for (TransitionDefinition transitionDefinition : flowNodeDefinition.getIncomingTransitions()) {
+                findExpressionFromNotNullContainer(transitionDefinition, expressionDefinitionId);
+            }
+            for (TransitionDefinition transitionDefinition : flowNodeDefinition.getOutgoingTransitions()) {
+                findExpressionFromNotNullContainer(transitionDefinition, expressionDefinitionId);
+            }
 
-        for (TransitionDefinition transitionDefinition : flowNodeDefinition.getIncomingTransitions()) {
-            final Expression expression = getExpressionFromContainer(transitionDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
+            for (ConnectorDefinition connectorDefinition : flowNodeDefinition.getConnectors()) {
+                findExpressionFromNotNullContainer(connectorDefinition, expressionDefinitionId);
             }
         }
-        for (TransitionDefinition transitionDefinition : flowNodeDefinition.getOutgoingTransitions()) {
-            final Expression expression = getExpressionFromContainer(transitionDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
-        }
-
-        for (ConnectorDefinition connectorDefinition : flowNodeDefinition.getConnectors()) {
-            final Expression expression = getExpressionFromContainer(connectorDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
-        }
-
-        return null;
     }
 
     @Override
-    public Expression find(FlowElementContainerDefinition container, long expressionDefinitionId) {
+    public void find(FlowElementContainerDefinition container, long expressionDefinitionId) {
         for (ActivityDefinition activity : container.getActivities()) {
-            final Expression expression = getExpressionFromContainer(activity, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(activity, expressionDefinitionId);
         }
         for (TransitionDefinition transition : container.getTransitions()) {
-            final Expression expression = getExpressionFromContainer(transition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(transition, expressionDefinitionId);
         }
         for (GatewayDefinition gatewayDefinition : container.getGatewaysList()) {
-            final Expression expression = getExpressionFromContainer(gatewayDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(gatewayDefinition, expressionDefinitionId);
         }
         for (StartEventDefinition startEventDefinition : container.getStartEvents()) {
-            final Expression expression = getExpressionFromContainer(startEventDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(startEventDefinition, expressionDefinitionId);
         }
         for (EndEventDefinition endEventDefinition : container.getEndEvents()) {
-            final Expression expression = getExpressionFromContainer(endEventDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(endEventDefinition, expressionDefinitionId);
         }
         for (IntermediateCatchEventDefinition catchEventDefinition : container.getIntermediateCatchEvents()) {
-            final Expression expression = getExpressionFromContainer(catchEventDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(catchEventDefinition, expressionDefinitionId);
         }
         for (IntermediateThrowEventDefinition throwEventDefinition : container.getIntermediateThrowEvents()) {
-            final Expression expression = getExpressionFromContainer(throwEventDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(throwEventDefinition, expressionDefinitionId);
         }
         for (DataDefinition dataDefinition : container.getDataDefinitions()) {
-            final Expression dataExpression = getExpressionFromContainer(dataDefinition, expressionDefinitionId);
-            if (dataExpression != null) {
-                return dataExpression;
-            }
+            findExpressionFromNotNullContainer(dataDefinition, expressionDefinitionId);
         }
         for (DocumentDefinition documentDefinition : container.getDocumentDefinitions()) {
-            final Expression expression = getExpressionFromContainer(documentDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(documentDefinition, expressionDefinitionId);
         }
         for (DocumentListDefinition documentListDefinition : container.getDocumentListDefinitions()) {
-            final Expression expression = getExpressionFromContainer(documentListDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(documentListDefinition, expressionDefinitionId);
         }
         for (BusinessDataDefinition businessDataDefinition : container.getBusinessDataDefinitions()) {
-            final Expression bizDataExpression = getExpressionFromContainer(businessDataDefinition, expressionDefinitionId);
-            if (bizDataExpression != null) {
-                return bizDataExpression;
-            }
+            findExpressionFromNotNullContainer(businessDataDefinition, expressionDefinitionId);
         }
         for (ConnectorDefinition connectorDefinition : container.getConnectors()) {
-            final Expression expression = getExpressionFromContainer(connectorDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(connectorDefinition, expressionDefinitionId);
         }
-        return null;
+
     }
 
     @Override
-    public Expression find(ActivityDefinition activityDefinition, long expressionDefinitionId) {
-        final Expression displayName = activityDefinition.getDisplayName();
-        if (getExpressionFromContainer(displayName, expressionDefinitionId) != null) {
-            return displayName;
-        }
-        final LoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
-        final Expression expression = getExpressionFromContainer(loopCharacteristics, expressionDefinitionId);
-        if (expression != null) {
-            return expression;
-        }
+    public void find(ActivityDefinition activityDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(activityDefinition.getDisplayName(), expressionDefinitionId);
+        findExpressionFromNotNullContainer(activityDefinition.getLoopCharacteristics(), expressionDefinitionId);
 
         for (BusinessDataDefinition businessDataDefinition : activityDefinition.getBusinessDataDefinitions()) {
-            final Expression bizDataExpression = getExpressionFromContainer(businessDataDefinition, expressionDefinitionId);
-            if (bizDataExpression != null) {
-                return bizDataExpression;
-            }
+            findExpressionFromNotNullContainer(businessDataDefinition, expressionDefinitionId);
         }
 
         for (DataDefinition dataDefinition : activityDefinition.getDataDefinitions()) {
-            final Expression dataExpression = getExpressionFromContainer(dataDefinition, expressionDefinitionId);
-            if (dataExpression != null) {
-                return dataExpression;
-            }
+            findExpressionFromNotNullContainer(dataDefinition, expressionDefinitionId);
         }
-        final Expression expressionFromOperation = getExpressionFromOperationList(activityDefinition.getOperations(), expressionDefinitionId);
-        if (expressionFromOperation != null) {
-            return expressionFromOperation;
-        }
+
+        getExpressionFromOperationList(activityDefinition.getOperations(), expressionDefinitionId);
+
         for (BoundaryEventDefinition boundaryEventDefinition : activityDefinition.getBoundaryEventDefinitions()) {
-            final Expression expressionFromBoundary = getExpressionFromContainer(boundaryEventDefinition, expressionDefinitionId);
-            if (expressionFromBoundary != null) {
-                return expressionFromBoundary;
-            }
+            findExpressionFromNotNullContainer(boundaryEventDefinition, expressionDefinitionId);
         }
 
-        return null;
     }
 
     @Override
-    public Expression find(HumanTaskDefinition humanTaskDefinition, long expressionDefinitionId) {
-        return humanTaskDefinition != null ? getExpressionFromContainer(humanTaskDefinition.getUserFilter(), expressionDefinitionId) : null;
+    public void find(HumanTaskDefinition humanTaskDefinition, long expressionDefinitionId) {
+        if (humanTaskDefinition != null) {
+            final UserFilterDefinition userFilter = humanTaskDefinition.getUserFilter();
+            if (userFilter != null) {
+                userFilter.accept(this, expressionDefinitionId);
+            }
+        }
     }
 
     @Override
-    public Expression find(UserFilterDefinition userFilterDefinition, long expressionDefinitionId) {
+    public void find(UserFilterDefinition userFilterDefinition, long expressionDefinitionId) {
         for (Expression expression : userFilterDefinition.getInputs().values()) {
-            if (getExpressionFromContainer(expression, expressionDefinitionId) != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(expression, expressionDefinitionId);
         }
-        return null;
+
     }
 
     @Override
-    public Expression find(UserTaskDefinition userTaskDefinition, long expressionDefinitionId) {
+    public void find(UserTaskDefinition userTaskDefinition, long expressionDefinitionId) {
         for (ContextEntry contextEntry : userTaskDefinition.getContext()) {
-            final Expression contextExpression = getExpressionFromContainer(contextEntry, expressionDefinitionId);
-            if (contextExpression != null) {
-                return contextExpression;
-            }
+            findExpressionFromNotNullContainer(contextEntry, expressionDefinitionId);
         }
-        return null;
     }
 
     @Override
-    public Expression find(SendTaskDefinition sendTaskDefinition, long expressionDefinitionId) {
-        return getExpressionFromContainer(sendTaskDefinition.getMessageTrigger(), expressionDefinitionId);
+    public void find(SendTaskDefinition sendTaskDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(sendTaskDefinition.getMessageTrigger(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(ReceiveTaskDefinition receiveTaskDefinition, long expressionDefinitionId) {
-        return getExpressionFromContainer(receiveTaskDefinition.getTrigger(), expressionDefinitionId);
+    public void find(ReceiveTaskDefinition receiveTaskDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(receiveTaskDefinition.getTrigger(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(SubProcessDefinition subProcessDefinition, long expressionDefinitionId) {
-        return getExpressionFromContainer(subProcessDefinition.getSubProcessContainer(), expressionDefinitionId);
+    public void find(SubProcessDefinition subProcessDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(subProcessDefinition.getSubProcessContainer(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(CallActivityDefinition callActivityDefinition, long expressionDefinitionId) {
-        final Expression callableElement = callActivityDefinition.getCallableElement();
-        if (getExpressionFromContainer(callableElement, expressionDefinitionId) != null) {
-            return callableElement;
-        }
-        final Expression callableElementVersion = callActivityDefinition.getCallableElementVersion();
-        if (getExpressionFromContainer(callableElementVersion, expressionDefinitionId) != null) {
-            return callableElementVersion;
-        }
+    public void find(CallActivityDefinition callActivityDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(callActivityDefinition.getCallableElement(), expressionDefinitionId);
+        findExpressionFromNotNullContainer(callActivityDefinition.getCallableElementVersion(), expressionDefinitionId);
         for (Expression expression : callActivityDefinition.getProcessStartContractInputs().values()) {
-            if (getExpressionFromContainer(expression, expressionDefinitionId) != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(expression, expressionDefinitionId);
         }
-        final Expression expressionInput = getExpressionFromOperationList(callActivityDefinition.getDataInputOperations(), expressionDefinitionId);
-        if (expressionInput != null) {
-            return expressionInput;
-        }
-        final Expression expressionOutput = getExpressionFromOperationList(callActivityDefinition.getDataOutputOperations(), expressionDefinitionId);
-        if (expressionOutput != null) {
-            return expressionOutput;
-        }
-        return null;
+        getExpressionFromOperationList(callActivityDefinition.getDataInputOperations(), expressionDefinitionId);
+        getExpressionFromOperationList(callActivityDefinition.getDataOutputOperations(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(Operation operation, long expressionDefinitionId) {
-        return getExpressionFromContainer(operation.getRightOperand(), expressionDefinitionId);
+    public void find(Operation operation, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(operation.getRightOperand(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(TransitionDefinition transition, long expressionDefinitionId) {
-        return getExpressionFromContainer(transition.getCondition(), expressionDefinitionId);
+    public void find(TransitionDefinition transition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(transition.getCondition(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(BusinessDataDefinition businessDataDefinition, long expressionDefinitionId) {
-        return getExpressionFromContainer(businessDataDefinition.getDefaultValueExpression(), expressionDefinitionId);
+    public void find(BusinessDataDefinition businessDataDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(businessDataDefinition.getDefaultValueExpression(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(DataDefinition dataDefinition, long expressionDefinitionId) {
-        return getExpressionFromContainer(dataDefinition.getDefaultValueExpression(), expressionDefinitionId);
+    public void find(DataDefinition dataDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(dataDefinition.getDefaultValueExpression(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(CorrelationDefinition correlationDefinition, long expressionDefinitionId) {
-        final Expression keyExpression = getExpressionFromContainer(correlationDefinition.getKey(), expressionDefinitionId);
-        if (keyExpression != null) {
-            return keyExpression;
-        }
-        final Expression valueExpression = getExpressionFromContainer(correlationDefinition.getValue(), expressionDefinitionId);
-        if (valueExpression != null) {
-            return valueExpression;
-        }
-        return null;
+    public void find(CorrelationDefinition correlationDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(correlationDefinition.getKey(), expressionDefinitionId);
+        findExpressionFromNotNullContainer(correlationDefinition.getValue(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition, long expressionDefinitionId) {
-        final Expression expression = getExpressionFromOperationList(catchMessageEventTriggerDefinition.getOperations(), expressionDefinitionId);
-        if (expression != null) {
-            return expression;
-        }
-        return null;
+    public void find(CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition, long expressionDefinitionId) {
+        getExpressionFromOperationList(catchMessageEventTriggerDefinition.getOperations(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(ThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition, long expressionDefinitionId) {
-        final Expression targetFlownode = getExpressionFromContainer(throwMessageEventTriggerDefinition.getTargetFlowNode(), expressionDefinitionId);
-        if (targetFlownode != null) {
-            return targetFlownode;
-        }
-        final Expression targetProcess = getExpressionFromContainer(throwMessageEventTriggerDefinition.getTargetProcess(), expressionDefinitionId);
-        if (targetProcess != null) {
-            return targetProcess;
-        }
+    public void find(ThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(throwMessageEventTriggerDefinition.getTargetFlowNode(), expressionDefinitionId);
+        findExpressionFromNotNullContainer(throwMessageEventTriggerDefinition.getTargetProcess(), expressionDefinitionId);
         for (DataDefinition dataDefinition : throwMessageEventTriggerDefinition.getDataDefinitions()) {
-            final Expression dataExpression = getExpressionFromContainer(dataDefinition, expressionDefinitionId);
-            if (dataExpression != null) {
-                return dataExpression;
-            }
+            findExpressionFromNotNullContainer(dataDefinition, expressionDefinitionId);
         }
-        return null;
     }
 
     @Override
-    public Expression find(MessageEventTriggerDefinition messageEventTriggerDefinition, long expressionDefinitionId) {
+    public void find(MessageEventTriggerDefinition messageEventTriggerDefinition, long expressionDefinitionId) {
         for (CorrelationDefinition correlationDefinition : messageEventTriggerDefinition.getCorrelations()) {
-            final Expression expression = getExpressionFromContainer(correlationDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(correlationDefinition, expressionDefinitionId);
         }
-        return null;
     }
 
     @Override
-    public Expression find(TimerEventTriggerDefinition timerEventTriggerDefinition, long expressionDefinitionId) {
-        return getExpressionFromContainer(timerEventTriggerDefinition.getTimerExpression(), expressionDefinitionId);
+    public void find(TimerEventTriggerDefinition timerEventTriggerDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(timerEventTriggerDefinition.getTimerExpression(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(ContextEntry contextEntry, long expressionDefinitionId) {
-        return getExpressionFromContainer(contextEntry.getExpression(), expressionDefinitionId);
+    public void find(ContextEntry contextEntry, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(contextEntry.getExpression(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(EventDefinition eventDefinition, long expressionDefinitionId) {
+    public void find(EventDefinition eventDefinition, long expressionDefinitionId) {
         for (EventTriggerDefinition eventTriggerDefinition : eventDefinition.getEventTriggers()) {
-            final Expression expression = getExpressionFromContainer(eventTriggerDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(eventTriggerDefinition, expressionDefinitionId);
         }
-        return null;
     }
 
     @Override
-    public Expression find(ThrowEventDefinition throwEventDefinition, long expressionDefinitionId) {
+    public void find(ThrowEventDefinition throwEventDefinition, long expressionDefinitionId) {
         for (ThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition : throwEventDefinition.getMessageEventTriggerDefinitions()) {
-            final Expression expression = getExpressionFromContainer(throwMessageEventTriggerDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(throwMessageEventTriggerDefinition, expressionDefinitionId);
         }
-        return null;
     }
 
     @Override
-    public Expression find(CatchEventDefinition catchEventDefinition, long expressionDefinitionId) {
+    public void find(CatchEventDefinition catchEventDefinition, long expressionDefinitionId) {
         for (TimerEventTriggerDefinition timerEventTriggerDefinition : catchEventDefinition.getTimerEventTriggerDefinitions()) {
-            final Expression expression = getExpressionFromContainer(timerEventTriggerDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(timerEventTriggerDefinition, expressionDefinitionId);
         }
         for (CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition : catchEventDefinition.getMessageEventTriggerDefinitions()) {
-            final Expression expression = getExpressionFromContainer(catchMessageEventTriggerDefinition, expressionDefinitionId);
-            if (expression != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(catchMessageEventTriggerDefinition, expressionDefinitionId);
         }
-        return null;
     }
 
     @Override
-    public Expression find(DocumentDefinition documentDefinition, long expressionDefinitionId) {
-        return getExpressionFromContainer(documentDefinition.getInitialValue(), expressionDefinitionId);
+    public void find(DocumentDefinition documentDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(documentDefinition.getInitialValue(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(DocumentListDefinition documentListDefinition, long expressionDefinitionId) {
-        return getExpressionFromContainer(documentListDefinition.getExpression(), expressionDefinitionId);
+    public void find(DocumentListDefinition documentListDefinition, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(documentListDefinition.getExpression(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(ConnectorDefinition connectorDefinition, long expressionDefinitionId) {
+    public void find(ConnectorDefinition connectorDefinition, long expressionDefinitionId) {
         for (Expression expression : connectorDefinition.getInputs().values()) {
-            if (getExpressionFromContainer(expression, expressionDefinitionId) != null) {
-                return expression;
-            }
+            findExpressionFromNotNullContainer(expression, expressionDefinitionId);
         }
-        final Expression expressionFromOperation = getExpressionFromOperationList(connectorDefinition.getOutputs(), expressionDefinitionId);
-        if (expressionFromOperation != null) {
-            return expressionFromOperation;
-        }
-        return null;
+        getExpressionFromOperationList(connectorDefinition.getOutputs(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(StandardLoopCharacteristics standardLoopCharacteristics, long expressionDefinitionId) {
-        final Expression loopCondition = standardLoopCharacteristics.getLoopCondition();
-        if (getExpressionFromContainer(loopCondition, expressionDefinitionId) != null) {
-            return loopCondition;
-        }
-        final Expression loopMax = standardLoopCharacteristics.getLoopMax();
-        if (getExpressionFromContainer(loopMax, expressionDefinitionId) != null) {
-            return loopMax;
-        }
-        return null;
+    public void find(StandardLoopCharacteristics standardLoopCharacteristics, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(standardLoopCharacteristics.getLoopCondition(), expressionDefinitionId);
+        findExpressionFromNotNullContainer(standardLoopCharacteristics.getLoopMax(), expressionDefinitionId);
     }
 
     @Override
-    public Expression find(MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics, long expressionDefinitionId) {
-        final Expression completionCondition = multiInstanceLoopCharacteristics.getCompletionCondition();
-        if (getExpressionFromContainer(completionCondition, expressionDefinitionId) != null) {
-            return completionCondition;
-        }
-        final Expression loopCardinality = multiInstanceLoopCharacteristics.getLoopCardinality();
-        if (getExpressionFromContainer(loopCardinality, expressionDefinitionId) != null) {
-            return loopCardinality;
-        }
-        return null;
+    public void find(MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics, long expressionDefinitionId) {
+        findExpressionFromNotNullContainer(multiInstanceLoopCharacteristics.getCompletionCondition(), expressionDefinitionId);
+        findExpressionFromNotNullContainer(multiInstanceLoopCharacteristics.getLoopCardinality(), expressionDefinitionId);
     }
 }
