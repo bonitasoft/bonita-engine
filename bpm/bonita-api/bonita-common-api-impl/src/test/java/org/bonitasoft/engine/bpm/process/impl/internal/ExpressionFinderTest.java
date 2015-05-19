@@ -23,6 +23,10 @@ import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
 import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateCatchEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.IntermediateThrowEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.StartEventDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.TransitionDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
@@ -52,6 +56,14 @@ public class ExpressionFinderTest {
         final UserTaskDefinitionImpl userTask = new UserTaskDefinitionImpl("task", "actor");
         final ContextEntryImpl taskContextEntry = new ContextEntryImpl();
         userTask.addContextEntry(taskContextEntry);
+        final ExpressionImpl userTaskDisplayDesc = new ExpressionImpl(1L);
+        userTask.setDisplayDescription(userTaskDisplayDesc);
+        final ExpressionImpl displayDescriptionAfterCompletion = new ExpressionImpl(22L);
+        userTask.setDisplayDescriptionAfterCompletion(displayDescriptionAfterCompletion);
+        final TransitionDefinitionImpl userTaskDefaultTransition = new TransitionDefinitionImpl("default");
+        final ExpressionImpl transitionCondition = new ExpressionImpl(333L);
+        userTaskDefaultTransition.setCondition(transitionCondition);
+        userTask.setDefaultTransition(userTaskDefaultTransition);
         processContainer.addActivity(userTask);
         final ExpressionImpl bizDataDefaultValue = new ExpressionImpl();
         processContainer.addBusinessDataDefinition(new BusinessDataDefinitionImpl("bizData", bizDataDefaultValue));
@@ -66,6 +78,16 @@ public class ExpressionFinderTest {
         connectorDefinition.addOutput(operation);
         processContainer.addConnector(connectorDefinition);
 
+        final StartEventDefinitionImpl startEvent = new StartEventDefinitionImpl("start");
+        startEvent.setDisplayName(new ExpressionImpl());
+        processContainer.addStartEvent(startEvent);
+
+        final IntermediateCatchEventDefinitionImpl intermediate_catch = new IntermediateCatchEventDefinitionImpl("intermediate_catch");
+        processContainer.addIntermediateCatchEvent(intermediate_catch);
+
+        final IntermediateThrowEventDefinitionImpl intermediate_throw = new IntermediateThrowEventDefinitionImpl("intermediate_throw");
+        processContainer.addIntermediateThrowEvent(intermediate_throw);
+
         expressionFinder.find(def, 999L);
 
         verify(expressionFinder).find(contextEntry, 999L);
@@ -78,6 +100,12 @@ public class ExpressionFinderTest {
         verify(expressionFinder).find(connectorInput, 999L);
         verify(expressionFinder).find(operation, 999L);
         verify(expressionFinder).find(connectorOperationRightOperand, 999L);
+        verify(expressionFinder).getExpressionFromContainer(startEvent, 999L);
+        verify(expressionFinder).getExpressionFromContainer(intermediate_catch, 999L);
+        verify(expressionFinder).getExpressionFromContainer(intermediate_throw, 999L);
+        verify(expressionFinder).find(userTaskDisplayDesc, 999L);
+        verify(expressionFinder).find(displayDescriptionAfterCompletion, 999L);
+        verify(expressionFinder).find(transitionCondition, 999L);
     }
 
     @Test

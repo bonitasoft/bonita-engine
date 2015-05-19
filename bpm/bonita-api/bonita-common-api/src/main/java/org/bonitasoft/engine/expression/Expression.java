@@ -16,12 +16,12 @@ package org.bonitasoft.engine.expression;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.BaseElement;
-import org.bonitasoft.engine.bpm.process.Container;
+import org.bonitasoft.engine.bpm.process.Visitable;
 
 /**
  * @author Feng Hui
  */
-public interface Expression extends BaseElement, Container {
+public interface Expression extends BaseElement, Visitable {
 
     String getName();
 

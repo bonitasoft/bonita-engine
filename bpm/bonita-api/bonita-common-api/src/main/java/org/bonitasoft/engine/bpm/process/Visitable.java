@@ -16,7 +16,7 @@ package org.bonitasoft.engine.bpm.process;
 /**
  * author Emmanuel Duchastenier
  */
-public interface Container {
+public interface Visitable {
 
     <T> T accept(ModelFinderVisitor<T> visitor, long modelId);
 }

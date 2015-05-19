@@ -15,11 +15,11 @@ package org.bonitasoft.engine.bpm.flownode;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.bpm.process.Container;
+import org.bonitasoft.engine.bpm.process.Visitable;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface EventTriggerDefinition extends Serializable, Container {
+public interface EventTriggerDefinition extends Serializable, Visitable {
 
 }

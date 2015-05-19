@@ -14,13 +14,13 @@
 package org.bonitasoft.engine.bpm.businessdata;
 
 import org.bonitasoft.engine.bpm.DescriptionElement;
-import org.bonitasoft.engine.bpm.process.Container;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public interface BusinessDataDefinition extends DescriptionElement, Container {
+public interface BusinessDataDefinition extends DescriptionElement, Visitable {
 
     /**
      * Returns the class name of the Business Data type.

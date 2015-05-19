@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
-import org.bonitasoft.engine.bpm.process.Container;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface TimerEventTriggerDefinition extends EventTriggerDefinition, Container {
+public interface TimerEventTriggerDefinition extends EventTriggerDefinition, Visitable {
 
     TimerType getTimerType();
 

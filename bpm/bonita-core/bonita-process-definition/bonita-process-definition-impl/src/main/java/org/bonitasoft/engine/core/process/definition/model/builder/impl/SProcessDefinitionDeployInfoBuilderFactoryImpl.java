@@ -51,7 +51,7 @@ public class SProcessDefinitionDeployInfoBuilderFactoryImpl implements SProcessD
 
     private static final String ICON_PATH = "iconPath";
 
-    private static final String DESIGN_CONTENT = "content";
+    private static final String DESIGN_CONTENT = "designContent";
 
     private static final String LABEL = "label";
 

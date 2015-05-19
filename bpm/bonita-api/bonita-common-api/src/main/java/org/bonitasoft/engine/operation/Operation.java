@@ -15,7 +15,7 @@ package org.bonitasoft.engine.operation;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.bpm.process.Container;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -29,7 +29,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Zhang Bole
  * @author Emmanuel Duchastenier
  */
-public interface Operation extends Serializable, Container {
+public interface Operation extends Serializable, Visitable {
 
     /**
      * @return the <code>LeftOperand</code> of this <code>Operation</code>, representing what entity will be set after execution.
