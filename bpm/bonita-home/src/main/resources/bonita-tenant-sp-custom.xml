@@ -3,6 +3,14 @@
 
     <!-- ADD ANY BEAN DEFINITION YOU WANT TO BE AVAILABLE TO THE TENANT ACCESSOR -->
 
+    <!-- you can define your own authentication service, don't forget to change authentication.service.ref.name property value in bonita-tenant-sp.properties -->
+    <!--
+    <bean id="myCustomAuthenticationService" class="? implements org.bonitasoft.engine.authentication.GenericAuthenticationService" lazy-init="true">
+        <constructor-arg name="arg-name" value="arg-value" />
+        <constructor-arg name="arg-name" ref="arg-ref" />
+    </bean>
+    -->
+
     <!--
     <bean id="commandsToDeployAtStartup" parent="spCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
         <property name="sourceList">
