@@ -12,5 +12,17 @@
     </bean>
     -->
 
+    <!--
+    <bean id="eventHandlers" class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="targetMapClass">
+            <value>java.util.HashMap</value>
+        </property>
+        <property name="sourceMap">
+            <map>
+            </map>
+        </property>
+    </bean>
+    -->
+
 
 </beans>

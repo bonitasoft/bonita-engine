@@ -39,6 +39,12 @@
 
         <!-- ENGINE SERVER CONF -->
 
+        <copy todir="${bh.dir}/engine-server/conf/platform">
+            <fileset dir="${resources.dir}">
+                <include name="bonita-platform-sp-custom.xml"/>
+            </fileset>
+        </copy>
+
         <copy todir="${bh.dir}/engine-server/conf/tenants/template">
             <fileset dir="${resources.dir}">
                 <include name="bonita-tenant-sp-custom.xml"/>
