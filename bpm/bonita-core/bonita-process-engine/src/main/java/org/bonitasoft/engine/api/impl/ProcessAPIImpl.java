@@ -923,17 +923,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public DesignProcessDefinition getDesignProcessDefinition(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            final File processDesignFile = BonitaHomeServer.getInstance().getProcessDefinitionFile(tenantAccessor.getTenantId(), processDefinitionId,
-                    ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-            final ProcessDefinitionBARContribution processDefinitionBARContribution = new ProcessDefinitionBARContribution();
-            return processDefinitionBARContribution.deserializeProcessDefinition(processDesignFile);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final InvalidBusinessArchiveFormatException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final IOException e) {
+            return getTenantAccessor().getProcessDefinitionService().getDesignProcessDefinition(processDefinitionId);
+        } catch (SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
         }
     }

@@ -1022,9 +1022,13 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", queryOptions, null);
     }
 
-    protected DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws IOException, XMLParseException,
-            SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent());
+    @Override
+    public DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException {
+        try {
+            return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent().getContent());
+        } catch (SProcessDefinitionReadException | IOException | XMLParseException e) {
+            throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
+        }
     }
 
     @Override
@@ -1042,7 +1046,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                     .createNewInstance().updateDesignContent(processDefinitionAsXMLString).done();
             updateProcessDefinitionDeployInfo(processDefinitionId, updateDescriptor);
-        } catch (SProcessDefinitionReadException | IOException | XMLParseException e) {
+        } catch (IOException e) {
             throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
         } catch (SProcessDeploymentInfoUpdateException e) {
             throw new SObjectModificationException(e);
