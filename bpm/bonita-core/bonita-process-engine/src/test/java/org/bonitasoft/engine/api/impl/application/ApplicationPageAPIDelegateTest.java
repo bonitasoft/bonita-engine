@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -25,6 +26,8 @@ import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
+import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
+import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.ApplicationPage;
 import org.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import org.bonitasoft.engine.business.application.ApplicationService;
@@ -46,7 +49,9 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -69,6 +74,12 @@ public class ApplicationPageAPIDelegateTest {
     @Mock
     private SearchResult<ApplicationPage> appPageSearchResult;
 
+    @Mock
+    ApplicationTokenValidator validator;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     private ApplicationPageAPIDelegate delegate;
 
     private static final long APPLICATION_ID = 15;
@@ -84,7 +95,8 @@ public class ApplicationPageAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationPageAPIDelegate(accessor, converter, 9999L);
+        delegate = new ApplicationPageAPIDelegate(accessor, converter, 9999L, validator);
+        given(validator.validate(anyString())).willReturn(new ValidationStatus(true));
     }
 
     @Test
@@ -169,12 +181,17 @@ public class ApplicationPageAPIDelegateTest {
         //then exception
     }
 
-    @Test(expected = CreationException.class)
-    public void createApplicationPage_should_throw_InvalidNameException_when_applicationService_throws_SInvalidNameException() throws Exception {
-        //when
-        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, "token with spaces");
+    @Test
+    public void createApplicationPage_should_throw_CreationException_when_token_is_invalid() throws Exception {
+        //given
+        given(validator.validate("invalid token")).willReturn(new ValidationStatus(false, "Invalid"));
 
-        //then exception
+        //then
+        expectedException.expect(CreationException.class);
+        expectedException.expectMessage("Invalid");
+
+        //when
+        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, "invalid token");
     }
 
     @Test
