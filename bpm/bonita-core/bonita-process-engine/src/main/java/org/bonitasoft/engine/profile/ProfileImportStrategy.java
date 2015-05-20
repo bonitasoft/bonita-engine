@@ -46,7 +46,7 @@ public abstract class ProfileImportStrategy {
             SProfileMemberDeletionException, SProfileUpdateException;
 
     /**
-     * return whether the profile can be created if it does not exist
+     * return the imported version of the exportedProfile
      */
     public abstract boolean canCreateProfileIfNotExists(ExportedProfile exportedProfile);
 
