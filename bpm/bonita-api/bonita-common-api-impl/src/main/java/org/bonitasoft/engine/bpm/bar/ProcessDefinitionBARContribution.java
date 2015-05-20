@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +98,7 @@ import org.bonitasoft.engine.bpm.bar.xml.TimerEventTriggerDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.TransitionDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.UserFilterDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.UserTaskDefinitionBinding;
+import org.bonitasoft.engine.bpm.bar.xml.XMLDataDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -144,6 +147,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(ExpressionBinding.class);
         bindings.add(ConditionalExpressionBinding.class);
         bindings.add(DataDefinitionBinding.class);
+        bindings.add(XMLDataDefinitionBinding.class);
         bindings.add(BusinessDataDefinitionBinding.class);
         bindings.add(TextDataDefinitionBinding.class);
         bindings.add(DocumentDefinitionBinding.class);
@@ -280,18 +284,28 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     public void serializeProcessDefinition(final File barFolder, final DesignProcessDefinition processDefinition) throws IOException {
         try {
-            final FileOutputStream fout = new FileOutputStream(new File(barFolder, PROCESS_DEFINITION_XML));
-            try {
-                final XMLNode rootNode = new XMLProcessDefinition().getXMLProcessDefinition(processDefinition);
-                handler.write(rootNode, fout);
-            } finally {
-                fout.close();
+            try (FileOutputStream outputStream = new FileOutputStream(new File(barFolder, PROCESS_DEFINITION_XML))) {
+                handler.write(getXMLNode(processDefinition), outputStream);
             }
             final String infos = generateInfosFromDefinition(processDefinition);
             IOUtil.writeContentToFile(getProcessInfos(infos), new File(barFolder, PROCESS_INFOS_FILE));
         } catch (final FileNotFoundException e) {
             throw new IOException(e);
         }
+    }
+
+    public String convertProcessToXml(DesignProcessDefinition processDefinition) throws IOException {
+        final StringWriter writer = new StringWriter();
+        handler.write(getXMLNode(processDefinition), writer);
+        return writer.toString();
+    }
+
+    public DesignProcessDefinition convertXmlToProcess(String content) throws IOException, XMLParseException {
+        return (DesignProcessDefinition) handler.getObjectFromXML(new StringReader(content));
+    }
+
+    XMLNode getXMLNode(DesignProcessDefinition processDefinition) {
+        return new XMLProcessDefinition().getXMLProcessDefinition(processDefinition);
     }
 
     protected String generateInfosFromDefinition(final DesignProcessDefinition processDefinition) {

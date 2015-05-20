@@ -28,7 +28,9 @@ import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -38,7 +40,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition {
+public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition, Visitable {
 
     private static final long serialVersionUID = -4719128363958199300L;
 
@@ -80,8 +82,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     public DesignProcessDefinitionImpl(final String name, final String version) {
         super(name, version);
-        parameters = new HashSet<ParameterDefinition>();
-        actors = new ArrayList<ActorDefinition>();
+        parameters = new HashSet<>();
+        actors = new ArrayList<>();
     }
 
     public void setDisplayName(final String name) {
@@ -110,7 +112,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     @Deprecated
     @Override
     public Set<ActorDefinition> getActors() {
-        return new HashSet<ActorDefinition>(actors);
+        return new HashSet<>(actors);
     }
 
     @Override
@@ -226,7 +228,6 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
         }
     }
 
-
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(displayName).append(displayDescription).append(parameters).append(actors).append(actorInitiator)
@@ -282,4 +283,10 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     public void addContextEntry(ContextEntry contextEntry) {
         context.add(contextEntry);
     }
+
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
+    }
+
 }

@@ -28,13 +28,9 @@ public class SDocumentDefinitionImpl extends SNamedElementImpl implements SDocum
     private static final long serialVersionUID = 6622182823980202155L;
 
     private String url;
-
     private String file;
-
     private String mimeType;
-
     private String description;
-
     private String fileName;
     private SExpression initialValue;
 

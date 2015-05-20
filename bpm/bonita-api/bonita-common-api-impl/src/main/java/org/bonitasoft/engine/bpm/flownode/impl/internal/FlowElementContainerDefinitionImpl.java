@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
 import org.bonitasoft.engine.bpm.ObjectSeeker;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
@@ -42,12 +41,14 @@ import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+import org.bonitasoft.engine.bpm.process.Visitable;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class FlowElementContainerDefinitionImpl extends BaseElementImpl implements FlowElementContainerDefinition {
+public class FlowElementContainerDefinitionImpl extends BaseElementImpl implements FlowElementContainerDefinition, Visitable {
 
     private static final long serialVersionUID = 1L;
 
@@ -77,26 +78,27 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
 
     private final Map<String, FlowNodeDefinition> flowNodes;
 
+    private final ElementFinder elementFinder = new ElementFinder();
+
     public FlowElementContainerDefinitionImpl() {
-        activities = new ArrayList<ActivityDefinition>();
-        transitions = new HashSet<TransitionDefinition>();
-        gateways = new ArrayList<GatewayDefinition>();
-        startEvents = new ArrayList<StartEventDefinition>(1);
-        intermediateCatchEvents = new ArrayList<IntermediateCatchEventDefinition>(4);
-        endEvents = new ArrayList<EndEventDefinition>(4);
-        intermediateThrowEvents = new ArrayList<IntermediateThrowEventDefinition>(4);
-        dataDefinitions = new ArrayList<DataDefinition>();
-        businessDataDefinitions = new ArrayList<BusinessDataDefinition>();
-        documentDefinitions = new ArrayList<DocumentDefinition>();
-        documentListDefinitions = new ArrayList<DocumentListDefinition>();
-        connectors = new ArrayList<ConnectorDefinition>();
-        flowNodes = new HashMap<String, FlowNodeDefinition>();
+        activities = new ArrayList<>();
+        transitions = new HashSet<>();
+        gateways = new ArrayList<>();
+        startEvents = new ArrayList<>(1);
+        intermediateCatchEvents = new ArrayList<>(4);
+        endEvents = new ArrayList<>(4);
+        intermediateThrowEvents = new ArrayList<>(4);
+        dataDefinitions = new ArrayList<>();
+        businessDataDefinitions = new ArrayList<>();
+        documentDefinitions = new ArrayList<>();
+        documentListDefinitions = new ArrayList<>();
+        connectors = new ArrayList<>();
+        flowNodes = new HashMap<>();
     }
 
     @Override
     public FlowNodeDefinition getFlowNode(final long sourceId) {
-        final Set<FlowNodeDefinition> flowNodes = getFlowNodes();
-        return getElementById(flowNodes, sourceId);
+        return elementFinder.getElementById(getFlowNodes(), sourceId);
     }
 
     @Override
@@ -106,7 +108,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     }
 
     private Set<FlowNodeDefinition> getFlowNodes() {
-        final Set<FlowNodeDefinition> flowNodes = new HashSet<FlowNodeDefinition>();
+        final Set<FlowNodeDefinition> flowNodes = new HashSet<>();
         flowNodes.addAll(gateways);
         flowNodes.addAll(activities);
         flowNodes.addAll(startEvents);
@@ -118,7 +120,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     }
 
     private List<BoundaryEventDefinition> getBoundaryEvents() {
-        final List<BoundaryEventDefinition> boundaryEvents = new ArrayList<BoundaryEventDefinition>(3);
+        final List<BoundaryEventDefinition> boundaryEvents = new ArrayList<>(3);
         for (final ActivityDefinition activity : activities) {
             boundaryEvents.addAll(activity.getBoundaryEventDefinitions());
         }
@@ -143,7 +145,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     @Deprecated
     @Override
     public Set<GatewayDefinition> getGateways() {
-        return Collections.unmodifiableSet(new HashSet<GatewayDefinition>(gateways));
+        return Collections.unmodifiableSet(new HashSet<>(gateways));
     }
 
     @Override
@@ -154,20 +156,6 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     @Override
     public GatewayDefinition getGateway(final String name) {
         return getElementByName(gateways, name);
-    }
-
-    private <T extends BaseElement> T getElementById(final Collection<T> elements, final long id) {
-        T element = null;
-        boolean found = false;
-        final Iterator<T> iterator = elements.iterator();
-        while (!found && iterator.hasNext()) {
-            final T next = iterator.next();
-            if (next.getId() == id) {
-                found = true;
-                element = next;
-            }
-        }
-        return element;
     }
 
     private <T extends NamedElement> T getElementByName(final Collection<T> elements, final String name) {
@@ -218,6 +206,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     public List<DocumentDefinition> getDocumentDefinitions() {
         return Collections.unmodifiableList(documentDefinitions);
     }
+
     @Override
     public List<DocumentListDefinition> getDocumentListDefinitions() {
         return Collections.unmodifiableList(documentListDefinitions);
@@ -273,6 +262,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     public void addDocumentDefinition(final DocumentDefinition documentDefinition) {
         documentDefinitions.add(documentDefinition);
     }
+
     public void addDocumentListDefinition(final DocumentListDefinition documentListDefinition) {
         documentListDefinitions.add(documentListDefinition);
     }
@@ -280,7 +270,6 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     public void addConnector(final ConnectorDefinition connectorDefinition) {
         connectors.add(connectorDefinition);
     }
-
 
     @Override
     public BusinessDataDefinition getBusinessDataDefinition(final String name) {
@@ -292,4 +281,8 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
         return ObjectSeeker.getNamedElement(dataDefinitions, name);
     }
 
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
+    }
 }

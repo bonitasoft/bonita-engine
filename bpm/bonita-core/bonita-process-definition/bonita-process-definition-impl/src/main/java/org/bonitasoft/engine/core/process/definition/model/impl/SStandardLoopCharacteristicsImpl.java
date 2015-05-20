@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
-import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.StandardLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SStandardLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.Expression;
@@ -37,13 +37,6 @@ public class SStandardLoopCharacteristicsImpl implements SStandardLoopCharacteri
         this.loopCondition = loopCondition;
         this.testBefore = testBefore;
         loopMax = null;
-    }
-
-    public SStandardLoopCharacteristicsImpl(final SExpression loopCondition, final boolean testBefore, final SExpression loopMax) {
-        super();
-        this.loopCondition = loopCondition;
-        this.testBefore = testBefore;
-        this.loopMax = loopMax;
     }
 
     public SStandardLoopCharacteristicsImpl(final StandardLoopCharacteristics loopCharacteristics) {

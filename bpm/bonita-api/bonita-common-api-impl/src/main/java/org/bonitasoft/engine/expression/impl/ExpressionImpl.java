@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -152,5 +153,10 @@ public class ExpressionImpl extends BaseElementImpl implements Expression {
         result = 31 * result + (interpreter != null ? interpreter.hashCode() : 0);
         result = 31 * result + (dependencies != null ? dependencies.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
     }
 }

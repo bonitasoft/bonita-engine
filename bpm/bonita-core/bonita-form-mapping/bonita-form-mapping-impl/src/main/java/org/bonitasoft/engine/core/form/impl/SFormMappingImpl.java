@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.form.impl;
 import java.util.Objects;
 
 import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.persistence.PersistentObjectId;
 
@@ -83,6 +84,16 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
     @Override
     public String getTask() {
         return task;
+    }
+
+    @Override
+    public String getProcessElementName() {
+        switch (FormMappingType.getTypeFromId(this.getType())) {
+            case TASK: return this.getTask();
+            case PROCESS_OVERVIEW: return FormMappingType.PROCESS_OVERVIEW.toString();
+            case PROCESS_START: return FormMappingType.PROCESS_START.toString();
+            default: return null;
+        }
     }
 
     @Override

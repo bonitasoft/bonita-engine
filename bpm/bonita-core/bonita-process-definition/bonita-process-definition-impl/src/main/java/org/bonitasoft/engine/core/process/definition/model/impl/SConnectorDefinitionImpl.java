@@ -57,7 +57,7 @@ public class SConnectorDefinitionImpl extends SNamedElementImpl implements SConn
         version = connector.getVersion();
         failAction = connector.getFailAction();
         errorCode = connector.getErrorCode();
-        inputs = new HashMap<String, SExpression>(connector.getInputs().size());
+        inputs = new HashMap<>(connector.getInputs().size());
         for (final Entry<String, Expression> input : connector.getInputs().entrySet()) {
             final Expression value = input.getValue();
             if (value != null) {
@@ -65,7 +65,7 @@ public class SConnectorDefinitionImpl extends SNamedElementImpl implements SConn
                 inputs.put(input.getKey(), sExpression);// creates SExpression
             }
         }
-        outputs = new ArrayList<SOperation>(connector.getOutputs().size());
+        outputs = new ArrayList<>(connector.getOutputs().size());
         for (final Operation operation : connector.getOutputs()) {
             final SOperation sOperation = ServerModelConvertor.convertOperation(operation);
             outputs.add(sOperation);
@@ -78,8 +78,8 @@ public class SConnectorDefinitionImpl extends SNamedElementImpl implements SConn
         this.connectorId = connectorId;
         this.version = version;
         this.activationEvent = activationEvent;
-        inputs = new HashMap<String, SExpression>();
-        outputs = new ArrayList<SOperation>();
+        inputs = new HashMap<>();
+        outputs = new ArrayList<>();
     }
 
     @Override
@@ -105,18 +105,6 @@ public class SConnectorDefinitionImpl extends SNamedElementImpl implements SConn
     @Override
     public List<SOperation> getOutputs() {
         return outputs;
-    }
-
-    public void addInput(final String key, final SExpression value) {
-        inputs.put(key, value);
-    }
-
-    public void addOutput(final SOperation operation) {
-        outputs.add(operation);
-    }
-
-    public void setFailAction(final FailAction failAction) {
-        this.failAction = failAction;
     }
 
     public void setErrorCode(final String errorCode) {

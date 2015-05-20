@@ -43,7 +43,7 @@ public interface SProcessDefinitionDeployInfo extends PersistentObject {
 
     /**
      * Get the dates of the last time execute update statement
-     * 
+     *
      * @return date of the last time execute update statement
      */
     long getLastUpdateDate();
@@ -61,4 +61,6 @@ public interface SProcessDefinitionDeployInfo extends PersistentObject {
      * @return Activation State
      */
     String getActivationState();
+
+    SProcessDefinitionDesignContent getDesignContent();
 }

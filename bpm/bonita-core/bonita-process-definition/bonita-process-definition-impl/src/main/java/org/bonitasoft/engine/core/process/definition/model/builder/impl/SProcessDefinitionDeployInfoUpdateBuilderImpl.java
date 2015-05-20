@@ -29,7 +29,8 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 public class SProcessDefinitionDeployInfoUpdateBuilderImpl implements SProcessDefinitionDeployInfoUpdateBuilder {
 
     private final EntityUpdateDescriptor descriptor;
-    
+    private SProcessDefinitionDeployInfoBuilderFactory builderFactory= BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class);;
+
     public SProcessDefinitionDeployInfoUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
         this.descriptor = descriptor;
     }
@@ -41,31 +42,37 @@ public class SProcessDefinitionDeployInfoUpdateBuilderImpl implements SProcessDe
 
     @Override
     public SProcessDefinitionDeployInfoUpdateBuilder updateDisplayName(final String displayName) {
-        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getDisplayNameKey(), displayName);
+        descriptor.addField(builderFactory.getDisplayNameKey(), displayName);
         return this;
     }
 
     @Override
     public SProcessDefinitionDeployInfoUpdateBuilder updateDisplayDescription(final String description) {
-        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getDisplayDescriptionKey(), description);
+        descriptor.addField(builderFactory.getDisplayDescriptionKey(), description);
         return this;
     }
 
     @Override
     public SProcessDefinitionDeployInfoUpdateBuilder updateActivationState(final ActivationState activationState) {
-        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getActivationStateKey(), activationState.name());
+        descriptor.addField(builderFactory.getActivationStateKey(), activationState.name());
         return this;
     }
 
     @Override
     public SProcessDefinitionDeployInfoUpdateBuilder updateConfigurationState(final ConfigurationState configurationState) {
-        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getConfigurationStateKey(), configurationState.name());
+        descriptor.addField(builderFactory.getConfigurationStateKey(), configurationState.name());
         return this;
     }
 
     @Override
     public SProcessDefinitionDeployInfoUpdateBuilder updateIconPath(final String iconPath) {
-        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getIconPathKey(), iconPath);
+        descriptor.addField(builderFactory.getIconPathKey(), iconPath);
+        return this;
+    }
+
+    @Override
+    public SProcessDefinitionDeployInfoUpdateBuilder updateDesignContent(String processDefinitionAsXMLString){
+        descriptor.addField(builderFactory.getDesignContentKey(), processDefinitionAsXMLString);
         return this;
     }
 }

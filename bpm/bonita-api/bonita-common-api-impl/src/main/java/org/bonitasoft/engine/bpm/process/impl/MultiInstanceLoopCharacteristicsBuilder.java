@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristicsImpl;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -23,7 +23,7 @@ import org.bonitasoft.engine.expression.Expression;
  */
 public class MultiInstanceLoopCharacteristicsBuilder {
 
-    private final MultiInstanceLoopCharacteristics entity;
+    private final MultiInstanceLoopCharacteristicsImpl entity;
 
     private final ProcessDefinitionBuilder builder;
 
@@ -33,7 +33,7 @@ public class MultiInstanceLoopCharacteristicsBuilder {
             final boolean isSequential, final Expression loopCardinality) {
         this.activityDefinition = activityDefinition;
         this.builder = builder;
-        entity = new MultiInstanceLoopCharacteristics(isSequential, loopCardinality);
+        entity = new MultiInstanceLoopCharacteristicsImpl(isSequential, loopCardinality);
         activityDefinition.setLoopCharacteristics(entity);
         if (!Integer.class.getName().equals(loopCardinality.getReturnType())) {
             builder.addError("the loop cardinality of the looped activity " + activityDefinition.getName() + " do not have the return type \"Integer\"");
@@ -44,7 +44,7 @@ public class MultiInstanceLoopCharacteristicsBuilder {
             final boolean isSequential, final String loopDataInputRef) {
         this.activityDefinition = activityDefinition;
         this.builder = builder;
-        entity = new MultiInstanceLoopCharacteristics(isSequential, loopDataInputRef);
+        entity = new MultiInstanceLoopCharacteristicsImpl(isSequential, loopDataInputRef);
         activityDefinition.setLoopCharacteristics(entity);
     }
 

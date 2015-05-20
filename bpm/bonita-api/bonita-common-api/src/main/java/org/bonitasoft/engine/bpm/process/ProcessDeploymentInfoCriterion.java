@@ -35,13 +35,6 @@ public enum ProcessDeploymentInfoCriterion {
     NAME_ASC(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC),
 
     /**
-     * Process label ascending order
-     * 
-     * @deprecated Since 6.3.5. This field doesn't exist in the process definition.
-     */
-    LABEL_ASC(ProcessDeploymentInfoSearchDescriptor.LABEL, Order.ASC),
-
-    /**
      * Process version ascending order
      */
     VERSION_ASC(ProcessDeploymentInfoSearchDescriptor.VERSION, Order.ASC),
@@ -60,13 +53,6 @@ public enum ProcessDeploymentInfoCriterion {
      * Process name ascending order
      */
     NAME_DESC(ProcessDeploymentInfoSearchDescriptor.NAME, Order.DESC),
-
-    /**
-     * Process label ascending order
-     * 
-     * @deprecated Since 6.3.5. This field doesn't exist in the process definition.
-     */
-    LABEL_DESC(ProcessDeploymentInfoSearchDescriptor.LABEL, Order.DESC),
 
     /**
      * Process version ascending order
@@ -92,7 +78,7 @@ public enum ProcessDeploymentInfoCriterion {
 
     private final Order order;
 
-    private ProcessDeploymentInfoCriterion(final String field, final Order order) {
+    ProcessDeploymentInfoCriterion(final String field, final Order order) {
         this.field = field;
         this.order = order;
     }

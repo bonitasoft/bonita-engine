@@ -98,15 +98,15 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
         for (ContextEntry contextEntry : processDefinition.getContext()) {
             context.add(new SContextEntryImpl(contextEntry.getKey(), ServerModelConvertor.convertExpression(contextEntry.getExpression())));
         }
-        container = new SFlowElementContainerDefinitionImpl(this, processDefinition.getProcessContainer());
+        container = new SFlowElementContainerDefinitionImpl(this, processDefinition.getFlowElementContainer());
 
     }
 
     public SProcessDefinitionImpl(final String name, final String version) {
         super(name);
         this.version = version;
-        actors = new HashSet<SActorDefinition>();
-        parameters = new HashSet<SParameterDefinition>();
+        actors = new HashSet<>();
+        parameters = new HashSet<>();
         container = new SFlowElementContainerDefinitionImpl();
     }
 
@@ -142,17 +142,9 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
         actors.add(actor);
     }
 
-    public void addParameter(final SParameterDefinition parameter) {
-        parameters.add(parameter);
-    }
-
     @Override
     public SActorDefinition getActorInitiator() {
         return sActorInitiator;
-    }
-
-    public void setActorInitiator(final SActorDefinition sActorInitiator) {
-        this.sActorInitiator = sActorInitiator;
     }
 
     @Override

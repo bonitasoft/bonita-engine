@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.NamedElement;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 
@@ -26,7 +27,7 @@ import org.bonitasoft.engine.operation.Operation;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public interface ConnectorDefinition extends NamedElement {
+public interface ConnectorDefinition extends NamedElement, Visitable {
 
     /**
      * @return The identifier of the connector definition
