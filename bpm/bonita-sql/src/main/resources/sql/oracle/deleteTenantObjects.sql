@@ -57,3 +57,4 @@ DELETE FROM job_desc WHERE tenantid = ${tenantid};
 DELETE FROM theme WHERE tenantid = ${tenantid};
 DELETE FROM form_mapping WHERE tenantid = ${tenantid};
 DELETE FROM page_mapping WHERE tenantid = ${tenantid};
+DELETE FROM process_content WHERE tenantid = ${tenantid};

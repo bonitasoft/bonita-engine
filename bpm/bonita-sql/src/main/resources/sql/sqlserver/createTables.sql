@@ -138,9 +138,17 @@ CREATE TABLE process_definition (
   lastUpdateDate NUMERIC(19, 0),
   categoryId NUMERIC(19, 0),
   iconPath NVARCHAR(255),
-  designcontent NVARCHAR(MAX) NOT NULL,
+  content_tenantid NUMERIC(19, 0) NOT NULL,
+  content_id NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id),
   UNIQUE (tenantid, name, version)
+)
+GO
+CREATE TABLE process_content (
+  tenantid NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  content NVARCHAR(MAX) NOT NULL,
+  PRIMARY KEY (tenantid, id)
 )
 GO
 CREATE TABLE arch_document_mapping (
