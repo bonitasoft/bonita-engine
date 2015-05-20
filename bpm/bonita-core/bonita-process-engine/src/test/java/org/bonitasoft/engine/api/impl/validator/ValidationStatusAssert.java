@@ -27,29 +27,6 @@ public class ValidationStatusAssert extends AbstractAssert<ValidationStatusAsser
   }
 
   /**
-   * Verifies that the actual ValidationStatus's errorType is equal to the given one.
-   * @param errorType the given errorType to compare the actual ValidationStatus's errorType to.
-   * @return this assertion object.
-   * @throws AssertionError - if the actual ValidationStatus's errorType is not equal to the given one.
-   */
-  public ValidationStatusAssert hasErrorType(ValidationStatus.ErrorType errorType) {
-    // check that actual ValidationStatus we want to make assertions on is not null.
-    isNotNull();
-
-    // overrides the default error message with a more explicit one
-    String assertjErrorMessage = "\nExpected errorType of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
-    
-    // null safe check
-    ValidationStatus.ErrorType actualErrorType = actual.getErrorType();
-    if (!Objects.areEqual(actualErrorType, errorType)) {
-      failWithMessage(assertjErrorMessage, actual, errorType, actualErrorType);
-    }
-
-    // return the current assertion for method chaining
-    return this;
-  }
-
-  /**
    * Verifies that the actual ValidationStatus's message is equal to the given one.
    * @param message the given message to compare the actual ValidationStatus's message to.
    * @return this assertion object.

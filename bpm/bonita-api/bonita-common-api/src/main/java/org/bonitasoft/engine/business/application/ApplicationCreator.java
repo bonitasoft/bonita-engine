@@ -37,7 +37,8 @@ public class ApplicationCreator implements Serializable {
      * <p>The created {@link Application} will used the default layout.</p>
      *
      * @param token the {@code Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
-     *        characters and the following special characters '-', '.', '_' or '~'.
+     *        characters and the following special characters '-', '.', '_' or '~'. In addition, the following words are reserved key words and cannot be used
+     *        as token: 'api', 'content', 'theme'.
      * @param displayName the <code>Application</code> display name. It cannot be null or empty
      * @param version the <code>Application</code> version
      * @see Application
@@ -48,7 +49,6 @@ public class ApplicationCreator implements Serializable {
         fields.put(ApplicationField.VERSION, version);
         fields.put(ApplicationField.DISPLAY_NAME, displayName);
     }
-
 
     /**
      * Retrieves the {@link Application} token

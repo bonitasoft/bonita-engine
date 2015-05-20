@@ -26,7 +26,7 @@ public class ValidationStatusTest {
         ValidationStatus status = new ValidationStatus(true);
 
         //then
-        assertThat(status).isValid().hasErrorType(ValidationStatus.ErrorType.NONE).hasMessage(null);
+        assertThat(status).isValid().hasMessage(null);
     }
 
     @Test
@@ -35,16 +35,16 @@ public class ValidationStatusTest {
         ValidationStatus status = new ValidationStatus(false);
 
         //then
-        assertThat(status).isNotValid().hasErrorType(ValidationStatus.ErrorType.INVALID_CHARACTER).hasMessage(null);
+        assertThat(status).isNotValid().hasMessage(null);
     }
 
     @Test
     public void should_create_invalid_status_with_message() throws Exception {
         //given
-        ValidationStatus status = new ValidationStatus(false, "'content' is a reserved keyword", ValidationStatus.ErrorType.RESERVED_KEY_WORD);
+        ValidationStatus status = new ValidationStatus(false, "'content' is a reserved keyword");
 
         //then
-        assertThat(status).isNotValid().hasErrorType(ValidationStatus.ErrorType.RESERVED_KEY_WORD).hasMessage("'content' is a reserved keyword");
+        assertThat(status).isNotValid().hasMessage("'content' is a reserved keyword");
     }
 
 

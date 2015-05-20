@@ -32,18 +32,12 @@ public class ApplicationTokenValidatorTest {
 
     @Test
     public void isValid_should_return_false_if_value_contains_special_characters() throws Exception {
-        //given
-        String token = "123/name";
-
         //when
-        final ValidationStatus valid = validator.validate(token);
+        final ValidationStatus valid = validator.validate("123/name");
 
         //then
-        String message = "The token '"
-                + token
-                + "' is invalid: the token can not be null or empty and should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'";
         assertThat(valid.isValid()).isFalse();
-        assertThat(valid.getMessage()).isEqualTo(message);
+        assertThat(valid.getMessage()).isEqualTo(getMessage("123/name"));
     }
 
     @Test
@@ -106,7 +100,18 @@ public class ApplicationTokenValidatorTest {
         final ValidationStatus valid = validator.validate("");
 
         //then
-        assertThat(valid.isValid()).isFalse();
+        ValidationStatusAssert.assertThat(valid).isNotValid().hasMessage(getMessage(""));
+
+    }
+
+    @Test
+    public void value_cannot_contain_only_white_spaces() throws Exception {
+        //when
+        final ValidationStatus valid = validator.validate("  ");
+
+        //then
+        ValidationStatusAssert.assertThat(valid).isNotValid().hasMessage(getMessage("  "));
+
     }
 
     @Test
@@ -115,7 +120,76 @@ public class ApplicationTokenValidatorTest {
         final ValidationStatus valid = validator.validate(null);
 
         //then
-        assertThat(valid.isValid()).isFalse();
+        ValidationStatusAssert.assertThat(valid).isNotValid().hasMessage(getMessage(null));
+    }
+
+    @Test
+    public void should_be_invalid_if_token_contains_keyword_content_lower_case() throws Exception {
+        //when
+        ValidationStatus status = validator.validate("content");
+
+        //then
+        ValidationStatusAssert.assertThat(status).isNotValid()
+                .hasMessage(getMessage("content"));
+    }
+
+    @Test
+    public void should_be_invalid_if_token_contains_keyword_content_up_case() throws Exception {
+        //when
+        String token = "CONTENT";
+        ValidationStatus status = validator.validate(token);
+
+        //then
+        ValidationStatusAssert.assertThat(status).isNotValid()
+                .hasMessage(getMessage("CONTENT"));
+    }
+
+    @Test
+    public void should_be_invalid_if_token_contains_keyword_api_lower_case() throws Exception {
+        //when
+        ValidationStatus status = validator.validate("api");
+
+        //then
+        ValidationStatusAssert.assertThat(status).isNotValid()
+                .hasMessage(getMessage("api"));
+    }
+
+    public String getMessage(String token) {
+        StringBuilder stb = new StringBuilder("The token '");
+        stb.append(token);
+        stb.append("' is invalid: the token can not be null or empty and should contain only alpha numeric characters and the following ");
+        stb.append("special characters '-', '.', '_' or '~'. In addition, the following words are reserved key words and cannot be used as token: 'api', 'content', 'theme'.");
+        return stb.toString();
+    }
+
+    @Test
+    public void should_be_invalid_if_token_contains_keyword_api_up_case() throws Exception {
+        //when
+        ValidationStatus status = validator.validate("API");
+
+        //then
+        ValidationStatusAssert.assertThat(status).isNotValid()
+                .hasMessage(getMessage("API"));
+    }
+
+    @Test
+    public void should_be_invalid_if_token_contains_keyword_theme_lower_case() throws Exception {
+        //when
+        ValidationStatus status = validator.validate("theme");
+
+        //then
+        ValidationStatusAssert.assertThat(status).isNotValid()
+                .hasMessage(getMessage("theme"));
+    }
+
+    @Test
+    public void should_be_invalid_if_token_contains_keyword_theme_up_case() throws Exception {
+        //when
+        ValidationStatus status = validator.validate("THEME");
+
+        //then
+        ValidationStatusAssert.assertThat(status).isNotValid()
+                .hasMessage(getMessage("THEME"));
     }
 
 }

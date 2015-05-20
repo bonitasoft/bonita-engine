@@ -23,29 +23,13 @@ public class ValidationStatus {
 
     private String message;
 
-    private ErrorType errorType;
-
-    public enum ErrorType {
-        INVALID_CHARACTER,
-
-        RESERVED_KEY_WORD,
-
-        NONE
-    }
-
     public ValidationStatus(final boolean valid) {
         this.valid = valid;
-        errorType = valid? ErrorType.NONE : ErrorType.INVALID_CHARACTER;
     }
 
-    public ValidationStatus(boolean valid, final String message, final ErrorType errorType) {
+    public ValidationStatus(boolean valid, final String message) {
         this.valid = valid;
         this.message = message;
-        this.errorType = errorType;
-    }
-
-    public ErrorType getErrorType() {
-        return errorType;
     }
 
     public String getMessage() {

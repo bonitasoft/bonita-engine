@@ -13,21 +13,24 @@
  **/
 package org.bonitasoft.engine.api.impl.validator;
 
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationTokenValidator {
 
     public ValidationStatus validate(String token) {
-        if(token == null || !token.matches("((\\p{Alnum})|-|\\.|_|~)+")) {
-            String message = "The token '"
-                    + token
-                    + "' is invalid: the token can not be null or empty and should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'";
-            return new ValidationStatus(false, message, ValidationStatus.ErrorType.INVALID_CHARACTER);
+        List<String> keywords = Arrays.asList("content", "api", "theme");
+        if (token == null || !token.matches("((\\p{Alnum})|-|\\.|_|~)+") || keywords.contains(token.toLowerCase())) {
+            StringBuilder stb = new StringBuilder("The token '");
+            stb.append(token);
+            stb.append("' is invalid: the token can not be null or empty and should contain only alpha numeric characters and the following ");
+            stb.append("special characters '-', '.', '_' or '~'. In addition, the following words are reserved key words and cannot be used as token: 'api', 'content', 'theme'.");
+            return new ValidationStatus(false, stb.toString());
         }
-        return  new ValidationStatus(true);
+        return new ValidationStatus(true);
     }
 
 }

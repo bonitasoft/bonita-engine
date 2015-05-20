@@ -51,8 +51,10 @@ public class ApplicationPageAPIDelegate {
     private final ApplicationPageModelConverter converter;
     private final ApplicationService applicationService;
     private final long loggedUserId;
+    private final ApplicationTokenValidator tokenValidator;
 
-    public ApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationPageModelConverter converter, final long loggedUserId) {
+    public ApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationPageModelConverter converter, final long loggedUserId, final ApplicationTokenValidator tokenValidator) {
+        this.tokenValidator = tokenValidator;
         applicationService = accessor.getApplicationService();
         this.converter = converter;
         this.loggedUserId = loggedUserId;
@@ -91,7 +93,6 @@ public class ApplicationPageAPIDelegate {
     }
 
     private void validateToken(final String token) throws CreationException {
-        final ApplicationTokenValidator tokenValidator = new ApplicationTokenValidator();
         ValidationStatus validationStatus = tokenValidator.validate(token);
         if (!validationStatus.isValid()) {
             throw new CreationException(validationStatus.getMessage());
