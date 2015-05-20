@@ -72,7 +72,7 @@ public class SProcessDefinitionDeployInfoUpdateBuilderImpl implements SProcessDe
 
     @Override
     public SProcessDefinitionDeployInfoUpdateBuilder updateDesignContent(String processDefinitionAsXMLString){
-        descriptor.addField(builderFactory.getDesignContent(), processDefinitionAsXMLString);
+        descriptor.addField(builderFactory.getDesignContentKey(), processDefinitionAsXMLString);
         return this;
     }
 }
