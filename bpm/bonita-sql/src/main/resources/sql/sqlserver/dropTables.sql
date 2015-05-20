@@ -128,3 +128,5 @@ DROP TABLE form_mapping
 GO
 DROP TABLE page_mapping
 GO
+DROP TABLE process_content
+GO

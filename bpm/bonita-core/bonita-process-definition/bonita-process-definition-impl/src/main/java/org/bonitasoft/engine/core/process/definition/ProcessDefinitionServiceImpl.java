@@ -49,6 +49,8 @@ import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefin
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionLogBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionLogBuilderFactory;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDesignContentImpl;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -251,7 +253,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public SProcessDefinition getProcessDefinition(final long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         try {
             final SProcessDefinitionDeployInfo processDeploymentInfo = getProcessDeploymentInfo(processId);
-            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent());
+            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent().getContent());
             SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
             setIdOnProcessDefinition(sProcessDefinition, processId);
             return sProcessDefinition;
@@ -310,7 +312,12 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         final SProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new Process definition");
         try {
             final String processDefinitionContent = getProcessContent(designProcessDefinition);
-            final long tenantId = sessionAccessor.getTenantId();
+            final SProcessDefinitionDesignContentImpl sProcessDefinitionDesignContent = new SProcessDefinitionDesignContentImpl();
+            sProcessDefinitionDesignContent.setContent(processDefinitionContent);
+
+            final InsertRecord insertRecordForContent = new InsertRecord(sProcessDefinitionDesignContent);
+            recorder.recordInsert(insertRecordForContent, null);
+
             final long processId = generateId();
             setIdOnProcessDefinition(definition, processId);
             String displayName = designProcessDefinition.getDisplayName();
@@ -321,17 +328,24 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             if (displayDescription == null || displayDescription.isEmpty()) {
                 displayDescription = definition.getDescription();
             }
-            final SProcessDefinitionDeployInfo definitionDeployInfo = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class)
-                    .createNewInstance(definition.getName(), definition.getVersion()).setProcessId(processId).setDescription(definition.getDescription())
-                    .setDeployedBy(getUserId()).setDeploymentDate(System.currentTimeMillis()).setActivationState(ActivationState.DISABLED.name())
-                    .setConfigurationState(ConfigurationState.UNRESOLVED.name()).setDisplayName(displayName).setDisplayDescription(displayDescription)
-                    .setDesignContent(processDefinitionContent).done();
+            final SProcessDefinitionDeployInfoImpl sProcessDefinitionDeployInfo = new SProcessDefinitionDeployInfoImpl();
+            sProcessDefinitionDeployInfo.setName(definition.getName());
+            sProcessDefinitionDeployInfo.setVersion(definition.getVersion());
+            sProcessDefinitionDeployInfo.setProcessId(processId);
+            sProcessDefinitionDeployInfo.setDescription(definition.getDescription());
+            sProcessDefinitionDeployInfo.setDeployedBy(getUserId());
+            sProcessDefinitionDeployInfo.setDeploymentDate(System.currentTimeMillis());
+            sProcessDefinitionDeployInfo.setActivationState(ActivationState.DISABLED.name());
+            sProcessDefinitionDeployInfo.setConfigurationState(ConfigurationState.UNRESOLVED.name());
+            sProcessDefinitionDeployInfo.setDisplayName(displayName);
+            sProcessDefinitionDeployInfo.setDisplayDescription(displayDescription);
+            sProcessDefinitionDeployInfo.setDesignContent(sProcessDefinitionDesignContent);
 
-            final InsertRecord record = new InsertRecord(definitionDeployInfo);
+            final InsertRecord record = new InsertRecord(sProcessDefinitionDeployInfo);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(PROCESSDEFINITION, EventActionType.CREATED)) {
                 insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PROCESSDEFINITION)
-                        .setObject(definitionDeployInfo).done();
+                        .setObject(sProcessDefinitionDeployInfo).done();
             }
             recorder.recordInsert(record, insertEvent);
             log(definition.getId(), SQueriableLog.STATUS_OK, logBuilder, "store");
