@@ -79,7 +79,7 @@ public class ProfilesUpdaterRestartHandlerTest {
         doReturn(technicalLoggerService).when(tenantServiceAccessor).getTechnicalLoggerService();
         doReturn(profileParser).when(tenantServiceAccessor).getProfileParser();
         md5File = temporaryFolder.newFile();
-        doReturn(md5File).when(profilesUpdaterRestartHandler).getMD5File(anyLong());
+        doReturn(md5File).when(profilesUpdaterRestartHandler).getMD5File(tenantServiceAccessor);
         doReturn(profilesImporter).when(profilesUpdaterRestartHandler).createProfilesImporter(any(TenantServiceAccessor.class), anyListOf(ExportedProfile.class));
     }
 
@@ -126,7 +126,7 @@ public class ProfilesUpdaterRestartHandlerTest {
     public void callable_call_do_update() throws Exception {
         //given
         ArrayList<ExportedProfile> exportedProfiles = new ArrayList<ExportedProfile>();
-        Callable<Object> content = profilesUpdaterRestartHandler.getUpdateProfilesCallable(tenantServiceAccessor, md5File, "content", exportedProfiles);
+        Callable<Object> content = profilesUpdaterRestartHandler.getCallable(tenantServiceAccessor, md5File, "content", exportedProfiles);
         doReturn(null).when(profilesUpdaterRestartHandler).doUpdateProfiles(any(TenantServiceAccessor.class), anyListOf(ExportedProfile.class), any(File.class),
                 anyString());
         //when
