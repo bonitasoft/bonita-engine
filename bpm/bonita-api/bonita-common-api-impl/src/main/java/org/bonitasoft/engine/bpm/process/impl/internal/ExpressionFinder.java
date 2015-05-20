@@ -74,7 +74,7 @@ public class ExpressionFinder implements ModelFinderVisitor {
     }
 
     protected void findExpressionFromNotNullContainer(Visitable visitable, long expressionDefinitionId) {
-        if (visitable != null) {
+        if (visitable != null && toBeFound == null) {
             visitable.accept(this, expressionDefinitionId);
         }
     }
@@ -93,10 +93,7 @@ public class ExpressionFinder implements ModelFinderVisitor {
         for (ContextEntry contextEntry : designProcessDefinition.getContext()) {
             findExpressionFromNotNullContainer(contextEntry, expressionDefinitionId);
         }
-        final FlowElementContainerDefinition flowElementContainer = designProcessDefinition.getFlowElementContainer();
-        if (flowElementContainer != null) {
-            flowElementContainer.accept(this, expressionDefinitionId);
-        }
+        findExpressionFromNotNullContainer(designProcessDefinition.getFlowElementContainer(), expressionDefinitionId);
     }
 
     @Override
@@ -186,10 +183,7 @@ public class ExpressionFinder implements ModelFinderVisitor {
     @Override
     public void find(HumanTaskDefinition humanTaskDefinition, long expressionDefinitionId) {
         if (humanTaskDefinition != null) {
-            final UserFilterDefinition userFilter = humanTaskDefinition.getUserFilter();
-            if (userFilter != null) {
-                userFilter.accept(this, expressionDefinitionId);
-            }
+            findExpressionFromNotNullContainer(humanTaskDefinition.getUserFilter(), expressionDefinitionId);
         }
     }
 

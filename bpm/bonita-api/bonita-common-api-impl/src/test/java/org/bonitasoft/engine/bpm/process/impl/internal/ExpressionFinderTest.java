@@ -14,8 +14,7 @@
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -179,5 +178,28 @@ public class ExpressionFinderTest {
 
         verify(expressionFinder).find(contextEntry, expressionFinderId);
         verify(expressionFinder).find(expressionToBeFound, expressionFinderId);
+    }
+
+    @Test
+    public void findShouldStopSearchingWhenFound() throws Exception {
+        DesignProcessDefinitionImpl def = new DesignProcessDefinitionImpl("name", "version");
+        final ContextEntryImpl contextEntry = new ContextEntryImpl();
+        long expressionFinderId = 6987451354L;
+        final ExpressionImpl expressionToBeFound = new ExpressionImpl(expressionFinderId);
+        contextEntry.setExpression(expressionToBeFound);
+        def.addContextEntry(contextEntry);
+        final FlowElementContainerDefinitionImpl processContainer = new FlowElementContainerDefinitionImpl();
+        def.setProcessContainer(processContainer);
+        final ExpressionImpl userTaskDisplayDesc = new ExpressionImpl(1L);
+        final UserTaskDefinitionImpl userTask = new UserTaskDefinitionImpl("task", "actor");
+        userTask.setDisplayDescription(userTaskDisplayDesc);
+        processContainer.addActivity(userTask);
+
+        expressionFinder.find(def, expressionFinderId);
+        final Expression expression = expressionFinder.getFoundExpression();
+        assertThat(expression).isEqualTo(expressionToBeFound);
+
+        verify(expressionFinder).find(contextEntry, expressionFinderId);
+        verify(expressionFinder, times(0)).find(userTaskDisplayDesc, expressionFinderId);
     }
 }
