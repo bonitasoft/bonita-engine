@@ -170,11 +170,8 @@ public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl impleme
     }
 
     @Override
-    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
-        final T accept = super.accept(visitor, modelId);
-        if (accept != null) {
-            return accept;
-        }
-        return visitor.find(this, modelId);
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
     }
 }

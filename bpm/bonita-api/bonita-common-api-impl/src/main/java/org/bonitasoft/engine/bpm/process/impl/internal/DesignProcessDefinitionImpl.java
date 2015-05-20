@@ -28,9 +28,9 @@ import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
-import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -285,8 +285,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     }
 
     @Override
-    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
-        return visitor.find(this, modelId);
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
     }
 
 }

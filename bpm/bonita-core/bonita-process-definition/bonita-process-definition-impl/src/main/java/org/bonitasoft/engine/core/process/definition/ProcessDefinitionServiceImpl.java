@@ -1064,7 +1064,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     protected Expression getExpression(DesignProcessDefinition processDefinition, long expressionDefinitionId) {
-        return new ExpressionFinder().find(processDefinition, expressionDefinitionId);
+        final ExpressionFinder expressionFinder = new ExpressionFinder();
+        expressionFinder.find(processDefinition, expressionDefinitionId);
+        return expressionFinder.getFoundExpression();
     }
 
 }

@@ -173,11 +173,8 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
     }
 
     @Override
-    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
-        final T element = super.accept(visitor, modelId);
-        if (element != null) {
-            return element;
-        }
-        return visitor.find(this, modelId);
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
     }
 }
