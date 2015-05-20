@@ -45,65 +45,65 @@ import org.bonitasoft.engine.operation.Operation;
 /**
  * author Emmanuel Duchastenier
  */
-public interface ModelFinderVisitor<T> {
+public interface ModelFinderVisitor {
 
-    T find(Expression expression, long modelId);
+    void find(Expression expression, long modelId);
 
-    T find(final DesignProcessDefinition designProcessDefinition, final long modelId);
+    void find(final DesignProcessDefinition designProcessDefinition, final long modelId);
 
-    T find(final FlowNodeDefinition flowNodeDefinition, final long modelId);
+    void find(final FlowNodeDefinition flowNodeDefinition, final long modelId);
 
-    T find(FlowElementContainerDefinition flowElementContainerDefinition, long modelId);
+    void find(FlowElementContainerDefinition flowElementContainerDefinition, long modelId);
 
-    T find(ActivityDefinition activityDefinition, long modelId);
+    void find(ActivityDefinition activityDefinition, long modelId);
 
-    T find(HumanTaskDefinition humanTaskDefinition, long modelId);
+    void find(HumanTaskDefinition humanTaskDefinition, long modelId);
 
-    T find(UserFilterDefinition userFilterDefinition, long modelId);
+    void find(UserFilterDefinition userFilterDefinition, long modelId);
 
-    T find(UserTaskDefinition userTaskDefinition, long modelId);
+    void find(UserTaskDefinition userTaskDefinition, long modelId);
 
-    T find(SendTaskDefinition sendTaskDefinition, long modelId);
+    void find(SendTaskDefinition sendTaskDefinition, long modelId);
 
-    T find(ReceiveTaskDefinition receiveTaskDefinition, long modelId);
+    void find(ReceiveTaskDefinition receiveTaskDefinition, long modelId);
 
-    T find(SubProcessDefinition subProcessDefinition, long modelId);
+    void find(SubProcessDefinition subProcessDefinition, long modelId);
 
-    T find(CallActivityDefinition callActivityDefinition, long modelId);
+    void find(CallActivityDefinition callActivityDefinition, long modelId);
 
-    T find(Operation operation, long modelId);
+    void find(Operation operation, long modelId);
 
-    T find(TransitionDefinition transition, long modelId);
+    void find(TransitionDefinition transition, long modelId);
 
-    T find(StandardLoopCharacteristics standardLoopCharacteristics, long expressionDefinitionId);
+    void find(StandardLoopCharacteristics standardLoopCharacteristics, long expressionDefinitionId);
 
-    T find(MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics, long expressionDefinitionId);
+    void find(MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics, long expressionDefinitionId);
 
-    T find(BusinessDataDefinition businessDataDefinition, long modelId);
+    void find(BusinessDataDefinition businessDataDefinition, long modelId);
 
-    T find(DataDefinition dataDefinition, long modelId);
+    void find(DataDefinition dataDefinition, long modelId);
 
-    T find(CorrelationDefinition correlationDefinition, long modelId);
+    void find(CorrelationDefinition correlationDefinition, long modelId);
 
-    T find(CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition, long modelId);
+    void find(CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition, long modelId);
 
-    T find(ThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition, long modelId);
+    void find(ThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition, long modelId);
 
-    T find(MessageEventTriggerDefinition messageEventTriggerDefinition, long modelId);
+    void find(MessageEventTriggerDefinition messageEventTriggerDefinition, long modelId);
 
-    T find(TimerEventTriggerDefinition timerEventTriggerDefinition, long modelId);
+    void find(TimerEventTriggerDefinition timerEventTriggerDefinition, long modelId);
 
-    T find(ContextEntry contextEntry, long modelId);
+    void find(ContextEntry contextEntry, long modelId);
 
-    T find(EventDefinition eventDefinition, long modelId);
+    void find(EventDefinition eventDefinition, long modelId);
 
-    T find(ThrowEventDefinition throwEventDefinition, long modelId);
+    void find(ThrowEventDefinition throwEventDefinition, long modelId);
 
-    T find(CatchEventDefinition catchEventDefinition, long modelId);
+    void find(CatchEventDefinition catchEventDefinition, long modelId);
 
-    T find(DocumentDefinition documentDefinition, long modelId);
+    void find(DocumentDefinition documentDefinition, long modelId);
 
-    T find(DocumentListDefinition documentListDefinition, long modelId);
+    void find(DocumentListDefinition documentListDefinition, long modelId);
 
-    T find(ConnectorDefinition connectorDefinition, long modelId);
+    void find(ConnectorDefinition connectorDefinition, long modelId);
 }

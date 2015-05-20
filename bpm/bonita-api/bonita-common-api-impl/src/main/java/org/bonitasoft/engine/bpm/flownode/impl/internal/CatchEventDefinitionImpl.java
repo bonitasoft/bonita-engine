@@ -45,18 +45,18 @@ public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl imple
 
     public CatchEventDefinitionImpl(final String name) {
         super(name);
-        timerEventTriggers = new ArrayList<TimerEventTriggerDefinition>(1);
-        messageEventTriggers = new ArrayList<CatchMessageEventTriggerDefinition>(1);
-        signalEventTriggers = new ArrayList<CatchSignalEventTriggerDefinition>(1);
-        errorEventTriggers = new ArrayList<CatchErrorEventTriggerDefinition>(1);
+        timerEventTriggers = new ArrayList<>(1);
+        messageEventTriggers = new ArrayList<>(1);
+        signalEventTriggers = new ArrayList<>(1);
+        errorEventTriggers = new ArrayList<>(1);
     }
 
     public CatchEventDefinitionImpl(final long id, final String name) {
         super(id, name);
-        timerEventTriggers = new ArrayList<TimerEventTriggerDefinition>(1);
-        messageEventTriggers = new ArrayList<CatchMessageEventTriggerDefinition>(1);
-        signalEventTriggers = new ArrayList<CatchSignalEventTriggerDefinition>(1);
-        errorEventTriggers = new ArrayList<CatchErrorEventTriggerDefinition>(1);
+        timerEventTriggers = new ArrayList<>(1);
+        messageEventTriggers = new ArrayList<>(1);
+        signalEventTriggers = new ArrayList<>(1);
+        errorEventTriggers = new ArrayList<>(1);
     }
 
     @Override
@@ -167,11 +167,8 @@ public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl imple
     }
 
     @Override
-    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
-        final T accept = super.accept(visitor, modelId);
-        if (accept != null) {
-            return accept;
-        }
-        return visitor.find(this, modelId);
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
     }
 }
