@@ -134,6 +134,7 @@ SABlobDataInstance --> 20050
 SAUSerTaskContractData -> 20210
 SAProcessContractData --> 20220
 SFormMappingImpl --> 10300
+SProcessDefinitionDesignContentImpl --> 10300
 
 =TESTS=
 HUMAN -> 1000
