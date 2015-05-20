@@ -23,6 +23,7 @@ import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationM
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import org.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
+import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
 import org.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
@@ -89,11 +90,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     private ApplicationAPIDelegate getApplicationAPIDelegate() {
         return new ApplicationAPIDelegate(getTenantAccessor(), new ApplicationModelConverter(getTenantAccessor().getPageService()),
-                SessionInfos.getUserIdFromSession());
+                SessionInfos.getUserIdFromSession(), new ApplicationTokenValidator());
     }
 
     private ApplicationPageAPIDelegate getApplicationPageAPIDelegate() {
-        return new ApplicationPageAPIDelegate(getTenantAccessor(), new ApplicationPageModelConverter(), SessionInfos.getUserIdFromSession());
+        return new ApplicationPageAPIDelegate(getTenantAccessor(), new ApplicationPageModelConverter(), SessionInfos.getUserIdFromSession(), new ApplicationTokenValidator());
     }
 
     private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate() {
