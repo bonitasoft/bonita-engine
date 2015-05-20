@@ -9,10 +9,13 @@
 package com.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.impl.ProcessConfigurationAPIImpl;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -51,10 +54,12 @@ public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl impl
     @Override
     public FormMapping updateFormMapping(final long formMappingId, final String url, Long pageId) throws FormMappingNotFoundException, UpdateException {
         getLicenseChecker().checkLicenseAndFeature(Features.LIVE_UPDATE_FORM_MAPPING);
-        final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final FormMappingService formMappingService = tenantAccessor.getFormMappingService();
         try {
             SFormMapping sFormMapping = formMappingService.get(formMappingId);
             formMappingService.update(sFormMapping, url, pageId);
+            tenantAccessor.getDependencyResolver().resolveDependencies(sFormMapping.getProcessDefinitionId(), tenantAccessor);
             return ModelConvertor.toFormMapping(sFormMapping);
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
@@ -66,8 +71,19 @@ public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl impl
     }
 
     @Override
-    public void updateExpressionContent(long processDefintionId, long expressionDefinitionId, String content) {
-        // TODO implement me !
+    public void updateExpressionContent(long processDefinitionId, long expressionDefinitionId, String content) throws ProcessDefinitionNotFoundException,
+            UpdateException {
+        getLicenseChecker().checkLicenseAndFeature(Features.LIVE_UPDATE_SCRIPT);
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        try {
+            processDefinitionService.updateExpressionContent(processDefinitionId, expressionDefinitionId, content);
+        } catch (SProcessDefinitionNotFoundException e) {
+            throw new ProcessDefinitionNotFoundException(e);
+        } catch (SObjectModificationException e) {
+            throw new UpdateException(e);
+        }
+
     }
 
 }
