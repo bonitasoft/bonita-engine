@@ -29,13 +29,13 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApplicationNodeConverterExtTest {
+public class NodeToApplicationConverterExtTest {
 
     @Mock
     private PageService pageService;
 
     @InjectMocks
-    private ApplicationNodeConverterExt converter;
+    private NodeToApplicationConverterExt converter;
 
     @Mock
     private SPage defaultTheme;

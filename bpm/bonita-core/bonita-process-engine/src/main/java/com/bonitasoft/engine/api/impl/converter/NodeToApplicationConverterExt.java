@@ -11,10 +11,7 @@ package com.bonitasoft.engine.api.impl.converter;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
-import org.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
-import org.bonitasoft.engine.business.application.converter.ApplicationPageNodeConverter;
+import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
@@ -23,20 +20,20 @@ import org.bonitasoft.engine.profile.ProfileService;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationNodeConverterExt extends ApplicationNodeConverter {
+public class NodeToApplicationConverterExt extends NodeToApplicationConverter {
 
-    public ApplicationNodeConverterExt(final ProfileService profileService, final ApplicationService applicationService, final ApplicationPageNodeConverter applicationPageNodeConverter, final ApplicationMenuNodeConverter applicationMenuNodeConverter, final PageService pageService) {
-        super(profileService, applicationService, applicationPageNodeConverter, applicationMenuNodeConverter, pageService);
+    public NodeToApplicationConverterExt(final ProfileService profileService, final PageService pageService) {
+        super(profileService, pageService);
     }
 
     @Override
     protected String getLayoutName(final ApplicationNode applicationNode) {
-        return applicationNode.getLayout() != null? applicationNode.getLayout() : super.getLayoutName(applicationNode);
+        return applicationNode.getLayout() != null ? applicationNode.getLayout() : super.getLayoutName(applicationNode);
     }
 
     @Override
     protected String getThemeName(final ApplicationNode applicationNode) {
-        return applicationNode.getTheme() != null? applicationNode.getTheme() : super.getThemeName(applicationNode);
+        return applicationNode.getTheme() != null ? applicationNode.getTheme() : super.getThemeName(applicationNode);
     }
 
     @Override
