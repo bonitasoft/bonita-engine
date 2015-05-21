@@ -87,8 +87,9 @@ public class ExpressionFinder implements ModelFinderVisitor {
 
     @Override
     public void find(DesignProcessDefinition designProcessDefinition, long expressionDefinitionId) {
-        for (int i = 1; i <= 5; i++) {
-            findExpressionFromNotNullContainer(designProcessDefinition.getStringIndexValue(i), expressionDefinitionId);
+        final List<Expression> expressions = designProcessDefinition.getStringIndexValues();
+        for (Expression expression: expressions) {
+            findExpressionFromNotNullContainer(expression, expressionDefinitionId);
         }
         for (ContextEntry contextEntry : designProcessDefinition.getContext()) {
             findExpressionFromNotNullContainer(contextEntry, expressionDefinitionId);
