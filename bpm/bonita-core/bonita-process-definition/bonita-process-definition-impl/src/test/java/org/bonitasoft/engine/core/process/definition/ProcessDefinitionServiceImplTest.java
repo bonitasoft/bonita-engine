@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.definition;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,6 +47,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.io.xml.XMLParseException;
@@ -76,6 +78,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionServiceImplTest {
@@ -1539,5 +1542,52 @@ public class ProcessDefinitionServiceImplTest {
         when(processDefinitionBARContribution.convertXmlToProcess(null)).thenReturn(designProcessDefinition);
         DesignProcessDefinition designProcessDefinitionResult = processDefinitionServiceImpl.getDesignProcessDefinition(0);
         assertThat(designProcessDefinitionResult).isSameAs(designProcessDefinition);
+    }
+
+    @Test
+    public void updateShouldWorkForGroovyExpression() throws Exception {
+        final ProcessDefinitionServiceImpl service = spy(processDefinitionServiceImpl);
+        final long processDefinitionId = 415L;
+        final long expressionDefinitionId = 77L;
+        final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
+        doReturn(designProcessDefinition).when(service).getDesignProcessDefinition(processDefinitionId);
+        final ExpressionImpl expression = mock(ExpressionImpl.class);
+        doReturn(expression).when(service).getExpression(designProcessDefinition, expressionDefinitionId);
+        doReturn("someXMLContent").when(service).getProcessContent(designProcessDefinition);
+        doReturn(null).when(service).updateProcessDefinitionDeployInfo(eq(processDefinitionId), any(EntityUpdateDescriptor.class));
+        doReturn(true).when(service).isValidExpressionTypeToUpdate(anyString());
+
+        service.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
+
+        verify(service).updateProcessDefinitionDeployInfo(eq(processDefinitionId), any(EntityUpdateDescriptor.class));
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void updateShouldForbidExpressionsOfTypeDifferentFromGroovyAndConstant() throws Exception {
+        final ProcessDefinitionServiceImpl service = spy(processDefinitionServiceImpl);
+        final long processDefinitionId = 415L;
+        final long expressionDefinitionId = 77L;
+        final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
+        doReturn(designProcessDefinition).when(service).getDesignProcessDefinition(processDefinitionId);
+        final ExpressionImpl expression = mock(ExpressionImpl.class);
+        doReturn(ExpressionType.TYPE_VARIABLE.name()).when(expression).getExpressionType();
+        doReturn(expression).when(service).getExpression(designProcessDefinition, expressionDefinitionId);
+
+        service.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
+    }
+
+    @Test
+    public void isValidExpressionTypeShouldOnlySupportGroovyScriptAndConstant() throws Exception {
+        for (ExpressionType expressionType : ExpressionType.values()) {
+            final boolean isValid = processDefinitionServiceImpl.isValidExpressionTypeToUpdate(expressionType.name());
+            switch (expressionType) {
+                case TYPE_CONSTANT:
+                case TYPE_READ_ONLY_SCRIPT:
+                    assertThat(isValid).as("Expression of type " + expressionType + " should be valid for update").isTrue();
+                    break;
+                default:
+                    assertThat(isValid).as("Expression of type " + expressionType + " should NOT be valid for update").isFalse();
+            }
+        }
     }
 }

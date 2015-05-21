@@ -181,9 +181,9 @@ public class ConnectorDefinitionImpl extends NamedElementImpl implements Connect
         }
         return true;
     }
-    @Override
-     public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
-        return visitor.find(this, modelId);
-    }
 
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
+    }
 }
