@@ -15,8 +15,7 @@
 package org.bonitasoft.engine.business.application.converter;
 
 import org.bonitasoft.engine.api.ImportError;
-import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
-import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
+import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -35,11 +34,11 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 public class NodeToApplicationPageConverter {
 
     private final PageService pageService;
-    private final ApplicationTokenValidator tokenValidator;
+    private final ApplicationImportValidator importValidator;
 
-    public NodeToApplicationPageConverter(final PageService pageService, final ApplicationTokenValidator tokenValidator) {
+    public NodeToApplicationPageConverter(final PageService pageService, final ApplicationImportValidator importValidator) {
         this.pageService = pageService;
-        this.tokenValidator = tokenValidator;
+        this.importValidator = importValidator;
     }
 
     /**
@@ -49,7 +48,7 @@ public class NodeToApplicationPageConverter {
      */
     public ApplicationPageImportResult toSApplicationPage(ApplicationPageNode applicationPageNode, SApplication application) throws SBonitaReadException, ImportException {
         String token = applicationPageNode.getToken();
-        validateToken(token);
+        importValidator.validate(token);
         long pageId = 0;
         ImportError importError = null;
         SPage page = pageService.getPageByName(applicationPageNode.getCustomPage());
@@ -60,15 +59,7 @@ public class NodeToApplicationPageConverter {
         }
         SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
         SApplicationPageBuilder builder = factory.createNewInstance(application.getId(), pageId, token);
-        ApplicationPageImportResult importResult = new ApplicationPageImportResult(builder.done(), importError);
-        return importResult;
-    }
-
-    private void validateToken(final String token) throws ImportException {
-        ValidationStatus validationStatus = tokenValidator.validate(token);
-        if(!validationStatus.isValid()){
-            throw new ImportException(validationStatus.getMessage());
-        }
+        return new ApplicationPageImportResult(builder.done(), importError);
     }
 
 }

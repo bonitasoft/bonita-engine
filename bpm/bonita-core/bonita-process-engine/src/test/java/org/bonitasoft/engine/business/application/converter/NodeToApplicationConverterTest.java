@@ -15,13 +15,12 @@ package org.bonitasoft.engine.business.application.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
-import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
+import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -64,7 +63,7 @@ public class NodeToApplicationConverterTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    ApplicationTokenValidator validator;
+    ApplicationImportValidator validator;
 
     @InjectMocks
     private NodeToApplicationConverter converter;
@@ -78,8 +77,6 @@ public class NodeToApplicationConverterTest {
         given(defaultTheme.getId()).willReturn(DEFAULT_THEME_ID);
         given(defaultTheme.getName()).willReturn(ApplicationService.DEFAULT_THEME_NAME);
         given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
-
-        given(validator.validate(anyString())).willReturn(new ValidationStatus(true));
     }
 
     @Test
@@ -251,7 +248,7 @@ public class NodeToApplicationConverterTest {
     @Test
     public void toSApplication_should_throw_ImportException_when_application_token_is_invalid() throws Exception {
         //given
-        given(validator.validate("invalid")).willReturn(new ValidationStatus(false, "invalid token"));
+        doThrow(new ImportException("invalid token")).when(validator).validate("invalid");
         ApplicationNode applicationNode = buildApplicationNode("invalid", "1.0");
 
         //then

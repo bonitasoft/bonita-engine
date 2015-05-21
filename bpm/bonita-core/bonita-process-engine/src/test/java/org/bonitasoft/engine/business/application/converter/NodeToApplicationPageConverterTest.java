@@ -16,12 +16,11 @@ package org.bonitasoft.engine.business.application.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.api.ImportError;
-import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
-import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
+import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -46,7 +45,7 @@ public class NodeToApplicationPageConverterTest {
     PageService pageService;
 
     @Mock
-    ApplicationTokenValidator validator;
+    ApplicationImportValidator validator;
 
     @InjectMocks
     private NodeToApplicationPageConverter converter;
@@ -62,8 +61,6 @@ public class NodeToApplicationPageConverterTest {
     public void setUp() throws Exception {
         application = new SApplicationImpl();
         application.setId(APPLICATION_ID);
-
-        given(validator.validate(anyString())).willReturn(new ValidationStatus(true));
     }
 
     @Test
@@ -120,7 +117,7 @@ public class NodeToApplicationPageConverterTest {
     public void toSApplicationPage_should_throw_ImportException_when_page_has_invalid_token() throws Exception {
         //given
         ApplicationPageNode pageNode = buildAppPageNode("invalid", "page");
-        given(validator.validate("invalid")).willReturn(new ValidationStatus(false, "invalid token"));
+        doThrow(new ImportException("invalid token")).when(validator).validate("invalid");
 
         //then
         expectedException.expect(ImportException.class);

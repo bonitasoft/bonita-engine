@@ -15,8 +15,7 @@ package org.bonitasoft.engine.business.application.converter;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
-import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
+import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ImportResult;
@@ -39,17 +38,17 @@ public class NodeToApplicationConverter {
 
     private final ProfileService profileService;
     private final PageService pageService;
-    private final ApplicationTokenValidator tokenValidator;
+    private final ApplicationImportValidator validator;
 
-    public NodeToApplicationConverter(final ProfileService profileService, final PageService pageService, final ApplicationTokenValidator tokenValidator) {
+    public NodeToApplicationConverter(final ProfileService profileService, final PageService pageService, final ApplicationImportValidator validator) {
         this.profileService = profileService;
         this.pageService = pageService;
-        this.tokenValidator = tokenValidator;
+        this.validator = validator;
     }
 
     public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) throws SBonitaReadException, ImportException {
         String token = applicationNode.getToken();
-        validateToken(token);
+        validator.validate(token);
         final ImportStatus importStatus = new ImportStatus(token);
         Long layoutId = getPageId(getLayoutName(applicationNode), token, importStatus);
         Long themeId = getPageId(getThemeName(applicationNode), token, importStatus);
@@ -66,13 +65,6 @@ public class NodeToApplicationConverter {
 
         final SApplication application = builder.done();
         return new ImportResult(application, importStatus);
-    }
-
-    private void validateToken(final String token) throws ImportException {
-        ValidationStatus validationStatus = tokenValidator.validate(token);
-        if(!validationStatus.isValid()) {
-            throw new ImportException(validationStatus.getMessage());
-        }
     }
 
     private Long getPageId(final String pageName, final String applicationToken, final ImportStatus importStatus) throws SBonitaReadException, ImportException {
