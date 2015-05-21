@@ -377,7 +377,7 @@ public class ProcessDefinitionServiceImplTest {
                 .createNewInstance();
         updateBuilder.updateDisplayName("newDisplayName");
 
-        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>> any());
+        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>>any());
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
@@ -1516,64 +1516,65 @@ public class ProcessDefinitionServiceImplTest {
 
     @Test(expected = SProcessDefinitionNotFoundException.class)
     public void getDesignProcessDefinition_Should_Throw_Exception_On_Unknown_Process() throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        doThrow(new SProcessDefinitionNotFoundException("impossible to find process")).when(processDefinitionServiceImpl).getProcessDeploymentInfo(anyLong());
-        processDefinitionServiceImpl.getDesignProcessDefinition(0);
+        int processDefinitionId = 456;
+        doThrow(new SProcessDefinitionNotFoundException("impossible to find process")).when(processDefinitionServiceImpl).getProcessDeploymentInfo(processDefinitionId);
+        processDefinitionServiceImpl.getDesignProcessDefinition(processDefinitionId);
     }
 
     @Test(expected = SProcessDefinitionNotFoundException.class)
     public void getDesignProcessDefinition_Should_Throw_Exception_On_UnparsableContent() throws Exception {
+        int processDefinitionId = 123;
         processDefinitionServiceImpl.processDefinitionBARContribution = processDefinitionBARContribution;
         SProcessDefinitionDeployInfo processDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(processDefinitionDeployInfo).when(processDefinitionServiceImpl).getProcessDeploymentInfo(anyLong());
+        doReturn(processDefinitionDeployInfo).when(processDefinitionServiceImpl).getProcessDeploymentInfo(processDefinitionId);
         SProcessDefinitionDesignContent processDefinitionDesignContent = mock(SProcessDefinitionDesignContent.class);
         when(processDefinitionDeployInfo.getDesignContent()).thenReturn(processDefinitionDesignContent);
         when(processDefinitionBARContribution.convertXmlToProcess(null)).thenThrow(new XMLParseException("impossible to parse content"));
-        processDefinitionServiceImpl.getDesignProcessDefinition(0);
+        processDefinitionServiceImpl.getDesignProcessDefinition(processDefinitionId);
     }
 
     @Test
     public void getDesignProcessDefinition_Should_return_XML_correctly() throws Exception {
+        int processDefinitionId = 123;
         processDefinitionServiceImpl.processDefinitionBARContribution = processDefinitionBARContribution;
         SProcessDefinitionDeployInfo processDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
-        doReturn(processDefinitionDeployInfo).when(processDefinitionServiceImpl).getProcessDeploymentInfo(anyLong());
+        doReturn(processDefinitionDeployInfo).when(processDefinitionServiceImpl).getProcessDeploymentInfo(processDefinitionId);
         SProcessDefinitionDesignContent processDefinitionDesignContent = mock(SProcessDefinitionDesignContent.class);
         when(processDefinitionDeployInfo.getDesignContent()).thenReturn(processDefinitionDesignContent);
         DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
         when(processDefinitionBARContribution.convertXmlToProcess(null)).thenReturn(designProcessDefinition);
-        DesignProcessDefinition designProcessDefinitionResult = processDefinitionServiceImpl.getDesignProcessDefinition(0);
+        DesignProcessDefinition designProcessDefinitionResult = processDefinitionServiceImpl.getDesignProcessDefinition(processDefinitionId);
         assertThat(designProcessDefinitionResult).isSameAs(designProcessDefinition);
     }
 
     @Test
     public void updateShouldWorkForGroovyExpression() throws Exception {
-        final ProcessDefinitionServiceImpl service = spy(processDefinitionServiceImpl);
         final long processDefinitionId = 415L;
         final long expressionDefinitionId = 77L;
         final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
-        doReturn(designProcessDefinition).when(service).getDesignProcessDefinition(processDefinitionId);
+        doReturn(designProcessDefinition).when(processDefinitionServiceImpl).getDesignProcessDefinition(processDefinitionId);
         final ExpressionImpl expression = mock(ExpressionImpl.class);
-        doReturn(expression).when(service).getExpression(designProcessDefinition, expressionDefinitionId);
-        doReturn("someXMLContent").when(service).getProcessContent(designProcessDefinition);
-        doReturn(null).when(service).updateProcessDefinitionDeployInfo(eq(processDefinitionId), any(EntityUpdateDescriptor.class));
-        doReturn(true).when(service).isValidExpressionTypeToUpdate(anyString());
+        doReturn(expression).when(processDefinitionServiceImpl).getExpression(designProcessDefinition, expressionDefinitionId);
+        doReturn("someXMLContent").when(processDefinitionServiceImpl).getProcessContent(designProcessDefinition);
+        doReturn(null).when(processDefinitionServiceImpl).updateProcessDefinitionDeployInfo(eq(processDefinitionId), any(EntityUpdateDescriptor.class));
+        doReturn(true).when(processDefinitionServiceImpl).isValidExpressionTypeToUpdate(anyString());
 
-        service.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
+        processDefinitionServiceImpl.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
 
-        verify(service).updateProcessDefinitionDeployInfo(eq(processDefinitionId), any(EntityUpdateDescriptor.class));
+        verify(processDefinitionServiceImpl).updateProcessDefinitionDeployInfo(eq(processDefinitionId), any(EntityUpdateDescriptor.class));
     }
 
     @Test(expected = SObjectModificationException.class)
     public void updateShouldForbidExpressionsOfTypeDifferentFromGroovyAndConstant() throws Exception {
-        final ProcessDefinitionServiceImpl service = spy(processDefinitionServiceImpl);
         final long processDefinitionId = 415L;
         final long expressionDefinitionId = 77L;
         final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
-        doReturn(designProcessDefinition).when(service).getDesignProcessDefinition(processDefinitionId);
+        doReturn(designProcessDefinition).when(processDefinitionServiceImpl).getDesignProcessDefinition(processDefinitionId);
         final ExpressionImpl expression = mock(ExpressionImpl.class);
         doReturn(ExpressionType.TYPE_VARIABLE.name()).when(expression).getExpressionType();
-        doReturn(expression).when(service).getExpression(designProcessDefinition, expressionDefinitionId);
+        doReturn(expression).when(processDefinitionServiceImpl).getExpression(designProcessDefinition, expressionDefinitionId);
 
-        service.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
+        processDefinitionServiceImpl.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
     }
 
     @Test

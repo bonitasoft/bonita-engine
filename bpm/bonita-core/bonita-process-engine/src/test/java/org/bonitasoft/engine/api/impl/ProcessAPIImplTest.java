@@ -65,6 +65,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
@@ -83,6 +84,7 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -597,7 +599,7 @@ public class ProcessAPIImplTest {
         // Given
         final String dataName = "dataName";
         ClassLoader processClassLoader = mock(ClassLoader.class);
-        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class)SBlobDataInstanceImpl.class);
+        when(processClassLoader.loadClass(SBlobDataInstanceImpl.class.getName())).thenReturn((Class) SBlobDataInstanceImpl.class);
         when(processClassLoader.loadClass(List.class.getName())).thenReturn((Class) List.class);
         doReturn(processClassLoader).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
         when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(processClassLoader);
@@ -1249,5 +1251,25 @@ public class ProcessAPIImplTest {
         SExpressionImpl sExpression = new SExpressionImpl();
         sExpression.setName(name);
         return sExpression;
+    }
+
+    @Test
+    public void getDesignProcessDefinition_Should_Return_Design() throws Exception{
+        int processDefinitionId = 123;
+        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
+        doReturn(processDefinitionService).when(tenantAccessor).getProcessDefinitionService();
+        DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
+        when(processDefinitionService.getDesignProcessDefinition(processDefinitionId)).thenReturn(designProcessDefinition);
+        DesignProcessDefinition designProcessDefinitionResult = processAPI.getDesignProcessDefinition(processDefinitionId);
+        assertThat(designProcessDefinitionResult).isSameAs(designProcessDefinition);
+    }
+
+    @Test(expected = ProcessDefinitionNotFoundException.class)
+    public void getDesignProcessDefinition_Should_ThrowExceptionWhen() throws Exception{
+        int processDefinitionId = 123;
+        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
+        doReturn(processDefinitionService).when(tenantAccessor).getProcessDefinitionService();
+        when(processDefinitionService.getDesignProcessDefinition(processDefinitionId)).thenThrow(new SProcessDefinitionNotFoundException("impossible to found given process definition"));
+        processAPI.getDesignProcessDefinition(processDefinitionId);
     }
 }
