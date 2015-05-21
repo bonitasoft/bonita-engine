@@ -11,6 +11,7 @@ package com.bonitasoft.engine.api.impl.converter;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ImportException;
@@ -22,8 +23,8 @@ import org.bonitasoft.engine.profile.ProfileService;
  */
 public class NodeToApplicationConverterExt extends NodeToApplicationConverter {
 
-    public NodeToApplicationConverterExt(final ProfileService profileService, final PageService pageService) {
-        super(profileService, pageService);
+    public NodeToApplicationConverterExt(final ProfileService profileService, final PageService pageService, final ApplicationTokenValidator tokenValidator) {
+        super(profileService, pageService, tokenValidator);
     }
 
     @Override

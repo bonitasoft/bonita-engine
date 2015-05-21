@@ -12,6 +12,7 @@ package com.bonitasoft.engine.api.impl;
 import com.bonitasoft.engine.api.impl.converter.ApplicationModelConverterExt;
 import com.bonitasoft.engine.api.impl.converter.NodeToApplicationConverterExt;
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
+import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.ProfileService;
@@ -27,7 +28,7 @@ public class ApplicationAPIExt extends org.bonitasoft.engine.api.impl.Applicatio
     }
 
     @Override
-    protected NodeToApplicationConverter getNodeToApplicationConverter(final PageService pageService, final ProfileService profileService) {
-        return new NodeToApplicationConverterExt(profileService, pageService);
+    protected NodeToApplicationConverter getNodeToApplicationConverter(final PageService pageService, final ProfileService profileService, final ApplicationTokenValidator tokenValidator) {
+        return new NodeToApplicationConverterExt(profileService, pageService, tokenValidator);
     }
 }

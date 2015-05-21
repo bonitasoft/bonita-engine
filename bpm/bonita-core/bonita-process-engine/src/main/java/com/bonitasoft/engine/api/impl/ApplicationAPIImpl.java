@@ -123,11 +123,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final PageService pageService = tenantAccessor.getPageService();
         final ApplicationPageImporter applicationPageImporter = new ApplicationPageImporter(tenantAccessor.getApplicationService(),
-                new NodeToApplicationPageConverter(pageService));
+                new NodeToApplicationPageConverter(pageService, new ApplicationTokenValidator()));
         final ApplicationMenuImporter applicationMenuImporter = new ApplicationMenuImporter(tenantAccessor.getApplicationService(),
                 new NodeToApplicationMenuConverter(applicationService));
         final ApplicationImporter applicationImporter = new ApplicationImporter(tenantAccessor.getApplicationService(),
-                new StrategySelector().selectStrategy(policy), new NodeToApplicationConverter(tenantAccessor.getProfileService(), pageService),
+                new StrategySelector().selectStrategy(policy), new NodeToApplicationConverter(tenantAccessor.getProfileService(), pageService, new ApplicationTokenValidator()),
                 applicationPageImporter, applicationMenuImporter);
         return new ApplicationsImporter(new ApplicationContainerImporter(), applicationImporter);
     }
