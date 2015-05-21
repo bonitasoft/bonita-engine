@@ -15,7 +15,7 @@ package org.bonitasoft.engine.business.application.exporter;
 
 import java.util.List;
 
-import org.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
+import org.bonitasoft.engine.business.application.converter.ApplicationsToNodeContainerConverter;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.bonitasoft.engine.exception.ExportException;
@@ -25,10 +25,10 @@ import org.bonitasoft.engine.exception.ExportException;
  */
 public class ApplicationExporter {
 
-    private final ApplicationContainerConverter converter;
+    private final ApplicationsToNodeContainerConverter converter;
     private final ApplicationContainerExporter exporter;
 
-    public ApplicationExporter(ApplicationContainerConverter converter, ApplicationContainerExporter exporter) {
+    public ApplicationExporter(ApplicationsToNodeContainerConverter converter, ApplicationContainerExporter exporter) {
         this.converter = converter;
         this.exporter = exporter;
     }
