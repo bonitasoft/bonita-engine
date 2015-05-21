@@ -117,20 +117,21 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return new ApplicationExporterDelegate(tenantAccessor.getApplicationService(), applicationExporter);
     }
 
-    protected NodeToApplicationConverter getNodeToApplicationConverter(final PageService pageService, final ProfileService profileService) {
-        return new NodeToApplicationConverter(profileService, pageService);
+    protected NodeToApplicationConverter getNodeToApplicationConverter(final PageService pageService, final ProfileService profileService, final ApplicationTokenValidator tokenValidator) {
+        return new NodeToApplicationConverter(profileService, pageService, tokenValidator);
     }
 
     private ApplicationsImporter getApplicationImporter(final ApplicationImportPolicy policy) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         PageService pageService = tenantAccessor.getPageService();
+        ApplicationTokenValidator tokenValidator = new ApplicationTokenValidator();
         final ApplicationPageImporter applicationPageImporter = new ApplicationPageImporter(tenantAccessor.getApplicationService(),
-                new NodeToApplicationPageConverter(pageService));
+                new NodeToApplicationPageConverter(pageService, tokenValidator));
         final ApplicationMenuImporter applicationMenuImporter = new ApplicationMenuImporter(tenantAccessor.getApplicationService(),
                 new NodeToApplicationMenuConverter(applicationService));
         final ApplicationImporter applicationImporter = new ApplicationImporter(applicationService, new StrategySelector().selectStrategy(policy),
-                getNodeToApplicationConverter(pageService, tenantAccessor.getProfileService()), applicationPageImporter, applicationMenuImporter);
+                getNodeToApplicationConverter(pageService, tenantAccessor.getProfileService(), tokenValidator), applicationPageImporter, applicationMenuImporter);
         return new ApplicationsImporter(new ApplicationContainerImporter(), applicationImporter);
     }
 

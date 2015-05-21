@@ -15,10 +15,13 @@ package org.bonitasoft.engine.business.application.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
+import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -30,7 +33,9 @@ import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -55,6 +60,12 @@ public class NodeToApplicationConverterTest {
 
     public static final long DEFAULT_THEME_ID = 102;
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Mock
+    ApplicationTokenValidator validator;
+
     @InjectMocks
     private NodeToApplicationConverter converter;
 
@@ -67,6 +78,8 @@ public class NodeToApplicationConverterTest {
         given(defaultTheme.getId()).willReturn(DEFAULT_THEME_ID);
         given(defaultTheme.getName()).willReturn(ApplicationService.DEFAULT_THEME_NAME);
         given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(defaultTheme);
+
+        given(validator.validate(anyString())).willReturn(new ValidationStatus(true));
     }
 
     @Test
@@ -204,10 +217,7 @@ public class NodeToApplicationConverterTest {
     @Test(expected = ImportException.class)
     public void toSApplication_should_throw_ImportException_when_layout_is_not_found() throws Exception {
         //given
-        final ApplicationNode node = new ApplicationNode();
-        node.setVersion("1.0");
-        node.setToken("app");
-        node.setState("ENABLED");
+        final ApplicationNode node = buildApplicationNode("app", "1.0");
 
         given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(null);
 
@@ -220,10 +230,7 @@ public class NodeToApplicationConverterTest {
     @Test(expected = ImportException.class)
     public void toSApplication_should_throw_ImportException_when_theme_is_not_found() throws Exception {
         //given
-        final ApplicationNode node = new ApplicationNode();
-        node.setVersion("1.0");
-        node.setToken("app");
-        node.setState("ENABLED");
+        final ApplicationNode node = buildApplicationNode("app", "1.0");
 
         given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(null);
 
@@ -232,6 +239,32 @@ public class NodeToApplicationConverterTest {
 
         //then exception
     }
+
+    private ApplicationNode buildApplicationNode(final String token, final String version) {
+        final ApplicationNode node = new ApplicationNode();
+        node.setVersion(version);
+        node.setToken(token);
+        node.setState("ENABLED");
+        return node;
+    }
+
+    @Test
+    public void toSApplication_should_throw_ImportException_when_application_token_is_invalid() throws Exception {
+        //given
+        given(validator.validate("invalid")).willReturn(new ValidationStatus(false, "invalid token"));
+        ApplicationNode applicationNode = buildApplicationNode("invalid", "1.0");
+
+        //then
+        expectedException.expect(ImportException.class);
+        expectedException.expectMessage("invalid token");
+
+        //when
+        converter.toSApplication(applicationNode, 1L);
+
+    }
+
+
+
 
 
 }
