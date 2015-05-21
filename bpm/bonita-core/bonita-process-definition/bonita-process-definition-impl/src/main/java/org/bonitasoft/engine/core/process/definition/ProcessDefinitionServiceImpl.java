@@ -1038,11 +1038,11 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException {
+    public DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         try {
             return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent().getContent());
-        } catch (SProcessDefinitionReadException | IOException | XMLParseException e) {
-            throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
+        } catch (IOException | XMLParseException e) {
+            throw new SProcessDefinitionReadException(e);
         }
     }
 
@@ -1067,7 +1067,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             updateProcessDefinitionDeployInfo(processDefinitionId, updateDescriptor);
         } catch (IOException e) {
             throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
-        } catch (SProcessDeploymentInfoUpdateException e) {
+        } catch (SProcessDefinitionReadException | SProcessDeploymentInfoUpdateException e) {
             throw new SObjectModificationException(e);
         }
     }

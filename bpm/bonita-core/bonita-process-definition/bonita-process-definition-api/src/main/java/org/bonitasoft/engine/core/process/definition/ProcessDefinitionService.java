@@ -776,8 +776,9 @@ public interface ProcessDefinitionService {
      * @return The corresponding process definition with informations.
      * @throws SProcessDefinitionNotFoundException
      *         If the process definition doesn't exist.
-     *
+     * @throws SProcessDefinitionReadException
+     *         If the process definition design cannot be read
      * @since 7.0
      */
-    DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException;
+    DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException;
 }
