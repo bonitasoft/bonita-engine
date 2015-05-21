@@ -10,12 +10,9 @@
 package com.bonitasoft.engine.api.impl;
 
 import com.bonitasoft.engine.api.impl.converter.ApplicationModelConverterExt;
-import com.bonitasoft.engine.api.impl.converter.ApplicationNodeConverterExt;
+import com.bonitasoft.engine.api.impl.converter.NodeToApplicationConverterExt;
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
-import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
-import org.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
-import org.bonitasoft.engine.business.application.converter.ApplicationPageNodeConverter;
+import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.profile.ProfileService;
 
@@ -30,7 +27,7 @@ public class ApplicationAPIExt extends org.bonitasoft.engine.api.impl.Applicatio
     }
 
     @Override
-    protected ApplicationNodeConverter getApplicationNodeConverter(final ApplicationService applicationService, final PageService pageService, final ProfileService profileService, final ApplicationPageNodeConverter applicationPageNodeConverter, final ApplicationMenuNodeConverter applicationMenuNodeConverter) {
-        return new ApplicationNodeConverterExt(profileService, applicationService, applicationPageNodeConverter, applicationMenuNodeConverter, pageService);
+    protected NodeToApplicationConverter getNodeToApplicationConverter(final PageService pageService, final ProfileService profileService) {
+        return new NodeToApplicationConverterExt(profileService, pageService);
     }
 }
