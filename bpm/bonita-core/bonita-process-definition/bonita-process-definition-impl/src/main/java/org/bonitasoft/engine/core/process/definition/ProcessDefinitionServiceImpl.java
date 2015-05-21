@@ -105,7 +105,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     private final ReadSessionAccessor sessionAccessor;
     private final QueriableLoggerService queriableLoggerService;
     private final DependencyService dependencyService;
-    private final ProcessDefinitionBARContribution processDefinitionBARContribution;
+    protected ProcessDefinitionBARContribution processDefinitionBARContribution;
 
     public ProcessDefinitionServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
             final EventService eventService, final SessionService sessionService, final ReadSessionAccessor sessionAccessor,
@@ -1039,7 +1039,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException {
         try {
-            return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent());
+            return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent().getContent());
         } catch (SProcessDefinitionReadException | IOException | XMLParseException e) {
             throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
         }
