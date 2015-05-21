@@ -22,6 +22,7 @@ import org.bonitasoft.engine.api.impl.converter.ApplicationPageModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
+import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
 import org.bonitasoft.engine.business.application.ApplicationService;
@@ -122,12 +123,13 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final PageService pageService = tenantAccessor.getPageService();
+        ApplicationImportValidator importValidator = new ApplicationImportValidator(new ApplicationTokenValidator());
         final ApplicationPageImporter applicationPageImporter = new ApplicationPageImporter(tenantAccessor.getApplicationService(),
-                new NodeToApplicationPageConverter(pageService, new ApplicationTokenValidator()));
+                new NodeToApplicationPageConverter(pageService, importValidator));
         final ApplicationMenuImporter applicationMenuImporter = new ApplicationMenuImporter(tenantAccessor.getApplicationService(),
                 new NodeToApplicationMenuConverter(applicationService));
         final ApplicationImporter applicationImporter = new ApplicationImporter(tenantAccessor.getApplicationService(),
-                new StrategySelector().selectStrategy(policy), new NodeToApplicationConverter(tenantAccessor.getProfileService(), pageService, new ApplicationTokenValidator()),
+                new StrategySelector().selectStrategy(policy), new NodeToApplicationConverter(tenantAccessor.getProfileService(), pageService, importValidator),
                 applicationPageImporter, applicationMenuImporter);
         return new ApplicationsImporter(new ApplicationContainerImporter(), applicationImporter);
     }
