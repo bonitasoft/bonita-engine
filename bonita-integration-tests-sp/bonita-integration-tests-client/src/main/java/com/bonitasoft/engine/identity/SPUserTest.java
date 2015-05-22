@@ -45,7 +45,7 @@ public class SPUserTest extends CommonAPISPIT {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
 
         // in case we don't have the expected exception (to track down the problem):
-        final APISession session = loginAPI.login(2, userName, password);
+        final APISession session = loginAPI.login(99999, userName, password);
         System.out
                 .println("################### Erroneous successful login on tenant with id " + session.getTenantId() + " and name " + session.getTenantName());
         loginAPI.logout(session);
@@ -58,10 +58,13 @@ public class SPUserTest extends CommonAPISPIT {
 
     @Test(expected = LoginException.class)
     public void loginFailsUsingWrongUser() throws BonitaException, BonitaHomeNotSetException {
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+        final long tenantId = getSession().getTenantId();
+        logoutOnTenant();
         final String userName = "hannu";
         final String password = "install";
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        loginAPI.login(1, userName, password);
+        loginAPI.login(tenantId, userName, password);
     }
 
     @Test(expected = LoginException.class)

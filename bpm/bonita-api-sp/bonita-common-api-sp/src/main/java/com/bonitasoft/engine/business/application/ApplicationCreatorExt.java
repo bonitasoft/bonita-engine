@@ -20,8 +20,8 @@ public class ApplicationCreatorExt extends org.bonitasoft.engine.business.applic
 
     /**
      * Creates an instance of <code>ApplicationCreatorExt</code> containing mandatory information.
-     * <p>The created {@code Application} will used the default layout. If you want to set a specific layout, use
-     * {@link #ApplicationCreatorExt(String, String, String, long)} instead.</p>
+     * <p>The created {@code Application} will used the default layout and the default theme. If you want to set a specific layout/theme, use
+     * {@link #ApplicationCreatorExt(String, String, String, long, long)} instead.</p>
      *
      * @param token the {@link org.bonitasoft.engine.business.application.Application} token. The token will be part of application URL. It cannot be null or
      *        empty and should contain only alpha numeric
@@ -43,12 +43,14 @@ public class ApplicationCreatorExt extends org.bonitasoft.engine.business.applic
      * @param displayName the <code>Application</code> display name. It cannot be null or empty
      * @param version the <code>Application</code> version
      * @param layoutId the identifier of the {@link Page} to be used as {@code Application} layout
+     * @param themeId
      * @see org.bonitasoft.engine.business.application.Application
      * @see Page
      */
-    public ApplicationCreatorExt(final String token, final String displayName, final String version, final long layoutId) {
+    public ApplicationCreatorExt(final String token, final String displayName, final String version, final long layoutId, final long themeId) {
         this(token, displayName, version);
         getFields().put(ApplicationField.LAYOUT_ID, layoutId);
+        getFields().put(ApplicationField.THEME_ID, themeId);
     }
 
 }

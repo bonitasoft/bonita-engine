@@ -9,7 +9,6 @@
 
 package com.bonitasoft.engine.business.application;
 
-import com.bonitasoft.engine.TestsInitializerSP;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -22,6 +21,5 @@ import org.junit.runners.Suite;
         ApplicationExtIT.class,
         ApplicationImportExportExtIT.class
 })
-@BonitaSuiteRunner.Initializer(TestsInitializerSP.class)
 public class ApplicationAPIExtITs {
 }

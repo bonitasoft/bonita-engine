@@ -10,11 +10,14 @@ package com.bonitasoft.engine.monitoring.mbean;
 
 import java.util.Map;
 
+import com.bonitasoft.engine.monitoring.SMonitoringException;
+
 /**
  * @author Christophe Havard
  * @author Matthieu Chaffotte
  */
 public interface SJvmMXBean extends BonitaMXBean {
+
 
     /**
      * Returns the sum of both heap and non-heap memory usage.

@@ -1,0 +1,15 @@
+<project name="bonita-engine-license" default="install-license" >
+
+	<property name="target.dir" value="${basedir}/target"/>
+	<property name="bh.dir" value="${target.dir}/bonita-home"/>
+
+	<target name="install-license">
+		<!-- TEMPORARY: LICENSE MANAGEMENT IN THE OLD FOLDER-->
+		<copy todir="${bh.dir}/server/licenses" overwrite="true">
+			<fileset dir="${user.home}/lic" includes="*.lic" />
+		</copy>
+
+
+	</target>
+
+</project>

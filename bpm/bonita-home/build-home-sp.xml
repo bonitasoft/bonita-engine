@@ -1,0 +1,73 @@
+<project name="bonita-engine-home" default="build-home-sp">
+
+    <property name="target.dir" value="${basedir}/target" />
+    <property name="resources.dir" value="${basedir}/src/main/resources" />
+    <property name="bh.dir" value="${target.dir}/bonita-home" />
+    <property name="bh.community.dir" value="${target.dir}/bonita-home-community/bonita-home" />
+
+    <target name="build-home-sp">
+        <delete dir="${bh.dir}" />
+
+        <copy todir="${bh.dir}">
+            <fileset dir="${bh.community.dir}">
+                <include name="**/*" />
+            </fileset>
+        </copy>
+
+        <!-- ENGINE SERVER - WORK -->
+
+        <copy todir="${bh.dir}/engine-server/work/platform">
+            <fileset dir="${resources.dir}">
+                <include name="bonita-platform-private-sp.properties" />
+                <include name="bonita-platform-sp.properties" />
+                <include name="bonita-platform-sp.xml" />
+                <include name="bonita-platform-sp-cluster.xml" />
+                <include name="bonita-platform-sp-cluster.properties" />
+            </fileset>
+        </copy>
+
+        <copy todir="${bh.dir}/engine-server/work/tenants/template">
+            <fileset dir="${resources.dir}">
+                <include name="bonita-tenant-sp.properties" />
+                <include name="bonita-tenant-sp.xml" />
+                <include name="bonita-tenant-sp-cluster.xml" />
+                <include name="bonita-tenant-sp-cluster.properties" />
+            </fileset>
+        </copy>
+
+        <!-- ENGINE SERVER CONF -->
+        <copy todir="${bh.dir}/engine-server/conf/platform">
+            <fileset dir="${resources.dir}">
+                <include name="bonita-platform-hibernate-cache.xml" />
+                <include name="bonita-tenant-hibernate-cache.xml" />
+            </fileset>
+        </copy>
+
+        <copy file="${resources.dir}/bonita-tenant-sp.properties" tofile="${bh.dir}/engine-server/conf/tenants/template/bonita-tenant-sp-custom.properties">
+            <filterchain>
+                <filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+                    <param name="prefix" value="#" />
+                </filterreader>
+            </filterchain>
+        </copy>
+
+        <copy file="${resources.dir}/bonita-tenant-sp-cluster.properties" tofile="${bh.dir}/engine-server/conf/tenants/template/bonita-tenant-sp-cluster-custom.properties">
+            <filterchain>
+                <filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+                    <param name="prefix" value="#" />
+                </filterreader>
+            </filterchain>
+        </copy>
+
+        <copy file="${resources.dir}/bonita-platform-sp-cluster.properties" tofile="${bh.dir}/engine-server/conf/platform/bonita-platform-sp-cluster-custom.properties">
+            <filterchain>
+                <filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+                    <param name="prefix" value="#" />
+                </filterreader>
+            </filterchain>
+        </copy>
+
+
+    </target>
+
+</project>

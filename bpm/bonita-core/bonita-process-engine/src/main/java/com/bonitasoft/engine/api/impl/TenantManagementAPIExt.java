@@ -50,6 +50,9 @@ import org.bonitasoft.engine.service.BroadcastService;
 import org.bonitasoft.engine.service.TaskResult;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Matthieu Chaffotte
@@ -145,7 +148,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     private void deleteSessionsOfTenantExceptTechnicalUser(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) {
-        final SessionService sessionService = platformServiceAccessor.getSessionService();
+        final SessionService sessionService = platformServiceAccessor.getTenantServiceAccessor(tenantId).getSessionService();
         sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
     }
 
@@ -164,6 +167,8 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             throw new UpdateException("Unable to resume all elements of the work service.", e);
         } catch (final SSchedulerException e) {
             throw new UpdateException("Unable to resume the scheduler.", e);
+        } catch (STransactionNotFoundException e) {
+            throw new UpdateException("Unable to resume the tenant restart handlers.", e);
         }
     }
 
@@ -177,17 +182,30 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         }
     }
 
-    private void afterServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws RestartException {
+    private void afterServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws RestartException, STransactionNotFoundException {
         final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlatformConfiguration();
         final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
-        STenant tenant;
+        final STenant tenant;
         try {
             tenant = platformServiceAccessor.getPlatformService().getTenant(tenantId);
         } catch (STenantNotFoundException e) {
             throw new RestartException("Unable to restart tenant", e);
         }
-        new StarterThread(platformServiceAccessor, platformServiceAccessor.getSessionService(), nodeConfiguration, Arrays.asList(tenant),
-                tenantServiceAccessor.getSessionAccessor(), tenantServiceAccessor.getTechnicalLoggerService()).start();
+        platformServiceAccessor.getTransactionService().registerBonitaSynchronization(new BonitaTransactionSynchronization() {
+            @Override
+            public void beforeCommit() {
+
+            }
+
+            @Override
+            public void afterCompletion(TransactionState txState) {
+                if (txState.equals(TransactionState.COMMITTED)) {
+                    new StarterThread(platformServiceAccessor, nodeConfiguration, Arrays.asList(tenant),
+                            tenantServiceAccessor.getSessionAccessor(), tenantServiceAccessor.getTechnicalLoggerService()).start();
+                }
+            }
+        });
+
     }
 
     // In Protected for unit tests

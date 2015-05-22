@@ -30,9 +30,18 @@ public class ApplicationModelConverterExt extends ApplicationModelConverter {
     protected Long getLayoutId(final ApplicationCreator creator) throws CreationException {
         Long layoutId = (Long) creator.getFields().get(ApplicationField.LAYOUT_ID);
         if (layoutId == null) {
-            return super.getLayoutId(creator);
+            layoutId = super.getLayoutId(creator);
         }
         return layoutId;
+    }
+
+    @Override
+    protected Long getThemeId(final ApplicationCreator creator) throws CreationException {
+        Long themeId = (Long) creator.getFields().get(ApplicationField.THEME_ID);
+        if (themeId == null) {
+            themeId = super.getThemeId(creator);
+        }
+        return themeId;
     }
 
     @Override
@@ -40,6 +49,9 @@ public class ApplicationModelConverterExt extends ApplicationModelConverter {
         super.updateFields(updater, builder);
         if (updater.getFields().containsKey(ApplicationField.LAYOUT_ID)) {
             builder.updateLayoutId((Long) updater.getFields().get(ApplicationField.LAYOUT_ID));
+        }
+        if(updater.getFields().containsKey(ApplicationField.THEME_ID)) {
+            builder.updateThemeId((Long) updater.getFields().get(ApplicationField.THEME_ID));
         }
     }
 }

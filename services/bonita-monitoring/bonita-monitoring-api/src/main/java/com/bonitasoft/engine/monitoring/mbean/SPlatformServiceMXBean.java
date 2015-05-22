@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.monitoring.mbean;
 
+import com.bonitasoft.engine.monitoring.SMonitoringException;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
@@ -25,5 +27,12 @@ public interface SPlatformServiceMXBean extends BonitaMXBean {
      * @return the current number of active transactions.
      */
     long getNumberOfActiveTransactions();
+
+    /**
+     * return the current number of executing jobs
+     *
+     * @throws com.bonitasoft.engine.monitoring.SMonitoringException
+     */
+    long getNumberOfExecutingJobs() throws SMonitoringException;
 
 }

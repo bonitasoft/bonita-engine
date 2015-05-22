@@ -9,7 +9,7 @@
 
 	<logger name="org.bonitasoft" level="INFO" />
 	<logger name="com.bonitasoft" level="INFO" />
-
+	<logger name="org.bonitasoft.engine.api.impl.ProcessAPIImpl" level="WARN" />
 
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />

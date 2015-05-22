@@ -26,13 +26,14 @@ import org.junit.Test;
  */
 public class ApplicationExtIT extends org.bonitasoft.engine.business.application.TestWithApplication {
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "create", "layout" })
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "create", "layout", "theme" })
     @Test
-    public void createApplication_with_specific_layout_returns_application_with_given_layout() throws Exception {
+    public void createApplication_with_specific_layout_and_theme_returns_application_with_given_layout_and_theme() throws Exception {
         //given
         final Profile profile = getProfileUser();
         Page layout = createPage("custompage_customizedLayout");
-        ApplicationCreatorExt creator = new ApplicationCreatorExt("My-Application", "My application display name", "1.0", layout.getId());
+        Page theme = createPage("custompage_customizedTheme");
+        ApplicationCreatorExt creator = new ApplicationCreatorExt("My-Application", "My application display name", "1.0", layout.getId(), theme.getId());
         creator.setDescription("This is my application");
         creator.setIconPath("/icon.jpg");
         creator.setProfileId(profile.getId());
@@ -53,9 +54,11 @@ public class ApplicationExtIT extends org.bonitasoft.engine.business.application
         assertThat(application.getHomePageId()).isNull();
         assertThat(application.getProfileId()).isEqualTo(profile.getId());
         assertThat(application.getLayoutId()).isEqualTo(layout.getId());
+        assertThat(application.getThemeId()).isEqualTo(theme.getId());
 
         getApplicationAPI().deleteApplication(application.getId());
         getPageAPI().deletePage(layout.getId());
+        getPageAPI().deletePage(theme.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "create", "default layout" })
@@ -75,29 +78,31 @@ public class ApplicationExtIT extends org.bonitasoft.engine.business.application
         getApplicationAPI().deleteApplication(application.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "update", "layout" })
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "update", "layout", "theme" })
     @Test
-    public void updateApplication_layout_should_return_application_up_with_new_layout() throws Exception {
+    public void updateApplication_layout_and_theme_should_return_application_with_new_layout_and_theme() throws Exception {
         //given
         Page layout = createPage("custompage_customizedLayout");
+        Page theme = createPage("custompage_customizedTheme");
         final ApplicationCreatorExt creator = new ApplicationCreatorExt("My-Application", "My application display name", "1.0");
         final org.bonitasoft.engine.business.application.Application application = getApplicationAPI().createApplication(creator);
 
         final ApplicationUpdaterExt updater = new ApplicationUpdaterExt();
-        updater.setToken("My-updated-app");
         updater.setLayoutId(layout.getId());
+        updater.setThemeId(theme.getId());
 
         //when
         final org.bonitasoft.engine.business.application.Application updatedApplication = getApplicationAPI().updateApplication(application.getId(), updater);
 
         //then
         assertThat(updatedApplication).isNotNull();
-        assertThat(updatedApplication.getToken()).isEqualTo("My-updated-app");
         assertThat(updatedApplication.getLayoutId()).isEqualTo(layout.getId());
+        assertThat(updatedApplication.getThemeId()).isEqualTo(theme.getId());
         assertThat(updatedApplication).isEqualTo(getApplicationAPI().getApplication(application.getId()));
 
         getApplicationAPI().deleteApplication(application.getId());
         getPageAPI().deletePage(layout.getId());
+        getPageAPI().deletePage(theme.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-13007", keywords = { "Application", "search",
@@ -106,8 +111,9 @@ public class ApplicationExtIT extends org.bonitasoft.engine.business.application
     public void searchApplications_can_filter_on_layoutId() throws Exception {
         //given
         Page layout = createPage("custompage_newLayout");
+        Page theme = createPage("custompage_newTheme");
         final ApplicationCreatorExt hrCreator = new ApplicationCreatorExt("HR-dashboard", "HR dash board", "1.0");
-        final ApplicationCreatorExt engineeringCreator = new ApplicationCreatorExt("Engineering-dashboard", "Engineering dashboard", "1.0", layout.getId());
+        final ApplicationCreatorExt engineeringCreator = new ApplicationCreatorExt("Engineering-dashboard", "Engineering dashboard", "1.0", layout.getId(), theme.getId());
         final ApplicationCreatorExt marketingCreator = new ApplicationCreatorExt("Marketing-dashboard", "Marketing dashboard", "1.0");
 
         final org.bonitasoft.engine.business.application.Application hr = getApplicationAPI().createApplication(hrCreator);

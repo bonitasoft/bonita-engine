@@ -1,0 +1,41 @@
+<beans
+		xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:util="http://www.springframework.org/schema/util"
+		xsi:schemaLocation="
+		http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans.xsd
+	    http://www.springframework.org/schema/util      http://www.springframework.org/schema/util/spring-util-3.0.xsd
+	    ">
+
+<bean id="employeeHandler" class="org.bonitasoft.engine.archive.model.SEmployeeHandlerImpl" />
+
+	<bean id="userPasswordHandler" class="org.bonitasoft.engine.identity.TestUserPasswordUpdateEventHandler" />
+
+
+	<bean id="eventHandlers" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass">
+			<value>java.util.HashMap</value>
+		</property>
+		<property name="sourceMap">
+			<map>
+				<entry key="USER_UPDATED" value-ref="userPasswordHandler" />
+				<entry key="EMPLOYEE_UPDATED" value-ref="employeeHandler" />
+			</map>
+		</property>
+	</bean>
+
+	<beans profile="performance">
+		<bean id="archivingStrategyMap" parent="archivingStrategyMapBase" class="org.springframework.beans.factory.config.MapFactoryBean">
+			<property name="sourceMap">
+				<map merge="true">
+					<entry key="org.bonitasoft.engine.archive.model.Employee" value="true" />
+					<entry key="org.bonitasoft.engine.archive.model.Laptop" value="true" />
+					<entry key="org.bonitasoft.engine.archive.model.Address" value="true" />
+					<entry key="org.bonitasoft.engine.archive.model.Project" value="true" />
+					<entry key="org.bonitasoft.engine.archive.model.EmployeeProjectMapping" value="true" />
+				</map>
+			</property>
+		</bean>
+	</beans>
+
+</beans>

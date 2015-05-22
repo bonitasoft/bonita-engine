@@ -24,11 +24,4 @@ public interface SServiceMXBean extends BonitaMXBean {
      */
     long getNumberOfActiveTransactions() throws SMonitoringException;
 
-    /**
-     * return the current number of executing jobs
-     * 
-     * @throws SMonitoringException
-     */
-    long getNumberOfExecutingJobs() throws SMonitoringException;
-
 }
