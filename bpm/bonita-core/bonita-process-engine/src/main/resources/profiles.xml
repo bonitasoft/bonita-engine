@@ -36,16 +36,23 @@
 				<description>BPM</description>
 				<type>folder</type>
 				<childrenEntries>
-					<profileEntry name="Cases" isCustom="false">
+					<profileEntry name="Processes" isCustom="false">
 						<parentName>BPM</parentName>
 						<index>0</index>
+						<description>All processes</description>
+						<type>link</type>
+						<page>processlistingadmin</page>
+					</profileEntry>
+					<profileEntry name="Cases" isCustom="false">
+						<parentName>BPM</parentName>
+						<index>2</index>
 						<description>All cases</description>
 						<type>link</type>
 						<page>caselistingadmin</page>
 					</profileEntry>
 					<profileEntry name="Tasks" isCustom="false">
 						<parentName>BPM</parentName>
-						<index>2</index>
+						<index>4</index>
 						<description>All tasks</description>
 						<type>link</type>
 						<page>tasklistingadmin</page>
@@ -96,34 +103,20 @@
 				</childrenEntries>
 			</parentProfileEntry>
 			<parentProfileEntry name="Resources" isCustom="false">
-				<parentName>NULL</parentName>
-				<index>4</index>
-				<description>Resources</description>
-				<type>folder</type>
-				<childrenEntries>
-					<profileEntry name="Processes" isCustom="false">
-						<parentName>Resources</parentName>
-						<index>0</index>
-						<description>All processes</description>
-						<type>link</type>
-						<page>processlistingadmin</page>
-					</profileEntry>
-                    <profileEntry name="Custom Pages" isCustom="false">
-                        <parentName>Resources</parentName>
-                        <index>2</index>
-                        <description>All custom pages</description>
-                        <type>link</type>
-                        <page>pagelisting</page>
-                    </profileEntry>
-				</childrenEntries>
-			</parentProfileEntry>
-            <parentProfileEntry name="Applications" isCustom="false">
                 <parentName>NULL</parentName>
-                <index>8</index>
+                <index>4</index>
+                <description>Resources</description>
+                <type>link</type>
+				<page>pagelisting</page>
+            </parentProfileEntry>
+			<parentProfileEntry name="Applications" isCustom="false">
+                <parentName>NULL</parentName>
+                <index>6</index>
                 <description>Applications</description>
                 <type>link</type>
                 <page>applicationslistingadmin</page>
             </parentProfileEntry>
+
 		</profileEntries>
 	</profile>
 </profiles:profiles>
