@@ -18,7 +18,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.CommonAPIIT;
+import org.bonitasoft.engine.PrintTestsStatusRule;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -75,25 +79,11 @@ public class PlatformIT extends CommonAPIIT {
     }
 
     @Rule
-    public TestRule testWatcher = new TestWatcher() {
-
+    public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
         @Override
-        public void starting(final Description d) {
-            LOGGER.warn("Starting test: " + d.getClassName() + "." + d.getMethodName());
+        public List<String> clean() throws Exception {
+            return Collections.emptyList();
         }
-
-        @Override
-        public void failed(final Throwable cause, final Description d) {
-            LOGGER.warn("Failed test: " + d.getClassName() + "." + d.getMethodName());
-            LOGGER.warn("-------------------------------------------------------------------------------------");
-        }
-
-        @Override
-        public void succeeded(final Description d) {
-            LOGGER.warn("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
-            LOGGER.warn("-------------------------------------------------------------------------------------");
-        }
-
     };
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Test if platform is created.", jira = "")

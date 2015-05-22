@@ -14,9 +14,11 @@
 package org.bonitasoft.engine.bpm.flownode;
 
 import java.util.List;
+
 import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
+import org.bonitasoft.engine.bpm.process.Visitable;
 
 /**
  * A User Task is a typical “workflow” Task where a human performer performs the Task with the assistance of a
@@ -25,7 +27,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface UserTaskDefinition extends HumanTaskDefinition {
+public interface UserTaskDefinition extends HumanTaskDefinition, Visitable {
 
     /**
      * Contract that must be respected when executing an instance of this user task
@@ -34,8 +36,6 @@ public interface UserTaskDefinition extends HumanTaskDefinition {
      *         the user task execution contract
      */
     ContractDefinition getContract();
-
-
 
     List<ContextEntry> getContext();
 

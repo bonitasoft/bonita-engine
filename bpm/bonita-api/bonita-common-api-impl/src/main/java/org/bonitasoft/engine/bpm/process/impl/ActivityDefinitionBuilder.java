@@ -20,7 +20,7 @@ import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristicsImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
@@ -227,7 +227,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
      * @return
      */
     public ActivityDefinitionBuilder addLoop(final boolean testBefore, final Expression condition) {
-        final StandardLoopCharacteristics loopCharacteristics = new StandardLoopCharacteristics(condition, testBefore);
+        final StandardLoopCharacteristicsImpl loopCharacteristics = new StandardLoopCharacteristicsImpl(condition, testBefore);
         activity.setLoopCharacteristics(loopCharacteristics);
         return this;
     }
@@ -244,7 +244,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
      * @return
      */
     public ActivityDefinitionBuilder addLoop(final boolean testBefore, final Expression condition, final Expression loopMax) {
-        final StandardLoopCharacteristics loopCharacteristics = new StandardLoopCharacteristics(condition, testBefore, loopMax);
+        final StandardLoopCharacteristicsImpl loopCharacteristics = new StandardLoopCharacteristicsImpl(condition, testBefore, loopMax);
         activity.setLoopCharacteristics(loopCharacteristics);
         return this;
     }
@@ -303,7 +303,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     }
 
     /**
-     * Adds a Business Data on the activity. The activity must contain a {@link org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics} using dataInput or dataOutput.
+     * Adds a Business Data on the activity. The activity must contain a {@link org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics} using dataInput or dataOutput.
      *
      * @param name the name of the business data
      * @param className complete name of class defining the Business Data Type

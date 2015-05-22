@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.document;
 
 import org.bonitasoft.engine.bpm.NamedElement;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -25,7 +26,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface DocumentListDefinition extends NamedElement {
+public interface DocumentListDefinition extends NamedElement, Visitable {
 
     /**
      * @return The description of the document

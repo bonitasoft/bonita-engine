@@ -27,7 +27,6 @@ import org.junit.Test;
  */
 public class SAXValidatorTest {
 
-    private static final String SERVEUR_PROCESS_SCHEMA = "/org/bonitasoft/engine/core/process/definition/model/builder/impl/SProcessDefinition.xsd";
     private static final String CLIENT_PROCESS_SCHEMA = "/org/bonitasoft/engine/bpm/bar/ProcessDefinition.xsd";
     private XMLSchemaValidator validator;
 
@@ -42,10 +41,6 @@ public class SAXValidatorTest {
         check_xml_file_is_valid(CLIENT_PROCESS_SCHEMA, "/client-process-design.xml");
     }
 
-    @Test
-    public void should_validate_serveur_xml_with_contract() throws Exception {
-        check_xml_file_is_valid(SERVEUR_PROCESS_SCHEMA, "/server-process-definition.xml");
-    }
 
     private void check_xml_file_is_valid(final String xsdResource, final String xmlResource) throws URISyntaxException, SInvalidSchemaException,
     SValidationException, IOException {

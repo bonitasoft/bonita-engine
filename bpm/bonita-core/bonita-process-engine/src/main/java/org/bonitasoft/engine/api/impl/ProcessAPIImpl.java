@@ -17,6 +17,7 @@ import static java.util.Collections.singletonMap;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -122,6 +123,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
+import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.category.CategoryNotFoundException;
@@ -252,7 +254,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilderFactory;
@@ -347,6 +348,7 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.io.xml.XMLNode;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
@@ -728,11 +730,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
+;
 
-        // create the runtime process definition
-        final SProcessDefinition sProcessDefinition = BuilderFactory.get(SProcessDefinitionBuilderFactory.class).createNewInstance(designProcessDefinition)
-                .done();
-
+        SProcessDefinition sProcessDefinition;
         try {
             try {
                 processDefinitionService.getProcessDefinitionId(designProcessDefinition.getName(), designProcessDefinition.getVersion());
@@ -741,8 +741,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             } catch (final SProcessDefinitionNotFoundException e) {
                 // ok
             }
-            processDefinitionService.store(sProcessDefinition, designProcessDefinition.getDisplayName(), designProcessDefinition.getDisplayDescription());
-            unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
+            sProcessDefinition = processDefinitionService.store(designProcessDefinition);
+            unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());
             final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(businessArchive, tenantAccessor, sProcessDefinition);
             if (isResolved) {
                 tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
@@ -3005,12 +3005,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             OrderByType order = null;
             switch (sortingCriterion) {
                 case DEFAULT:
-                    break;
-                case LABEL_ASC:
-                    // field = processDefinitionDeployInfoKyeProvider.get
-                    // FIXME add label?
-                    break;
-                case LABEL_DESC:
                     break;
                 case NAME_ASC:
                     field = builder.getNameKey();

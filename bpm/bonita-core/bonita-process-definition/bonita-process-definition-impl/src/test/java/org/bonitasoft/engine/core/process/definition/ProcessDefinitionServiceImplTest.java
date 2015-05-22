@@ -17,10 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,9 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeploymentInfoUpdateException;
@@ -43,6 +42,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -53,6 +53,7 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
@@ -111,8 +112,8 @@ public class ProcessDefinitionServiceImplTest {
         final Parser parser = mock(Parser.class);
         doReturn(parser).when(parserFactory).createParser(Matchers.<ElementBindingsFactory> any());
 
-        processDefinitionServiceImpl = new ProcessDefinitionServiceImpl(cacheService, recorder, persistenceService, eventService, sessionService,
-                sessionAccessor, parserFactory, xmlWriter, queriableLoggerService, dependencyService);
+        processDefinitionServiceImpl = new ProcessDefinitionServiceImpl(recorder, persistenceService, eventService, sessionService,
+                sessionAccessor, queriableLoggerService, dependencyService);
     }
 
     /**
@@ -299,8 +300,7 @@ public class ProcessDefinitionServiceImplTest {
     }
 
     /**
-     * Test method for
-     * {@link ProcessDefinitionService#getProcessDefinitionId(String, String)}.
+     * Test method for {@link ProcessDefinitionService#getProcessDefinitionId(String, String)}.
      */
     @Test
     public void getProcessDefinitionId_should_return_id_of_process_definition_with_given_name_and_version() throws Exception {
@@ -1454,5 +1454,56 @@ public class ProcessDefinitionServiceImplTest {
 
         // When
         processDefinitionServiceImpl.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(options);
+    }
+
+    @Test(expected = SProcessDefinitionNotFoundException.class)
+    public void updateExpressionContentShouldThrowProcessNotFoundIfReadException() throws Exception {
+        final ProcessDefinitionServiceImpl service = spy(processDefinitionServiceImpl);
+        final long processDefinitionId = 415L;
+        doThrow(SProcessDefinitionReadException.class).when(service).getProcessDeploymentInfo(processDefinitionId);
+
+        service.updateExpressionContent(processDefinitionId, 77L, "string");
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void updateExpressionContentShouldThrowObjectModificationIfUpdateException() throws Exception {
+        final ProcessDefinitionServiceImpl service = spy(processDefinitionServiceImpl);
+        final long processDefinitionId = 415L;
+        final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
+        doReturn(designProcessDefinition).when(service).getDesignProcessDefinition(processDefinitionId);
+        doReturn("someXMLContent").when(service).getProcessContent(designProcessDefinition);
+
+        doThrow(SProcessDefinitionReadException.class).when(service).updateProcessDefinitionDeployInfo(eq(processDefinitionId),
+                any(EntityUpdateDescriptor.class));
+
+        service.updateExpressionContent(processDefinitionId, 77L, "string");
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void updateExpressionContentShouldThrowObjectModificationIfExpressionNotFound() throws Exception {
+        final ProcessDefinitionServiceImpl service = spy(processDefinitionServiceImpl);
+        final long processDefinitionId = 415L;
+        final long expressionDefinitionId = 77L;
+        final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
+        doReturn(designProcessDefinition).when(service).getDesignProcessDefinition(processDefinitionId);
+        doReturn(null).when(service).getExpression(designProcessDefinition, expressionDefinitionId);
+
+        service.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void updateExpressionContentShouldThrowObjectModificationUpdateFails() throws Exception {
+        final ProcessDefinitionServiceImpl service = spy(processDefinitionServiceImpl);
+        final long processDefinitionId = 415L;
+        final long expressionDefinitionId = 77L;
+        final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
+        doReturn(designProcessDefinition).when(service).getDesignProcessDefinition(processDefinitionId);
+        doReturn(mock(ExpressionImpl.class)).when(service).getExpression(designProcessDefinition, expressionDefinitionId);
+        doReturn("someXMLContent").when(service).getProcessContent(designProcessDefinition);
+
+        doThrow(SProcessDeploymentInfoUpdateException.class).when(service).updateProcessDefinitionDeployInfo(eq(processDefinitionId),
+                any(EntityUpdateDescriptor.class));
+
+        service.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
     }
 }

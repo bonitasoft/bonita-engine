@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.bonitasoft.engine.bpm.flownode.EndEventInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;

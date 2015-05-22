@@ -33,10 +33,6 @@ public class SActorDefinitionImpl extends SNamedElementImpl implements SActorDef
         initiator = actor.isInitiator();
     }
 
-    public SActorDefinitionImpl(final String name) {
-        super(name);
-    }
-
     @Override
     public String getDescription() {
         return description;

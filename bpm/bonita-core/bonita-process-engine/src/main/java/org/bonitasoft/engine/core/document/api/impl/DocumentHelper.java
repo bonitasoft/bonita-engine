@@ -13,6 +13,9 @@
  */
 package org.bonitasoft.engine.core.document.api.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +27,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
@@ -54,7 +58,7 @@ public class DocumentHelper {
     private final ProcessInstanceService processInstanceService;
 
     public DocumentHelper(final DocumentService documentService, final ProcessDefinitionService processDefinitionService,
-            final ProcessInstanceService processInstanceService) {
+                          final ProcessInstanceService processInstanceService) {
         this.documentService = documentService;
         this.processDefinitionService = processDefinitionService;
         this.processInstanceService = processInstanceService;
@@ -97,11 +101,29 @@ public class DocumentHelper {
 
     public SDocument createDocumentObject(final DocumentValue documentValue, final long authorId) {
         final SDocumentBuilder processDocumentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance(documentValue.getFileName(),
-                documentValue.getMimeType(), authorId);
+                getMimeTypeOrGuessIt(documentValue), authorId);
         processDocumentBuilder.setHasContent(documentValue.hasContent());
         processDocumentBuilder.setURL(documentValue.getUrl());
         processDocumentBuilder.setContent(documentValue.getContent());
         return processDocumentBuilder.done();
+    }
+
+    String getMimeTypeOrGuessIt(DocumentValue documentValue) {
+        final String mimeType = documentValue.getMimeType();
+        final byte[] content = documentValue.getContent();
+        final String fileName = documentValue.getFileName();
+        if (mimeType != null && !mimeType.isEmpty() || content == null || fileName == null || fileName.isEmpty()) {
+            return mimeType;
+        }
+        try {
+            final File tempFile = File.createTempFile("tmp", fileName);
+            IOUtil.write(tempFile, content);
+            final String s = Files.probeContentType(tempFile.toPath());
+            tempFile.delete();
+            return s;
+        } catch (Throwable e) {
+            return mimeType;
+        }
     }
 
     public void deleteDocument(final String documentName, final long processInstanceId) throws SObjectModificationException {
@@ -163,7 +185,7 @@ public class DocumentHelper {
     }
 
     SMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(final List<SMappedDocument> currentList, final Long documentId, final String documentName,
-            final Long processInstanceId) throws SObjectNotFoundException {
+                                                                 final Long processInstanceId) throws SObjectNotFoundException {
         final Iterator<SMappedDocument> iterator = currentList.iterator();
         while (iterator.hasNext()) {
             final SMappedDocument next = iterator.next();
@@ -196,7 +218,7 @@ public class DocumentHelper {
     }
 
     void processDocumentOnIndex(final DocumentValue documentValue, final String documentName, final long processInstanceId,
-            final List<SMappedDocument> currentList, final int index, final long authorId) throws SObjectCreationException, SObjectAlreadyExistsException,
+                                final List<SMappedDocument> currentList, final int index, final long authorId) throws SObjectCreationException, SObjectAlreadyExistsException,
             SObjectNotFoundException, SObjectModificationException {
         if (documentValue.getDocumentId() != null) {
             // if hasChanged update

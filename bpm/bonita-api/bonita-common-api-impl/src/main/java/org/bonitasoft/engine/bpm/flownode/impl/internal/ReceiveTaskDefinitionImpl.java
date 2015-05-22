@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ReceiveTaskDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 
@@ -79,6 +80,15 @@ public class ReceiveTaskDefinitionImpl extends TaskDefinitionImpl implements Rec
             return false;
         }
         return true;
+    }
+
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        final T accept = super.accept(visitor, modelId);
+        if (accept != null) {
+            return accept;
+        }
+        return visitor.find(this, modelId);
     }
 
 }

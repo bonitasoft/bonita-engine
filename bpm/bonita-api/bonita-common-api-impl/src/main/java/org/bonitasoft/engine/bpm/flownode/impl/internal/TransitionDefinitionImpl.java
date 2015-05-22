@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -122,4 +123,8 @@ public class TransitionDefinitionImpl extends NamedElementImpl implements Transi
         return true;
     }
 
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
+    }
 }

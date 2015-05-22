@@ -38,10 +38,8 @@ public class STransitionDefinitionImpl extends SNamedElementImpl implements STra
 
     public STransitionDefinitionImpl(final TransitionDefinition transition) {
         this(transition.getName(), transition.getSource(), transition.getTarget());
-        final Expression exp = transition.getCondition();
         if (transition.getCondition() != null) {
-            final SExpression sExpression = ServerModelConvertor.convertExpression(exp);
-            condition = sExpression;
+            condition = ServerModelConvertor.convertExpression(transition.getCondition());
         }
     }
 
