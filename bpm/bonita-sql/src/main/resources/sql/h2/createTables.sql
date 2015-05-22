@@ -42,17 +42,6 @@ CREATE TABLE processcategorymapping (
 );
 
 ALTER TABLE processcategorymapping ADD CONSTRAINT fk_catmapping_catid FOREIGN KEY (tenantid, categoryid) REFERENCES category(tenantid, id) ON DELETE CASCADE;
-CREATE TABLE migration_plan (
-  tenantid BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  description VARCHAR(255) NOT NULL,
-  source_name VARCHAR(50) NOT NULL,
-  source_version VARCHAR(50) NOT NULL,
-  target_name VARCHAR(50) NOT NULL,
-  target_version VARCHAR(50) NOT NULL,
-  content MEDIUMBLOB NOT NULL,
-  PRIMARY KEY (tenantid, id)
-);
 CREATE TABLE arch_process_comment(
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
