@@ -408,6 +408,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Search for archived flow node instances (activities, gateways and events) supervised by the specified user.
+     * Warning: A manager can only see the tasks of his process. To see tasks of a sub-process, he has to be also manager of the sub-process.
      *
      * @param supervisorId
      *            The identifier of the supervising user.
