@@ -114,7 +114,8 @@ public interface ApplicationAPI {
      *        {@link org.bonitasoft.engine.page.Page} will be associated
      * @param pageId the identifier of <code>Page</code> to be associated to the <code>Application</code>
      * @param token the token that this <code>Page</code> will take in this <code>ApplicationPage</code>. The token must be unique for a given application and
-     *        should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'.
+     *        should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'. In addition, the following words are reserved key words and cannot be used
+     *        as token: 'api', 'content', 'theme'.
      * @return the created {@link ApplicationPage}
      * @throws AlreadyExistsException if the token is already used by another <code>ApplicationPage</code> on this <code>Application</code>
      * @throws CreationException if an error occurs during the creation

@@ -22,18 +22,18 @@ import org.bonitasoft.engine.exception.ExportException;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationContainerConverter {
+public class ApplicationsToNodeContainerConverter {
 
-    private final ApplicationNodeConverter applicationNodeConverter;
+    private final ApplicationToNodeConverter applicationToNodeConverter;
 
-    public ApplicationContainerConverter(final ApplicationNodeConverter applicationNodeConverter) {
-        this.applicationNodeConverter = applicationNodeConverter;
+    public ApplicationsToNodeContainerConverter(final ApplicationToNodeConverter applicationToNodeConverter) {
+        this.applicationToNodeConverter = applicationToNodeConverter;
     }
 
     public ApplicationNodeContainer toNode(final List<SApplication> applications) throws ExportException {
         final ApplicationNodeContainer container = new ApplicationNodeContainer();
         for (final SApplication application : applications) {
-            container.addApplication(applicationNodeConverter.toNode(application));
+            container.addApplication(applicationToNodeConverter.toNode(application));
         }
         return container;
     }

@@ -11,14 +11,32 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.page;
+
+package org.bonitasoft.engine.api.impl.validator;
 
 /**
- * @author Baptiste Mesta
+ * @author Elias Ricken de Medeiros
  */
-public class SInvalidPageZipMissingPropertiesException extends SInvalidPageZipException {
+public class ValidationStatus {
 
-    public SInvalidPageZipMissingPropertiesException() {
-        super("Missing page.properties");
+    boolean valid;
+
+    private String message;
+
+    public ValidationStatus(final boolean valid) {
+        this.valid = valid;
+    }
+
+    public ValidationStatus(boolean valid, final String message) {
+        this.valid = valid;
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public boolean isValid() {
+        return valid;
     }
 }
