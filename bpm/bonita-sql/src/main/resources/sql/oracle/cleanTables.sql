@@ -4,7 +4,6 @@ DELETE FROM actormember;
 DELETE FROM actor;
 DELETE FROM processcategorymapping;
 DELETE FROM category;
-DELETE FROM migration_plan;
 DELETE FROM arch_process_comment;
 DELETE FROM process_comment;
 DELETE FROM process_definition;

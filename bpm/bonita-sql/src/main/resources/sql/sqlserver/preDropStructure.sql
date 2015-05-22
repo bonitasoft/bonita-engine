@@ -41,8 +41,6 @@ ALTER TABLE job_param DROP CONSTRAINT fk_job_param_tenantId
 GO
 ALTER TABLE message_instance DROP CONSTRAINT fk_message_instance_tenantId
 GO
--- ALTER TABLE migration_plan DROP CONSTRAINT fk_migration_plan_tenantId
-GO
 ALTER TABLE custom_usr_inf_def DROP CONSTRAINT fk_custom_usr_inf_def_tenantId
 GO
 ALTER TABLE custom_usr_inf_val DROP CONSTRAINT fk_custom_usr_inf_val_tenantId

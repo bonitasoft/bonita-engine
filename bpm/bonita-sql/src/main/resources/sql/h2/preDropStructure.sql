@@ -20,7 +20,6 @@ ALTER TABLE group_ DROP CONSTRAINT fk_group__tenantId;
 ALTER TABLE job_desc DROP CONSTRAINT fk_job_desc_tenantId;
 ALTER TABLE job_param DROP CONSTRAINT fk_job_param_tenantId;
 ALTER TABLE message_instance DROP CONSTRAINT fk_message_instance_tenantId;
--- ALTER TABLE migration_plan DROP CONSTRAINT fk_migration_plan_tenantId;
 ALTER TABLE custom_usr_inf_def DROP CONSTRAINT fk_custom_usr_inf_def_tenantId;
 ALTER TABLE custom_usr_inf_val DROP CONSTRAINT fk_custom_usr_inf_val_tenantId;
 ALTER TABLE pending_mapping DROP CONSTRAINT fk_pending_mapping_tenantId;

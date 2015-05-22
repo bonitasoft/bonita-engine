@@ -10,8 +10,6 @@ DELETE FROM processcategorymapping
 GO
 DELETE FROM category
 GO
-DELETE FROM migration_plan
-GO
 DELETE FROM arch_process_comment
 GO
 DELETE FROM process_comment
