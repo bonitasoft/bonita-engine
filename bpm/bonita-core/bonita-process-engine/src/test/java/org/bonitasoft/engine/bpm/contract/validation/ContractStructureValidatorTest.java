@@ -28,6 +28,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -175,7 +176,7 @@ public class ContractStructureValidatorTest {
     }
 
     @Test
-    public void should_throw_exception_with_explanations_when_complex_inputs_leaf_are_missing() throws Exception {
+    public void should_throw_exception_with_explanations_when_complex_inputs_leaves_are_missing() throws Exception {
         final SContractDefinition contract = aContract()
                 .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
         final Map<String, Serializable> map = aMap().put("complex", aMap().build()).build();
@@ -183,9 +184,28 @@ public class ContractStructureValidatorTest {
             validator.validate(contract, map);
             fail("expected exception has not been thrown");
         } catch (final SContractViolationException e) {
-            assertThat(e.getExplanations())
-                    .containsOnly("Expected input [embedded] is missing");
+            assertThat(e.getExplanations()).containsOnly("Expected input [embedded] is missing");
         }
+    }
+
+    @Test
+    public void should_not_check_children_when_complex_input_is_null() throws Exception {
+        // Given
+        final SInputDefinition complex = aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded")).build();
+        final SContractDefinition contract = aContract().withInput(complex).build();
+        final Map<String, Serializable> inputs = Collections.singletonMap("complex", null);
+        final ContractStructureValidator spy = spy(this.validator);
+        // when
+        spy.validate(contract, inputs);
+        // then
+        verify(spy, times(0)).validateInputContainer(eq(complex), eq(inputs), any(ErrorReporter.class));
+    }
+
+    @Test
+    public void should_not_check_type_validation_when_input_is_null() throws Exception {
+        final SContractDefinition contract = aContract().withInput(aSimpleInput(TEXT).withName("someNullText")).build();
+        validator.validate(contract, Collections.<String, Serializable> singletonMap("someNullText", null));
+        verifyZeroInteractions(typeValidator);
     }
 
     @Test
@@ -218,27 +238,17 @@ public class ContractStructureValidatorTest {
     }
 
     @Test
-    public void should_throw_a_SContractViolationException_for_present_simple_input_with_null_value() throws Exception {
+    public void should_not_throw_exception_for_present_simple_input_with_null_value() throws Exception {
         final SContractDefinition contract = aContract().withInput(aSimpleInput(TEXT).withName("firstName")).build();
 
-        try {
-            validator.validate(contract, contractInputMap(entry("firstName", null)));
-            fail("SContractViolationException expected but not thrown.");
-        } catch (final SContractViolationException e) {
-            assertThat(e.getExplanations()).containsOnly("Input [firstName] has a null value.");
-        }
+        validator.validate(contract, contractInputMap(entry("firstName", null)));
     }
 
     @Test
-    public void should_throw_a_SContractViolationException_for_present_complex_input_with_null_value() throws Exception {
+    public void should_not_throw_exception_for_present_complex_input_with_null_value() throws Exception {
         final SContractDefinition contract = aContract().withInput(aComplexInput().withName("employee")).build();
 
-        try {
-            validator.validate(contract, contractInputMap(entry("employee", null)));
-            fail("SContractViolationException expected but not thrown.");
-        } catch (final SContractViolationException e) {
-            assertThat(e.getExplanations()).containsOnly("Input [employee] has a null value.");
-        }
+        validator.validate(contract, contractInputMap(entry("employee", null)));
     }
 
 }
