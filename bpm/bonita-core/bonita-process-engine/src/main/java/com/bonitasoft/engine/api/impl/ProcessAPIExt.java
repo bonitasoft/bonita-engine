@@ -29,7 +29,6 @@ import org.bonitasoft.engine.api.impl.connector.ConnectorReseter;
 import org.bonitasoft.engine.api.impl.flownode.FlowNodeRetrier;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
@@ -68,6 +67,7 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadExce
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -160,6 +160,10 @@ import com.bonitasoft.manager.Features;
  */
 public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
+    public ProcessAPIExt() {
+        super(new ProcessManagementAPIExtDelegate(), new DocumentAPIImpl());
+    }
+
     protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -170,23 +174,17 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    public ProcessAPIExt() {
-        super(new ProcessManagementAPIExtDelegate(), new DocumentAPIImpl());
-    }
-
     @Override
     public void importParameters(final long processDefinitionId, final byte[] parameters) throws ImportParameterException {
         final org.bonitasoft.engine.service.TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        SProcessDefinition sDefinition = null;
+        SProcessDefinition sDefinition;
         if (processDefinitionId > 0) {
             final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-            final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processDefinitionId, processDefinitionService);
             try {
-                getProcessDefinition.execute();
-            } catch (final SBonitaException e) {
+                sDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            } catch (SProcessDefinitionNotFoundException | SBonitaReadException e) {
                 throw new ImportParameterException(e);
             }
-            sDefinition = getProcessDefinition.getResult();
         } else {
             throw new ImportParameterException("The identifier of the process definition have to be a positif number.");
         }
@@ -239,7 +237,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SParameterDefinition parameter = sProcessDefinition.getParameter(parameterName);
             if (parameter == null) {
                 throw new ParameterNotFoundException(processDefinitionId, parameterName);
-    }
+            }
             parameterService.update(processDefinitionId, parameterName, parameterValue);
             tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
         } catch (final SParameterProcessNotFoundException e) {
@@ -269,19 +267,19 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final List<org.bonitasoft.engine.bpm.parameter.ParameterInstance> parameterInstances = super.getParameterInstances(processDefinitionId, startIndex,
                 maxResults, org.bonitasoft.engine.bpm.parameter.ParameterCriterion.valueOf(sort.name()));
         return convert(parameterInstances);
-            }
+    }
 
     private List<ParameterInstance> convert(final List<org.bonitasoft.engine.bpm.parameter.ParameterInstance> parameterInstances) {
         final ArrayList<ParameterInstance> converted = new ArrayList<ParameterInstance>(parameterInstances.size());
         for (final org.bonitasoft.engine.bpm.parameter.ParameterInstance parameterInstance : parameterInstances) {
             converted.add(convert(parameterInstance));
-            }
-        return converted;
         }
+        return converted;
+    }
 
     private ParameterInstance convert(final org.bonitasoft.engine.bpm.parameter.ParameterInstance parameterInstance) {
         return new ParameterImpl(parameterInstance.getName(), parameterInstance.getDescription(), parameterInstance.getValue(), parameterInstance.getType());
-            }
+    }
 
     @Override
     public ManualTaskInstance addManualUserTask(final ManualTaskCreator creator) throws CreationException, AlreadyExistsException {
@@ -528,7 +526,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     // TODO delete files after use/if an exception occurs
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
         try {
-            return BonitaHomeServer.getInstance().exportBarProcessContentUnderHome(getTenantAccessor().getTenantId(), processDefinitionId, exportActorMapping(processDefinitionId));
+            return BonitaHomeServer.getInstance().exportBarProcessContentUnderHome(getTenantAccessor().getTenantId(), processDefinitionId,
+                    exportActorMapping(processDefinitionId));
         } catch (Exception e) {
             throw new ProcessExportException(e);
         }
