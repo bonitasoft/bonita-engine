@@ -83,6 +83,7 @@ import com.bonitasoft.engine.platform.TenantDeactivationException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 import com.bonitasoft.engine.platform.TenantUpdater;
 import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
+import com.bonitasoft.engine.profile.DefaultProfilesUpdaterExt;
 import com.bonitasoft.engine.search.SearchTenants;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -210,7 +211,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         sessionAccessor.deleteSessionId();
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-                        // Create default profiles: done by profile updater restart handler
+                        // Create default profiles (without creating a new transaction)
+                        new DefaultProfilesUpdaterExt(platformAccessor, tenantServiceAccessor).execute(false);
                         // Create custom page examples: done by page service start
                         // Create default themes: done by theme service start
 
