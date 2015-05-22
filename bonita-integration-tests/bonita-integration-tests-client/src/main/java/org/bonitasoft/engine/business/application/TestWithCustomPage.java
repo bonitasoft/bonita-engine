@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.business.application;
 
 import org.bonitasoft.engine.page.Page;
+import org.bonitasoft.engine.page.PageCreator;
 import org.junit.After;
 import org.junit.Before;
 
@@ -42,6 +43,11 @@ public class TestWithCustomPage extends TestWithApplication {
 
     public Page getPage() {
         return page;
+    }
+
+    protected Page createPage(final String pageName) throws Exception {
+        return getPageAPI().createPage(new PageCreator(pageName, "content.zip").setDisplayName(pageName),
+                createTestPageContent(pageName, "no display name", "empty desc"));
     }
 
 }

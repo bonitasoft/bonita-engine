@@ -7,7 +7,7 @@ This project builds bonita BPM Execution Engine (Community Edition)
 
 Requirements
 -------------
->     Java JDK 1.6 or higher
+>     Java JDK 1.7 or higher
 >     Maven 3.x or higher
 
 Building the Engine

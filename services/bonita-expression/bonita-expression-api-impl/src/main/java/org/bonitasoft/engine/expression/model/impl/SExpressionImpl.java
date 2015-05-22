@@ -15,6 +15,7 @@ package org.bonitasoft.engine.expression.model.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -111,70 +112,32 @@ public class SExpressionImpl implements SExpression {
     }
 
     @Override
+    public boolean hasDependencies() {
+        return !getDependencies().isEmpty();
+    }
+
+    @Override
     public ExpressionKind getExpressionKind() {
         return expressionKind;
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (content == null ? 0 : content.hashCode());
-        result = prime * result + (dependencies == null ? 0 : dependencies.hashCode());
-        result = prime * result + (expressionKind == null ? 0 : expressionKind.hashCode());
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (returnType == null ? 0 : returnType.hashCode());
-        return result;
+        return Objects.hash(name, content, returnType, dependencies, expressionKind);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        }
-        if (obj == null) {
+        if (!(o instanceof SExpressionImpl))
             return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SExpressionImpl other = (SExpressionImpl) obj;
-        if (content == null) {
-            if (other.content != null) {
-                return false;
-            }
-        } else if (!content.equals(other.content)) {
-            return false;
-        }
-        if (dependencies == null) {
-            if (other.dependencies != null) {
-                return false;
-            }
-        } else if (!dependencies.equals(other.dependencies)) {
-            return false;
-        }
-        if (expressionKind == null) {
-            if (other.expressionKind != null) {
-                return false;
-            }
-        } else if (!expressionKind.equals(other.expressionKind)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (returnType == null) {
-            if (other.returnType != null) {
-                return false;
-            }
-        } else if (!returnType.equals(other.returnType)) {
-            return false;
-        }
-        return true;
+        SExpressionImpl that = (SExpressionImpl) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(content, that.content) &&
+                Objects.equals(returnType, that.returnType) &&
+                Objects.equals(dependencies, that.dependencies) &&
+                Objects.equals(expressionKind, that.expressionKind);
     }
 
     @Override

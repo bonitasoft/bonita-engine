@@ -1411,18 +1411,23 @@ public interface ProcessRuntimeAPI {
     void cancelProcessInstance(long processInstanceId) throws ProcessInstanceNotFoundException, UpdateException;
 
     /**
-     * Reset the state of a failed activity instance to its previous state and then execute it.
-     * The activity must be in state FAILED.
+     * Reset the state of a failed {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstance} to its previous state and then execute it. Pre-condition: the
+     * {@code FlowNodeInstance} must be in state FAILED. If this condition is not respected, a ActivityExecutionException is thrown.
+     * <p>If the {@code FlowNodeInstance} contains failed {@link org.bonitasoft.engine.bpm.connector.ConnectorInstance}s, they will be re-executed. In the case
+     * where the connector execution fails again, the {@code FlowNodeInstance} will remain in failed state. There is not counter on the number of
+     * re-executions</p>
      *
      * @param activityInstanceId
-     *        The identifier of the activity instance.
+     *        The identifier of the {@code FlowNodeInstance} to be re-retried.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         If the session is invalid, e.g. the session has expired.
+     *         when session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
-     *         If there is no activity instance with the specified identifier.
+     *         when no {@code FlowNodeInstance} is found with the specified identifier.
      * @throws ActivityExecutionException
-     *         If an error occurs either while resetting the state of while executing the activity instance.
+     *         occurs if the current Flownode is not in FAILED state, or while resetting the state, or while executing the {@code FlowNodeInstance}.
      * @since 6.0
+     * @see org.bonitasoft.engine.bpm.flownode.FlowNodeInstance
+     * @see org.bonitasoft.engine.bpm.connector.ConnectorInstance
      */
     void retryTask(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
@@ -1864,7 +1869,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * Check whether a specific user is involved in a given human task instance.<br/>
-     * User A is involved with a  human task  instance if any of the following is true:
+     * User A is involved with a human task instance if any of the following is true:
      * <ul>
      * <li>the human task instance is assigned to user A</li>
      * <li>the human task instance is pending for user A</li>
@@ -2562,4 +2567,40 @@ public interface ProcessRuntimeAPI {
      * @throws ContractDataNotFoundException if identifier does not refer to an existing process instance.
      */
     Serializable getProcessInputValueAfterInitialization(long processInstanceId, String name) throws ContractDataNotFoundException;
+
+    /**
+     * return the context defined in the process definition for this user task instance
+     *
+     * @param userTaskInstanceId the id of the user task instance
+     * @return a map containing the evaluated context
+     * @throws UserTaskNotFoundException if <code>userTaskInstanceId</code> does not reference any existing task.
+     */
+    Map<String, Serializable> getUserTaskExecutionContext(long userTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException;
+
+    /**
+     * return the context defined in the process definition for this user task instance
+     *
+     * @param archivedUserTaskInstanceId the id of the archived version of the user task instance
+     * @return a map containing the evaluated context
+     * @throws UserTaskNotFoundException if <code>archivedUserTaskInstanceId</code> does not reference any existing archived task.
+     */
+    Map<String, Serializable> getArchivedUserTaskExecutionContext(long archivedUserTaskInstanceId) throws UserTaskNotFoundException, ExpressionEvaluationException;
+
+    /**
+     * return the context defined in the process definition for this process instance
+     *
+     * @param processInstanceId the id of the process instance
+     * @return a map containing the evaluated context
+     * @throws ProcessInstanceNotFoundException if <code>processInstanceId</code> does not reference any existing process.
+     */
+    Map<String, Serializable> getProcessInstanceExecutionContext(long processInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
+
+    /**
+     * return the context defined in the process definition for this process instance
+     *
+     * @param archivedProcessInstanceId the id of the archived version of a process instance
+     * @return a map containing the evaluated context
+     * @throws ProcessInstanceNotFoundException if <code>archivedProcessInstanceId</code> does not reference any existing process.
+     */
+    Map<String, Serializable> getArchivedProcessInstanceExecutionContext(long archivedProcessInstanceId) throws ProcessInstanceNotFoundException, ExpressionEvaluationException;
 }

@@ -15,92 +15,76 @@ package org.bonitasoft.engine.bpm.contract.validation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
+import org.bonitasoft.engine.expression.ContainerState;
+import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
+import org.bonitasoft.engine.expression.ExpressionService;
+import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
+import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.mvel2.MVEL;
 
 public class ContractConstraintsValidator {
 
     private final TechnicalLoggerService logger;
-    private final ConstraintsDefinitionHelper constraintsDefinitionHelper;
-    private final ContractVariableHelper contractVariableHelper;
+    private final ExpressionService expressionService;
 
-    public ContractConstraintsValidator(final TechnicalLoggerService logger, final ConstraintsDefinitionHelper constraintsDefinitionHelper,
-            final ContractVariableHelper contractVariableHelper) {
+    public ContractConstraintsValidator(final TechnicalLoggerService logger, ExpressionService expressionService) {
         this.logger = logger;
-        this.constraintsDefinitionHelper = constraintsDefinitionHelper;
-        this.contractVariableHelper = contractVariableHelper;
+        this.expressionService = expressionService;
     }
 
-    public void validate(final SContractDefinition contract, final Map<String, Serializable> variables) throws ContractViolationException {
-        final List<String> comments = new ArrayList<String>();
+    public void validate(long processDefinitionId, final SContractDefinition contract, final Map<String, Serializable> variables)
+            throws SContractViolationException {
+        final Map<String, Serializable> vars = (variables == null ? Collections.EMPTY_MAP : variables);
+        final List<String> comments = new ArrayList<>();
+        Map<String, Object> context = new HashMap<>(vars.size());
+        context.putAll(vars);
+        context.put(ExpressionExecutorStrategy.DEFINITION_ID, processDefinitionId);
         for (final SConstraintDefinition constraint : contract.getConstraints()) {
-            log(TechnicalLogSeverity.DEBUG, "Evaluating constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames());
-            if (isMandatoryConstraint(constraint)) {
-                if (constraint.getInputNames().size() != 1) {
-                    log(TechnicalLogSeverity.WARNING, "Constraint [" + constraint.getName() + "] inputNames are not valid");
-                    comments.add("Constraint [" + constraint.getName() + "] inputNames are not valid");
-                }
-                else {
-                    validateMandatoryContraint(comments, constraintsDefinitionHelper.getInputDefinition(contract, constraint.getInputNames().get(0)),
-                            constraint, variables);
-                }
-            } else {
-                validateContraint(comments, constraint, variables);
+            if (logger.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)) {
+                logger.log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG, "Evaluating constraint [" + constraint.getName() + "] on input(s) "
+                        + constraint.getInputNames());
             }
+            validateConstraint(comments, constraint, context);
         }
         if (!comments.isEmpty()) {
-            throw new ContractViolationException("Error while validating constraints", comments);
+            throw new SContractViolationException("Error while validating constraints", comments);
         }
     }
 
-    private void validateMandatoryContraint(final List<String> comments, final SInputDefinition sInputDefinition, final SConstraintDefinition constraint,
-            final Map<String, Serializable> variables) {
-        final List<Map<String, Serializable>> inputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(constraint, variables);
-        for (final Map<String, Serializable> inputVariable : inputVariables) {
-            if (sInputDefinition.isMultiple()) {
-                final List<Map<String, Serializable>> multipleVariables = contractVariableHelper.convertMultipleToList(inputVariable);
-                for (final Map<String, Serializable> multipleVariable : multipleVariables) {
-                    validateContraint(comments, constraint, multipleVariable);
-                }
-            }
-            else {
-                validateContraint(comments, constraint, inputVariable);
-            }
-        }
-    }
-
-    private boolean isMandatoryConstraint(final SConstraintDefinition constraint) {
-        if (constraint.getConstraintType() == null) {
-            return false;
-        }
-        return constraint.getConstraintType().equals(SConstraintType.MANDATORY);
-    }
-
-    private void validateContraint(final List<String> comments, final SConstraintDefinition constraint, final Map<String, Serializable> variables) {
-        Boolean valid = Boolean.FALSE;
+    private void validateConstraint(final List<String> comments, final SConstraintDefinition constraint, final Map<String, Object> variables)
+            throws SContractViolationException {
+        Boolean valid;
         try {
-            valid = MVEL.evalToBoolean(constraint.getExpression(), variables);
-        } catch (final Exception e) {
-            valid = Boolean.FALSE;
+            valid = (Boolean) expressionService.evaluate(createGroovyExpression(constraint), variables, Collections.<Integer, Object> emptyMap(),
+                    ContainerState.ACTIVE);
+        } catch (SExpressionTypeUnknownException | SExpressionEvaluationException | SExpressionDependencyMissingException | SInvalidExpressionException e) {
+            throw new SContractViolationException("Exception while validating constraints", e);
         }
         if (!valid) {
-            log(TechnicalLogSeverity.WARNING, "Constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames() + " is not valid");
+            logger.log(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING,
+                    "Constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames() + " is not valid");
             comments.add(constraint.getExplanation());
         }
     }
 
-    private void log(final TechnicalLogSeverity severity, final String message) {
-        if (logger.isLoggable(ContractConstraintsValidator.class, severity)) {
-            logger.log(ContractConstraintsValidator.class, severity, message);
-        }
+    private SExpression createGroovyExpression(SConstraintDefinition constraint) throws SInvalidExpressionException {
+        return BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(constraint.getName()).setContent(constraint.getExpression())
+                .setExpressionType(ExpressionExecutorStrategy.TYPE_READ_ONLY_SCRIPT).setInterpreter(ExpressionExecutorStrategy.INTERPRETER_GROOVY)
+                .setReturnType(Boolean.class.getName()).done();
     }
+
 }

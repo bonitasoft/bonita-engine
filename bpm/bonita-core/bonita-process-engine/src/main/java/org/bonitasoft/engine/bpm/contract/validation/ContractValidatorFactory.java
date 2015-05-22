@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
+import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -22,10 +23,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class ContractValidatorFactory {
 
-    public ContractValidator createContractValidator(final TechnicalLoggerService loggerService) {
-        final ContractStructureValidator complexValidator = new ContractStructureValidator(new ContractTypeValidator(), loggerService);
-        final ContractConstraintsValidator contractConstraintValidator = new ContractConstraintsValidator(loggerService, new ConstraintsDefinitionHelper(),
-                new ContractVariableHelper());
-        return new ContractValidator(complexValidator, contractConstraintValidator);
+    public ContractValidator createContractValidator(final TechnicalLoggerService loggerService, ExpressionService expressionService) {
+        return new ContractValidator(new ContractStructureValidator(new ContractTypeValidator(), loggerService),
+                new ContractConstraintsValidator(loggerService, expressionService));
     }
 }

@@ -17,7 +17,6 @@
 	<modules>
 		<module>bonita-test-utils</module>
 		<module>bonita-query-tests</module>
-		<module>bonita-integration-tests-services-sql</module>
 	</modules>
 
 	<dependencyManagement>
@@ -62,8 +61,6 @@
 		<profile>
 			<id>package-all</id>
 			<modules>
-				<module>bonita-integration-tests-services</module>
-				<module>bonita-integration-tests-services-bpm</module>
 				<module>bonita-integration-tests-client</module>
 				<module>bonita-integration-tests-local</module>
 				<module>bonita-integration-tests-as</module>
@@ -73,17 +70,8 @@
 		<profile>
 			<id>tests</id>
 			<modules>
-				<module>bonita-integration-tests-services</module>
-				<module>bonita-integration-tests-services-bpm</module>
 				<module>bonita-integration-tests-client</module>
 				<module>bonita-integration-tests-local</module>
-			</modules>
-		</profile>
-
-		<profile>
-			<id>sonar</id>
-			<modules>
-				<module>bonita-integration-tests-services</module>
 			</modules>
 		</profile>
 
@@ -99,8 +87,6 @@
 		<profile>
 			<id>all</id>
 			<modules>
-				<module>bonita-integration-tests-services</module>
-				<module>bonita-integration-tests-services-bpm</module>
 				<module>bonita-integration-tests-client</module>
 				<module>bonita-integration-tests-local</module>
 			</modules>

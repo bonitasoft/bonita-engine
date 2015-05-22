@@ -7,7 +7,8 @@
 		</encoder>
 	</appender>
 
-	<logger name="org.bonitasoft" level="INFO" />
+	<logger name="org.bonitasoft" level="WARN" />
+	<logger name="org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork" level="OFF" />
 
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />

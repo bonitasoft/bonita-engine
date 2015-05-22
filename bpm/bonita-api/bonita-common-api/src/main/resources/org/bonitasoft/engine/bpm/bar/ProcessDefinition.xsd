@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:definition="http://www.bonitasoft.org/ns/process/client/6.3" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/process/client/6.3"
-    elementFormDefault="qualified">
+           elementFormDefault="qualified">
 
     <xs:element name="processDefinition" type="definition:ProcessDefinition" />
 
@@ -51,6 +51,7 @@
                         </xs:complexType>
                     </xs:element>
                     <xs:element name="contract" type="definition:ContractDefinition" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="context" type="definition:ContextDefinition" minOccurs="0" maxOccurs="1" />
                 </xs:all>
                 <xs:attribute type="xs:string" name="version" use="required" />
                 <xs:attribute type="xs:string" name="bos_version" use="required" />
@@ -255,6 +256,7 @@
                 <xs:sequence>
                     <xs:element name="userFilter" type="definition:UserFilterDefinition" minOccurs="0" />
                     <xs:element name="contract" type="definition:ContractDefinition" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="context" type="definition:ContextDefinition" minOccurs="0" maxOccurs="1" />
                 </xs:sequence>
                 <xs:attribute name="actorName" type="xs:string" />
                 <xs:attribute name="priority" type="xs:string" />
@@ -302,6 +304,7 @@
                     <xs:element type="definition:Expression" name="callableElement" minOccurs="1" maxOccurs="1" />
                     <xs:element type="definition:Expression" name="callableElementVersion" minOccurs="0" maxOccurs="1" />
                     <xs:element type="definition:Operation" name="dataInputOperation" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element type="definition:ContractInputs" name="contractInputs" minOccurs="0" maxOccurs="1" />
                     <xs:element type="definition:Operation" name="dataOutputOperation" minOccurs="0" maxOccurs="unbounded" />
                 </xs:sequence>
                 <xs:attribute name="callableElementType">
@@ -387,7 +390,6 @@
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:choice>
                             <xs:element name="inputDefinition" type="definition:InputDefinition" />
-                            <xs:element name="complexInputDefinition" type="definition:ComplexInputDefinition" />
                         </xs:choice>
                     </xs:sequence>
                 </xs:complexType>
@@ -404,7 +406,13 @@
 
     <xs:complexType name="InputDefinition">
         <xs:complexContent>
-            <xs:extension base="definition:InputElement">
+            <xs:extension base="definition:NamedElement">
+                <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:choice>
+                        <xs:element name="inputDefinition" type="definition:InputDefinition" />
+                    </xs:choice>
+                </xs:sequence>
+                <xs:attribute name="multiple" type="xs:boolean" use="required" />
                 <xs:attribute name="type">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
@@ -414,22 +422,10 @@
                             <xs:enumeration value="INTEGER" />
                             <xs:enumeration value="DECIMAL" />
                             <xs:enumeration value="BYTE_ARRAY" />
+                            <xs:enumeration value="FILE" />
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="ComplexInputDefinition">
-        <xs:complexContent>
-            <xs:extension base="definition:InputElement">
-                <xs:sequence minOccurs="1" maxOccurs="unbounded">
-                    <xs:choice>
-                        <xs:element name="inputDefinition" type="definition:InputDefinition" />
-                        <xs:element name="complexInputDefinition" type="definition:ComplexInputDefinition" />
-                    </xs:choice>
-                </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -439,7 +435,7 @@
             <xs:extension base="definition:NamedElement">
                 <xs:sequence>
                     <xs:element name="conditionalExpression" type="xs:string" />
-                    <xs:element name="explanation" type="xs:string" />
+                    <xs:element name="explanation" type="xs:string" minOccurs="0" maxOccurs="1" />
                     <xs:element name="inputDefinitionNames" minOccurs="0" maxOccurs="1">
                         <xs:complexType>
                             <xs:sequence minOccurs="1" maxOccurs="unbounded">
@@ -448,16 +444,21 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute name="type" use="required">
-                    <xs:simpleType>
-                        <xs:restriction base="xs:string">
-                            <xs:enumeration value="CUSTOM" />
-                            <xs:enumeration value="MANDATORY" />
-                        </xs:restriction>
-                    </xs:simpleType>
-                </xs:attribute>
             </xs:extension>
         </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ContextDefinition">
+        <xs:sequence>
+            <xs:element name="contextEntry" type="definition:ContextEntry" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ContextEntry">
+        <xs:sequence>
+            <xs:element name="expression" type="definition:Expression" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="key" type="xs:string" />
     </xs:complexType>
 
     <xs:complexType name="UserFilterDefinition">
@@ -557,6 +558,7 @@
                     <xs:element name="url" type="xs:string" minOccurs="0" />
                     <xs:element name="file" type="xs:string" minOccurs="0" />
                     <xs:element name="fileName" type="xs:string" minOccurs="0" />
+                    <xs:element name="expression" type="definition:Expression" minOccurs="0" />
                 </xs:all>
                 <xs:attribute name="mimeType" type="xs:string" use="required" />
             </xs:extension>
@@ -680,7 +682,8 @@
     <xs:complexType name="CatchErrorEventTriggerDefinition">
         <xs:complexContent>
             <xs:extension base="definition:EventTriggerDefinition">
-                <xs:attribute name="errorCode" type="xs:string" use="optional" /> <!-- for the catch event the error code is optional -->
+                <xs:attribute name="errorCode" type="xs:string" use="optional" />
+                <!-- for the catch event the error code is optional -->
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -774,14 +777,18 @@
     </xs:complexType>
 
     <xs:complexType name="Expression">
-        <xs:sequence>
-            <xs:element name="content" type="xs:string" minOccurs="1" />
-            <xs:element name="expression" type="definition:Expression" minOccurs="0" maxOccurs="unbounded" />
-        </xs:sequence>
-        <xs:attribute name="name" type="xs:string" />
-        <xs:attribute name="expressionType" />
-        <xs:attribute name="returnType" />
-        <xs:attribute name="interpreter" />
+        <xs:complexContent>
+            <xs:extension base="definition:BaseElement">
+                <xs:sequence>
+                    <xs:element name="content" type="xs:string" minOccurs="1" />
+                    <xs:element name="expression" type="definition:Expression" minOccurs="0" maxOccurs="unbounded" />
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string" />
+                <xs:attribute name="expressionType" />
+                <xs:attribute name="returnType" />
+                <xs:attribute name="interpreter" />
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
 
     <xs:complexType name="Operation">
@@ -807,16 +814,14 @@
         </xs:complexContent>
     </xs:complexType>
 
-    <xs:complexType name="InputElement">
-        <xs:complexContent>
-            <xs:extension base="definition:NamedElement">
-                <xs:attribute name="multiple" type="xs:boolean" use="required" />
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-
     <xs:complexType name="BaseElement">
         <xs:attribute name="id" type="xs:long" />
+    </xs:complexType>
+
+    <xs:complexType name="ContractInputs">
+        <xs:sequence>
+            <xs:element name="contractInput" minOccurs="0" maxOccurs="unbounded" type="definition:IOExpression" />
+        </xs:sequence>
     </xs:complexType>
 
 </xs:schema>

@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.commons.exceptions;
 
 /**
@@ -24,7 +24,15 @@ public class SExecutionException extends SBonitaException {
         super(message);
     }
 
+    public SExecutionException(Throwable t) {
+        super(t);
+    }
+
     public SExecutionException(String message, Throwable cause) {
-        super(message,cause);
+        super(message, cause);
+    }
+
+    public SExecutionException(SBonitaException e) {
+        super(e);
     }
 }

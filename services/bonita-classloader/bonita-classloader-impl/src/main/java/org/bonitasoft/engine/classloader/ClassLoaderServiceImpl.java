@@ -13,19 +13,18 @@
  **/
 package org.bonitasoft.engine.classloader;
 
-import java.io.File;
-import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.commons.io.IOUtil;
+import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.model.SEvent;
+import org.bonitasoft.engine.events.model.impl.SEventImpl;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -38,19 +37,13 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private static final String SEPARATOR = ":";
 
-    private static final String GLOBAL_FOLDER = "global";
-
     public static final String GLOBAL_TYPE = "GLOBAL";
 
     public static final long GLOBAL_ID = -1;
 
-    private static final String LOCAL_FOLDER = "local";
-
     private final ParentClassLoaderResolver parentClassLoaderResolver;
 
     private final TechnicalLoggerService logger;
-
-    private final String temporaryFolder;
 
     private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
 
@@ -60,28 +53,13 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private boolean shuttingDown = false;
 
-    public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final String temporaryFolder, final TechnicalLoggerService logger) {
+    private final EventService eventService;
+
+    public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final TechnicalLoggerService logger, final EventService eventService) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
-        final String temporaryFolderName = buildTemporaryFolderName(temporaryFolder);
-        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        this.eventService = eventService;
         // BS-9304 : Create the temporary directory with the IOUtil class, to delete it at the end of the JVM
-        this.temporaryFolder = IOUtil.createTempDirectory(new File(temporaryFolderName, "bonita_engine_" + jvmName).toURI()).getAbsolutePath();
-    }
-
-    private String buildTemporaryFolderName(final String temporaryFolder) {
-        String temporaryFolderName = temporaryFolder;
-        if (temporaryFolder.startsWith("${") && temporaryFolder.contains("}")) {
-            final Pattern pattern = Pattern.compile("^(.*)\\$\\{(.*)\\}(.*)$");
-            final Matcher matcher = pattern.matcher(temporaryFolder);
-            matcher.find();
-            final StringBuilder sb = new StringBuilder();
-            sb.append(matcher.group(1));
-            sb.append(System.getProperty(matcher.group(2)));
-            sb.append(matcher.group(3));
-            temporaryFolderName = sb.toString();
-        }
-        return temporaryFolderName;
     }
 
     private static final class ClassLoaderServiceMutex {
@@ -172,25 +150,6 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
-    private URI getGlobalTemporaryFolder() {
-        final StringBuffer stb = new StringBuffer(temporaryFolder);
-        stb.append(File.separator);
-        stb.append(GLOBAL_FOLDER);
-        return new File(stb.toString()).toURI();
-    }
-
-    private URI getLocalTemporaryFolder(final String artifactType, final long artifactId) {
-        final StringBuffer stb = new StringBuffer(temporaryFolder);
-        stb.append(File.separator);
-        stb.append(LOCAL_FOLDER);
-        stb.append(File.separator);
-        stb.append(artifactType);
-        stb.append(File.separator);
-        stb.append(artifactId);
-        return new File(stb.toString()).toURI();
-
-    }
-
     @Override
     public void removeAllLocalClassLoaders(final String application) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -209,6 +168,9 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     private void destroyLocalClassLoader(final String key) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Destroying local classloader with key: " + key);
+        }
         final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
         if (localClassLoader != null) {
             localClassLoader.destroy();
@@ -216,45 +178,69 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
-    public String getTemporaryFolder() {
-        return temporaryFolder;
-    }
-
     @Override
-    public void refreshGlobalClassLoader(final Map<String, byte[]> resources) {
+    public void refreshGlobalClassLoader(final Map<String, byte[]> resources) throws SClassLoaderException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Refreshing global classloader");
+        }
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
-        refreshLocalClassLoader(virtualClassloader, resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(), getGlobalTemporaryFolder(),
-                ClassLoaderServiceImpl.class.getClassLoader());
+        try {
+            refreshClassLoader(virtualClassloader, resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(), BonitaHomeServer.getInstance().getGlobalTemporaryFolder(),
+                    ClassLoaderServiceImpl.class.getClassLoader());
+        } catch (Exception e) {
+            throw new SClassLoaderException(e);
+        }
     }
 
     @Override
-    public void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) {
+    public void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) throws SClassLoaderException {
+        final String key = getKey(type, id);
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Refreshing local classloader with key: " + key);
+        }
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getLocalClassLoader(type, id);
-        refreshLocalClassLoader(virtualClassloader, resources, type, id, getLocalTemporaryFolder(type, id), new ParentRedirectClassLoader(
-                getGlobalClassLoader(), parentClassLoaderResolver, this, type, id));
+        try {
+            refreshClassLoader(virtualClassloader, resources, type, id, BonitaHomeServer.getInstance().getLocalTemporaryFolder(type, id), new ParentRedirectClassLoader(
+                    getGlobalClassLoader(), parentClassLoaderResolver, this, type, id));
+            final String eventType = "ClassLoaderRefreshed";
+            final SEvent event = new SEventImpl(eventType);
+            event.setObject(key);
+            eventService.fireEvent(event);
+        } catch (Exception e) {
+            throw new SClassLoaderException(e);
+        }
     }
 
-    private void refreshLocalClassLoader(final VirtualClassLoader virtualClassloader, final Map<String, byte[]> resources, final String type, final long id,
-            final URI temporaryFolder, final ClassLoader parent) {
+    private void refreshClassLoader(final VirtualClassLoader virtualClassloader, final Map<String, byte[]> resources, final String type, final long id,
+                                    final URI temporaryFolder, final ClassLoader parent) {
         virtualClassloader.destroy();
-        final BonitaClassLoader classloader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
-        virtualClassloader.setClassLoader(classloader);
+        final BonitaClassLoader classLoader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
+        virtualClassloader.setClassLoader(classLoader);
     }
 
     @Override
     public void start() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Starting classloader service");
+        }
         shuttingDown = false;
         virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
     }
 
     @Override
     public void stop() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Stopping classloader service");
+        }
         shuttingDown = true;
         destroyAllLocalClassLoaders();
         virtualGlobalClassLoader.destroy();
     }
 
     private void destroyAllLocalClassLoaders() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Destroying all classloaders");
+        }
         for (final VirtualClassLoader classLoader : localClassLoaders.values()) {
             classLoader.destroy();
         }
@@ -263,11 +249,17 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public void pause() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Pausing classloader service");
+        }
         // Nothing to do
     }
 
     @Override
     public void resume() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Resuming classloader service");
+        }
         // Nothing to do
     }
 }

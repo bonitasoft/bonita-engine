@@ -15,6 +15,9 @@ package org.bonitasoft.engine.core.contract.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.Serializable;
+
+import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 import org.junit.Test;
 
 public class SAProcessContractDataTest {
@@ -40,4 +43,22 @@ public class SAProcessContractDataTest {
         assertThat(saProcessContractData.getSourceObjectId()).isEqualTo(originalProcessDataId);
         assertThat(saProcessContractData.getValue()).isEqualTo(value);
     }
+
+    @Test
+    public void setValue_serialize_to_xml() throws Exception {
+        final SAProcessContractData saProcessContractData = new SAProcessContractData();
+
+        final MyPojo myPojo = new MyPojo("theName", "theValue".getBytes());
+        saProcessContractData.setValue(myPojo);
+
+
+        final Serializable value = saProcessContractData.value;
+        assertThat(value).isInstanceOf(String.class);
+        final Serializable unserializedValue = saProcessContractData.getValue();
+        assertThat(unserializedValue).isInstanceOf(MyPojo.class);
+        assertThat(((MyPojo) unserializedValue).getName()).isEqualTo("theName");
+        assertThat(((MyPojo) unserializedValue).getContent()).isEqualTo("theValue".getBytes());
+        assertThat(value).isEqualTo(XStreamFactory.getXStream().toXML(myPojo));
+    }
+
 }

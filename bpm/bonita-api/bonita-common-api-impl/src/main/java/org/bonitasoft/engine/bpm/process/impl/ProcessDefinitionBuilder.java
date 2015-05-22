@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.process.impl;
 
 import java.io.Serializable;
@@ -27,10 +27,11 @@ import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.AutomaticTaskDefinition;
@@ -52,7 +53,6 @@ import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
@@ -80,7 +80,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     protected DesignProcessDefinitionImpl process;
 
-    private List<String> designErrors;
+    List<String> designErrors;
 
     /**
      * Initiates the building of a new {@link DesignProcessDefinition} with the given name and version. This method is the entry point of this builder. It must
@@ -127,6 +127,55 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         validateEventsSubProcess();
         validateActors();
         validateBusinessData();
+        validateProcessContract();
+    }
+
+    private void validateUserTask(final UserTaskDefinition userTaskDefinition) {
+        validateContract(userTaskDefinition.getContract(), "the task-level contract for task <" + userTaskDefinition.getName() + ">");
+    }
+
+    private void validateContractInputName(final String name) {
+        if (!SourceVersion.isIdentifier(name)) {
+            designErrors.add("contract input name " + name + " is invalid");
+        }
+    }
+
+    void validateProcessContract() {
+        final ContractDefinition contract = process.getContract();
+        validateContract(contract, "the process-level contract");
+    }
+
+    void validateContract(ContractDefinition contract, String containerIdentifier) {
+        if (contract == null) {
+            return;
+        }
+        for (final ConstraintDefinition constraint : contract.getConstraints()) {
+            if (constraint.getName() == null) {
+                addError("A constraint name is missing");
+            }
+            if (constraint.getExpression() == null) {
+                addError("The expression of constraint" + constraint.getName() + " is missing");
+            }
+        }
+        for (InputDefinition inputDefinition : contract.getInputs()) {
+            validateContractInput(containerIdentifier, inputDefinition);
+        }
+    }
+
+    private void validateContractInput(String containerIdentifier, InputDefinition inputDefinition) {
+        validateContractInputName(inputDefinition.getName());
+        if (inputDefinition.hasChildren() && (inputDefinition.getType() != null && !inputDefinition.getType().equals(Type.FILE))) {
+            addError("Can't have a type set on the contract input <" + inputDefinition.getName() + "> on " + containerIdentifier
+                    + " because it has children");
+        }
+        if (!inputDefinition.hasChildren() && inputDefinition.getType() == null) {
+            addError("Type not set on the contract input <" + inputDefinition.getName() + "> on " + containerIdentifier);
+        }
+        if (inputDefinition.hasChildren()) {
+            for (InputDefinition definition : inputDefinition.getInputs()) {
+                validateContractInput(containerIdentifier, definition);
+            }
+        }
     }
 
     /**
@@ -312,47 +361,6 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         }
     }
 
-    private void validateUserTask(final UserTaskDefinition userTaskDefinition) {
-        final ContractDefinition contract = userTaskDefinition.getContract();
-        if (contract != null) {
-            validateUserTaskContractInputs(contract.getSimpleInputs(), contract.getComplexInputs());
-
-            for (final ConstraintDefinition constraint : contract.getConstraints()) {
-                if (constraint.getName() == null) {
-                    addError("A constraint name is missing");
-                }
-                if (constraint.getExpression() == null) {
-                    addError("The expression of constraint" + constraint.getName() + " is missing");
-                }
-            }
-        }
-    }
-
-    private void validateUserTaskContractInputs(final List<SimpleInputDefinition> simpleInputDefinitions,
-            final List<ComplexInputDefinition> complexInputDefinitions) {
-        for (final SimpleInputDefinition simpleInputDefinition : simpleInputDefinitions) {
-            validateContractInput(simpleInputDefinition);
-        }
-        for (final ComplexInputDefinition complexInputDefinition : complexInputDefinitions) {
-            validateContractInput(complexInputDefinition);
-        }
-    }
-
-    private void validateContractInput(final ComplexInputDefinition complexInputDefinition) {
-        validateContractInputName(complexInputDefinition.getName());
-        validateUserTaskContractInputs(complexInputDefinition.getSimpleInputs(), complexInputDefinition.getComplexInputs());
-    }
-
-    private void validateContractInput(final SimpleInputDefinition inputDefinition) {
-        validateContractInputName(inputDefinition.getName());
-    }
-
-    private void validateContractInputName(final String name) {
-        if (!SourceVersion.isIdentifier(name)) {
-            designErrors.add("contract input name " + name + " is invalid");
-        }
-    }
-
     private void validateGateways(final FlowElementContainerDefinition processContainer) {
         for (final GatewayDefinition gateway : processContainer.getGatewaysList()) {
             for (final TransitionDefinition transition : gateway.getOutgoingTransitions()) {
@@ -440,7 +448,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                 if (loopCharacteristics.getDataOutputItemRef() != null && !loopCharacteristics.getDataOutputItemRef().isEmpty()
                         && (loopCharacteristics.getLoopDataOutputRef() == null || loopCharacteristics.getLoopDataOutputRef().isEmpty())) {
                     designErrors
-                    .add("The multi instance has got a data output reference but does not have a loop data output on activity" + activity.getName());
+                            .add("The multi instance has got a data output reference but does not have a loop data output on activity" + activity.getName());
                 }
                 // TODO add validation on data existence
             }
@@ -516,7 +524,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     private void validateBoundaryOutgoingTransitions(final BoundaryEventDefinition boundaryEvent) {
         for (final TransitionDefinition transition : boundaryEvent.getOutgoingTransitions()) {
             if (transition.getCondition() != null) {
-                designErrors.add("A boundary event must have not inconditional transitions: " + transition.getSource() + "->" + transition.getTarget());
+                designErrors.add("A boundary event must have no conditional transitions: " + transition.getSource() + "->" + transition.getTarget());
             }
         }
     }
@@ -693,7 +701,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     public TextDataDefinitionBuilder addLongTextData(final String name, final Expression defaultValue) {
         final String className = String.class.getName();
         return new TextDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue)
-        .isLongText();
+                .isLongText();
     }
 
     @Override
@@ -788,7 +796,6 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         return done();
     }
 
-
     /**
      * Add a parameter on this process.
      *
@@ -802,6 +809,10 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         return new ParameterDefinitionBuilder(this, process, parameterName, type);
     }
 
+    public ProcessDefinitionBuilder addContextEntry(final String key, final Expression expression) {
+        process.addContextEntry(new ContextEntryImpl(key, expression));
+        return this;
+    }
 
     public ContractDefinitionBuilder addContract() {
         return new ContractDefinitionBuilder(this, process);

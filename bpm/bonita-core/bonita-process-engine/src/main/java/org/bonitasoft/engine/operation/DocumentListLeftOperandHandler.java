@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.operation;
 
 import java.util.List;
@@ -44,9 +44,8 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     public DocumentListLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService, final ProcessDefinitionService processDefinitionService,
             final ProcessInstanceService processInstanceService) {
-        super(activityInstanceService, sessionAccessor, sessionService);
-        this.documentService = documentService;
-        documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
+        this(activityInstanceService, sessionAccessor, sessionService, documentService, new DocumentHelper(documentService, processDefinitionService,
+                processInstanceService));
     }
 
     public DocumentListLeftOperandHandler(final ActivityInstanceService activityInstanceService, final SessionAccessor sessionAccessor,
@@ -57,9 +56,10 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     }
 
     @Override
-    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId,
+            final String containerType)
             throws SOperationExecutionException {
-        final List<DocumentValue> documentList = toCheckedList(newValue);
+        final List<DocumentValue> documentList = documentHelper.toCheckedList(newValue);
         final String documentName = sLeftOperand.getName();
         try {
             final long processInstanceId = getProcessInstanceId(containerId, containerType);
@@ -69,19 +69,6 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
             throw new SOperationExecutionException(e.getMessage(), e);
         }
 
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DocumentValue> toCheckedList(final Object newValue) throws SOperationExecutionException {
-        if (!(newValue instanceof List)) {
-            throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
-        }
-        for (final Object item : (List<?>) newValue) {
-            if (!(item instanceof DocumentValue)) {
-                throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
-            }
-        }
-        return (List<DocumentValue>) newValue;
     }
 
     @Override
@@ -100,7 +87,8 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     }
 
     @Override
-    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet)
+            throws SBonitaReadException {
         //do nothing
     }
 

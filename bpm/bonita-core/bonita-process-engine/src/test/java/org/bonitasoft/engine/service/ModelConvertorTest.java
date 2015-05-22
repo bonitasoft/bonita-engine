@@ -10,49 +10,59 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoDefinition;
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoValue;
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.EventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.business.data.BusinessDataReference;
+import org.bonitasoft.engine.business.data.impl.MultipleBusinessDataReferenceImpl;
+import org.bonitasoft.engine.business.data.impl.SimpleBusinessDataReferenceImpl;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
-import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
-import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance;
+import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
@@ -63,11 +73,12 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThr
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.form.FormMapping;
-import org.bonitasoft.engine.form.FormMappingTarget;
 import org.bonitasoft.engine.form.FormMappingType;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.User;
@@ -141,7 +152,7 @@ public class ModelConvertorTest {
     }
 
     @Test
-    public void toArchivedUserTaskInstance_sould_return_the_right_idenfiers() {
+    public void toArchivedUserTaskInstance_sould_return_the_right_identifiers() {
         final SAUserTaskInstanceImpl sInstance = new SAUserTaskInstanceImpl();
         sInstance.setRootContainerId(1L);
         sInstance.setParentContainerId(2L);
@@ -150,6 +161,8 @@ public class ModelConvertorTest {
         sInstance.setLogicalGroup(2, 456L);
         sInstance.setLogicalGroup(3, 2L);
         sInstance.setStateId(5);
+        final long claimedDate = System.currentTimeMillis();
+        sInstance.setClaimedDate(claimedDate);
         sInstance.setPriority(STaskPriority.NORMAL);
 
         when(manager.getState(5)).thenReturn(new CompletedActivityStateImpl());
@@ -160,6 +173,7 @@ public class ModelConvertorTest {
         assertThat(archivedUserTaskInstance.getParentContainerId()).isEqualTo(2L);
         assertThat(archivedUserTaskInstance.getProcessInstanceId()).isEqualTo(2L);
         assertThat(archivedUserTaskInstance.getParentActivityInstanceId()).isEqualTo(456L);
+        assertThat(archivedUserTaskInstance.getClaimedDate().getTime()).isEqualTo(claimedDate);
     }
 
     @Test
@@ -406,7 +420,7 @@ public class ModelConvertorTest {
         sFormMapping.setPageMapping(new SPageMappingImpl());
 
         // Then
-        List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping> asList(sFormMapping));
+        List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping>asList(sFormMapping));
 
         // When
         assertThat(formMapping).hasSize(1);
@@ -434,9 +448,9 @@ public class ModelConvertorTest {
     @Test
     public void convertSContractDefinition() {
         //given
-        final SimpleInputDefinition expectedSimpleInput = new SimpleInputDefinitionImpl("name", Type.TEXT, "description");
-        final ComplexInputDefinition expectedComplexInput = new ComplexInputDefinitionImpl("complex input", "complex description",
-                Arrays.asList(expectedSimpleInput), null);
+        final InputDefinition expectedSimpleInput = new InputDefinitionImpl("name", Type.TEXT, "description");
+        final InputDefinition expectedComplexInput = new InputDefinitionImpl("complex input", "complex description",
+                Arrays.asList(expectedSimpleInput));
         final ConstraintDefinition expectedRule = new ConstraintDefinitionImpl("name", "expression", "explanation");
         expectedRule.getInputNames().add("input1");
         expectedRule.getInputNames().add("input2");
@@ -444,29 +458,36 @@ public class ModelConvertorTest {
         //when
         final SContractDefinition contractDefinition = new SContractDefinitionImpl();
         final SConstraintDefinition sRule = new SConstraintDefinitionImpl(expectedRule);
-        final SSimpleInputDefinition sSimpleInput = new SSimpleInputDefinitionImpl(expectedSimpleInput);
-        final SComplexInputDefinition sComplexInput = new SComplexInputDefinitionImpl(expectedComplexInput);
+        final SInputDefinition sSimpleInput = new SInputDefinitionImpl(expectedSimpleInput);
+        final SInputDefinition sComplexInput = new SInputDefinitionImpl(expectedComplexInput);
 
         contractDefinition.getConstraints().add(sRule);
-        contractDefinition.getSimpleInputs().add(sSimpleInput);
-        contractDefinition.getComplexInputs().add(sComplexInput);
+        contractDefinition.getInputDefinitions().add(sSimpleInput);
+        contractDefinition.getInputDefinitions().add(sComplexInput);
 
         final ContractDefinition contract = ModelConvertor.toContract(contractDefinition);
 
         //then
         assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
-        assertThat(contract.getSimpleInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput);
-        assertThat(contract.getComplexInputs()).as("should convert complex inputs").containsExactly(expectedComplexInput);
+        assertThat(contract.getInputs()).as("should convert inputs").containsExactly(expectedSimpleInput, expectedComplexInput);
+    }
+    @Test
+    public void convertNullSContractDefinition() {
+        //when
+        final ContractDefinition contract = ModelConvertor.toContract(null);
+
+        //then
+        assertThat(contract).as("contract null").isNull();
     }
 
     @Test
     public void convertMultipleSContractDefinition() {
         //given
-        final SimpleInputDefinition expectedSimpleInput = new SimpleInputDefinitionImpl("name", Type.TEXT, "description", true);
-        final ComplexInputDefinition expectedComplexInput = new ComplexInputDefinitionImpl("complex input", "complex description", true,
-                Arrays.asList(expectedSimpleInput), null);
-        final ComplexInputDefinition expectedComplexWithComplexInput = new ComplexInputDefinitionImpl("complex in complext", "complex description", true,
-                null, Arrays.asList(expectedComplexInput));
+        final InputDefinition expectedSimpleInput = new InputDefinitionImpl("name", Type.TEXT, "description", true);
+        final InputDefinition expectedComplexInput = new InputDefinitionImpl("complex input", "complex description", true,
+                Collections.singletonList(expectedSimpleInput));
+        final InputDefinition expectedComplexWithComplexInput = new InputDefinitionImpl("complex in complex", "complex description", true,
+                null, Collections.singletonList(expectedComplexInput));
 
         final ConstraintDefinition expectedRule = new ConstraintDefinitionImpl("name", "expression", "explanation");
         expectedRule.getInputNames().add("input1");
@@ -475,19 +496,59 @@ public class ModelConvertorTest {
         //when
         final SContractDefinition contractDefinition = new SContractDefinitionImpl();
         final SConstraintDefinition sRule = new SConstraintDefinitionImpl(expectedRule);
-        final SSimpleInputDefinition sSimpleInput = new SSimpleInputDefinitionImpl(expectedSimpleInput);
-        final SComplexInputDefinition sComplexInput = new SComplexInputDefinitionImpl(expectedComplexWithComplexInput);
+        final SInputDefinition sSimpleInput = new SInputDefinitionImpl(expectedSimpleInput);
+        final SInputDefinition sComplexInput = new SInputDefinitionImpl(expectedComplexWithComplexInput);
 
         contractDefinition.getConstraints().add(sRule);
-        contractDefinition.getSimpleInputs().add(sSimpleInput);
-        contractDefinition.getComplexInputs().add(sComplexInput);
+        contractDefinition.getInputDefinitions().add(sSimpleInput);
+        contractDefinition.getInputDefinitions().add(sComplexInput);
 
         final ContractDefinition contract = ModelConvertor.toContract(contractDefinition);
 
         //then
         assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
-        assertThat(contract.getSimpleInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput);
-        assertThat(contract.getComplexInputs()).as("should convert complex inputs").containsExactly(expectedComplexWithComplexInput);
+        assertThat(contract.getInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput, expectedComplexWithComplexInput);
+    }
+
+    SProcessSimpleRefBusinessDataInstance createProcessSimpleDataReference(String name, long processInstanceId, String type, long businessDataId) {
+        SProcessSimpleRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstanceImpl();
+        sProcessSimpleRefBusinessDataInstance.setName(name);
+        sProcessSimpleRefBusinessDataInstance.setProcessInstanceId(processInstanceId);
+        sProcessSimpleRefBusinessDataInstance.setDataClassName(type);
+        sProcessSimpleRefBusinessDataInstance.setDataId(businessDataId);
+        return sProcessSimpleRefBusinessDataInstance;
+    }
+
+    SProcessMultiRefBusinessDataInstance createProcessMultipleDataReference(String name, long processInstanceId, String type, List<Long> dataIds) {
+        SProcessMultiRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SProcessMultiRefBusinessDataInstanceImpl();
+        sProcessSimpleRefBusinessDataInstance.setName(name);
+        sProcessSimpleRefBusinessDataInstance.setProcessInstanceId(processInstanceId);
+        sProcessSimpleRefBusinessDataInstance.setDataClassName(type);
+        sProcessSimpleRefBusinessDataInstance.setDataIds(dataIds);
+        return sProcessSimpleRefBusinessDataInstance;
+    }
+
+    @Test
+    public void convert_multiple_business_data() {
+        BusinessDataReference businessDataReference = ModelConvertor
+                .toBusinessDataReference(createProcessSimpleDataReference("myBData", 157l, "theType", 5555l));
+
+        assertThat(businessDataReference).isEqualTo(new SimpleBusinessDataReferenceImpl("myBData", "theType", 5555l));
+    }
+
+    @Test
+    public void convert_simple_business_data() {
+        BusinessDataReference businessDataReference = ModelConvertor.toBusinessDataReference(createProcessMultipleDataReference("myBData", 157l, "theType",
+                Arrays.asList(5555l, 5556l, 5557l)));
+
+        assertThat(businessDataReference).isEqualTo(new MultipleBusinessDataReferenceImpl("myBData", "theType", Arrays.asList(5555l, 5556l, 5557l)));
+    }
+
+    @Test
+    public void convert_null_business_data() {
+        BusinessDataReference businessDataReference = ModelConvertor.toBusinessDataReference(null);
+
+        assertThat(businessDataReference).isNull();
     }
 
 }

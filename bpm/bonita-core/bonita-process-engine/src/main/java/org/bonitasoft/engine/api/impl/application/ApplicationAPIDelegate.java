@@ -15,7 +15,8 @@ package org.bonitasoft.engine.api.impl.application;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
-import org.bonitasoft.engine.api.impl.validator.TokenValidator;
+import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
+import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationField;
@@ -44,8 +45,10 @@ public class ApplicationAPIDelegate {
     private final ApplicationModelConverter converter;
     private final long loggedUserId;
     private final ApplicationService applicationService;
+    private final ApplicationTokenValidator tokenValidator;
 
-    public ApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationModelConverter converter, final long loggedUserId) {
+    public ApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationModelConverter converter, final long loggedUserId, final ApplicationTokenValidator tokenValidator) {
+        this.tokenValidator = tokenValidator;
         applicationService = accessor.getApplicationService();
         this.converter = converter;
         this.loggedUserId = loggedUserId;
@@ -64,9 +67,9 @@ public class ApplicationAPIDelegate {
     }
 
     private void validateCreator(final ApplicationCreator applicationCreator) throws CreationException {
-        final TokenValidator tokenValidator = new TokenValidator(applicationCreator.getToken());
-        if (!tokenValidator.validate()) {
-            throw new CreationException(tokenValidator.getError());
+        ValidationStatus validationStatus = tokenValidator.validate(applicationCreator.getToken());
+        if (!validationStatus.isValid()) {
+            throw new CreationException(validationStatus.getMessage());
         }
         final String displayName = (String) applicationCreator.getFields().get(ApplicationField.DISPLAY_NAME);
         if (displayName == null || displayName.trim().isEmpty()) {
@@ -139,9 +142,9 @@ public class ApplicationAPIDelegate {
     private void validateToken(final ApplicationUpdater updater) throws UpdateException {
         if (updater.getFields().keySet().contains(ApplicationField.TOKEN)) {
             final String token = (String) updater.getFields().get(ApplicationField.TOKEN);
-            final TokenValidator tokenValidator = new TokenValidator(token);
-            if (!tokenValidator.validate()) {
-                throw new UpdateException(tokenValidator.getError());
+            ValidationStatus validationStatus = tokenValidator.validate(token);
+            if (!validationStatus.isValid()) {
+                throw new UpdateException(validationStatus.getMessage());
             }
         }
     }

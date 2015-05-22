@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.HashMap;
@@ -23,10 +23,11 @@ import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.FailAction;
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
@@ -147,6 +148,9 @@ public class XMLProcessDefinition {
     public static final String CALL_ACTIVITY_NODE = "callActivity";
 
     public static final String DATA_INPUT_OPERATION_NODE = "dataInputOperation";
+
+    public static final String CONTRACT_INPUTS_EXPRESSION_NODE = "contractInputs";
+    public static final String CONTRACT_INPUT_EXPRESSION_NODE = "contractInput";
 
     public static final String DATA_OUTPUT_OPERATION_NODE = "dataOutputOperation";
 
@@ -352,9 +356,7 @@ public class XMLProcessDefinition {
 
     private static final String CONTRACT_INPUTS_NODE = "inputDefinitions";
 
-    public static final String CONTRACT_SIMPLE_INPUT_NODE = "inputDefinition";
-
-    public static final String CONTRACT_COMPLEX_INPUT_NODE = "complexInputDefinition";
+    public static final String CONTRACT_INPUT_NODE = "inputDefinition";
 
     public static final String TYPE = "type";
 
@@ -373,6 +375,12 @@ public class XMLProcessDefinition {
     public static final String INPUT_NAMES = "inputDefinitionNames";
 
     public static final String INPUT_NAME = "inputDefinitionName";
+
+    public static final String CONTEXT_NODE = "context";
+
+    public static final String CONTEXT_ENTRY_NODE = "contextEntry";
+
+    public static final String CONTEXT_ENTRY_KEY = "key";
 
     public Map<Object, String> objectToId = new HashMap<Object, String>();
 
@@ -460,6 +468,7 @@ public class XMLProcessDefinition {
         if (contract != null) {
             rootNode.addChild(createContractNode(contract));
         }
+        rootNode.addChild(createContextNode(processDefinition.getContext()));
         return rootNode;
     }
 
@@ -534,8 +543,11 @@ public class XMLProcessDefinition {
                     fillUserFilterNode(userFilterNode, humanTaskDefinition.getUserFilter());
                     activityNode.addChild(userFilterNode);
                 }
-                if (humanTaskDefinition instanceof UserTaskDefinition && ((UserTaskDefinition) humanTaskDefinition).getContract() != null) {
-                    activityNode.addChild(createContractNode(((UserTaskDefinition) humanTaskDefinition).getContract()));
+                if (humanTaskDefinition instanceof UserTaskDefinition) {
+                    if (((UserTaskDefinition) humanTaskDefinition).getContract() != null) {
+                        activityNode.addChild(createContractNode(((UserTaskDefinition) humanTaskDefinition).getContract()));
+                    }
+                    activityNode.addChild(createContextNode(((UserTaskDefinition) humanTaskDefinition).getContext()));
                 }
             } else if (activity instanceof CallActivityDefinition) {
                 fillCallActivity((CallActivityDefinition) activity, activityNode);
@@ -564,14 +576,9 @@ public class XMLProcessDefinition {
     private XMLNode createContractNode(final ContractDefinition contract) {
         final XMLNode contractNode = new XMLNode(CONTRACT_NODE);
         final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
-        if (!contract.getSimpleInputs().isEmpty()) {
-            for (final SimpleInputDefinition input : contract.getSimpleInputs()) {
-                inputsNode.addChild(createSimpleInputNode(input));
-            }
-        }
-        if (!contract.getComplexInputs().isEmpty()) {
-            for (final ComplexInputDefinition input : contract.getComplexInputs()) {
-                inputsNode.addChild(createComplexInputNode(input));
+        if (!contract.getInputs().isEmpty()) {
+            for (final InputDefinition input : contract.getInputs()) {
+                inputsNode.addChild(createInputNode(input));
             }
         }
         if (!inputsNode.getChildNodes().isEmpty()) {
@@ -588,10 +595,20 @@ public class XMLProcessDefinition {
         return contractNode;
     }
 
+    private XMLNode createContextNode(final List<ContextEntry> context) {
+        final XMLNode contextNode = new XMLNode(CONTEXT_NODE);
+        for (final ContextEntry contextEntry : context) {
+            final XMLNode node = new XMLNode(CONTEXT_ENTRY_NODE);
+            node.addAttribute(CONTEXT_ENTRY_KEY, contextEntry.getKey());
+            addExpressionNode(node, EXPRESSION_NODE, contextEntry.getExpression());
+            contextNode.addChild(node);
+        }
+        return contextNode;
+    }
+
     private XMLNode createConstraintNode(final ConstraintDefinition constraintDefinition) {
         final XMLNode xmlNode = new XMLNode(CONTRACT_CONSTRAINT_NODE);
         xmlNode.addAttribute(NAME, constraintDefinition.getName());
-        xmlNode.addAttribute(CONSTRAINT_TYPE, constraintDefinition.getConstraintType().toString());
         xmlNode.addChild(CONSTRAINT_EXPRESSION, constraintDefinition.getExpression());
         xmlNode.addChild(CONSTRAINT_EXPLANATION, constraintDefinition.getExplanation());
         final XMLNode namesNode = new XMLNode(INPUT_NAMES);
@@ -602,26 +619,18 @@ public class XMLProcessDefinition {
         return xmlNode;
     }
 
-    private XMLNode createComplexInputNode(final ComplexInputDefinition input) {
-        final XMLNode inputNode = new XMLNode(CONTRACT_COMPLEX_INPUT_NODE);
+    private XMLNode createInputNode(final InputDefinition input) {
+        final XMLNode inputNode = new XMLNode(CONTRACT_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
         inputNode.addAttribute(MULTIPLE, String.valueOf(input.isMultiple()));
         inputNode.addAttribute(DESCRIPTION, input.getDescription());
-        for (final SimpleInputDefinition inputDefinition : input.getSimpleInputs()) {
-            inputNode.addChild(createSimpleInputNode(inputDefinition));
+        final Type type = input.getType();
+        if (type != null) {
+            inputNode.addAttribute(TYPE, type.toString());
         }
-        for (final ComplexInputDefinition inputDefinition : input.getComplexInputs()) {
-            inputNode.addChild(createComplexInputNode(inputDefinition));
+        for (final InputDefinition inputDefinition : input.getInputs()) {
+            inputNode.addChild(createInputNode(inputDefinition));
         }
-        return inputNode;
-    }
-
-    private XMLNode createSimpleInputNode(final SimpleInputDefinition input) {
-        final XMLNode inputNode = new XMLNode(CONTRACT_SIMPLE_INPUT_NODE);
-        inputNode.addAttribute(NAME, input.getName());
-        inputNode.addAttribute(MULTIPLE, String.valueOf(input.isMultiple()));
-        inputNode.addAttribute(DESCRIPTION, input.getDescription());
-        inputNode.addAttribute(TYPE, input.getType().toString());
         return inputNode;
     }
 
@@ -681,8 +690,22 @@ public class XMLProcessDefinition {
         addExpressionNode(activityNode, CALLABLE_ELEMENT_NODE, activity.getCallableElement());
         addExpressionNode(activityNode, CALLABLE_ELEMENT_VERSION_NODE, activity.getCallableElementVersion());
         createAndfillOperations(activityNode, activity.getDataInputOperations(), DATA_INPUT_OPERATION_NODE);
+        createAndfillContractInputs(activityNode, activity.getProcessStartContractInputs());
         createAndfillOperations(activityNode, activity.getDataOutputOperations(), DATA_OUTPUT_OPERATION_NODE);
         activityNode.addAttribute(CALLABLE_ELEMENT_TYPE, activity.getCallableElementType().name());
+    }
+
+    private void createAndfillContractInputs(XMLNode node, Map<String, Expression> contractInputs) {
+        final XMLNode contractInputsNode = new XMLNode(CONTRACT_INPUTS_EXPRESSION_NODE);
+        for (final Entry<String, Expression> input : contractInputs.entrySet()) {
+            final XMLNode contractInputNode = new XMLNode(CONTRACT_INPUT_EXPRESSION_NODE);
+            contractInputNode.addAttribute(NAME, input.getKey());
+            final XMLNode expressionNode = new XMLNode(EXPRESSION_NODE);
+            fillExpressionNode(expressionNode, input.getValue(), false);
+            contractInputNode.addChild(expressionNode);
+            contractInputsNode.addChild(contractInputNode);
+        }
+        node.addChild(contractInputsNode);
     }
 
     private void fillReceiveTask(final ReceiveTaskDefinition receiveTask, final XMLNode activityNode) {
@@ -1055,6 +1078,9 @@ public class XMLProcessDefinition {
         if (documentDefinition.getFile() != null) {
             documentDefinitionNode.addChild(DOCUMENT_DEFINITION_FILE, documentDefinition.getFile());
         }
+        if (documentDefinition.getInitialValue() != null) {
+            addExpressionNode(documentDefinitionNode, EXPRESSION_NODE, documentDefinition.getInitialValue());
+        }
     }
 
     private void fillDocumentListDefinitionNode(final XMLNode documentListDefinitionNode, final DocumentListDefinition documentListDefinition) {
@@ -1143,6 +1169,7 @@ public class XMLProcessDefinition {
         expressionNode.addAttribute(NAME, expression.getName());
         expressionNode.addAttribute(EXPRESSION_RETURN_TYPE, expression.getReturnType());
         expressionNode.addAttribute(EXPRESSION_INTERPRETER, expression.getInterpreter());
+        expressionNode.addAttribute(ID, String.valueOf(expression.getId()));
         expressionNode.addChild(EXPRESSION_CONTENT, expression.getContent());
         for (final Expression dependency : expression.getDependencies()) {
             final XMLNode dependencyExpression = new XMLNode(EXPRESSION_NODE);

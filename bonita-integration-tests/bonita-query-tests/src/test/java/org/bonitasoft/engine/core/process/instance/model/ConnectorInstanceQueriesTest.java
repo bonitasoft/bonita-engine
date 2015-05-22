@@ -184,4 +184,16 @@ public class ConnectorInstanceQueriesTest {
         assertThat(idsToFind).isEmpty();
     }
 
+    @Test
+    public void getConnectorInstancesWithFailureInState() {
+        List<SConnectorInstanceWithFailureInfo> connectors = repository
+                .getConnectorInstancesWithFailureInfo(containerId, containerType, ConnectorState.FAILED.toString(),
+                        PersistentObjectBuilder.DEFAULT_TENANT_ID);
+
+        final List<Long> idsToFind = Lists.newArrayList(expectedConnector5.getId(), expectedConnector6.getId());
+        assertThat(connectors).hasSize(2);
+        assertThat(idsToFind).contains(connectors.get(0).getId());
+        assertThat(idsToFind).contains(connectors.get(1).getId());
+    }
+
 }

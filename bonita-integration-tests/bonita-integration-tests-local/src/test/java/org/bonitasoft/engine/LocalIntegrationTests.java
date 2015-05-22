@@ -13,12 +13,16 @@
  **/
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.business.application.ApplicationAPIITs;
+import org.bonitasoft.engine.activity.UserTaskContractITest;
+import org.bonitasoft.engine.business.application.ApplicationIT;
+import org.bonitasoft.engine.business.application.ApplicationImportExportIT;
+import org.bonitasoft.engine.business.application.ApplicationMenuIT;
+import org.bonitasoft.engine.business.application.ApplicationPageIT;
 import org.bonitasoft.engine.business.data.BDRepositoryLocalIT;
 import org.bonitasoft.engine.form.FormMappingIT;
 import org.bonitasoft.engine.page.PageAPIIT;
 import org.bonitasoft.engine.tenant.TenantMaintenanceLocalIT;
-import org.bonitasoft.engine.test.APIMethodIT;
+import org.bonitasoft.engine.test.APIMethodLocalIT;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
@@ -30,15 +34,21 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         BPMLocalSuiteTests.class,
-        BPMRemoteTests.class,
+        BPMRemoteTestsLocal.class,
         FormMappingIT.class,
+        UserTaskContractITest.class,
         PageAPIIT.class,
-        ApplicationAPIITs.class,
-        APIMethodIT.class,
+        ApplicationIT.class,
+        ApplicationPageIT.class,
+        ApplicationMenuIT.class,
+        ApplicationImportExportIT.class,
+        APIMethodLocalIT.class,
         TenantMaintenanceLocalIT.class,
         BDRepositoryLocalIT.class,
+        //last test suite because it break the platform
+        AllBPMTests.class,
 })
-@Initializer(TestsInitializer.class)
+@Initializer(LocalServerTestsInitializer.class)
 public class LocalIntegrationTests {
 
     @BeforeClass

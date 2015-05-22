@@ -103,16 +103,13 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
         if (getPageMapping() == null) {
             return TARGET_UNDEFINED;
         }
-        if (getPageMapping().getPageId() != null) {
-            return TARGET_INTERNAL;
-        }
         if (getPageMapping().getUrl() != null) {
             return TARGET_URL;
         }
         if (getPageMapping().getUrlAdapter() != null) {
             return TARGET_LEGACY;
         }
-        return null;
+        return TARGET_INTERNAL;
     }
 
     @Override
@@ -135,5 +132,17 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), processDefinitionId, task, pageMapping, type, lastUpdateDate, lastUpdatedBy);
+    }
+
+    @Override
+    public String toString() {
+        return "SFormMappingImpl{" +
+                "processDefinitionId=" + processDefinitionId +
+                ", task='" + task + '\'' +
+                ", pageMapping=" + pageMapping +
+                ", type=" + type +
+                ", lastUpdateDate=" + lastUpdateDate +
+                ", lastUpdatedBy=" + lastUpdatedBy +
+                "} " + super.toString();
     }
 }

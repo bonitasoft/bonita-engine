@@ -13,10 +13,7 @@
  **/
 package org.bonitasoft.engine.event;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -120,38 +117,6 @@ public class TimerEventIT extends TestWithUser {
         // wait for process instance creation
         waitForUserTask(stepName);
 
-        disableAndDeleteProcess(definition);
-    }
-
-    //    uncomment to repeat random test
-    //    @Rule
-    //    public RepeatRule repeatRule = new RepeatRule();
-    //
-    //    @Repeat(times = 100)
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer cycle type.", jira = "")
-    @Test
-    public void timerStartEventCycle() throws Exception {
-        final Expression timerExpression = new ExpressionBuilder().createConstantStringExpression("*/1 * * * * ?"); // new instance created every second
-        final String stepName = "step1";
-        final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.CYCLE, timerExpression, stepName);
-
-        //when
-        Thread.sleep(2000);
-
-        //then
-        final List<ProcessInstance> firstProcessInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertThat(firstProcessInstances).as("should have started first instance").isNotEmpty();
-
-        //when
-        Thread.sleep(2000);
-
-        //then
-        final List<ProcessInstance> secondProcessInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertThat(secondProcessInstances).as("should have started another instance").isNotEmpty();
-        assertThat(secondProcessInstances.size()).as("should have started another instance").isGreaterThan(firstProcessInstances.size());
-
-        //cleanup
-        waitForUserTask(secondProcessInstances.get(secondProcessInstances.size() - 1), stepName);
         disableAndDeleteProcess(definition);
     }
 

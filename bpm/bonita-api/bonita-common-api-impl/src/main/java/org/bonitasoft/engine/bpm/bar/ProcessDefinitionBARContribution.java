@@ -38,12 +38,14 @@ import org.bonitasoft.engine.bpm.bar.xml.CallableElementVersionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CatchErrorEventTriggerDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CatchMessageEventTriggerDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CatchSignalEventTriggerDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.ComplexInputDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConditionalExpressionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionInputBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConstraintDefinitionBinding;
+import org.bonitasoft.engine.bpm.bar.xml.ContextDefinitionBinding;
+import org.bonitasoft.engine.bpm.bar.xml.ContextEntryBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ContractDefinitionBinding;
+import org.bonitasoft.engine.bpm.bar.xml.ContractInputBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationKeyBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationValueBinding;
@@ -62,6 +64,7 @@ import org.bonitasoft.engine.bpm.bar.xml.ExpressionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.FlowElementBinding;
 import org.bonitasoft.engine.bpm.bar.xml.GatewayDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.IncomingTransitionRefBinding;
+import org.bonitasoft.engine.bpm.bar.xml.InputDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.IntermediateCatchEventBinding;
 import org.bonitasoft.engine.bpm.bar.xml.IntermediateThrowEventDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.LeftOperandBinding;
@@ -78,7 +81,6 @@ import org.bonitasoft.engine.bpm.bar.xml.ProcessDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ReceiveTaskDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.RightOperandBinding;
 import org.bonitasoft.engine.bpm.bar.xml.SendTaskDefinitionBinding;
-import org.bonitasoft.engine.bpm.bar.xml.SimpleInputDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StandardLoopCharacteristicsBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StartEventDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StringIndexBinding;
@@ -95,7 +97,7 @@ import org.bonitasoft.engine.bpm.bar.xml.TransitionDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.UserFilterDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.UserTaskDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
+import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.io.IOUtil;
@@ -154,6 +156,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(IncomingTransitionRefBinding.class);
         bindings.add(CatchMessageEventTriggerDefinitionBinding.class);
         bindings.add(OperationBinding.class);
+        bindings.add(ContractInputBinding.class);
         bindings.add(RightOperandBinding.class);
         bindings.add(LeftOperandBinding.class);
         bindings.add(ThrowMessageEventTriggerDefinitionBinding.class);
@@ -182,8 +185,9 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(SubProcessDefinitionBinding.class);
         bindings.add(FlowElementBinding.class);
         bindings.add(ContractDefinitionBinding.class);
-        bindings.add(SimpleInputDefinitionBinding.class);
-        bindings.add(ComplexInputDefinitionBinding.class);
+        bindings.add(ContextDefinitionBinding.class);
+        bindings.add(ContextEntryBinding.class);
+        bindings.add(InputDefinitionBinding.class);
         bindings.add(ConstraintDefinitionBinding.class);
 
         //        final InputStream schemaStream = ProcessDefinitionBARContribution.class.getResourceAsStream("ProcessDefinition.xsd");
@@ -291,7 +295,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     }
 
     protected String generateInfosFromDefinition(final DesignProcessDefinition processDefinition) {
-        final FlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
+        final FlowElementContainerDefinition processContainer = processDefinition.getFlowElementContainer();
         return new StringBuilder("key1:").append(processDefinition.getActorsList().size()).append(",key2:").append(processContainer.getTransitions().size())
                 .append(",key3:").append(processContainer.getActivities().size()).toString();
     }

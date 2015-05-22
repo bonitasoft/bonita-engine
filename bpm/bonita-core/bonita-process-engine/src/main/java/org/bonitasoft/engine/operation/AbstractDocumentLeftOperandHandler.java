@@ -10,12 +10,10 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.operation;
 
-import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
-import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -49,15 +47,6 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
             processInstanceId = flowNodeInstance.getParentProcessInstanceId();
         }
         return processInstanceId;
-    }
-
-    protected DocumentValue toCheckedDocumentValue(final Object newValue) throws SOperationExecutionException {
-        final boolean isDocumentWithContent = newValue instanceof DocumentValue;
-        if (!isDocumentWithContent && newValue != null) {
-            throw new SOperationExecutionException("Document operation only accepts an expression returning a DocumentValue and not "
-                    + newValue.getClass().getName());
-        }
-        return (DocumentValue) newValue;
     }
 
     protected long getAuthorId() {

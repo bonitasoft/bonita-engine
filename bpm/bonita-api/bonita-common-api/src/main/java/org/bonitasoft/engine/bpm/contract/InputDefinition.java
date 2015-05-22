@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.contract;
 
+import java.util.List;
+
 import org.bonitasoft.engine.bpm.DescriptionElement;
 
 /**
@@ -21,8 +23,19 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
  * @author Matthieu Chaffotte
  * @since 7.0
  */
-public interface InputDefinition extends DescriptionElement {
+public interface InputDefinition extends DescriptionElement, InputContainerDefinition {
+
+    String FILE_INPUT_FILENAME = "filename";
+    String FILE_INPUT_CONTENT = "content";
 
     boolean isMultiple();
 
+    /**
+     * Gets the type of the input.
+     *
+     * @return the input {@link Type}
+     */
+    Type getType();
+
+    boolean hasChildren();
 }

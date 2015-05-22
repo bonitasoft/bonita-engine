@@ -10,20 +10,19 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 
 /**
  * @author Matthieu Chaffotte
@@ -32,26 +31,20 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
 
     private static final long serialVersionUID = -5281686322739618159L;
 
-    private final List<SSimpleInputDefinition> simpleInputs;
-
-    private final List<SComplexInputDefinition> complexInputs;
+    private final List<SInputDefinition> inputDefinitions;
 
     private final List<SConstraintDefinition> constraints;
 
     public SContractDefinitionImpl() {
         super();
-        simpleInputs = new ArrayList<SSimpleInputDefinition>();
-        complexInputs = new ArrayList<SComplexInputDefinition>();
-        constraints = new ArrayList<SConstraintDefinition>();
+        inputDefinitions = new ArrayList<>();
+        constraints = new ArrayList<>();
     }
 
     public SContractDefinitionImpl(final ContractDefinition contract) {
         this();
-        for (final SimpleInputDefinition input : contract.getSimpleInputs()) {
-            simpleInputs.add(new SSimpleInputDefinitionImpl(input));
-        }
-        for (final ComplexInputDefinition input : contract.getComplexInputs()) {
-            complexInputs.add(new SComplexInputDefinitionImpl(input));
+        for (final InputDefinition input : contract.getInputs()) {
+            inputDefinitions.add(new SInputDefinitionImpl(input));
         }
         for (final ConstraintDefinition rule : contract.getConstraints()) {
             constraints.add(new SConstraintDefinitionImpl(rule));
@@ -59,16 +52,12 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
     }
 
     @Override
-    public List<SSimpleInputDefinition> getSimpleInputs() {
-        return simpleInputs;
+    public List<SInputDefinition> getInputDefinitions() {
+        return inputDefinitions;
     }
 
-    public void addSimpleInput(final SSimpleInputDefinition input) {
-        simpleInputs.add(input);
-    }
-
-    public void addComplexInput(final SComplexInputDefinition input) {
-        complexInputs.add(input);
+    public void addInput(final SInputDefinition input) {
+        inputDefinitions.add(input);
     }
 
     @Override
@@ -80,57 +69,26 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
         constraints.add(rule);
     }
 
-
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        SContractDefinitionImpl that = (SContractDefinitionImpl) o;
+        return Objects.equals(inputDefinitions, that.inputDefinitions) &&
+                Objects.equals(constraints, that.constraints);
+    }
 
     @Override
-    public List<SComplexInputDefinition> getComplexInputs() {
-        return complexInputs;
+    public String toString() {
+        return "SContractDefinitionImpl{" +
+                "inputDefinitions=" + inputDefinitions +
+                ", constraints=" + constraints +
+                "} " + super.toString();
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (complexInputs == null ? 0 : complexInputs.hashCode());
-        result = prime * result + (constraints == null ? 0 : constraints.hashCode());
-        result = prime * result + (simpleInputs == null ? 0 : simpleInputs.hashCode());
-        return result;
+        return Objects.hash(super.hashCode(), inputDefinitions, constraints);
     }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SContractDefinitionImpl other = (SContractDefinitionImpl) obj;
-        if (complexInputs == null) {
-            if (other.complexInputs != null) {
-                return false;
-            }
-        } else if (!complexInputs.equals(other.complexInputs)) {
-            return false;
-        }
-        if (constraints == null) {
-            if (other.constraints != null) {
-                return false;
-            }
-        } else if (!constraints.equals(other.constraints)) {
-            return false;
-        }
-        if (simpleInputs == null) {
-            if (other.simpleInputs != null) {
-                return false;
-            }
-        } else if (!simpleInputs.equals(other.simpleInputs)) {
-            return false;
-        }
-        return true;
-    }
-
 }

@@ -53,6 +53,7 @@
                         </xs:complexType>
                     </xs:element>
                     <xs:element name="contract" type="definition:SContractDefinition" minOccurs="0" />
+                    <xs:element name="context" type="definition:SContextDefinition" minOccurs="0" maxOccurs="1" />
                 </xs:all>
                 <xs:attribute type="xs:string" name="version" use="required" />
                 <xs:attribute type="xs:string" name="bos_version" use="required" />
@@ -255,6 +256,7 @@
                 <xs:sequence>
                     <xs:element name="userFilter" type="definition:SUserFilterDefinition" minOccurs="0" maxOccurs="1" />
                     <xs:element name="contract" type="definition:SContractDefinition" minOccurs="0" />
+                    <xs:element name="context" type="definition:SContextDefinition" minOccurs="0" maxOccurs="1" />
                 </xs:sequence>
                 <xs:attribute name="actorName" type="xs:string" />
                 <xs:attribute name="priority" type="xs:string" />
@@ -302,6 +304,7 @@
                     <xs:element type="definition:SExpression" name="callableElement" minOccurs="1" maxOccurs="1" />
                     <xs:element type="definition:SExpression" name="callableElementVersion" minOccurs="0" maxOccurs="1" />
                     <xs:element type="definition:SOperation" name="dataInputOperation" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element type="definition:SContractInputs" name="contractInputs" minOccurs="0" maxOccurs="1" />
                     <xs:element type="definition:SOperation" name="dataOutputOperation" minOccurs="0" maxOccurs="unbounded" />
                 </xs:sequence>
                 <xs:attribute name="callableElementType">
@@ -354,7 +357,6 @@
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
                         <xs:choice>
                             <xs:element name="inputDefinition" type="definition:SInputDefinition" />
-                            <xs:element name="complexInputDefinition" type="definition:SComplexInputDefinition" />
                         </xs:choice>
                     </xs:sequence>
                 </xs:complexType>
@@ -372,6 +374,11 @@
     <xs:complexType name="SInputDefinition">
         <xs:complexContent>
             <xs:extension base="definition:SInputElement">
+                <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:choice>
+                        <xs:element name="inputDefinition" type="definition:SInputDefinition" />
+                    </xs:choice>
+                </xs:sequence>
                 <xs:attribute name="type">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
@@ -381,22 +388,10 @@
                             <xs:enumeration value="INTEGER" />
                             <xs:enumeration value="DECIMAL" />
                             <xs:enumeration value="BYTE_ARRAY" />
+                            <xs:enumeration value="FILE" />
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="SComplexInputDefinition">
-        <xs:complexContent>
-            <xs:extension base="definition:SInputElement">
-                <xs:sequence minOccurs="1" maxOccurs="unbounded">
-                    <xs:choice>
-                        <xs:element name="inputDefinition" type="definition:SInputDefinition" />
-                        <xs:element name="complexInputDefinition" type="definition:SComplexInputDefinition" />
-                    </xs:choice>
-                </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -406,7 +401,7 @@
             <xs:extension base="definition:SNamedElement">
                 <xs:sequence>
                     <xs:element name="conditionalExpression" type="xs:string" />
-                    <xs:element name="explanation" type="xs:string" />
+                    <xs:element name="explanation" type="xs:string" minOccurs="0" maxOccurs="1"/>
                     <xs:element name="inputDefinitionNames" minOccurs="0" maxOccurs="1">
                         <xs:complexType>
                             <xs:sequence minOccurs="1" maxOccurs="unbounded">
@@ -415,16 +410,21 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute name="type" use="required">
-                    <xs:simpleType>
-                        <xs:restriction base="xs:string">
-                            <xs:enumeration value="CUSTOM" />
-                            <xs:enumeration value="MANDATORY" />
-                        </xs:restriction>
-                    </xs:simpleType>
-                </xs:attribute>
             </xs:extension>
         </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="SContextDefinition">
+        <xs:sequence>
+            <xs:element name="contextEntry" type="definition:SContextEntry" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SContextEntry">
+        <xs:sequence>
+            <xs:element name="expression" type="definition:SExpression" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="key" type="xs:string" />
     </xs:complexType>
 
     <xs:complexType name="SConnectorDefinition">
@@ -558,6 +558,7 @@
                     <xs:element name="url" type="xs:string" minOccurs="0" />
                     <xs:element name="file" type="xs:string" minOccurs="0" />
                     <xs:element name="fileName" type="xs:string" minOccurs="0" />
+                    <xs:element name="expression" type="definition:SExpression" minOccurs="0" />
                 </xs:all>
                 <xs:attribute name="mimeType" type="xs:string" use="required" />
             </xs:extension>
@@ -818,5 +819,11 @@
 
     <xs:complexType name="SBaseElement">
         <xs:attribute name="id" type="xs:long" />
+    </xs:complexType>
+
+    <xs:complexType name="SContractInputs">
+        <xs:sequence>
+            <xs:element name="contractInput" minOccurs="0" maxOccurs="unbounded" type="definition:SIOExpression" />
+        </xs:sequence>
     </xs:complexType>
 </xs:schema>

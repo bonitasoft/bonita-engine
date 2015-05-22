@@ -662,8 +662,6 @@ public class ProcessCategoryIT extends TestWithTechnicalUser {
         final long processDefinitionId = processDefinition.getId();
         processDefinitionCount = getProcessAPI().getNumberOfUncategorizedProcessDefinitions();
         assertEquals(1, processDefinitionCount);
-
-        deleteProcess(processDefinitionId);
     }
 
     @Test

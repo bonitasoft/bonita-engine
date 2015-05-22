@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.io.IOException;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
@@ -41,22 +42,26 @@ import org.bonitasoft.engine.util.APITypeManager;
 public class PlatformAPIAccessor {
 
     private static ServerAPI getServerAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        final ApiAccessType apiType = APITypeManager.getAPIType();
-        Map<String, String> parameters = null;
-        switch (apiType) {
-            case LOCAL:
-                return LocalServerAPIFactory.getServerAPI();
-            case EJB3:
-                parameters = APITypeManager.getAPITypeParameters();
-                return new EJB3ServerAPI(parameters);
-            case HTTP:
-                parameters = APITypeManager.getAPITypeParameters();
-                return new HTTPServerAPI(parameters);
-            case TCP:
-                parameters = APITypeManager.getAPITypeParameters();
-                return new TCPServerAPI(parameters);
-            default:
-                throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
+        try {
+            final ApiAccessType apiType = APITypeManager.getAPIType();
+            Map<String, String> parameters = null;
+            switch (apiType) {
+                case LOCAL:
+                    return LocalServerAPIFactory.getServerAPI();
+                case EJB3:
+                    parameters = APITypeManager.getAPITypeParameters();
+                    return new EJB3ServerAPI(parameters);
+                case HTTP:
+                    parameters = APITypeManager.getAPITypeParameters();
+                    return new HTTPServerAPI(parameters);
+                case TCP:
+                    parameters = APITypeManager.getAPITypeParameters();
+                    return new TCPServerAPI(parameters);
+                default:
+                    throw new UnknownAPITypeException("Unsupported API Type: " + apiType);
+            }
+        } catch (IOException e) {
+            throw new ServerAPIException(e);
         }
     }
 

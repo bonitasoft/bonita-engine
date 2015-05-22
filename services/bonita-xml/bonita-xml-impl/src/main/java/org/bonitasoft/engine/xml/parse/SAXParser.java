@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.xml.parse;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -82,6 +83,10 @@ public class SAXParser implements Parser {
         }
     }
 
+    @Override
+    public Object getObjectFromXML(final byte[] bytes) throws SXMLParseException, IOException {
+        return getObjectFromXML(new ByteArrayInputStream(bytes));
+    }
     @Override
     public Object getObjectFromXML(final InputStream xmlStream) throws SXMLParseException, IOException {
         final InputStreamReader xmlInputStreamReader = new InputStreamReader(xmlStream, Charset.forName(UTF_8));

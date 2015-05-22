@@ -18,6 +18,5 @@ package org.bonitasoft.engine.bpm.contract;
  * @since 7.0
  */
 public enum Type {
-    TEXT, BOOLEAN, DATE, INTEGER, DECIMAL, BYTE_ARRAY
-
+    TEXT, BOOLEAN, DATE, INTEGER, DECIMAL, BYTE_ARRAY, FILE
 }

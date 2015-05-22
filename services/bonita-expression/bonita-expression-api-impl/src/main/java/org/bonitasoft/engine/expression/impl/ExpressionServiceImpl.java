@@ -53,7 +53,7 @@ public class ExpressionServiceImpl implements ExpressionService {
             final boolean checkExpressionReturnType, final TimeTracker timeTracker) {
         super();
         final List<ExpressionExecutorStrategy> expressionExecutors = expressionExecutorStrategyProvider.getExpressionExecutors();
-        expressionExecutorsMap = new HashMap<ExpressionKind, ExpressionExecutorStrategy>(expressionExecutors.size());
+        expressionExecutorsMap = new HashMap<>(expressionExecutors.size());
         this.checkExpressionReturnType = checkExpressionReturnType;
         for (final ExpressionExecutorStrategy expressionExecutorStrategy : expressionExecutors) {
             expressionExecutorsMap.put(expressionExecutorStrategy.getExpressionKind(), expressionExecutorStrategy);
@@ -87,16 +87,7 @@ public class ExpressionServiceImpl implements ExpressionService {
         } finally {
             if (timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSION)) {
                 final long endTime = System.currentTimeMillis();
-                final StringBuilder desc = new StringBuilder();
-                desc.append("Expression: ");
-                desc.append(expression);
-                desc.append(" - ");
-                desc.append("dependencyValues: ");
-                desc.append(dependencyValues);
-                desc.append(" - ");
-                desc.append("strategy: ");
-                desc.append(expressionExecutorStrategy);
-                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION, desc.toString(), endTime - startTime);
+                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION, "Expression: " + expression + " - " + "dependencyValues: " + dependencyValues + " - " + "strategy: " + expressionExecutorStrategy, endTime - startTime);
             }
         }
         if (mustCheckExpressionReturnType()) {
@@ -151,16 +142,7 @@ public class ExpressionServiceImpl implements ExpressionService {
         } finally {
             if (timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSIONS)) {
                 final long endTime = System.currentTimeMillis();
-                final StringBuilder desc = new StringBuilder();
-                desc.append("Expressions: ");
-                desc.append(expressions);
-                desc.append(" - ");
-                desc.append("dependencyValues: ");
-                desc.append(dependencyValues);
-                desc.append(" - ");
-                desc.append("strategy: ");
-                desc.append(expressionExecutorStrategy);
-                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSIONS, desc.toString(), endTime - startTime);
+                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSIONS, "Expressions: " + expressions + " - " + "dependencyValues: " + dependencyValues + " - " + "strategy: " + expressionExecutorStrategy, endTime - startTime);
             }
         }
         if (list == null || list.size() != expressions.size()) {

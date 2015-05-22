@@ -16,6 +16,8 @@ package org.bonitasoft.engine.platform.command;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
+
 import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformCommandAPI;
@@ -34,7 +36,7 @@ public class PlatformCommandIT extends CommonAPIIT {
     private static PlatformSession session;
 
     @Before
-    public void before() throws BonitaException {
+    public void before() throws BonitaException, IOException {
         session = loginOnPlatform();
         platformCommandAPI = PlatformAPIAccessor.getPlatformCommandAPI(session);
     }

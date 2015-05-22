@@ -1,0 +1,111 @@
+<project name="bonita-engine-home" default="build-home" >
+
+	<property name="target.dir" value="${basedir}/target"/>
+	<property name="resources.dir" value="${basedir}/src/main/resources"/>
+	<property name="bh.dir" value="${target.dir}/bonita-home"/>
+
+	<target name="build-home">
+		<delete dir="${bh.dir}" />
+
+		<!-- ENGINE CLIENT WORK -->
+
+		<copy todir="${bh.dir}/engine-client/work">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-client-community.properties"/>
+			</fileset>
+		</copy>
+
+		<!-- ENGINE CLIENT CONF -->
+		<copy file="${resources.dir}/bonita-client-community.properties" tofile="${bh.dir}/engine-client/conf/bonita-client-custom.properties">
+			<filterchain>
+				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+					<param name="prefix" value="#"/>
+				</filterreader>
+			</filterchain>
+		</copy>
+
+		<!-- ENGINE SERVER -->
+
+		<!-- ENGINE SERVER - WORK -->
+		<copy todir="${bh.dir}/engine-server/work/platform-init">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-platform-init-community.xml"/>
+				<include name="bonita-platform-init-community.properties"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${bh.dir}/engine-server/work/platform">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-platform-community.properties"/>
+				<include name="bonita-platform-private-community.properties"/>
+				<include name="bonita-platform-community.xml"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${bh.dir}/engine-server/work/platform">
+			<fileset dir="${target.dir}">
+				<include name="VERSION"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${bh.dir}/engine-server/work/tenants/template">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-tenant-community.properties"/>
+				<include name="bonita-tenant-private-community.properties"/>
+				<include name="bonita-tenant-community.xml"/>
+			</fileset>
+		</copy>
+
+		<!-- ENGINE SERVER - CONF -->
+
+		<copy todir="${bh.dir}/engine-server/conf/platform-init">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-platform-init-custom.xml"/>
+			</fileset>
+		</copy>
+
+
+		<copy file="${resources.dir}/bonita-platform-init-community.properties" tofile="${bh.dir}/engine-server/conf/platform-init/bonita-platform-init-community-custom.properties">
+			<filterchain>
+				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+					<param name="prefix" value="#"/>
+				</filterreader>
+			</filterchain>
+		</copy>
+
+		<copy todir="${bh.dir}/engine-server/conf/platform">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-platform-custom.xml"/>
+			</fileset>
+		</copy>
+
+		<copy file="${resources.dir}/bonita-platform-community.properties" tofile="${bh.dir}/engine-server/conf/platform/bonita-platform-community-custom.properties">
+			<filterchain>
+				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+					<param name="prefix" value="#"/>
+				</filterreader>
+			</filterchain>
+		</copy>
+
+		<copy todir="${bh.dir}/engine-server/conf/tenants/template">
+			<fileset dir="${resources.dir}">
+				<include name="bonita-tenants-custom.xml"/>
+			</fileset>
+		</copy>
+
+		<copy file="${resources.dir}/bonita-tenant-community.properties" tofile="${bh.dir}/engine-server/conf/tenants/template/bonita-tenant-community-custom.properties">
+			<filterchain>
+				<filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+					<param name="prefix" value="#"/>
+				</filterreader>
+			</filterchain>
+		</copy>
+
+		<!-- ENGINE SERVER - TEMP -->
+		<mkdir dir="${bh.dir}/engine-server/temp/tenants/template"/>
+		<mkdir dir="${bh.dir}/engine-server/temp/platform"/>
+		<mkdir dir="${bh.dir}/engine-server/temp/platform-init"/>
+
+	</target>
+
+</project>

@@ -44,6 +44,8 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private final ThreadLocal<List<Callable<Void>>> beforeCommitCallables = new ThreadLocal<List<Callable<Void>>>();
 
+    private ThreadLocal<String> txLastBegin = new ThreadLocal<>();
+
     public JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager) {
         this.logger = logger;
         if (txManager == null) {
@@ -58,7 +60,17 @@ public class JTATransactionServiceImpl implements TransactionService {
         try {
             final TransactionServiceContext txContext = txContextThreadLocal.get();
             if (txContext.reentrantCounter() == 1) {
-                throw new STransactionCreationException("We do not support nested calls to the transaction service.");
+                TransactionState txState = null;
+                try {
+                    txState = getState();
+                } catch (STransactionException e) {
+                    e.printStackTrace();
+                }
+                String message = "We do not support nested calls to the transaction service. Current state is: " + txState + ". ";
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
+                    message += "Last begin made by: " + txLastBegin.get();
+                }
+                throw new STransactionCreationException(message);
             }
             txContext.incrementReentrantCounter();
 
@@ -106,6 +118,17 @@ public class JTATransactionServiceImpl implements TransactionService {
             }
 
             numberOfActiveTransactions.getAndIncrement();
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(this.getClass().getName() + " new transaction started by: ");
+                sb.append("\n");
+                final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+                for (final StackTraceElement stackTraceElement : stackTraceElements) {
+                    sb.append("\n        at ");
+                    sb.append(stackTraceElement);
+                }
+                txLastBegin.set(sb.toString());
+            }
         } catch (final NotSupportedException e) {
             // Should never happen as we do not want to support nested transaction
             throw new STransactionCreationException(e);
@@ -143,6 +166,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             } else {
                 commit();
             }
+            this.txLastBegin.set(null);
         } catch (final SystemException e) {
             throw new STransactionCommitException(e);
         }

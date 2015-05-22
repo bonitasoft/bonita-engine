@@ -18,11 +18,7 @@ import java.util.List;
 /**
  * @author Matthieu Chaffotte
  */
-public interface SContractDefinition extends SBaseElement {
-
-    List<SSimpleInputDefinition> getSimpleInputs();
-
-    List<SComplexInputDefinition> getComplexInputs();
+public interface SContractDefinition extends SInputContainerDefinition {
 
     List<SConstraintDefinition> getConstraints();
 

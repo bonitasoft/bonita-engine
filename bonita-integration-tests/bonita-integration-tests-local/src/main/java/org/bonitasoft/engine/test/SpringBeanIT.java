@@ -22,15 +22,21 @@ import java.util.List;
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.LocalServerTestsInitializer;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Celine Souchet
  */
+@RunWith(BonitaTestRunner.class)
+@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class SpringBeanIT {
 
     private static final String BONITA_HOME = "bonita.home";
@@ -73,7 +79,7 @@ public class SpringBeanIT {
                 for (final File subdir : subdirs) {
                     iterateOnDirectory(subdir);
                 }
-            } else if (file.isFile() && file.getName().startsWith("cfg") && file.getName().endsWith(".xml")) {
+            } else if (file.isFile() && (file.getName().startsWith("bonita") || file.getName().startsWith("cfg")) && file.getName().endsWith(".xml")) {
                 findAllBeansOfDocument(parse(file));
             }
         }

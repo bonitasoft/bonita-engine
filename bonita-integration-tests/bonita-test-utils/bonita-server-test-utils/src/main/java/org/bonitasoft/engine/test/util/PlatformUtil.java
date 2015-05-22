@@ -13,20 +13,14 @@
  **/
 package org.bonitasoft.engine.test.util;
 
-import java.util.List;
-
+import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
-import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
-import org.bonitasoft.engine.platform.exception.STenantDeletionException;
-import org.bonitasoft.engine.platform.exception.STenantException;
 import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
-import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.session.SessionService;
@@ -41,6 +35,8 @@ public class PlatformUtil {
 
     public static final String DEFAULT_TENANT_STATUS = "DEACTIVATED";
 
+    public static final String TENANT_STATUS_ACTIVATED = "ACTIVATED";
+
     public static long createTenant(final TransactionService transactionService, final PlatformService platformService,
             final String tenantName, final String createdBy, final String status) throws Exception {
         try {
@@ -51,6 +47,7 @@ public class PlatformUtil {
                     false);
             final STenant tenant = tenantBuilder.done();
             platformService.createTenant(tenant);
+            BonitaHomeServer.getInstance().createTenant(tenant.getId());
             platformService.activateTenant(tenant.getId());
             return tenant.getId();
         } finally {
@@ -68,17 +65,9 @@ public class PlatformUtil {
                     .createNewInstance(tenantName, createdBy, created, status, true);
             final STenant tenant = tenantBuilder.done();
             platformService.createTenant(tenant);
+            BonitaHomeServer.getInstance().createTenant(tenant.getId());
             platformService.activateTenant(tenant.getId());
             return tenant.getId();
-        } finally {
-            transactionService.complete();
-        }
-    }
-
-    public static boolean isPlatformCreated(final TransactionService transactionService, final PlatformService platformService) throws Exception {
-        try {
-            transactionService.begin();
-            return platformService.isPlatformCreated();
         } finally {
             transactionService.complete();
         }
@@ -102,67 +91,16 @@ public class PlatformUtil {
         }
     }
 
-    public static void createPlatform(final TransactionService transactionService, final PlatformService platformService)
-            throws Exception {
-        final String version = "myVersion";
-        final String previousVersion = "previousVersion";
-        final String initialVersion = "initialVersion";
-        final String createdBy = "mycreatedBy";
-        final long created = System.currentTimeMillis();
-
-        platformService.createTables();
-
-        try {
-            transactionService.begin();
-            platformService.initializePlatformStructure();
-        } finally {
-            transactionService.complete();
-        }
-
-        final SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class)
-                .createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
-        try {
-            transactionService.begin();
-            platformService.createPlatform(platform);
-        } finally {
-            transactionService.complete();
-        }
+    public static void createPlatform() throws CreationException {
+        new PlatformAPIImpl().createPlatform();
     }
 
-    public static void deletePlatform(final TransactionService transactionService, final PlatformService platformService) throws Exception {
-        try {
-            transactionService.begin();
-            deactiveAndDeleteAllTenants(platformService);
-            platformService.deletePlatform();
-        } finally {
-            transactionService.complete();
-        }
-        platformService.deleteTables();
-    }
-
-    private static void deactiveAndDeleteAllTenants(final PlatformService platformService) throws STenantException, STenantNotFoundException,
-    STenantDeactivationException, STenantDeletionException, SDeletingActivatedTenantException {
-        List<STenant> existingTenants;
-        do {
-            existingTenants = platformService.getTenants(new QueryOptions(0, 100, STenant.class, "id", OrderByType.ASC));
-            for (final STenant sTenant : existingTenants) {
-                final long tenantId = sTenant.getId();
-                platformService.deactiveTenant(tenantId);
-                platformService.deleteTenant(tenantId);
-            }
-        } while (existingTenants.size() == 100);
-    }
-
-    public static String getDefaultTenantName() {
-        return DEFAULT_TENANT_NAME;
+    public static void deletePlatform() throws DeletionException {
+        new PlatformAPIImpl().deletePlatform();
     }
 
     public static long getDefaultTenantId(final PlatformService platformService) throws STenantNotFoundException {
         return platformService.getDefaultTenant().getId();
-    }
-
-    public static String getDefaultCreatedBy() {
-        return DEFAULT_CREATED_BY;
     }
 
     public static long createDefaultTenant(final TransactionService transactionService, final PlatformService platformService) throws Exception {

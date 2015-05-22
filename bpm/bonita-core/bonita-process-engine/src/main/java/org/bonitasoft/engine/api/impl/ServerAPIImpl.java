@@ -229,13 +229,14 @@ public class ServerAPIImpl implements ServerAPI {
     private ClassLoader beforeInvokeMethodForAPISession(final SessionAccessor sessionAccessor, final ServiceAccessorFactory serviceAccessorFactory,
             final PlatformServiceAccessor platformServiceAccessor, final Session session) throws  SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        final SessionService sessionService = platformServiceAccessor.getSessionService();
 
         checkTenantSession(platformServiceAccessor, session);
+        final long tenantId = ((APISession) session).getTenantId();
+        final SessionService sessionService = platformServiceAccessor.getTenantServiceAccessor(tenantId).getSessionService();
         sessionService.renewSession(session.getId());
-        sessionAccessor.setSessionInfo(session.getId(), ((APISession) session).getTenantId());
+        sessionAccessor.setSessionInfo(session.getId(), tenantId);
         final ClassLoader serverClassLoader = getTenantClassLoader(platformServiceAccessor, session);
-        setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(((APISession) session).getTenantId()).getTechnicalLoggerService());
+        setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(tenantId).getTechnicalLoggerService());
         return serverClassLoader;
     }
 
@@ -285,7 +286,7 @@ public class ServerAPIImpl implements ServerAPI {
 
     protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session, boolean isInTransaction) {
         if (!isNodeInAValidStateFor(method)) {
-            logNodeNotStartedMessage(apiInterfaceName, method.getName());
+            logNodeNotStartedMessage(apiInterfaceName, method);
             throw new NodeNotStartedException();
         }
         // we don't check if tenant is in pause mode at platform level and when there is no session
@@ -390,9 +391,9 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
 
-    protected void logNodeNotStartedMessage(final String apiInterfaceName, final String methodName) {
-        logTechnicalErrorMessage("Node not started. Method '" + apiInterfaceName + "." + methodName
-                + "' cannot be called until node has been started (PlatformAPI.startNode())");
+    protected void logNodeNotStartedMessage(final String apiInterfaceName, final Method method) {
+        logTechnicalErrorMessage("Node not started. Method '" + apiInterfaceName + "." + method.getName()
+                + "' cannot be called until node has been started (PlatformAPI.startNode()). Exact class: " + method.getDeclaringClass().getName());
     }
 
     protected void logTechnicalErrorMessage(final String message) {

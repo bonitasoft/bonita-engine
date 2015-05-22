@@ -249,6 +249,9 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                 }
                 // shutdown();
             }
+            if(scheduler.isShutdown()){
+                initializeScheduler();
+            }
 
             scheduler.start();
 

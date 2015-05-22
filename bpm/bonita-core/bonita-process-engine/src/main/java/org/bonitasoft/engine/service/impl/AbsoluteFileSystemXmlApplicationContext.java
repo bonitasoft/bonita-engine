@@ -36,9 +36,9 @@ public class AbsoluteFileSystemXmlApplicationContext extends FileSystemXmlApplic
      * @throws BeansException
      *             if context creation failed
      */
-    public AbsoluteFileSystemXmlApplicationContext(final String[] configLocations, final boolean refresh, final ApplicationContext parent)
+    public AbsoluteFileSystemXmlApplicationContext(final String[] configLocations, final ApplicationContext parent)
             throws BeansException {
-        super(configLocations, refresh, parent);
+        super(configLocations, false, parent);
 
     }
 

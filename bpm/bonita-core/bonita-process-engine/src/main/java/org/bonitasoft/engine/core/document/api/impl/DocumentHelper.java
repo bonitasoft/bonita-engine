@@ -10,13 +10,14 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.document.api.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -28,6 +29,7 @@ import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
+import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
@@ -84,13 +86,11 @@ public class DocumentHelper {
         } catch (final SProcessInstanceNotFoundException e) {
             throw new SObjectNotFoundException("Unable to find the list " + documentName + ", nothing in database and the process instance "
                     + processInstanceId + " is not found", e);
-        } catch (final SProcessInstanceReadException e) {
+        } catch (final SProcessInstanceReadException | SProcessDefinitionReadException e) {
             throw new SBonitaReadException(e);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new SObjectNotFoundException("Unable to find the list " + documentName + " on process instance " + processInstanceId
                     + ", nothing in database and the process definition is not found", e);
-        } catch (final SProcessDefinitionReadException e) {
-            throw new SBonitaReadException(e);
         }
         return false;
     }
@@ -112,7 +112,18 @@ public class DocumentHelper {
         }
     }
 
-    public void createOrUpdateDocument(final DocumentValue newValue, final String documentName, final long processInstanceId, final long authorId)
+    /**
+     * @param newValue the new value
+     * @param documentName the name of the document
+     * @param processInstanceId the id of the process instance
+     * @param authorId the author id
+     * @param description used only when creating a document
+     * @throws SBonitaReadException
+     * @throws SObjectCreationException
+     * @throws SObjectModificationException
+     */
+    public void createOrUpdateDocument(final DocumentValue newValue, final String documentName, final long processInstanceId, final long authorId,
+            String description)
             throws SBonitaReadException, SObjectCreationException, SObjectModificationException {
         final SDocument document = createDocumentObject(newValue, authorId);
         try {
@@ -121,7 +132,7 @@ public class DocumentHelper {
             // a document exist, update it with the new values
             documentService.updateDocument(mappedDocument, document);
         } catch (final SObjectNotFoundException e) {
-            documentService.attachDocumentToProcessInstance(document, processInstanceId, documentName, null);
+            documentService.attachDocumentToProcessInstance(document, processInstanceId, documentName, description);
         }
     }
 
@@ -197,4 +208,46 @@ public class DocumentHelper {
             documentService.attachDocumentToProcessInstance(createDocumentObject(documentValue, authorId), processInstanceId, documentName, null, index);
         }
     }
+
+    public DocumentValue toCheckedDocumentValue(final Object newValue) throws SOperationExecutionException {
+        if (newValue != null) {
+            final boolean isFileInput = newValue instanceof FileInputValue;
+            if (isFileInput) {
+                FileInputValue fileInput = ((FileInputValue) newValue);
+                return toDocumentValue(fileInput);
+            }
+            final boolean isDocumentWithContent = newValue instanceof DocumentValue;
+            if (!isDocumentWithContent) {
+                throw new SOperationExecutionException("Document operation only accepts an expression returning a DocumentValue and not "
+                        + newValue.getClass().getName());
+            }
+        }
+        return (DocumentValue) newValue;
+    }
+
+    public DocumentValue toDocumentValue(FileInputValue fileInput) {
+        return new DocumentValue(fileInput.getContent(), null, fileInput.getFileName());
+    }
+
+    public List<DocumentValue> toCheckedList(final Object newValue) throws SOperationExecutionException {
+        if (!(newValue instanceof List)) {
+            throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
+        }
+        List<DocumentValue> newList = new ArrayList<>(((List) newValue).size());
+        for (final Object item : (List<?>) newValue) {
+            if (item instanceof FileInputValue) {
+                newList.add(toDocumentValue((FileInputValue) item));
+                continue;
+            }
+            if (item instanceof DocumentValue) {
+                newList.add((DocumentValue) item);
+                continue;
+
+            }
+            throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
+
+        }
+        return newList;
+    }
+
 }

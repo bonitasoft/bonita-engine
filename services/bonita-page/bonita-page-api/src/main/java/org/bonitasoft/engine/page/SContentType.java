@@ -8,4 +8,6 @@ public interface SContentType {
     String PAGE = "page";
 
     String FORM = "form";
+
+    String API_EXTENSION= "apiExtension";
 }

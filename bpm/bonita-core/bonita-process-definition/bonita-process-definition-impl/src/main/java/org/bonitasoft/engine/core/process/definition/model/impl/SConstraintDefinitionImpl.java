@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
 
 /**
  * @author Matthieu Chaffotte
@@ -33,18 +32,15 @@ public class SConstraintDefinitionImpl extends SNamedElementImpl implements SCon
 
     private final List<String> inputNames;
 
-    private final SConstraintType constraintType;
-
-    public SConstraintDefinitionImpl(final String name, final String expression, final String explanation, final SConstraintType constraintType) {
+    public SConstraintDefinitionImpl(final String name, final String expression, final String explanation) {
         super(name);
-        this.constraintType = constraintType;
         this.explanation = explanation;
         this.expression = expression;
         inputNames = new ArrayList<String>();
     }
 
     public SConstraintDefinitionImpl(final ConstraintDefinition rule) {
-        this(rule.getName(), rule.getExpression(), rule.getExplanation(), SConstraintType.valueOf(rule.getConstraintType().toString()));
+        this(rule.getName(), rule.getExpression(), rule.getExplanation());
         for (final String inputName : rule.getInputNames()) {
             inputNames.add(inputName);
         }
@@ -67,11 +63,6 @@ public class SConstraintDefinitionImpl extends SNamedElementImpl implements SCon
 
     public void addInputName(final String inputName) {
         inputNames.add(inputName);
-    }
-
-    @Override
-    public SConstraintType getConstraintType() {
-        return constraintType;
     }
 
 }

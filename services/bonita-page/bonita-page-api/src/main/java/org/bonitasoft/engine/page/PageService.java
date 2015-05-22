@@ -38,6 +38,8 @@ public interface PageService extends TenantLifecycleService {
 
     String PROPERTIES_DESCRIPTION = "description";
 
+    String PROPERTIES_CONTENT_TYPE = "contentType";
+
     String PROPERTIES_NAME = "name";
 
     String PAGE = "PAGE";

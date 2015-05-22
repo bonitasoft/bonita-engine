@@ -10,26 +10,26 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.execution;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.bpm.bar.DocumentsResourcesContribution;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionException;
+import org.bonitasoft.engine.bpm.contract.validation.ContractValidator;
+import org.bonitasoft.engine.bpm.contract.validation.ContractValidatorFactory;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -48,18 +48,18 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadExce
 import org.bonitasoft.engine.core.contract.data.ContractDataService;
 import org.bonitasoft.engine.core.contract.data.SContractDataCreationException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.model.SDocument;
-import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
+import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
+import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -78,6 +78,7 @@ import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
@@ -112,6 +113,7 @@ import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -121,6 +123,7 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
@@ -138,55 +141,35 @@ import org.bonitasoft.engine.work.WorkService;
 public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected final ActivityInstanceService activityInstanceService;
-
-    private final FlowNodeExecutor flowNodeExecutor;
-
-    private final TechnicalLoggerService logger;
-
     protected final ProcessInstanceService processInstanceService;
-
-    private final WorkService workService;
-
-    private final ProcessDefinitionService processDefinitionService;
-
-    private final GatewayInstanceService gatewayInstanceService;
-
-    private final TransitionService transitionService;
-
-    private final EventInstanceService eventInstanceService;
-
     protected final ClassLoaderService classLoaderService;
-
     protected final ExpressionResolverService expressionResolverService;
-
+    protected final ExpressionService expressionService;
     protected final ConnectorService connectorService;
-
-    private final OperationService operationService;
-
-    private final DocumentService documentService;
-
-    private final ReadSessionAccessor sessionAccessor;
-
     protected final BPMInstancesCreator bpmInstancesCreator;
-
     protected final EventsHandler eventsHandler;
-
+    private final FlowNodeExecutor flowNodeExecutor;
+    private final TechnicalLoggerService logger;
+    private final WorkService workService;
+    private final ProcessDefinitionService processDefinitionService;
+    private final GatewayInstanceService gatewayInstanceService;
+    private final TransitionService transitionService;
+    private final EventInstanceService eventInstanceService;
+    private final OperationService operationService;
+    private final ReadSessionAccessor sessionAccessor;
     private final ConnectorInstanceService connectorInstanceService;
-
     private final TransitionEvaluator transitionEvaluator;
-
-    private BusinessDataRepository businessDataRepository;
-
-    private RefBusinessDataService refBusinessDataService;
-
     private final ContractDataService contractDataService;
+    private final BusinessDataRepository businessDataRepository;
+    private final RefBusinessDataService refBusinessDataService;
+    private final DocumentHelper documentHelper;
 
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
             final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
             final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
             final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
-            final ExpressionResolverService expressionResolverService, final EventService eventService,
+            final ExpressionResolverService expressionResolverService, final ExpressionService expressionService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
             final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager, BusinessDataRepository businessDataRepository,
@@ -206,7 +189,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.classLoaderService = classLoaderService;
         this.operationService = operationService;
         this.expressionResolverService = expressionResolverService;
-        this.documentService = documentService;
+        this.expressionService = expressionService;
         this.sessionAccessor = sessionAccessor;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -214,6 +197,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.businessDataRepository = businessDataRepository;
         this.refBusinessDataService = refBusinessDataService;
         this.contractDataService = contractDataService;
+        documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
         // dependency injection because of circular references...
         flowNodeStateManager.setProcessExecutor(this);
         eventsHandler.setProcessExecutor(this);
@@ -423,7 +407,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         initializeData(sProcessDefinition, sProcessInstance);
         initializeBusinessData(sProcessDefinition, sProcessInstance, expressionContext);
 
-        createDocuments(sProcessDefinition, sProcessInstance, userId);
+        createDocuments(sProcessDefinition, sProcessInstance, userId, expressionContext, context);
         createDocumentLists(sProcessDefinition, sProcessInstance, userId, expressionContext, context);
         if (connectors != null) {
             executeConnectors(sProcessDefinition, sProcessInstance, connectors);
@@ -447,6 +431,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private void initializeBusinessData(SProcessDefinition sDefinition, SProcessInstance sInstance, SExpressionContext expressionContext)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException,
             SRefBusinessDataInstanceCreationException {
+        setContextContainerIfNotSet(expressionContext, sInstance);
         final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
         for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
             final SExpression expression = bdd.getDefaultValueExpression();
@@ -464,6 +449,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         .done();
                 refBusinessDataService.addRefBusinessDataInstance(instance);
             }
+        }
+    }
+
+    private void setContextContainerIfNotSet(SExpressionContext expressionContext, SProcessInstance sInstance) {
+        if (expressionContext != null && expressionContext.getContainerId() == null && sInstance != null && sInstance.getId() != 0) {
+            expressionContext.setContainerId(sInstance.getId());
+            expressionContext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
         }
     }
 
@@ -491,28 +483,62 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return dataIds;
     }
 
-    protected void createDocuments(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance, final long authorId)
-            throws SObjectCreationException, BonitaHomeNotSetException, STenantIdNotSetException, IOException, SObjectAlreadyExistsException {
+    protected void createDocuments(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance, final long authorId,
+                                   final SExpressionContext expressionContext, final Map<String, Object> context)
+            throws SObjectCreationException, BonitaHomeNotSetException, STenantIdNotSetException, IOException, SObjectAlreadyExistsException,
+            SBonitaReadException, SObjectModificationException, SExpressionTypeUnknownException, SExpressionDependencyMissingException, SExpressionEvaluationException, SInvalidExpressionException, SOperationExecutionException {
         final SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
         final List<SDocumentDefinition> documentDefinitions = processContainer.getDocumentDefinitions();
+        final Map<SExpression, DocumentValue> evaluatedDocumentValues = evaluateInitialExpressionsOfDocument(sProcessInstance, expressionContext, context, documentDefinitions);
         if (!documentDefinitions.isEmpty()) {
-            final String processesFolder = BonitaHomeServer.getInstance().getProcessFolder(sessionAccessor.getTenantId(), sDefinition.getId());
-            final File documentsFolder = new File(processesFolder, DocumentsResourcesContribution.DOCUMENTS_FOLDER);
             for (final SDocumentDefinition document : documentDefinitions) {
-                if (document.getFile() != null) {
-                    final String file = document.getFile();// should always exists...validation on businessarchive
-                    final byte[] content = FileUtils.readFileToByteArray(new File(documentsFolder, file));
-                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), content, authorId,
-                            document.getDescription(), -1);
-                } else if (document.getUrl() != null) {
-                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), document.getUrl(),
-                            authorId, document.getDescription(), -1);
+                DocumentValue documentValue = getInitialDocumentValue(sDefinition, evaluatedDocumentValues, document);
+                if (documentValue != null) {
+                    documentHelper.createOrUpdateDocument(documentValue,
+                            document.getName(), sProcessInstance.getId(), authorId, document.getDescription());
                 }
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
+    protected DocumentValue getInitialDocumentValue(SProcessDefinition sDefinition, Map<SExpression, DocumentValue> evaluatedDocumentValues, SDocumentDefinition document) throws BonitaHomeNotSetException, IOException, STenantIdNotSetException {
+                DocumentValue documentValue = null;
+                if (document.getInitialValue() != null) {
+            documentValue = evaluatedDocumentValues.get(document.getInitialValue());
+                } else if (document.getFile() != null) {
+            final byte[] content = getProcessDocumentContent(sDefinition, document);
+                    documentValue = new DocumentValue(content, document.getMimeType(), document.getFileName());
+                } else if (document.getUrl() != null) {
+                    documentValue = new DocumentValue(document.getUrl());
+                    documentValue.setFileName(document.getFileName());
+                    documentValue.setMimeType(document.getMimeType());
+                }
+        return documentValue;
+                }
+
+    byte[] getProcessDocumentContent(SProcessDefinition sDefinition, SDocumentDefinition document) throws BonitaHomeNotSetException, IOException, STenantIdNotSetException {
+        final String file = document.getFile();// should always exists...validation on BusinessArchive
+        return BonitaHomeServer.getInstance().getProcessDocument(sessionAccessor.getTenantId(), sDefinition.getId(), file);
+            }
+
+
+    private Map<SExpression,DocumentValue> evaluateInitialExpressionsOfDocument(final SProcessInstance processInstance, final SExpressionContext expressionContext,
+                                                                   final Map<String, Object> context, final List<SDocumentDefinition> documentDefinitions) throws SExpressionTypeUnknownException,
+            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SOperationExecutionException {
+        final List<SExpression> initialValuesExpressions = new ArrayList<SExpression>(documentDefinitions.size());
+        Map<SExpression, DocumentValue> evaluatedDocumentValue = new HashMap<>();
+        for (final SDocumentDefinition documentDefinition : documentDefinitions) {
+            if(documentDefinition.getInitialValue() != null){
+                initialValuesExpressions.add(documentDefinition.getInitialValue());
+        }
+    }
+        final List<Object> evaluate = expressionResolverService.evaluate(initialValuesExpressions, getsExpressionContext(processInstance, expressionContext, context));
+        for (int i = 0; i < initialValuesExpressions.size(); i++) {
+            evaluatedDocumentValue.put(initialValuesExpressions.get(i),documentHelper.toCheckedDocumentValue(evaluate.get(i)));
+        }
+        return evaluatedDocumentValue;
+    }
+
     protected void createDocumentLists(final SProcessDefinition sDefinition, final SProcessInstance processInstance, final long authorId,
             final SExpressionContext expressionContext, final Map<String, Object> context)
             throws SBonitaException {
@@ -521,30 +547,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (!documentListDefinitions.isEmpty()) {
             final List<Object> initialValues = evaluateInitialExpressionsOfDocumentLists(processInstance, expressionContext, context, documentListDefinitions);
             for (int i = 0; i < documentListDefinitions.size(); i++) {
-                attachDocumentForList(processInstance, authorId, (List<DocumentValue>) initialValues.get(i), documentListDefinitions.get(i));
-            }
-        }
-    }
-
-    private void attachDocumentForList(final SProcessInstance processInstance, final long authorId, final List<DocumentValue> initialValue,
-            final SDocumentListDefinition documentListDefinition) throws SObjectCreationException, SObjectAlreadyExistsException {
-        if (initialValue != null) {
-            for (int index = 0; index < initialValue.size(); index++) {
-                attacheDocument(processInstance, authorId, initialValue, documentListDefinition, index);
-            }
-        }
-    }
-
-    private void attacheDocument(final SProcessInstance processInstance, final long authorId, final List<DocumentValue> initialValue,
-            final SDocumentListDefinition documentListDefinition, final int index) throws SObjectCreationException, SObjectAlreadyExistsException {
-        final DocumentValue documentValue = initialValue.get(index);
-        if (documentValue != null) {
-            if (documentValue.hasContent()) {
-                attachDocument(processInstance.getId(), documentListDefinition.getName(), documentValue.getFileName(), documentValue.getMimeType(),
-                        documentValue.getContent(), authorId, documentListDefinition.getDescription(), index);
-            } else {
-                attachDocument(processInstance.getId(), documentListDefinition.getName(), documentValue.getFileName(), documentValue.getMimeType(),
-                        documentValue.getUrl(), authorId, documentListDefinition.getDescription(), index);
+                final Object newValue = initialValues.get(i);
+                if(newValue == null){
+                    continue;
+                }
+                documentHelper.setDocumentList(
+                        documentHelper.toCheckedList(newValue), documentListDefinitions.get(i).getName(), processInstance.getId(), authorId);
             }
         }
     }
@@ -572,21 +580,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             currentExpressionContext.setInputValues(context);
         }
         return currentExpressionContext;
-    }
-
-    protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final String url, final long authorId, final String description, final int index) throws SObjectCreationException, SObjectAlreadyExistsException {
-        final SDocument attachment = BuilderFactory.get(SDocumentBuilderFactory.class)
-                .createNewExternalProcessDocumentReference(fileName, mimeType, authorId, url).done();
-        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
-    }
-
-    protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final byte[] documentContent, final long authorId, final String description, final int index) throws SObjectCreationException,
-            SObjectAlreadyExistsException {
-        final SDocument attachment = BuilderFactory.get(SDocumentBuilderFactory.class).createNewProcessDocument(fileName, mimeType, authorId, documentContent)
-                .done();
-        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
     }
 
     @Override
@@ -688,8 +681,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      * Evaluate the split of the element
      * The element contains the current token it received
      *
-     * @return
-     *         number of token of the process
+     * @return number of token of the process
      */
     private boolean executeValidOutgoingTransitionsAndUpdateTokens(final SProcessDefinition processDefinition, final SFlowNodeInstance child,
             final SProcessInstance sProcessInstance) throws SBonitaException {
@@ -747,7 +739,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
             throws SArchivingException {
-        //FIXME HERRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEEE
+        //FIXME we archive the flow node instance here because it was not archived before because the flow node was interrupting the parent.. we should change that because it's not very easy to see how it works
         if (child.getId() != sProcessInstance.getInterruptingEventId() || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
             // Let's archive the final state of the child:
             flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
@@ -755,7 +747,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private boolean needToReevaluateInclusiveGateways(FlowNodeTransitionsWrapper transitionsDescriptor) {
-        int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size();
+        int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size()
+                + (transitionsDescriptor.getDefaultTransition() != null ? 1 : 0);
         int takenTransition = transitionsDescriptor.getValidOutgoingTransitionDefinitions().size();
         /*
          * Why this condition?
@@ -779,8 +772,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     @Override
     public SProcessInstance start(final long starterId, final long starterSubstituteId, final List<SOperation> operations, final Map<String, Object> context,
-            final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final FlowNodeSelector selector, Map<String, Serializable> processInputs)
-            throws SProcessInstanceCreationException {
+            final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final FlowNodeSelector selector, final Map<String, Serializable> processInputs)
+            throws SProcessInstanceCreationException, SContractViolationException {
         return start(starterId, starterSubstituteId, null, operations, context, connectorsWithInput, -1, selector, processInputs);
     }
 
@@ -788,7 +781,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     public SProcessInstance start(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final long starterId, final long starterSubstituteId,
             final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final long callerId, final long subProcessDefinitionId,
-            Map<String, Serializable> processInputs) throws SProcessInstanceCreationException {
+            final Map<String, Serializable> processInputs) throws SProcessInstanceCreationException, SContractViolationException {
         try {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, getFilter(targetSFlowNodeDefinitionId), subProcessDefinitionId);
@@ -810,10 +803,16 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     @Override
     public SProcessInstance start(final long starterId, final long starterSubstituteId, final SExpressionContext expressionContext,
             final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectors,
-            final long callerId, final FlowNodeSelector selector, Map<String, Serializable> processInputs) throws SProcessInstanceCreationException {
+            final long callerId, final FlowNodeSelector selector, Map<String, Serializable> processInputs) throws SProcessInstanceCreationException,
+            SContractViolationException {
+
+        final SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
+
+        // Validate start process contract inputs:
+        validateContractInputs(processInputs, sProcessDefinition);
+
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
             final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), sProcessDefinition.getId());
             Thread.currentThread().setContextClassLoader(localClassLoader);
             // initialize the process classloader by getting it one time
@@ -822,6 +821,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             } catch (final ClassNotFoundException e) {
                 // ignore, just to load
             }
+
             final SProcessInstance sProcessInstance = createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, callerId);
 
             final boolean isInitializing = initialize(starterId, sProcessDefinition, sProcessInstance, expressionContext,
@@ -853,6 +853,14 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             throw new SProcessInstanceCreationException(e);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+    }
+
+    protected void validateContractInputs(Map<String, Serializable> processInputs, SProcessDefinition sProcessDefinition) throws SContractViolationException {
+        final SContractDefinition contractDefinition = sProcessDefinition.getContract();
+        if (contractDefinition != null) {
+            final ContractValidator validator = new ContractValidatorFactory().createContractValidator(logger, expressionService);
+            validator.validate(sProcessDefinition.getId(), contractDefinition, processInputs);
         }
     }
 

@@ -1,0 +1,1269 @@
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="synchroService" class="org.bonitasoft.engine.synchro.SynchroServiceImpl">
+        <constructor-arg name="initialCapacity" value="${bonita.platform.synchro.initialcapacity}" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="cacheService" ref="platformCacheService" />
+    </bean>
+
+    <bean id="quartzProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="org.quartz.scheduler.skipUpdateCheck">${org.quartz.scheduler.skipUpdateCheck:true}</prop>
+                <prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+                <prop key="org.quartz.threadPool.threadCount">${bonita.platform.scheduler.quartz.threadpool.size}</prop>
+                <prop key="org.quartz.jobStore.class">org.bonitasoft.engine.scheduler.impl.BonitaJobStoreCMT</prop>
+                <prop key="org.quartz.jobStore.driverDelegateClass">${${db.vendor}.quartz.connection.jobstoredriver}</prop>
+                <prop key="org.quartz.jobStore.dataSource">managedDS</prop>
+                <prop key="org.quartz.jobStore.useProperties">true</prop>
+                <prop key="org.quartz.jobStore.nonManagedTXDataSource">notManagedDS</prop>
+                <prop key="org.quartz.dataSource.managedDS.jndiURL">${database.journal.datasource.name}</prop>
+                <prop key="org.quartz.dataSource.notManagedDS.jndiURL">${database.sequence.manager.datasource.name}</prop>
+                <prop key="org.quartz.jobStore.dontSetAutoCommitFalse">true</prop>
+                <prop key="org.quartz.scheduler.wrapJobExecutionInUserTransaction">true</prop>
+                <prop key="org.quartz.scheduler.userTransactionURL">${userTransaction}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor">
+        <constructor-arg name="schedulerFactory" ref="quartzSchedulerFactory" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="transactionService" ref="transactionService" />
+        <constructor-arg name="useOptimization" value="true" />
+    </bean>
+
+    <bean id="jobService" class="org.bonitasoft.engine.scheduler.impl.JobServiceImpl">
+        <constructor-arg name="eventService" ref="platformEventService" />
+        <constructor-arg name="recorder" ref="tenantRecorderSyncForPlatform" />
+        <constructor-arg name="readPersistenceService" ref="persistenceService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="scheduler" class="org.bonitasoft.engine.scheduler.impl.SchedulerServiceImpl">
+        <constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
+        <constructor-arg name="jobService" ref="jobService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="eventService" ref="platformEventService" />
+        <constructor-arg name="transactionService" ref="transactionService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="servicesResolver" ref="servicesResolver" />
+        <constructor-arg name="batchSize" value="${bonita.platform.scheduler.batchsize}" />
+    </bean>
+
+    <bean id="servicesResolver" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver" />
+
+    <bean id="quartzSchedulerFactory" class="org.bonitasoft.engine.scheduler.impl.BonitaSchedulerFactory">
+        <constructor-arg name="props" ref="quartzProperties" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="platformSessionProvider" class="org.bonitasoft.engine.platform.session.impl.PlatformSessionProviderImpl">
+    </bean>
+
+    <bean id="platformSessionService" class="org.bonitasoft.engine.platform.session.impl.PlatformSessionServiceImpl">
+        <constructor-arg name="platformSessionProvider" ref="platformSessionProvider" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="platformLoginService" class="org.bonitasoft.engine.core.platform.login.impl.PlatformLoginServiceImpl">
+        <constructor-arg name="platformAuthenticationService" ref="platformAuthenticationService" />
+        <constructor-arg name="platformSessionService" ref="platformSessionService" />
+    </bean>
+
+    <bean id="platformCommandService" class="org.bonitasoft.engine.platform.command.impl.PlatformCommandServiceImpl">
+        <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="platformAuthenticationService" class="org.bonitasoft.engine.service.impl.PlatformAuthenticationChecker" />
+
+    <bean id="sqlFolders" parent="communitySqlFolders" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="communitySqlFolders" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+                <value>/sql/${db.vendor}</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="platformService" class="org.bonitasoft.engine.platform.impl.PlatformServiceImpl">
+        <constructor-arg ref="platformPersistenceService" />
+        <constructor-arg name="tenantPersistenceServices">
+            <list>
+                <ref bean="persistenceService" />
+            </list>
+        </constructor-arg>
+        <constructor-arg ref="platformTechnicalLoggerService" />
+        <constructor-arg ref="platformCacheService" />
+        <constructor-arg ref="platformProperties" />
+        <constructor-arg name="recorder" ref="platformRecorderSync" />
+        <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <!-- read SQL files from within bonita-server.jar -->
+        <constructor-arg name="sqlFolders" ref="sqlFolders" />
+        <constructor-arg name="statementDelimiter" value="${${db.vendor}.sql.delimiter}" />
+    </bean>
+
+    <bean id="platformProperties" class="org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl" />
+
+    <bean id="tenantRestartHandlers" parent="communityTenantRestartHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="commonTenantRestartHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+                <bean class="org.bonitasoft.engine.execution.work.RestartFlowNodesHandler" />
+                <bean class="org.bonitasoft.engine.execution.work.RestartProcessHandler" />
+                <bean class="org.bonitasoft.engine.execution.work.BPMEventWorksHandler" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="communityTenantRestartHandlers" parent="commonTenantRestartHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+                <bean class="org.bonitasoft.engine.profile.ProfilesUpdaterRestartHandler" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
+        <property name="shouldStartScheduler" value="true" />
+        <property name="shouldRestartElements" value="true" />
+        <property name="tenantRestartHandlers" ref="tenantRestartHandlers"/>
+        <property name="restartHandlers">
+            <list>
+                <ref bean="schedulerServiceRestartHandler" />
+            </list>
+        </property>
+        <property name="lifecycleServices">
+            <list>
+                <ref bean="classLoaderService" />
+                <ref bean="platformCacheService" />
+            </list>
+        </property>
+        <property name="jobListeners">
+            <list>
+                <ref bean="loggerJobListener" />
+                <ref bean="jdbcJobListener" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="jobLogCreator" class="org.bonitasoft.engine.scheduler.impl.JobLogCreator">
+        <constructor-arg name="jobService" ref="jobService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
+        <constructor-arg name="schedulerService" ref="scheduler" />
+        <constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
+        <constructor-arg name="jobService" ref="jobService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="transactionService" ref="transactionService" />
+        <constructor-arg name="incidentService" ref="incidentService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="jobLogCreator" ref="jobLogCreator" />
+    </bean>
+
+    <bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="schedulerServiceRestartHandler" class="org.bonitasoft.engine.handler.SchedulerServiceRestartHandler">
+        <constructor-arg name="schedulerService" ref="scheduler" />
+        <constructor-arg name="technicalLoggerService" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="platformTechnicalLoggerService" class="org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl" />
+
+    <bean id="lockService" class="org.bonitasoft.engine.lock.impl.MemoryLockService" scope="singleton">
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="lockTimeout" value="${bonita.platform.lock.memory.timeout}" />
+        <constructor-arg name="lockPoolSize" value="${bonita.platform.lock.memory.poolsize}" />
+    </bean>
+
+    <bean id="incidentService" class="org.bonitasoft.engine.incident.IncidentServiceImpl">
+        <constructor-arg name="handlers">
+            <list>
+                <bean class="org.bonitasoft.engine.incident.FileLoggerIncidentHandler" />
+            </list>
+        </constructor-arg>
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="bonitaSequenceManagerDSJNDI" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${database.sequence.manager.datasource.name}" />
+    </bean>
+
+    <bean id="platformDependencyService" class="org.bonitasoft.engine.dependency.impl.PlatformDependencyServiceImpl">
+        <constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
+        <constructor-arg name="classLoaderService" ref="classLoaderService" />
+    </bean>
+
+    <bean id="parentClassLoaderResolver" class="org.bonitasoft.engine.bpm.classloader.BonitaBPMParentClassLoaderResolver">
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+    </bean>
+
+    <bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
+        <constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="eventService" ref="platformEventService" />
+    </bean>
+
+    <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="cacheConfigurations" ref="platformCacheConfigurations" />
+        <constructor-arg name="defaultCacheConfiguration" ref="defaultPlatformCacheConfiguration" />
+        <constructor-arg name="diskStorePath" value="java.io.tmpdir/platform.cache" />
+    </bean>
+
+    <bean id="defaultPlatformCacheConfiguration" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="DEFAULT_PLATFORM" />
+        <property name="maxElementsInMemory" value="${bonita.platform.cache.default.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.platform.cache.default.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.platform.cache.default.eternal}" />
+        <property name="evictionPolicy" value="${bonita.platform.cache.default.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.platform.cache.default.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.platform.cache.default.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.platform.cache.default.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.platform.cache.default.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.platform.cache.default.readIntensive}" />
+    </bean>
+
+    <bean id="platformCacheConfigurations" parent="communityPlatformCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+            </list>
+        </property>
+    </bean>
+
+    <bean id="communityPlatformCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
+                <ref bean="synchroServiceCacheConfig" />
+                <ref bean="platformCacheConfig" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="synchroServiceCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="SYNCHRO_SERVICE_CACHE" />
+        <property name="maxElementsInMemory" value="${bonita.platform.cache.synchro.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.platform.cache.synchro.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.platform.cache.synchro.eternal}" />
+        <property name="evictionPolicy" value="${bonita.platform.cache.synchro.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.platform.cache.synchro.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.platform.cache.synchro.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.platform.cache.synchro.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.platform.cache.synchro.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.platform.cache.synchro.readIntensive}" />
+    </bean>
+
+    <bean id="platformCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="PLATFORM" />
+        <property name="maxElementsInMemory" value="${bonita.platform.cache.platform.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.platform.cache.platform.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.platform.cache.platform.eternal}" />
+        <property name="evictionPolicy" value="${bonita.platform.cache.platform.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.platform.cache.platform.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.platform.cache.platform.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.platform.cache.platform.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.platform.cache.platform.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.platform.cache.platform.readIntensive}" />
+    </bean>
+
+    <bean id="broadcastService" class="org.bonitasoft.engine.service.impl.BroadcastServiceLocal" />
+
+    <bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+        <constructor-arg name="persistenceService" ref="platformPersistenceService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="eventService" ref="platformEventService" />
+    </bean>
+
+    <bean id="tenantRecorderSyncForPlatform" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+        <constructor-arg name="persistenceService" ref="persistenceService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="eventService" ref="platformEventService" />
+    </bean>
+
+    <bean id="transactionExecutor" class="org.bonitasoft.engine.execution.TransactionExecutorImpl">
+        <constructor-arg name="transactionService" ref="transactionService" />
+    </bean>
+
+    <bean id="platformEventService" class="org.bonitasoft.engine.events.impl.EventServiceImpl">
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+    </bean>
+
+    <bean id="sequenceMappingProvider" class="org.bonitasoft.engine.sequence.SequenceMappingProvider" autowire="byType" />
+
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" />
+        <constructor-arg name="sequenceId" value="0" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.0:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.platform.model.impl.STenantImpl" />
+        <constructor-arg name="sequenceId" value="1" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.1:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" />
+        <constructor-arg name="sequenceId" value="2" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.2:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" />
+        <constructor-arg name="sequenceId" value="3" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.3:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" />
+        <constructor-arg name="sequenceId" value="4" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.4:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" />
+        <constructor-arg name="sequenceId" value="10" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" />
+        <constructor-arg name="sequenceId" value="11" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.11:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
+        <constructor-arg name="sequenceId" value="20" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SRoleImpl" />
+        <constructor-arg name="sequenceId" value="21" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.21:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SGroupImpl" />
+        <constructor-arg name="sequenceId" value="22" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.22:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" />
+        <constructor-arg name="sequenceId" value="23" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.23:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" />
+        <constructor-arg name="sequenceId" value="24" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.24:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" />
+        <constructor-arg name="sequenceId" value="25" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.25:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" />
+        <constructor-arg name="sequenceId" value="26" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.26:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" />
+        <constructor-arg name="sequenceId" value="30" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.30:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" />
+        <constructor-arg name="sequenceId" value="31" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.31:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl" />
+        <constructor-arg name="sequenceId" value="70" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.70:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl" />
+        <constructor-arg name="sequenceId" value="71" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.71:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl" />
+        <constructor-arg name="sequenceId" value="72" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.72:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.command.model.SCommandImpl" />
+        <constructor-arg name="sequenceId" value="90" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.90:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.theme.model.impl.SThemeImpl" />
+        <constructor-arg name="sequenceId" value="9890" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9890:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.impl.SProfileImpl" />
+        <constructor-arg name="sequenceId" value="9990" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9990:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
+        <constructor-arg name="sequenceId" value="9991" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9991:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
+        <constructor-arg name="sequenceId" value="9992" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.9992:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" />
+        <constructor-arg name="sequenceId" value="10000" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10000:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" />
+        <constructor-arg name="sequenceId" value="10001" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10001:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
+        <constructor-arg name="sequenceId" value="10010" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10010:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+            <set>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SSendTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl</value>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl</value>
+            </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="10011" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10011:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" />
+        <constructor-arg name="sequenceId" value="10012" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10012:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.definition.model.impl.SActorImpl" />
+        <constructor-arg name="sequenceId" value="10013" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10013:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceWithFailureInfoImpl</value>
+        </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="10014" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10014:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl</value>
+        </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="10015" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10015:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl</value>
+        </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="10016" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10016:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
+        <constructor-arg name="sequenceId" value="10017" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10017:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" />
+        <constructor-arg name="sequenceId" value="10018" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10018:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl</value>
+        </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="10020" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10020:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" />
+        <constructor-arg name="sequenceId" value="10030" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10030:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" />
+        <constructor-arg name="sequenceId" value="10031" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10031:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" />
+        <constructor-arg name="sequenceId" value="10040" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10040:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl" />
+        <constructor-arg name="sequenceId" value="10050" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10050:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl</value>
+        <value>org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl</value>
+        </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="10060" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10060:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" />
+        <constructor-arg name="sequenceId" value="10070" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10070:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
+        <constructor-arg name="sequenceId" value="10080" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.bonitasoft:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.document.model.impl.SDocumentImpl</value>
+        <value>org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl</value>
+        </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="10090" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10090:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.page.impl.SPageWithContentImpl</value>
+        <value>org.bonitasoft.engine.page.impl.SPageImpl</value>
+        <value>org.bonitasoft.engine.page.impl.SPageContentImpl</value>
+        </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="10120" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10120:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.page.impl.SPageMappingImpl" />
+        <constructor-arg name="sequenceId" value="10121" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10121:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" />
+        <constructor-arg name="sequenceId" value="10200" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10200:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" />
+        <constructor-arg name="sequenceId" value="10201" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10201:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" />
+        <constructor-arg name="sequenceId" value="10202" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10202:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.STaskContractData" />
+        <constructor-arg name="sequenceId" value="10210" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10210:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.SProcessContractData" />
+        <constructor-arg name="sequenceId" value="10220" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10220:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" />
+        <constructor-arg name="sequenceId" value="10300" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10300:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl</value>
+        </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="10096" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10096:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
+        <constructor-arg name="sequenceId" value="20010" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20010:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SASendTaskInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAMultiInstanceActivityInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl</value>
+        <value>org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl</value>
+        </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="20011" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20011:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" />
+        <constructor-arg name="sequenceId" value="20012" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20012:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl" />
+        <constructor-arg name="sequenceId" value="20013" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20013:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="classNames">
+        <set>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl</value>
+        <value>org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl</value>
+        </set>
+        </constructor-arg>
+        <constructor-arg name="sequenceId" value="20050" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20050:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" />
+        <constructor-arg name="sequenceId" value="20040" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20040:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.SATaskContractData" />
+        <constructor-arg name="sequenceId" value="20210" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20210:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.contract.data.SAProcessContractData" />
+        <constructor-arg name="sequenceId" value="20220" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20220:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+
+    <bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
+        <constructor-arg name="lockService" ref="lockService" />
+        <constructor-arg name="sequenceMappingProvider" ref="sequenceMappingProvider" />
+        <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="retries" value="${bonita.platform.sequence.retries}" />
+        <constructor-arg name="delay" value="${bonita.platform.sequence.delay}" />
+        <constructor-arg name="delayFactor" value="${bonita.platform.sequence.delayFactor}" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${transaction.manager}" />
+    </bean>
+
+    <bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" scope="singleton">
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="txManager" ref="transactionManager" />
+    </bean>
+
+
+    <bean id="communityHbmResourcesProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesProvider">
+        <property name="resources">
+            <set>
+                <!-- actor -->
+                <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.hbm.xml</value>
+                <value>org/bonitasoft/engine/actor/mapping/model/impl/hibernate/actor.queries.hbm.xml</value>
+                <!-- theme -->
+                <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.hbm.xml</value>
+                <value>org/bonitasoft/engine/theme/model/impl/hibernate/theme.queries.hbm.xml</value>
+                <!-- supervisor -->
+                <value>org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.hbm.xml</value>
+                <value>org/bonitasoft/engine/supervisor/mapping/model/impl/hibernate/supervisor.queries.hbm.xml</value>
+                <!-- scheduler -->
+                <value>org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.hbm.xml</value>
+                <value>org/bonitasoft/engine/scheduler/impl/hibernate/schedulerimpl.queries.hbm.xml</value>
+                <!-- profile -->
+                <value>org/bonitasoft/engine/profile/model/impl/hibernate/profile.hbm.xml</value>
+                <value>org/bonitasoft/engine/profile/model/impl/hibernate/profile.queries.hbm.xml</value>
+                <!-- process instance -->
+                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
+                <!-- archived process instance -->
+                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
+                <!-- process definition -->
+                <value>org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/process/definition/model/impl/hibernate/process.definition.queries.hbm.xml</value>
+                <!-- comment -->
+                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/comment.queries.hbm.xml</value>
+                <!-- archived comment -->
+                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/process/comment/model/impl/hibernate/archive.comment.queries.hbm.xml</value>
+                <!-- platform -->
+                <value>org/bonitasoft/engine/platform/model/impl/hibernate/platform.hbm.xml</value>
+                <value>org/bonitasoft/engine/platform/model/impl/hibernate/platform.queries.hbm.xml</value>
+                <!-- platform command -->
+                <value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.hbm.xml</value>
+                <value>org/bonitasoft/engine/platform/command/model/impl/hibernate/platformCommand.queries.hbm.xml</value>
+                <!-- page -->
+                <value>org/bonitasoft/engine/page/impl/hibernate/page.hbm.xml</value>
+                <value>org/bonitasoft/engine/page/impl/hibernate/page.queries.hbm.xml</value>
+                <!-- queriable log -->
+                <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.hbm.xml</value>
+                <value>org/bonitasoft/engine/queriablelogger/model/impl/hibernate/queriablelogger.queries.hbm.xml</value>
+                <!-- identity -->
+                <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.hbm.xml</value>
+                <value>org/bonitasoft/engine/identity/model/impl/hibernate/identity.queries.hbm.xml</value>
+                <!-- external identity -->
+                <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.hbm.xml</value>
+                <value>org/bonitasoft/engine/external/identity/mapping/model/impl/hibernate/external.identity.mapping.queries.hbm.xml</value>
+                <!-- document -->
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/document.queries.hbm.xml</value>
+                <!-- archived document -->
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/archive.document.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/document/model/impl/hibernate/archive.document.queries.hbm.xml</value>
+                <!-- platform dependency -->
+                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/platform-dependency.hbm.xml</value>
+                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/platform-dependency.queries.hbm.xml</value>
+                <!-- dependency -->
+                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.hbm.xml</value>
+                <value>org/bonitasoft/engine/dependency/model/impl/hibernate/dependency.queries.hbm.xml</value>
+                <!-- data instance -->
+                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/data.instance.hbm.xml</value>
+                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/data.instance.queries.hbm.xml</value>
+                <!-- archived data instance -->
+                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.hbm.xml</value>
+                <value>org/bonitasoft/engine/data/instance/model/impl/hibernate/archived.data.instance.queries.hbm.xml</value>
+                <!-- command -->
+                <value>org/bonitasoft/engine/command/model/impl/hibernate/command.hbm.xml</value>
+                <value>org/bonitasoft/engine/command/model/impl/hibernate/command.queries.hbm.xml</value>
+                <!-- category -->
+                <value>org/bonitasoft/engine/core/category/model/impl/hibernate/category.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/category/model/impl/hibernate/category.queries.hbm.xml</value>
+                <!-- application -->
+                <value>org/bonitasoft/engine/business/application/impl/hibernate/application.hbm.xml</value>
+                <value>org/bonitasoft/engine/business/application/impl/hibernate/application.queries.hbm.xml</value>
+                <!-- form mapping -->
+                <value>org/bonitasoft/engine/core/form/impl/form-mapping.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/form/impl/form-mapping.queries.hbm.xml</value>
+                <!-- contract -->
+                <value>org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.hbm.xml</value>
+                <value>org/bonitasoft/engine/core/contract/data/model/impl/hibernate/contract.queries.hbm.xml</value>
+            </set>
+        </property>
+        <property name="classAliasMappings">
+            <map>
+                <!-- actor -->
+                <entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="actor" />
+                <entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="actormember" />
+                <!-- theme -->
+                <entry key="org.bonitasoft.engine.theme.model.STheme" value="theme" />
+                <!-- supervisor -->
+                <entry key="org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor" value="processsupervisor" />
+                <!-- scheduler -->
+                <entry key="org.bonitasoft.engine.scheduler.model.SJobDescriptor" value="jd" />
+                <entry key="org.bonitasoft.engine.scheduler.model.SJobParameter" value="jp" />
+                <entry key="org.bonitasoft.engine.scheduler.model.SJobLog" value="jl" />
+                <!-- profile -->
+                <entry key="org.bonitasoft.engine.profile.model.SProfile" value="profile" />
+                <entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="profileentry" />
+                <entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="pm" />
+                <!-- process instance -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="p" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="a" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="f" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="g" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="c" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo" value="cfi" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" value="e" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance" value="e" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance" value="e" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance" value="e" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="e" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="e" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance" value="e" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="t" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance" value="t" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance" value="t" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance" value="t" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance" value="t" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent" value="s" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent" value="s" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" value="s" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent" value="s" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="m" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping" value="mapping" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="a" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="a" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance" value="a" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="a" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="a" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="a" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" value="a" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="la" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="a" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="a" />
+                <!-- archived process instance -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="ap" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" value="aa" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" value="aa" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance" value="aa" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance" value="aa" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance" value="aa" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance" value="aa" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance" value="aa" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance" value="aa" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance" value="aa" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance" value="aa" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="aa" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="at" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" value="ac" />
+                <!-- process definition -->
+                <entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo" value="process_definition" />
+                <entry key="org.bonitasoft.engine.core.process.definition.model.SActor" value="actor" />
+                <entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="actormember" />
+                <entry key="org.bonitasoft.engine.identity.model.SUser" value="user" />
+                <!-- comment -->
+                <entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="comment" />
+                <entry key="org.bonitasoft.engine.core.process.comment.model.SHumanComment" value="comment" />
+                <entry key="org.bonitasoft.engine.core.process.comment.model.SSystemComment" value="comment" />
+                <!-- archived comment -->
+                <entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="saComment" />
+                <!-- platform -->
+                <entry key="org.bonitasoft.engine.platform.model.SPlatform" value="platform" />
+                <entry key="org.bonitasoft.engine.platform.model.STenant" value="tenant" />
+                <!-- platform command -->
+                <entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="platformCommand" />
+                <!-- page -->
+                <entry key="org.bonitasoft.engine.page.SPage" value="page" />
+                <entry key="org.bonitasoft.engine.page.SPageContent" value="pagecontent" />
+                <!-- queriable log -->
+                <entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog" value="log" />
+                <!-- identity -->
+                <entry key="org.bonitasoft.engine.identity.model.SUser" value="user" />
+                <entry key="org.bonitasoft.engine.identity.model.SRole" value="role" />
+                <entry key="org.bonitasoft.engine.identity.model.SGroup" value="group_" />
+                <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition" value="custom_usr_inf_def" />
+                <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoValue" value="custom_usr_inf_val" />
+                <entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="user_membership" />
+                <entry key="org.bonitasoft.engine.identity.model.SContactInfo" value="contactinfo" />
+                <!-- external identity -->
+                <entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="ext_ident_mapping" />
+                <!-- document -->
+                <entry key="org.bonitasoft.engine.core.document.model.SDocument" value="doc" />
+                <entry key="org.bonitasoft.engine.core.document.model.SLightDocument" value="doc" />
+                <entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="docmapping" />
+                <entry key="org.bonitasoft.engine.core.document.model.SMappedDocument" value="mappeddoc" />
+                <!-- archived document -->
+                <entry key="org.bonitasoft.engine.core.document.model.archive.SADocumentMapping" value="docmapping" />
+                <entry key="org.bonitasoft.engine.core.document.model.archive.SAMappedDocument" value="mappeddoc" />
+                <!-- platform dependency -->
+                <entry key="org.bonitasoft.engine.dependency.model.SPlatformDependency" value="pdependency" />
+                <entry key="org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping" value="pdependencymapping" />
+                <!-- dependency -->
+                <entry key="org.bonitasoft.engine.dependency.model.SDependency" value="dependency" />
+                <entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="dependencymapping" />
+                <!-- data instance -->
+                <entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="dataInstance" />
+                <!-- archived data instance -->
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="saDataInstance" />
+                <!-- command -->
+                <entry key="org.bonitasoft.engine.command.model.SCommand" value="command" />
+                <!-- category -->
+                <entry key="org.bonitasoft.engine.core.category.model.SCategory" value="category" />
+                <entry key="org.bonitasoft.engine.core.category.model.SProcessCategoryMapping" value="categorymapping" />
+                <!-- application -->
+                <entry key="org.bonitasoft.engine.business.application.model.SApplication" value="application" />
+                <entry key="org.bonitasoft.engine.business.application.model.SApplicationPage" value="applicationPage" />
+                <entry key="org.bonitasoft.engine.business.application.model.SApplicationMenu" value="applicationMenu" />
+                <!-- form mapping -->
+                <entry key="org.bonitasoft.engine.core.form.SFormMapping" value="formmap" />
+                <entry key="org.bonitasoft.engine.page.SPageMapping" value="pagemap" />
+                <!-- contract -->
+                <entry key="org.bonitasoft.engine.core.contract.data.STaskContractData" value="tcd"/>
+                <entry key="org.bonitasoft.engine.core.contract.data.SATaskContractData" value="atcd"/>
+                <entry key="org.bonitasoft.engine.core.contract.data.SProcessContractData" value="pcd"/>
+                <entry key="org.bonitasoft.engine.core.contract.data.SAProcessContractData" value="apcd"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="extraPlatformHibernateProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+        <property name="map">
+            <map>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="extraTenantHibernateProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+        <property name="map">
+            <map>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformHibernatePersistenceService" destroy-method="destroy">
+        <constructor-arg name="name" value="platform" />
+        <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
+        <constructor-arg name="extraHibernateProperties" ref="extraPlatformHibernateProperties" />
+        <constructor-arg name="likeEscapeCharacter" value="${bonita.platform.persistence.platform.likeEscapeCharacter}" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="sequenceManager" ref="sequenceManager" />
+        <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="enableWordSearch" value="${bonita.platform.persistence.platform.enableWordSearch}" />
+        <constructor-arg name="wordSearchExclusionMappings" ref="platformWordSearchExclusionMappings"/>
+    </bean>
+
+    <bean id="defaultPlatformWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
+        <property name="targetSetClass">
+            <value>java.util.HashSet</value>
+        </property>
+        <property name="sourceSet">
+            <list>
+
+            </list>
+        </property>
+    </bean>
+
+    <bean id="platformWordSearchExclusionMappings" parent="defaultPlatformWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
+        <property name="targetSetClass">
+            <value>java.util.HashSet</value>
+        </property>
+        <property name="sourceSet">
+            <list merge="true">
+                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
+            </list>
+        </property>
+    </bean>
+
+    <bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" destroy-method="destroy">
+        <constructor-arg name="name" value="journal" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="hbmConfigurationProvider" ref="hbmConfigurationProvider" />
+        <constructor-arg name="extraHibernateProperties" ref="extraTenantHibernateProperties" />
+        <constructor-arg name="likeEscapeCharacter" value="${bonita.platform.persistence.tenant.likeEscapeCharacter}" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="sequenceManager" ref="sequenceManager" />
+        <constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+        <constructor-arg name="enableWordSearch" value="${bonita.platform.persistence.tenant.enableWordSearch}" />
+        <constructor-arg name="wordSearchExclusionMappings" ref="tenantWordSearchExclusionMappings"/>
+    </bean>
+
+    <bean id="defaultTenantWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
+        <property name="targetSetClass">
+            <value>java.util.HashSet</value>
+        </property>
+        <property name="sourceSet">
+            <list>
+
+            </list>
+        </property>
+    </bean>
+
+    <bean id="tenantWordSearchExclusionMappings" parent="defaultTenantWordSearchExclusionMappings" class="org.springframework.beans.factory.config.SetFactoryBean">
+        <property name="targetSetClass">
+            <value>java.util.HashSet</value>
+        </property>
+        <property name="sourceSet">
+            <list merge="true">
+                <!-- value>org.bonitasoft.engine.identity.model.SUser</value -->
+            </list>
+        </property>
+    </bean>
+
+    <bean id="hbmConfigurationProviderProperties" parent="communityHbmConfigurationProviderProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+        <property name="map">
+            <map merge="true">
+            </map>
+        </property>
+    </bean>
+
+    <bean id="communityHbmConfigurationProviderProperties" class="org.bonitasoft.engine.service.impl.MapToPropertiesFactoryBean">
+        <property name="map">
+            <map>
+                <entry key="hibernate.connection.datasource" value="${database.journal.datasource.name}" />
+                <entry key="hibernate.current_session_context_class" value="jta" />
+                <entry key="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
+                <entry key="hibernate.transaction.jta.platform" value="${hibernate.transaction.jta_platform}" />
+                <entry key="hibernate.dialect" value="${${db.vendor}.hibernate.dialect}" />
+                <entry key="hibernate.interceptor" value="${${db.vendor}.hibernate.journal.interceptor}" />
+                <entry key="hibernate.show_sql" value="${hibernate.journal.show_sql}" />
+                <entry key="hibernate.format_sql" value="${hibernate.journal.format_sql}" />
+                <entry key="hibernate.use_sql_comments" value="${hibernate.journal.use_sql_comments}" />
+                <entry key="hibernate.generate_statistics" value="${bonita.platform.persistence.generate_statistics}" />
+                <entry key="hibernate.connection.shutdown" value="${bonita.platform.persistence.connection.shutdown}" />
+                <entry key="hibernate.validator.autoregister_listeners" value="${bonita.platform.persistence.validator.autoregister_listeners}" />
+                <entry key="hibernate.validator.apply_to_ddl" value="${bonita.platform.persistence.validator.apply_to_ddl}" />
+                <entry key="javax.persistence.validation.mode" value="${bonita.platform.persistence.javax.persistence.validation.mode}" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="interfaceToClassMapping" parent="communityInterfaceToClassMapping" class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="targetMapClass">
+            <value>java.util.HashMap</value>
+        </property>
+        <property name="sourceMap">
+            <map merge="true">
+            </map>
+        </property>
+    </bean>
+
+    <bean id="communityInterfaceToClassMapping" class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="targetMapClass">
+            <value>java.util.HashMap</value>
+        </property>
+        <property name="sourceMap">
+            <map>
+                <!-- platform -->
+                <entry key="org.bonitasoft.engine.platform.model.SPlatform" value="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" />
+                <entry key="org.bonitasoft.engine.platform.model.STenant" value="org.bonitasoft.engine.platform.model.impl.STenantImpl" />
+                <entry key="org.bonitasoft.engine.platform.command.model.SPlatformCommand" value="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" />
+                <entry key="org.bonitasoft.engine.dependency.model.SPlatformDependency" value="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" />
+                <entry key="org.bonitasoft.engine.dependency.model.SPlatformDependencyMapping" value="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" />
+                <!-- services -->
+                <entry key="org.bonitasoft.engine.dependency.model.SDependency" value="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" />
+                <entry key="org.bonitasoft.engine.dependency.model.SDependencyMapping" value="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" />
+                <entry key="org.bonitasoft.engine.identity.model.SUser" value="org.bonitasoft.engine.identity.model.impl.SUserImpl" />
+                <entry key="org.bonitasoft.engine.identity.model.SRole" value="org.bonitasoft.engine.identity.model.impl.SRoleImpl" />
+                <entry key="org.bonitasoft.engine.identity.model.SGroup" value="org.bonitasoft.engine.identity.model.impl.SGroupImpl" />
+                <entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" />
+                <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition" value="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" />
+                <entry key="org.bonitasoft.engine.identity.model.SCustomUserInfoValue" value="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" />
+                <entry key="org.bonitasoft.engine.identity.model.SContactInfo" value="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" />
+                <entry key="org.bonitasoft.engine.identity.model.SUserLogin" value="org.bonitasoft.engine.identity.model.impl.SUserLoginImpl" />
+                <entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLog" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" />
+                <entry key="org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter" value="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" />
+                <entry key="org.bonitasoft.engine.scheduler.model.SJobDescriptor" value="org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl" />
+                <entry key="org.bonitasoft.engine.scheduler.model.SJobParameter" value="org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl" />
+                <entry key="org.bonitasoft.engine.scheduler.model.SJobLog" value="org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl" />
+                <entry key="org.bonitasoft.engine.command.model.SCommand" value="org.bonitasoft.engine.command.model.SCommandImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SBooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SIntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SDoubleDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SFloatDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SShortTextDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SLongDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SDateDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SLongTextDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SXMLDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SBlobDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.profile.model.SProfile" value="org.bonitasoft.engine.profile.model.impl.SProfileImpl" />
+                <entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
+                <entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
+                <entry key="org.bonitasoft.engine.theme.model.STheme" value="org.bonitasoft.engine.theme.model.impl.SThemeImpl" />
+
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SADoubleDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SAFloatDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SAShortTextDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SALongDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SADateDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SALongTextDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SAXMLDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" />
+
+                <entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" />
+
+                <!-- bpm -->
+                <entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" />
+                <entry key="org.bonitasoft.engine.actor.mapping.model.SActorMember" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SSendTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SCatchEventInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateThrowEventInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo" value="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo" value="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceWithFailureInfoImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance" value="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingSignalEventImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping" value="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" />
+
+                <!--business data-->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SMultiRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SProcessMultiRefBusinessDataInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl" />
+
+                <entry key="org.bonitasoft.engine.core.category.model.SCategory" value="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" />
+                <entry key="org.bonitasoft.engine.core.category.model.SProcessCategoryMapping" value="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.SDocument" value="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.SMappedDocument" value="org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.SLightDocument" value="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" />
+                <entry key="org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor" value="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl" />
+
+                <entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" />
+                <entry key="org.bonitasoft.engine.core.process.comment.model.SHumanComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl" />
+                <entry key="org.bonitasoft.engine.core.process.comment.model.SSystemComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" />
+                <entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" />
+                <entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
+                <entry key="org.bonitasoft.engine.page.SPage" value="org.bonitasoft.engine.page.impl.SPageImpl" />
+                <entry key="org.bonitasoft.engine.page.SPageContent" value="org.bonitasoft.engine.page.impl.SPageContentImpl" />
+                <entry key="org.bonitasoft.engine.page.SPageWithContent" value="org.bonitasoft.engine.page.impl.SPageWithContentImpl" />
+                <entry key="org.bonitasoft.engine.page.SPageMapping" value="org.bonitasoft.engine.page.impl.SPageMappingImpl" />
+                <entry key="org.bonitasoft.engine.business.application.model.SApplication" value="org.bonitasoft.engine.business.application.model.impl.SApplicationImpl" />
+                <entry key="org.bonitasoft.engine.business.application.model.SApplicationPage" value="org.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" />
+                <entry key="org.bonitasoft.engine.business.application.model.SApplicationMenu" value="org.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" />
+                <entry key="org.bonitasoft.engine.core.form.SFormMapping" value="org.bonitasoft.engine.core.form.impl.SFormMappingImpl" />
+                <entry key="org.bonitasoft.engine.core.contract.data.STaskContractData" value="org.bonitasoft.engine.core.contract.data.STaskContractData" />
+                <entry key="org.bonitasoft.engine.core.contract.data.SProcessContractData" value="org.bonitasoft.engine.core.contract.data.SProcessContractData" />
+                <!-- archived objects -->
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAAutomaticTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAReceiveTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SASendTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAHumanTaskInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAMultiInstanceActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAMultiInstanceActivityInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.archive.SADocumentMapping" value="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.archive.SAMappedDocument" value="org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl" />
+                <entry key="org.bonitasoft.engine.core.contract.data.SATaskContractData" value="org.bonitasoft.engine.core.contract.data.SATaskContractData" />
+                <entry key="org.bonitasoft.engine.core.contract.data.SAProcessContractData" value="org.bonitasoft.engine.core.contract.data.SAProcessContractData" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="mappingExclusions" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list>
+                <value>org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="hbmConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateConfigurationProviderImpl">
+        <constructor-arg name="properties" ref="hbmConfigurationProviderProperties" />
+        <constructor-arg name="interfaceToClassMapping" ref="interfaceToClassMapping" />
+        <constructor-arg name="mappingExclusions" ref="mappingExclusions" />
+        <constructor-arg ref="hbmResourcesConfigurationProvider" />
+    </bean>
+
+    <bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl" autowire="byType" />
+
+</beans>

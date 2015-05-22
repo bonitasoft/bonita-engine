@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+	<query name="getEmployeeById">
+		SELECT employee
+		FROM org.bonitasoft.engine.archive.model.Employee AS employee
+		WHERE employee.id = :id
+	</query>
+
+	<query name="getEmployeeByAge">
+		SELECT employee
+		FROM org.bonitasoft.engine.archive.model.Employee AS employee
+		WHERE employee.age = :age
+	</query>
+
+	<query name="getLaptopById">
+		SELECT laptop
+		FROM org.bonitasoft.engine.archive.model.Laptop AS laptop
+		WHERE laptop.id = :id
+	</query>
+
+	<query name="getAddressById">
+		SELECT address
+		FROM org.bonitasoft.engine.archive.model.Address AS address
+		WHERE address.id = :id
+	</query>
+
+	<query name="getProjectById">
+		SELECT project
+		FROM org.bonitasoft.engine.archive.model.Project AS project
+		WHERE project.id = :id
+	</query>
+
+	<query name="getEmployeeProjectMappingById">
+		SELECT epMapping
+		FROM org.bonitasoft.engine.archive.model.EmployeeProjectMapping AS epMapping
+		WHERE epMapping.id = :id
+	</query>
+
+	<query name="getSAEmployeesByArchivedDate">
+		SELECT saemployee
+		FROM org.bonitasoft.engine.archive.model.SAEmployee AS saemployee
+		WHERE :time IS NULL OR saemployee.archiveDate &lt; :time
+	</query>
+
+	<query name="getAllSAEmployees">
+		SELECT saemployee
+		FROM org.bonitasoft.engine.archive.model.SAEmployee AS saemployee
+	</query>
+
+	<query name="getSAEmployeeById">
+		SELECT saemployee
+		FROM org.bonitasoft.engine.archive.model.SAEmployee AS saemployee
+		WHERE saemployee.id = :id
+	</query>
+
+</hibernate-mapping>

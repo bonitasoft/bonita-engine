@@ -6,32 +6,11 @@
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
+
 		<fileSet>
-			<outputDirectory>home</outputDirectory>
-			<directory>base</directory>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>home</outputDirectory>
-			<directory>hibernate</directory>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>home</outputDirectory>
-			<directory>common</directory>
-			<excludes>
-				<exclude>server/platform/conf/VERSION</exclude>
-			</excludes>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>home/server/platform/conf/</outputDirectory>
-			<directory>common/server/platform/conf/</directory>
-			<includes>
-				<include>VERSION</include>
-			</includes>
-			<filtered>true</filtered>
-		</fileSet>
-        <fileSet>
-            <outputDirectory>home</outputDirectory>
-            <directory>${project.build.directory}/common/home</directory>
+			<directory>${project.build.directory}/bonita-home</directory>
+			<outputDirectory>bonita-home</outputDirectory>
 		</fileSet>
 	</fileSets>
+
 </assembly>

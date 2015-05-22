@@ -27,21 +27,7 @@ import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
  * @author Matthieu Chaffotte
  * @since 7.0
  */
-public interface ContractDefinition extends BonitaObject {
-
-    /**
-     * Lists the simpleInputs of the contract.
-     *
-     * @return the simple inputs of the contract
-     */
-    List<SimpleInputDefinition> getSimpleInputs();
-
-    /**
-     * Lists the complex inputs of the contract.
-     *
-     * @return the complex inputs of the contract
-     */
-    List<ComplexInputDefinition> getComplexInputs();
+public interface ContractDefinition extends InputContainerDefinition {
 
     /**
      * Lists the validation rules of the contract.

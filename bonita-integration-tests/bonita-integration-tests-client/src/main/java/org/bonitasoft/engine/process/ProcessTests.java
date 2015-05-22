@@ -42,6 +42,7 @@ import org.junit.runners.Suite.SuiteClasses;
         StartProcessWithOperationsIT.class,
         ProcessDeletionIT.class,
         EvaluateExpressionIT.class,
+        ExecutionContextIT.class,
         CommentIT.class,
         DocumentIT.class,
         ActorTests.class,
