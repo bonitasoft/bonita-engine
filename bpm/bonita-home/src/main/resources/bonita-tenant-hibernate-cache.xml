@@ -86,6 +86,10 @@
             maxElementsInMemory="10000" timeToLiveSeconds="120"
             memoryStoreEvictionPolicy="LRU" overflowToDisk="false"/>
     <cache
+            name="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDesignContentImpl"
+            maxElementsInMemory="10000" timeToLiveSeconds="120"
+            memoryStoreEvictionPolicy="LRU" overflowToDisk="false"/>
+    <cache
             name="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl"
             maxElementsInMemory="10000" timeToLiveSeconds="120"
             memoryStoreEvictionPolicy="LRU" overflowToDisk="false"/>

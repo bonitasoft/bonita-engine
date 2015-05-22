@@ -8,29 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.tenant;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
-import com.bonitasoft.engine.APITestSPUtil;
-import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.api.IdentityAPI;
-import com.bonitasoft.engine.api.LoginAPI;
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.api.TenantManagementAPI;
-import com.bonitasoft.engine.api.TenantStatusException;
-import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.platform.TenantActivationException;
-import com.bonitasoft.engine.platform.TenantCreator;
-import com.bonitasoft.engine.platform.TenantDeactivationException;
-import com.bonitasoft.engine.platform.TenantNotFoundException;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
@@ -61,6 +44,23 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import com.bonitasoft.engine.APITestSPUtil;
+import com.bonitasoft.engine.BPMTestSPUtil;
+import com.bonitasoft.engine.api.IdentityAPI;
+import com.bonitasoft.engine.api.LoginAPI;
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.api.TenantManagementAPI;
+import com.bonitasoft.engine.api.TenantStatusException;
+import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.platform.TenantActivationException;
+import com.bonitasoft.engine.platform.TenantCreator;
+import com.bonitasoft.engine.platform.TenantDeactivationException;
+import com.bonitasoft.engine.platform.TenantNotFoundException;
 
 /**
  * @author Yanyan Liu
@@ -149,7 +149,7 @@ public class TenantIT {
     public void cannotAccessTenantAPIsOnPausedTenant() throws Exception {
         final APITestSPUtil apiTestSPUtil = new APITestSPUtil();
         apiTestSPUtil.loginOnTenantWith(userName, password, tenantId);
-        final TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
+        final TenantAdministrationAPI tenantManagementAPI = apiTestSPUtil.getTenantAdministrationAPI();
         tenantManagementAPI.pause();
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         apiSession = loginAPI.login(tenantId, userName, password);
@@ -169,7 +169,7 @@ public class TenantIT {
         apiTestSPUtil.loginOnTenantWith(userName, password, tenantId);
         final IdentityAPI identityAPI = apiTestSPUtil.getIdentityAPI();
         final User john = identityAPI.createUser("john", "bpm");
-        final TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
+        final TenantAdministrationAPI tenantManagementAPI = apiTestSPUtil.getTenantAdministrationAPI();
         tenantManagementAPI.pause();
         loginAPI.logout(apiTestSPUtil.getSession());
         // login with normal user: not working
@@ -182,7 +182,7 @@ public class TenantIT {
         // login with normal user: not working
         APISession loginOnDefaultTenantWithTechnical = loginAPI.login(tenantId, userName, password);
         // ok to login with technical user
-        TenantAPIAccessor.getTenantManagementAPI(loginOnDefaultTenantWithTechnical).resume();
+        TenantAPIAccessor.getTenantAdministrationAPI(loginOnDefaultTenantWithTechnical).resume();
         loginAPI.logout(loginOnDefaultTenantWithTechnical);
         // can now login with normal user
         final APISession login = loginAPI.login(tenantId, "john", "bpm");
