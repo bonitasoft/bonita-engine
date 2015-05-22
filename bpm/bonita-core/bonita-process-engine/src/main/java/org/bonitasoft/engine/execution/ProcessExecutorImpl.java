@@ -56,7 +56,6 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
@@ -484,12 +483,14 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     protected void createDocuments(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance, final long authorId,
-                                   final SExpressionContext expressionContext, final Map<String, Object> context)
+            final SExpressionContext expressionContext, final Map<String, Object> context)
             throws SObjectCreationException, BonitaHomeNotSetException, STenantIdNotSetException, IOException, SObjectAlreadyExistsException,
-            SBonitaReadException, SObjectModificationException, SExpressionTypeUnknownException, SExpressionDependencyMissingException, SExpressionEvaluationException, SInvalidExpressionException, SOperationExecutionException {
+            SBonitaReadException, SObjectModificationException, SExpressionTypeUnknownException, SExpressionDependencyMissingException,
+            SExpressionEvaluationException, SInvalidExpressionException, SOperationExecutionException {
         final SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
         final List<SDocumentDefinition> documentDefinitions = processContainer.getDocumentDefinitions();
-        final Map<SExpression, DocumentValue> evaluatedDocumentValues = evaluateInitialExpressionsOfDocument(sProcessInstance, expressionContext, context, documentDefinitions);
+        final Map<SExpression, DocumentValue> evaluatedDocumentValues = evaluateInitialExpressionsOfDocument(sProcessInstance, expressionContext, context,
+                documentDefinitions);
         if (!documentDefinitions.isEmpty()) {
             for (final SDocumentDefinition document : documentDefinitions) {
                 DocumentValue documentValue = getInitialDocumentValue(sDefinition, evaluatedDocumentValues, document);
@@ -501,40 +502,43 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
     }
 
-    protected DocumentValue getInitialDocumentValue(SProcessDefinition sDefinition, Map<SExpression, DocumentValue> evaluatedDocumentValues, SDocumentDefinition document) throws BonitaHomeNotSetException, IOException, STenantIdNotSetException {
-                DocumentValue documentValue = null;
-                if (document.getInitialValue() != null) {
+    protected DocumentValue getInitialDocumentValue(SProcessDefinition sDefinition, Map<SExpression, DocumentValue> evaluatedDocumentValues,
+            SDocumentDefinition document) throws BonitaHomeNotSetException, IOException, STenantIdNotSetException {
+        DocumentValue documentValue = null;
+        if (document.getInitialValue() != null) {
             documentValue = evaluatedDocumentValues.get(document.getInitialValue());
-                } else if (document.getFile() != null) {
+        } else if (document.getFile() != null) {
             final byte[] content = getProcessDocumentContent(sDefinition, document);
-                    documentValue = new DocumentValue(content, document.getMimeType(), document.getFileName());
-                } else if (document.getUrl() != null) {
-                    documentValue = new DocumentValue(document.getUrl());
-                    documentValue.setFileName(document.getFileName());
-                    documentValue.setMimeType(document.getMimeType());
-                }
+            documentValue = new DocumentValue(content, document.getMimeType(), document.getFileName());
+        } else if (document.getUrl() != null) {
+            documentValue = new DocumentValue(document.getUrl());
+            documentValue.setFileName(document.getFileName());
+            documentValue.setMimeType(document.getMimeType());
+        }
         return documentValue;
-                }
+    }
 
-    byte[] getProcessDocumentContent(SProcessDefinition sDefinition, SDocumentDefinition document) throws BonitaHomeNotSetException, IOException, STenantIdNotSetException {
+    byte[] getProcessDocumentContent(SProcessDefinition sDefinition, SDocumentDefinition document) throws BonitaHomeNotSetException, IOException,
+            STenantIdNotSetException {
         final String file = document.getFile();// should always exists...validation on BusinessArchive
         return BonitaHomeServer.getInstance().getProcessDocument(sessionAccessor.getTenantId(), sDefinition.getId(), file);
-            }
+    }
 
-
-    private Map<SExpression,DocumentValue> evaluateInitialExpressionsOfDocument(final SProcessInstance processInstance, final SExpressionContext expressionContext,
-                                                                   final Map<String, Object> context, final List<SDocumentDefinition> documentDefinitions) throws SExpressionTypeUnknownException,
+    private Map<SExpression, DocumentValue> evaluateInitialExpressionsOfDocument(final SProcessInstance processInstance,
+            final SExpressionContext expressionContext,
+            final Map<String, Object> context, final List<SDocumentDefinition> documentDefinitions) throws SExpressionTypeUnknownException,
             SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SOperationExecutionException {
         final List<SExpression> initialValuesExpressions = new ArrayList<SExpression>(documentDefinitions.size());
         Map<SExpression, DocumentValue> evaluatedDocumentValue = new HashMap<>();
         for (final SDocumentDefinition documentDefinition : documentDefinitions) {
-            if(documentDefinition.getInitialValue() != null){
+            if (documentDefinition.getInitialValue() != null) {
                 initialValuesExpressions.add(documentDefinition.getInitialValue());
+            }
         }
-    }
-        final List<Object> evaluate = expressionResolverService.evaluate(initialValuesExpressions, getsExpressionContext(processInstance, expressionContext, context));
+        final List<Object> evaluate = expressionResolverService.evaluate(initialValuesExpressions,
+                getsExpressionContext(processInstance, expressionContext, context));
         for (int i = 0; i < initialValuesExpressions.size(); i++) {
-            evaluatedDocumentValue.put(initialValuesExpressions.get(i),documentHelper.toCheckedDocumentValue(evaluate.get(i)));
+            evaluatedDocumentValue.put(initialValuesExpressions.get(i), documentHelper.toCheckedDocumentValue(evaluate.get(i)));
         }
         return evaluatedDocumentValue;
     }
@@ -548,7 +552,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final List<Object> initialValues = evaluateInitialExpressionsOfDocumentLists(processInstance, expressionContext, context, documentListDefinitions);
             for (int i = 0; i < documentListDefinitions.size(); i++) {
                 final Object newValue = initialValues.get(i);
-                if(newValue == null){
+                if (newValue == null) {
                     continue;
                 }
                 documentHelper.setDocumentList(
@@ -786,9 +790,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, getFilter(targetSFlowNodeDefinitionId), subProcessDefinitionId);
             return start(starterId, starterSubstituteId, expressionContext, operations, context, connectorsWithInput, callerId, selector, processInputs);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new SProcessInstanceCreationException(e);
-        } catch (final SProcessDefinitionReadException e) {
+        } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e) {
             throw new SProcessInstanceCreationException(e);
         }
     }

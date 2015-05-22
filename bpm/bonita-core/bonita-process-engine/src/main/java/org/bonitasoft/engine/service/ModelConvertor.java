@@ -153,6 +153,7 @@ import org.bonitasoft.engine.business.data.impl.SimpleBusinessDataReferenceImpl;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandDescriptorImpl;
 import org.bonitasoft.engine.command.model.SCommand;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.core.category.model.SCategory;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -168,7 +169,6 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
@@ -277,6 +277,7 @@ import org.bonitasoft.engine.operation.impl.OperationImpl;
 import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.page.SPageMapping;
 import org.bonitasoft.engine.page.SPageURL;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
 import org.bonitasoft.engine.platform.impl.PlatformImpl;
@@ -574,10 +575,8 @@ public class ModelConvertor {
             try {
                 sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
                 processDefinitions.put(sProcessDefinition.getId(), sProcessDefinition);
-            } catch (final SProcessDefinitionNotFoundException e) {
-                // ignore...
-            } catch (final SProcessDefinitionReadException e) {
-                // ignore...
+            } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e ) {
+                throw new SBonitaRuntimeException(e);
             }
         }
         return sProcessDefinition;

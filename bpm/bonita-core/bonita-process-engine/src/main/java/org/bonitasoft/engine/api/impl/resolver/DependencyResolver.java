@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl.resolver;
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.ERROR;
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.INFO;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.transaction.dependency.AddSDependency;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
@@ -34,7 +32,6 @@ import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
@@ -45,10 +42,10 @@ import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -94,7 +91,7 @@ public class DependencyResolver {
         try {
             List<Long> processDefinitionIds = tenantAccessor.getProcessDefinitionService().getProcessDefinitionIds(0, Integer.MAX_VALUE);
             resolveDependencies(processDefinitionIds, tenantAccessor);
-        } catch (SProcessDefinitionReadException e) {
+        } catch (SBonitaReadException e) {
             loggerService.log(DependencyResolver.class, ERROR, "Unable to retrieve tenant process definitions, dependency resolution aborted");
         }
     }
@@ -166,10 +163,10 @@ public class DependencyResolver {
     public void resolveAndCreateDependencies(final long tenantId, final ProcessDefinitionService processDefinitionService,
             final DependencyService dependencyService, final long processDefinitionId) throws SBonitaException {
         Map<String, byte[]> resources = null;
-                try {
-        resources = BonitaHomeServer.getInstance().getProcessClasspath(tenantId, processDefinitionId);
-                } catch (final IOException e) {
-                    throw new SDependencyCreationException(e);
+        try {
+            resources = BonitaHomeServer.getInstance().getProcessClasspath(tenantId, processDefinitionId);
+        } catch (final IOException e) {
+            throw new SDependencyCreationException(e);
         } catch (BonitaHomeNotSetException e) {
             throw new SDependencyCreationException(e);
         }

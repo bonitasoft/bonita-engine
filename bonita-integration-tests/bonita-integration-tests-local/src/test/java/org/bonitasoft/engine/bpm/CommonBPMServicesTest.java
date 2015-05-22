@@ -36,7 +36,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -227,7 +226,7 @@ public class CommonBPMServicesTest {
         }
     }
 
-    private void cleanProcessesDefinitions(List<String> messages) throws SProcessDefinitionReadException, SProcessDefinitionNotFoundException,
+    private void cleanProcessesDefinitions(List<String> messages) throws SBonitaReadException, SProcessDefinitionNotFoundException,
             SProcessDeletionException, SDeletingEnabledProcessException {
         final QueryOptions queryOptions = new QueryOptions(0, 200, SProcessDefinitionDeployInfo.class, "name", OrderByType.ASC);
         final List<SProcessDefinitionDeployInfo> processes = getTenantAccessor().getProcessDefinitionService().getProcessDeploymentInfos(queryOptions);
