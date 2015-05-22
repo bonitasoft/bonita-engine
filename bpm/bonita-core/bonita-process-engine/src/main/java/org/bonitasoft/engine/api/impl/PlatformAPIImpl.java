@@ -630,7 +630,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             try {
                 // Get user name
-                userName = getUserName(tenant, tenantId);
+                userName = getUserName(tenantId);
             } catch (Exception e) {
                 transactionService.complete();
                 throw new STenantCreationException(e);
@@ -663,10 +663,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         } finally {
             cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
-    }
-
-    private String getUserName(final STenant tenant, final Long tenantId) throws IOException, BonitaHomeNotSetException {
-        return getUserName(tenantId);
     }
 
     private void createTenantFolderInBonitaHome(final long tenantId) throws STenantCreationException {
