@@ -15,6 +15,7 @@ package org.bonitasoft.engine.page.impl;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -324,19 +325,35 @@ public class ApiExtensionPageServiceListenerImplTest {
         final SPageImpl page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
         final Properties properties = new Properties();
-        properties.setProperty("apiExtensions", "employee ");
-        properties.setProperty("employee.method", "GET");
+        properties.setProperty("apiExtensions", "employees, employee ");
+        properties.setProperty("employees.method", "GET");
+        properties.setProperty("employees.pathTemplate", "employees");
+        properties.setProperty("employees.classFileName", "Index.groovy");
+        properties.setProperty("employees.permissions", "myPermission");
+        properties.setProperty("employee.method", "PUT");
         properties.setProperty("employee.pathTemplate", "employees");
         properties.setProperty("employee.classFileName", "Index.groovy");
         properties.setProperty("employee.permissions", "myPermission");
         when(helper.loadPageProperties(content)).thenReturn(properties);
-        final List<SPageMapping> mappings = buildPageMappings(1);
+        final SPageMapping pageMapping1 = buildPageMapping("apiExtension|POST|employees");
+        final SPageMapping pageMapping2 = buildPageMapping("apiExtension|GET|employees");
+        final List<SPageMapping> mappings = new ArrayList<SPageMapping>();
+        mappings.add(pageMapping1);
+        mappings.add(pageMapping2);
         when(pageMappingService.get(pageId, 0, 100)).thenReturn(mappings);
 
         listener.pageUpdated(page, content);
 
-        verify(pageMappingService).delete(any(SPageMapping.class));
-        verify(pageMappingService).create("apiExtension|GET|employees", pageId, Collections.<String> emptyList());
+        verify(pageMappingService).delete(pageMapping1);
+        verify(pageMappingService, never()).delete(pageMapping2);
+        verify(pageMappingService).create("apiExtension|PUT|employees", pageId, Collections.<String> emptyList());
+        verify(pageMappingService, never()).create(pageMapping2.getKey(), pageId, Collections.<String> emptyList());
+    }
+
+    private SPageMapping buildPageMapping(final String key) {
+        final SPageMappingImpl pageMapping = new SPageMappingImpl();
+        pageMapping.setKey(key);
+        return pageMapping;
     }
 
     @Test
@@ -345,7 +362,7 @@ public class ApiExtensionPageServiceListenerImplTest {
         final long pageId = 10L;
         final SPageImpl page = buildPage(pageId);
         final byte[] content = new byte[] { 1, 0, 0 };
-        when(pageMappingService.get(pageId, 0, 100)).thenThrow(new SBonitaReadException("exception"));
+        when(helper.loadPageProperties(content)).thenThrow(new IOException("exception"));
 
         //then
         exception.expect(SObjectModificationException.class);
@@ -353,6 +370,18 @@ public class ApiExtensionPageServiceListenerImplTest {
 
         //when
         listener.pageUpdated(page, content);
+    }
+
+    @Test
+    public void pageUpdated_should_only_care_of_api_extension() throws Exception {
+        final SPageImpl page = new SPageImpl();
+        page.setId(2L);
+        page.setContentType(SContentType.PAGE);
+        final byte[] content = new byte[] { 1, 0, 0 };
+
+        listener.pageUpdated(page, content);
+
+        verifyZeroInteractions(pageMappingService, helper);
     }
 
 }

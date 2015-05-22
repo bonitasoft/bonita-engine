@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.converter.ApplicationPageNodeConverter;
+import org.bonitasoft.engine.business.application.converter.NodeToApplicationPageConverter;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
@@ -42,7 +42,7 @@ public class ApplicationPageImporterTest {
     private ApplicationService applicationService;
 
     @Mock
-    private ApplicationPageNodeConverter converter;
+    private NodeToApplicationPageConverter converter;
 
     @InjectMocks
     private ApplicationPageImporter importer;

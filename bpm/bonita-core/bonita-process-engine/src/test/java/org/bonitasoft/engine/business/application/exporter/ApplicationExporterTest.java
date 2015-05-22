@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
+import org.bonitasoft.engine.business.application.converter.ApplicationsToNodeContainerConverter;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ApplicationExporterTest {
 
     @Mock
-    private ApplicationContainerConverter converter;
+    private ApplicationsToNodeContainerConverter converter;
 
     @Mock
     private ApplicationContainerExporter containerExporter;
