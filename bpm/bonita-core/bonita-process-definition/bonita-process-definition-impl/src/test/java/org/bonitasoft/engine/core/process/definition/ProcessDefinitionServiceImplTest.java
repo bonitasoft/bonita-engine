@@ -394,7 +394,7 @@ public class ProcessDefinitionServiceImplTest {
     public void getProcessDefinition_from_cache() throws Exception {
         sProcessDefinitionDeployInfo.setLastUpdateDate(5478L);
         final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("a", "b");
-        doReturn(new Pair<Long, SProcessDefinition>(5478L, sProcessDefinition)).when(processDefinitionServiceImpl).getFromCache(PROCESS_ID);
+        doReturn(new Pair<Long, SProcessDefinition>(5478L, sProcessDefinition)).when(processDefinitionServiceImpl).getSProcessDefinitionFromCache(PROCESS_ID);
 
         final SProcessDefinition processDefinition = processDefinitionServiceImpl.getProcessDefinition(PROCESS_ID);
 
@@ -419,7 +419,7 @@ public class ProcessDefinitionServiceImplTest {
         sProcessDefinitionDeployInfo.setLastUpdateDate(5478L);
         final SProcessDefinitionImpl processDefinitionB = new SProcessDefinitionImpl("a", "b");
         final SProcessDefinitionImpl processDefinitionC = new SProcessDefinitionImpl("a", "c");
-        doReturn(new Pair<Long, SProcessDefinition>(5477L, processDefinitionB)).when(processDefinitionServiceImpl).getFromCache(PROCESS_ID);
+        doReturn(new Pair<Long, SProcessDefinition>(5477L, processDefinitionB)).when(processDefinitionServiceImpl).getSProcessDefinitionFromCache(PROCESS_ID);
         doReturn(processDefinitionC).when(processDefinitionServiceImpl).convertDesignProcessDefinition(designProcessDefinition);
         final SProcessDefinition processDefinition = processDefinitionServiceImpl.getProcessDefinition(PROCESS_ID);
 
@@ -463,7 +463,7 @@ public class ProcessDefinitionServiceImplTest {
         final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("a", "b");
         doReturn(new Pair<Long, SProcessDefinition>(541L, sProcessDefinition)).when(cacheService).get(anyString(), any());
         // When
-        processDefinitionServiceImpl.updateLastUpdateDateInCache(3L, sProcessDefinitionDeployInfo);
+        processDefinitionServiceImpl.updateSProcessDefinitionTimestampInCache(3L, sProcessDefinitionDeployInfo);
         // Then
         verify(cacheService).store(ProcessDefinitionService.PROCESS_CACHE_NAME, 3L, new Pair<Long, SProcessDefinition>(5478L, sProcessDefinition));
     }
@@ -474,7 +474,7 @@ public class ProcessDefinitionServiceImplTest {
         final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
         doReturn(3L).when(sProcessDefinitionDeployInfo).getId();
         // When
-        processDefinitionServiceImpl.updateLastUpdateDateInCache(3L, sProcessDefinitionDeployInfo);
+        processDefinitionServiceImpl.updateSProcessDefinitionTimestampInCache(3L, sProcessDefinitionDeployInfo);
         // Then
         verify(cacheService, times(0)).store(anyString(), any(Serializable.class), any());
     }

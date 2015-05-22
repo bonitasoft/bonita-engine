@@ -190,11 +190,10 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
     }
 
-    void updateLastUpdateDateInCache(long processId, SProcessDefinitionDeployInfo processDefinitionDeployInfo) throws SCacheException {
-        final Pair<Long, SProcessDefinition> fromCache = getFromCache(processId);
+    void updateSProcessDefinitionTimestampInCache(long processId, SProcessDefinitionDeployInfo processDefinitionDeployInfo) throws SCacheException {
+        final Pair<Long, SProcessDefinition> fromCache = getSProcessDefinitionFromCache(processId);
         if (fromCache != null) {
-            fromCache.setKey(processDefinitionDeployInfo.getLastUpdateDate());
-            cacheService.store(PROCESS_CACHE_NAME, processId, fromCache);
+            storeProcessDefinitionInCache(fromCache.getValue(), processDefinitionDeployInfo.getLastUpdateDate());
         }
     }
 
@@ -267,26 +266,36 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public SProcessDefinition getProcessDefinition(final long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         try {
+            //get from database
             final SProcessDefinitionDeployInfo processDeploymentInfo = getProcessDeploymentInfo(processId);
-            final Pair<Long, SProcessDefinition> processWithTimestamp = getFromCache(processId);
-            SProcessDefinition sProcessDefinition;
-            if (processWithTimestamp == null || processWithTimestamp.getKey() != processDeploymentInfo.getLastUpdateDate()) {
-                final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent()
-                        .getContent());
-                sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
-                setIdOnProcessDefinition(sProcessDefinition, processId);
-                cache(sProcessDefinition, processDeploymentInfo.getLastUpdateDate());
+            //get from cache
+            final Pair<Long, SProcessDefinition> processWithTimestamp = getSProcessDefinitionFromCache(processId);
+            //read SProcessDefinition if needed
+            if (isSProcessDefinitionUpToDate(processDeploymentInfo, processWithTimestamp)) {
+                return readSProcessDefinitionFromDatabase(processId, processDeploymentInfo);
             } else {
-                sProcessDefinition = processWithTimestamp.getValue();
+                return processWithTimestamp.getValue();
             }
-            return sProcessDefinition;
         } catch (XMLParseException | IOException | SReflectException | SCacheException e) {
             throw new SProcessDefinitionReadException(e);
         }
     }
 
+    SProcessDefinition readSProcessDefinitionFromDatabase(long processId, SProcessDefinitionDeployInfo processDeploymentInfo) throws IOException, XMLParseException, SReflectException, SCacheException {
+        final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent()
+                .getContent());
+        SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
+        setIdOnProcessDefinition(sProcessDefinition, processId);
+        storeProcessDefinitionInCache(sProcessDefinition, processDeploymentInfo.getLastUpdateDate());
+        return sProcessDefinition;
+    }
+
+    boolean isSProcessDefinitionUpToDate(SProcessDefinitionDeployInfo processDeploymentInfo, Pair<Long, SProcessDefinition> processWithTimestamp) {
+        return processWithTimestamp == null || processWithTimestamp.getKey() != processDeploymentInfo.getLastUpdateDate();
+    }
+
     @SuppressWarnings("unchecked")
-    Pair<Long, SProcessDefinition> getFromCache(long processId) throws SCacheException {
+    Pair<Long, SProcessDefinition> getSProcessDefinitionFromCache(long processId) throws SCacheException {
         return (Pair<Long, SProcessDefinition>) cacheService.get(PROCESS_CACHE_NAME, processId);
     }
 
@@ -376,7 +385,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                         .setObject(sProcessDefinitionDeployInfo).done();
             }
             recorder.recordInsert(record, insertEvent);
-            cache(definition, sProcessDefinitionDeployInfo.getLastUpdateDate());
+            storeProcessDefinitionInCache(definition, sProcessDefinitionDeployInfo.getLastUpdateDate());
             log(definition.getId(), SQueriableLog.STATUS_OK, logBuilder, "store");
         } catch (final Exception e) {
             log(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");
@@ -385,7 +394,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return definition;
     }
 
-    void cache(SProcessDefinition definition, Long lastUpdateDate) throws SCacheException {
+    void storeProcessDefinitionInCache(SProcessDefinition definition, Long lastUpdateDate) throws SCacheException {
         cacheService.store(PROCESS_CACHE_NAME, definition.getId(), Pair.of(lastUpdateDate, definition));
     }
 
@@ -589,7 +598,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             throws SRecorderException, SCacheException {
         recorder.recordUpdate(updateRecord, updateEvent);
         if (!updateRecord.getFields().containsKey(SProcessDefinitionDeployInfoBuilderFactoryImpl.DESIGN_CONTENT)) {
-            updateLastUpdateDateInCache(processId, processDefinitionDeployInfo);
+            updateSProcessDefinitionTimestampInCache(processId, processDefinitionDeployInfo);
         }
     }
 
