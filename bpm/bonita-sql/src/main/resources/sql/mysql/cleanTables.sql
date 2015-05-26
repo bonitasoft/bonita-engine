@@ -24,7 +24,6 @@ DELETE FROM event_trigger_instance;
 DELETE FROM connector_instance;
 DELETE FROM flownode_instance;
 DELETE FROM process_instance;
-DELETE FROM breakpoint;
 DELETE FROM report;
 DELETE FROM processsupervisor;
 DELETE FROM business_app_menu;

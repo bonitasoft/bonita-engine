@@ -463,18 +463,6 @@ CREATE TABLE pending_mapping (
 );
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
 
-CREATE TABLE breakpoint (
-	tenantid INT8 NOT NULL,
-  	id INT8 NOT NULL,
-  	state_id INT NOT NULL,
-  	int_state_id INT NOT NULL,
-  	elem_name VARCHAR(255) NOT NULL,
-  	inst_scope BOOLEAN NOT NULL,
-  	inst_id INT8 NOT NULL,
-  	def_id INT8 NOT NULL,
-  	PRIMARY KEY (tenantid, id)
-);
-
 CREATE TABLE ref_biz_data_inst (
 	tenantid INT8 NOT NULL,
   	id INT8 NOT NULL,

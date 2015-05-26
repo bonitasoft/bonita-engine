@@ -1317,8 +1317,6 @@
                 <ref bean="connectorCacheConfig" />
                 <ref bean="parameterCacheConfig" />
                 <ref bean="userFilterCacheConfig" />
-                <ref bean="migrationPlanCacheConfig" />
-                <ref bean="breakpointCacheConfig" />
                 <ref bean="groovyScriptCacheConfig" />
                 <ref bean="transientDataCacheConfig" />
             </list>
@@ -1376,32 +1374,6 @@
         <property name="copyOnRead" value="${bonita.tenant.cache.userfilter.copyOnRead}" />
         <property name="copyOnWrite" value="${bonita.tenant.cache.userfilter.copyOnWrite}" />
         <property name="readIntensive" value="${bonita.tenant.cache.userfilter.readIntensive}" />
-    </bean>
-
-    <bean id="migrationPlanCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="MIGRATION_PLAN_CACHE_NAME" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.migrationplan.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.migrationplan.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.migrationplan.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.migrationplan.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.migrationplan.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.migrationplan.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.migrationplan.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.migrationplan.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.migrationplan.readIntensive}" />
-    </bean>
-
-    <bean id="breakpointCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="BREAKPOINTS_BY_INSTANCE" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.breakpoint.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.breakpoint.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.breakpoint.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.breakpoint.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.breakpoint.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.breakpoint.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.breakpoint.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.breakpoint.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.breakpoint.readIntensive}" />
     </bean>
 
     <bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">

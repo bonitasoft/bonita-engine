@@ -24,7 +24,6 @@ DROP TABLE process_instance;
 DROP TABLE event_trigger_instance;
 DROP TABLE waiting_event;
 DROP TABLE message_instance;
-DROP TABLE breakpoint;
 DROP TABLE report;
 DROP TABLE processsupervisor;
 DROP TABLE business_app_menu;
