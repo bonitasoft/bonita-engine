@@ -83,7 +83,7 @@ public interface SchedulerService extends PlatformLifecycleService {
      * @throws SSchedulerException
      *         if an exception occurs.
      */
-    void schedule(SJobDescriptor jobDescriptor, List<SJobParameter> parameters, Trigger trigger) throws SSchedulerException;
+    void schedule(SJobDescriptor jobDescriptor, List<SJobParameter> jobParameters, Trigger trigger) throws SSchedulerException;
 
     void executeAgain(long jobDescriptorId) throws SSchedulerException;
 
