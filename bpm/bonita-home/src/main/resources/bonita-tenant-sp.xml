@@ -5,33 +5,6 @@
 
     <bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor" />
 
-    <bean id="flowNodeStateManager" class="com.bonitasoft.engine.execution.FlowNodeStateManagerExt">
-        <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
-        <constructor-arg name="processInstanceService" ref="processInstanceService" />
-        <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
-        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
-        <constructor-arg name="expressionResolverService" ref="expressionResolverService" />
-        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-        <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
-        <constructor-arg name="operationService" ref="operationService" />
-        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
-        <constructor-arg name="containerRegistry" ref="containerRegistry" />
-        <constructor-arg name="archiveService" ref="archiveService" />
-        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="documentService" ref="documentService" />
-        <constructor-arg name="commentService" ref="commentService" />
-        <constructor-arg name="eventsHandler" ref="eventsHandler" />
-        <constructor-arg name="userFilterService" ref="userFilterService" />
-        <constructor-arg name="actorMappingService" ref="actorMappingService" />
-        <constructor-arg name="workService" ref="workService" />
-        <constructor-arg name="identityService" ref="identityService" />
-        <constructor-arg name="breakpointService" ref="breakpointService" />
-        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
-        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver" />
-        <constructor-arg name="waitingEventsInterrupter" ref="waitingEventsInterrupter" />
-        <constructor-arg name="classLoaderService" ref="classLoaderService" />
-    </bean>
-
     <bean id="processExecutor" class="com.bonitasoft.engine.execution.ProcessExecutorExt">
         <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
         <constructor-arg name="processInstanceService" ref="processInstanceService" />
@@ -97,9 +70,6 @@
             <list merge="true">
                 <ref bean="executeActionsAndTerminateExt" />
                 <ref bean="executeActionsAndStartInstanceExt" />
-                <ref bean="addBreakpointCommand" />
-                <ref bean="removeBreakpointCommand" />
-                <ref bean="getBreakpointsCommand" />
             </list>
         </property>
     </bean>
@@ -125,42 +95,6 @@
         </constructor-arg>
         <constructor-arg name="implementation">
             <value>com.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTaskExt</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="addBreakpointCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>addBreakpoint</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Add the breakpoint.</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>com.bonitasoft.engine.command.AddBreakpointCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="removeBreakpointCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>removeBreakpoint</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Remove the breakpoint.</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>com.bonitasoft.engine.command.RemoveBreakpointCommand</value>
-        </constructor-arg>
-    </bean>
-
-    <bean id="getBreakpointsCommand" class="org.bonitasoft.engine.command.api.impl.CommandDeployment">
-        <constructor-arg name="name">
-            <value>getBreakpoints</value>
-        </constructor-arg>
-        <constructor-arg name="description">
-            <value>Get breakpoints.</value>
-        </constructor-arg>
-        <constructor-arg name="implementation">
-            <value>com.bonitasoft.engine.command.GetBreakpointsCommand</value>
         </constructor-arg>
     </bean>
 
@@ -214,8 +148,6 @@
                 <entry key="APPLICATION_MENU_CREATED:INTERNAL" value="true" />
                 <entry key="APPLICATION_MENU_DELETED:INTERNAL" value="true" />
                 <entry key="APPLICATION_MENU_UPDATED:INTERNAL" value="true" />
-                <entry key="BREAKPOINT_CREATED:INTERNAL" value="true" />
-                <entry key="BREAKPOINT_DELETED:INTERNAL" value="true" />
                 <entry key="CATEGORY_CREATED:INTERNAL" value="true" />
                 <entry key="CATEGORY_DELETED:INTERNAL" value="true" />
                 <entry key="CATEGORY_UPDATED:INTERNAL" value="true" />
@@ -338,15 +270,6 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="sessionService" ref="sessionService" />
         <constructor-arg name="technicalLog" ref="tenantTechnicalLoggerService" />
-    </bean>
-
-    <bean id="breakpointService" class="com.bonitasoft.engine.core.process.instance.impl.BreakpointServiceImpl">
-        <constructor-arg name="recorder" ref="tenantRecorderSync" />
-        <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="eventService" ref="tenantEventService" />
-        <constructor-arg name="cacheService" ref="cacheService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
-        <constructor-arg name="transactionService" ref="transactionService" />
     </bean>
 
     <bean id="bonitaDSJNDI" class="org.springframework.jndi.JndiObjectFactoryBean">

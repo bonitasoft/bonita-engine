@@ -45,12 +45,6 @@
 		<constructor-arg name="technicalLog" ref="platformTechnicalLoggerService" />
 		<constructor-arg name="jobHandler" ref="jobHandler" />
 	</bean>
-
-	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-		<constructor-arg name="className" value="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
-		<constructor-arg name="sequenceId" value="10019" />
-		<constructor-arg name="rangeSize" value="${bonita.platform.sequence.10019:${bonita.platform.sequence.defaultRangeSize}}" />
-	</bean>
 	<bean class="org.bonitasoft.engine.sequence.SequenceMapping">
 		<constructor-arg name="className" value="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" />
 		<constructor-arg name="sequenceId" value="500" />
@@ -73,9 +67,6 @@
 				<!-- report -->
 				<value>com/bonitasoft/engine/core/reporting/model/impl/hibernate/report.hbm.xml</value>
 				<value>com/bonitasoft/engine/core/reporting/model/impl/hibernate/report.queries.hbm.xml</value>
-				<!-- process instance -->
-				<value>com/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.hbm.xml</value>
-				<value>com/bonitasoft/engine/core/process/instance/model/impl/hibernate/process.instance.queries.hbm.xml</value>
 			</set>
 		</property>
 		<property name="classAliasMappings">
@@ -83,9 +74,6 @@
 				<!-- report -->
 				<entry key="com.bonitasoft.engine.core.reporting.SReport" value="report" />
 				<entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="reportcontent" />
-				<!-- process instance -->
-				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="breakpoint" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance" value="ref" />
 			</map>
 		</property>
 	</bean>
@@ -148,7 +136,6 @@
 		</property>
 		<property name="sourceMap">
 			<map merge="true">
-				<entry key="com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint" value="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SReport" value="com.bonitasoft.engine.core.reporting.SReportImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SReportContent" value="com.bonitasoft.engine.core.reporting.SReportContentImpl" />
 				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContent" value="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" />
