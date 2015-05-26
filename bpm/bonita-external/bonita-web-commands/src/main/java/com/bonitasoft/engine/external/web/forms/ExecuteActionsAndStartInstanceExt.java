@@ -20,12 +20,12 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -70,7 +70,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
     private ProcessInstance startProcess(final long processDefinitionId, final long userId, final List<Operation> operations,
             final Map<String, Serializable> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput)
-            throws SProcessDefinitionException, SProcessDefinitionReadException, SProcessInstanceCreationException, SContractViolationException {
+            throws SProcessDefinitionException, SBonitaReadException, SProcessInstanceCreationException, SContractViolationException {
         return new ProcessStarter(userId, processDefinitionId, operations, context).start(connectorsWithInput);
     }
 
