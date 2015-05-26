@@ -61,6 +61,7 @@ import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.io.xml.XMLParseException;
@@ -105,7 +106,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     private final ReadSessionAccessor sessionAccessor;
     private final QueriableLoggerService queriableLoggerService;
     private final DependencyService dependencyService;
-    private final ProcessDefinitionBARContribution processDefinitionBARContribution;
+    protected ProcessDefinitionBARContribution processDefinitionBARContribution;
 
     public ProcessDefinitionServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
             final EventService eventService, final SessionService sessionService, final ReadSessionAccessor sessionAccessor,
@@ -1036,9 +1037,13 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, "WithAssignedOrPendingHumanTasks", queryOptions, null);
     }
 
-    protected DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws IOException, XMLParseException,
-            SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent().getContent());
+    @Override
+    public DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+        try {
+            return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent().getContent());
+        } catch (IOException | XMLParseException e) {
+            throw new SProcessDefinitionReadException(e);
+        }
     }
 
     @Override
@@ -1051,20 +1056,30 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 throw new SObjectModificationException("No expression with ID " + expressionDefinitionId + " found on process "
                         + designProcessDefinition.getDisplayName() + " (" + designProcessDefinition.getVersion() + ")");
             }
+            if (!isValidExpressionTypeToUpdate(expression.getExpressionType())) {
+                throw new SObjectModificationException("Updating an Expression of type " + expression.getExpressionType()
+                        + " is not supported. Only Groovy scripts and constants are allowed.");
+            }
             expression.setContent(content);
             final String processDefinitionAsXMLString = getProcessContent(designProcessDefinition);
             final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                     .createNewInstance().updateDesignContent(processDefinitionAsXMLString).done();
             updateProcessDefinitionDeployInfo(processDefinitionId, updateDescriptor);
-        } catch (SProcessDefinitionReadException | IOException | XMLParseException e) {
+        } catch (IOException e) {
             throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
-        } catch (SProcessDeploymentInfoUpdateException e) {
+        } catch (SProcessDefinitionReadException | SProcessDeploymentInfoUpdateException e) {
             throw new SObjectModificationException(e);
         }
     }
 
+    protected boolean isValidExpressionTypeToUpdate(String type) {
+        return ExpressionType.TYPE_READ_ONLY_SCRIPT.name().equals(type) || ExpressionType.TYPE_CONSTANT.name().equals(type);
+    }
+
     protected Expression getExpression(DesignProcessDefinition processDefinition, long expressionDefinitionId) {
-        return new ExpressionFinder().find(processDefinition, expressionDefinitionId);
+        final ExpressionFinder expressionFinder = new ExpressionFinder();
+        expressionFinder.find(processDefinition, expressionDefinitionId);
+        return expressionFinder.getFoundExpression();
     }
 
 }

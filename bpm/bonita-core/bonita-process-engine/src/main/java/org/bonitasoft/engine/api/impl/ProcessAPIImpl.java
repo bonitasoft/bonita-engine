@@ -15,9 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import static java.util.Collections.singletonMap;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -122,8 +120,6 @@ import org.bonitasoft.engine.bpm.actor.ActorUpdater.ActorField;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.category.CategoryNotFoundException;
@@ -348,7 +344,6 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.io.xml.XMLNode;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
@@ -729,8 +724,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
-;
+        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();;
 
         SProcessDefinition sProcessDefinition;
         try {
@@ -922,17 +916,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public DesignProcessDefinition getDesignProcessDefinition(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            final File processDesignFile = BonitaHomeServer.getInstance().getProcessDefinitionFile(tenantAccessor.getTenantId(), processDefinitionId,
-                    ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-            final ProcessDefinitionBARContribution processDefinitionBARContribution = new ProcessDefinitionBARContribution();
-            return processDefinitionBARContribution.deserializeProcessDefinition(processDesignFile);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final InvalidBusinessArchiveFormatException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final IOException e) {
+            return getTenantAccessor().getProcessDefinitionService().getDesignProcessDefinition(processDefinitionId);
+        } catch (SProcessDefinitionReadException | SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
         }
     }

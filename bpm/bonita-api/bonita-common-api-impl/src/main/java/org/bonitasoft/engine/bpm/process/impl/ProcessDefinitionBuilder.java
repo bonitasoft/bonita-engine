@@ -94,7 +94,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
      * @return
      */
     public ProcessDefinitionBuilder createNewInstance(final String name, final String version) {
-        designErrors = new ArrayList<String>(5);
+        designErrors = new ArrayList<>(5);
         if (name == null || name.isEmpty()) {
             designErrors.add("name of the process is null or empty");
         }
@@ -120,7 +120,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private void validateProcess() {
         final FlowElementContainerDefinition flowElementContainer = process.getProcessContainer();
-        final List<String> names = new ArrayList<String>();
+        final List<String> names = new ArrayList<>();
         validateFlowNodeUnique(flowElementContainer, names); // FIXME: can be removed after ids are added in flow nodes
         validateProcessAttributes();
         validateProcess(flowElementContainer, true);
@@ -260,7 +260,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     private void validateConnectors(final List<ConnectorDefinition> connectorDefinitions) {
-        final List<String> names = new ArrayList<String>();
+        final List<String> names = new ArrayList<>();
         for (final ConnectorDefinition connectorDefinition : connectorDefinitions) {
             if (names.contains(connectorDefinition.getName())) {
                 designErrors.add("More than one connector are named '" + connectorDefinition.getName() + "'. All names must be unique.");
@@ -346,7 +346,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
             }
             final List<Operation> operations = activity.getOperations();
 
-            final Map<String, Boolean> leftOperandUpdates = new HashMap<String, Boolean>();
+            final Map<String, Boolean> leftOperandUpdates = new HashMap<>();
             for (final Operation operation : operations) {
                 final LeftOperand leftOperand = operation.getLeftOperand();
                 final Boolean update = leftOperandUpdates.get(leftOperand.getName());

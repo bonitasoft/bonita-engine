@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -28,9 +29,9 @@ import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
-import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -285,8 +286,17 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     }
 
     @Override
-    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
-        return visitor.find(this, modelId);
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
     }
 
+    @Override
+    public List<String> getStringIndexLabels() {
+        return Arrays.asList(getStringIndexLabel(1), getStringIndexLabel(2), getStringIndexLabel(3), getStringIndexLabel(4), getStringIndexLabel(5));
+    }
+
+    @Override
+    public List<Expression> getStringIndexValues() {
+        return Arrays.asList(getStringIndexValue(1), getStringIndexValue(2), getStringIndexValue(3), getStringIndexValue(4), getStringIndexValue(5));
+    }
 }

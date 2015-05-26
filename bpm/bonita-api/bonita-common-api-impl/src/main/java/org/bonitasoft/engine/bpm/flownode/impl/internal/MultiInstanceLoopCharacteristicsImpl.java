@@ -200,8 +200,8 @@ public class MultiInstanceLoopCharacteristicsImpl implements MultiInstanceLoopCh
     }
 
     @Override
-    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
-        return visitor.find(this, modelId);
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
     }
 
 }
