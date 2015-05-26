@@ -2,7 +2,6 @@
 ALTER TABLE actor DROP FOREIGN KEY fk_actor_tenantId;
 ALTER TABLE actormember DROP FOREIGN KEY fk_actormember_tenantId;
 ALTER TABLE actormember DROP FOREIGN KEY fk_actormember_actorId;
-ALTER TABLE breakpoint DROP FOREIGN KEY fk_breakpoint_tenantId;
 -- ALTER TABLE queriable_log DROP FOREIGN KEY fk_queriable_log_tenantId;
 ALTER TABLE queriablelog_p DROP FOREIGN KEY fk_queriablelog_p_tenantId;
 ALTER TABLE category DROP FOREIGN KEY fk_category_tenantId;
