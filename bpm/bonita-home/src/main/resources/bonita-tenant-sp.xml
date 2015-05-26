@@ -6,7 +6,7 @@
     <bean id="searchEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor" />
 
     <bean id="flowNodeStateManager" class="com.bonitasoft.engine.execution.FlowNodeStateManagerExt">
-        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="processInstanceService" ref="processInstanceService" />
         <constructor-arg name="activityInstanceService" ref="activityInstanceService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
@@ -38,7 +38,7 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="flowNodeExecutor" ref="flowNodeExecutor" />
         <constructor-arg name="workService" ref="workService" />
-        <constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
+        <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
         <constructor-arg name="transitionService" ref="transitionService" />
         <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
