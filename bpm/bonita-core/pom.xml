@@ -14,7 +14,6 @@
     <name>Bonita Engine SP Core Services</name>
 
 	<modules>
-		<module>bonita-instance-migration-impl-sp</module>
 		<module>bonita-process-instance</module>
 		<module>bonita-reporting</module>
 		<module>bonita-process-engine</module>

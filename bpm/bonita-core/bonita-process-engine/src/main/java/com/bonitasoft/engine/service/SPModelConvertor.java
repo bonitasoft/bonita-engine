@@ -17,9 +17,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
-import com.bonitasoft.engine.bpm.breakpoint.impl.BreakpointImpl;
-import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
+import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
+import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.model.SProfileEntry;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.service.ModelConvertor;
+
 import com.bonitasoft.engine.core.reporting.SReport;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
 import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
@@ -44,18 +54,6 @@ import com.bonitasoft.engine.reporting.Report;
 import com.bonitasoft.engine.reporting.ReportCreator;
 import com.bonitasoft.engine.reporting.ReportCreator.ReportField;
 import com.bonitasoft.engine.reporting.impl.ReportImpl;
-import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
-import org.bonitasoft.engine.profile.builder.SProfileBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
-import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
  * @author Matthieu Chaffotte
@@ -115,26 +113,6 @@ public final class SPModelConvertor extends ModelConvertor {
             tenants.add(toTenant(sTenant));
         }
         return tenants;
-    }
-
-    public static Breakpoint toBreakpoint(final SBreakpoint sBreakpoint) {
-        final BreakpointImpl breakpoint = new BreakpointImpl();
-        breakpoint.setId(sBreakpoint.getId());
-        breakpoint.setDefinitionId(sBreakpoint.getDefinitionId());
-        breakpoint.setInstanceId(sBreakpoint.getInstanceId());
-        breakpoint.setElementName(sBreakpoint.getElementName());
-        breakpoint.setInstanceScope(sBreakpoint.isInstanceScope());
-        breakpoint.setInterruptedStateId(sBreakpoint.getInterruptedStateId());
-        breakpoint.setStateId(sBreakpoint.getStateId());
-        return breakpoint;
-    }
-
-    public static List<Breakpoint> toBreakpoints(final List<SBreakpoint> sBreakpoints) {
-        final List<Breakpoint> breakpoints = new ArrayList<Breakpoint>(sBreakpoints.size());
-        for (final SBreakpoint sBreakpoint : sBreakpoints) {
-            breakpoints.add(toBreakpoint(sBreakpoint));
-        }
-        return breakpoints;
     }
 
     public static SProfile constructSProfile(final ProfileCreator creator, final boolean isDefault, final long createdBy) {
