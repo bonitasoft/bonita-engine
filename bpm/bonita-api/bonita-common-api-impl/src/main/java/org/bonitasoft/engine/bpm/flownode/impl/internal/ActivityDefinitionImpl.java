@@ -23,6 +23,7 @@ import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
@@ -46,18 +47,18 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
 
     public ActivityDefinitionImpl(final long id, final String name) {
         super(id, name);
-        dataDefinitions = new ArrayList<DataDefinition>();
-        operations = new ArrayList<Operation>();
-        boundaryEventDefinitions = new ArrayList<BoundaryEventDefinition>(1);
-        businessDataDefinitions = new ArrayList<BusinessDataDefinition>(3);
+        dataDefinitions = new ArrayList<>();
+        operations = new ArrayList<>();
+        boundaryEventDefinitions = new ArrayList<>(1);
+        businessDataDefinitions = new ArrayList<>(3);
     }
 
     public ActivityDefinitionImpl(final String name) {
         super(name);
-        dataDefinitions = new ArrayList<DataDefinition>();
-        operations = new ArrayList<Operation>();
-        boundaryEventDefinitions = new ArrayList<BoundaryEventDefinition>(1);
-        businessDataDefinitions = new ArrayList<BusinessDataDefinition>(3);
+        dataDefinitions = new ArrayList<>();
+        operations = new ArrayList<>();
+        boundaryEventDefinitions = new ArrayList<>(1);
+        businessDataDefinitions = new ArrayList<>(3);
     }
 
     @Override
@@ -177,4 +178,12 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
         return ObjectSeeker.getNamedElement(dataDefinitions, name);
     }
 
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        final T accept = super.accept(visitor, modelId);
+        if (accept != null) {
+            return accept;
+        }
+        return visitor.find(this, modelId);
+    }
 }

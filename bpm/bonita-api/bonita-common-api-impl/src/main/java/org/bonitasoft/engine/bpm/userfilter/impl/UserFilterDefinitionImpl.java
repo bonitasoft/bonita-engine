@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 import org.bonitasoft.engine.expression.Expression;
 
@@ -132,6 +133,11 @@ public class UserFilterDefinitionImpl extends NamedElementImpl implements UserFi
         }
         builder.append("]");
         return builder.toString();
+    }
+
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
     }
 
 }

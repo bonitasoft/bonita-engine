@@ -22,6 +22,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 
@@ -179,6 +180,10 @@ public class ConnectorDefinitionImpl extends NamedElementImpl implements Connect
             return false;
         }
         return true;
+    }
+    @Override
+     public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
     }
 
 }

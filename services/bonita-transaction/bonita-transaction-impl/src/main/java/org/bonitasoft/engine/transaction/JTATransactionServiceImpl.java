@@ -42,7 +42,7 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private final TransactionServiceContextThreadLocal txContextThreadLocal;
 
-    private final ThreadLocal<List<Callable<Void>>> beforeCommitCallables = new ThreadLocal<List<Callable<Void>>>();
+    private final ThreadLocal<List<Callable<Void>>> beforeCommitCallables = new ThreadLocal<>();
 
     private ThreadLocal<String> txLastBegin = new ThreadLocal<>();
 
@@ -100,9 +100,7 @@ public class JTATransactionServiceImpl implements TransactionService {
 
             // Then the monitoring of numberOfActiveTransactions is up-to-date.
             tx.registerSynchronization(new DecrementNumberOfActiveTransactionsSynchronization(this));
-        } catch (final IllegalStateException e) {
-            throw new STransactionCreationException(e);
-        } catch (final RollbackException e) {
+        } catch (final IllegalStateException | RollbackException e) {
             throw new STransactionCreationException(e);
         }
     }
@@ -187,15 +185,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             }
 
             txManager.commit();
-        } catch (final SecurityException e) {
-            throw new STransactionCommitException(e);
-        } catch (final IllegalStateException e) {
-            throw new STransactionCommitException(e);
-        } catch (final RollbackException e) {
-            throw new STransactionCommitException(e);
-        } catch (final HeuristicMixedException e) {
-            throw new STransactionCommitException(e);
-        } catch (final HeuristicRollbackException e) {
+        } catch (final SecurityException | HeuristicRollbackException | HeuristicMixedException | RollbackException | IllegalStateException e) {
             throw new STransactionCommitException(e);
         }
     }
@@ -206,9 +196,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(getClass(), TechnicalLogSeverity.TRACE, "Rollbacking transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
             }
-        } catch (final IllegalStateException e) {
-            throw new STransactionRollbackException(e);
-        } catch (final SecurityException e) {
+        } catch (final IllegalStateException | SecurityException e) {
             throw new STransactionRollbackException(e);
         }
     }
@@ -252,9 +240,7 @@ public class JTATransactionServiceImpl implements TransactionService {
     public void setRollbackOnly() throws STransactionException {
         try {
             txManager.setRollbackOnly();
-        } catch (final IllegalStateException e) {
-            throw new STransactionException(e);
-        } catch (final SystemException e) {
+        } catch (final IllegalStateException | SystemException e) {
             throw new STransactionException(e);
         }
     }
@@ -276,11 +262,7 @@ public class JTATransactionServiceImpl implements TransactionService {
                 throw new STransactionNotFoundException("No active transaction.");
             }
             transaction.registerSynchronization(new JTATransactionWrapper(txSync));
-        } catch (final IllegalStateException e) {
-            throw new STransactionNotFoundException(e);
-        } catch (final RollbackException e) {
-            throw new STransactionNotFoundException(e);
-        } catch (final SystemException e) {
+        } catch (final IllegalStateException | SystemException | RollbackException e) {
             throw new STransactionNotFoundException(e);
         }
     }
@@ -294,13 +276,11 @@ public class JTATransactionServiceImpl implements TransactionService {
             }
             List<Callable<Void>> callables = beforeCommitCallables.get();
             if (callables == null) {
-                callables = new ArrayList<Callable<Void>>();
+                callables = new ArrayList<>();
                 beforeCommitCallables.set(callables);
             }
             callables.add(callable);
-        } catch (final IllegalStateException e) {
-            throw new STransactionNotFoundException(e.getMessage());
-        } catch (final SystemException e) {
+        } catch (final IllegalStateException | SystemException e) {
             throw new STransactionNotFoundException(e.getMessage());
         }
     }

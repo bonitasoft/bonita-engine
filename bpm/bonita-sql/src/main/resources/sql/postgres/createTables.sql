@@ -120,8 +120,16 @@ CREATE TABLE process_definition (
   lastUpdateDate INT8,
   categoryId INT8,
   iconPath VARCHAR(255),
+  content_tenantid INT8 NOT NULL,
+  content_id INT8 NOT NULL,
   PRIMARY KEY (tenantid, id),
   UNIQUE (tenantid, name, version)
+);
+CREATE TABLE process_content (
+  tenantid INT8 NOT NULL,
+  id INT8 NOT NULL,
+  content TEXT NOT NULL,
+  PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE arch_document_mapping (
   tenantid INT8 NOT NULL,

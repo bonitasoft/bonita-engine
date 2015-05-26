@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -63,4 +64,9 @@ public abstract class ErrorEventTriggerDefinitionImpl implements ErrorEventTrigg
         return true;
     }
 
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        // nothing to do here:
+        return null;
+    }
 }

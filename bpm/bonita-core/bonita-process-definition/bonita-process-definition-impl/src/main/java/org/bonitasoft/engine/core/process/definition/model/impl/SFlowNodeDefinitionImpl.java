@@ -73,17 +73,18 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
             defaultTransition = sTransitionsMap.get(flowNodeDefinition.getDefaultTransition().getName());
         }
         final List<ConnectorDefinition> connectors2 = flowNodeDefinition.getConnectors();
-        final ArrayList<SConnectorDefinition> mConnectors = new ArrayList<SConnectorDefinition>(connectors2.size());
-        connectorsMap = new HashMap<ConnectorEvent, List<SConnectorDefinition>>(2);
+        final ArrayList<SConnectorDefinition> mConnectors = new ArrayList<>(connectors2.size());
+        connectorsMap = new HashMap<>(2);
         connectorsMap.put(ConnectorEvent.ON_ENTER, new ArrayList<SConnectorDefinition>());
         connectorsMap.put(ConnectorEvent.ON_FINISH, new ArrayList<SConnectorDefinition>());
+        allConnectorsMap = new HashMap<>(2);
         for (final ConnectorDefinition connector : connectors2) {
             final SConnectorDefinitionImpl e = new SConnectorDefinitionImpl(connector);
             mConnectors.add(e);
             connectorsMap.get(e.getActivationEvent()).add(e);
+            allConnectorsMap.put(e.getName(), e);
         }
         connectors = Collections.unmodifiableList(mConnectors);
-        allConnectorsMap = new HashMap<String, SConnectorDefinition>(2);
 
         description = flowNodeDefinition.getDescription();
         displayDescription = ServerModelConvertor.convertExpression(flowNodeDefinition.getDisplayDescription());
@@ -95,13 +96,13 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
     public SFlowNodeDefinitionImpl(final long id, final String name) {
         super(name);
         setId(id);
-        incomings = new ArrayList<STransitionDefinition>();
-        outgoings = new ArrayList<STransitionDefinition>();
-        connectors = new ArrayList<SConnectorDefinition>();
-        connectorsMap = new HashMap<ConnectorEvent, List<SConnectorDefinition>>(2);
+        incomings = new ArrayList<>();
+        outgoings = new ArrayList<>();
+        connectors = new ArrayList<>();
+        connectorsMap = new HashMap<>(2);
         connectorsMap.put(ConnectorEvent.ON_ENTER, new ArrayList<SConnectorDefinition>());
         connectorsMap.put(ConnectorEvent.ON_FINISH, new ArrayList<SConnectorDefinition>());
-        allConnectorsMap = new HashMap<String, SConnectorDefinition>(2);
+        allConnectorsMap = new HashMap<>(2);
     }
 
     @Override
@@ -109,15 +110,11 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         return parentContainer;
     }
 
-    public void setParentContainer(final SFlowElementContainerDefinition parentContainer) {
-        this.parentContainer = parentContainer;
-    }
-
     private List<STransitionDefinition> buildOutGoingTransitions(final FlowNodeDefinition nodeDefinition,
             final Map<String, STransitionDefinition> sTransitionsMap) {
         Iterator<TransitionDefinition> iterator;
         final List<TransitionDefinition> outgoingTransitions = nodeDefinition.getOutgoingTransitions();
-        final List<STransitionDefinition> outgoings = new ArrayList<STransitionDefinition>();
+        final List<STransitionDefinition> outgoings = new ArrayList<>();
         iterator = outgoingTransitions.iterator();
         while (iterator.hasNext()) {
             final TransitionDefinition sTransition = iterator.next();
@@ -130,7 +127,7 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
     private List<STransitionDefinition> buildIncomingTransitions(final FlowNodeDefinition nodeDefinition,
             final Map<String, STransitionDefinition> sTransitionsMap) {
         final List<TransitionDefinition> incomingTransitions = nodeDefinition.getIncomingTransitions();
-        final List<STransitionDefinition> incomings = new ArrayList<STransitionDefinition>();
+        final List<STransitionDefinition> incomings = new ArrayList<>();
         final Iterator<TransitionDefinition> iterator = incomingTransitions.iterator();
         while (iterator.hasNext()) {
             final TransitionDefinition sTransition = iterator.next();
@@ -171,10 +168,6 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         return defaultTransition;
     }
 
-    public void setDefaultTransition(final STransitionDefinition sTransition) {
-        defaultTransition = sTransition;
-    }
-
     @Override
     public boolean hasIncomingTransitions() {
         return !incomings.isEmpty();
@@ -196,37 +189,10 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         }
     }
 
-    public void addOutgoingTransition(final int index, final STransitionDefinition sTransition) {
-        if (!outgoings.contains(sTransition)) {
-            outgoings.add(index, sTransition);
-        }
-    }
-
-    public void removeOutgoingTransition(final STransitionDefinition sTransition) {
-        outgoings.remove(sTransition);
-    }
-
     public void addIncomingTransition(final STransitionDefinition sTransition) {
         if (!incomings.contains(sTransition)) {
             incomings.add(sTransition);
         }
-    }
-
-    public void addIncomingTransition(final int index, final STransitionDefinition sTransition) {
-        if (!incomings.contains(sTransition)) {
-            incomings.add(index, sTransition);
-        }
-    }
-
-    public void removeIncomingTransition(final STransitionDefinition sTransition) {
-        incomings.remove(sTransition);
-    }
-
-    public void addConnector(final SConnectorDefinition sConnectorDefinition) {
-        connectors.add(sConnectorDefinition);
-        connectorsMap.get(sConnectorDefinition.getActivationEvent()).add(sConnectorDefinition);
-        // allConnectorsMap.put(sConnectorDefinition.getId(), sConnectorDefinition); // FIXME: Uncomment when generate id
-        allConnectorsMap.put(sConnectorDefinition.getName(), sConnectorDefinition);
     }
 
     @Override
@@ -250,10 +216,6 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
     @Override
     public SExpression getDisplayDescriptionAfterCompletion() {
         return displayDescriptionAfterCompletion;
-    }
-
-    public void setDisplayDescriptionAfterCompletion(final SExpression displayDescriptionAfterCompletion) {
-        this.displayDescriptionAfterCompletion = displayDescriptionAfterCompletion;
     }
 
     @Override

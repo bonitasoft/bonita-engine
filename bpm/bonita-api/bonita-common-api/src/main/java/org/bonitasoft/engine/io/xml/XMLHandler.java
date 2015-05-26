@@ -188,22 +188,6 @@ public class XMLHandler {
         validate(new StreamSource(content));
     }
 
-    public byte[] write(final XMLNode rootNode) {
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        byte[] xmlContent = null;
-        try {
-            this.write(rootNode, outputStream);
-            xmlContent = outputStream.toByteArray();
-        } catch (final IOException e) {
-        } finally {
-            try {
-                outputStream.close();
-            } catch (final IOException e) {
-            }
-        }
-        return xmlContent;
-    }
-
     public void write(final XMLNode rootNode, final OutputStream outputStream) throws IOException {
         OutputStreamWriter osw = null;
         try {

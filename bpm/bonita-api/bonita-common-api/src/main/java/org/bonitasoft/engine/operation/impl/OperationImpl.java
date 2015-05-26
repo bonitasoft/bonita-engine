@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.operation.impl;
 
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
@@ -150,6 +151,11 @@ public class OperationImpl implements Operation {
     @Override
     public String toString() {
         return "Operation [ set " + leftOperand + " using " + type + " " + operator + " with" + rightOperand + "]";
+    }
+
+    @Override
+    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+        return visitor.find(this, modelId);
     }
 
 }

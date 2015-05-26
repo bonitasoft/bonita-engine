@@ -14,12 +14,14 @@
 package org.bonitasoft.engine.api.impl.page;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.bonitasoft.engine.api.impl.converter.PageModelConverter;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
@@ -168,11 +170,9 @@ public class PageAPIDelegate {
 
     public void deletePage(final long pageId) throws DeletionException {
         try {
-            final SPage page = pageService.getPage(pageId);
             pageService.deletePage(pageId);
-            updatePageMappings(pageId);
-            final Long processDefinitionId = page.getProcessDefinitionId();
-            if (processDefinitionId != null) {
+            final Set<Long> processDefinitionIds = updatePageMappings(pageId);
+            for (Long processDefinitionId : processDefinitionIds) {
                 updateProcessResolution(processDefinitionId);
             }
         } catch (final SBonitaException e) {
@@ -180,20 +180,23 @@ public class PageAPIDelegate {
         }
     }
 
-    protected void updatePageMappings(long pageId) throws SBonitaReadException, SObjectModificationException, SObjectNotFoundException {
+    Set<Long> updatePageMappings(long pageId) throws SBonitaReadException, SObjectModificationException, SObjectNotFoundException {
         List<SFormMapping> formMappings;
         QueryOptions queryOptions = new QueryOptions(0, 20, Collections.singletonList(new OrderByOption(SFormMapping.class,
-                FormMappingSearchDescriptor.ID, OrderByType.ASC)), Arrays.asList(new FilterOption(SPageMapping.class,
+                FormMappingSearchDescriptor.ID, OrderByType.ASC)), Collections.singletonList(new FilterOption(SPageMapping.class,
                 FormMappingSearchDescriptor.PAGE_ID, pageId)), null);
+        final Set<Long> processDefinitionIds = new HashSet<>();
         do {
             formMappings = formMappingService.searchFormMappings(queryOptions);
             for (SFormMapping formMapping : formMappings) {
                 pageMappingService.update(formMapping.getPageMapping(), null);
+                processDefinitionIds.add(formMapping.getProcessDefinitionId());
             }
             queryOptions = QueryOptions.getNextPage(queryOptions);
-        } while (!formMappings.isEmpty());
-
+        } while (formMappings.size() == 20);
+        return processDefinitionIds;
     }
+
 
     private void updateProcessResolution(Long processDefinitionId) {
         dependencyResolver.resolveDependencies(processDefinitionId, tenantAccessor);

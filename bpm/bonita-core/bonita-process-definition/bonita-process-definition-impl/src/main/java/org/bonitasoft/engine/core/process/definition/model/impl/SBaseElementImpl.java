@@ -24,7 +24,7 @@ public class SBaseElementImpl implements SBaseElement {
 
     private Long id;
 
-    protected static enum EQUALS_STATE {
+    protected enum EQUALS_STATE {
         CONTINUE, RETURN_FALSE, RETURN_TRUE
     }
 

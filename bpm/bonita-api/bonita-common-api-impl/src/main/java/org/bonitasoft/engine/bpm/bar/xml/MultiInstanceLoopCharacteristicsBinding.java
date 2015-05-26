@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristicsImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.io.xml.ElementBinding;
 
@@ -63,11 +63,11 @@ public class MultiInstanceLoopCharacteristicsBinding extends ElementBinding {
 
     @Override
     public Object getObject() {
-        MultiInstanceLoopCharacteristics loopCharacteristics;
+        MultiInstanceLoopCharacteristicsImpl loopCharacteristics;
         if (loopCardinality != null) {
-            loopCharacteristics = new MultiInstanceLoopCharacteristics(isSequential, loopCardinality);
+            loopCharacteristics = new MultiInstanceLoopCharacteristicsImpl(isSequential, loopCardinality);
         } else {
-            loopCharacteristics = new MultiInstanceLoopCharacteristics(isSequential, loopDataInput);
+            loopCharacteristics = new MultiInstanceLoopCharacteristicsImpl(isSequential, loopDataInput);
         }
         loopCharacteristics.setCompletionCondition(completionCondition);
         loopCharacteristics.setDataInputItemRef(dataInputItemRef);

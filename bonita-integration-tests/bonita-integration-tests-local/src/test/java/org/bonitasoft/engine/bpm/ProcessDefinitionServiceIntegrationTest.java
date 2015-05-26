@@ -30,7 +30,6 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
-import org.bonitasoft.engine.data.model.LightEmployee;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -65,7 +64,7 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
     @Test(expected = IllegalArgumentException.class)
     public void storeNullProcessDefinition() throws Exception {
         getTransactionService().begin();
-        processDefinitionService.store(null, "", "");
+        processDefinitionService.store(null);
         getTransactionService().complete();
     }
 
