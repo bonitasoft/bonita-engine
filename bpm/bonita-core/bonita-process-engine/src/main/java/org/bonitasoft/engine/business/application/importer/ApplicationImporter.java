@@ -19,7 +19,7 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
+import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
@@ -39,22 +39,22 @@ public class ApplicationImporter {
 
     private final ApplicationService applicationService;
     private final ApplicationImportStrategy strategy;
-    private ApplicationNodeConverter applicationNodeConverter;
+    private NodeToApplicationConverter nodeToApplicationConverter;
     private ApplicationPageImporter applicationPageImporter;
     private ApplicationMenuImporter applicationMenuImporter;
 
-    public ApplicationImporter(ApplicationService applicationService, ApplicationImportStrategy strategy, ApplicationNodeConverter applicationNodeConverter,
+    public ApplicationImporter(ApplicationService applicationService, ApplicationImportStrategy strategy, NodeToApplicationConverter nodeToApplicationConverter,
             ApplicationPageImporter applicationPageImporter, ApplicationMenuImporter applicationMenuImporter) {
         this.applicationService = applicationService;
         this.strategy = strategy;
-        this.applicationNodeConverter = applicationNodeConverter;
+        this.nodeToApplicationConverter = nodeToApplicationConverter;
         this.applicationPageImporter = applicationPageImporter;
         this.applicationMenuImporter = applicationMenuImporter;
     }
 
     public ImportStatus importApplication(ApplicationNode applicationNode, long createdBy) throws ImportException, AlreadyExistsException {
         try {
-            ImportResult importResult = applicationNodeConverter.toSApplication(applicationNode, createdBy);
+            ImportResult importResult = nodeToApplicationConverter.toSApplication(applicationNode, createdBy);
             SApplication application = importApplication(importResult.getApplication());
             importApplicationPages(applicationNode, importResult, application);
             importApplicationMenus(applicationNode, importResult, application);

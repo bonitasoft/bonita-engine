@@ -13,27 +13,20 @@
  **/
 package org.bonitasoft.engine.business.application.converter;
 
-import org.bonitasoft.engine.api.ImportError;
-import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
-import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilder;
-import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.page.PageService;
-import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Emmanuel Duchastenier
  */
-public class ApplicationPageNodeConverter {
+public class ApplicationPageToNodeConverter {
 
     private final PageService pageService;
 
-    public ApplicationPageNodeConverter(final PageService pageService) {
+    public ApplicationPageToNodeConverter(final PageService pageService) {
         this.pageService = pageService;
     }
 
@@ -51,26 +44,6 @@ public class ApplicationPageNodeConverter {
         pageNode.setToken(page.getToken());
         pageNode.setCustomPage(pageService.getPage(page.getPageId()).getName());
         return pageNode;
-    }
-
-    /**
-     * @param applicationPageNode the XML node to convert to {@link org.bonitasoft.engine.business.application.model.SApplicationPage}
-     * @param application the {@link org.bonitasoft.engine.business.application.model.SApplication} where the {@code SApplicationPage} will be attached
-     * @return an ApplicationPageImportResult containing the converted {@code SApplicationPage} and an error (if any)
-     */
-    public ApplicationPageImportResult toSApplicationPage(ApplicationPageNode applicationPageNode, SApplication application) throws SBonitaReadException {
-        long pageId = 0;
-        ImportError importError = null;
-        SPage page = pageService.getPageByName(applicationPageNode.getCustomPage());
-        if (page != null) {
-            pageId = page.getId();
-        } else {
-            importError = new ImportError(applicationPageNode.getCustomPage(), ImportError.Type.PAGE);
-        }
-        SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
-        SApplicationPageBuilder builder = factory.createNewInstance(application.getId(), pageId, applicationPageNode.getToken());
-        ApplicationPageImportResult importResult = new ApplicationPageImportResult(builder.done(), importError);
-        return importResult;
     }
 
 }
