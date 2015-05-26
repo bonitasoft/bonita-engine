@@ -15,6 +15,7 @@ package org.bonitasoft.engine.business.application.converter;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ImportResult;
@@ -37,18 +38,21 @@ public class NodeToApplicationConverter {
 
     private final ProfileService profileService;
     private final PageService pageService;
+    private final ApplicationImportValidator validator;
 
-    public NodeToApplicationConverter(final ProfileService profileService, final PageService pageService) {
+    public NodeToApplicationConverter(final ProfileService profileService, final PageService pageService, final ApplicationImportValidator validator) {
         this.profileService = profileService;
         this.pageService = pageService;
+        this.validator = validator;
     }
 
     public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) throws SBonitaReadException, ImportException {
-        final ImportStatus importStatus = new ImportStatus(applicationNode.getToken());
-
-        Long layoutId = getPageId(getLayoutName(applicationNode), applicationNode.getToken(), importStatus);
-        Long themeId = getPageId(getThemeName(applicationNode), applicationNode.getToken(), importStatus);
-        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
+        String token = applicationNode.getToken();
+        validator.validate(token);
+        final ImportStatus importStatus = new ImportStatus(token);
+        Long layoutId = getPageId(getLayoutName(applicationNode), token, importStatus);
+        Long themeId = getPageId(getThemeName(applicationNode), token, importStatus);
+        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(token,
                 applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, layoutId, themeId);
         builder.setIconPath(applicationNode.getIconPath());
         builder.setDescription(applicationNode.getDescription());
