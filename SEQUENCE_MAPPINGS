@@ -116,7 +116,6 @@ SProcessContractData --> 10220
 
 ProcessInstance -> 20010
 ActivityInstance -> 20011
-TransitionInstance -> 20012
 
 SADocumentMapping -> 20040
 

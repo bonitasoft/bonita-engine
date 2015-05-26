@@ -67,13 +67,11 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
-import org.bonitasoft.engine.core.process.definition.model.TransitionState;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
@@ -81,7 +79,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViola
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -152,7 +149,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private final WorkService workService;
     private final ProcessDefinitionService processDefinitionService;
     private final GatewayInstanceService gatewayInstanceService;
-    private final TransitionService transitionService;
     private final EventInstanceService eventInstanceService;
     private final OperationService operationService;
     private final ReadSessionAccessor sessionAccessor;
@@ -166,7 +162,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
             final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
             final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
-            final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
+            final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
             final ExpressionResolverService expressionResolverService, final ExpressionService expressionService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
@@ -182,7 +178,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.workService = workService;
         this.processDefinitionService = processDefinitionService;
         this.gatewayInstanceService = gatewayInstanceService;
-        this.transitionService = transitionService;
         this.eventInstanceService = eventInstanceService;
         this.connectorService = connectorService;
         this.classLoaderService = classLoaderService;
@@ -693,16 +688,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
         final FlowNodeTransitionsWrapper transitionsDescriptor = transitionEvaluator.buildTransitionsWrapper(sFlowNodeDefinition, processDefinition, child);
 
-        archiveInvalidTransitions(child, transitionsDescriptor);
-
         final List<STransitionDefinition> chosenGatewaysTransitions = new ArrayList<STransitionDefinition>(transitionsDescriptor
                 .getValidOutgoingTransitionDefinitions().size());
         final List<SFlowNodeDefinition> chosenFlowNode = new ArrayList<SFlowNodeDefinition>(transitionsDescriptor.getValidOutgoingTransitionDefinitions()
                 .size());
         for (final STransitionDefinition sTransitionDefinition : transitionsDescriptor.getValidOutgoingTransitionDefinitions()) {
             final SFlowNodeDefinition flowNodeDefinition = processDefinitionService.getNextFlowNode(processDefinition, sTransitionDefinition.getName());
-            // we archive a transition to keep a track of where the flow was
-            transitionService.archive(sTransitionDefinition, child, TransitionState.TAKEN);
             if (flowNodeDefinition instanceof SGatewayDefinition) {
                 chosenGatewaysTransitions.add(sTransitionDefinition);
             } else {
@@ -762,16 +753,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
          * reevaluation is needed
          */
         return takenTransition < allOutgoingTransitions;
-    }
-
-    private void archiveInvalidTransitions(final SFlowNodeInstance child, final FlowNodeTransitionsWrapper transitionsDescriptor)
-            throws STransitionCreationException {
-        for (final STransitionDefinition sTransitionDefinition : transitionsDescriptor.getAllOutgoingTransitionDefinitions()) {
-            if (!transitionsDescriptor.getValidOutgoingTransitionDefinitions().contains(sTransitionDefinition)) {
-                // Archive invalid transitions
-                transitionService.archive(sTransitionDefinition, child, TransitionState.ABORTED);
-            }
-        }
     }
 
     @Override
