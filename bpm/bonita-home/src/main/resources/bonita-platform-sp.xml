@@ -23,14 +23,31 @@
 	</bean>
 
 	<bean id="platformEventService" class="com.bonitasoft.engine.events.impl.ConfigurableEventServiceImpl">
-		<constructor-arg name="handlers">
+		<constructor-arg name="handlers" ref="platformEventHandlers"/>
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+	</bean>
+
+	<bean id="platformDefaultEventHandlers" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass">
+			<value>java.util.HashMap</value>
+		</property>
+		<property name="sourceMap">
 			<map>
 				<entry key="JOB_EXECUTING" value-ref="jobHandler"/>
 				<entry key="JOB_FAILED" value-ref="jobHandler"/>
 				<entry key="JOB_COMPLETED" value-ref="jobHandler"/>
 			</map>
-		</constructor-arg>
-		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+		</property>
+	</bean>
+
+	<bean id="platformEventHandlers" parent="platformDefaultEventHandlers" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass">
+			<value>java.util.HashMap</value>
+		</property>
+		<property name="sourceMap">
+			<map merge="true">
+			</map>
+		</property>
 	</bean>
 
 	<bean id="jvmMXBean" class="com.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl" />
