@@ -45,4 +45,6 @@ public final class ArchivedActivityInstanceSearchDescriptor {
 
     public static final String SOURCE_OBJECT_ID = "sourceObjectId";
 
+    public static final String ARCHIVE_DATE = "archiveDate";
+
 }
