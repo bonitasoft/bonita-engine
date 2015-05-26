@@ -42,7 +42,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
@@ -131,8 +130,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private final TechnicalLoggerService logger;
 
-    private final TransitionService transitionService;
-
     private final ProcessDefinitionService processDefinitionService;
 
     private final ConnectorInstanceService connectorInstanceService;
@@ -145,14 +142,13 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     public ProcessInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
             final ActivityInstanceService activityService, final TechnicalLoggerService logger, final EventInstanceService bpmEventInstanceService,
-            final DataInstanceService dataInstanceService, final ArchiveService archiveService, final TransitionService transitionService,
-            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final DocumentService documentService, final SCommentService commentService) {
+            final DataInstanceService dataInstanceService, final ArchiveService archiveService, final ProcessDefinitionService processDefinitionService,
+            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final DocumentService documentService,
+            final SCommentService commentService) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
         this.eventService = eventService;
         this.activityService = activityService;
-        this.transitionService = transitionService;
         this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
         this.classLoaderService = classLoaderService;
@@ -175,10 +171,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         try {
             recorder.recordInsert(insertRecord, insertEvent);
             setProcessState(processInstance, ProcessInstanceState.INITIALIZING);
-        } catch (final SRecorderException sre) {
+        } catch (final SRecorderException | SProcessInstanceModificationException sre) {
             throw new SProcessInstanceCreationException(sre);
-        } catch (final SProcessInstanceModificationException spicme) {
-            throw new SProcessInstanceCreationException(spicme);
         }
     }
 
@@ -240,9 +234,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             getProcessInstance(sProcessInstance.getId());
             // process is still here, that's not normal. The problem must be raised:
             throw e;
-        } catch (final SProcessInstanceReadException e1) {
-            logProcessInstanceNotFound(e);
-        } catch (final SProcessInstanceNotFoundException e1) {
+        } catch (final SProcessInstanceReadException | SProcessInstanceNotFoundException e1) {
             logProcessInstanceNotFound(e);
         }
     }
@@ -291,8 +283,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 throw e;
             }
             logArchivedProcessInstanceNotFound(new SAProcessInstanceNotFoundException(saProcessInstance.getId()));
-        } catch (final SProcessInstanceModificationException e1) {
-            throw e;
         } catch (final SProcessInstanceReadException e1) {
             logArchivedProcessInstanceNotFound(e);
         }
@@ -329,7 +319,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             dataInstanceService.deleteLocalArchivedDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString());
             documentService.deleteArchivedDocuments(processInstanceId);
             connectorInstanceService.deleteArchivedConnectorInstances(processInstanceId, SConnectorInstance.PROCESS_TYPE);
-            transitionService.deleteArchivedTransitionsOfProcessInstance(processInstanceId);
             commentService.deleteArchivedComments(processInstanceId);
             deleteArchivedChidrenProcessInstanceAndElements(processInstanceId, processDefinitionId);
         } catch (final SBonitaException e) {
@@ -340,7 +329,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private void deleteArchivedChidrenProcessInstanceAndElements(final long processInstanceId, final long processDefinitionId) throws SBonitaException {
-        List<Long> childrenProcessInstanceIds = null;
+        List<Long> childrenProcessInstanceIds;
         do {
             // from index always will be zero because elements will be deleted
             childrenProcessInstanceIds = getArchivedChildrenSourceObjectIdsFromRootProcessInstance(processInstanceId, 0, BATCH_SIZE, OrderByType.ASC);
@@ -349,7 +338,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private void deleteArchivedChildrenProcessInstancesAndElements(final long processDefinitionId, final List<Long> childrenProcessInstanceIds)
-            throws SProcessInstanceModificationException, SBonitaException {
+            throws SBonitaException {
         for (final Long childProcessInstanceId : childrenProcessInstanceIds) {
             deleteArchivedProcessInstanceElements(childProcessInstanceId, processDefinitionId);
             deleteArchivedProcessInstancesOfProcessInstance(childProcessInstanceId);

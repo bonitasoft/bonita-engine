@@ -178,7 +178,6 @@
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
-        <constructor-arg name="transitionService" ref="transitionService" />
         <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="connectorService" ref="connectorService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
@@ -1071,7 +1070,6 @@
         <constructor-arg name="bpmEventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
-        <constructor-arg name="transitionService" ref="transitionService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
@@ -1085,11 +1083,6 @@
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
-    </bean>
-
-    <bean id="transitionService" class="org.bonitasoft.engine.core.process.instance.impl.TransitionServiceImpl">
-        <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
     <bean id="eventInstanceService" class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl">

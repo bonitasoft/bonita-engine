@@ -16,7 +16,6 @@ package org.bonitasoft.engine.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -33,7 +32,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -147,45 +145,6 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
             }
 
         });
-        // TODO check data instance visibility mapping when archived
-    }
-
-    @Test
-    public void deleteProcessDefinitionDeleteArchivedInstancesWithTransition() throws Exception {
-        setSessionInfo(getSession());
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
-        final TransitionService transitionService = tenantAccessor.getTransitionInstanceService();
-        final Callable<Long> getNumberOfArchivedTransitionInstances = new Callable<Long>() {
-
-            @Override
-            public Long call() throws Exception {
-                return transitionService.getNumberOfArchivedTransitionInstances(QueryOptions.countQueryOptions());
-            }
-        };
-
-        final long initialNumber = userTransactionService.executeInTransaction(getNumberOfArchivedTransitionInstances);
-        final long initialNumberOfArchivedProcessInstance = getProcessAPI().getNumberOfArchivedProcessInstances();
-        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("ProcessToDelete", "1.0").addActor("actor")
-                .addAutomaticTask("step1").addAutomaticTask("step2").addTransition("step1", "step2").getProcess();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
-        final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
-        final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
-        final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForProcessToFinish(p1);
-        waitForProcessToFinish(p2);
-        waitForProcessToFinish(p3);
-
-        assertEquals(initialNumberOfArchivedProcessInstance + 3, getProcessAPI().getNumberOfArchivedProcessInstances());
-        setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final long newNumber = userTransactionService.executeInTransaction(getNumberOfArchivedTransitionInstances);
-        assertTrue(newNumber > initialNumber);
-        disableAndDeleteProcess(processDefinition);
-        assertEquals(initialNumberOfArchivedProcessInstance, getProcessAPI().getNumberOfArchivedProcessInstances());
-        setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final long lastNumber = userTransactionService.executeInTransaction(getNumberOfArchivedTransitionInstances);
-        assertEquals(initialNumber, lastNumber);
-        cleanSession();
     }
 
     @Test
