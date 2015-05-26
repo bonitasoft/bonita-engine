@@ -23,7 +23,7 @@ public class Pair<L, R> implements Serializable, Map.Entry<L, R> {
 
     private static final long serialVersionUID = 1L;
 
-    private final L left;
+    private L left;
 
     private R right;
 
@@ -107,6 +107,11 @@ public class Pair<L, R> implements Serializable, Map.Entry<L, R> {
         final R oldRight = this.right;
         this.right = right;
         return oldRight;
+    }
+    public L setKey(final L left) {
+        final L oldLeft = this.left;
+        this.left = left;
+        return oldLeft;
     }
 
 }

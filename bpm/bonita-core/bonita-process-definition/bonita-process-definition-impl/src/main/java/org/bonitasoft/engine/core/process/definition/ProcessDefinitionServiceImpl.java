@@ -27,8 +27,11 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.bpm.process.impl.internal.ExpressionFinder;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
@@ -49,6 +52,7 @@ import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefin
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionLogBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionLogBuilderFactory;
+import org.bonitasoft.engine.core.process.definition.model.builder.impl.SProcessDefinitionDeployInfoBuilderFactoryImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDesignContentImpl;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -106,11 +110,12 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     private final ReadSessionAccessor sessionAccessor;
     private final QueriableLoggerService queriableLoggerService;
     private final DependencyService dependencyService;
+    private final CacheService cacheService;
     protected ProcessDefinitionBARContribution processDefinitionBARContribution;
 
     public ProcessDefinitionServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
             final EventService eventService, final SessionService sessionService, final ReadSessionAccessor sessionAccessor,
-            final QueriableLoggerService queriableLoggerService, final DependencyService dependencyService) {
+            final QueriableLoggerService queriableLoggerService, final DependencyService dependencyService, CacheService cacheService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.eventService = eventService;
@@ -118,6 +123,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         this.sessionAccessor = sessionAccessor;
         this.queriableLoggerService = queriableLoggerService;
         this.dependencyService = dependencyService;
+        this.cacheService = cacheService;
         processDefinitionBARContribution = new ProcessDefinitionBARContribution();
     }
 
@@ -176,11 +182,18 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                     .setObject(processDefinitionDeployInfo).done();
         }
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            update(processId, processDefinitionDeployInfo, updateRecord, updateEvent);
             log(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, "disableProcess");
-        } catch (final SRecorderException e) {
+        } catch (final SRecorderException | SCacheException e) {
             log(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "disableProcess");
             throw new SProcessDisablementException(e);
+        }
+    }
+
+    void updateSProcessDefinitionTimestampInCache(long processId, SProcessDefinitionDeployInfo processDefinitionDeployInfo) throws SCacheException {
+        final Pair<Long, SProcessDefinition> fromCache = getSProcessDefinitionFromCache(processId);
+        if (fromCache != null) {
+            storeProcessDefinitionInCache(fromCache.getValue(), processDefinitionDeployInfo.getLastUpdateDate());
         }
     }
 
@@ -211,9 +224,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                     .setObject(processDefinitionDeployInfo).done();
         }
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            update(processId, processDefinitionDeployInfo, updateRecord, updateEvent);
             log(processId, SQueriableLog.STATUS_OK, logBuilder, "enableProcess");
-        } catch (final SRecorderException e) {
+        } catch (final SRecorderException | SCacheException e) {
             log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "enableProcess");
             throw new SProcessEnablementException(e);
         }
@@ -253,14 +266,37 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public SProcessDefinition getProcessDefinition(final long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         try {
+            //get from database
             final SProcessDefinitionDeployInfo processDeploymentInfo = getProcessDeploymentInfo(processId);
-            final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent().getContent());
-            SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
-            setIdOnProcessDefinition(sProcessDefinition, processId);
-            return sProcessDefinition;
-        } catch (XMLParseException | IOException | SReflectException e) {
+            //get from cache
+            final Pair<Long, SProcessDefinition> processWithTimestamp = getSProcessDefinitionFromCache(processId);
+            //read SProcessDefinition if needed
+            if (isSProcessDefinitionUpToDate(processDeploymentInfo, processWithTimestamp)) {
+                return readSProcessDefinitionFromDatabase(processId, processDeploymentInfo);
+            } else {
+                return processWithTimestamp.getValue();
+            }
+        } catch (XMLParseException | IOException | SReflectException | SCacheException e) {
             throw new SProcessDefinitionReadException(e);
         }
+    }
+
+    SProcessDefinition readSProcessDefinitionFromDatabase(long processId, SProcessDefinitionDeployInfo processDeploymentInfo) throws IOException, XMLParseException, SReflectException, SCacheException {
+        final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent()
+                .getContent());
+        SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
+        setIdOnProcessDefinition(sProcessDefinition, processId);
+        storeProcessDefinitionInCache(sProcessDefinition, processDeploymentInfo.getLastUpdateDate());
+        return sProcessDefinition;
+    }
+
+    boolean isSProcessDefinitionUpToDate(SProcessDefinitionDeployInfo processDeploymentInfo, Pair<Long, SProcessDefinition> processWithTimestamp) {
+        return processWithTimestamp == null || processWithTimestamp.getKey() != processDeploymentInfo.getLastUpdateDate();
+    }
+
+    @SuppressWarnings("unchecked")
+    Pair<Long, SProcessDefinition> getSProcessDefinitionFromCache(long processId) throws SCacheException {
+        return (Pair<Long, SProcessDefinition>) cacheService.get(PROCESS_CACHE_NAME, processId);
     }
 
     @Override
@@ -349,12 +385,17 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                         .setObject(sProcessDefinitionDeployInfo).done();
             }
             recorder.recordInsert(record, insertEvent);
+            storeProcessDefinitionInCache(definition, sProcessDefinitionDeployInfo.getLastUpdateDate());
             log(definition.getId(), SQueriableLog.STATUS_OK, logBuilder, "store");
         } catch (final Exception e) {
             log(definition.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "store");
             throw new SProcessDefinitionException(e);
         }
         return definition;
+    }
+
+    void storeProcessDefinitionInCache(SProcessDefinition definition, Long lastUpdateDate) throws SCacheException {
+        cacheService.store(PROCESS_CACHE_NAME, definition.getId(), Pair.of(lastUpdateDate, definition));
     }
 
     String getProcessContent(DesignProcessDefinition designProcessDefinition) throws IOException {
@@ -399,9 +440,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                     .setObject(processDefinitionDeployInfo).done();
         }
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            update(processId, processDefinitionDeployInfo, updateRecord, updateEvent);
             log(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, "resolveProcess");
-        } catch (final SRecorderException e) {
+        } catch (final SRecorderException | SCacheException e) {
             log(processDefinitionDeployInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "resolveProcess");
             throw new SProcessDisablementException(e);
         }
@@ -544,13 +585,21 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                     .setObject(processDefinitionDeployInfo).done();
         }
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            update(processId, processDefinitionDeployInfo, updateRecord, updateEvent);
             log(processId, SQueriableLog.STATUS_OK, logBuilder, "updateProcessDeploymentInfo");
-        } catch (final SRecorderException e) {
+        } catch (final SRecorderException | SCacheException e) {
             log(processId, SQueriableLog.STATUS_FAIL, logBuilder, "updateProcessDeploymentInfo");
             throw new SProcessDeploymentInfoUpdateException(e);
         }
         return processDefinitionDeployInfo;
+    }
+
+    void update(long processId, SProcessDefinitionDeployInfo processDefinitionDeployInfo, UpdateRecord updateRecord, SUpdateEvent updateEvent)
+            throws SRecorderException, SCacheException {
+        recorder.recordUpdate(updateRecord, updateEvent);
+        if (!updateRecord.getFields().containsKey(SProcessDefinitionDeployInfoBuilderFactoryImpl.DESIGN_CONTENT)) {
+            updateSProcessDefinitionTimestampInCache(processId, processDefinitionDeployInfo);
+        }
     }
 
     private UpdateRecord getUpdateRecord(final EntityUpdateDescriptor descriptor, final SProcessDefinitionDeployInfo processDefinitionDeployInfo) {
@@ -1038,7 +1087,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+    public DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException,
+            SProcessDefinitionReadException {
         try {
             return processDefinitionBARContribution.convertXmlToProcess(getProcessDeploymentInfo(processDefinitionId).getDesignContent().getContent());
         } catch (IOException | XMLParseException e) {

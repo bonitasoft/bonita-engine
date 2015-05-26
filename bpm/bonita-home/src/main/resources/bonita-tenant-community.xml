@@ -1127,6 +1127,7 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />
+        <constructor-arg name="cacheService" ref="cacheService" />
     </bean>
 
 
@@ -1319,6 +1320,7 @@
     <bean id="communityCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
         <property name="sourceList">
             <list merge="true">
+                <ref bean="processDefinitionCacheConfig" />
                 <ref bean="connectorCacheConfig" />
                 <ref bean="parameterCacheConfig" />
                 <ref bean="userFilterCacheConfig" />
@@ -1341,6 +1343,19 @@
         <property name="copyOnRead" value="${bonita.tenant.cache.connector.copyOnRead}" />
         <property name="copyOnWrite" value="${bonita.tenant.cache.connector.copyOnWrite}" />
         <property name="readIntensive" value="${bonita.tenant.cache.connector.readIntensive}" />
+    </bean>
+
+    <bean id="processDefinitionCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="_PROCESSDEF" />
+        <property name="maxElementsInMemory" value="${bonita.tenant.cache.processdef.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.tenant.cache.processdef.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.tenant.cache.processdef.eternal}" />
+        <property name="evictionPolicy" value="${bonita.tenant.cache.processdef.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.processdef.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.processdef.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.tenant.cache.processdef.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.tenant.cache.processdef.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.tenant.cache.processdef.readIntensive}" />
     </bean>
 
 
