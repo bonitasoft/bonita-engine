@@ -15,6 +15,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -33,6 +34,9 @@ public class NodeToApplicationConverterExtTest {
 
     @Mock
     private PageService pageService;
+
+    @Mock
+    private ApplicationImportValidator validator;
 
     @InjectMocks
     private NodeToApplicationConverterExt converter;
