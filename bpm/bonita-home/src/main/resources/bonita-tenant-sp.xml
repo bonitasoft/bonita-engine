@@ -40,7 +40,6 @@
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
-        <constructor-arg name="transitionService" ref="transitionService" />
         <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="connectorService" ref="connectorService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
@@ -415,8 +414,6 @@
                     <entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="${bonita.tenant.archive.SConnectorInstance}" />
                     <entry key="org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance" value="${bonita.tenant.archive.SSendTaskInstance}" />
                     <entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="${bonita.tenant.archive.SDataInstance}" />
-                    <!-- archived version because there is no not archived one -->
-                    <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="${bonita.tenant.archive.SATransitionInstance}" />
                 </map>
             </property>
         </bean>
