@@ -28,7 +28,6 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
@@ -40,6 +39,7 @@ import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownExceptio
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.tracking.TimeTrackerRecords;
 
@@ -100,7 +100,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         SExpressionContext newEvaluationContext = EMPTY_CONTEXT;
         try {
-            final Map<String, Object> dependencyValues = new HashMap<String, Object>();
+            final Map<String, Object> dependencyValues = new HashMap<>();
             if (evaluationContext != null) {
                 newEvaluationContext = evaluationContext;
                 fillContext(newEvaluationContext, dependencyValues);
@@ -108,20 +108,20 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
 
             loadProcessClassLoader(newEvaluationContext);
 
-            final Map<SExpression, SExpression> dataReplacement = new HashMap<SExpression, SExpression>();
+            final Map<SExpression, SExpression> dataReplacement = new HashMap<>();
             // We incrementally build the Map of already resolved expressions:
-            final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>();
+            final Map<Integer, Object> resolvedExpressions = new HashMap<>();
             // Let's evaluate all expressions with no dependencies first:
             resolvedExpressions.putAll(evaluateAllExpressionsWithNoDependencies(dependencyValues, dataReplacement, expressions, newEvaluationContext));
 
             for (final SExpression sExpression : expressions) {
-                if(sExpression != null){
+                if (sExpression != null) {
                     // Then evaluate recursively all remaining expressions:
                     resolvedExpressions.putAll(evaluateExpressionWithResolvedDependencies(sExpression, dependencyValues, dataReplacement, resolvedExpressions,
                             newEvaluationContext.getContainerState()));
                 }
             }
-            final List<Object> results = new ArrayList<Object>(expressions.size());
+            final List<Object> results = new ArrayList<>(expressions.size());
             for (final SExpression sExpression : expressions) {
                 if (sExpression != null) {
                     final int key = sExpression.getDiscriminant();
@@ -135,9 +135,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
                 }
             }
             return results;
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw buildSExpressionEvaluationExceptionWhenNotFindProcess(newEvaluationContext, e);
-        } catch (final SProcessDefinitionReadException e) {
+        } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e) {
             throw buildSExpressionEvaluationExceptionWhenNotFindProcess(newEvaluationContext, e);
         } catch (final SClassLoaderException e) {
             throw new SExpressionEvaluationException(e, null);
@@ -168,7 +166,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
     private Map<Integer, Object> evaluateAllExpressionsWithNoDependencies(final Map<String, Object> dependencyValues,
             final Map<SExpression, SExpression> dataReplacement, final List<SExpression> expressions, final SExpressionContext evaluationContext)
             throws SExpressionTypeUnknownException, SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
-        final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>();
+        final Map<Integer, Object> resolvedExpressions = new HashMap<>();
         final Map<ExpressionKind, List<SExpression>> expressionMapByKind = flattenDependencies(expressions);
         final List<SExpression> variableExpressions = expressionMapByKind.get(new ExpressionKind(ExpressionType.TYPE_VARIABLE.name()));
 
@@ -204,7 +202,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
             final Map<String, Object> dependencyValues, final Map<SExpression, SExpression> dataReplacement,
             final Map<Integer, Object> alreadyResolvedExpressions, final ContainerState containerState) throws SExpressionTypeUnknownException,
             SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
-        final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>(alreadyResolvedExpressions);
+        final Map<Integer, Object> resolvedExpressions = new HashMap<>(alreadyResolvedExpressions);
         // Evaluate the dependencies first:
         for (final SExpression dep : sExpression.getDependencies()) {
             resolvedExpressions.putAll(evaluateExpressionWithResolvedDependencies(dep, dependencyValues, dataReplacement, resolvedExpressions, containerState));
@@ -222,7 +220,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
             final ExpressionKind kind, final Map<SExpression, SExpression> dataReplacement, final Map<Integer, Object> alreadyResolvedExpressions,
             final ContainerState containerState) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
-        final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>();
+        final Map<Integer, Object> resolvedExpressions = new HashMap<>();
         if (expressionsOfKind != null) {
             final List<Object> evaluationResults = expressionService.evaluate(kind, expressionsOfKind, dependencyValues, alreadyResolvedExpressions,
                     containerState);
@@ -251,9 +249,9 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
     }
 
     private Map<ExpressionKind, List<SExpression>> flattenDependencies(final Collection<SExpression> collection) {
-        final Map<ExpressionKind, List<SExpression>> expressionMapByKind = new HashMap<ExpressionKind, List<SExpression>>();
+        final Map<ExpressionKind, List<SExpression>> expressionMapByKind = new HashMap<>();
         for (final SExpression sExpression : collection) {
-            if(sExpression == null){
+            if (sExpression == null) {
                 continue;
             }
             final ExpressionKind expressionKind = sExpression.getExpressionKind();
@@ -262,7 +260,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
 
             // If no present, put it in the map
             if (exprList == null) {
-                exprList = new ArrayList<SExpression>();
+                exprList = new ArrayList<>();
                 expressionMapByKind.put(expressionKind, exprList);
             }
             if (!exprList.contains(sExpression)) {
@@ -276,7 +274,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
     }
 
     private void fillContext(final SExpressionContext evaluationContext, final Map<String, Object> dependencyValues)
-            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
+            throws SProcessDefinitionNotFoundException, SBonitaReadException {
         if (evaluationContext.getContainerId() == null && evaluationContext.getProcessDefinitionId() != null) {
             final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(evaluationContext.getProcessDefinitionId());
             evaluationContext.setProcessDefinition(processDefinition);

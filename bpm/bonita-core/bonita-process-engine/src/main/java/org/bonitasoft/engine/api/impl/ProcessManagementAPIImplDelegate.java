@@ -20,17 +20,14 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterCriterion;
 import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import org.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -60,7 +57,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Matthieu Chaffotte
  */
 // Uncomment the "implements" when this delegate implements all the methods.
-public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */ {
+public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */{
 
     private static PlatformServiceAccessor getPlatformServiceAccessor() {
         try {
@@ -71,19 +68,8 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     }
 
     public static SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
-            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionId,
-                processDefinitionService);
-        try {
-            transactionContentWithResult.execute();
-            return transactionContentWithResult.getResult();
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw e;
-        } catch (final SProcessDefinitionReadException e) {
-            throw e;
-        } catch (final SBonitaException e) {
-            throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
-        }
+            throws SProcessDefinitionNotFoundException, SBonitaReadException {
+        return processDefinitionService.getProcessDefinition(processDefinitionId);
     }
 
     protected TenantServiceAccessor getTenantAccessor() {
@@ -141,12 +127,10 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
                 throw new UpdateException("Purge can only be done on a disabled process with no running instances");
             }
             tenantAccessor.getClassLoaderService().removeLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
-        } catch (final SProcessDefinitionNotFoundException spdnfe) {
-            throw new ProcessDefinitionNotFoundException(spdnfe);
-        } catch (final SProcessDefinitionReadException spdre) {
-            throw new RetrieveException(spdre);
-        } catch (final SBonitaReadException sbre) {
-            throw new RetrieveException(sbre);
+        } catch (final SProcessDefinitionNotFoundException e) {
+            throw new ProcessDefinitionNotFoundException(e);
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
         }
     }
 
@@ -156,7 +140,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
-            OrderBy order = null;
+            OrderBy order;
             switch (sort) {
                 case NAME_DESC:
                     order = OrderBy.NAME_DESC;

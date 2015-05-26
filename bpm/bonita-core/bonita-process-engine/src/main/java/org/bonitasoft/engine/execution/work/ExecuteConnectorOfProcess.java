@@ -25,7 +25,6 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorDefinitionNotFou
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
@@ -47,6 +46,7 @@ import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.StartFlowNodeFilter;
 import org.bonitasoft.engine.execution.event.EventsHandler;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -69,17 +69,17 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     private long subProcessDefinitionId;
 
     ExecuteConnectorOfProcess(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
-                              final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent,
-                              final FlowNodeSelector flowNodeSelector) {
+            final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent,
+            final FlowNodeSelector flowNodeSelector) {
         super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(processInstanceId,
                 DataInstanceContainer.PROCESS_INSTANCE.name(), processDefinitionId));
         this.processInstanceId = processInstanceId;
         this.rootProcessInstanceId = rootProcessInstanceId;
         this.activationEvent = activationEvent;
-        if(flowNodeSelector != null){
+        if (flowNodeSelector != null) {
             this.filter = flowNodeSelector.getSelector();
             this.subProcessDefinitionId = flowNodeSelector.getSubProcessDefinitionId();
-        }else{
+        } else {
             this.filter = null;
             this.subProcessDefinitionId = -1;
         }
@@ -165,7 +165,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
     @Override
     protected SConnectorDefinition getSConnectorDefinition(final ProcessDefinitionService processDefinitionService)
-            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException, SConnectorDefinitionNotFoundException {
+            throws SProcessDefinitionNotFoundException, SBonitaReadException, SConnectorDefinitionNotFoundException {
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         // final SConnectorDefinition sConnectorDefinition = processContainer.getConnectorDefinition(connectorDefinitionId);// FIXME: Uncomment when generate id
