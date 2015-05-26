@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.assertj.core.data.MapEntry;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -826,7 +827,7 @@ public class PageServiceImplTest {
     @Test
     public void zipTest_no_page_properties() throws Exception {
         exception.expect(SInvalidPageZipMissingPropertiesException.class);
-        exception.expectMessage("Missing page.propeties");
+        exception.expectMessage("Missing page.properties");
 
         // given
         @SuppressWarnings("unchecked")
@@ -1015,6 +1016,46 @@ public class PageServiceImplTest {
         pageServiceImpl.updatePageContent(page.getId(), content, "contentName");
 
         verify(apiExtensionPageServiceListener).pageUpdated(page, content);
+    }
+
+    @Test
+    public void updatePageContent_should_update_page_content_type() throws Exception {
+        verifyPageUpdateContent(getPagePropertiesContentPair("contentType=" + SContentType.API_EXTENSION), SContentType.API_EXTENSION);
+    }
+
+    @Test
+    public void updatePageContent_should_update_to_default_content_type() throws Exception {
+        verifyPageUpdateContent(getPagePropertiesContentPair(), SContentType.PAGE);
+    }
+
+    protected void verifyPageUpdateContent(Pair<String, byte[]> pagePropertiesContentPair, final String expectedContentType) throws Exception {
+        //given
+        final SPageImpl sPage = new SPageImpl("name", 10201983L, 2005L, false, "contentName");
+        sPage.setId(45L);
+        final SPageContent pageContent = new SPageContentImpl();
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageContent", SPageContent.class, sPage.getId()))).thenReturn(pageContent);
+        when(readPersistenceService.selectById(new SelectByIdDescriptor<>("getPageById", SPage.class, sPage.getId()))).thenReturn(sPage);
+        final byte[] content = IOUtil.zip(getIndexGroovyContentPair(), pagePropertiesContentPair);
+
+        //then
+        doAnswer(new Answer<Object>() {
+
+            @Override
+            public Object answer(final InvocationOnMock invocation) throws Throwable {
+
+                EntityUpdateDescriptor entityUpdateDescriptor = (EntityUpdateDescriptor) invocation.getArguments()[1];
+                assertThat(entityUpdateDescriptor.getFields()).contains(expectedUpdateFields()).contains(entry("contentType", expectedContentType));
+                return null;
+            }
+        }).when(pageServiceImpl).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
+
+        //when
+        pageServiceImpl.updatePageContent(sPage.getId(), content, "contentName");
+    }
+
+    private MapEntry[] expectedUpdateFields() {
+        return new MapEntry[] { entry("description", "mypage description"), entry("name", "custompage_mypage"),
+                entry("contentName", "contentName"), entry("displayName", "mypage display name") };
     }
 
     @Test

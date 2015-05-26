@@ -29,13 +29,13 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApplicationContainerConverterTest {
+public class ApplicationsToNodeContainerConverterTest {
 
     @Mock
-    private ApplicationNodeConverter applicationNodeConverter;
+    private ApplicationToNodeConverter applicationToNodeConverter;
 
     @InjectMocks
-    private ApplicationContainerConverter applicationContainerConverter;
+    private ApplicationsToNodeContainerConverter applicationsToNodeContainerConverter;
 
     @Test
     public void toNode_should_create_a_container_to_put_all_converted_applications() throws Exception {
@@ -46,11 +46,11 @@ public class ApplicationContainerConverterTest {
         ApplicationNode appNode1 = mock(ApplicationNode.class);
         ApplicationNode appNode2 = mock(ApplicationNode.class);
 
-        given(applicationNodeConverter.toNode(app1)).willReturn(appNode1);
-        given(applicationNodeConverter.toNode(app2)).willReturn(appNode2);
+        given(applicationToNodeConverter.toNode(app1)).willReturn(appNode1);
+        given(applicationToNodeConverter.toNode(app2)).willReturn(appNode2);
 
         //when
-        ApplicationNodeContainer nodeContainer = applicationContainerConverter.toNode(Arrays.asList(app1, app2));
+        ApplicationNodeContainer nodeContainer = applicationsToNodeContainerConverter.toNode(Arrays.asList(app1, app2));
 
         //then
         assertThat(nodeContainer).isNotNull();

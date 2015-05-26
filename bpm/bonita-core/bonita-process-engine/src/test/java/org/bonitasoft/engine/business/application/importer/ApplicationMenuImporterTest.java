@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
+import org.bonitasoft.engine.business.application.converter.NodeToApplicationMenuConverter;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
@@ -43,7 +43,7 @@ public class ApplicationMenuImporterTest {
     ApplicationService applicationService;
 
     @Mock
-    ApplicationMenuNodeConverter converter;
+    NodeToApplicationMenuConverter converter;
 
     @InjectMocks
     ApplicationMenuImporter importer;

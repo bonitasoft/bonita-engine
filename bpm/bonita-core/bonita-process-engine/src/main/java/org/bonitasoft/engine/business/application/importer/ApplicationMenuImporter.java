@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
+import org.bonitasoft.engine.business.application.converter.NodeToApplicationMenuConverter;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
@@ -31,9 +31,9 @@ import org.bonitasoft.engine.exception.ImportException;
 public class ApplicationMenuImporter {
 
     private ApplicationService applicationService;
-    private ApplicationMenuNodeConverter converter;
+    private NodeToApplicationMenuConverter converter;
 
-    public ApplicationMenuImporter(ApplicationService applicationService, ApplicationMenuNodeConverter converter) {
+    public ApplicationMenuImporter(ApplicationService applicationService, NodeToApplicationMenuConverter converter) {
         this.applicationService = applicationService;
         this.converter = converter;
     }

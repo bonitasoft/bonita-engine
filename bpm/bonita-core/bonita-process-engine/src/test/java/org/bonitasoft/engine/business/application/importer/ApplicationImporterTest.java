@@ -30,7 +30,7 @@ import java.util.List;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.business.application.ApplicationService;
-import org.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
+import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
@@ -59,7 +59,7 @@ public class ApplicationImporterTest {
     private ApplicationImportStrategy strategy;
 
     @Mock
-    private ApplicationNodeConverter applicationNodeConverter;
+    private NodeToApplicationConverter nodeToApplicationConverter;
 
     @Mock
     private ApplicationPageImporter applicationPageImporter;
@@ -94,7 +94,7 @@ public class ApplicationImporterTest {
         applicationNode.addApplicationMenu(menu2);
         applicationNode.setHomePage("home");
         applicationNode.setToken("app");
-        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
 
         long homePageId = 222L;
         SApplicationPage applicationPage = mock(SApplicationPage.class);
@@ -153,7 +153,7 @@ public class ApplicationImporterTest {
 
         ApplicationNode applicationNode = new ApplicationNode();
         applicationNode.addApplicationPage(pageNode1);
-        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
 
         given(applicationPageImporter.importApplicationPage(pageNode1, app)).willReturn(errorPage);
 
@@ -181,7 +181,7 @@ public class ApplicationImporterTest {
 
         ApplicationNode applicationNode = new ApplicationNode();
         applicationNode.setToken("app");
-        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
         given(applicationService.createApplication(app)).willReturn(app);
 
         //when
@@ -207,7 +207,7 @@ public class ApplicationImporterTest {
         applicationNode.setToken("app");
         applicationNode.setHomePage("home");
 
-        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
         given(applicationService.createApplication(app)).willReturn(app);
 
         given(applicationService.getApplicationPage("app", "home")).willThrow(new SObjectNotFoundException(""));
@@ -234,7 +234,7 @@ public class ApplicationImporterTest {
         SApplication appInConflict = mock(SApplication.class);
 
         ApplicationNode applicationNode = mock(ApplicationNode.class);
-        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
 
         //when
@@ -258,7 +258,7 @@ public class ApplicationImporterTest {
         SApplication appInConflict = mock(SApplication.class);
 
         ApplicationNode applicationNode = mock(ApplicationNode.class);
-        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
         doThrow(new AlreadyExistsException("")).when(strategy).whenApplicationExists(appInConflict, appToBeImported);
 
@@ -278,7 +278,7 @@ public class ApplicationImporterTest {
         given(importResult.getApplication()).willReturn(app1);
 
         ApplicationNode applicationNode = mock(ApplicationNode.class);
-        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
+        given(nodeToApplicationConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
 
         given(applicationService.createApplication(app1)).willThrow(new SObjectCreationException(""));
 

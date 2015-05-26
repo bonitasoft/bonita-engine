@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.api.impl.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -23,6 +23,8 @@ import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
+import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
+import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
@@ -47,7 +49,9 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -70,7 +74,13 @@ public class ApplicationAPIDelegateTest {
     @Mock
     private SearchResult<Application> appSearchResult;
 
+    @Mock
+    ApplicationTokenValidator validator;
+
     private ApplicationAPIDelegate delegate;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private static final long APPLICATION_ID = 15;
 
@@ -91,7 +101,8 @@ public class ApplicationAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationAPIDelegate(accessor, converter, LOGGED_USER_ID);
+        delegate = new ApplicationAPIDelegate(accessor, converter, LOGGED_USER_ID, validator);
+        given(validator.validate(anyString())).willReturn(new ValidationStatus(true));
     }
 
     @Test
@@ -147,51 +158,18 @@ public class ApplicationAPIDelegateTest {
     }
 
     @Test
-    public void createApplication_should_throw_CreationException_when_token_has_spaces() throws Exception {
+    public void createApplication_should_throw_InvalidCharacterException_when_token_contains_invalid_character() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator("token with spaces", APP_DISP_NAME, VERSION);
+        final ApplicationCreator creator = new ApplicationCreator("invalid token", APP_DISP_NAME, VERSION);
+        given(validator.validate("invalid token")).willReturn(new ValidationStatus(false, "invalid character"));
+
+        //then
+        expectedException.expect(CreationException.class);
+        expectedException.expectMessage("invalid character");
 
         //when
-        try {
-            delegate.createApplication(creator);
-            fail("exception expected");
-        } catch (final CreationException e) {
-            assertThat(e.getMessage()).contains("The token");
-        }
+        delegate.createApplication(creator);
 
-        //then exception
-    }
-
-    @Test
-    public void createApplication_should_throw_CreationException_when_token_isEmpty() throws Exception {
-        //given
-        final ApplicationCreator creator = new ApplicationCreator("", APP_DISP_NAME, VERSION);
-
-        //when
-        try {
-            delegate.createApplication(creator);
-            fail("exception expected");
-        } catch (final CreationException e) {
-            assertThat(e.getMessage()).contains("The token");
-        }
-
-        //then exception
-    }
-
-    @Test
-    public void createApplication_should_throw_CreationException_when_token_isEmpty_after_trim() throws Exception {
-        //given
-        final ApplicationCreator creator = new ApplicationCreator(" ", APP_DISP_NAME, VERSION);
-
-        //when
-        try {
-            delegate.createApplication(creator);
-            fail("exception expected");
-        } catch (final CreationException e) {
-            assertThat(e.getMessage()).contains("The token");
-        }
-
-        //then exception
     }
 
     @Test(expected = CreationException.class)
@@ -212,22 +190,6 @@ public class ApplicationAPIDelegateTest {
 
         //when
         delegate.createApplication(creator);
-
-        //then exception
-    }
-
-    @Test
-    public void createApplication_should_throw_CreationException_when_token_is_null() throws Exception {
-        //given
-        final ApplicationCreator creator = new ApplicationCreator(null, APP_DISP_NAME, VERSION);
-
-        //when
-        try {
-            delegate.createApplication(creator);
-            fail("exception expected");
-        } catch (final CreationException e) {
-            assertThat(e.getMessage()).contains("The token");
-        }
 
         //then exception
     }
@@ -380,16 +342,20 @@ public class ApplicationAPIDelegateTest {
         //then exception
     }
 
-    @Test(expected = UpdateException.class)
+    @Test
     public void updateApplication_should_throw_UpdateException_when_applicationService_token_is_invalid() throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
-        updater.setToken("token with spaces");
+        updater.setToken("invalid token");
+        given(validator.validate("invalid token")).willReturn(new ValidationStatus(false, "invalid token"));
+
+        //then exception
+        expectedException.expect(UpdateException.class);
+        expectedException.expectMessage("invalid token");
 
         //when
         delegate.updateApplication(APPLICATION_ID, updater);
 
-        //then exception
     }
 
     @Test(expected = UpdateException.class)
