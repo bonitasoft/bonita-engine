@@ -18,5 +18,5 @@ package org.bonitasoft.engine.bpm.process;
  */
 public interface Visitable {
 
-    <T> T accept(ModelFinderVisitor<T> visitor, long modelId);
+    void accept(ModelFinderVisitor visitor, long modelId);
 }

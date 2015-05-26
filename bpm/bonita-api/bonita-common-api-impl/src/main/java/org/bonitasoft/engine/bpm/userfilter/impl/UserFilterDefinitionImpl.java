@@ -34,7 +34,7 @@ public class UserFilterDefinitionImpl extends NamedElementImpl implements UserFi
 
     private final String version;
 
-    private final Map<String, Expression> inputs = new HashMap<String, Expression>();
+    private final Map<String, Expression> inputs = new HashMap<>();
 
     public UserFilterDefinitionImpl(final String name, final String filterId, final String version) {
         super(name);
@@ -136,8 +136,8 @@ public class UserFilterDefinitionImpl extends NamedElementImpl implements UserFi
     }
 
     @Override
-    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
-        return visitor.find(this, modelId);
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
     }
 
 }

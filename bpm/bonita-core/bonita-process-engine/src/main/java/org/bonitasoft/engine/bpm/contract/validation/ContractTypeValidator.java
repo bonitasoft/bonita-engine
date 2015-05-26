@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.definition.model.SType;
 public class ContractTypeValidator {
 
     public boolean validate(final SInputDefinition definition, final Object object, ErrorReporter errorReporter) {
-
         if (definition.hasChildren() && definition.getType() == null) {
             if (!isValidForComplexType(definition, object, errorReporter)) {
                 errorReporter.addError(object + " cannot be assigned to COMPLEX type");
@@ -69,7 +68,6 @@ public class ContractTypeValidator {
             return isValidForMultipleComplexType(definition, object, errorReporter);
         } else {
             return isValidForSimpleComplexType(definition, object, errorReporter);
-
         }
     }
 
