@@ -6070,11 +6070,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, UnauthorizedAccessException, ExecutionException {
-        return processConfigurationAPI.resolvePageOrURL(key, context, executeAuthorizationRules);
-    }
-
-    @Override
     public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
         return processConfigurationAPI.getFormMapping(formMappingId);
     }

@@ -13,31 +13,44 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.impl.page.PageAPIDelegate;
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipContentException;
 import org.bonitasoft.engine.exception.InvalidPageZipInconsistentException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingAPropertyException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingPropertiesException;
+import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageCreator;
+import org.bonitasoft.engine.page.PageMappingService;
 import org.bonitasoft.engine.page.PageNotFoundException;
+import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.page.PageUpdater;
+import org.bonitasoft.engine.page.SAuthorizationException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -108,7 +121,7 @@ public class PageAPIImpl implements PageAPI {
 
     @Override
     public Page getPageByNameAndProcessDefinitionId(String name, long processDefinitionId) throws PageNotFoundException {
-        return getPageAPIDelegate().getPageByNameAndProcessDefinition(name,processDefinitionId);
+        return getPageAPIDelegate().getPageByNameAndProcessDefinition(name, processDefinitionId);
     }
 
     @Override
@@ -128,6 +141,25 @@ public class PageAPIImpl implements PageAPI {
             InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException,
             InvalidPageZipMissingAPropertyException {
         return getPageAPIDelegate().getPageProperties(content, checkIfItAlreadyExists);
+    }
+
+    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, ExecutionException, UnauthorizedAccessException {
+        PageMappingService pageMappingService = retrievePageMappingService();
+        try {
+            return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context, executeAuthorizationRules));
+        } catch (SObjectNotFoundException e) {
+            throw new NotFoundException(e);
+        } catch (SBonitaReadException e) {
+            throw new RetrieveException(e);
+        } catch (SExecutionException e) {
+            throw new ExecutionException(e);
+        } catch (SAuthorizationException e) {
+            throw new UnauthorizedAccessException(e);
+        }
+    }
+
+    PageMappingService retrievePageMappingService() {
+        return getTenantAccessor().getPageMappingService();
     }
 
 }
