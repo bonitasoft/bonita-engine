@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -46,7 +45,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * @author Baptiste Mesta
  */
-public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
+public class ProcessConfigurationAPIImpl {
 
     protected TenantServiceAccessor getTenantAccessor() {
         try {
@@ -58,7 +57,6 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         }
     }
 
-    @Override
     public SearchResult<FormMapping> searchFormMappings(final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         FormMappingService formMappingService = tenantAccessor.getFormMappingService();
@@ -73,7 +71,6 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         }
     }
 
-    @Override
     public PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, ExecutionException, UnauthorizedAccessException {
         PageMappingService pageMappingService = retrievePageMappingService();
         try {
@@ -93,7 +90,6 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         return getTenantAccessor().getPageMappingService();
     }
 
-    @Override
     public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {

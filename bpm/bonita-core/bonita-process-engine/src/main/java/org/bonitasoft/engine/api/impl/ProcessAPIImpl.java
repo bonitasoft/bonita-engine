@@ -308,11 +308,13 @@ import org.bonitasoft.engine.exception.ContractDataNotFoundException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -334,6 +336,7 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
@@ -349,6 +352,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -453,14 +457,16 @@ public class ProcessAPIImpl implements ProcessAPI {
     private final ProcessManagementAPIImplDelegate processManagementAPIImplDelegate;
 
     private final DocumentAPI documentAPI;
+    protected final ProcessConfigurationAPIImpl processConfigurationAPI;
 
     public ProcessAPIImpl() {
-        this(new ProcessManagementAPIImplDelegate(), new DocumentAPIImpl());
+        this(new ProcessManagementAPIImplDelegate(), new DocumentAPIImpl(), new ProcessConfigurationAPIImpl());
     }
 
-    public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI) {
+    public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI, ProcessConfigurationAPIImpl processConfigurationAPI) {
         processManagementAPIImplDelegate = processManagementAPIDelegate;
         this.documentAPI = documentAPI;
+        this.processConfigurationAPI = processConfigurationAPI;
     }
 
     protected ProcessManagementAPIImplDelegate instantiateProcessManagementAPIDelegate() {
@@ -6058,4 +6064,18 @@ public class ProcessAPIImpl implements ProcessAPI {
         return expressionContext;
     }
 
+    @Override
+    public SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions) throws SearchException {
+        return processConfigurationAPI.searchFormMappings(searchOptions);
+    }
+
+    @Override
+    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, UnauthorizedAccessException, ExecutionException {
+        return processConfigurationAPI.resolvePageOrURL(key, context, executeAuthorizationRules);
+    }
+
+    @Override
+    public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
+        return processConfigurationAPI.getFormMapping(formMappingId);
+    }
 }

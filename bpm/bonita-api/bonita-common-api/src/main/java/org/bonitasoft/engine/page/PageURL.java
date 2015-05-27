@@ -13,12 +13,13 @@
  */
 package org.bonitasoft.engine.page;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * author Emmanuel Duchastenier
  */
-public class PageURL {
+public class PageURL implements Serializable {
 
     private String url;
 

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,11 +55,15 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -1810,4 +1815,32 @@ public interface ProcessManagementAPI {
      */
     List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort);
 
+    /**
+     * Search for form mapping
+     *
+     * @param searchOptions
+     *        search options to search for form mapping
+     * @return the result of the search
+     * @see org.bonitasoft.engine.form.FormMappingSearchDescriptor
+     * @see org.bonitasoft.engine.form.FormMappingType
+     * @since 7.0.0
+     */
+    SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Resolves a Page URL from a specific key.
+     *
+     * @param key the key of the page to resolve.
+     * @return the <code>PageURL</code> containing the pageId or the complete
+     * @throws NotFoundException if the key does not match anything.
+     * @see PageURL the structured PageURL that points to the Page or URL
+     */
+    PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, UnauthorizedAccessException, ExecutionException;
+
+    /**
+     * @param formMappingId
+     * @return
+     * @throws FormMappingNotFoundException
+     */
+    FormMapping getFormMapping(final long formMappingId) throws FormMappingNotFoundException;
 }
