@@ -223,8 +223,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                 checkPlatformVersion(platformAccessor);
                 final List<STenant> tenants = getTenants(platformAccessor);
                 startPlatformServices(platformAccessor);
-                boolean mustRestartElements;
-                if (mustRestartElements = !isNodeStarted()) {
+                final boolean mustRestartElements = !isNodeStarted();
+                if (mustRestartElements) {
                     // restart handlers of tenant are executed before any service start
                     beforeServicesStartOfRestartHandlersOfTenant(platformAccessor, sessionAccessor, tenants);
                 }
@@ -237,7 +237,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 if (mustRestartElements) {
                     afterServicesStartOfRestartHandlersOfTenant(platformAccessor, sessionAccessor, tenants);
                 }
-                registerMissingTenantsDefaultJobs(tenants);
+                registerMissingTenantsDefaultJobs(platformAccessor, sessionAccessor, tenants);
 
             } catch (final SClassLoaderException e) {
                 throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
@@ -265,6 +265,8 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     /**
      * Registers missing default jobs (if any) for the provided tenants
+     * @param platformAccessor
+     * @param sessionAccessor
      * @param tenants
      * @throws BonitaHomeNotSetException
      * @throws BonitaHomeConfigurationException
@@ -276,30 +278,28 @@ public class PlatformAPIImpl implements PlatformAPI {
      * @throws IOException
      * @throws ClassNotFoundException 
      */
-    protected void registerMissingTenantsDefaultJobs(final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
+    protected void registerMissingTenantsDefaultJobs(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor, final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
             InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
+        final TransactionService transactionService = platformAccessor.getTransactionService();
         for (final STenant tenant : tenants) {
-            SessionAccessor sessionAccessor = null;
             long platformSessionId = -1;
             try {
-            	final TransactionService transactionService = getPlatformAccessor().getTransactionService();
-            	final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenant.getId());
-            	
-            	sessionAccessor = createSessionAccessor();
-            	final long sessionId = createSession(tenant.getId(), tenantServiceAccessor.getSessionService());
-            	platformSessionId = sessionAccessor.getSessionId();
+                final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenant.getId());
+
+                final long sessionId = createSession(tenant.getId(), tenantServiceAccessor.getSessionService());
+                platformSessionId = sessionAccessor.getSessionId();
                 sessionAccessor.deleteSessionId();
                 sessionAccessor.setSessionInfo(sessionId, tenant.getId());
-            	
+
                 final SchedulerService schedulerService = tenantServiceAccessor.getSchedulerService();
                 final TenantConfiguration tenantConfiguration = tenantServiceAccessor.getTenantConfiguration();
                 final List<JobRegister> defaultJobs = tenantConfiguration.getJobsToRegister();
                 final List<String> scheduledJobNames = schedulerService.getJobs();
-                
+
                 // Only register missing default jobs if they are missing
                 transactionService.begin();
                 try {
-                	for (final JobRegister defaultJob : defaultJobs) {
+                    for (final JobRegister defaultJob : defaultJobs) {
                         if (!scheduledJobNames.contains(defaultJob.getJobName())) {
                             registerJob(schedulerService, defaultJob);
                         }
@@ -310,7 +310,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 }
             }
             finally {
-            	cleanSessionAccessor(sessionAccessor, platformSessionId);
+                cleanSessionAccessor(sessionAccessor, platformSessionId);
             }
         }
     }
@@ -403,7 +403,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void startScheduler(final PlatformServiceAccessor platformAccessor, final List<STenant> tenants) throws SBonitaException,
+    void startScheduler(final PlatformServiceAccessor platformAccessor, final List<STenant> tenants) throws SBonitaException,
             BonitaHomeNotSetException, BonitaHomeConfigurationException, IOException, NoSuchMethodException, InstantiationException, IllegalAccessException,
             InvocationTargetException {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
@@ -704,7 +704,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             try {
                 // Get user name
-                userName = getUserName(tenant, tenantId);
+                userName = getUserName(tenantId);
             } catch (Exception e) {
                 transactionService.complete();
                 throw new STenantCreationException(e);
@@ -737,10 +737,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         } finally {
             cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
-    }
-
-    private String getUserName(final STenant tenant, final Long tenantId) throws IOException, BonitaHomeNotSetException {
-        return getUserName(tenantId);
     }
 
     private void createTenantFolderInBonitaHome(final long tenantId) throws STenantCreationException {
