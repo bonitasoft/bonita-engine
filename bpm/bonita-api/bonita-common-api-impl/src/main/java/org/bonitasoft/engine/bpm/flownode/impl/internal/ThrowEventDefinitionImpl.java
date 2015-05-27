@@ -106,11 +106,18 @@ public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl imple
     }
 
     @Override
-    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
-        final T accept = super.accept(visitor, modelId);
-        if (accept != null) {
-            return accept;
-        }
-        return visitor.find(this, modelId);
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ThrowEventDefinitionImpl{");
+        sb.append("messageEventTriggerDefinitions=").append(messageEventTriggerDefinitions);
+        sb.append(", signalEventTriggerDefinitions=").append(signalEventTriggerDefinitions);
+        sb.append('}');
+        sb.append(super.toString());
+        return sb.toString();
+    }
+
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
     }
 }

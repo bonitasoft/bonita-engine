@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.definition;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.io.xml.XMLParseException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -764,4 +766,19 @@ public interface ProcessDefinitionService {
      */
     void updateExpressionContent(long processDefinitionId, long expressionDefinitionId, String content) throws SProcessDefinitionNotFoundException,
             SObjectModificationException;
+
+    /**
+     *
+     * Returns a specific process definition that include informations such as tasks definition, actors...
+     *
+     * @param processDefinitionId
+     *        Identifier of process definition
+     * @return The corresponding process definition with informations.
+     * @throws SProcessDefinitionNotFoundException
+     *         If the process definition doesn't exist.
+     * @throws SProcessDefinitionReadException
+     *         If the process definition design cannot be read
+     * @since 7.0
+     */
+    DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException;
 }

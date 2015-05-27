@@ -130,6 +130,19 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     String getStringIndexLabel(int index);
 
     /**
+     * Retrieves the label list for the ProcessDefinition given search index.
+     * <p>
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * index</a> Bonitasoft documentation page
+     * </p>
+     *
+     * @throws IndexOutOfBoundsException if index is invalid
+     * @return The label list of the search index
+     */
+
+    List<String> getStringIndexLabels();
+
+    /**
      * Retrieves the Expression for the ProcessDefinition given search index.
      * <p>
      * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
@@ -142,6 +155,17 @@ public interface DesignProcessDefinition extends ProcessDefinition {
      * @return The {@link Expression} of the search index
      */
     Expression getStringIndexValue(int index);
+
+    /**
+     * Retrieves the Expression list of the ProcessDefinition search index values.
+     * <p>
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * index</a> Bonitasoft documentation page
+     * </p>
+     *
+     * @return The {@link Expression} list of the search index
+     */
+    List<Expression> getStringIndexValues();
 
     /**
      * Contract that must be respected when starting an instance of this process

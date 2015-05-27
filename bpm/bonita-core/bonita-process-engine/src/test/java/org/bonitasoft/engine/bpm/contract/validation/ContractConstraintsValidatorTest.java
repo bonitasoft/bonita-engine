@@ -132,7 +132,7 @@ public class ContractConstraintsValidatorTest {
     }
 
     @Test
-    public void isValid_should_be_false_when_rule_fails_to_evaluate() throws Exception {
+    public void validate_should_throw_ContractViolation_with_explanations_when_rule_fails_to_evaluate() throws Exception {
         //given
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
         final SConstraintDefinitionImpl badRule = new SConstraintDefinitionImpl("bad rule", "a == b", "failing rule");

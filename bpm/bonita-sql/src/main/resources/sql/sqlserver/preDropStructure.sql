@@ -59,6 +59,8 @@ ALTER TABLE process_comment DROP CONSTRAINT fk_process_comment_tenantId
 GO
 ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_tenantId
 GO
+ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_content
+GO
 ALTER TABLE process_instance DROP CONSTRAINT fk_process_instance_tenantId
 GO
 ALTER TABLE processsupervisor DROP CONSTRAINT fk_processsupervisor_tenantId

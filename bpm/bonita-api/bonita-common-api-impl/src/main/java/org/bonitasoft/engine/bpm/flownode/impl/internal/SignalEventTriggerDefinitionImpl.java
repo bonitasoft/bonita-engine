@@ -65,8 +65,7 @@ public abstract class SignalEventTriggerDefinitionImpl implements SignalEventTri
     }
 
     @Override
-    public <T> T accept(ModelFinderVisitor<T> visitor, long modelId) {
+    public void accept(ModelFinderVisitor visitor, long modelId) {
         // nothing to do here:
-        return null;
     }
 }
