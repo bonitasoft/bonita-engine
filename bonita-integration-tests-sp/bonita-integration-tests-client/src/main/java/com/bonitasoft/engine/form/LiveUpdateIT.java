@@ -109,10 +109,10 @@ public class LiveUpdateIT extends CommonAPISPIT {
 
         //resolve urls:
         final Map<String, Serializable> context = Collections.singletonMap(AuthorizationRuleConstants.IS_ADMIN, (Serializable) true);
-        PageURL pInstantiation = getProcessAPI().resolvePageOrURL("process/ProcessWithUpdatedFormMappings/1.0", context, true);
-        PageURL pOverview = getProcessAPI().resolvePageOrURL("processInstance/ProcessWithUpdatedFormMappings/1.0", context, true);
-        PageURL pStep1Execution = getProcessAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step1", context, true);
-        PageURL pStep2Execution = getProcessAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step2", context, true);
+        PageURL pInstantiation = getCustomPageAPI().resolvePageOrURL("process/ProcessWithUpdatedFormMappings/1.0", context, true);
+        PageURL pOverview = getCustomPageAPI().resolvePageOrURL("processInstance/ProcessWithUpdatedFormMappings/1.0", context, true);
+        PageURL pStep1Execution = getCustomPageAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step1", context, true);
+        PageURL pStep2Execution = getCustomPageAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step2", context, true);
         assertThat(pInstantiation.getUrl()).isEqualTo("processStartForm?tenant=" + getSession().getTenantId());
         assertThat(pInstantiation.getPageId()).isNull();
         assertThat(pOverview.getPageId()).isNull();
