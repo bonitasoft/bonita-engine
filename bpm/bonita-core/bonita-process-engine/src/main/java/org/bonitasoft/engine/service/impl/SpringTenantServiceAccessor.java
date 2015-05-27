@@ -30,6 +30,7 @@ import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
+import org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -873,7 +874,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public GenericAuthenticationService getAuthenticationService() {
         if (genericAuthenticationService == null) {
-            genericAuthenticationService = beanAccessor.getService(GenericAuthenticationService.class);
+            genericAuthenticationService = beanAccessor.getService(GenericAuthenticationServiceAccessor.class).getAuthenticationService();
         }
         return genericAuthenticationService;
     }

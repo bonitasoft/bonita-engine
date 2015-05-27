@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -59,6 +60,7 @@ public class ActivateTenantTest {
 
     @Before
     public void setup() {
+        MockitoAnnotations.initMocks(this);
         activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, logger, workService, connectorExecutor, plaformConfiguration,
                 tenantConfiguration);
     }
