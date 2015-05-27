@@ -15,13 +15,10 @@ package org.bonitasoft.engine.api.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -82,14 +79,8 @@ import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
-import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
-import org.bonitasoft.engine.scheduler.model.SJobParameter;
-import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -247,8 +238,6 @@ public class PlatformAPIImpl implements PlatformAPI {
                 if (mustRestartElements) {
                     afterServicesStartOfRestartHandlersOfTenant(platformAccessor, sessionAccessor, tenants);
                 }
-                registerMissingTenantsDefaultJobs(tenants);
-
             } catch (final SClassLoaderException e) {
                 throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
             } catch (final SDependencyException e) {
@@ -271,69 +260,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             }
             throw e;
         }
-    }
-
-    /**
-     * Registers missing default jobs (if any) for the provided tenants
-     * @param tenants
-     * @throws BonitaHomeNotSetException
-     * @throws BonitaHomeConfigurationException
-     * @throws NoSuchMethodException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     * @throws SBonitaException
-     * @throws IOException
-     * @throws ClassNotFoundException 
-     */
-    protected void registerMissingTenantsDefaultJobs(final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
-            InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
-        for (final STenant tenant : tenants) {
-            SessionAccessor sessionAccessor = null;
-            long platformSessionId = -1;
-            try {
-            	final TransactionService transactionService = getPlatformAccessor().getTransactionService();
-            	final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenant.getId());
-            	
-            	sessionAccessor = createSessionAccessor();
-            	final long sessionId = createSession(tenant.getId(), tenantServiceAccessor.getSessionService());
-            	platformSessionId = sessionAccessor.getSessionId();
-                sessionAccessor.deleteSessionId();
-                sessionAccessor.setSessionInfo(sessionId, tenant.getId());
-            	
-                final SchedulerService schedulerService = tenantServiceAccessor.getSchedulerService();
-                final TenantConfiguration tenantConfiguration = tenantServiceAccessor.getTenantConfiguration();
-                final List<JobRegister> defaultJobs = tenantConfiguration.getJobsToRegister();
-                final List<String> scheduledJobNames = schedulerService.getJobs();
-                
-                // Only register missing default jobs if they are missing
-                transactionService.begin();
-                try {
-                	for (final JobRegister defaultJob : defaultJobs) {
-                        if (!scheduledJobNames.contains(defaultJob.getJobName())) {
-                            registerJob(schedulerService, defaultJob);
-                        }
-                    }
-                }
-                finally {
-                    transactionService.complete();
-                }
-            }
-            finally {
-            	cleanSessionAccessor(sessionAccessor, platformSessionId);
-            }
-        }
-    }
-
-    protected void registerJob(final SchedulerService schedulerService, final JobRegister jobRegister) throws SSchedulerException {
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(jobRegister.getJobClass().getName(), jobRegister.getJobName(), true).done();
-        final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
-        for (final Entry<String, Serializable> entry : jobRegister.getJobParameters().entrySet()) {
-            jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance(entry.getKey(), entry.getValue()).done());
-        }
-        final Trigger trigger = jobRegister.getTrigger();
-        schedulerService.schedule(jobDescriptor, jobParameters, trigger);
     }
 
     SessionAccessor createSessionAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException, ClassNotFoundException,
