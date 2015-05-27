@@ -17,7 +17,6 @@
 		<module>bonita-process-instance</module>
 		<module>bonita-reporting</module>
 		<module>bonita-process-engine</module>
-		<module>bonita-bpm-monitoring</module>
 	</modules>
 
 </project>
