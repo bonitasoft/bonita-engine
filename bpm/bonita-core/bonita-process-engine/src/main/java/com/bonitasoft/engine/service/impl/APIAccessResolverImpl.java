@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.api.impl.ApplicationAPIExt;
 import org.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.BusinessDataAPI;
 import org.bonitasoft.engine.api.CommandAPI;
@@ -25,7 +24,6 @@ import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformCommandAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
@@ -34,7 +32,6 @@ import org.bonitasoft.engine.api.impl.PageAPIImpl;
 import org.bonitasoft.engine.api.impl.PermissionAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformCommandAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformLoginAPIImpl;
-import org.bonitasoft.engine.api.impl.ProcessConfigurationAPIImpl;
 import org.bonitasoft.engine.api.impl.TenantAdministrationAPIImpl;
 import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
 import org.bonitasoft.engine.service.APIAccessResolver;
@@ -44,6 +41,7 @@ import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.TenantManagementAPI;
+import com.bonitasoft.engine.api.impl.ApplicationAPIExt;
 import com.bonitasoft.engine.api.impl.ApplicationAPIImpl;
 import com.bonitasoft.engine.api.impl.CommandAPIExt;
 import com.bonitasoft.engine.api.impl.IdentityAPIExt;
@@ -55,7 +53,6 @@ import com.bonitasoft.engine.api.impl.PageAPIExt;
 import com.bonitasoft.engine.api.impl.PlatformAPIExt;
 import com.bonitasoft.engine.api.impl.PlatformMonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.ProcessAPIExt;
-import com.bonitasoft.engine.api.impl.ProcessConfigurationAPIExt;
 import com.bonitasoft.engine.api.impl.ProfileAPIExt;
 import com.bonitasoft.engine.api.impl.ReportingAPIExt;
 import com.bonitasoft.engine.api.impl.TenantManagementAPIExt;
@@ -100,8 +97,6 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(com.bonitasoft.engine.api.ApplicationAPI.class.getName(), new ApplicationAPIImpl());
         apis.put(ApplicationAPI.class.getName(), new ApplicationAPIExt());
         apis.put(PermissionAPI.class.getName(), new PermissionAPIImpl());
-        apis.put(ProcessConfigurationAPI.class.getName(), new ProcessConfigurationAPIImpl());
-        apis.put(com.bonitasoft.engine.api.ProcessConfigurationAPI.class.getName(), new ProcessConfigurationAPIExt());
         apis.put(BusinessDataAPI.class.getName(), new BusinessDataAPIImpl());
     }
 

@@ -9,22 +9,15 @@
 package com.bonitasoft.engine.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPIT;
-import com.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.form.FormMappingModelBuilder;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
@@ -50,6 +43,11 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.bonitasoft.engine.BPMTestSPUtil;
+import com.bonitasoft.engine.CommonAPISPIT;
+import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 /**
  * @author Emmanuel Duchastenier
@@ -91,7 +89,7 @@ public class LiveUpdateIT extends CommonAPISPIT {
                 "before the update of form mapping the process should be unresolved").isEqualTo(ConfigurationState.UNRESOLVED);
         assertThat(getProcessAPI().getProcessResolutionProblems(p.getId())).as("before the update of form mapping the process should be unresolved").hasSize(1);
         long afterDeploy = System.currentTimeMillis();
-        ProcessConfigurationAPI processConfigurationAPI = getProcessConfigurationAPI();
+        ProcessAPI processConfigurationAPI = getProcessAPI();
 
         //get
         FormMapping step1Form = getFormMapping(p, processConfigurationAPI, "step1");
@@ -111,10 +109,10 @@ public class LiveUpdateIT extends CommonAPISPIT {
 
         //resolve urls:
         final Map<String, Serializable> context = Collections.singletonMap(AuthorizationRuleConstants.IS_ADMIN, (Serializable) true);
-        PageURL pInstantiation = getProcessConfigurationAPI().resolvePageOrURL("process/ProcessWithUpdatedFormMappings/1.0", context, true);
-        PageURL pOverview = getProcessConfigurationAPI().resolvePageOrURL("processInstance/ProcessWithUpdatedFormMappings/1.0", context, true);
-        PageURL pStep1Execution = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step1", context, true);
-        PageURL pStep2Execution = getProcessConfigurationAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step2", context, true);
+        PageURL pInstantiation = getProcessAPI().resolvePageOrURL("process/ProcessWithUpdatedFormMappings/1.0", context, true);
+        PageURL pOverview = getProcessAPI().resolvePageOrURL("processInstance/ProcessWithUpdatedFormMappings/1.0", context, true);
+        PageURL pStep1Execution = getProcessAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step1", context, true);
+        PageURL pStep2Execution = getProcessAPI().resolvePageOrURL("taskInstance/ProcessWithUpdatedFormMappings/1.0/step2", context, true);
         assertThat(pInstantiation.getUrl()).isEqualTo("processStartForm?tenant=" + getSession().getTenantId());
         assertThat(pInstantiation.getPageId()).isNull();
         assertThat(pOverview.getPageId()).isNull();
@@ -140,7 +138,7 @@ public class LiveUpdateIT extends CommonAPISPIT {
         assertThat(getProcessAPI().getProcessResolutionProblems(p.getId())).as("the process should be unresolved").hasSize(1);
         assertThat(getProcessAPI().getProcessDeploymentInfo(p.getId()).getConfigurationState()).isEqualTo(ConfigurationState.UNRESOLVED);
         // check if we update form mapping the process is resolved
-        getProcessConfigurationAPI().updateFormMapping(step1Form.getId(), null, anOtherForm.getId());
+        getProcessAPI().updateFormMapping(step1Form.getId(), null, anOtherForm.getId());
         assertThat(getProcessAPI().getProcessResolutionProblems(p.getId())).as("the process should not have resolution problems").isEmpty();
         assertThat(getProcessAPI().getProcessDeploymentInfo(p.getId()).getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
 
@@ -152,8 +150,8 @@ public class LiveUpdateIT extends CommonAPISPIT {
         return TenantAPIAccessor.getCustomPageAPI(getSession());
     }
 
-    FormMapping getFormMapping(ProcessDefinition p, ProcessConfigurationAPI processConfigurationAPI, String step2) throws SearchException {
-        return processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 10)
+    FormMapping getFormMapping(ProcessDefinition p, ProcessAPI processAPI, String step2) throws SearchException {
+        return processAPI.searchFormMappings(new SearchOptionsBuilder(0, 10)
                 .filter(FormMappingSearchDescriptor.TYPE, FormMappingType.TASK).filter(FormMappingSearchDescriptor.PROCESS_DEFINITION_ID, p.getId())
                 .filter(FormMappingSearchDescriptor.TASK, step2).done()).getResult().get(0);
     }
@@ -181,8 +179,8 @@ public class LiveUpdateIT extends CommonAPISPIT {
         final DesignProcessDefinition designProcessDefinition = getProcessAPI().getDesignProcessDefinition(processDefinition.getId());
         Expression step1DisplayName = designProcessDefinition.getFlowElementContainer().getFlowNode("step1").getDisplayName();
         Expression step2DisplayName = designProcessDefinition.getFlowElementContainer().getFlowNode("step2").getDisplayName();
-        getProcessConfigurationAPI().updateExpressionContent(processDefinition.getId(), step1DisplayName.getId(), "return 'groovy after update'");
-        getProcessConfigurationAPI().updateExpressionContent(processDefinition.getId(), step2DisplayName.getId(), "the constant after update");
+        getProcessAPI().updateExpressionContent(processDefinition.getId(), step1DisplayName.getId(), "return 'groovy after update'");
+        getProcessAPI().updateExpressionContent(processDefinition.getId(), step2DisplayName.getId(), "the constant after update");
 
         //start new instance after update of expression and recheck
         processInstance = getProcessAPI().startProcess(processDefinition.getId());

@@ -50,6 +50,7 @@ import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessExportException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -100,6 +101,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -109,6 +111,7 @@ import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -160,8 +163,11 @@ import com.bonitasoft.manager.Features;
  */
 public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
+    private final ProcessConfigurationAPIExt processConfigurationAPIExt;
+
     public ProcessAPIExt() {
-        super(new ProcessManagementAPIExtDelegate(), new DocumentAPIImpl());
+        super(new ProcessManagementAPIExtDelegate(), new DocumentAPIImpl(), new ProcessConfigurationAPIExt());
+        this.processConfigurationAPIExt = (ProcessConfigurationAPIExt) processConfigurationAPI;
     }
 
     protected TenantServiceAccessor getTenantAccessor() {
@@ -1071,4 +1077,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    @Override
+    public FormMapping updateFormMapping(long formMappingId, String url, Long pageId) throws FormMappingNotFoundException, UpdateException {
+        return processConfigurationAPIExt.updateFormMapping(formMappingId, url, pageId);
+    }
+
+    @Override
+    public void updateExpressionContent(long processDefintionId, long expressionDefinitionId, String content) throws ProcessDefinitionNotFoundException, UpdateException {
+        processConfigurationAPIExt.updateExpressionContent(processDefintionId, expressionDefinitionId, content);
+    }
 }

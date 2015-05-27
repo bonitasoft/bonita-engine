@@ -55,7 +55,6 @@ import com.bonitasoft.engine.api.PageAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.ProcessConfigurationAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.ReportingAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
@@ -87,8 +86,6 @@ public class APITestSPUtil extends APITestUtil {
     private PageAPI pageAPI;
 
     private ApplicationAPI applicationAPI;
-
-    private ProcessConfigurationAPI processConfigurationAPI;
 
     @Override
     public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
@@ -140,11 +137,6 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    public ProcessConfigurationAPI getProcessConfigurationAPI() {
-        return processConfigurationAPI;
-    }
-
-    @Override
     public IdentityAPI getIdentityAPI() {
         return (IdentityAPI) super.getIdentityAPI();
     }
@@ -184,10 +176,6 @@ public class APITestSPUtil extends APITestUtil {
         this.tenantManagementAPI = tenantManagementAPI;
     }
 
-    public void setProcessConfigurationAPI(ProcessConfigurationAPI processConfigurationAPI) {
-        this.processConfigurationAPI = processConfigurationAPI;
-    }
-
     public void loginOnTenantWith(final String userName, final String password, final long tenantId) throws BonitaException {
         setSession(BPMTestSPUtil.loginOnTenant(userName, password, tenantId));
         setAPIs();
@@ -213,7 +201,6 @@ public class APITestSPUtil extends APITestUtil {
     @Override
     protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessConfigurationAPI(TenantAPIAccessor.getProcessConfigurationAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
@@ -241,7 +228,6 @@ public class APITestSPUtil extends APITestUtil {
         BPMTestSPUtil.logoutOnTenant(getSession());
         setSession(null);
         setIdentityAPI(null);
-        setProcessConfigurationAPI(null);
         setProcessAPI(null);
         setProfileAPI(null);
         setThemeAPI(null);
