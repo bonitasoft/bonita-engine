@@ -13,8 +13,11 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.platform;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
@@ -28,8 +31,10 @@ import org.bonitasoft.engine.jobs.CleanInvalidSessionsJob;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
+import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -87,6 +92,37 @@ public final class ActivateTenant implements TransactionContent {
             connectorExecutor.start();
             startEventHandling();
             startCleanInvalidSessionsJob();
+            final List<JobRegister> jobsToRegister = tenantConfiguration.getJobsToRegister();
+            for (final JobRegister jobRegister : jobsToRegister) {
+                registerJob(jobRegister);
+            }
+        }
+    }
+
+    private void registerJob(final JobRegister jobRegister) {
+        try {
+            final List<String> jobs = schedulerService.getAllJobs();
+            if (!jobs.contains(jobRegister.getJobName())) {
+                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Register " + jobRegister.getJobDescription());
+                }
+                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                        .createNewInstance(jobRegister.getJobClass().getName(), jobRegister.getJobName(), true).done();
+                final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
+                for (final Entry<String, Serializable> entry : jobRegister.getJobParameters().entrySet()) {
+                    jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance(entry.getKey(), entry.getValue()).done());
+                }
+                final Trigger trigger = jobRegister.getTrigger();
+                schedulerService.schedule(jobDescriptor, jobParameters, trigger);
+            } else {
+                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The " + jobRegister.getJobDescription() + " was already started");
+            }
+        } catch (final SSchedulerException e) {
+            logger.log(this.getClass(), TechnicalLogSeverity.ERROR,
+                    "Unable to register job " + jobRegister.getJobDescription() + " because " + e.getMessage());
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
+            }
         }
     }
 
