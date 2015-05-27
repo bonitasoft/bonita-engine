@@ -56,8 +56,6 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
 
     private String stringIndex5;
 
-    private long migrationPlanId;
-
     public SAProcessInstanceImpl() {
         super();
     }
@@ -74,7 +72,6 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         stateId = processInstance.getStateId();
         rootProcessInstanceId = processInstance.getRootProcessInstanceId();
         callerId = processInstance.getCallerId();
-        migrationPlanId = processInstance.getMigrationPlanId();
         stringIndex1 = processInstance.getStringIndex1();
         stringIndex2 = processInstance.getStringIndex2();
         stringIndex3 = processInstance.getStringIndex3();
@@ -220,15 +217,6 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
 
     public void setStringIndex5(final String stringIndex5) {
         this.stringIndex5 = stringIndex5;
-    }
-
-    @Override
-    public long getMigrationPlanId() {
-        return migrationPlanId;
-    }
-
-    public void setMigrationPlanId(final long migrationPlanId) {
-        this.migrationPlanId = migrationPlanId;
     }
 
     @Override

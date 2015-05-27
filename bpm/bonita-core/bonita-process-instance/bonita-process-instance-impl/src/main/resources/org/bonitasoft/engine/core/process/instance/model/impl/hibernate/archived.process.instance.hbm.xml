@@ -24,7 +24,6 @@
         <property name="lastUpdate" column="lastUpdate" />
         <property name="rootProcessInstanceId" column="rootProcessInstanceId" />
         <property name="callerId" column="callerId" />
-        <property name="migrationPlanId" column="migration_plan" />
         <property name="stringIndex1" column="stringIndex1" />
         <property name="stringIndex2" column="stringIndex2" />
         <property name="stringIndex3" column="stringIndex3" />

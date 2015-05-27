@@ -76,8 +76,6 @@ public interface SProcessInstance extends SFlowElementsContainer {
 
     SStateCategory getStateCategory();
 
-    long getMigrationPlanId();
-
     String getStringIndex1();
 
     String getStringIndex2();

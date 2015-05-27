@@ -576,15 +576,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    @Override
-    public void setMigrationPlanId(final SProcessInstance processInstance, final long migrationPlanId) throws SProcessInstanceModificationException {
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(processInstanceKeyProvider.getMigrationPlanIdKey(), migrationPlanId);
-        final long now = System.currentTimeMillis();
-        descriptor.addField(processInstanceKeyProvider.getLastUpdateKey(), now);
-        updateProcessInstance(processInstance, descriptor, MIGRATION_PLAN);
-    }
-
     private void setProcessState(final SProcessInstance processInstance, final ProcessInstanceState state) throws SProcessInstanceModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(processInstanceKeyProvider.getStateIdKey(), state.getId());

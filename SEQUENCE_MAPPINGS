@@ -97,9 +97,6 @@ SAComment -> 10080
 ExternalIdentityMapping
 ExternalIdentityMapping -> 10070
 
-MigrationPlan
-MigrationPlanDescriptor -> 10100
-
 Token -> 10110
 
 Page -> 10120
