@@ -15,7 +15,6 @@ package org.bonitasoft.engine.profile;
 
 import java.util.List;
 
-import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -40,7 +39,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public interface ProfileService extends TenantLifecycleService{
+public interface ProfileService {
 
     String PROFILE = "PROFILE";
 
