@@ -26,7 +26,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
@@ -79,7 +78,7 @@ public class ProcessSupervisedTest extends CommonAPISPIT {
     }
 
     @After
-    public void after() throws BonitaException, BonitaHomeNotSetException {
+    public void after() throws BonitaException {
         deleteSupervisors(processSupervisors);
         disableAndDeleteProcess(processDefinitions);
         deleteUsers(users);
@@ -108,7 +107,7 @@ public class ProcessSupervisedTest extends CommonAPISPIT {
     @Cover(classes = { ProcessAPI.class, ArchivedFlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8694", keywords = { "Call activity",
             "Sub-Process", "Manager", "searchArchivedFlowNodeInstancesSupervisedBy" })
     @Test
-    public void searchArchivedFlowNodeInstancesSupervisedBy_should_return_1_flownode_when_is_on_subprocess_and_searchs_by_subprocess_manager() throws Exception {
+    public void searchArchivedFlowNodeInstancesSupervisedBy_should_not_return_tasks_from_subprocess() throws Exception {
         final User subProcessPM = users.get(0);
         final long subProcessPMId = subProcessPM.getId();
         final User parentProcessPM = createUser(USERNAME + 2, PASSWORD);
@@ -116,39 +115,41 @@ public class ProcessSupervisedTest extends CommonAPISPIT {
         users.add(parentProcessPM);
 
         // Create Sub-process and its supervisor
-        final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("Target process", PROCESS_VERSION);
-        targetProcessDefBuilder.addActor(ACTOR_NAME);
-        targetProcessDefBuilder.addUserTask("stepOfSubProcess", ACTOR_NAME);
-        processDefinitions.add(deployAndEnableProcessWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, subProcessPM));
-        processSupervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(2).getId(), subProcessPMId));
+        final ProcessDefinitionBuilder subProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("Sub process", PROCESS_VERSION);
+        subProcessDefBuilder.addActor(ACTOR_NAME);
+        final String stepNameOfSubProcess = "stepOfSubProcess";
+        subProcessDefBuilder.addUserTask(stepNameOfSubProcess, ACTOR_NAME);
+        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(subProcessDefBuilder.done(), ACTOR_NAME, subProcessPM);
+        processDefinitions.add(subProcessDefinition);
+        processSupervisors.add(getProcessAPI().createProcessSupervisorForUser(subProcessDefinition.getId(), subProcessPMId));
 
         // Create parent process and its supervisor
-        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("Target process");
+        final Expression subProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("Sub process");
+
         final ProcessDefinitionBuilder parentProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("Process parent", PROCESS_VERSION);
         parentProcessDefBuilder.addActor(ACTOR_NAME);
-        parentProcessDefBuilder.addStartEvent("start").addCallActivity("callActivity", targetProcessNameExpr, null).addUserTask("step1", ACTOR_NAME)
+        final String step1Name = "step1Name";
+        parentProcessDefBuilder.addStartEvent("start").addCallActivity("callActivity", subProcessNameExpr, null).addUserTask(step1Name, ACTOR_NAME)
                 .addEndEvent("end");
-        parentProcessDefBuilder.addTransition("start", "callActivity").addTransition("callActivity", "step1").addTransition("step1", "end");
-        processDefinitions.add(deployAndEnableProcessWithActor(parentProcessDefBuilder.done(), ACTOR_NAME, parentProcessPM));
-        processSupervisors.add(getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(3).getId(), parentProcessPMId));
+        parentProcessDefBuilder.addTransition("start", "callActivity").addTransition("callActivity", step1Name).addTransition(step1Name, "end");
+        final ProcessDefinition parentProcessDefinition = deployAndEnableProcessWithActor(parentProcessDefBuilder.done(), ACTOR_NAME, parentProcessPM);
+        processDefinitions.add(parentProcessDefinition);
+        processSupervisors.add(getProcessAPI().createProcessSupervisorForUser(parentProcessDefinition.getId(), parentProcessPMId));
 
         // Start the parent process and execute the task of the sub process
-        getProcessAPI().startProcess(processDefinitions.get(3).getId());
-        final HumanTaskInstance stepOfSubProcess = waitForUserTaskAndExecuteAndGetIt("stepOfSubProcess", parentProcessPM);
+        final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcessDefinition.getId());
+        final HumanTaskInstance stepOfSubProcess = waitForUserTaskAndExecuteAndGetIt(stepNameOfSubProcess, parentProcessPM);
         waitForProcessToFinish(stepOfSubProcess.getParentProcessInstanceId());
+        waitForUserTask(parentProcessInstance, step1Name);
 
         // Then
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ArchivedActivityInstanceSearchDescriptor.NAME, Order.ASC);
+        builder.filter(ArchivedActivityInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, stepOfSubProcess.getParentProcessInstanceId());
         final SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstancesSupervisedByParentProcessPM = getProcessAPI()
                 .searchArchivedFlowNodeInstancesSupervisedBy(parentProcessPMId, builder.done());
+        // A manager should NOT see the tasks of a "sub-process" he is not also manager of:
         assertEquals(0, searchArchivedFlowNodeInstancesSupervisedByParentProcessPM.getCount());
-
-        final SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstancesSupervisedBySubProcessPM = getProcessAPI()
-                .searchArchivedFlowNodeInstancesSupervisedBy(subProcessPMId, builder.done());
-        assertEquals(1, searchArchivedFlowNodeInstancesSupervisedBySubProcessPM.getCount());
-        final List<ArchivedFlowNodeInstance> result = searchArchivedFlowNodeInstancesSupervisedBySubProcessPM.getResult();
-        assertEquals("stepOfSubProcess", result.get(0).getName());
     }
 
     @Cover(classes = { ProcessAPI.class, FlowNodeInstance.class }, concept = BPMNConcept.SUPERVISOR, jira = "BS-8295", keywords = { "" })

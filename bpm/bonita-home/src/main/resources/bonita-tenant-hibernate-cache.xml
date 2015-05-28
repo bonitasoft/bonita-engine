@@ -54,7 +54,7 @@
             />
 
     <!-- You can add any cache definition here for objects you want to have a specific configuration -->
-
+    
     <!--
     <cache
             name="name_of_the_entity"

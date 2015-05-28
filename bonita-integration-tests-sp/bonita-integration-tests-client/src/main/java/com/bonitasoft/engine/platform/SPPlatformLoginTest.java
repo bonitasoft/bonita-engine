@@ -10,6 +10,11 @@ package com.bonitasoft.engine.platform;
 
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
+import java.util.List;
+
+import com.bonitasoft.engine.log.Log;
+import org.bonitasoft.engine.PrintTestsStatusRule;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.platform.PlatformLoginException;
@@ -53,25 +58,11 @@ public class SPPlatformLoginTest {
     }
 
     @Rule
-    public TestRule testWatcher = new TestWatcher() {
-
+    public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
         @Override
-        public void starting(final Description d) {
-            LOGGER.info("Starting test: " + getClass().getName() + "." + d.getMethodName());
+        public List<String> clean() throws Exception {
+            return Collections.emptyList();
         }
-
-        @Override
-        public void failed(final Throwable cause, final Description d) {
-            LOGGER.info("Failed test: " + getClass().getName() + "." + d.getMethodName());
-            LOGGER.info("-------------------------------------------------------------------------------------");
-        }
-
-        @Override
-        public void succeeded(final Description d) {
-            LOGGER.info("Succeeded test: " + getClass().getName() + "." + d.getMethodName());
-            LOGGER.info("-------------------------------------------------------------------------------------");
-        }
-
     };
 
     @Test(expected = PlatformLoginException.class)

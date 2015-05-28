@@ -10,10 +10,14 @@ package com.bonitasoft.engine.api.impl;
 
 import static org.mockito.Mockito.*;
 
+import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.impl.SFormMappingImpl;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -29,6 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
+import com.bonitasoft.manager.Features;
 
 /**
  * author Emmanuel Duchastenier
@@ -41,20 +46,24 @@ public class ProcessConfigurationAPIExtTest {
 
     @Mock
     private LicenseChecker licenceChecker;
-
     @Mock
-    public FormMappingService formMappingService;
+    private DependencyResolver dependencyResolver;
     @Mock
-    public TenantServiceAccessor tenantServiceAccessor;
+    private FormMappingService formMappingService;
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
+    @Mock
+    private TenantServiceAccessor tenantServiceAccessor;
     @Spy
-    public ProcessConfigurationAPIExt processConfigurationAPI;
+    private ProcessConfigurationAPIExt processConfigurationAPI;
 
     @Before
     public void setUp() throws Exception {
         doReturn(licenceChecker).when(processConfigurationAPI).getLicenseChecker();
         doReturn(tenantServiceAccessor).when(processConfigurationAPI).getTenantAccessor();
         doReturn(formMappingService).when(tenantServiceAccessor).getFormMappingService();
-
+        doReturn(processDefinitionService).when(tenantServiceAccessor).getProcessDefinitionService();
+        doReturn(dependencyResolver).when(tenantServiceAccessor).getDependencyResolver();
     }
 
     SFormMappingImpl createSFormMapping(FormMappingType type, long formMappingId, String url, Long pageId, String urlAdapter, long processDefinitionId) {
@@ -97,5 +106,41 @@ public class ProcessConfigurationAPIExtTest {
         processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", null);
         //then
         verify(formMappingService, times(1)).update(sFormMapping, "theNewForm", null);
+    }
+
+    @Test
+    public void updateFormMapping_call_resolution_of_process() throws Exception {
+        //given
+        doReturn(createSFormMapping(FormMappingType.PROCESS_START, FORM_MAPPING_ID, "theUrl", null, null, PROCESS_DEF_ID)).when(formMappingService).get(FORM_MAPPING_ID);
+        //when
+        processConfigurationAPI.updateFormMapping(FORM_MAPPING_ID, "theNewForm", null);
+        //then
+        verify(dependencyResolver).resolveDependencies(PROCESS_DEF_ID, tenantServiceAccessor);
+    }
+
+    @Test
+    public void updateExpressionShouldCheckLicenseKey() throws Exception {
+        processConfigurationAPI.updateExpressionContent(124L, 87L, "someGroovyScript");
+
+        verify(licenceChecker).checkLicenseAndFeature(Features.LIVE_UPDATE_SCRIPT);
+    }
+
+    @Test
+    public void updateExpressionShouldCallProcessDefinitionService_update() throws Exception {
+        processConfigurationAPI.updateExpressionContent(124L, 87L, "someGroovyScript");
+
+        verify(processDefinitionService).updateExpressionContent(124L, 87L, "someGroovyScript");
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateExressionShouldThrowUpdateExceptionWhenAppropriate() throws Exception {
+        doThrow(SObjectModificationException.class).when(processDefinitionService).updateExpressionContent(anyLong(), anyLong(), anyString());
+        processConfigurationAPI.updateExpressionContent(124L, 87L, "someGroovyScript");
+    }
+
+    @Test(expected = ProcessDefinitionNotFoundException.class)
+    public void updateExressionShouldThrowProcessDefinitionNotFoundExceptionWhenAppropriate() throws Exception {
+        doThrow(SProcessDefinitionNotFoundException.class).when(processDefinitionService).updateExpressionContent(anyLong(), anyLong(), anyString());
+        processConfigurationAPI.updateExpressionContent(124L, 87L, "anyString");
     }
 }
