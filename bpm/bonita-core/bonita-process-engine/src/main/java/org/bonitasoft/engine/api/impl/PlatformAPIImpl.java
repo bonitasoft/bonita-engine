@@ -240,9 +240,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 }
                 registerMissingTenantsDefaultJobs(platformAccessor, sessionAccessor, tenants);
 
-            } catch (final SClassLoaderException e) {
-                throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
-            } catch (final SDependencyException e) {
+            } catch (final SClassLoaderException | SDependencyException e) {
                 throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
             } catch (final StartNodeException sne) {
                 throw sne;
@@ -295,10 +293,10 @@ public class PlatformAPIImpl implements PlatformAPI {
                 final SchedulerService schedulerService = tenantServiceAccessor.getSchedulerService();
                 final TenantConfiguration tenantConfiguration = tenantServiceAccessor.getTenantConfiguration();
                 final List<JobRegister> defaultJobs = tenantConfiguration.getJobsToRegister();
-                final List<String> scheduledJobNames = schedulerService.getJobs();
 
                 // Only register missing default jobs if they are missing
                 transactionService.begin();
+                final List<String> scheduledJobNames = schedulerService.getJobs();
                 try {
                     for (final JobRegister defaultJob : defaultJobs) {
                         if (!scheduledJobNames.contains(defaultJob.getJobName())) {
