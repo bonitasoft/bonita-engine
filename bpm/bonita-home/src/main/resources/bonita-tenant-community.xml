@@ -670,7 +670,7 @@
             <value>Execute a named query in the BDM, and returns its Json representation. Use parameter keys : "queryName" the name of the query in the bdm, "returnType" the query expected return type, "returnsList" if result is a List or a single value, "queryParameters" a Map to value query parameters</value>
         </constructor-arg>
         <constructor-arg name="implementation">
-            <value>org.bonitasoft.engine.command.getbusinessdatabyquerycommand</value>
+            <value>org.bonitasoft.engine.command.GetBusinessDataByQueryCommand</value>
         </constructor-arg>
     </bean>
 
