@@ -154,6 +154,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         return em.createQuery(criteriaQuery).getResultList();
     }
 
+    @Override
     public <T extends Entity> List<T> findByIdentifiers(final Class<T> entityClass, final List<Long> primaryKeys) {
         if (primaryKeys == null || primaryKeys.isEmpty()) {
             return new ArrayList<T>();
@@ -163,7 +164,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             try {
                 entities.add(findById(entityClass, primaryKey));
             } catch (final SBusinessDataNotFoundException e) {
-                // If the business data does not exists, do no add it in the result list in order to have the same behaviour as findByIds
+                // If the business data does not exist, do not add it in the result list in order to have the same behaviour as findByIds
             }
         }
         return entities;
