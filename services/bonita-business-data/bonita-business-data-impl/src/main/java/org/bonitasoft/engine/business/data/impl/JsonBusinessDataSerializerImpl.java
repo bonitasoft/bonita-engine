@@ -50,8 +50,7 @@ public class JsonBusinessDataSerializerImpl implements JsonBusinessDataSerialize
 
     @Override
     public String serializeEntity(final List<? extends Entity> entities, final String businessDataURIPattern) throws JsonGenerationException,
-            JsonMappingException,
-    IOException {
+            JsonMappingException, IOException {
         serializer.setPatternURI(businessDataURIPattern);
         final StringWriter writer = new StringWriter();
         mapper.writeValue(writer, entities);

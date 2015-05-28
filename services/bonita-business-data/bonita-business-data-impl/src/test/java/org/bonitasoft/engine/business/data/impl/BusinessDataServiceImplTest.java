@@ -693,7 +693,7 @@ public class BusinessDataServiceImplTest {
         final List<EntityPojo> pojos = new ArrayList<>();
         pojos.add(pojo1);
         pojos.add(pojo2);
-        when(businessDataRepository.findByIds(EntityPojo.class, identifiers)).thenReturn(pojos);
+        when(businessDataRepository.findByIdentifiers(EntityPojo.class, identifiers)).thenReturn(pojos);
 
         businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
@@ -712,7 +712,7 @@ public class BusinessDataServiceImplTest {
         final List<EntityPojo> pojos = new ArrayList<>();
         pojos.add(pojo1);
         pojos.add(pojo2);
-        when(businessDataRepository.findByIds(EntityPojo.class, identifiers)).thenReturn(pojos);
+        when(businessDataRepository.findByIdentifiers(EntityPojo.class, identifiers)).thenReturn(pojos);
         when(jsonEntitySerializer.serializeEntity(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE)).thenThrow(new IOException("exception"));
 
         businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);

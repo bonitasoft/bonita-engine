@@ -27,6 +27,6 @@ public interface JsonBusinessDataSerializer {
 
     String serializeEntity(Entity entity, String businessDataURIPattern) throws JsonGenerationException, JsonMappingException, IOException;
 
-    String serializeEntity(List<? extends Entity> childEntity, String businessDataURIPattern) throws JsonGenerationException, JsonMappingException, IOException;
+    String serializeEntity(List<? extends Entity> entities, String businessDataURIPattern) throws JsonGenerationException, JsonMappingException, IOException;
 
 }

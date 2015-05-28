@@ -261,7 +261,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     public Serializable getJsonEntities(final String entityClassName, final List<Long> identifiers, final String businessDataURIPattern)
             throws SBusinessDataRepositoryException {
         final Class<? extends Entity> entityClass = loadClass(entityClassName);
-        final List<? extends Entity> entities = businessDataRepository.findByIds(entityClass, identifiers);
+        final List<? extends Entity> entities = businessDataRepository.findByIdentifiers(entityClass, identifiers);
         return buildJsonRepresentation((List<Entity>) entities, businessDataURIPattern);
     }
 
