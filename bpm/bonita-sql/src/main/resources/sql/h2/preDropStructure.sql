@@ -29,6 +29,7 @@ ALTER TABLE pending_mapping DROP CONSTRAINT fk_pending_mapping_flownode_instance
 ALTER TABLE processcategorymapping DROP CONSTRAINT fk_processcategorymapping_tenantId;
 ALTER TABLE process_comment DROP CONSTRAINT fk_process_comment_tenantId;
 ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_tenantId;
+ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_content;
 ALTER TABLE process_instance DROP CONSTRAINT fk_process_instance_tenantId;
 ALTER TABLE processsupervisor DROP CONSTRAINT fk_processsupervisor_tenantId;
 ALTER TABLE profile DROP CONSTRAINT fk_profile_tenantId;
@@ -56,6 +57,8 @@ ALTER TABLE business_app_page DROP CONSTRAINT fk_bus_app_id;
 ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id;
 ALTER TABLE business_app DROP CONSTRAINT fk_app_profileId;
 ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId;
+ALTER TABLE business_app DROP CONSTRAINT fk_app_layoutId;
+ALTER TABLE business_app DROP CONSTRAINT fk_app_themeId;
 
 
 

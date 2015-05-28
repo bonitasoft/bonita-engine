@@ -36,12 +36,12 @@ public class EndEventDefinitionImpl extends ThrowEventDefinitionImpl implements 
 
     public EndEventDefinitionImpl(final String name) {
         super(name);
-        errorEventTriggerDefinitions = new ArrayList<ThrowErrorEventTriggerDefinition>(1);
+        errorEventTriggerDefinitions = new ArrayList<>(1);
     }
 
     public EndEventDefinitionImpl(final long id, final String name) {
         super(id, name);
-        errorEventTriggerDefinitions = new ArrayList<ThrowErrorEventTriggerDefinition>(1);
+        errorEventTriggerDefinitions = new ArrayList<>(1);
     }
 
     @Override

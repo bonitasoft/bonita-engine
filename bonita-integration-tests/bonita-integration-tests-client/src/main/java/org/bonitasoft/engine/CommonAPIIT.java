@@ -47,48 +47,16 @@ public abstract class CommonAPIIT extends APITestUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPIIT.class);
 
     @Rule
-    public TestRule testWatcher = new TestWatcher() {
-
+    public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
         @Override
-        public void starting(final Description d) {
-            LOGGER.warn("Starting test: " + d.getClassName() + "." + d.getMethodName());
-        }
-
-        @Override
-        public void failed(final Throwable cause, final Description d) {
-            try {
-                LOGGER.error("Failed test: " + d.getClassName() + "." + d.getMethodName());
-                clean();
-            } catch (final Exception be) {
-                LOGGER.error("Unable to clean db", be);
-            } finally {
-                LOGGER.warn("-----------------------------------------------------------------------------------------------");
-            }
-        }
-
-        @Override
-        public void succeeded(final Description d) {
-            try {
-                List<String> clean = null;
-                try {
-                    clean = clean();
-                } catch (final BonitaException e) {
-                    throw new BonitaRuntimeException(e);
-                }
-                LOGGER.warn("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
-                if (!clean.isEmpty()) {
-                    throw new BonitaRuntimeException(clean.toString());
-                }
-            } finally {
-                LOGGER.warn("-----------------------------------------------------------------------------------------------");
-            }
+        public List<String> clean() throws Exception {
+            return CommonAPIIT.this.clean();
         }
     };
 
+
     /**
-     * FIXME: clean actors!
-     *
-     * @return
+     * @return warning list of unclean elements
      * @throws BonitaException
      */
     private List<String> clean() throws BonitaException {
@@ -96,24 +64,19 @@ public abstract class CommonAPIIT extends APITestUtil {
 
         final List<String> messages = new ArrayList<String>();
         messages.addAll(checkNoCommands());
-
         messages.addAll(checkNoFlowNodes());
         messages.addAll(checkNoArchivedFlowNodes());
         messages.addAll(checkNoComments());
         messages.addAll(checkNoArchivedComments());
         messages.addAll(checkNoWaitingEvent());
-
         messages.addAll(checkNoProcessIntances());
         messages.addAll(checkNoArchivedProcessIntances());
         messages.addAll(checkNoProcessDefinitions());
-
         messages.addAll(checkNoCategories());
-
         messages.addAll(checkNoUsers());
         messages.addAll(checkNoGroups());
         messages.addAll(checkNoRoles());
         messages.addAll(checkNoSupervisors());
-
         logoutOnTenant();
         return messages;
     }

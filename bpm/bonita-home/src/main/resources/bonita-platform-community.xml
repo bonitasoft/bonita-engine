@@ -646,6 +646,11 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10300:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
+        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDesignContentImpl" />
+        <constructor-arg name="sequenceId" value="10310" />
+        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.10310:${bonita.platform.sequence.defaultRangeSize}}" />
+    </bean>
+    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="classNames">
         <set>
         <value>org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessMultiRefBusinessDataInstanceImpl</value>

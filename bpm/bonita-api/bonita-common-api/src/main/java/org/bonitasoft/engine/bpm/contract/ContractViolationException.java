@@ -13,7 +13,6 @@
  */
 package org.bonitasoft.engine.bpm.contract;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.BonitaException;
@@ -34,17 +33,13 @@ public class ContractViolationException extends BonitaException {
     /**
      * Constructs an <code>ContractViolationException</code> with the specified detail message and the explanations.
      *
-     * @param message      the specified detail message
+     * @param message the specified detail message
      * @param explanations the explanations
      */
-    public ContractViolationException(final String message, final List<String> explanations) {
-        super(message + ": " + explanations);
-        this.simpleMessage = message;
-        if (explanations == null) {
-            this.explanations = new ArrayList<>();
-        } else {
-            this.explanations = new ArrayList<>(explanations);
-        }
+    public ContractViolationException(final String simpleMessage, final String message, final List<String> explanations, final Throwable e) {
+        super(message, e);
+        this.simpleMessage = simpleMessage;
+        this.explanations = explanations;
     }
 
     /**

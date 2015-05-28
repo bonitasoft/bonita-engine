@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.CatchSignalEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Matthieu Chaffotte
@@ -26,4 +27,8 @@ public class CatchSignalEventTriggerDefinitionImpl extends SignalEventTriggerDef
         super(signalName);
     }
 
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        // nothing to do here:
+    }
 }

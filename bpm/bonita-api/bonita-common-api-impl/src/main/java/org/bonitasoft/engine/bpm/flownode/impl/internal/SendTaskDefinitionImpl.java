@@ -13,9 +13,9 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.SendTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -41,10 +41,6 @@ public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTa
 
     public void setTargetFlowNode(final Expression targetFlowNode) {
         trigger.setTargetFlowNode(targetFlowNode);
-    }
-
-    public void addMessageData(final DataDefinition datadefiniton) {
-        trigger.addDataDefinition(datadefiniton);
     }
 
     public void addCorrelation(final Expression key, final Expression value) {
@@ -84,6 +80,12 @@ public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTa
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
     }
 
 }

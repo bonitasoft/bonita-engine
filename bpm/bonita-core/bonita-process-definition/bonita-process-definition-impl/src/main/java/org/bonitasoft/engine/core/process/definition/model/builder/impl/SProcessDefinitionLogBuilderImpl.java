@@ -25,7 +25,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatory
 public class SProcessDefinitionLogBuilderImpl extends CRUDELogBuilder implements SProcessDefinitionLogBuilder {
 
     private static final String PROCESS_DEFINITION = "PROCESS_DEFINITION";
-    
+
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
         queriableLogBuilder.numericIndex(ProcessDefinitionLogIndexesMapper.PROCESS_DEFINITION_INDEX, objectId);
@@ -41,7 +41,7 @@ public class SProcessDefinitionLogBuilderImpl extends CRUDELogBuilder implements
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
             if (log.getNumericIndex(ProcessDefinitionLogIndexesMapper.PROCESS_DEFINITION_INDEX) == 0L) {
-                throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "ProcessDefinition deployment info Id");
+                throw new MissingMandatoryFieldsException("Some mandatory fields are missing: ProcessDefinition deployment info Id");
             }
         }
     }

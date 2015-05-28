@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
+import java.util.Objects;
+
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDesignContent;
 
 /**
  * @author Baptiste Mesta
@@ -58,6 +61,8 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
 
     private String displayDescription;
 
+    private SProcessDefinitionDesignContent designContent;
+
     public SProcessDefinitionDeployInfoImpl() {
         super();
     }
@@ -65,6 +70,10 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
     @Override
     public String getName() {
         return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override
@@ -82,9 +91,17 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
         return deploymentDate;
     }
 
+    public void setDeploymentDate(final long deploymentDate) {
+        this.deploymentDate = deploymentDate;
+    }
+
     @Override
     public long getDeployedBy() {
         return deployedBy;
+    }
+
+    public void setDeployedBy(final long deployedBy) {
+        this.deployedBy = deployedBy;
     }
 
     @Override
@@ -92,25 +109,13 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
         return version;
     }
 
+    public void setVersion(final String version) {
+        this.version = version;
+    }
+
     @Override
     public String getDescription() {
         return description;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public void setDeploymentDate(final long deploymentDate) {
-        this.deploymentDate = deploymentDate;
-    }
-
-    public void setDeployedBy(final long deployedBy) {
-        this.deployedBy = deployedBy;
-    }
-
-    public void setVersion(final String version) {
-        this.version = version;
     }
 
     public void setDescription(final String description) {
@@ -149,13 +154,13 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
         this.migrationDate = migrationDate;
     }
 
-    public void setSupervisorId(final long supervisorId) {
-        this.supervisorId = supervisorId;
-    }
-
     @Override
     public long getSupervisorId() {
         return supervisorId;
+    }
+
+    public void setSupervisorId(final long supervisorId) {
+        this.supervisorId = supervisorId;
     }
 
     @Override
@@ -185,13 +190,13 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
         this.iconPath = iconPath;
     }
 
-    public void setDisplayDescription(final String displayDescription) {
-        this.displayDescription = displayDescription;
-    }
-
     @Override
     public String getDisplayDescription() {
         return displayDescription;
+    }
+
+    public void setDisplayDescription(final String displayDescription) {
+        this.displayDescription = displayDescription;
     }
 
     @Override
@@ -213,134 +218,64 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (deployedBy ^ deployedBy >>> 32);
-        result = prime * result + (int) (deploymentDate ^ deploymentDate >>> 32);
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
-        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
-        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
-        result = prime * result + (id == null ? 0 : id.hashCode());
-        result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
-        result = prime * result + (int) (migrationDate ^ migrationDate >>> 32);
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (int) (processId ^ processId >>> 32);
-        result = prime * result + (activationState == null ? 0 : activationState.hashCode());
-        result = prime * result + (configurationState == null ? 0 : configurationState.hashCode());
-        result = prime * result + (int) (supervisorId ^ supervisorId >>> 32);
-        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
-        result = prime * result + (version == null ? 0 : version.hashCode());
-        return result;
+    public SProcessDefinitionDesignContent getDesignContent() {
+        return designContent;
+    }
+
+    public void setDesignContent(SProcessDefinitionDesignContent designContent) {
+        this.designContent = designContent;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        }
-        if (obj == null) {
+        if (o == null || getClass() != o.getClass())
             return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SProcessDefinitionDeployInfoImpl other = (SProcessDefinitionDeployInfoImpl) obj;
-        if (deployedBy != other.processId) {
-            return false;
-        }
-        if (deploymentDate != other.deploymentDate) {
-            return false;
-        }
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (displayDescription == null) {
-            if (other.displayDescription != null) {
-                return false;
-            }
-        } else if (!displayDescription.equals(other.displayDescription)) {
-            return false;
-        }
-        if (displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
-            return false;
-        }
-        if (id == null) {
-            if (other.id != null) {
-                return false;
-            }
-        } else if (!id.equals(other.id)) {
-            return false;
-        }
-        if (lastUpdateDate != other.lastUpdateDate) {
-            return false;
-        }
-        if (migrationDate != other.migrationDate) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (processId != other.processId) {
-            return false;
-        }
-        if (activationState == null) {
-            if (other.activationState != null) {
-                return false;
-            }
-        } else if (!activationState.equals(other.activationState)) {
-            return false;
-        }
-        if (configurationState == null) {
-            if (other.configurationState != null) {
-                return false;
-            }
-        } else if (!configurationState.equals(other.configurationState)) {
-            return false;
-        }
-        if (supervisorId != other.supervisorId) {
-            return false;
-        }
-        if (tenantId != other.tenantId) {
-            return false;
-        }
-        if (version == null) {
-            if (other.version != null) {
-                return false;
-            }
-        } else if (!version.equals(other.version)) {
-            return false;
-        }
-        return true;
+        SProcessDefinitionDeployInfoImpl that = (SProcessDefinitionDeployInfoImpl) o;
+        return Objects.equals(deploymentDate, that.deploymentDate) &&
+                Objects.equals(deployedBy, that.deployedBy) &&
+                Objects.equals(tenantId, that.tenantId) &&
+                Objects.equals(processId, that.processId) &&
+                Objects.equals(migrationDate, that.migrationDate) &&
+                Objects.equals(supervisorId, that.supervisorId) &&
+                Objects.equals(lastUpdateDate, that.lastUpdateDate) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(version, that.version) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(configurationState, that.configurationState) &&
+                Objects.equals(activationState, that.activationState) &&
+                Objects.equals(displayName, that.displayName) &&
+                Objects.equals(iconPath, that.iconPath) &&
+                Objects.equals(displayDescription, that.displayDescription);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, id, deploymentDate, deployedBy, version, description, configurationState, activationState, tenantId, processId,
+                migrationDate, supervisorId, displayName, lastUpdateDate, iconPath, displayDescription);
     }
 
     @Override
     public String toString() {
-        return "SProcessDefinitionDeployInfoImpl [name=" + name + ", id=" + id + ", deploymentDate=" + deploymentDate + ", deployedBy=" + deployedBy
-                + ", version=" + version + ", description=" + description + ", activationState =" + activationState + ", configurationState ="
-                + configurationState + ", tenantId=" + tenantId + ", processId=" + processId + ", migrationDate=" + migrationDate + ", supervisorId="
-                + supervisorId + ", displayName=" + displayName + ", lastUpdateDate=" + lastUpdateDate + ", iconPath=" + iconPath + ", displayDescription="
-                + displayDescription + "]";
+        return "SProcessDefinitionDeployInfoImpl{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                ", deploymentDate=" + deploymentDate +
+                ", deployedBy=" + deployedBy +
+                ", version='" + version + '\'' +
+                ", description='" + description + '\'' +
+                ", configurationState='" + configurationState + '\'' +
+                ", activationState='" + activationState + '\'' +
+                ", tenantId=" + tenantId +
+                ", processId=" + processId +
+                ", migrationDate=" + migrationDate +
+                ", supervisorId=" + supervisorId +
+                ", displayName='" + displayName + '\'' +
+                ", lastUpdateDate=" + lastUpdateDate +
+                ", iconPath='" + iconPath + '\'' +
+                ", displayDescription='" + displayDescription + '\'' +
+                '}';
     }
-
 }

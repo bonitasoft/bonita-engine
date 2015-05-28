@@ -13,16 +13,10 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.builder.impl;
 
-import java.io.InputStream;
-
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.bindings.XMLSProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
-import org.bonitasoft.engine.xml.ElementBindingsFactory;
-import org.bonitasoft.engine.xml.XMLNode;
 
 /**
  * @author Baptiste Mesta
@@ -33,21 +27,6 @@ public class SProcessDefinitionBuilderFactoryImpl implements SProcessDefinitionB
     public SProcessDefinitionBuilder createNewInstance(final DesignProcessDefinition processDefinition) {
         final SProcessDefinitionImpl entity = new SProcessDefinitionImpl(processDefinition);
         return new SProcessDefinitionBuilderImpl(entity);
-    }
-
-    @Override
-    public InputStream getModelSchema() {
-        return this.getClass().getResourceAsStream("SProcessDefinition.xsd");
-    }
-
-    @Override
-    public XMLNode getXMLProcessDefinition(final SProcessDefinition definition) {
-        return new XMLSProcessDefinition().getXMLProcessDefinition(definition);
-    }
-
-    @Override
-    public ElementBindingsFactory getElementsBindings() {
-        return new SProcessElementBindingsFactory();
     }
 
 }

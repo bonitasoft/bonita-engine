@@ -16,7 +16,9 @@ package org.bonitasoft.engine.core.process.definition.model.builder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.expression.Expression;
@@ -58,4 +60,19 @@ public class ServerModelConvertorTest {
         assertThat(businessDataDefinition).isNull();
     }
 
+    @Test
+    public void shouldConvertContractInputs() throws Exception {
+        final HashMap<String, Expression> contractInputs = new HashMap<>();
+        final ExpressionImpl expression1 = new ExpressionImpl(211L);
+        expression1.setReturnType("SomeType");
+        final ExpressionImpl expression2 = new ExpressionImpl(227L);
+        expression2.setReturnType("SomeReturnType");
+        contractInputs.put("inputname1", expression1);
+        contractInputs.put("inputname2", expression2);
+
+        final Map<String, SExpression> convertedContractInputs = ServerModelConvertor.convertContractInputs(contractInputs);
+
+        assertThat(convertedContractInputs.get("inputname1")).isEqualTo(ServerModelConvertor.convertExpression(expression1));
+        assertThat(convertedContractInputs.get("inputname2")).isEqualTo(ServerModelConvertor.convertExpression(expression2));
+    }
 }

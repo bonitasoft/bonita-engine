@@ -10,17 +10,25 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.document.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.contract.FileInputValue;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -28,6 +36,7 @@ import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
+import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
@@ -53,12 +62,12 @@ public class DocumentHelperTest {
 
     public static final long AUTHOR_ID = 12l;
     public static final long PROCESS_INSTANCE_ID = 45l;
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
     @Mock
     private ProcessDefinitionService processDefinitionService;
     @Mock
     private ProcessInstanceService processInstanceService;
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
     @Mock
     private SProcessInstance processInstance;
     @Mock
@@ -212,7 +221,7 @@ public class DocumentHelperTest {
         doReturn(docToUpdate).when(documentService).getMappedDocument(PROCESS_INSTANCE_ID, "myDoc");
         //when
         DocumentValue docValue = new DocumentValue("myUrl");
-        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID);
+        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID, null);
         //then
         verify(documentService).updateDocument(eq(docToUpdate), any(SDocument.class));
     }
@@ -223,7 +232,7 @@ public class DocumentHelperTest {
         doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(PROCESS_INSTANCE_ID, "myDoc");
         //when
         DocumentValue docValue = new DocumentValue("myUrl");
-        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID);
+        documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID, null);
         //then
         verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("myDoc"), anyString());
     }
@@ -352,4 +361,113 @@ public class DocumentHelperTest {
         verify(documentService).updateDocumentOfList(eq(documentToUpdate),any(SDocument.class),eq(2));
     }
 
+    @Test
+    public void should_getMimeTypeOrGuessIt_return_the_original_mime_type_if_not_null() {
+        //given
+        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, "myMimeType", "theFile.bin");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isEqualTo("myMimeType");
+
+    }
+
+    @Test
+    public void should_getMimeTypeOrGuessIt_guess_plain_text_mime_type() {
+        //given
+        final DocumentValue documentValue = new DocumentValue("content".getBytes(), null, "theFile.txt");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isEqualTo("text/plain");
+    }
+
+    @Test
+    public void should_getMimeTypeOrGuessIt_guess_plain_text_mime_type_when_empty() {
+        //given
+        final DocumentValue documentValue = new DocumentValue("content".getBytes(), "", "theFile.txt");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isEqualTo("text/plain");
+    }
+
+
+    @Test
+    public void should_getMimeTypeOrGuessIt_guess_xml_mime_type() {
+        //given
+        final String xmlFileContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<note>\n" +
+                "\t<to>Tove</to>\n" +
+                "\t<from>Jani</from>\n" +
+                "\t<heading>Reminder</heading>\n" +
+                "\t<body>Don't forget me this weekend!</body>\n" +
+                "</note>";
+        final DocumentValue documentValue = new DocumentValue(xmlFileContent.getBytes(), null, "theFile.xml");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isEqualTo("application/xml");
+    }
+
+    @Test
+    public void should_getMimeTypeOrGuessIt_guess_application_octet_stream_if_byte_array() {
+        //given
+        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, null, "theFile.bin");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isEqualTo("application/octet-stream");
+    }
+    @Test
+    public void should_getMimeTypeOrGuessIt_do_not_fail_with_bad_filename() {
+        //given
+        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, null, "the\0File.bin");
+        //when
+        final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
+        //then
+        assertThat(mimeTypeOrGuessIt).isNull();
+    }
+
+
+    @Test
+    public void should_toCheckedDocumentValue_return_new_DocumentValue_for_FileInput() throws Exception {
+        final FileInputValue fileInputValue = new FileInputValue("theFile.txt", "It's my file".getBytes());
+
+        final DocumentValue documentValue = documentHelper.toCheckedDocumentValue(fileInputValue);
+
+
+        assertThat(documentValue).isEqualToIgnoringGivenFields(new DocumentValue(null, null, "theFile.txt"), "content");
+        assertThat(documentValue.getContent()).isEqualTo("It's my file".getBytes());
+    }
+
+
+    @Test
+    public void should_toCheckedList_check_null() throws Exception {
+        exception.expect(SOperationExecutionException.class);
+        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
+        documentHelper.toCheckedList(null);
+    }
+
+    @Test
+    public void should_toCheckedList_check_not_list() throws Exception {
+        exception.expect(SOperationExecutionException.class);
+        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
+        documentHelper.toCheckedList(new Object());
+    }
+
+    @Test
+    public void should_toCheckedList_check_not_all_doc() throws Exception {
+        exception.expect(SOperationExecutionException.class);
+        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
+        documentHelper.toCheckedList(Arrays.asList(new DocumentValue("theUrl"), new Object()));
+    }
+
+    @Test
+    public void should_toCheckedList_returns_the_list_if_contains_FileInputValue() throws Exception {
+        final List<FileInputValue> inputList = Collections.singletonList(new FileInputValue("report.pdf", "The report content".getBytes()));
+        final List<DocumentValue> result = documentHelper.toCheckedList(inputList);
+        assertThat(result.get(0).getContent()).isEqualTo("The report content".getBytes());
+        assertThat(result.get(0).getFileName()).isEqualTo("report.pdf");
+    }
 }

@@ -346,8 +346,9 @@ public class BonitaHomeServer extends BonitaHome {
         return FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile(fileName);
     }
 
-    public void writeBusinessArchive(long tenantId, long processIdd, BusinessArchive businessArchive) throws BonitaHomeNotSetException, IOException {
-        final Folder processFolder = getProcessFolder(tenantId, processIdd);
+    public void writeBusinessArchive(long tenantId, long processId, BusinessArchive businessArchive) throws BonitaHomeNotSetException, IOException {
+        final Folder processFolder = getProcessFolder(tenantId, processId);
+        processFolder.create();
         processFolder.writeBusinessArchive(businessArchive);
     }
 

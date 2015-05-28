@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.document.impl;
 
 import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -29,8 +30,7 @@ public class DocumentListDefinitionImpl extends NamedElementImpl implements Docu
     private Expression expression;
 
     /**
-     * @param name
-     *        the name of the document list
+     * @param name the name of the document list
      */
     public DocumentListDefinitionImpl(final String name) {
         super(name);
@@ -86,4 +86,10 @@ public class DocumentListDefinitionImpl extends NamedElementImpl implements Docu
                 ", expression=" + expression +
                 "} " + super.toString();
     }
+
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
+    }
+
 }

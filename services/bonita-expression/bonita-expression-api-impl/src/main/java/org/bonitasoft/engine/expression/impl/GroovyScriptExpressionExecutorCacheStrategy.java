@@ -134,10 +134,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyS
             return script.run();
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
-            final StringBuilder builder = new StringBuilder("Expression ");
-            builder.append(expressionName).append(" with content = <").append(expressionContent).append("> depends on ").append(property)
-                    .append(" is neither defined in the script nor in dependencies.");
-            throw new SExpressionEvaluationException(builder.toString(), e, expressionName);
+            throw new SExpressionEvaluationException("Expression " + expressionName + " with content = <" + expressionContent + "> depends on " + property + " is neither defined in the script nor in dependencies.", e, expressionName);
         } catch (final GroovyRuntimeException e) {
             throw new SExpressionEvaluationException(e, expressionName);
         } catch (final SCacheException e) {

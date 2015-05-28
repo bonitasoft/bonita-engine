@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.CorrelationDefinition;
 import org.bonitasoft.engine.bpm.flownode.MessageEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -35,7 +36,7 @@ public abstract class MessageEventTriggerDefinitionImpl implements MessageEventT
 
     public MessageEventTriggerDefinitionImpl(final String name) {
         messageName = name;
-        correlations = new ArrayList<CorrelationDefinition>(1);
+        correlations = new ArrayList<>(1);
     }
 
     public MessageEventTriggerDefinitionImpl(final String name, final List<CorrelationDefinition> correlations) {
@@ -98,6 +99,11 @@ public abstract class MessageEventTriggerDefinitionImpl implements MessageEventT
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
     }
 
 }

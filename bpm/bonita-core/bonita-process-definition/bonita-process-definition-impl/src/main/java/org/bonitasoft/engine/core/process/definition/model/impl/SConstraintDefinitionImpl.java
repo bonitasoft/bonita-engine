@@ -36,7 +36,7 @@ public class SConstraintDefinitionImpl extends SNamedElementImpl implements SCon
         super(name);
         this.explanation = explanation;
         this.expression = expression;
-        inputNames = new ArrayList<String>();
+        inputNames = new ArrayList<>();
     }
 
     public SConstraintDefinitionImpl(final ConstraintDefinition rule) {

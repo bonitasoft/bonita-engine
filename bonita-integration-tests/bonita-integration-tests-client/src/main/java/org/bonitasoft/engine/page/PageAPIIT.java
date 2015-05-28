@@ -171,6 +171,45 @@ public class PageAPIIT extends CommonAPIIT {
 
     }
 
+    @Test(expected = AlreadyExistsException.class)
+    public void updateForm_with_existing_name_should_fail() throws Exception {
+        final PageUpdater pageUpdater = new PageUpdater();
+
+        // given
+        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setProcessDefinitionId(PROCESS_DEFINITION_ID),
+                CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
+        final Page page2 = getPageAPI().createPage(new PageCreator(PAGE_NAME2, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setProcessDefinitionId(PROCESS_DEFINITION_ID),
+                CommonTestUtil.createTestPageContent(PAGE_NAME2, DISPLAY_NAME, PAGE_DESCRIPTION));
+
+        // when
+        pageUpdater.setName(PAGE_NAME1);
+        getPageAPI().updatePage(page2.getId(), pageUpdater);
+
+        // then
+        // exception
+
+    }
+
+
+    @Test(expected = AlreadyExistsException.class)
+    public void updateForm_with_existing_process_definitionId_should_fail() throws Exception {
+        final PageUpdater pageUpdater = new PageUpdater();
+
+        // given
+        getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME).setProcessDefinitionId(PROCESS_DEFINITION_ID),
+                CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
+        final Page page2 = getPageAPI().createPage(new PageCreator(PAGE_NAME1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
+                CommonTestUtil.createTestPageContent(PAGE_NAME1, DISPLAY_NAME, PAGE_DESCRIPTION));
+
+        // when
+        pageUpdater.setProcessDefinitionId(PROCESS_DEFINITION_ID);
+        getPageAPI().updatePage(page2.getId(), pageUpdater);
+
+        // then
+        // exception
+
+    }
+
     @Test(expected = UpdatingWithInvalidPageZipContentException.class)
     public void updatePageContent_with_bad_content_should_fail() throws Exception {
         // given
@@ -204,6 +243,7 @@ public class PageAPIIT extends CommonAPIIT {
 
     }
 
+    @Test
     public void updatePage_contents_should_updates_page() throws Exception {
         // given
         final Page pageBefore = getPageAPI().createPage(
@@ -251,6 +291,50 @@ public class PageAPIIT extends CommonAPIIT {
         checkPageContentContainsProperties(returnedPageContent, DISPLAY_NAME, PAGE_DESCRIPTION);
         assertThat(returnedPage.getLastModificationDate()).as("last modification date should be modified ").isAfter(
                 page.getLastModificationDate());
+    }
+
+    @Test
+    public void should_create_page_use_content_type_in_properties() throws Exception {
+        // given
+        final String pageName1 = generateUniquePageName(0);
+        final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName1, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION,
+                "contentType=WillBeIgnored", "apiExtensions=myGetResource", "myGetResource.method=POST", "myGetResource.pathTemplate=helloWorld",
+                "myGetResource.classFileName=Index.groovy","myGetResource.permissions=newPermission");
+
+        final String pageName2 = generateUniquePageName(1);
+        final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName2, DISPLAY_NAME, "with page creator " + PAGE_DESCRIPTION, "contentType="
+                + ContentType.API_EXTENSION, "apiExtensions=myGetResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
+                "myGetResource.classFileName=Index.groovy","myGetResource.permissions=newPermission");
+
+        // when
+        final Page pageWithCreator = getPageAPI().createPage(
+                new PageCreator(pageName1, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME)
+                        .setContentType(ContentType.API_EXTENSION),
+                pageContent1);
+        final Page pageWithContent = getPageAPI().createPage(pageName2, pageContent2);
+
+        // then
+        PageAssert.assertThat(pageWithContent).hasContentType(ContentType.API_EXTENSION);
+        PageAssert.assertThat(pageWithCreator).hasContentType(ContentType.API_EXTENSION);
+    }
+
+    @Test
+    public void should_create_delete_create_page_with_same_values() throws Exception {
+        // given
+        final String pageName = generateUniquePageName(1);
+        final byte[] pageContent = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with page creator " + PAGE_DESCRIPTION, "contentType="
+                + ContentType.API_EXTENSION, "apiExtensions=myGetResource, myPostResource", "myGetResource.method=GET",
+                "myGetResource.pathTemplate=helloWorld", "myGetResource.classFileName=Index.groovy","myGetResource.permissions=newPermission", "myPostResource.method=POST",
+                "myPostResource.pathTemplate=helloWorld", "myPostResource.classFileName=Index.groovy","myPostResource.permissions=newPermission");
+
+        // when
+        Page pageWithContent = getPageAPI().createPage(pageName, pageContent);
+        getPageAPI().deletePage(pageWithContent.getId());
+
+        pageWithContent = getPageAPI().createPage(pageName, pageContent);
+
+        // then
+        PageAssert.assertThat(pageWithContent).hasContentType(ContentType.API_EXTENSION);
     }
 
     @Test
@@ -418,7 +502,7 @@ public class PageAPIIT extends CommonAPIIT {
         // given
         final String pageName = generateUniquePageName(0);
         final byte[] bytes = createTestPageContent(pageName, DISPLAY_NAME, PAGE_DESCRIPTION);
-        final Page page = getPageAPI().createPage(
+        getPageAPI().createPage(
                 new PageCreator(pageName, CONTENT_NAME, ContentType.FORM, PROCESS_DEFINITION_ID).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 bytes);
 
@@ -586,4 +670,24 @@ public class PageAPIIT extends CommonAPIIT {
         assertThat(results.get(0)).isEqualToComparingFieldByField(expectedMatchingPage);
 
     }
+
+    @Test
+    public void updatePageContent_should_update_mappings() throws Exception {
+        // given
+        final String pageName = generateUniquePageName(0);
+        final byte[] pageContent1 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION, "contentType="
+                + ContentType.API_EXTENSION, "apiExtensions=myGetResource, myPostResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission", "myPostResource.method=POST",
+                "myPostResource.pathTemplate=helloWorld", "myPostResource.classFileName=Index.groovy", "myPostResource.permissions = newPermission");
+
+        final byte[] pageContent2 = CommonTestUtil.createTestPageContent(pageName, DISPLAY_NAME, "with content " + PAGE_DESCRIPTION, "contentType="
+                + ContentType.API_EXTENSION, "apiExtensions=myGetResource, myPutResource", "myGetResource.method=GET", "myGetResource.pathTemplate=helloWorld",
+                "myGetResource.classFileName=Index.groovy", "myGetResource.permissions=newPermission", "myPutResource.method=PUT",
+                "myPutResource.pathTemplate=helloWorld", "myPutResource.classFileName=Index.groovy", "myPutResource.permissions = newPermission");
+
+        // when
+        final Page page = getPageAPI().createPage(pageName, pageContent1);
+        getPageAPI().updatePageContent(page.getId(), pageContent2);
+    }
+
 }

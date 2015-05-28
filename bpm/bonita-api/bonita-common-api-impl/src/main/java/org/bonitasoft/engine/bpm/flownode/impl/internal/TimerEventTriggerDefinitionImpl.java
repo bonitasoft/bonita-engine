@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -75,6 +76,11 @@ public class TimerEventTriggerDefinitionImpl implements TimerEventTriggerDefinit
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
     }
 
 }

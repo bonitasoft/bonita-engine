@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.api.impl.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -23,6 +23,8 @@ import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.api.impl.converter.ApplicationModelConverter;
 import org.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
+import org.bonitasoft.engine.api.impl.validator.ApplicationTokenValidator;
+import org.bonitasoft.engine.api.impl.validator.ValidationStatus;
 import org.bonitasoft.engine.business.application.Application;
 import org.bonitasoft.engine.business.application.ApplicationCreator;
 import org.bonitasoft.engine.business.application.ApplicationNotFoundException;
@@ -47,7 +49,9 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -59,7 +63,7 @@ public class ApplicationAPIDelegateTest {
     private TenantServiceAccessor accessor;
 
     @Mock
-    private ApplicationModelConverter convertor;
+    private ApplicationModelConverter converter;
 
     @Mock
     private SearchApplications searchApplications;
@@ -70,11 +74,21 @@ public class ApplicationAPIDelegateTest {
     @Mock
     private SearchResult<Application> appSearchResult;
 
+    @Mock
+    ApplicationTokenValidator validator;
+
     private ApplicationAPIDelegate delegate;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private static final long APPLICATION_ID = 15;
 
     private static final long LOGGED_USER_ID = 10;
+
+    private static final long LAYOUT_ID = 60;
+
+    private static final long THEME_ID = 61;
 
     private static final String APP_TOKEN = "app";
 
@@ -87,7 +101,8 @@ public class ApplicationAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationAPIDelegate(accessor, convertor, LOGGED_USER_ID);
+        delegate = new ApplicationAPIDelegate(accessor, converter, LOGGED_USER_ID, validator);
+        given(validator.validate(anyString())).willReturn(new ValidationStatus(true));
     }
 
     @Test
@@ -95,11 +110,11 @@ public class ApplicationAPIDelegateTest {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
         creator.setDescription(DESCRIPTION);
-        final SApplicationImpl sApp = getDefaultApplication();
+        final SApplicationImpl sApp = buildDefaultApplication();
         sApp.setDescription(DESCRIPTION);
         final ApplicationImpl application = new ApplicationImpl(APP_TOKEN, VERSION, DESCRIPTION);
-        given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
-        given(convertor.toApplication(sApp)).willReturn(application);
+        given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
+        given(converter.toApplication(sApp)).willReturn(application);
         given(applicationService.createApplication(sApp)).willReturn(sApp);
 
         //when
@@ -109,18 +124,17 @@ public class ApplicationAPIDelegateTest {
         assertThat(createdApplication).isEqualTo(application);
     }
 
-    private SApplicationImpl getDefaultApplication() {
-        final SApplicationImpl sApp = new SApplicationImpl(APP_TOKEN, APP_DISP_NAME, VERSION, System.currentTimeMillis(), LOGGED_USER_ID,
-                SApplicationState.DEACTIVATED.name());
-        return sApp;
+    private SApplicationImpl buildDefaultApplication() {
+        return new SApplicationImpl(APP_TOKEN, APP_DISP_NAME, VERSION, System.currentTimeMillis(), LOGGED_USER_ID,
+                SApplicationState.DEACTIVATED.name(), LAYOUT_ID, THEME_ID);
     }
 
     @Test(expected = AlreadyExistsException.class)
     public void createApplication_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
-        final SApplicationImpl sApp = getDefaultApplication();
-        given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
+        final SApplicationImpl sApp = buildDefaultApplication();
+        given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectAlreadyExistsException(""));
 
         //when
@@ -133,8 +147,8 @@ public class ApplicationAPIDelegateTest {
     public void createApplication_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, APP_DISP_NAME, VERSION);
-        final SApplicationImpl sApp = getDefaultApplication();
-        given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
+        final SApplicationImpl sApp = buildDefaultApplication();
+        given(converter.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectCreationException(""));
 
         //when
@@ -144,51 +158,18 @@ public class ApplicationAPIDelegateTest {
     }
 
     @Test
-    public void createApplication_should_throw_CreationException_when_token_has_spaces() throws Exception {
+    public void createApplication_should_throw_InvalidCharacterException_when_token_contains_invalid_character() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator("token with spaces", APP_DISP_NAME, VERSION);
+        final ApplicationCreator creator = new ApplicationCreator("invalid token", APP_DISP_NAME, VERSION);
+        given(validator.validate("invalid token")).willReturn(new ValidationStatus(false, "invalid character"));
+
+        //then
+        expectedException.expect(CreationException.class);
+        expectedException.expectMessage("invalid character");
 
         //when
-        try {
-            delegate.createApplication(creator);
-            fail("exception expected");
-        } catch (final CreationException e) {
-            assertThat(e.getMessage()).contains("The token");
-        }
+        delegate.createApplication(creator);
 
-        //then exception
-    }
-
-    @Test
-    public void createApplication_should_throw_CreationException_when_token_isEmpty() throws Exception {
-        //given
-        final ApplicationCreator creator = new ApplicationCreator("", APP_DISP_NAME, VERSION);
-
-        //when
-        try {
-            delegate.createApplication(creator);
-            fail("exception expected");
-        } catch (final CreationException e) {
-            assertThat(e.getMessage()).contains("The token");
-        }
-
-        //then exception
-    }
-
-    @Test
-    public void createApplication_should_throw_CreationException_when_token_isEmpty_after_trim() throws Exception {
-        //given
-        final ApplicationCreator creator = new ApplicationCreator(" ", APP_DISP_NAME, VERSION);
-
-        //when
-        try {
-            delegate.createApplication(creator);
-            fail("exception expected");
-        } catch (final CreationException e) {
-            assertThat(e.getMessage()).contains("The token");
-        }
-
-        //then exception
     }
 
     @Test(expected = CreationException.class)
@@ -209,22 +190,6 @@ public class ApplicationAPIDelegateTest {
 
         //when
         delegate.createApplication(creator);
-
-        //then exception
-    }
-
-    @Test
-    public void createApplication_should_throw_CreationException_when_token_is_null() throws Exception {
-        //given
-        final ApplicationCreator creator = new ApplicationCreator(null, APP_DISP_NAME, VERSION);
-
-        //when
-        try {
-            delegate.createApplication(creator);
-            fail("exception expected");
-        } catch (final CreationException e) {
-            assertThat(e.getMessage()).contains("The token");
-        }
 
         //then exception
     }
@@ -260,10 +225,10 @@ public class ApplicationAPIDelegateTest {
 
     @Test
     public void getApplication_should_return_the_application_returned_by_applicationService_coverted() throws Exception {
-        final SApplicationImpl sApp = getDefaultApplication();
+        final SApplicationImpl sApp = buildDefaultApplication();
         final ApplicationImpl application = new ApplicationImpl(APP_TOKEN, VERSION, null);
         given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApp);
-        given(convertor.toApplication(sApp)).willReturn(application);
+        given(converter.toApplication(sApp)).willReturn(application);
 
         //when
         final Application retriedApp = delegate.getApplication(APPLICATION_ID);
@@ -303,9 +268,9 @@ public class ApplicationAPIDelegateTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willReturn(sApplication);
-        given(convertor.toApplication(sApplication)).willReturn(application);
+        given(converter.toApplication(sApplication)).willReturn(application);
 
         //when
         final Application updatedApplication = delegate.updateApplication(APPLICATION_ID, updater);
@@ -321,9 +286,9 @@ public class ApplicationAPIDelegateTest {
         final Application application = mock(Application.class);
         final ApplicationUpdater updater = new ApplicationUpdater();
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApplication);
-        given(convertor.toApplication(sApplication)).willReturn(application);
+        given(converter.toApplication(sApplication)).willReturn(application);
 
         //when
         final Application updatedApplication = delegate.updateApplication(APPLICATION_ID, updater);
@@ -338,7 +303,7 @@ public class ApplicationAPIDelegateTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectModificationException());
 
         //when
@@ -353,7 +318,7 @@ public class ApplicationAPIDelegateTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectAlreadyExistsException());
 
         //when
@@ -368,7 +333,7 @@ public class ApplicationAPIDelegateTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(converter.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectNotFoundException());
 
         //when
@@ -377,16 +342,20 @@ public class ApplicationAPIDelegateTest {
         //then exception
     }
 
-    @Test(expected = UpdateException.class)
+    @Test
     public void updateApplication_should_throw_UpdateException_when_applicationService_token_is_invalid() throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
-        updater.setToken("token with spaces");
+        updater.setToken("invalid token");
+        given(validator.validate("invalid token")).willReturn(new ValidationStatus(false, "invalid token"));
+
+        //then exception
+        expectedException.expect(UpdateException.class);
+        expectedException.expectMessage("invalid token");
 
         //when
         delegate.updateApplication(APPLICATION_ID, updater);
 
-        //then exception
     }
 
     @Test(expected = UpdateException.class)

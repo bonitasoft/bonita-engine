@@ -22,6 +22,7 @@ import org.bonitasoft.engine.bpm.flownode.CatchEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchSignalEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -44,18 +45,18 @@ public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl imple
 
     public CatchEventDefinitionImpl(final String name) {
         super(name);
-        timerEventTriggers = new ArrayList<TimerEventTriggerDefinition>(1);
-        messageEventTriggers = new ArrayList<CatchMessageEventTriggerDefinition>(1);
-        signalEventTriggers = new ArrayList<CatchSignalEventTriggerDefinition>(1);
-        errorEventTriggers = new ArrayList<CatchErrorEventTriggerDefinition>(1);
+        timerEventTriggers = new ArrayList<>(1);
+        messageEventTriggers = new ArrayList<>(1);
+        signalEventTriggers = new ArrayList<>(1);
+        errorEventTriggers = new ArrayList<>(1);
     }
 
     public CatchEventDefinitionImpl(final long id, final String name) {
         super(id, name);
-        timerEventTriggers = new ArrayList<TimerEventTriggerDefinition>(1);
-        messageEventTriggers = new ArrayList<CatchMessageEventTriggerDefinition>(1);
-        signalEventTriggers = new ArrayList<CatchSignalEventTriggerDefinition>(1);
-        errorEventTriggers = new ArrayList<CatchErrorEventTriggerDefinition>(1);
+        timerEventTriggers = new ArrayList<>(1);
+        messageEventTriggers = new ArrayList<>(1);
+        signalEventTriggers = new ArrayList<>(1);
+        errorEventTriggers = new ArrayList<>(1);
     }
 
     @Override
@@ -165,4 +166,9 @@ public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl imple
         return true;
     }
 
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
+    }
 }

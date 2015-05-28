@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model;
 
+import org.bonitasoft.engine.expression.model.SExpression;
+
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
@@ -36,7 +38,7 @@ public interface SDocumentDefinition extends SNamedElement {
     /**
      * mime type of the document's content.
      */
-    String getContentMimeType();
+    String getMimeType();
 
     /**
      * @return
@@ -47,5 +49,7 @@ public interface SDocumentDefinition extends SNamedElement {
      * @return
      */
     String getFileName();
+
+    SExpression getInitialValue();
 
 }

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.CorrelationDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -86,4 +87,8 @@ public class CorrelationDefinitionImpl implements CorrelationDefinition {
         return "CorrelationDefinitionImpl [value=" + value + ", key=" + key + "]";
     }
 
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
+    }
 }

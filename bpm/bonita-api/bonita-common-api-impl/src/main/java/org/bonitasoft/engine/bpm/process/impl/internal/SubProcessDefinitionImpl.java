@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.process.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 
 /**
@@ -85,6 +86,12 @@ public class SubProcessDefinitionImpl extends ActivityDefinitionImpl implements 
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
     }
 
 }

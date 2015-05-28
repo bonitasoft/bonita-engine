@@ -19,6 +19,7 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.context.ContextEntry;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Baptiste Mesta
@@ -56,6 +57,12 @@ public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements U
 
     public void addContextEntry(ContextEntry contextEntry) {
         context.add(contextEntry);
+    }
+
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
     }
 
 }

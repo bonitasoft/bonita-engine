@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.businessdata.impl;
 
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -140,4 +141,8 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
         return true;
     }
 
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
+    }
 }

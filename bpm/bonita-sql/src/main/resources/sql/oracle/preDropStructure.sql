@@ -11,6 +11,7 @@ ALTER TABLE processcategorymapping DROP CONSTRAINT fk_procCatMap_tenId;
 ALTER TABLE multi_biz_data DROP CONSTRAINT fk_multi_biz_data_tenantId;
 ALTER TABLE ref_biz_data_inst DROP CONSTRAINT fk_ref_biz_data_inst_tenantId;
 ALTER TABLE theme DROP CONSTRAINT fk_theme_tenantId;
+ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_content;
 
 
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_tenantId;
@@ -22,7 +23,8 @@ ALTER TABLE business_app_page DROP CONSTRAINT fk_bus_app_id;
 ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id;
 ALTER TABLE business_app DROP CONSTRAINT fk_app_profileId;
 ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId;
-
+ALTER TABLE business_app DROP CONSTRAINT fk_app_layoutId;
+ALTER TABLE business_app DROP CONSTRAINT fk_app_themeId;
 
 
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_ADocMap_tenId;

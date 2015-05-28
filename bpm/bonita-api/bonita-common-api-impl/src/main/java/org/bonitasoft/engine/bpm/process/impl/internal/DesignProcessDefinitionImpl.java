@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -29,6 +30,8 @@ import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -38,7 +41,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition {
+public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition, Visitable {
 
     private static final long serialVersionUID = -4719128363958199300L;
 
@@ -80,8 +83,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     public DesignProcessDefinitionImpl(final String name, final String version) {
         super(name, version);
-        parameters = new HashSet<ParameterDefinition>();
-        actors = new ArrayList<ActorDefinition>();
+        parameters = new HashSet<>();
+        actors = new ArrayList<>();
     }
 
     public void setDisplayName(final String name) {
@@ -110,7 +113,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     @Deprecated
     @Override
     public Set<ActorDefinition> getActors() {
-        return new HashSet<ActorDefinition>(actors);
+        return new HashSet<>(actors);
     }
 
     @Override
@@ -226,7 +229,6 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
         }
     }
 
-
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(displayName).append(displayDescription).append(parameters).append(actors).append(actorInitiator)
@@ -281,5 +283,20 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     public void addContextEntry(ContextEntry contextEntry) {
         context.add(contextEntry);
+    }
+
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
+    }
+
+    @Override
+    public List<String> getStringIndexLabels() {
+        return Arrays.asList(getStringIndexLabel(1), getStringIndexLabel(2), getStringIndexLabel(3), getStringIndexLabel(4), getStringIndexLabel(5));
+    }
+
+    @Override
+    public List<Expression> getStringIndexValues() {
+        return Arrays.asList(getStringIndexValue(1), getStringIndexValue(2), getStringIndexValue(3), getStringIndexValue(4), getStringIndexValue(5));
     }
 }

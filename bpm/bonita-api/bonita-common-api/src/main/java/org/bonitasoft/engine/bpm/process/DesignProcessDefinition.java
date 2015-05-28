@@ -58,7 +58,7 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     /**
      * Retrieves the definition of the FlowElementContainerDefinition of the process container.
      * <p>
-     *     This method is deprecated. Please, use {@link #getFlowElementContainer()} instead.
+     * This method is deprecated. Please, use {@link #getFlowElementContainer()} instead.
      * </p>
      * Th
      *
@@ -71,6 +71,7 @@ public interface DesignProcessDefinition extends ProcessDefinition {
 
     /**
      * Returns a {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition} containing all flow elements of this process.
+     * 
      * @return a {@code FlowElementContainerDefinition} containing all flow elements of this process.
      * @see org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition
      * @since 6.4.1
@@ -113,7 +114,6 @@ public interface DesignProcessDefinition extends ProcessDefinition {
      */
     ActorDefinition getActorInitiator();
 
-
     /**
      * Retrieves the label for the ProcessDefinition given search index.
      * <p>
@@ -130,6 +130,19 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     String getStringIndexLabel(int index);
 
     /**
+     * Retrieves the label list for the ProcessDefinition given search index.
+     * <p>
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * index</a> Bonitasoft documentation page
+     * </p>
+     *
+     * @throws IndexOutOfBoundsException if index is invalid
+     * @return The label list of the search index
+     */
+
+    List<String> getStringIndexLabels();
+
+    /**
      * Retrieves the Expression for the ProcessDefinition given search index.
      * <p>
      * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
@@ -144,6 +157,17 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     Expression getStringIndexValue(int index);
 
     /**
+     * Retrieves the Expression list of the ProcessDefinition search index values.
+     * <p>
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * index</a> Bonitasoft documentation page
+     * </p>
+     *
+     * @return The {@link Expression} list of the search index
+     */
+    List<Expression> getStringIndexValues();
+
+    /**
      * Contract that must be respected when starting an instance of this process
      * 
      * @return
@@ -151,6 +175,6 @@ public interface DesignProcessDefinition extends ProcessDefinition {
      */
     ContractDefinition getContract();
 
-
     List<ContextEntry> getContext();
+
 }

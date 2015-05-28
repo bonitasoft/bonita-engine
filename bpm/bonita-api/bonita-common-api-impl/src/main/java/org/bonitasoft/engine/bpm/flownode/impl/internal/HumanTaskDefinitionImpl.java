@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 
 /**
@@ -168,4 +169,9 @@ public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl impleme
         return builder.toString();
     }
 
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
+    }
 }

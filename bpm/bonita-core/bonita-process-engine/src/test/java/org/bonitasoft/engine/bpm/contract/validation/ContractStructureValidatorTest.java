@@ -13,35 +13,30 @@
  */
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.aMap;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.contractInputMap;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SComplexInputDefinitionBuilder.aComplexInput;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.aContract;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.aSimpleInput;
-import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
-import static org.bonitasoft.engine.core.process.definition.model.SType.INTEGER;
-import static org.bonitasoft.engine.core.process.definition.model.SType.TEXT;
+import static org.bonitasoft.engine.core.process.definition.model.SType.*;
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
@@ -101,7 +96,7 @@ public class ContractStructureValidatorTest {
         final SContractDefinition contract = aContract()
                 .withInput(aSimpleInput(TEXT).withName("aText").withMultiple(true)).build();
 
-        final List<String> values = new ArrayList<String>();
+        final List<String> values = new ArrayList<>();
         values.add("hello");
         values.add("world");
 
@@ -121,7 +116,7 @@ public class ContractStructureValidatorTest {
                         aComplexInput().withName("complex").withMultiple(true)
                                 .withInput(aSimpleInput(TEXT).withName("name").build(), aSimpleInput(SType.INTEGER).withName("value").build())).build();
 
-        final List<Map<String, Serializable>> complexList = new ArrayList<Map<String, Serializable>>();
+        final List<Map<String, Serializable>> complexList = new ArrayList<>();
         complexList.add(aMap().put("name", "value1").put("value", 5).build());
         complexList.add(aMap().put("name", "value2").put("value", 8).build());
 
@@ -131,7 +126,7 @@ public class ContractStructureValidatorTest {
         //then no exception expected
         try {
             validator.validate(contract, taskInputs);
-        } catch (final ContractViolationException e) {
+        } catch (final SContractViolationException e) {
             fail(e.getExplanations().toString());
         }
     }
@@ -159,8 +154,8 @@ public class ContractStructureValidatorTest {
 
         try {
             validator.validate(contract, new HashMap<String, Serializable>());
-            fail("Expected ContractViolationException");
-        } catch (final ContractViolationException e) {
+            fail("Expected SContractViolationException");
+        } catch (final SContractViolationException e) {
             assertThat(e.getExplanations())
                     .containsOnly("Expected input [aText] is missing", "Expected input [anotherText] is missing");
         }
@@ -173,25 +168,44 @@ public class ContractStructureValidatorTest {
 
         try {
             validator.validate(contract, new HashMap<String, Serializable>());
-            fail("Expected ContractViolationException");
-        } catch (final ContractViolationException e) {
+            fail("Expected SContractViolationException");
+        } catch (final SContractViolationException e) {
             assertThat(e.getExplanations())
                     .containsOnly("Expected input [complex] is missing");
         }
     }
 
     @Test
-    public void should_throw_exception_with_explanations_when_complex_inputs_leaf_are_missing() throws Exception {
+    public void should_throw_exception_with_explanations_when_complex_inputs_leaves_are_missing() throws Exception {
         final SContractDefinition contract = aContract()
                 .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
         final Map<String, Serializable> map = aMap().put("complex", aMap().build()).build();
         try {
             validator.validate(contract, map);
             fail("expected exception has not been thrown");
-        } catch (final ContractViolationException e) {
-            assertThat(e.getExplanations())
-                    .containsOnly("Expected input [embedded] is missing");
+        } catch (final SContractViolationException e) {
+            assertThat(e.getExplanations()).containsOnly("Expected input [embedded] is missing");
         }
+    }
+
+    @Test
+    public void should_not_check_children_when_complex_input_is_null() throws Exception {
+        // Given
+        final SInputDefinition complex = aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded")).build();
+        final SContractDefinition contract = aContract().withInput(complex).build();
+        final Map<String, Serializable> inputs = Collections.singletonMap("complex", null);
+        final ContractStructureValidator spy = spy(this.validator);
+        // when
+        spy.validate(contract, inputs);
+        // then
+        verify(spy, times(0)).validateInputContainer(eq(complex), eq(inputs), any(ErrorReporter.class));
+    }
+
+    @Test
+    public void should_not_check_type_validation_when_input_is_null() throws Exception {
+        final SContractDefinition contract = aContract().withInput(aSimpleInput(TEXT).withName("someNullText")).build();
+        validator.validate(contract, Collections.<String, Serializable> singletonMap("someNullText", null));
+        verifyZeroInteractions(typeValidator);
     }
 
     @Test
@@ -207,8 +221,6 @@ public class ContractStructureValidatorTest {
         verify(typeValidator).validate(any(SInputDefinition.class), eq("thisIsNotAComplex"), any(ErrorReporter.class));
     }
 
-
-
     @Test
     public void validate_should_handle_null_inputs_map_argument_as_empty_map() throws Exception {
         final SContractDefinition contract = aContract()
@@ -220,33 +232,23 @@ public class ContractStructureValidatorTest {
         try {
             validator.validate(contract, null);
             fail("expected exception has not been thrown");
-        } catch (final ContractViolationException e) {
+        } catch (final SContractViolationException e) {
             assertThat(e.getExplanations()).containsOnly("Expected input [anInteger] is missing", "Expected input [complex] is missing");
         }
     }
 
     @Test
-    public void should_throw_a_ContractViolationException_for_present_simple_input_with_null_value() throws Exception {
+    public void should_not_throw_exception_for_present_simple_input_with_null_value() throws Exception {
         final SContractDefinition contract = aContract().withInput(aSimpleInput(TEXT).withName("firstName")).build();
 
-        try {
-            validator.validate(contract, contractInputMap(entry("firstName", null)));
-            fail("ContractViolationException expected but not thrown.");
-        } catch (final ContractViolationException e) {
-            assertThat(e.getExplanations()).containsOnly("Input [firstName] has a null value.");
-        }
+        validator.validate(contract, contractInputMap(entry("firstName", null)));
     }
 
     @Test
-    public void should_throw_a_ContractViolationException_for_present_complex_input_with_null_value() throws Exception {
+    public void should_not_throw_exception_for_present_complex_input_with_null_value() throws Exception {
         final SContractDefinition contract = aContract().withInput(aComplexInput().withName("employee")).build();
 
-        try {
-            validator.validate(contract, contractInputMap(entry("employee", null)));
-            fail("ContractViolationException expected but not thrown.");
-        } catch (final ContractViolationException e) {
-            assertThat(e.getExplanations()).containsOnly("Input [employee] has a null value.");
-        }
+        validator.validate(contract, contractInputMap(entry("employee", null)));
     }
 
 }

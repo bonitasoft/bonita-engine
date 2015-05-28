@@ -16,13 +16,13 @@ package org.bonitasoft.engine.bpm.context;
 
 import java.util.Objects;
 
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Baptiste Mesta
  */
 public class ContextEntryImpl implements ContextEntry {
-
 
     private String key;
     private Expression expression;
@@ -55,8 +55,10 @@ public class ContextEntryImpl implements ContextEntry {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ContextEntryImpl)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof ContextEntryImpl))
+            return false;
         ContextEntryImpl that = (ContextEntryImpl) o;
         return Objects.equals(key, that.key) &&
                 Objects.equals(expression, that.expression);
@@ -73,5 +75,10 @@ public class ContextEntryImpl implements ContextEntry {
                 "key='" + key + '\'' +
                 ", expression='" + expression + '\'' +
                 '}';
+    }
+
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
     }
 }

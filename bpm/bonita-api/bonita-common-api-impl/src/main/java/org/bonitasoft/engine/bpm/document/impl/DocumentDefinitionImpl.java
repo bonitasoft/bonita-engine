@@ -13,28 +13,29 @@
  **/
 package org.bonitasoft.engine.bpm.document.impl;
 
+import java.util.Objects;
+
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Baptiste Mesta
  */
 public class DocumentDefinitionImpl extends NamedElementImpl implements DocumentDefinition {
 
-    private static final long serialVersionUID = -2478390362777026410L;
+    private static final long serialVersionUID = 2L;
 
     private String url;
-
     private String file;
-
     private String mimeType;
-
     private String description;
-
     private String fileName;
+    private Expression initialValue;
 
     /**
-     * @param name
+     * @param name the name of the document
      */
     public DocumentDefinitionImpl(final String name) {
         super(name);
@@ -56,7 +57,7 @@ public class DocumentDefinitionImpl extends NamedElementImpl implements Document
     }
 
     /**
-     * @param description
+     * @param description the description of the document
      */
     public void setDescription(final String description) {
         this.description = description;
@@ -93,85 +94,50 @@ public class DocumentDefinitionImpl extends NamedElementImpl implements Document
         this.fileName = fileName;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (file == null ? 0 : file.hashCode());
-        result = prime * result + (fileName == null ? 0 : fileName.hashCode());
-        result = prime * result + (mimeType == null ? 0 : mimeType.hashCode());
-        result = prime * result + (url == null ? 0 : url.hashCode());
-        return result;
+    public void setInitialValue(Expression initialValue) {
+        this.initialValue = initialValue;
+    }
+
+    public Expression getInitialValue() {
+        return initialValue;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        }
-        if (!super.equals(obj)) {
+        if (o == null || getClass() != o.getClass())
             return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (!super.equals(o))
             return false;
-        }
-        final DocumentDefinitionImpl other = (DocumentDefinitionImpl) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (file == null) {
-            if (other.file != null) {
-                return false;
-            }
-        } else if (!file.equals(other.file)) {
-            return false;
-        }
-        if (fileName == null) {
-            if (other.fileName != null) {
-                return false;
-            }
-        } else if (!fileName.equals(other.fileName)) {
-            return false;
-        }
-        if (mimeType == null) {
-            if (other.mimeType != null) {
-                return false;
-            }
-        } else if (!mimeType.equals(other.mimeType)) {
-            return false;
-        }
-        if (url == null) {
-            if (other.url != null) {
-                return false;
-            }
-        } else if (!url.equals(other.url)) {
-            return false;
-        }
-        return true;
+        DocumentDefinitionImpl that = (DocumentDefinitionImpl) o;
+        return Objects.equals(url, that.url) &&
+                Objects.equals(file, that.file) &&
+                Objects.equals(mimeType, that.mimeType) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(fileName, that.fileName) &&
+                Objects.equals(initialValue, that.initialValue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), url, file, mimeType, description, fileName, initialValue);
     }
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("DocumentDefinitionImpl [url=");
-        builder.append(url);
-        builder.append(", file=");
-        builder.append(file);
-        builder.append(", mimeType=");
-        builder.append(mimeType);
-        builder.append(", description=");
-        builder.append(description);
-        builder.append(", fileName=");
-        builder.append(fileName);
-        builder.append(", getName()=");
-        builder.append(getName());
-        builder.append("]");
-        return builder.toString();
+        return "DocumentDefinitionImpl{" +
+                "url='" + url + '\'' +
+                ", file='" + file + '\'' +
+                ", mimeType='" + mimeType + '\'' +
+                ", description='" + description + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", initialValue=" + initialValue +
+                "} " + super.toString();
     }
 
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
+    }
 }

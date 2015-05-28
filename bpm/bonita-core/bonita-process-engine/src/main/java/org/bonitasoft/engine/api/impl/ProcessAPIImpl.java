@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api.impl;
 
 import static java.util.Collections.singletonMap;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -121,7 +120,6 @@ import org.bonitasoft.engine.bpm.actor.ActorUpdater.ActorField;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
-import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.category.CategoryNotFoundException;
@@ -252,7 +250,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilderFactory;
@@ -270,6 +267,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInsta
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
@@ -726,12 +724,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
+        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();;
 
-        // create the runtime process definition
-        final SProcessDefinition sProcessDefinition = BuilderFactory.get(SProcessDefinitionBuilderFactory.class).createNewInstance(designProcessDefinition)
-                .done();
-
+        SProcessDefinition sProcessDefinition;
         try {
             try {
                 processDefinitionService.getProcessDefinitionId(designProcessDefinition.getName(), designProcessDefinition.getVersion());
@@ -740,8 +735,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             } catch (final SProcessDefinitionNotFoundException e) {
                 // ok
             }
-            processDefinitionService.store(sProcessDefinition, designProcessDefinition.getDisplayName(), designProcessDefinition.getDisplayDescription());
-            unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
+            sProcessDefinition = processDefinitionService.store(designProcessDefinition);
+            unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());
             final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(businessArchive, tenantAccessor, sProcessDefinition);
             if (isResolved) {
                 tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
@@ -921,16 +916,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public DesignProcessDefinition getDesignProcessDefinition(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            final File processDesignFile = BonitaHomeServer.getInstance().getProcessDefinitionFile(tenantAccessor.getTenantId(), processDefinitionId, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
-            final ProcessDefinitionBARContribution processDefinitionBARContribution = new ProcessDefinitionBARContribution();
-            return processDefinitionBARContribution.deserializeProcessDefinition(processDesignFile);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final InvalidBusinessArchiveFormatException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final IOException e) {
+            return getTenantAccessor().getProcessDefinitionService().getDesignProcessDefinition(processDefinitionId);
+        } catch (SProcessDefinitionReadException | SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
         }
     }
@@ -2474,7 +2462,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void updateDataInstances(final List<SDataInstance> sDataInstances, final Map<String, Serializable> dataNameValues, ClassLoader classLoader) throws ClassNotFoundException,
+    protected void updateDataInstances(final List<SDataInstance> sDataInstances, final Map<String, Serializable> dataNameValues, ClassLoader classLoader)
+            throws ClassNotFoundException,
             UpdateException, SDataInstanceException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
@@ -2484,7 +2473,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void updateDataInstance(final DataInstanceService dataInstanceService, final SDataInstance sDataInstance, final Serializable dataNewValue, ClassLoader classLoader)
+    protected void updateDataInstance(final DataInstanceService dataInstanceService, final SDataInstance sDataInstance, final Serializable dataNewValue,
+            ClassLoader classLoader)
             throws UpdateException, SDataInstanceException {
         verifyTypeOfNewDataValue(sDataInstance, dataNewValue, classLoader);
 
@@ -2508,6 +2498,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw e;
         }
     }
+
     private EntityUpdateDescriptor buildEntityUpdateDescriptorForData(final Serializable dataValue) {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField("value", dataValue);
@@ -3001,12 +2992,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             switch (sortingCriterion) {
                 case DEFAULT:
                     break;
-                case LABEL_ASC:
-                    // field = processDefinitionDeployInfoKyeProvider.get
-                    // FIXME add label?
-                    break;
-                case LABEL_DESC:
-                    break;
                 case NAME_ASC:
                     field = builder.getNameKey();
                     order = OrderByType.ASC;
@@ -3177,28 +3162,16 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessInstance startProcessWithInputs(final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
-        throwContractViolationExceptionIfProcessContractIsInvalid(instantiationInputs, processDefinitionId);
         return startProcessWithInputs(0, processDefinitionId, instantiationInputs);
     }
 
     @Override
     public ProcessInstance startProcessWithInputs(final long userId, final long processDefinitionId, final Map<String, Serializable> instantiationInputs)
             throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException, ContractViolationException {
-        return new ProcessStarter(userId, processDefinitionId, instantiationInputs).start();
-    }
-
-    private void throwContractViolationExceptionIfProcessContractIsInvalid(final Map<String, Serializable> inputs, long processDefinitionId)
-            throws ContractViolationException, ProcessDefinitionNotFoundException {
-        final SContractDefinition contractDefinition;
         try {
-            contractDefinition = getTenantAccessor().getProcessDefinitionService().getProcessDefinition(processDefinitionId)
-                    .getContract();
-        } catch (SProcessDefinitionNotFoundException | SProcessDefinitionReadException e) {
-            throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
-        }
-        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(getTenantAccessor().getTechnicalLoggerService());
-        if (!validator.isValid(contractDefinition, inputs)) {
-            throw new ContractViolationException("Contract is not valid: ", validator.getComments());
+            return new ProcessStarter(userId, processDefinitionId, instantiationInputs).start();
+        } catch (SContractViolationException e) {
+            throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause());
         }
     }
 
@@ -3250,7 +3223,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     public ProcessInstance startProcess(final long userId, final long processDefinitionId, final List<Operation> operations,
             final Map<String, Serializable> context) throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
         final ProcessStarter starter = new ProcessStarter(userId, processDefinitionId, operations, context);
-        return starter.start();
+        try {
+            return starter.start();
+        } catch (SContractViolationException e) {
+            // To not have an API break, we need to wrapped this new Exception:
+            throw new ProcessExecutionException(new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause()));
+        }
     }
 
     @Override
@@ -5874,7 +5852,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance.getResult();
         if (flowNodeInstance instanceof SUserTaskInstance) {
-            throwContractViolationExceptionIfContractIsInvalid(wrapInTransaction, inputs, tenantAccessor, flowNodeInstance);
+            try {
+                throwContractViolationExceptionIfContractIsInvalid(wrapInTransaction, inputs, tenantAccessor, flowNodeInstance);
+            } catch (SContractViolationException e) {
+                throw new ContractViolationException(e.getSimpleMessage(), e.getMessage(), e.getExplanations(), e.getCause());
+            }
         }
 
         final LockService lockService = tenantAccessor.getLockService();
@@ -5889,16 +5871,15 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void throwContractViolationExceptionIfContractIsInvalid(final boolean wrapInTransaction, final Map<String, Serializable> inputs,
-            final TenantServiceAccessor tenantAccessor,
-            final SFlowNodeInstance flowNodeInstance) throws SBonitaException, ContractViolationException {
+            final TenantServiceAccessor tenantAccessor, final SFlowNodeInstance flowNodeInstance) throws SBonitaException, SContractViolationException {
         final GetContractOfUserTaskInstance contractOfUserTaskInstance = new GetContractOfUserTaskInstance(tenantAccessor.getProcessDefinitionService(),
                 (SUserTaskInstance) flowNodeInstance);
         executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
         final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
-        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService());
-        if (!validator.isValid(contractDefinition, inputs)) {
-            throw new ContractViolationException("Contract is not valid: ", validator.getComments());
-        }
+        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService(),
+                tenantAccessor.getExpressionService());
+        validator.validate(flowNodeInstance.getProcessDefinitionId(), contractDefinition, inputs);
+
     }
 
     @Override

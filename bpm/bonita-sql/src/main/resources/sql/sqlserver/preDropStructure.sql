@@ -59,6 +59,8 @@ ALTER TABLE process_comment DROP CONSTRAINT fk_process_comment_tenantId
 GO
 ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_tenantId
 GO
+ALTER TABLE process_definition DROP CONSTRAINT fk_process_definition_content
+GO
 ALTER TABLE process_instance DROP CONSTRAINT fk_process_instance_tenantId
 GO
 ALTER TABLE processsupervisor DROP CONSTRAINT fk_processsupervisor_tenantId
@@ -110,8 +112,10 @@ ALTER TABLE business_app DROP CONSTRAINT fk_app_profileId
 GO
 ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId
 GO
-
-
+ALTER TABLE business_app DROP CONSTRAINT fk_app_layoutId
+GO
+ALTER TABLE business_app DROP CONSTRAINT fk_app_themeId
+GO
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_arch_document_mapping_tenantId

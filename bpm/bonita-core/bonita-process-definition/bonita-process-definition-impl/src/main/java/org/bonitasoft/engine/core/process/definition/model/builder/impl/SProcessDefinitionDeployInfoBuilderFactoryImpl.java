@@ -51,6 +51,8 @@ public class SProcessDefinitionDeployInfoBuilderFactoryImpl implements SProcessD
 
     private static final String ICON_PATH = "iconPath";
 
+    private static final String DESIGN_CONTENT = "designContent.content";
+
     private static final String LABEL = "label";
 
     @Override
@@ -127,6 +129,11 @@ public class SProcessDefinitionDeployInfoBuilderFactoryImpl implements SProcessD
     @Override
     public String getIconPathKey() {
         return ICON_PATH;
+    }
+
+    @Override
+    public String getDesignContentKey() {
+        return DESIGN_CONTENT;
     }
 
     @Override

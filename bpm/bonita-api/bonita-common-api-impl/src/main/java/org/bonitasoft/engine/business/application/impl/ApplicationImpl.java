@@ -27,6 +27,7 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
 
     private static final long serialVersionUID = -5393587887795907117L;
     private final String version;
+    private Long layoutId;
     private String iconPath;
     private Date creationDate;
     private long createdBy;
@@ -36,6 +37,7 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
     private Long homePageId;
     private String displayName;
     private Long profileId;
+    private Long themeId;
     private final String description;
     private final String token;
 
@@ -43,6 +45,12 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
         this.token = token;
         this.version = version;
         this.description = description;
+    }
+
+    public ApplicationImpl(final String token, final String version, final String description, Long layoutId, final Long themeId) {
+        this(token, version, description);
+        this.layoutId = layoutId;
+        this.themeId = themeId;
     }
 
     @Override
@@ -137,39 +145,51 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
         return profileId;
     }
 
+    @Override
+    public Long getLayoutId() {
+        return layoutId;
+    }
+
+    @Override
+    public Long getThemeId() {
+        return themeId;
+    }
+
     public void setProfileId(final Long profileId) {
         this.profileId = profileId;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (!(o instanceof ApplicationImpl)) return false;
         if (!super.equals(o)) return false;
 
-        ApplicationImpl that = (ApplicationImpl) o;
+        final ApplicationImpl that = (ApplicationImpl) o;
 
         if (createdBy != that.createdBy) return false;
         if (updatedBy != that.updatedBy) return false;
-        if (creationDate != null ? !creationDate.equals(that.creationDate) : that.creationDate != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (displayName != null ? !displayName.equals(that.displayName) : that.displayName != null) return false;
-        if (homePageId != null ? !homePageId.equals(that.homePageId) : that.homePageId != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+        if (layoutId != null ? !layoutId.equals(that.layoutId) : that.layoutId != null) return false;
         if (iconPath != null ? !iconPath.equals(that.iconPath) : that.iconPath != null) return false;
+        if (creationDate != null ? !creationDate.equals(that.creationDate) : that.creationDate != null) return false;
         if (lastUpdateDate != null ? !lastUpdateDate.equals(that.lastUpdateDate) : that.lastUpdateDate != null)
             return false;
-        if (profileId != null ? !profileId.equals(that.profileId) : that.profileId != null) return false;
         if (state != null ? !state.equals(that.state) : that.state != null) return false;
-        if (token != null ? !token.equals(that.token) : that.token != null) return false;
-        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+        if (homePageId != null ? !homePageId.equals(that.homePageId) : that.homePageId != null) return false;
+        if (displayName != null ? !displayName.equals(that.displayName) : that.displayName != null) return false;
+        if (profileId != null ? !profileId.equals(that.profileId) : that.profileId != null) return false;
+        if (themeId != null ? !themeId.equals(that.themeId) : that.themeId != null) return false;
+        if (description != null ? !description.equals(that.description) : that.description != null) return false;
+        return !(token != null ? !token.equals(that.token) : that.token != null);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (layoutId != null ? layoutId.hashCode() : 0);
         result = 31 * result + (iconPath != null ? iconPath.hashCode() : 0);
         result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
         result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
@@ -179,6 +199,7 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
         result = 31 * result + (homePageId != null ? homePageId.hashCode() : 0);
         result = 31 * result + (displayName != null ? displayName.hashCode() : 0);
         result = 31 * result + (profileId != null ? profileId.hashCode() : 0);
+        result = 31 * result + (themeId != null ? themeId.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (token != null ? token.hashCode() : 0);
         return result;

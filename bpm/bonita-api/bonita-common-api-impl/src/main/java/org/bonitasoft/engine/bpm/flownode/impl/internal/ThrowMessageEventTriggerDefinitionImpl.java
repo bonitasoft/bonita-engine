@@ -20,6 +20,7 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.CorrelationDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
@@ -39,21 +40,21 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
 
     public ThrowMessageEventTriggerDefinitionImpl(final String messageName) {
         super(messageName);
-        dataDefinitions = new ArrayList<DataDefinition>();
+        dataDefinitions = new ArrayList<>();
     }
 
     public ThrowMessageEventTriggerDefinitionImpl(final String name, final Expression targetProcess, final Expression targetFlowNode) {
         super(name);
         this.targetProcess = targetProcess;
         this.targetFlowNode = targetFlowNode;
-        dataDefinitions = new ArrayList<DataDefinition>();
+        dataDefinitions = new ArrayList<>();
     }
 
     public ThrowMessageEventTriggerDefinitionImpl(final String name, final Expression targetProcess) {
         super(name);
         this.targetProcess = targetProcess;
         targetFlowNode = null;
-        dataDefinitions = new ArrayList<DataDefinition>();
+        dataDefinitions = new ArrayList<>();
     }
 
     public ThrowMessageEventTriggerDefinitionImpl(final String name, final Expression targetProcess, final Expression targetFlowNode,
@@ -142,6 +143,12 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
     }
 
 }

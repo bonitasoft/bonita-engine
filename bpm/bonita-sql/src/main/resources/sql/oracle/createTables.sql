@@ -118,8 +118,16 @@ CREATE TABLE process_definition (
   lastUpdateDate NUMBER(19, 0),
   categoryId NUMBER(19, 0),
   iconPath VARCHAR2(255 CHAR),
+  content_tenantid NUMBER(19, 0) NOT NULL,
+  content_id NUMBER(19, 0) NOT NULL,
   PRIMARY KEY (tenantId, id),
   CONSTRAINT UK_Process_Definition UNIQUE (tenantId, name, version)
+);
+CREATE TABLE process_content (
+  tenantId NUMBER(19, 0) NOT NULL,
+  id NUMBER(19, 0) NOT NULL,
+  content CLOB NOT NULL,
+  PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE arch_document_mapping (
   tenantid NUMBER(19, 0) NOT NULL,
@@ -534,6 +542,8 @@ CREATE TABLE business_app (
   state VARCHAR2(30 CHAR) NOT NULL,
   homePageId NUMBER(19, 0),
   profileId NUMBER(19, 0),
+  layoutId NUMBER(19, 0),
+  themeId NUMBER(19, 0),
   displayName VARCHAR2(255 CHAR) NOT NULL
 );
 

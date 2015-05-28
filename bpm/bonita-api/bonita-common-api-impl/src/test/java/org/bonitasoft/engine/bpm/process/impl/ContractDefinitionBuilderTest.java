@@ -15,12 +15,12 @@ package org.bonitasoft.engine.bpm.process.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 import org.junit.Before;
@@ -108,24 +108,39 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addComplexInputTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, description, new ArrayList<InputDefinition>());
+        final InputContainerDefinitionBuilder builder = contractDefinitionBuilder.addComplexInput(name, description);
+        contractDefinitionBuilder.addInput("theInput2", Type.TEXT, "desc");
 
         //then
-        assertThat(activity.getContract().getInputs()).hasSize(1);
+        assertThat(activity.getContract().getInputs()).hasSize(2);
         assertThat(activity.getContract().getInputs().get(0).isMultiple()).as("should not be multiple").isFalse();
-        checkBuilder(builder);
+        assertThat(activity.getContract().getInputs().get(1).getName()).isEqualTo("theInput2");
+    }
 
+    @Test
+    public void addComplexInputWithChildren() throws Exception {
+        //when
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput("name", Type.TEXT, "the name of the user");
+        builder.addComplexInput("addresses", "the addresses").addInput("address", Type.TEXT, "the address", true);
+
+        //then
+        assertThat(activity.getContract().getInputs()).hasSize(2);
+        assertThat(activity.getContract().getInputs().get(0)).isEqualTo(new InputDefinitionImpl("name", Type.TEXT, "the name of the user", false));
+        assertThat(activity.getContract().getInputs().get(1)).isEqualToIgnoringGivenFields(new InputDefinitionImpl("addresses", "the addresses", false),
+                "inputs");
+        assertThat(activity.getContract().getInputs().get(1).getInputs()).hasSize(1);
+        assertThat(activity.getContract().getInputs().get(1).getInputs().get(0)).isEqualTo(new InputDefinitionImpl("address", Type.TEXT, "the address", true));
+        checkBuilder(builder);
     }
 
     @Test
     public void addMultipleComplexInputTest() throws Exception {
         //when
-        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addInput(name, description, true, new ArrayList<InputDefinition>());
+        contractDefinitionBuilder.addComplexInput(name, description, true);
 
         //then
         assertThat(activity.getContract().getInputs()).hasSize(1);
         assertThat(activity.getContract().getInputs().get(0).isMultiple()).as("should be multiple").isTrue();
-        checkBuilder(builder);
 
     }
 
@@ -139,7 +154,7 @@ public class ContractDefinitionBuilderTest {
         assertThat(complexInputs.get(0).isMultiple()).isFalse();
         final List<InputDefinition> simpleInputs = complexInputs.get(0).getInputs();
         assertThat(simpleInputs).hasSize(2);
-        assertThat(simpleInputs.get(0).getName()).isEqualTo("fileName");
+        assertThat(simpleInputs.get(0).getName()).isEqualTo("filename");
         assertThat(simpleInputs.get(0).getType()).isEqualTo(Type.TEXT);
         assertThat(simpleInputs.get(1).getName()).isEqualTo("content");
         assertThat(simpleInputs.get(1).getType()).isEqualTo(Type.BYTE_ARRAY);
@@ -157,7 +172,7 @@ public class ContractDefinitionBuilderTest {
         assertThat(complexInputs.get(0).isMultiple()).isTrue();
         final List<InputDefinition> simpleInputs = complexInputs.get(0).getInputs();
         assertThat(simpleInputs).hasSize(2);
-        assertThat(simpleInputs.get(0).getName()).isEqualTo("fileName");
+        assertThat(simpleInputs.get(0).getName()).isEqualTo("filename");
         assertThat(simpleInputs.get(0).getType()).isEqualTo(Type.TEXT);
         assertThat(simpleInputs.get(1).getName()).isEqualTo("content");
         assertThat(simpleInputs.get(1).getType()).isEqualTo(Type.BYTE_ARRAY);
@@ -175,7 +190,7 @@ public class ContractDefinitionBuilderTest {
         checkBuilder(builder);
     }
 
-    private void checkBuilder(final ContractDefinitionBuilder builder) {
+    private void checkBuilder(final InputContainerDefinitionBuilder builder) {
         assertThat(builder).as("should return a builder").isNotNull().isEqualTo(contractDefinitionBuilder);
     }
 

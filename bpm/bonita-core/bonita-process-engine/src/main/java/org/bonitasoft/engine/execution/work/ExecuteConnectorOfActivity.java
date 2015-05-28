@@ -158,7 +158,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
         final SConnectorDefinition sConnectorDefinition = flowNodeDefinition.getConnectorDefinition(connectorDefinitionName);
         if (sConnectorDefinition == null) {
-            throw new SConnectorDefinitionNotFoundException("Coudn't find the connector definition [" + connectorDefinitionName + "]");
+            throw new SConnectorDefinitionNotFoundException("Couldn't find the connector definition [" + connectorDefinitionName + "]");
         }
         return sConnectorDefinition;
     }

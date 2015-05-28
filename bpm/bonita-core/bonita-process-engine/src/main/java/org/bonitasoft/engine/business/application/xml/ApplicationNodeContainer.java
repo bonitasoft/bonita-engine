@@ -32,7 +32,7 @@ public class ApplicationNodeContainer {
     private List<ApplicationNode> applications;
 
     public ApplicationNodeContainer() {
-        this.applications = new ArrayList<ApplicationNode>();
+        this.applications = new ArrayList<>();
     }
 
     public List<ApplicationNode> getApplications() {

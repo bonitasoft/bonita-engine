@@ -15,12 +15,13 @@ package org.bonitasoft.engine.bpm.flownode;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.process.Visitable;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface CatchMessageEventTriggerDefinition extends MessageEventTriggerDefinition {
+public interface CatchMessageEventTriggerDefinition extends MessageEventTriggerDefinition, Visitable {
 
     List<Operation> getOperations();
 

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.TerminateEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Matthieu Chaffotte
@@ -22,4 +23,8 @@ public class TerminateEventTriggerDefinitionImpl implements TerminateEventTrigge
 
     private static final long serialVersionUID = -1494352183532063268L;
 
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        // nothing to do here:
+    }
 }

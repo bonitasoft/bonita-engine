@@ -20,6 +20,7 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.flownode.ThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowSignalEventTriggerDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -36,14 +37,14 @@ public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl imple
 
     public ThrowEventDefinitionImpl(final String name) {
         super(name);
-        messageEventTriggerDefinitions = new ArrayList<ThrowMessageEventTriggerDefinition>(1);
-        signalEventTriggerDefinitions = new ArrayList<ThrowSignalEventTriggerDefinition>(1);
+        messageEventTriggerDefinitions = new ArrayList<>(1);
+        signalEventTriggerDefinitions = new ArrayList<>(1);
     }
 
     public ThrowEventDefinitionImpl(final long id, final String name) {
         super(id, name);
-        messageEventTriggerDefinitions = new ArrayList<ThrowMessageEventTriggerDefinition>(1);
-        signalEventTriggerDefinitions = new ArrayList<ThrowSignalEventTriggerDefinition>(1);
+        messageEventTriggerDefinitions = new ArrayList<>(1);
+        signalEventTriggerDefinitions = new ArrayList<>(1);
     }
 
     @Override
@@ -104,4 +105,19 @@ public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl imple
         return true;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ThrowEventDefinitionImpl{");
+        sb.append("messageEventTriggerDefinitions=").append(messageEventTriggerDefinitions);
+        sb.append(", signalEventTriggerDefinitions=").append(signalEventTriggerDefinitions);
+        sb.append('}');
+        sb.append(super.toString());
+        return sb.toString();
+    }
+
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
+    }
 }

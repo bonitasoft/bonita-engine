@@ -33,10 +33,6 @@ public class SAutomaticTaskDefinitionImpl extends SActivityDefinitionImpl implem
         super(activityDefinition, transitionsMap);
     }
 
-    public SAutomaticTaskDefinitionImpl(final long id, final String name) {
-        super(id, name);
-    }
-
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.AUTOMATIC_TASK;

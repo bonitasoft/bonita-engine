@@ -49,8 +49,10 @@ import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskDefinition;
+import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.ReceiveTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.SendTaskDefinition;
+import org.bonitasoft.engine.bpm.flownode.StandardLoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TerminateEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowErrorEventTriggerDefinition;
@@ -62,8 +64,6 @@ import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
-import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristics;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
@@ -148,6 +148,9 @@ public class XMLProcessDefinition {
     public static final String CALL_ACTIVITY_NODE = "callActivity";
 
     public static final String DATA_INPUT_OPERATION_NODE = "dataInputOperation";
+
+    public static final String CONTRACT_INPUTS_EXPRESSION_NODE = "contractInputs";
+    public static final String CONTRACT_INPUT_EXPRESSION_NODE = "contractInput";
 
     public static final String DATA_OUTPUT_OPERATION_NODE = "dataOutputOperation";
 
@@ -687,8 +690,22 @@ public class XMLProcessDefinition {
         addExpressionNode(activityNode, CALLABLE_ELEMENT_NODE, activity.getCallableElement());
         addExpressionNode(activityNode, CALLABLE_ELEMENT_VERSION_NODE, activity.getCallableElementVersion());
         createAndfillOperations(activityNode, activity.getDataInputOperations(), DATA_INPUT_OPERATION_NODE);
+        createAndfillContractInputs(activityNode, activity.getProcessStartContractInputs());
         createAndfillOperations(activityNode, activity.getDataOutputOperations(), DATA_OUTPUT_OPERATION_NODE);
         activityNode.addAttribute(CALLABLE_ELEMENT_TYPE, activity.getCallableElementType().name());
+    }
+
+    private void createAndfillContractInputs(XMLNode node, Map<String, Expression> contractInputs) {
+        final XMLNode contractInputsNode = new XMLNode(CONTRACT_INPUTS_EXPRESSION_NODE);
+        for (final Entry<String, Expression> input : contractInputs.entrySet()) {
+            final XMLNode contractInputNode = new XMLNode(CONTRACT_INPUT_EXPRESSION_NODE);
+            contractInputNode.addAttribute(NAME, input.getKey());
+            final XMLNode expressionNode = new XMLNode(EXPRESSION_NODE);
+            fillExpressionNode(expressionNode, input.getValue(), false);
+            contractInputNode.addChild(expressionNode);
+            contractInputsNode.addChild(contractInputNode);
+        }
+        node.addChild(contractInputsNode);
     }
 
     private void fillReceiveTask(final ReceiveTaskDefinition receiveTask, final XMLNode activityNode) {
@@ -1060,6 +1077,9 @@ public class XMLProcessDefinition {
         }
         if (documentDefinition.getFile() != null) {
             documentDefinitionNode.addChild(DOCUMENT_DEFINITION_FILE, documentDefinition.getFile());
+        }
+        if (documentDefinition.getInitialValue() != null) {
+            addExpressionNode(documentDefinitionNode, EXPRESSION_NODE, documentDefinition.getInitialValue());
         }
     }
 

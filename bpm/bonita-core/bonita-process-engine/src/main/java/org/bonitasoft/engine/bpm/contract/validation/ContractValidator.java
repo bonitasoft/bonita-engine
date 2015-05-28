@@ -14,12 +14,10 @@
 package org.bonitasoft.engine.bpm.contract.validation;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 
 /**
  * Validate tasks inputs according to given contract
@@ -32,27 +30,15 @@ public class ContractValidator {
     private final ContractStructureValidator structureValidator;
     private final ContractConstraintsValidator rulesValidator;
 
-    private final List<String> comments;
-
     public ContractValidator(final ContractStructureValidator contractStructureValidator, final ContractConstraintsValidator contractRulesValidator) {
-        rulesValidator = contractRulesValidator;
         structureValidator = contractStructureValidator;
-        comments = new ArrayList<>();
+        rulesValidator = contractRulesValidator;
     }
 
-    public boolean isValid(final SContractDefinition contract, final Map<String, Serializable> variables) {
-        try {
-            structureValidator.validate(contract, variables);
-            rulesValidator.validate(contract, variables);
-        } catch (final ContractViolationException e) {
-            comments.addAll(e.getExplanations());
-            return false;
-        }
-        return true;
-    }
-
-    public List<String> getComments() {
-        return comments;
+    public void validate(long processDefinitionId, final SContractDefinition contract, final Map<String, Serializable> variables)
+            throws SContractViolationException {
+        structureValidator.validate(contract, variables);
+        rulesValidator.validate(processDefinitionId, contract, variables);
     }
 
 }

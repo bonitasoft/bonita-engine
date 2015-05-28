@@ -10,11 +10,12 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ */
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,25 +42,27 @@ public class SCallActivityDefinitionImpl extends SActivityDefinitionImpl impleme
 
     private final List<SOperation> dataInputOperations;
 
+    private final Map<String, SExpression> contractInputs;
+
     private final List<SOperation> dataOutputOperations;
 
     private SCallableElementType callableElementType;
 
     public SCallActivityDefinitionImpl(final long id, final String name) {
         super(id, name);
-        dataInputOperations = new ArrayList<SOperation>(3);
-        dataOutputOperations = new ArrayList<SOperation>(3);
+        dataInputOperations = new ArrayList<>(3);
+        contractInputs = new HashMap<>();
+        dataOutputOperations = new ArrayList<>(3);
     }
 
-    public SCallActivityDefinitionImpl(final CallActivityDefinition activityDefinition,
-            final Map<String, STransitionDefinition> transitionsMap) {
+    public SCallActivityDefinitionImpl(final CallActivityDefinition activityDefinition, final Map<String, STransitionDefinition> transitionsMap) {
         super(activityDefinition, transitionsMap);
         callableElement = ServerModelConvertor.convertExpression(activityDefinition.getCallableElement());
         callableElementVersion = ServerModelConvertor.convertExpression(activityDefinition.getCallableElementVersion());
         dataInputOperations = ServerModelConvertor.convertOperations(activityDefinition.getDataInputOperations());
+        contractInputs = ServerModelConvertor.convertContractInputs(activityDefinition.getProcessStartContractInputs());
         dataOutputOperations = ServerModelConvertor.convertOperations(activityDefinition.getDataOutputOperations());
         callableElementType = SCallableElementType.valueOf(activityDefinition.getCallableElementType().name());
-
     }
 
     @Override
@@ -67,49 +70,39 @@ public class SCallActivityDefinitionImpl extends SActivityDefinitionImpl impleme
         return callableElement;
     }
 
-    public void setCallableElement(final SExpression callableElement) {
-        this.callableElement = callableElement;
-    }
-
     @Override
     public SExpression getCallableElementVersion() {
         return callableElementVersion;
     }
 
-    public void setCallableElementVersion(final SExpression callableElementVersion) {
-        this.callableElementVersion = callableElementVersion;
-    }
 
     @Override
     public List<SOperation> getDataInputOperations() {
         return Collections.unmodifiableList(dataInputOperations);
     }
 
-    public void addDataInputOperation(final SOperation dataInputOperation) {
-        dataInputOperations.add(dataInputOperation);
-    }
 
     @Override
     public List<SOperation> getDataOutputOperations() {
         return Collections.unmodifiableList(dataOutputOperations);
     }
 
-    public void addDataOutputOperation(final SOperation dataOutputOperation) {
-        dataOutputOperations.add(dataOutputOperation);
-    }
 
     @Override
     public SCallableElementType getCallableElementType() {
         return callableElementType;
     }
 
-    public void setCallableElementType(final SCallableElementType callableElementType) {
-        this.callableElementType = callableElementType;
-    }
 
     @Override
     public SFlowNodeType getType() {
         return SFlowNodeType.CALL_ACTIVITY;
+    }
+
+
+    @Override
+    public Map<String, SExpression> getProcessStartContractInputs() {
+        return contractInputs;
     }
 
     @Override

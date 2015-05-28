@@ -36,4 +36,5 @@ public interface SProcessDefinitionDeployInfoUpdateBuilder {
 
     SProcessDefinitionDeployInfoUpdateBuilder updateDisplayDescription(String value);
 
+    SProcessDefinitionDeployInfoUpdateBuilder updateDesignContent(String processDefinitionAsXMLString);
 }

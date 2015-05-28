@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.EventDefinition;
 import org.bonitasoft.engine.bpm.flownode.EventTriggerDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -32,12 +33,12 @@ public abstract class EventDefinitionImpl extends FlowNodeDefinitionImpl impleme
 
     public EventDefinitionImpl(final String name) {
         super(name);
-        eventTriggers = new ArrayList<EventTriggerDefinition>();
+        eventTriggers = new ArrayList<>();
     }
 
     public EventDefinitionImpl(final long id, final String name) {
         super(id, name);
-        eventTriggers = new ArrayList<EventTriggerDefinition>();
+        eventTriggers = new ArrayList<>();
     }
 
     @Override
@@ -79,4 +80,9 @@ public abstract class EventDefinitionImpl extends FlowNodeDefinitionImpl impleme
         return true;
     }
 
+    @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        super.accept(visitor, modelId);
+        visitor.find(this, modelId);
+    }
 }

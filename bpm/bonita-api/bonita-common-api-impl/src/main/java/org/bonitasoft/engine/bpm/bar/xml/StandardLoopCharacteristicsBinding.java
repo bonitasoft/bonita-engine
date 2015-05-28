@@ -15,7 +15,7 @@ package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacteristicsImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.io.xml.ElementBinding;
 
@@ -52,9 +52,9 @@ public class StandardLoopCharacteristicsBinding extends ElementBinding {
     @Override
     public Object getObject() {
         if (loopMax == null) {
-            return new StandardLoopCharacteristics(loopCondition, testBefore);
+            return new StandardLoopCharacteristicsImpl(loopCondition, testBefore);
         }
-        return new StandardLoopCharacteristics(loopCondition, testBefore, loopMax);
+        return new StandardLoopCharacteristicsImpl(loopCondition, testBefore, loopMax);
     }
 
     @Override
