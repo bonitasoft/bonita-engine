@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.bonitasoft.engine.bdm.Entity;
+
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -26,6 +27,6 @@ public interface JsonBusinessDataSerializer {
 
     String serializeEntity(Entity entity, String businessDataURIPattern) throws JsonGenerationException, JsonMappingException, IOException;
 
-    String serializeEntity(List<Entity> childEntity, String businessDataURIPattern) throws JsonGenerationException, JsonMappingException, IOException;
+    String serializeEntity(List<? extends Entity> childEntity, String businessDataURIPattern) throws JsonGenerationException, JsonMappingException, IOException;
 
 }
