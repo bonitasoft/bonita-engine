@@ -73,6 +73,7 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -682,7 +683,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             final TransactionService transactionService) throws STenantCreationException {
         final String tenantName = "default";
         final String description = "Default tenant";
-        String userName = "";
+        String userName;
         SessionAccessor sessionAccessor = null;
         long platformSessionId = -1;
         Long tenantId = -1L;
@@ -711,14 +712,16 @@ public class PlatformAPIImpl implements PlatformAPI {
             }
 
             // Create session
-            final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
+            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+            final SessionService sessionService = tenantServiceAccessor.getSessionService();
             sessionAccessor = createSessionAccessor();
             final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
 
-            // Create default profiles: done by profile updater restart handler
+            // Create default profiles: they will be updated by the tenant profile update handler in a separate thread but we create them here synchronously
+            new DefaultProfilesUpdater(platformAccessor, tenantServiceAccessor).execute(false);
             // Create custom page examples: done by page service start
             // Create default themes: done by theme service start
 
