@@ -11,22 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.business.data;
 
-import java.io.IOException;
-import java.util.List;
+package org.bonitasoft.engine.api.impl.validator;
 
-import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.exception.ImportException;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+/**
+ * @author Elias Ricken de Medeiros
+ */
+public class ApplicationImportValidator {
 
-public interface JsonBusinessDataSerializer {
+    private final ApplicationTokenValidator tokenValidator;
 
-    String EMPTY_OBJECT = "{}";
+    public ApplicationImportValidator(ApplicationTokenValidator tokenValidator) {
+        this.tokenValidator = tokenValidator;
+    }
 
-    String serializeEntity(Entity entity, String businessDataURIPattern) throws JsonGenerationException, JsonMappingException, IOException;
-
-    String serializeEntity(List<? extends Entity> entities, String businessDataURIPattern) throws JsonGenerationException, JsonMappingException, IOException;
+    public void validate(String token) throws ImportException {
+        ValidationStatus validationStatus = tokenValidator.validate(token);
+        if(!validationStatus.isValid()) {
+            throw new ImportException(validationStatus.getMessage());
+        }
+    }
 
 }

@@ -33,17 +33,16 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 
-import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionService;
-import org.hibernate.Hibernate;
-import org.hibernate.proxy.HibernateProxy;
-
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.bdm.model.field.Field;
 import org.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.TransactionService;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 
 /**
  * @author Matthieu Chaffotte
@@ -148,11 +147,27 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             return new ArrayList<T>();
         }
         final EntityManager em = getEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<T> criteriaQuery = cb.createQuery(entityClass);
-        Root<T> row = criteriaQuery.from(entityClass);
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<T> criteriaQuery = cb.createQuery(entityClass);
+        final Root<T> row = criteriaQuery.from(entityClass);
         criteriaQuery.select(row).where(row.get(Field.PERSISTENCE_ID).in(primaryKeys));
         return em.createQuery(criteriaQuery).getResultList();
+    }
+
+    @Override
+    public <T extends Entity> List<T> findByIdentifiers(final Class<T> entityClass, final List<Long> primaryKeys) {
+        if (primaryKeys == null || primaryKeys.isEmpty()) {
+            return new ArrayList<T>();
+        }
+        final List<T> entities = new ArrayList<>();
+        for (final Long primaryKey : primaryKeys) {
+            try {
+                entities.add(findById(entityClass, primaryKey));
+            } catch (final SBusinessDataNotFoundException e) {
+                // If the business data does not exist, do not add it in the result list in order to have the same behaviour as findByIds
+            }
+        }
+        return entities;
     }
 
     protected <T extends Serializable> T find(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters)

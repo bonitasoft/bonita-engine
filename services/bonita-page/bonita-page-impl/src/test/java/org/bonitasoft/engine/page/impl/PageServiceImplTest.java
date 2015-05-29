@@ -331,6 +331,12 @@ public class PageServiceImplTest {
         // given
         // resource in the classpath bonita-groovy-example-page.zip
         doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
+        pageServiceImpl.setProvidedPages(Arrays.asList(
+                "bonita-groovy-page-example.zip",
+                "bonita-home-page.zip",
+                "bonita-html-page-example.zip",
+                "bonita-layout-page.zip",
+                "bonita-theme-page.zip"));
 
         Answer<SPage> answer = new Answer<SPage>() {
 
@@ -410,8 +416,16 @@ public class PageServiceImplTest {
         doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
         doReturn(null).when(pageServiceImpl).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
         doNothing().when(pageServiceImpl).updatePageContent(anyLong(), any(byte[].class), anyString());
+
         // when
+        pageServiceImpl.setProvidedPages(Arrays.asList(
+                "bonita-groovy-page-example.zip",
+                "bonita-home-page.zip",
+                "bonita-html-page-example.zip",
+                "bonita-layout-page.zip",
+                "bonita-theme-page.zip"));
         pageServiceImpl.start();
+
         // then
         verify(pageServiceImpl, times(0)).insertPage(any(SPage.class), any(byte[].class));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(13L), any(byte[].class), eq("bonita-html-page-example.zip"));

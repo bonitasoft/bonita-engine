@@ -1312,10 +1312,10 @@ public class BDRepositoryIT extends CommonAPIIT {
         waitForUserTask(processInstance, "step2");
 
         final SimpleBusinessDataReference businessDataReference = (SimpleBusinessDataReference) getBusinessDataAPI().getProcessBusinessDataReference(
-                bizDataName,
-                processInstance.getId());
+                bizDataName, processInstance.getId());
 
         verifyCommandGetBusinessDataById(businessDataReference);
+        verifyCommandGetBusinessDataByIds(businessDataReference);
         verifyCommandGetQuery_findByFirstNameAndLastNameNewOrder();
         verifyCommandGetQuery_getEmployeeByPhoneNumber();
         verifyCommandGetQuery_findByFirstNameFetchAddresses();
@@ -1323,6 +1323,22 @@ public class BDRepositoryIT extends CommonAPIIT {
         verifyCommandGetQuery_findByHireDate();
 
         disableAndDeleteProcess(processDefinition.getId());
+    }
+
+    private void verifyCommandGetBusinessDataByIds(final SimpleBusinessDataReference businessDataReference) throws Exception {
+        final List<Long> ids = new ArrayList<Long>();
+        ids.add(businessDataReference.getStorageId());
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("businessDataIds", (Serializable) ids);
+        parameters.put("entityClassName", EMPLOYEE_QUALIFIED_NAME);
+        parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
+
+        // when
+        final String lazyAddressResultWithChildName = (String) getCommandAPI().execute("getBusinessDataByIds", parameters);
+
+        // then
+        assertThatJson(lazyAddressResultWithChildName).as("should get address with lazy link to country")
+                .hasSameStructureAs(getJsonContent("getBusinessDataByIdsEmployee.json"));
     }
 
     private void verifyCommandGetBusinessDataById(final SimpleBusinessDataReference businessDataReference) throws Exception {

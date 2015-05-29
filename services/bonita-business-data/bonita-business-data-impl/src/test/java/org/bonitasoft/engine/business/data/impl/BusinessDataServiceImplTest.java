@@ -23,7 +23,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,9 +88,9 @@ public class BusinessDataServiceImplTest {
 
     @Before
     public void before() throws Exception {
-        String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss","yyyy-MM-dd'T'HH:mm:ss.SSS" };
-        typeConverterUtil=new TypeConverterUtil(datePatterns);
-        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository,typeConverterUtil ));
+        final String[] datePatterns = new String[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd", "HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ss.SSS" };
+        typeConverterUtil = new TypeConverterUtil(datePatterns);
+        businessDataService = spy(new BusinessDataServiceImpl(businessDataRepository, jsonEntitySerializer, businessDataModelRepository, typeConverterUtil));
     }
 
     @Test
@@ -508,7 +510,7 @@ public class BusinessDataServiceImplTest {
         doReturn(entities).when(businessDataRepository).findListByNamedQuery(anyString(), any(Class.class), anyMap(), anyInt(), anyInt());
 
         //given
-        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        final BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
         doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
 
         //when
@@ -533,7 +535,7 @@ public class BusinessDataServiceImplTest {
 
         doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
 
-        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        final BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
         doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
 
         //when then exception
@@ -552,7 +554,7 @@ public class BusinessDataServiceImplTest {
         parameters.put(PARAMETER_LONG, "34");
 
         doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
-        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        final BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
         doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
 
         //when then no exception
@@ -572,7 +574,7 @@ public class BusinessDataServiceImplTest {
         final EntityPojo entity = new EntityPojo(1562L);
         doReturn(entity.getClass()).when(businessDataService).loadClass(entity.getClass().getName());
 
-        BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
+        final BusinessObjectModel businessObjectModel = getBusinessObjectModel(entity);
         doReturn(businessObjectModel).when(businessDataModelRepository).getBusinessObjectModel();
 
         //when then exception
@@ -580,20 +582,58 @@ public class BusinessDataServiceImplTest {
                 PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
-    private BusinessObjectModel getBusinessObjectModel(EntityPojo entity) {
+    private BusinessObjectModel getBusinessObjectModel(final EntityPojo entity) {
         BusinessObjectModel businessObjectModel;
         businessObjectModel = new BusinessObjectModel();
 
-        Query query = new Query("query", "content", String.class.getName());
+        final Query query = new Query("query", "content", String.class.getName());
         query.getQueryParameters().add(new QueryParameter(PARAMETER_STRING, String.class.getName()));
         query.getQueryParameters().add(new QueryParameter(PARAMETER_INTEGER, Integer.class.getName()));
         query.getQueryParameters().add(new QueryParameter(PARAMETER_LONG, Long.class.getName()));
 
-        BusinessObject businessObject = new BusinessObject();
+        final BusinessObject businessObject = new BusinessObject();
         businessObject.setQualifiedName(entity.getClass().getName());
         businessObject.setQueries(Arrays.asList(query));
         businessObjectModel.getBusinessObjects().add(businessObject);
 
         return businessObjectModel;
     }
+
+    @Test
+    public void getJsonEntities_should_serialize_entities() throws Exception {
+        final long identifier1 = 1983L;
+        final long identifier2 = 1990L;
+        final EntityPojo pojo1 = new EntityPojo(identifier1);
+        final EntityPojo pojo2 = new EntityPojo(identifier2);
+        final List<Long> identifiers = new ArrayList<>();
+        identifiers.add(identifier1);
+        identifiers.add(identifier2);
+        final List<EntityPojo> pojos = new ArrayList<>();
+        pojos.add(pojo1);
+        pojos.add(pojo2);
+        when(businessDataRepository.findByIdentifiers(EntityPojo.class, identifiers)).thenReturn(pojos);
+
+        businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        verify(jsonEntitySerializer).serializeEntity(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    @Test(expected = SBusinessDataRepositoryException.class)
+    public void getJsonEntities_should_throw_exception_if_the_serialization_fails() throws Exception {
+        final long identifier1 = 1983L;
+        final long identifier2 = 1990L;
+        final EntityPojo pojo1 = new EntityPojo(identifier1);
+        final EntityPojo pojo2 = new EntityPojo(identifier2);
+        final List<Long> identifiers = new ArrayList<>();
+        identifiers.add(identifier1);
+        identifiers.add(identifier2);
+        final List<EntityPojo> pojos = new ArrayList<>();
+        pojos.add(pojo1);
+        pojos.add(pojo2);
+        when(businessDataRepository.findByIdentifiers(EntityPojo.class, identifiers)).thenReturn(pojos);
+        when(jsonEntitySerializer.serializeEntity(pojos, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE)).thenThrow(new IOException("exception"));
+
+        businessDataService.getJsonEntities(EntityPojo.class.getName(), identifiers, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
 }

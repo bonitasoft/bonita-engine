@@ -19,11 +19,11 @@ import java.util.List;
 
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
+
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-
 
 public class JsonBusinessDataSerializerImpl implements JsonBusinessDataSerializer {
 
@@ -38,6 +38,7 @@ public class JsonBusinessDataSerializerImpl implements JsonBusinessDataSerialize
         hbm.addSerializer(serializer);
         mapper.registerModule(hbm);
     }
+
     @Override
     public String serializeEntity(final Entity entity, final String businessDataURIPattern) throws JsonGenerationException, JsonMappingException, IOException {
         serializer.setPatternURI(businessDataURIPattern);
@@ -48,8 +49,8 @@ public class JsonBusinessDataSerializerImpl implements JsonBusinessDataSerialize
     }
 
     @Override
-    public String serializeEntity(final List<Entity> entities, final String businessDataURIPattern) throws JsonGenerationException, JsonMappingException,
-            IOException {
+    public String serializeEntity(final List<? extends Entity> entities, final String businessDataURIPattern) throws JsonGenerationException,
+            JsonMappingException, IOException {
         serializer.setPatternURI(businessDataURIPattern);
         final StringWriter writer = new StringWriter();
         mapper.writeValue(writer, entities);
