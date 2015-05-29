@@ -36,12 +36,12 @@
 				<description>BPM</description>
 				<type>folder</type>
 				<childrenEntries>
-					<profileEntry name="Processes" isCustom="false">
+					<profileEntry name="Tasks" isCustom="false">
 						<parentName>BPM</parentName>
 						<index>0</index>
-						<description>All processes</description>
+						<description>All tasks</description>
 						<type>link</type>
-						<page>processlistingadmin</page>
+						<page>tasklistingadmin</page>
 					</profileEntry>
 					<profileEntry name="Cases" isCustom="false">
 						<parentName>BPM</parentName>
@@ -50,12 +50,12 @@
 						<type>link</type>
 						<page>caselistingadmin</page>
 					</profileEntry>
-					<profileEntry name="Tasks" isCustom="false">
+					<profileEntry name="Processes" isCustom="false">
 						<parentName>BPM</parentName>
 						<index>4</index>
-						<description>All tasks</description>
+						<description>All processes</description>
 						<type>link</type>
-						<page>tasklistingadmin</page>
+						<page>processlistingadmin</page>
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
