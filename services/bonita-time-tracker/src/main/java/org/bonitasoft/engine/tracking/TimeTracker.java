@@ -17,7 +17,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
-public class TimeTracker  implements TenantLifecycleService {
+public class TimeTracker implements TenantLifecycleService {
 
     private Set<String> activatedRecords;
 
@@ -37,13 +37,13 @@ public class TimeTracker  implements TenantLifecycleService {
      * NB: to avoid the synchronization, it may be a better idea to create one EventFlusher, and then the Event Flusher keep the list.
      */
     private final Queue<Record> allRecords;
-    
+
     private boolean started;
 
     private final boolean startFlushThread;
 
-    private String msgTimeTracker="";
-    
+    private String msgTimeTracker = "";
+
     public TimeTracker(
             final TechnicalLoggerService logger,
             final boolean startFlushThread,
@@ -62,8 +62,7 @@ public class TimeTracker  implements TenantLifecycleService {
             final int maxSize,
             final int flushIntervalInSeconds,
             final String... activatedRecords) {
-    		
-    		
+
         this.startFlushThread = startFlushThread;
         started = false;
         this.logger = logger;
@@ -79,7 +78,7 @@ public class TimeTracker  implements TenantLifecycleService {
                             + activatedRecords);
         }
         if (!startFlushThread)
-        		msgTimeTracker="FLUSH NOT ALLOWED TO START. Check parameter[startFlushThread] in service;";
+            msgTimeTracker = "FLUSH NOT ALLOWED TO START. Check parameter[startFlushThread] in service;";
 
         flushThread = new FlushThread(clock, flushIntervalInSeconds, this, logger);
 
@@ -108,32 +107,32 @@ public class TimeTracker  implements TenantLifecycleService {
             }
             // TODO needs a synchro?
             recordsInQueue.add(record);
-            
+
             // Evolution : keep a reference to a Flusher, and ask him. Then, the synchonisation is not needed
-            synchronized ( allRecords ) {
-            		allRecords.add(record);
-						}
+            synchronized (allRecords) {
+                allRecords.add(record);
+            }
         }
     }
 
-  
     /**
      * flush is call by only one thread, from the FlushTread class
+     * 
      * @return
      */
     public List<FlushResult> flush() {
 
-    		if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Flushing...");
         }
         final List<Record> listRecords = new ArrayList<Record>();
-        Record oneRecord =null;
+        Record oneRecord = null;
         do
         {
-        		oneRecord = recordsInQueue.poll();
-        		if (oneRecord!=null)
-        				listRecords.add( oneRecord );
-        } while (oneRecord !=null);
+            oneRecord = recordsInQueue.poll();
+            if (oneRecord != null)
+                listRecords.add(oneRecord);
+        } while (oneRecord != null);
 
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Flushing...");
@@ -142,29 +141,27 @@ public class TimeTracker  implements TenantLifecycleService {
         final List<FlushResult> flushResults = new ArrayList<FlushResult>();
 
         // build the flushEvent array from the queue
-        if ((listRecords.size()>0) && (flushEventListeners != null))
+        if ((listRecords.size() > 0) && (flushEventListeners != null))
         {
-        	final FlushEvent flushEvent = new FlushEvent(listRecords);
-         
-          
-          for (final FlushEventListener listener : flushEventListeners) {
-              try {
-                  flushResults.add(listener.flush(flushEvent));
-              } catch (final Exception e) {
-                  if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                      logger.log(getClass(), TechnicalLogSeverity.WARNING, "Exception while flushing: " + flushEvent + " on listener " + listener);
-                  }
-              }
-          }
-          
-          if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-              logger.log(getClass(), TechnicalLogSeverity.INFO, "Flush finished: " + flushEvent);
-          }
+            final FlushEvent flushEvent = new FlushEvent(listRecords);
+
+            for (final FlushEventListener listener : flushEventListeners) {
+                try {
+                    flushResults.add(listener.flush(flushEvent));
+                } catch (final Exception e) {
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                        logger.log(getClass(), TechnicalLogSeverity.WARNING, "Exception while flushing: " + flushEvent + " on listener " + listener);
+                    }
+                }
+            }
+
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Flush finished: " + flushEvent);
+            }
         }
         return flushResults;
     }
 
-    
     /**
      * get all the records.
      * Evolution ? : keep a reference to a Flusher, and ask him. Then, the synchonisation is not needed
@@ -173,13 +170,12 @@ public class TimeTracker  implements TenantLifecycleService {
         return Arrays.asList(allRecords.toArray(new Record[] {}));
     }
 
-   
-    
-    public void start()  {
+    public void start() {
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting TimeTracker..."+startFlushThread+" && "+(!flushThread.isAlive())+"] listEventListener["+ flushEventListeners.size()+"]");
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting TimeTracker..." + startFlushThread + " && " + (!flushThread.isAlive())
+                    + "] listEventListener[" + flushEventListeners.size() + "]");
         }
-        				
+
         if (startFlushThread && !flushThread.isAlive()) {
             flushThread.start();
         }
@@ -194,7 +190,7 @@ public class TimeTracker  implements TenantLifecycleService {
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Stopping TimeTracker...");
         }
-        flushThread.askStop=true;
+        flushThread.askStop = true;
         if (flushThread.isAlive()) {
             flushThread.interrupt();
         }
@@ -219,82 +215,87 @@ public class TimeTracker  implements TenantLifecycleService {
     public boolean isFlushThreadAlive() {
         return flushThread.isAlive();
     }
-    
+
     public long getFlushIntervalInSeconds()
     {
-    		return flushThread.getFlushIntervalInSeconds();
+        return flushThread.getFlushIntervalInSeconds();
     }
-    public void setFlushIntervalInSeconds( long flushIntervalInSeconds)
+
+    public void setFlushIntervalInSeconds(long flushIntervalInSeconds)
     {
-    		flushThread.setFlushIntervalInSeconds( flushIntervalInSeconds );
+        flushThread.setFlushIntervalInSeconds(flushIntervalInSeconds);
     }
-    
+
     /**
      * return null if the flush is never made
+     * 
      * @return
      */
     public Date getLastFlushExecutionTime()
     {
-    		return flushThread.getLastFlushExecutionTime();
+        return flushThread.getLastFlushExecutionTime();
     }
-    
+
     public String getFlushMsgState()
     {
-    		return msgTimeTracker
-    						+ (this.activatedRecords.size()==0 ? "NoRecordActivated;" : this.activatedRecords.size()+" events recorded;")
-    						+ ( flushThread.isAlive() ? "Flush Alive;":"Flush not started;")
-    						+ flushThread.getMsgState();
+        return msgTimeTracker
+                + (this.activatedRecords.size() == 0 ? "NoRecordActivated;" : this.activatedRecords.size() + " events recorded;")
+                + (flushThread.isAlive() ? "Flush Alive;" : "Flush not started;")
+                + flushThread.getMsgState();
     }
-    
+
     /**
      * return the list of different activated record.
      * Different string have constants, and can be found at org.bonitasoft.engine.tracking.TimeTrackerRecords
+     * 
      * @return
      * @see org.bonitasoft.engine.tracking.TimeTrackerRecords
      */
     public Set<String> getActivatedRecords()
     {
-    	return activatedRecords;
+        return activatedRecords;
     }
-    
+
     /**
-     * Set the list of different string.   
+     * Set the list of different string.
+     * 
      * @param activatedRecords
      * @see org.bonitasoft.engine.tracking.TimeTrackerRecords
-     * @see 
+     * @see
      */
-    public void setActivatedRecords(Set<String> activatedRecords )
+    public void setActivatedRecords(Set<String> activatedRecords)
     {
-    		this.activatedRecords = activatedRecords;
+        this.activatedRecords = activatedRecords;
     }
-    
+
     /**
-     * Add a new register event 
+     * Add a new register event
+     * 
      * @param flushEventListener
      */
-    public void registerListener(FlushEventListener flushEventListener )
-    { 
-    		this.flushEventListeners.add( flushEventListener );
+    public void registerListener(FlushEventListener flushEventListener)
+    {
+        this.flushEventListeners.add(flushEventListener);
     }
-    public void unRegisterListener(FlushEventListener flushEventListener )
-    { 
-    		this.flushEventListeners.remove( flushEventListener );
+
+    public void unRegisterListener(FlushEventListener flushEventListener)
+    {
+        this.flushEventListeners.remove(flushEventListener);
     }
-    
+
     public List<FlushEventListener> getListEventListener()
     {
-    		return this.flushEventListeners;
+        return this.flushEventListeners;
     }
-    
+
     public String getListEventListenerSt()
     {
-    		StringBuffer result=new StringBuffer();
-    		for (FlushEventListener eventListener : this.flushEventListeners)
-    		{
-    				result.append(eventListener.toString()+";");	
-    		}
-    		return result.toString();
+        StringBuffer result = new StringBuffer();
+        for (FlushEventListener eventListener : this.flushEventListeners)
+        {
+            result.append(eventListener.toString() + ";");
+        }
+        return result.toString();
     }
-    
-}
 
+}
