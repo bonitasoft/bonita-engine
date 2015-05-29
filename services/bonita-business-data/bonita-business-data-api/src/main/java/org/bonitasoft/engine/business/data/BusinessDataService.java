@@ -14,8 +14,12 @@
 package org.bonitasoft.engine.business.data;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Matthieu Chaffotte
+ */
 public interface BusinessDataService {
 
     Object callJavaOperation(Object businessObject, Object valueToSetObjectWith, String methodName, String parameterType)
@@ -23,14 +27,15 @@ public interface BusinessDataService {
 
     boolean isBusinessData(Object valueToSetObjectWith);
 
-    Serializable getJsonEntity(String entityClassName, Long identifier, String businessDataURIPattern) throws SBusinessDataNotFoundException,
-            SBusinessDataRepositoryException;
+    Serializable getJsonEntity(String entityClassName, Long identifier, String businessDataURIPattern)
+            throws SBusinessDataNotFoundException, SBusinessDataRepositoryException;
 
     Serializable getJsonChildEntity(String entityClassName, Long identifier, String childName, String businessDataURIPattern)
-            throws SBusinessDataNotFoundException,
-            SBusinessDataRepositoryException;
+            throws SBusinessDataNotFoundException, SBusinessDataRepositoryException;
 
-    Serializable getJsonQueryEntities(String entityClassName, String queryName, Map<String, Serializable> queryParameters, Integer startIndex, Integer maxResults, String businessDataURIPattern)
-            throws SBusinessDataRepositoryException;
+    Serializable getJsonQueryEntities(String entityClassName, String queryName, Map<String, Serializable> queryParameters, Integer startIndex,
+            Integer maxResults, String businessDataURIPattern) throws SBusinessDataRepositoryException;
+
+    Serializable getJsonEntities(String entityClassName, List<Long> identifiers, String businessDataURIPattern) throws SBusinessDataRepositoryException;
 
 }
