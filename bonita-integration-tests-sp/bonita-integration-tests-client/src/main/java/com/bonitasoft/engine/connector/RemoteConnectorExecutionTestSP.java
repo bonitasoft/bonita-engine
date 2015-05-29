@@ -1469,7 +1469,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     }
 
     private ProcessDefinitionBuilderExt buildProcessWithOuputConnector(final String actor, final Expression input1Expression,
-            final Expression defaultValueExpression, final String connectorId, final String CONNECTOR_VERSION, final String dataName)
+                                                                       final Expression defaultValueExpression, final String connectorId, final String CONNECTOR_VERSION, final String dataName)
             throws InvalidExpressionException {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(actor);
