@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.bonitasoft.engine</groupId>
     <artifactId>services</artifactId>
-    <version>6.5.3-SNAPSHOT</version>
+    <version>6.5.3.RC1</version>
   </parent>
   <artifactId>bonita-builder-sp</artifactId>
 </project>
