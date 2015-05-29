@@ -1196,6 +1196,7 @@
                 <value>bonita-html-page-example.zip</value>
                 <value>bonita-groovy-page-example.zip</value>
                 <value>api-extension-example.zip</value>
+                <value>api-extension-viewer.zip</value>
             </list>
         </property>
     </bean>
