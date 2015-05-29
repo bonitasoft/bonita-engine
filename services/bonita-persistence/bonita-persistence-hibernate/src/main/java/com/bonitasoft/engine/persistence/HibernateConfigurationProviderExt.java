@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.persistence;
 
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,9 +19,6 @@ import org.bonitasoft.engine.services.SPersistenceException;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.mapping.PersistentClass;
-import org.hibernate.mapping.RootClass;
 
 /**
  * @author Celine Souchet
@@ -32,8 +27,6 @@ import org.hibernate.mapping.RootClass;
 public class HibernateConfigurationProviderExt extends HibernateConfigurationProviderImpl {
 
     private final Map<String, String> cacheQueries;
-
-    public static final String NO_CACHE_STRATEGY = "none";
 
     public HibernateConfigurationProviderExt(final Properties properties, final Properties cacheProperties,
             final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider, final Map<String, String> interfaceToClassMapping,
@@ -69,28 +62,5 @@ public class HibernateConfigurationProviderExt extends HibernateConfigurationPro
     @Override
     public Map<String, String> getCacheQueries() {
         return cacheQueries;
-    }
-
-    @Override
-    protected Configuration buildConfiguration(final Properties properties, final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider) {
-        final Configuration configuration = super.buildConfiguration(properties, hibernateResourcesConfigurationProvider);
-        final Map<String, String> exceptions = ((HibernateResourcesConfigurationProviderExt)hibernateResourcesConfigurationProvider).getCacheConcurrencyStrategiesExceptions();
-        final String defaultCacheConcurrencyStrategy = ((HibernateResourcesConfigurationProviderExt)hibernateResourcesConfigurationProvider).getDefaultCacheConcurrencyStrategy();
-        final Iterator<PersistentClass> entities = configuration.getClassMappings();
-        while (entities.hasNext()) {
-            final PersistentClass entity = entities.next();
-            final String className = entity.getClassName();
-            if (entity instanceof RootClass) {
-                String cacheConcurrencyStrategy = defaultCacheConcurrencyStrategy;
-                if (exceptions.containsKey(className)) {
-                    cacheConcurrencyStrategy = exceptions.get(className);
-                }
-                if (!NO_CACHE_STRATEGY.equals(cacheConcurrencyStrategy)) {
-                    configuration.setCacheConcurrencyStrategy(className, cacheConcurrencyStrategy);
-                }
-            }
-        }
-
-        return configuration;
     }
 }
