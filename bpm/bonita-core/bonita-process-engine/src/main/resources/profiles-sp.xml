@@ -148,12 +148,12 @@
                 <type>link</type>
                 <page>monitoringpm</page>
             </parentProfileEntry>
-            <parentProfileEntry name="Tasks" isCustom="false">
+            <parentProfileEntry name="Processes" isCustom="false">
                 <parentName>NULL</parentName>
                 <index>2</index>
-                <description>My tasks</description>
+                <description>My processes</description>
                 <type>link</type>
-                <page>tasklistingpm</page>
+                <page>processlistingpm</page>
             </parentProfileEntry>
             <parentProfileEntry name="Cases" isCustom="false">
                 <parentName>NULL</parentName>
@@ -162,12 +162,12 @@
                 <type>link</type>
                 <page>caselistingpm</page>
             </parentProfileEntry>
-            <parentProfileEntry name="Processes" isCustom="false">
+            <parentProfileEntry name="Tasks" isCustom="false">
                 <parentName>NULL</parentName>
                 <index>6</index>
-                <description>My processes</description>
+                <description>My tasks</description>
                 <type>link</type>
-                <page>processlistingpm</page>
+                <page>tasklistingpm</page>
             </parentProfileEntry>
         </profileEntries>
     </profile>
