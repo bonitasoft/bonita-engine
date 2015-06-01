@@ -23,6 +23,8 @@
                 <include name="bonita-platform-sp.xml" />
                 <include name="bonita-platform-sp-cluster.xml" />
                 <include name="bonita-platform-sp-cluster.properties" />
+                <include name="bonita-platform-hibernate-cache.xml" />
+                <include name="bonita-tenant-hibernate-cache.xml" />
             </fileset>
         </copy>
 
@@ -36,11 +38,28 @@
         </copy>
 
         <!-- ENGINE SERVER CONF -->
+
         <copy todir="${bh.dir}/engine-server/conf/platform">
             <fileset dir="${resources.dir}">
-                <include name="bonita-platform-hibernate-cache.xml" />
-                <include name="bonita-tenant-hibernate-cache.xml" />
+                <include name="bonita-platform-sp-custom.xml"/>
             </fileset>
+        </copy>
+
+        <copy todir="${bh.dir}/engine-server/conf/tenants/template">
+            <fileset dir="${resources.dir}">
+                <include name="bonita-tenant-sp-custom.xml"/>
+            </fileset>
+        </copy>
+
+        <copy file="${resources.dir}/bonita-platform-hibernate-cache.xml" tofile="${bh.dir}/engine-server/conf/platform/bonita-platform-hibernate-cache.xml.notused"/>
+        <copy file="${resources.dir}/bonita-tenant-hibernate-cache.xml" tofile="${bh.dir}/engine-server/conf/platform/bonita-tenant-hibernate-cache.xml.notused"/>
+
+        <copy file="${resources.dir}/bonita-platform-sp.properties" tofile="${bh.dir}/engine-server/conf/platform/bonita-platform-sp-custom.properties">
+            <filterchain>
+                <filterreader classname="org.apache.tools.ant.filters.PrefixLines">
+                    <param name="prefix" value="#" />
+                </filterreader>
+            </filterchain>
         </copy>
 
         <copy file="${resources.dir}/bonita-tenant-sp.properties" tofile="${bh.dir}/engine-server/conf/tenants/template/bonita-tenant-sp-custom.properties">

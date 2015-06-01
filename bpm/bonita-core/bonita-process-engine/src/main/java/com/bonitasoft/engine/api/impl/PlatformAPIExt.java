@@ -64,12 +64,10 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.MissingServiceException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageService;
@@ -83,9 +81,6 @@ import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
-import org.bonitasoft.engine.profile.ImportPolicy;
-import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -111,7 +106,7 @@ import com.bonitasoft.engine.platform.TenantDeactivationException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 import com.bonitasoft.engine.platform.TenantUpdater;
 import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
-import com.bonitasoft.engine.profile.ProfilesImporterExt;
+import com.bonitasoft.engine.profile.DefaultProfilesUpdaterExt;
 import com.bonitasoft.engine.search.SearchTenants;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -128,8 +123,6 @@ import com.bonitasoft.manager.Features;
 public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
-
-    public static final String PROFILES_FILE_SP = "profiles-sp.xml";
 
     private final LicenseChecker checker;
 
@@ -241,9 +234,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         sessionAccessor.deleteSessionId();
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-                        // Create default profiles
-                        createDefaultProfiles(tenantServiceAccessor);
-
+                        // Create default profiles (without creating a new transaction)
+                        new DefaultProfilesUpdaterExt(platformAccessor, tenantServiceAccessor).execute(false);
                         // Create custom page examples: done by page service start
                         // Create default themes: done by theme service start
 
@@ -274,13 +266,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         final BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
         final RegisterTenantJobListeners registerTenantJobListeners = new RegisterTenantJobListeners(tenantId);
         broadcastService.execute(registerTenantJobListeners, tenantId);
-    }
-
-    @Override
-    protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
-            final org.bonitasoft.engine.service.TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
-        final PageService pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
-        new ProfilesImporterExt(profileService, identityService, pageService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
     }
 
     @Override
@@ -694,11 +679,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final IOException ioe) {
             throw new StopNodeException(ioe);
         }
-    }
-
-    @Override
-    protected String getProfileFileName() {
-        return PROFILES_FILE_SP;
     }
 
     protected PlatformService getPlatformService() {

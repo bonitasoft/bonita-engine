@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.service.impl;
 
 import java.io.File;
+import java.net.MalformedURLException;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
@@ -18,7 +19,9 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
  */
 public class URLofFileInFolderFactory extends AbstractFactoryBean<String> {
 
-    private String filePath;
+    private String primaryFilePath;
+
+    private String secondaryFilePath;
 
     private String baseFolder;
 
@@ -29,16 +32,30 @@ public class URLofFileInFolderFactory extends AbstractFactoryBean<String> {
 
     @Override
     protected String createInstance() throws Exception {
-        File file = new File(new File(baseFolder).getAbsolutePath(), filePath);
-        if (file.exists()) {
-            return file.toURI().toURL().toString();
+        final String folder = new File(baseFolder).getAbsolutePath();
+        File primaryFile = new File(folder, primaryFilePath);
+        if (primaryFile.exists()) {
+            return url(primaryFile);
         }
-        throw new IllegalStateException("The file " + filePath + " does not exists in " + baseFolder);
+        File secondaryFile = new File(folder, secondaryFilePath);
+        if (secondaryFile.exists()) {
+            return url(secondaryFile);
+        }
+        throw new IllegalStateException("Neither primary file '" + primaryFilePath + "', neither secondary file '" + secondaryFilePath +  "' exists in folder '" + folder + "'");
 
     }
 
-    public void setFilePath(final String filePath) {
-        this.filePath = filePath;
+    private String url(final File file) throws MalformedURLException {
+        return file.toURI().toURL().toString();
+    }
+
+    public void setPrimaryFilePath(final String primaryFilePath) {
+        this.primaryFilePath = primaryFilePath;
+
+    }
+
+    public void setSecondaryFilePath(final String secondaryFilePath) {
+        this.secondaryFilePath = secondaryFilePath;
 
     }
 
