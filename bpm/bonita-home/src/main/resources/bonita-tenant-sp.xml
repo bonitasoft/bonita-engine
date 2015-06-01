@@ -220,6 +220,8 @@
                 <entry key="APPLICATION_MENU_CREATED:INTERNAL" value="${bonita.tenant.queriable.log.APPLICATION_MENU_CREATED.INTERNAL:true}" />
                 <entry key="APPLICATION_MENU_DELETED:INTERNAL" value="${bonita.tenant.queriable.log.APPLICATION_MENU_DELETED.INTERNAL:true}" />
                 <entry key="APPLICATION_MENU_UPDATED:INTERNAL" value="${bonita.tenant.queriable.log.APPLICATION_MENU_UPDATED.INTERNAL:true}" />
+                <entry key="BREAKPOINT_CREATED:INTERNAL" value="${bonita.tenant.queriable.log.BREAKPOINT_CREATED.INTERNAL:true}" />
+                <entry key="BREAKPOINT_DELETED:INTERNAL" value="${bonita.tenant.queriable.log.BREAKPOINT_DELETED.INTERNAL:true}" />
                 <entry key="CATEGORY_CREATED:INTERNAL" value="${bonita.tenant.queriable.log.CATEGORY_CREATED.INTERNAL:true}" />
                 <entry key="CATEGORY_DELETED:INTERNAL" value="${bonita.tenant.queriable.log.CATEGORY_DELETED.INTERNAL:true}" />
                 <entry key="CATEGORY_UPDATED:INTERNAL" value="${bonita.tenant.queriable.log.CATEGORY_UPDATED.INTERNAL:true}" />
