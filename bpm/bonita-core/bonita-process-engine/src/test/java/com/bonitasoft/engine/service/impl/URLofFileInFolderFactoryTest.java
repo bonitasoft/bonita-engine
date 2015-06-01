@@ -24,7 +24,7 @@ public class URLofFileInFolderFactoryTest {
         FileWriter fileWriter = new FileWriter(tempFile);
         fileWriter.write("test");
         fileWriter.close();
-        URLofFileInFolderFactory factory = createFactory("", tempFile.getName());
+        URLofFileInFolderFactory factory = createFactory("", tempFile.getName(), null);
 
         // when
         String url = factory.createInstance();
@@ -35,10 +35,10 @@ public class URLofFileInFolderFactoryTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void should_create_instance_with__unexisting_file_throw_exception() throws Exception {
+    public void should_create_instance_with__unexisting_files_throw_exception() throws Exception {
         // given
         File currentDir = new File("");
-        URLofFileInFolderFactory factory = createFactory(currentDir.getAbsolutePath(), "testtttttt");
+        URLofFileInFolderFactory factory = createFactory(currentDir.getAbsolutePath(), "testtttttt", "ttt");
 
         // when
         factory.createInstance();
@@ -48,7 +48,7 @@ public class URLofFileInFolderFactoryTest {
     public void should_create_instance_with_file_return_url() throws Exception {
         // given
         File tempFile = File.createTempFile("prefix", ".tmp");
-        URLofFileInFolderFactory factory = createFactory(tempFile.getParentFile().getAbsolutePath(), tempFile.getName());
+        URLofFileInFolderFactory factory = createFactory(tempFile.getParentFile().getAbsolutePath(), tempFile.getName(), null);
 
         // when
         String url = factory.createInstance();
@@ -58,10 +58,25 @@ public class URLofFileInFolderFactoryTest {
         assertThat(url).isEqualTo(tempFile.toURI().toURL().toString());
     }
 
-    private URLofFileInFolderFactory createFactory(final String baseFolder, final String filePath) {
+    @Test
+    public void should_create_instance_with_file_wrong_primary_is_using_secondary() throws Exception {
+        // given
+        File tempFile = File.createTempFile("prefix", ".tmp");
+        URLofFileInFolderFactory factory = createFactory(tempFile.getParentFile().getAbsolutePath(), "tjknt", tempFile.getName());
+
+        // when
+        String url = factory.createInstance();
+
+        tempFile.delete();
+        // then
+        assertThat(url).isEqualTo(tempFile.toURI().toURL().toString());
+    }
+
+    private URLofFileInFolderFactory createFactory(final String baseFolder, final String primaryFilePath, final String secondaryFilePath) {
         URLofFileInFolderFactory factory = new URLofFileInFolderFactory();
         factory.setBaseFolder(baseFolder);
-        factory.setFilePath(filePath);
+        factory.setPrimaryFilePath(primaryFilePath);
+        factory.setSecondaryFilePath(secondaryFilePath);
         return factory;
     }
 }

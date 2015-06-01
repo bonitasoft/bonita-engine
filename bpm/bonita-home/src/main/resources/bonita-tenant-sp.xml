@@ -71,28 +71,27 @@
         <constructor-arg name="transitionEvaluator" ref="transitionEvaluator" />
         <constructor-arg name="contractDataService" ref="contractDataService" />
     </bean>
-    <!--
-        <bean id="casAuthenticatorDelegate"
-              class="com.bonitasoft.engine.authentication.impl.cas.CASAuthenticatorImpl" lazy-init="true">
-            <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-            <property name="casServerUrlPrefix"
-                      value="${authentication.delegate.cas.server.url.prefix:http://cas.internal.bonitasoft.com/}" />
-            <property name="casService"
-                      value="${authentication.delegate.cas.service.url:http://internal.bonitasoft.com/bonita/loginservice}" />
-        </bean>
 
-        <bean id="nullAuthenticationDelegate"
-              class="com.bonitasoft.engine.authentication.impl.NullAuthenticationDelegate"  lazy-init="true"/>
+    <bean id="casAuthenticatorDelegate" class="com.bonitasoft.engine.authentication.impl.cas.CASAuthenticatorImpl" lazy-init="true">
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <property name="casServerUrlPrefix" value="${authentication.delegate.cas.server.url.prefix:http://cas.internal.bonitasoft.com/}" />
+        <property name="casService" value="${authentication.delegate.cas.service.url:http://internal.bonitasoft.com/bonita/loginservice}" />
+    </bean>
 
-        <bean id="authenticationService"
-              class="com.bonitasoft.engine.authentication.impl.JAASGenericAuthenticationServiceImpl" lazy-init="true">
-            <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-            <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-            <property name="authenticatorDelegate"
-                      ref="${authenticator.delegate:nullAuthenticationDelegate}" />
-        </bean>
-    -->
-    <bean id="defaultCommands" parent="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
+    <bean id="nullAuthenticationDelegate" class="com.bonitasoft.engine.authentication.impl.NullAuthenticationDelegate"  lazy-init="true"/>
+
+    <bean id="jaasAuthenticationService" class="com.bonitasoft.engine.authentication.impl.JAASGenericAuthenticationServiceImpl" lazy-init="true">
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <property name="authenticatorDelegate" ref="${authenticator.delegate:nullAuthenticationDelegate}" />
+    </bean>
+
+    <bean id="noAuthenticationService" class="com.bonitasoft.engine.authentication.impl.NoAuthenticationServiceImpl" lazy-init="true">
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="identityService" ref="identityService" />
+    </bean>
+
+    <bean id="spCommands" parent="communityDefaultCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
         <property name="sourceList">
             <list merge="true">
                 <ref bean="executeActionsAndTerminateExt" />
@@ -100,6 +99,13 @@
                 <ref bean="addBreakpointCommand" />
                 <ref bean="removeBreakpointCommand" />
                 <ref bean="getBreakpointsCommand" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="commandsToDeployAtStartup" parent="spCommands" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list merge="true">
             </list>
         </property>
     </bean>

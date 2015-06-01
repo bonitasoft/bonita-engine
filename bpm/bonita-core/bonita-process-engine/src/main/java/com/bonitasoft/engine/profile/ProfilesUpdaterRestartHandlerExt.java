@@ -11,14 +11,10 @@
 
 package com.bonitasoft.engine.profile;
 
-import java.util.List;
-
-import org.bonitasoft.engine.profile.ProfilesImporter;
+import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
 import org.bonitasoft.engine.profile.ProfilesUpdaterRestartHandler;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-
-import com.bonitasoft.engine.api.impl.PlatformAPIExt;
 
 /**
  * @author Baptiste Mesta
@@ -26,14 +22,8 @@ import com.bonitasoft.engine.api.impl.PlatformAPIExt;
 public class ProfilesUpdaterRestartHandlerExt extends ProfilesUpdaterRestartHandler {
 
     @Override
-    protected String getProfilesFileName() {
-        return PlatformAPIExt.PROFILES_FILE_SP;
-    }
-
-    @Override
-    protected ProfilesImporter createProfilesImporter(TenantServiceAccessor tenantServiceAccessor, List<ExportedProfile> profilesFromXML) {
-        return new ProfilesImporterExt(tenantServiceAccessor.getProfileService(), tenantServiceAccessor
-                .getIdentityService(), ((com.bonitasoft.engine.service.TenantServiceAccessor) tenantServiceAccessor).getPageService(), profilesFromXML,
-                org.bonitasoft.engine.profile.ImportPolicy.UPDATE_DEFAULTS);
+    protected DefaultProfilesUpdater getProfileUpdater(final PlatformServiceAccessor platformServiceAccessor, 
+            final TenantServiceAccessor tenantServiceAccessor) {
+        return new DefaultProfilesUpdaterExt(platformServiceAccessor, tenantServiceAccessor);
     }
 }
