@@ -4,7 +4,6 @@ DROP TABLE actormember;
 DROP TABLE actor;
 DROP TABLE processcategorymapping;
 DROP TABLE category;
-DROP TABLE migration_plan;
 DROP TABLE arch_process_comment;
 DROP TABLE process_comment;
 DROP TABLE process_definition;

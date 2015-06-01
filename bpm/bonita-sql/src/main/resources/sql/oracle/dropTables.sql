@@ -4,7 +4,6 @@ DROP TABLE actormember cascade constraints purge;
 DROP TABLE actor cascade constraints purge;
 DROP TABLE processcategorymapping cascade constraints purge;
 DROP TABLE category cascade constraints purge;
-DROP TABLE migration_plan cascade constraints purge;
 DROP TABLE arch_process_comment cascade constraints purge;
 DROP TABLE process_comment cascade constraints purge;
 DROP TABLE process_definition cascade constraints purge;

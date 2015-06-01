@@ -10,8 +10,6 @@ DROP TABLE processcategorymapping
 GO
 DROP TABLE category
 GO
-DROP TABLE migration_plan
-GO
 DROP TABLE arch_process_comment
 GO
 DROP TABLE process_comment

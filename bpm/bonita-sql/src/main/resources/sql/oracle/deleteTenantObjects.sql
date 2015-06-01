@@ -4,7 +4,6 @@ DELETE FROM actormember WHERE tenantid = ${tenantid};
 DELETE FROM actor WHERE tenantid = ${tenantid};
 DELETE FROM processcategorymapping WHERE tenantid = ${tenantid};
 DELETE FROM category WHERE tenantid = ${tenantid};
-DELETE FROM migration_plan WHERE tenantid = ${tenantid};
 DELETE FROM arch_process_comment WHERE tenantid = ${tenantid};
 DELETE FROM process_comment WHERE tenantid = ${tenantid};
 DELETE FROM process_definition WHERE tenantid = ${tenantid};

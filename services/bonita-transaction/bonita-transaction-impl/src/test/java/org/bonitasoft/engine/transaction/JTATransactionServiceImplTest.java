@@ -13,16 +13,8 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.Callable;
 
@@ -36,16 +28,21 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.transaction.MyTransactionManager.MyTransaction;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
-
+@RunWith(MockitoJUnitRunner.class)
 public class JTATransactionServiceImplTest {
+
+    @Mock
+    TechnicalLoggerService logger;
+    @Mock
+    TransactionManager txManager;
 
     @Test
     public void beginTransaction() throws Exception {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        TransactionManager txManager = mock(TransactionManager.class);
-
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_ACTIVE);
         when(txManager.getTransaction()).thenReturn(mock(Transaction.class));
 
@@ -56,11 +53,8 @@ public class JTATransactionServiceImplTest {
         assertEquals(1, txService.getNumberOfActiveTransactions());
     }
 
-    @Test(expected=STransactionCreationException.class)
+    @Test(expected = STransactionCreationException.class)
     public void doNotSupportNestedCalls() throws Exception {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        TransactionManager txManager = mock(TransactionManager.class);
-
         when(txManager.getStatus()).thenReturn(Status.STATUS_ACTIVE);
         when(txManager.getTransaction()).thenReturn(mock(Transaction.class));
 
@@ -72,9 +66,6 @@ public class JTATransactionServiceImplTest {
 
     @Test
     public void beginTransactionFailed() throws Exception {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        TransactionManager txManager = mock(TransactionManager.class);
-
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION);
         doThrow(new SystemException("Mocked")).when(txManager).begin();
 
@@ -91,9 +82,8 @@ public class JTATransactionServiceImplTest {
 
     @Test
     public void numberOfActiveTransactionsWhenCompleteFailed() throws Exception {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-
         MyTransactionManager.MyTransaction transaction = new MyTransactionManager.MyTransaction() {
+
             @Override
             public int internalCommit() throws SystemException {
                 throw new SystemException("Mocked");
@@ -114,13 +104,10 @@ public class JTATransactionServiceImplTest {
         }
     }
 
-
     @Test
     public void beginTransactionEventFailed() throws Exception {
         // We want to ensure that when an exception was thrown after the transaction's begin then
         // we close the open transaction to be in a consistent state.
-
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         when(logger.isLoggable(JTATransactionServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
 
         TransactionManager txManager = mock(TransactionManager.class);
@@ -140,8 +127,6 @@ public class JTATransactionServiceImplTest {
 
     @Test
     public void setRollbackOnly() throws Exception {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        TransactionManager txManager = mock(TransactionManager.class);
 
         JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager);
 
@@ -151,13 +136,11 @@ public class JTATransactionServiceImplTest {
 
     /**
      * The method call has to be executed between a transaction.
+     *
      * @throws Exception
      */
     @Test
     public void testExecuteInTransactionWithCommit() throws Exception {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        TransactionManager txManager = mock(TransactionManager.class);
-
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_ACTIVE);
         when(txManager.getTransaction()).thenReturn(mock(Transaction.class));
 
@@ -173,13 +156,11 @@ public class JTATransactionServiceImplTest {
 
     /**
      * The method call has to be executed between a transaction.
+     *
      * @throws Exception
      */
     @Test
     public void testExecuteInTransactionWithRollback() throws Exception {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        TransactionManager txManager = mock(TransactionManager.class);
-
         // First to allow to start the transaction, then to force to call rollback
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_MARKED_ROLLBACK);
         when(txManager.getTransaction()).thenReturn(mock(Transaction.class));
@@ -202,7 +183,6 @@ public class JTATransactionServiceImplTest {
 
     @Test
     public void testTransactionSynchronizationInManagedTransaction() throws Exception {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         Transaction transaction = mock(MyTransaction.class);
         TransactionManager txManager = new MyTransactionManager(transaction);
 
@@ -220,7 +200,6 @@ public class JTATransactionServiceImplTest {
 
     @Test
     public void testTransactionSynchronizationInNotManagedTransaction() throws Exception {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         Transaction transaction = mock(MyTransaction.class);
         TransactionManager txManager = new MyTransactionManager(transaction);
 
@@ -241,7 +220,6 @@ public class JTATransactionServiceImplTest {
         verify(transaction, times(2)).registerSynchronization(Mockito.any(Synchronization.class));
     }
 
-
     private class MyBeforeCommitCallable implements Callable<Void> {
 
         private boolean called = false;
@@ -260,7 +238,6 @@ public class JTATransactionServiceImplTest {
 
     @Test
     public void testBeforeCommitCallablesAreExecutedWhileCommit() throws Exception {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         Transaction transaction = new MyTransaction();
         TransactionManager txManager = new MyTransactionManager(transaction);
 
@@ -280,7 +257,6 @@ public class JTATransactionServiceImplTest {
 
     @Test
     public void testBeforeCommitCallablesAreNotExecutedWhileMarkedAsRollback() throws Exception {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         Transaction transaction = new MyTransaction();
         TransactionManager txManager = new MyTransactionManager(transaction);
 
@@ -300,4 +276,55 @@ public class JTATransactionServiceImplTest {
         assertFalse(callable.isCalled());
     }
 
+    @Test(expected = STransactionException.class)
+    public void completeShouldDecrementCounterIfSystemExceptionOccurs() throws Exception {
+        doReturn(Status.STATUS_PREPARED).when(txManager).getStatus();
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager));
+        doThrow(SystemException.class).when(txService).commit();
+
+        try {
+            txService.complete();
+        } finally {
+            verify(txService).resetTxCounter(any(JTATransactionServiceImpl.TransactionServiceContext.class));
+        }
+    }
+
+    @Test(expected = STransactionException.class)
+    public void completeShouldDecrementCounterIfTransactionExceptionOccurs() throws Exception {
+        doReturn(Status.STATUS_PREPARED).when(txManager).getStatus();
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager));
+        doThrow(STransactionCommitException.class).when(txService).commit();
+
+        try {
+            txService.complete();
+        } finally {
+            verify(txService).resetTxCounter(any(JTATransactionServiceImpl.TransactionServiceContext.class));
+        }
+    }
+
+    @Test(expected = STransactionCreationException.class)
+    public void beginShouldResetCounterIfTransactionCreationExceptionOccurs() throws Exception {
+        doReturn(Status.STATUS_PREPARED).when(txManager).getStatus();
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager));
+        doThrow(STransactionCreationException.class).when(txService).createTransaction(anyBoolean());
+
+        try {
+            txService.begin();
+        } finally {
+            verify(txService).resetTxCounter(any(JTATransactionServiceImpl.TransactionServiceContext.class));
+        }
+    }
+
+    @Test(expected = STransactionCreationException.class)
+    public void beginShouldResetCounterIfSystemExceptionOccurs() throws Exception {
+        doReturn(Status.STATUS_PREPARED).when(txManager).getStatus();
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager));
+        doThrow(SystemException.class).when(txService).createTransaction(anyBoolean());
+
+        try {
+            txService.begin();
+        } finally {
+            verify(txService).resetTxCounter(any(JTATransactionServiceImpl.TransactionServiceContext.class));
+        }
+    }
 }
