@@ -13,13 +13,13 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.expression;
 
-import org.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerLazyLoader;
-import org.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
-import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.business.data.BusinessDataRepository;
-
 import java.io.Serializable;
 import java.util.Collection;
+
+import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.business.data.BusinessDataRepository;
+import org.bonitasoft.engine.business.data.proxy.ServerLazyLoader;
+import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 
 
 /**
@@ -46,9 +46,7 @@ public class EntityMerger {
                     newCollection.add(proxyfier.proxify((Entity) item));
                 }
                 return (Serializable) newCollection;
-            } catch (final InstantiationException e) {
-                throw new IllegalStateException(e);
-            } catch (final IllegalAccessException e) {
+            } catch (final InstantiationException | IllegalAccessException e) {
                 throw new IllegalStateException(e);
             }
         } else if (isAnEntity(value)) {

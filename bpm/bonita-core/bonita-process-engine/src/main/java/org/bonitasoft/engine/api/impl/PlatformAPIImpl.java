@@ -13,11 +13,13 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
@@ -42,7 +44,6 @@ import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -51,11 +52,9 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -74,13 +73,16 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
-import org.bonitasoft.engine.profile.ImportPolicy;
-import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.ProfilesImporter;
-import org.bonitasoft.engine.profile.impl.ExportedProfile;
+import org.bonitasoft.engine.profile.DefaultProfilesUpdater;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
+import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
+import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
+import org.bonitasoft.engine.scheduler.model.SJobParameter;
+import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -103,8 +105,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
 public class PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
-
-    public static final String PROFILES_FILE = "profiles.xml";
 
     private static boolean isNodeStarted = false;
 
@@ -224,8 +224,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                 checkPlatformVersion(platformAccessor);
                 final List<STenant> tenants = getTenants(platformAccessor);
                 startPlatformServices(platformAccessor);
-                boolean mustRestartElements;
-                if (mustRestartElements = !isNodeStarted()) {
+                final boolean mustRestartElements = !isNodeStarted();
+                if (mustRestartElements) {
                     // restart handlers of tenant are executed before any service start
                     beforeServicesStartOfRestartHandlersOfTenant(platformAccessor, sessionAccessor, tenants);
                 }
@@ -238,9 +238,9 @@ public class PlatformAPIImpl implements PlatformAPI {
                 if (mustRestartElements) {
                     afterServicesStartOfRestartHandlersOfTenant(platformAccessor, sessionAccessor, tenants);
                 }
-            } catch (final SClassLoaderException e) {
-                throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
-            } catch (final SDependencyException e) {
+                registerMissingTenantsDefaultJobs(platformAccessor, sessionAccessor, tenants);
+
+            } catch (final SClassLoaderException | SDependencyException e) {
                 throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
             } catch (final StartNodeException sne) {
                 throw sne;
@@ -260,6 +260,69 @@ public class PlatformAPIImpl implements PlatformAPI {
             }
             throw e;
         }
+    }
+
+    /**
+     * Registers missing default jobs (if any) for the provided tenants
+     * @param platformAccessor
+     * @param sessionAccessor
+     * @param tenants
+     * @throws BonitaHomeNotSetException
+     * @throws BonitaHomeConfigurationException
+     * @throws NoSuchMethodException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws SBonitaException
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
+    protected void registerMissingTenantsDefaultJobs(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor, final List<STenant> tenants) throws BonitaHomeNotSetException, BonitaHomeConfigurationException, NoSuchMethodException,
+            InstantiationException, IllegalAccessException, InvocationTargetException, SBonitaException, IOException, ClassNotFoundException {
+        final TransactionService transactionService = platformAccessor.getTransactionService();
+        for (final STenant tenant : tenants) {
+            long platformSessionId = -1;
+            try {
+                final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenant.getId());
+
+                final long sessionId = createSession(tenant.getId(), tenantServiceAccessor.getSessionService());
+                platformSessionId = sessionAccessor.getSessionId();
+                sessionAccessor.deleteSessionId();
+                sessionAccessor.setSessionInfo(sessionId, tenant.getId());
+
+                final SchedulerService schedulerService = tenantServiceAccessor.getSchedulerService();
+                final TenantConfiguration tenantConfiguration = tenantServiceAccessor.getTenantConfiguration();
+                final List<JobRegister> defaultJobs = tenantConfiguration.getJobsToRegister();
+
+                // Only register missing default jobs if they are missing
+                transactionService.begin();
+                final List<String> scheduledJobNames = schedulerService.getJobs();
+                try {
+                    for (final JobRegister defaultJob : defaultJobs) {
+                        if (!scheduledJobNames.contains(defaultJob.getJobName())) {
+                            registerJob(schedulerService, defaultJob);
+                        }
+                    }
+                }
+                finally {
+                    transactionService.complete();
+                }
+            }
+            finally {
+                cleanSessionAccessor(sessionAccessor, platformSessionId);
+            }
+        }
+    }
+
+    protected void registerJob(final SchedulerService schedulerService, final JobRegister jobRegister) throws SSchedulerException {
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                .createNewInstance(jobRegister.getJobClass().getName(), jobRegister.getJobName(), true).done();
+        final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
+        for (final Entry<String, Serializable> entry : jobRegister.getJobParameters().entrySet()) {
+            jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance(entry.getKey(), entry.getValue()).done());
+        }
+        final Trigger trigger = jobRegister.getTrigger();
+        schedulerService.schedule(jobDescriptor, jobParameters, trigger);
     }
 
     SessionAccessor createSessionAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException, ClassNotFoundException,
@@ -339,7 +402,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void startScheduler(final PlatformServiceAccessor platformAccessor, final List<STenant> tenants) throws SBonitaException,
+    void startScheduler(final PlatformServiceAccessor platformAccessor, final List<STenant> tenants) throws SBonitaException,
             BonitaHomeNotSetException, BonitaHomeConfigurationException, IOException, NoSuchMethodException, InstantiationException, IllegalAccessException,
             InvocationTargetException {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
@@ -618,7 +681,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             final TransactionService transactionService) throws STenantCreationException {
         final String tenantName = "default";
         final String description = "Default tenant";
-        String userName = "";
+        String userName;
         SessionAccessor sessionAccessor = null;
         long platformSessionId = -1;
         Long tenantId = -1L;
@@ -640,7 +703,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             try {
                 // Get user name
-                userName = getUserName(tenant, tenantId);
+                userName = getUserName(tenantId);
             } catch (Exception e) {
                 transactionService.complete();
                 throw new STenantCreationException(e);
@@ -648,16 +711,15 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             // Create session
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final SessionService sessionService = platformAccessor.getTenantServiceAccessor(tenantId).getSessionService();
+            final SessionService sessionService = tenantServiceAccessor.getSessionService();
             sessionAccessor = createSessionAccessor();
             final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
 
-            // Create default profiles
-            createDefaultProfiles(tenantServiceAccessor);
-
+            // Create default profiles: they will be updated by the tenant profile update handler in a separate thread but we create them here synchronously
+            new DefaultProfilesUpdater(platformAccessor, tenantServiceAccessor).execute(false);
             // Create custom page examples: done by page service start
             // Create default themes: done by theme service start
 
@@ -678,10 +740,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private String getUserName(final STenant tenant, final Long tenantId) throws IOException, BonitaHomeNotSetException {
-        return getUserName(tenantId);
-    }
-
     private void createTenantFolderInBonitaHome(final long tenantId) throws STenantCreationException {
         final BonitaHomeServer home = BonitaHomeServer.getInstance();
         try {
@@ -689,21 +747,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (Exception e) {
             throw new STenantCreationException("Exception while creating tenant folder");
         }
-    }
-
-    protected void createDefaultProfiles(final TenantServiceAccessor tenantServiceAccessor) throws Exception {
-        File file = ProfilesImporter.getFileContainingMD5(tenantServiceAccessor);
-        String fileContent = IOUtil.readResource(getProfileFileName());
-        List<ExportedProfile> profilesFromXML = ProfilesImporter.getProfilesFromXML(fileContent, tenantServiceAccessor.getProfileParser());
-        importProfiles(tenantServiceAccessor.getProfileService(), tenantServiceAccessor.getIdentityService(), profilesFromXML, tenantServiceAccessor);
-        IOUtil.writeMD5(file, fileContent.getBytes());
-    }
-
-    protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
-            final TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
-        ProfilesImporter profilesImporter = new ProfilesImporter(tenantServiceAccessor.getProfileService(), tenantServiceAccessor.getIdentityService(),
-                profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES);
-        profilesImporter.importProfiles(-1);
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {
@@ -892,11 +935,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     @AvailableOnStoppedNode
     public boolean isNodeStarted() {
         return isNodeStarted;
-    }
-
-    // Overrided in SP
-    protected String getProfileFileName() {
-        return PROFILES_FILE;
     }
 
     @Override

@@ -46,6 +46,7 @@ import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
+import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
 import org.bonitasoft.engine.commons.TypeConverterUtil;
@@ -127,16 +128,16 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     private Object callJavaOperationOnEntity(final Entity businessObject, final Object valueToSetObjectWith, final String methodName, final String parameterType)
             throws SBusinessDataRepositoryException, SBusinessDataNotFoundException {
 
-        final Entity jpaEntity;
-        if (businessObject.getPersistenceId() == null) {
-            jpaEntity = copyForServer(businessObject);
-        } else {
+        Entity jpaEntity = businessObject;
+        if (businessObject.getPersistenceId() != null) {
             jpaEntity = businessDataRepository.findById(businessObject.getClass(), businessObject.getPersistenceId());
         }
+
         final Object valueToSet = loadValueToSet(businessObject, valueToSetObjectWith, methodName);
         try {
             invokeJavaMethod(jpaEntity, methodName, parameterType, valueToSet);
-            return copyForClient(jpaEntity);
+            // TODO Auto-generated method stub
+            return jpaEntity;
         } catch (final Exception e) {
             throw new SBusinessDataRepositoryException(e);
         }
@@ -147,11 +148,6 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         final JavaMethodInvoker methodInvoker = new JavaMethodInvoker();
         methodInvoker.invokeJavaMethod(parameterType, valueToSet, objectToSet, methodName, parameterType);
-    }
-
-    private Object copyForClient(final Entity jpaEntity) {
-        // TODO Auto-generated method stub
-        return jpaEntity;
     }
 
     @SuppressWarnings("unchecked")
@@ -172,7 +168,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private List<Long> getPrimaryKeys(final List<Entity> entities) throws SBusinessDataNotFoundException {
         List<Long> primaryKeys;
-        primaryKeys = new ArrayList<Long>();
+        primaryKeys = new ArrayList<>();
         for (final Entity entity : entities) {
             if (entity.getPersistenceId() == null) {
                 throw new SBusinessDataNotFoundException("persistenceId of business data is null");
@@ -187,26 +183,18 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             return new ArrayList<Entity>();
         }
         if (Type.AGGREGATION.equals(type)) {
-            return businessDataRepository.findByIds(entities.get(0).getClass(), getPrimaryKeys(entities));
+            return businessDataRepository.findByIds(ServerProxyfier.getRealClass(entities.get(0)), getPrimaryKeys(entities));
         } else {
-            return copyForServer(entities);
+            return entities;
         }
     }
 
     private Entity getPersistedValue(final Entity entity, final Type type) throws SBusinessDataNotFoundException {
         if (Type.AGGREGATION.equals(type)) {
-            return businessDataRepository.findById(entity.getClass(), entity.getPersistenceId());
+            return businessDataRepository.findById(ServerProxyfier.getRealClass(entity), entity.getPersistenceId());
         } else {
-            return copyForServer(entity);
+            return entity;
         }
-    }
-
-    private List<Entity> copyForServer(final List<Entity> entities) {
-        return entities;
-    }
-
-    private Entity copyForServer(final Entity entity) {
-        return entity;
     }
 
     private Type getRelationType(final Entity businessObject, final String methodName) throws SBusinessDataRepositoryException {
@@ -308,8 +296,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             final Class<?> type = (Class<?>) ((ParameterizedType) getterReturnType).getActualTypeArguments()[0];
             if (Entity.class.isAssignableFrom(type)) {
                 return buildJsonRepresentation((List<Entity>) childEntity, businessDataURIPattern);
+                }
             }
-        }
         return null;
     }
 
@@ -324,7 +312,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
                 getQueryParameters(queryDefinition, parameters), startIndex,
                 maxResults);
         return buildJsonRepresentation((List<Entity>) list, businessDataURIPattern);
-    }
+        }
 
     private Class<? extends Serializable> getQueryReturnType(final Query queryDefinition, final String entityClassName) throws SBusinessDataRepositoryException {
         final String returnType = queryDefinition.getReturnType();

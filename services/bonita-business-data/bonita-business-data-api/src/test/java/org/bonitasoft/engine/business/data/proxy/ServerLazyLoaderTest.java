@@ -11,9 +11,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.transaction.expression.bdm;
 
-import static org.mockito.Mockito.*;
+package org.bonitasoft.engine.business.data.proxy;
+
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -22,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
 import org.junit.Before;
@@ -50,7 +53,7 @@ public class ServerLazyLoaderTest {
         }
 
         public List<Addresses> getAddresses() {
-            return new ArrayList<Addresses>();
+            return new ArrayList<>();
         }
 
         public String getName() {
@@ -58,9 +61,6 @@ public class ServerLazyLoaderTest {
         }
 
     }
-
-    @Mock
-    private CommandAPI commandAPI;
 
     @Mock
     private BusinessDataRepository businessDataRepository;
@@ -87,7 +87,7 @@ public class ServerLazyLoaderTest {
 
         final String queryName = "Addresses.findAddressesByEmployeePersistenceId";
         final Class<? extends Serializable> resultClass = Addresses.class;
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("persistenceId", persistenceId);
         final int startIndex = 0;
         final int maxResults = Integer.MAX_VALUE;
@@ -103,7 +103,7 @@ public class ServerLazyLoaderTest {
         //given
         final String queryName = "String.findNameByEmployeePersistenceId";
         final Class<? extends Serializable> resultClass = String.class;
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("persistenceId", persistenceId);
         final int startIndex = 0;
         final int maxResults = Integer.MAX_VALUE;
@@ -122,7 +122,7 @@ public class ServerLazyLoaderTest {
     public void should_load_single_object_throw_exception() throws Exception {
         final String queryName = "String.findNameByEmployeePersistenceId";
         final Class<? extends Serializable> resultClass = String.class;
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         parameters.put("persistenceId", persistenceId);
         final Method method = employee.getClass().getMethod("getName");
 
