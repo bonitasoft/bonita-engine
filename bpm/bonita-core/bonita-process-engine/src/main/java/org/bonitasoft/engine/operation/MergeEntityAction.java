@@ -16,9 +16,9 @@ package org.bonitasoft.engine.operation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
+import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 
 /**
  * @author Elias Ricken de Medeiros

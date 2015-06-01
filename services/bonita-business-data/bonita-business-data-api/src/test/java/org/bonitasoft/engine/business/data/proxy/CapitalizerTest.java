@@ -11,14 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.transaction.expression.bdm.internal;
 
-public class Capitalizer {
+package org.bonitasoft.engine.business.data.proxy;
 
-	public static String capitalize(final String str) {
-		if (str == null || str.isEmpty()) {
-			return str;
-		}
-		return Character.toUpperCase(str.charAt(0)) + str.substring(1);
-	}
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.Test;
+
+public class CapitalizerTest {
+
+    @Test
+    public void testCapitalizer() throws Exception {
+        assertThat(Capitalizer.capitalize("name")).isEqualTo("Name");
+    }
+
+    @Test
+    public void capitalizer_null_value() throws Exception {
+        assertThat(Capitalizer.capitalize(null)).isEqualTo(null);
+    }
+
+    @Test
+    public void capitalizer_empty_value() throws Exception {
+        assertThat(Capitalizer.capitalize("")).isEqualTo("");
+    }
 }

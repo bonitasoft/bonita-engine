@@ -19,11 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerLazyLoader;
-import org.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.bonitasoft.engine.business.data.NonUniqueResultException;
+import org.bonitasoft.engine.business.data.proxy.ServerLazyLoader;
+import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -45,7 +45,7 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
             final ContainerState containerState) throws SExpressionEvaluationException {
         final String queryName = expression.getContent();
         final String returnType = expression.getReturnType();
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        final Map<String, Serializable> parameters = new HashMap<>();
         for (final SExpression dependency : expression.getDependencies()) {
             parameters.put(dependency.getName(), (Serializable) resolvedExpressions.get(dependency.getDiscriminant()));
         }
@@ -64,7 +64,7 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
                                 getStartIndexParameter(expression.getDependencies(), resolvedExpressions, expression.getName(), parameters),
                                 getMaxResultParameter(expression.getDependencies(), resolvedExpressions, expression.getName(), parameters));
                 
-                List<Entity> e = new ArrayList<Entity>();
+                List<Entity> e = new ArrayList<>();
                 for (Entity entity : entities) {
                     ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
                     Entity proxify = proxyfier.proxify(entity);
@@ -119,7 +119,7 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionEvaluationException {
-        final List<Object> list = new ArrayList<Object>(expressions.size());
+        final List<Object> list = new ArrayList<>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(evaluate(expression, context, resolvedExpressions, containerState));
         }

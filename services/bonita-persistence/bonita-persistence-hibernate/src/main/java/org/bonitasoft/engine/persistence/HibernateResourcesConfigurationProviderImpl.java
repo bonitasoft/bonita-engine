@@ -45,13 +45,13 @@ public class HibernateResourcesConfigurationProviderImpl implements HibernateRes
     }
 
     @Override
-    public Set<String> getResources() {
-        return resources;
+    public Map<String, String> getCacheConcurrencyStrategies() {
+        return null;
     }
 
     @Override
-    public Map<String, String> getCacheConcurrencyStrategies() {
-        return null;
+    public Set<String> getResources() {
+        return resources;
     }
 
     @Override

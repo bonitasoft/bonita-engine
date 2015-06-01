@@ -11,23 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.persistence;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+package org.bonitasoft.engine.authentication;
 
 /**
- * @author Celine Souchet
+ * @author Charles Souillard
+ * @since 7.0
  */
-public interface HibernateResourcesConfigurationProvider {
+public class GenericAuthenticationServiceAccessor {
 
-    void setHbmResources(final List<HibernateResourcesProvider> resources);
+    private final GenericAuthenticationService genericAuthenticationService;
 
-    Map<String, String> getCacheConcurrencyStrategies();
+    public GenericAuthenticationServiceAccessor(GenericAuthenticationService genericAuthenticationService) {
+        this.genericAuthenticationService = genericAuthenticationService;
+    }
 
-    Set<String> getResources();
 
-    Map<String, String> getClassAliasMappings();
-
+    public GenericAuthenticationService getAuthenticationService() {
+        return this.genericAuthenticationService;
+    }
 }
