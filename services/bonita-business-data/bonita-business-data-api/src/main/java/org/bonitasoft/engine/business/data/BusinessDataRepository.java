@@ -18,9 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.commons.TenantLifecycleService;
-
 import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 
 /**
  * The BusinessDataRepository service allows to manage Business Data operations. It includes deploy / undeploy of a Business Data Model, search / find / create
@@ -51,6 +50,16 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * @return the list of found entities
      */
     <T extends Entity> List<T> findByIds(Class<T> entityClass, List<Long> primaryKeys);
+
+    /**
+     * Finds (well-loaded) entities that is defined in a deployed Business Data Model. If a primary key does not match an existing entity no exception is thrown
+     * and nothing is added in the list.
+     *
+     * @param entityClass the class of the entity to search for.
+     * @param primaryKeys the primary keys.
+     * @return the list of found entities
+     */
+    <T extends Entity> List<T> findByIdentifiers(Class<T> entityClass, List<Long> primaryKeys);
 
     /**
      * Finds an Entity that is defined in a deployed Business Data Model, through JPQL query.

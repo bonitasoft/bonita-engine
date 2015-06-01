@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.business.application.converter;
 
 import org.bonitasoft.engine.api.ImportError;
+import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
@@ -22,6 +23,7 @@ import org.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilder;
 import org.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 import org.bonitasoft.engine.business.application.xml.ApplicationPageNode;
+import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -32,9 +34,11 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 public class NodeToApplicationPageConverter {
 
     private final PageService pageService;
+    private final ApplicationImportValidator importValidator;
 
-    public NodeToApplicationPageConverter(final PageService pageService) {
+    public NodeToApplicationPageConverter(final PageService pageService, final ApplicationImportValidator importValidator) {
         this.pageService = pageService;
+        this.importValidator = importValidator;
     }
 
     /**
@@ -42,7 +46,9 @@ public class NodeToApplicationPageConverter {
      * @param application the {@link SApplication} where the {@code SApplicationPage} will be attached
      * @return an ApplicationPageImportResult containing the converted {@code SApplicationPage} and an error (if any)
      */
-    public ApplicationPageImportResult toSApplicationPage(ApplicationPageNode applicationPageNode, SApplication application) throws SBonitaReadException {
+    public ApplicationPageImportResult toSApplicationPage(ApplicationPageNode applicationPageNode, SApplication application) throws SBonitaReadException, ImportException {
+        String token = applicationPageNode.getToken();
+        importValidator.validate(token);
         long pageId = 0;
         ImportError importError = null;
         SPage page = pageService.getPageByName(applicationPageNode.getCustomPage());
@@ -52,9 +58,8 @@ public class NodeToApplicationPageConverter {
             importError = new ImportError(applicationPageNode.getCustomPage(), ImportError.Type.PAGE);
         }
         SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
-        SApplicationPageBuilder builder = factory.createNewInstance(application.getId(), pageId, applicationPageNode.getToken());
-        ApplicationPageImportResult importResult = new ApplicationPageImportResult(builder.done(), importError);
-        return importResult;
+        SApplicationPageBuilder builder = factory.createNewInstance(application.getId(), pageId, token);
+        return new ApplicationPageImportResult(builder.done(), importError);
     }
 
 }
