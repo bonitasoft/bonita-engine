@@ -17,15 +17,20 @@ import org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProvider
  */
 public class HibernateResourcesConfigurationProviderExt extends HibernateResourcesConfigurationProviderImpl {
 
-    protected final Map<String, String> cacheConcurrencyStrategies;
+    protected final Map<String, String> cacheConcurrencyStrategiesExceptions;
+    protected final String defaultCacheConcurrencyStrategy;
 
-    public HibernateResourcesConfigurationProviderExt(final Map<String, String> cacheConcurrencyStrategies) {
+    public HibernateResourcesConfigurationProviderExt(final String defaultCacheConcurrencyStrategy, final Map<String, String> cacheConcurrencyStrategiesExceptions) {
         super();
-        this.cacheConcurrencyStrategies = cacheConcurrencyStrategies;
+        this.defaultCacheConcurrencyStrategy = defaultCacheConcurrencyStrategy;
+        this.cacheConcurrencyStrategiesExceptions = cacheConcurrencyStrategiesExceptions;
     }
 
-    @Override
-    public Map<String, String> getCacheConcurrencyStrategies() {
-        return cacheConcurrencyStrategies;
+    public Map<String, String> getCacheConcurrencyStrategiesExceptions() {
+        return cacheConcurrencyStrategiesExceptions;
+    }
+
+    public String getDefaultCacheConcurrencyStrategy() {
+        return defaultCacheConcurrencyStrategy;
     }
 }
