@@ -36,7 +36,7 @@ public class SearchArchivedActivityInstanceDescriptor extends SearchEntityDescri
 
     public SearchArchivedActivityInstanceDescriptor() {
         final SAUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SAUserTaskInstanceBuilderFactory.class);
-        archivedActivityInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(10);
+        archivedActivityInstanceDescriptorKeys = new HashMap<>(10);
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.NAME,
                 new FieldDescriptor(SAActivityInstance.class, keyProvider.getNameKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PRIORITY, new FieldDescriptor(SAActivityInstance.class,
@@ -59,8 +59,10 @@ public class SearchArchivedActivityInstanceDescriptor extends SearchEntityDescri
                 keyProvider.getReachedStateDateKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.SOURCE_OBJECT_ID, new FieldDescriptor(SAActivityInstance.class,
                 keyProvider.getSourceObjectIdKey()));
+        archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.ARCHIVE_DATE,
+                new FieldDescriptor(SAActivityInstance.class, keyProvider.getArchivedDateKey()));
 
-        archivedActivityInstanceDescriptorAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
+        archivedActivityInstanceDescriptorAllFields = new HashMap<>(1);
         final Set<String> humanFields = new HashSet<String>(2);
         humanFields.add(keyProvider.getNameKey());
         humanFields.add(keyProvider.getDisplayNameKey());

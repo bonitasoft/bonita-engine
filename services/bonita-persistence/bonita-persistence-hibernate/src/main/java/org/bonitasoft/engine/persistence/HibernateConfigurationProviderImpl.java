@@ -78,18 +78,11 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
         this.mappingExclusions = mappingExclusions;
     }
 
-    private Configuration buildConfiguration(final Properties properties, final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider) {
+    protected Configuration buildConfiguration(final Properties properties, final HibernateResourcesConfigurationProvider hibernateResourcesConfigurationProvider) {
         final Configuration configuration = new Configuration();
         configuration.addProperties(properties);
         for (final String resource : hibernateResourcesConfigurationProvider.getResources()) {
             configuration.addResource(resource);
-        }
-
-        final Map<String, String> cacheConcurrencyStrategies = hibernateResourcesConfigurationProvider.getCacheConcurrencyStrategies();
-        if (cacheConcurrencyStrategies != null) {
-            for (final Map.Entry<String, String> cacheConcurrencyStrategy : cacheConcurrencyStrategies.entrySet()) {
-                configuration.setCacheConcurrencyStrategy(cacheConcurrencyStrategy.getKey(), cacheConcurrencyStrategy.getValue());
-            }
         }
         configuration.buildMappings();
         return configuration;

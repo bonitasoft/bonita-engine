@@ -67,6 +67,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
+import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.home.BonitaHome;
 import org.bonitasoft.engine.identity.User;
@@ -132,6 +133,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final BusinessObject countryBO = new BusinessObject();
         countryBO.setQualifiedName(COUNTRY_QUALIFIED_NAME);
         countryBO.addField(name);
+        countryBO.addUniqueConstraint("uk_name", "name");
 
         final SimpleField street = new SimpleField();
         street.setName("street");
@@ -647,9 +649,17 @@ public class BDRepositoryIT extends CommonAPIIT {
                 new ExpressionBuilder().createGroovyScriptExpression(getLastNameWithDAOExpression, "import " + EMPLOYEE_QUALIFIED_NAME + "; Employee e = "
                         + employeeDAOName + ".findByFirstName('" + firstName + "', 0, 10).get(0); e.getAddresses().get(0).city", String.class.getName(),
                         new ExpressionBuilder().buildBusinessObjectDAOExpression(employeeDAOName, EMPLOYEE_QUALIFIED_NAME + "DAO")), null);
+        expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression(COUNT_ADDRESS, "Address." + COUNT_ADDRESS, Long.class.getName()), null);
+        expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression(COUNT_EMPLOYEE, "Employee." + COUNT_EMPLOYEE, Long.class.getName()), null);
         Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         String returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
         assertThat(returnedLastName).isEqualTo("Grenoble");
+
+        Serializable nbOfAddress = evaluatedExpressions.get(COUNT_ADDRESS);
+        Serializable nbOfEmployee = evaluatedExpressions.get(COUNT_EMPLOYEE);
+
+        assertThat(nbOfAddress).isEqualTo(1L);
+        assertThat(nbOfEmployee).isEqualTo(1L);
 
         logoutOnTenant();
 
@@ -850,12 +860,22 @@ public class BDRepositoryIT extends CommonAPIIT {
             "intermixed" }, jira = "BS-8591", story = "Create business datas using intermixed java setter operations.")
     @Test
     public void shouldBeAbleToCreate2BusinessDataUsingIntermixedBizDataJavaSetterOperations() throws Exception {
+        final Expression countryQueryNameParameter = new ExpressionBuilder().createExpression("name", "France", String.class.getName(), ExpressionType.TYPE_CONSTANT);
+        final Expression countryQueryExpression = new ExpressionBuilder().createQueryBusinessDataExpression("country", "Country.findByName",
+                COUNTRY_QUALIFIED_NAME, countryQueryNameParameter);
+        final Expression createNewAddressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress", "import " + ADDRESS_QUALIFIED_NAME + "; Address a = new Address(street:'32, rue Gustave Eiffel', city:'Grenoble'); a;",
+                ADDRESS_QUALIFIED_NAME);
+        final Expression createNewCountryExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewCountry", "import " + COUNTRY_QUALIFIED_NAME + "; Country c = new Country(name:'France'); c;",
+                COUNTRY_QUALIFIED_NAME);
+
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(
                 "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", PROCESS_VERSION);
         final String businessDataName = "newBornBaby";
         final String businessDataName2 = "data2";
         processDefinitionBuilder.addBusinessData(businessDataName, EMPLOYEE_QUALIFIED_NAME, null);
         processDefinitionBuilder.addBusinessData(businessDataName2, EMPLOYEE_QUALIFIED_NAME, null);
+        processDefinitionBuilder.addBusinessData("address", ADDRESS_QUALIFIED_NAME, createNewAddressExpression);
+        processDefinitionBuilder.addBusinessData("country", COUNTRY_QUALIFIED_NAME, createNewCountryExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder
                 .addAutomaticTask("step1")
@@ -870,7 +890,10 @@ public class BDRepositoryIT extends CommonAPIIT {
                                 new ExpressionBuilder().createConstantStringExpression("Péuigrec")))
                 .addOperation(
                         new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName2, "setLastName", String.class.getName(),
-                                new ExpressionBuilder().createConstantStringExpression("Plip")));
+                                new ExpressionBuilder().createConstantStringExpression("Plip")))
+                .addOperation(
+                        new OperationBuilder().createBusinessDataSetAttributeOperation("address", "setCountry", COUNTRY_QUALIFIED_NAME,
+                                countryQueryExpression));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
@@ -1234,6 +1257,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Test
     public void getProcessBusinessDataReferencesShoulReturnTheListOfReferences() throws Exception {
         final String taskName = "step";
         final ProcessDefinition definition = buildProcessThatUpdateBizDataInsideConnector(taskName);

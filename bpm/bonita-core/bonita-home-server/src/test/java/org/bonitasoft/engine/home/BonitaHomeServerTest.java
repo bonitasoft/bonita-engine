@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.home;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +39,20 @@ public class BonitaHomeServerTest {
     public void generateRelativeResourcePathShouldHandleBackslashOS() {
         // given:
         final String pathname = "C:\\hello\\hi\\folder";
+        final String resourceRelativePath = "resource/toto.lst";
+
+        // when:
+        final String generatedRelativeResourcePath = Util.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
+                + resourceRelativePath));
+
+        // then:
+        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
+    }
+
+    @Test
+    public void generateRelativeResourcePathShouldHandleNetWorkBackslash() {
+        // given:
+        final String pathname = "\\\\hello\\hi\\folder";
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:

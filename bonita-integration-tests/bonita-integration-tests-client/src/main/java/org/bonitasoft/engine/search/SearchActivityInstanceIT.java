@@ -666,6 +666,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
 
         searchOptionsBuilder = new SearchOptionsBuilder(0, 20);
         searchOptionsBuilder.filter(ArchivedActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
+        searchOptionsBuilder.sort(ArchivedActivityInstanceSearchDescriptor.ARCHIVE_DATE, Order.DESC);
         archivedActivityInstancesSearch = getProcessAPI().searchArchivedActivities(searchOptionsBuilder.done());
         assertEquals(8, archivedActivityInstancesSearch.getCount());
         for (final ArchivedActivityInstance activity : archivedActivityInstancesSearch.getResult()) {
