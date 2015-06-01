@@ -50,9 +50,7 @@
 			<set>
 				<value>GROOVY_SCRIPT_CACHE_NAME</value>
 				<value>_PROCESSDEF</value>
-				<value>MIGRATION_PLAN_CACHE_NAME</value>
 				<value>USER_FILTER</value>
-				<value>BREAKPOINTS_BY_INSTANCE</value>
 			</set>
 		</constructor-arg>
 	</bean>

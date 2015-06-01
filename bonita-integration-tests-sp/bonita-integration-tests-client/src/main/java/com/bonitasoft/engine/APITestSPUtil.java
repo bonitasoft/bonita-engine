@@ -9,13 +9,9 @@
 package com.bonitasoft.engine;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +23,6 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.command.CommandExecutionException;
-import org.bonitasoft.engine.command.CommandNotFoundException;
-import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.TestConnector3;
 import org.bonitasoft.engine.connectors.TestConnectorLongToExecute;
@@ -62,14 +55,11 @@ import com.bonitasoft.engine.api.PageAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.ProcessConfigurationAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.ReportingAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.ThemeAPI;
-import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
-import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.connector.APIAccessorConnector;
 import com.bonitasoft.engine.log.Log;
@@ -96,8 +86,6 @@ public class APITestSPUtil extends APITestUtil {
     private PageAPI pageAPI;
 
     private ApplicationAPI applicationAPI;
-
-    private ProcessConfigurationAPI processConfigurationAPI;
 
     @Override
     public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
@@ -149,11 +137,6 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    public ProcessConfigurationAPI getProcessConfigurationAPI() {
-        return processConfigurationAPI;
-    }
-
-    @Override
     public IdentityAPI getIdentityAPI() {
         return (IdentityAPI) super.getIdentityAPI();
     }
@@ -193,10 +176,6 @@ public class APITestSPUtil extends APITestUtil {
         this.tenantManagementAPI = tenantManagementAPI;
     }
 
-    public void setProcessConfigurationAPI(ProcessConfigurationAPI processConfigurationAPI) {
-        this.processConfigurationAPI = processConfigurationAPI;
-    }
-
     public void loginOnTenantWith(final String userName, final String password, final long tenantId) throws BonitaException {
         setSession(BPMTestSPUtil.loginOnTenant(userName, password, tenantId));
         setAPIs();
@@ -222,7 +201,6 @@ public class APITestSPUtil extends APITestUtil {
     @Override
     protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessConfigurationAPI(TenantAPIAccessor.getProcessConfigurationAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
@@ -250,7 +228,6 @@ public class APITestSPUtil extends APITestUtil {
         BPMTestSPUtil.logoutOnTenant(getSession());
         setSession(null);
         setIdentityAPI(null);
-        setProcessConfigurationAPI(null);
         setProcessAPI(null);
         setProfileAPI(null);
         setThemeAPI(null);
@@ -342,25 +319,6 @@ public class APITestSPUtil extends APITestUtil {
         return messages;
     }
 
-    public List<String> checkNoBreakpoints() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
-        final List<String> messages = new ArrayList<String>();
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put("startIndex", 0);
-        parameters.put("maxResults", 10000);
-        parameters.put("sort", BreakpointCriterion.DEFINITION_ID_ASC);
-        @SuppressWarnings("unchecked")
-        final List<Breakpoint> breakpoints = (List<Breakpoint>) getCommandAPI().execute("getBreakpoints", parameters);
-        if (!breakpoints.isEmpty()) {
-            final StringBuilder bpBuilder = new StringBuilder("Breakpoints are still present: ");
-            for (final Breakpoint breakpoint : breakpoints) {
-                bpBuilder.append(breakpoint.getElementName()).append(", ");
-                getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpoint.getId()));
-            }
-            messages.add(bpBuilder.toString());
-        }
-        return messages;
-    }
-
     public List<String> checkNoReports() throws SearchException {
         final List<String> messages = new ArrayList<String>();
         // only for non-default tenants:
@@ -375,18 +333,6 @@ public class APITestSPUtil extends APITestUtil {
             messages.add(messageBuilder.toString());
         }
         return messages;
-    }
-
-    /**
-     * @return
-     * @throws BonitaException
-     */
-    public Collection<? extends String> checkNoDataMappings() throws BonitaException {
-        final Integer count = new Integer(getReportingAPI().selectList("SELECT count(*) FROM data_mapping").split("\n")[1]);
-        if (count == 0) {
-            return Collections.emptyList();
-        }
-        return Arrays.asList("There is some data mapping present: " + count);
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnector3(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
