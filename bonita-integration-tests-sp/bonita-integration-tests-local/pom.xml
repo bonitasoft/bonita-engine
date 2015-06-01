@@ -214,8 +214,8 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <target name="build-home-sp">
-                                <ant antfile="build-home-sp.xml" target="build-home-sp"/>
+                            <target name="build-home-sp-tests">
+                                <ant antfile="build-home-sp-tests.xml" target="build-home-sp-tests"/>
                             </target>
                         </configuration>
                     </execution>

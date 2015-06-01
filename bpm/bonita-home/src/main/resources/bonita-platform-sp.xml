@@ -23,14 +23,31 @@
 	</bean>
 
 	<bean id="platformEventService" class="com.bonitasoft.engine.events.impl.ConfigurableEventServiceImpl">
-		<constructor-arg name="handlers">
+		<constructor-arg name="handlers" ref="platformEventHandlers"/>
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+	</bean>
+
+	<bean id="platformDefaultEventHandlers" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass">
+			<value>java.util.HashMap</value>
+		</property>
+		<property name="sourceMap">
 			<map>
 				<entry key="JOB_EXECUTING" value-ref="jobHandler"/>
 				<entry key="JOB_FAILED" value-ref="jobHandler"/>
 				<entry key="JOB_COMPLETED" value-ref="jobHandler"/>
 			</map>
-		</constructor-arg>
-		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+		</property>
+	</bean>
+
+	<bean id="platformEventHandlers" parent="platformDefaultEventHandlers" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="targetMapClass">
+			<value>java.util.HashMap</value>
+		</property>
+		<property name="sourceMap">
+			<map merge="true">
+			</map>
+		</property>
 	</bean>
 
 	<bean id="jvmMXBean" class="com.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl" />
@@ -112,7 +129,8 @@
 			<map>
 				<entry key="net.sf.ehcache.configurationResourceName">
 					<bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
-						<property name="filePath" value="/engine-server/conf/platform/bonita-platform-hibernate-cache.xml" />
+						<property name="primaryFilePath" value="/engine-server/conf/platform/bonita-platform-hibernate-cache.xml" />
+						<property name="secondaryFilePath" value="/engine-server/work/platform/bonita-platform-hibernate-cache.xml" />
 						<property name="baseFolder" value="${bonita.home}" />
 					</bean>
 				</entry>
@@ -125,7 +143,8 @@
 			<map>
 				<entry key="net.sf.ehcache.configurationResourceName">
 					<bean class="com.bonitasoft.engine.service.impl.URLofFileInFolderFactory">
-						<property name="filePath" value="/engine-server/conf/platform/bonita-tenant-hibernate-cache.xml" />
+						<property name="primaryFilePath" value="/engine-server/conf/platform/bonita-tenant-hibernate-cache.xml" />
+						<property name="secondaryFilePath" value="/engine-server/work/platform/bonita-tenant-hibernate-cache.xml" />
 						<property name="baseFolder" value="${bonita.home}" />
 					</bean>
 				</entry>
@@ -227,6 +246,8 @@
 				<entry key="getCommandByName" value="true" />
 				<entry key="getUserByUserName" value="true" />
 				<entry key="getRoleByName" value="true" />
+				<entry key="getPageByName" value="true" />
+				<entry key="getReportByName" value="true" />
 			</map>
 		</property>
 	</bean>
@@ -255,7 +276,6 @@
 				<entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDesignContentImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="read-write" />
