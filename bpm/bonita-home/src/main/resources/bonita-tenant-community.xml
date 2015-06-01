@@ -178,7 +178,6 @@
         <constructor-arg name="workService" ref="workService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="gatewayInstanceService" ref="gatewayInstanceService" />
-        <constructor-arg name="transitionService" ref="transitionService" />
         <constructor-arg name="eventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="connectorService" ref="connectorService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
@@ -1084,7 +1083,6 @@
         <constructor-arg name="bpmEventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
-        <constructor-arg name="transitionService" ref="transitionService" />
         <constructor-arg name="processDefinitionService" ref="processDefinitionService" />
         <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
@@ -1098,11 +1096,6 @@
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
-    </bean>
-
-    <bean id="transitionService" class="org.bonitasoft.engine.core.process.instance.impl.TransitionServiceImpl">
-        <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
     <bean id="eventInstanceService" class="org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl">
@@ -1140,6 +1133,7 @@
         <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />
+        <constructor-arg name="cacheService" ref="cacheService" />
     </bean>
 
 
@@ -1353,11 +1347,10 @@
     <bean id="communityCacheConfigurations" class="org.springframework.beans.factory.config.ListFactoryBean">
         <property name="sourceList">
             <list merge="true">
+                <ref bean="processDefinitionCacheConfig" />
                 <ref bean="connectorCacheConfig" />
                 <ref bean="parameterCacheConfig" />
                 <ref bean="userFilterCacheConfig" />
-                <ref bean="migrationPlanCacheConfig" />
-                <ref bean="breakpointCacheConfig" />
                 <ref bean="groovyScriptCacheConfig" />
                 <ref bean="transientDataCacheConfig" />
             </list>
@@ -1375,6 +1368,19 @@
         <property name="copyOnRead" value="${bonita.tenant.cache.connector.copyOnRead}" />
         <property name="copyOnWrite" value="${bonita.tenant.cache.connector.copyOnWrite}" />
         <property name="readIntensive" value="${bonita.tenant.cache.connector.readIntensive}" />
+    </bean>
+
+    <bean id="processDefinitionCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+        <property name="name" value="_PROCESSDEF" />
+        <property name="maxElementsInMemory" value="${bonita.tenant.cache.processdef.maxElementsInMemory}" />
+        <property name="inMemoryOnly" value="${bonita.tenant.cache.processdef.inMemoryOnly}" />
+        <property name="eternal" value="${bonita.tenant.cache.processdef.eternal}" />
+        <property name="evictionPolicy" value="${bonita.tenant.cache.processdef.evictionPolicy}" />
+        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.processdef.timeToLiveSeconds}" />
+        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.processdef.maxElementsOnDisk}" />
+        <property name="copyOnRead" value="${bonita.tenant.cache.processdef.copyOnRead}" />
+        <property name="copyOnWrite" value="${bonita.tenant.cache.processdef.copyOnWrite}" />
+        <property name="readIntensive" value="${bonita.tenant.cache.processdef.readIntensive}" />
     </bean>
 
 
@@ -1402,32 +1408,6 @@
         <property name="copyOnRead" value="${bonita.tenant.cache.userfilter.copyOnRead}" />
         <property name="copyOnWrite" value="${bonita.tenant.cache.userfilter.copyOnWrite}" />
         <property name="readIntensive" value="${bonita.tenant.cache.userfilter.readIntensive}" />
-    </bean>
-
-    <bean id="migrationPlanCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="MIGRATION_PLAN_CACHE_NAME" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.migrationplan.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.migrationplan.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.migrationplan.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.migrationplan.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.migrationplan.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.migrationplan.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.migrationplan.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.migrationplan.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.migrationplan.readIntensive}" />
-    </bean>
-
-    <bean id="breakpointCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
-        <property name="name" value="BREAKPOINTS_BY_INSTANCE" />
-        <property name="maxElementsInMemory" value="${bonita.tenant.cache.breakpoint.maxElementsInMemory}" />
-        <property name="inMemoryOnly" value="${bonita.tenant.cache.breakpoint.inMemoryOnly}" />
-        <property name="eternal" value="${bonita.tenant.cache.breakpoint.eternal}" />
-        <property name="evictionPolicy" value="${bonita.tenant.cache.breakpoint.evictionPolicy}" />
-        <property name="timeToLiveSeconds" value="${bonita.tenant.cache.breakpoint.timeToLiveSeconds}" />
-        <property name="maxElementsOnDisk" value="${bonita.tenant.cache.breakpoint.maxElementsOnDisk}" />
-        <property name="copyOnRead" value="${bonita.tenant.cache.breakpoint.copyOnRead}" />
-        <property name="copyOnWrite" value="${bonita.tenant.cache.breakpoint.copyOnWrite}" />
-        <property name="readIntensive" value="${bonita.tenant.cache.breakpoint.readIntensive}" />
     </bean>
 
     <bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">

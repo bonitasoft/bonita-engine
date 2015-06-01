@@ -10,8 +10,6 @@ DROP TABLE processcategorymapping
 GO
 DROP TABLE category
 GO
-DROP TABLE migration_plan
-GO
 DROP TABLE arch_process_comment
 GO
 DROP TABLE process_comment
@@ -49,8 +47,6 @@ GO
 DROP TABLE waiting_event
 GO
 DROP TABLE message_instance
-GO
-DROP TABLE breakpoint
 GO
 DROP TABLE report
 GO

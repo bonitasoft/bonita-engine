@@ -330,7 +330,6 @@ public class ModelConvertorTest {
         saProcessInstance.setEndDate(1345646L);
         saProcessInstance.setId(98L);
         saProcessInstance.setLastUpdate(8L);
-        saProcessInstance.setMigrationPlanId(9L);
         saProcessInstance.setName("name2");
         saProcessInstance.setProcessDefinitionId(9L);
         saProcessInstance.setRootProcessInstanceId(9745L);

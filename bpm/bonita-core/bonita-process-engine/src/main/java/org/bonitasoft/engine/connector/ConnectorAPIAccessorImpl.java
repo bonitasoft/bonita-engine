@@ -23,7 +23,6 @@ import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
@@ -111,11 +110,6 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     @Override
     public ApplicationAPI getLivingApplicationAPI() {
         return getAPI(ApplicationAPI.class, getAPISession());
-    }
-
-    @Override
-    public ProcessConfigurationAPI getProcessConfigurationAPI() {
-        return getAPI(ProcessConfigurationAPI.class, getAPISession());
     }
 
     @Override

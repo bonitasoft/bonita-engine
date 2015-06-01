@@ -41,8 +41,6 @@ public class SProcessInstanceBuilderFactoryImpl implements SProcessInstanceBuild
 
     private static final String CONTAINER_ID_KEY = "containerId";
 
-    private static final String MIGRATION_PLAN_ID = "migrationPlanId";
-
     private static final String END_DATE_KEY = "endDate";
 
     private static final String STARTED_BY_KEY = "startedBy";
@@ -138,10 +136,6 @@ public class SProcessInstanceBuilderFactoryImpl implements SProcessInstanceBuild
         return INTERRUPTING_EVENT_ID_KEY;
     }
 
-    @Override
-    public String getMigrationPlanIdKey() {
-        return MIGRATION_PLAN_ID;
-    }
 
     @Override
     public String getCallerIdKey() {

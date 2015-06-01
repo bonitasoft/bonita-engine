@@ -49,8 +49,6 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
 
     private long processId;
 
-    private long migrationDate;
-
     private long supervisorId;
 
     private String displayName;
@@ -146,15 +144,6 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
     }
 
     @Override
-    public long getMigrationDate() {
-        return migrationDate;
-    }
-
-    public void setMigrationDate(final long migrationDate) {
-        this.migrationDate = migrationDate;
-    }
-
-    @Override
     public long getSupervisorId() {
         return supervisorId;
     }
@@ -237,7 +226,6 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
                 Objects.equals(deployedBy, that.deployedBy) &&
                 Objects.equals(tenantId, that.tenantId) &&
                 Objects.equals(processId, that.processId) &&
-                Objects.equals(migrationDate, that.migrationDate) &&
                 Objects.equals(supervisorId, that.supervisorId) &&
                 Objects.equals(lastUpdateDate, that.lastUpdateDate) &&
                 Objects.equals(name, that.name) &&
@@ -254,7 +242,7 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
     @Override
     public int hashCode() {
         return Objects.hash(name, id, deploymentDate, deployedBy, version, description, configurationState, activationState, tenantId, processId,
-                migrationDate, supervisorId, displayName, lastUpdateDate, iconPath, displayDescription);
+                supervisorId, displayName, lastUpdateDate, iconPath, displayDescription);
     }
 
     @Override
@@ -270,7 +258,6 @@ public class SProcessDefinitionDeployInfoImpl implements SProcessDefinitionDeplo
                 ", activationState='" + activationState + '\'' +
                 ", tenantId=" + tenantId +
                 ", processId=" + processId +
-                ", migrationDate=" + migrationDate +
                 ", supervisorId=" + supervisorId +
                 ", displayName='" + displayName + '\'' +
                 ", lastUpdateDate=" + lastUpdateDate +

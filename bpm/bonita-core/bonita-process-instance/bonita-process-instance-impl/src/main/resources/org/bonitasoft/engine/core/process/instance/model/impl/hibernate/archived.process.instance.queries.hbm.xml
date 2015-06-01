@@ -376,22 +376,6 @@
 		ORDER BY name ASC, stateName ASC
 	</query>
 
-	<query name="getNumberOfSATransitionInstance">
-		SELECT COUNT(at)
-		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl AS at
-	</query>
-
-	<query name="searchSATransitionInstance">
-		SELECT at
-		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl AS at
-	</query>
-
-	<query name="getArchivedTransitionOfProcessInstance">
-		SELECT at
-		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl AS at
-		WHERE at.rootContainerId = :processInstanceId
-	</query>
-
 	<query name="searchSAConnectorInstance">
 		SELECT ac
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl AS ac

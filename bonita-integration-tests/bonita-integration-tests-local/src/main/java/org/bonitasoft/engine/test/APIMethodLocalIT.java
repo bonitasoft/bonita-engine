@@ -22,19 +22,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.LocalServerTestsInitializer;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformCommandAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
-import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
-import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-@RunWith(BonitaTestRunner.class)
-@BonitaSuiteRunner.Initializer(LocalServerTestsInitializer.class)
 public class APIMethodLocalIT {
 
     @Test

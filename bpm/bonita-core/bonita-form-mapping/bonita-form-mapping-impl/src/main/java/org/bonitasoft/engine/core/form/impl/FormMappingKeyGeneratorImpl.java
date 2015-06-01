@@ -19,8 +19,8 @@ import org.bonitasoft.engine.core.form.FormMappingKeyGenerator;
 import org.bonitasoft.engine.core.form.SFormMapping;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Baptiste Mesta
@@ -41,7 +41,7 @@ public class FormMappingKeyGeneratorImpl implements FormMappingKeyGenerator {
             if (processDefinition == null) {
                 throw new SObjectCreationException("Process with id " + processDefinitionId + " does not exists");
             }
-        } catch (SProcessDefinitionNotFoundException | SProcessDefinitionReadException e) {
+        } catch (SProcessDefinitionNotFoundException | SBonitaReadException e) {
             throw new SObjectCreationException("Unable to get the process with id " + processDefinitionId, e);
         }
         switch (type) {

@@ -10,8 +10,6 @@ DELETE FROM processcategorymapping WHERE tenantid = ${tenantid}
 GO
 DELETE FROM category WHERE tenantid = ${tenantid}
 GO
-DELETE FROM migration_plan WHERE tenantid = ${tenantid}
-GO
 DELETE FROM arch_process_comment WHERE tenantid = ${tenantid}
 GO
 DELETE FROM process_comment WHERE tenantid = ${tenantid}
@@ -49,8 +47,6 @@ GO
 DELETE FROM process_instance WHERE tenantid = ${tenantid}
 GO
 DELETE FROM flownode_instance WHERE tenantid = ${tenantid}
-GO
-DELETE FROM breakpoint WHERE tenantid = ${tenantid}
 GO
 DELETE FROM report WHERE tenantid = ${tenantid}
 GO
