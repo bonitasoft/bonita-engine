@@ -690,11 +690,6 @@
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20011:${bonita.platform.sequence.defaultRangeSize}}" />
     </bean>
     <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
-        <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" />
-        <constructor-arg name="sequenceId" value="20012" />
-        <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20012:${bonita.platform.sequence.defaultRangeSize}}" />
-    </bean>
-    <bean class="org.bonitasoft.engine.sequence.SequenceMapping">
         <constructor-arg name="className" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl" />
         <constructor-arg name="sequenceId" value="20013" />
         <constructor-arg name="rangeSize" value="${bonita.platform.sequence.20013:${bonita.platform.sequence.defaultRangeSize}}" />
@@ -905,7 +900,6 @@
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance" value="aa" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance" value="aa" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="aa" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="at" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" value="ac" />
                 <!-- process definition -->
                 <entry key="org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo" value="process_definition" />
@@ -1245,7 +1239,6 @@
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl" />
                 <entry key="org.bonitasoft.engine.core.document.model.archive.SADocumentMapping" value="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" />
                 <entry key="org.bonitasoft.engine.core.document.model.archive.SAMappedDocument" value="org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl" />

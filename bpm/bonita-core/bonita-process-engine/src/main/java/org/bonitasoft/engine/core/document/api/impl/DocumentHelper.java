@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.document.api.impl;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,7 +35,6 @@ import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -58,7 +56,7 @@ public class DocumentHelper {
     private final ProcessInstanceService processInstanceService;
 
     public DocumentHelper(final DocumentService documentService, final ProcessDefinitionService processDefinitionService,
-                          final ProcessInstanceService processInstanceService) {
+            final ProcessInstanceService processInstanceService) {
         this.documentService = documentService;
         this.processDefinitionService = processDefinitionService;
         this.processInstanceService = processInstanceService;
@@ -90,7 +88,7 @@ public class DocumentHelper {
         } catch (final SProcessInstanceNotFoundException e) {
             throw new SObjectNotFoundException("Unable to find the list " + documentName + ", nothing in database and the process instance "
                     + processInstanceId + " is not found", e);
-        } catch (final SProcessInstanceReadException | SProcessDefinitionReadException e) {
+        } catch (final SProcessInstanceReadException e) {
             throw new SBonitaReadException(e);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new SObjectNotFoundException("Unable to find the list " + documentName + " on process instance " + processInstanceId
@@ -185,7 +183,7 @@ public class DocumentHelper {
     }
 
     SMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(final List<SMappedDocument> currentList, final Long documentId, final String documentName,
-                                                                 final Long processInstanceId) throws SObjectNotFoundException {
+            final Long processInstanceId) throws SObjectNotFoundException {
         final Iterator<SMappedDocument> iterator = currentList.iterator();
         while (iterator.hasNext()) {
             final SMappedDocument next = iterator.next();
@@ -218,7 +216,7 @@ public class DocumentHelper {
     }
 
     void processDocumentOnIndex(final DocumentValue documentValue, final String documentName, final long processInstanceId,
-                                final List<SMappedDocument> currentList, final int index, final long authorId) throws SObjectCreationException, SObjectAlreadyExistsException,
+            final List<SMappedDocument> currentList, final int index, final long authorId) throws SObjectCreationException, SObjectAlreadyExistsException,
             SObjectNotFoundException, SObjectModificationException {
         if (documentValue.getDocumentId() != null) {
             // if hasChanged update

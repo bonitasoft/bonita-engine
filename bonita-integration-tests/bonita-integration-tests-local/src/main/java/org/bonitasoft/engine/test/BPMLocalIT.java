@@ -52,9 +52,7 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
-import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -64,7 +62,6 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
@@ -121,49 +118,6 @@ public class BPMLocalIT extends CommonAPILocalIT {
 
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(fakeSession);
         identityAPI.getGroup(12);
-    }
-
-    @Cover(classes = { TransitionService.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Transition", "Activity" }, jira = "ENGINE-528")
-    @Test
-    public void checkTransitionWhenNextFlowNodeIsActivity() throws Exception {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final TransitionService transitionInstanceService = tenantAccessor.getTransitionInstanceService();
-        final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
-        final ProcessDefinitionBuilder processDef = new ProcessDefinitionBuilder().createNewInstance("processToTestTransitions", "1.0");
-        processDef.addStartEvent("start");
-        processDef.addUserTask("step1", ACTOR_NAME);
-        processDef.addAutomaticTask("step2");
-        processDef.addEndEvent("end");
-        processDef.addTransition("start", "step1");
-        processDef.addTransition("step1", "step2");
-        processDef.addTransition("step2", "end");
-        processDef.addActor(ACTOR_NAME);
-
-        // Execute process
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDef.done(), ACTOR_NAME, john);
-        setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-
-        // Execute step1
-        waitForUserTaskAndExecuteIt(processInstance, "step1", john);
-        waitForProcessToFinish(processInstance);
-
-        setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
-        // Check
-        final List<SATransitionInstance> searchArchivedTransitions = transactionService.executeInTransaction(new Callable<List<SATransitionInstance>>() {
-
-            @Override
-            public List<SATransitionInstance> call() throws Exception {
-                final OrderByOption orderByOption = new OrderByOption(SATransitionInstance.class, "id", OrderByType.ASC);
-                final QueryOptions searchOptions = new QueryOptions(0, 10, Collections.singletonList(orderByOption));
-                return transitionInstanceService.searchArchivedTransitionInstances(searchOptions);
-            }
-        });
-        assertEquals(3, searchArchivedTransitions.size());
-        assertTrue(searchArchivedTransitions.get(2).getId() > searchArchivedTransitions.get(0).getId());
-        assertEquals(searchArchivedTransitions.get(2).getId(), searchArchivedTransitions.get(0).getId() + 2);
-
-        disableAndDeleteProcess(definition);
     }
 
     @Test

@@ -68,17 +68,7 @@ CREATE TABLE processcategorymapping (
 );
 
 ALTER TABLE processcategorymapping ADD CONSTRAINT fk_catmapping_catid FOREIGN KEY (tenantid, categoryid) REFERENCES category(tenantid, id) ON DELETE CASCADE;
-CREATE TABLE migration_plan (
-  tenantid INT8 NOT NULL,
-  id INT8 NOT NULL,
-  description VARCHAR(255) NOT NULL,
-  source_name VARCHAR(50) NOT NULL,
-  source_version VARCHAR(50) NOT NULL,
-  target_name VARCHAR(50) NOT NULL,
-  target_version VARCHAR(50) NOT NULL,
-  content BYTEA NOT NULL,
-  PRIMARY KEY (tenantid, id)
-);
+
 CREATE TABLE arch_process_comment(
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
@@ -114,7 +104,6 @@ CREATE TABLE process_definition (
   deployedBy INT8 NOT NULL,
   activationState VARCHAR(30) NOT NULL,
   configurationState VARCHAR(30) NOT NULL,
-  migrationDate INT8,
   displayName VARCHAR(75),
   displayDescription VARCHAR(255),
   lastUpdateDate INT8,
@@ -183,7 +172,6 @@ CREATE TABLE arch_process_instance (
   lastUpdate INT8 NOT NULL,
   rootProcessInstanceId INT8,
   callerId INT8,
-  migration_plan INT8,
   sourceObjectId INT8 NOT NULL,
   stringIndex1 VARCHAR(255),
   stringIndex2 VARCHAR(255),
@@ -306,7 +294,6 @@ CREATE TABLE process_instance (
   callerId INT8,
   callerType VARCHAR(50),
   interruptingEventId INT8,
-  migration_plan INT8,
   stringIndex1 VARCHAR(255),
   stringIndex2 VARCHAR(255),
   stringIndex3 VARCHAR(255),
@@ -462,18 +449,6 @@ CREATE TABLE pending_mapping (
   	PRIMARY KEY (tenantid, id)
 );
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
-
-CREATE TABLE breakpoint (
-	tenantid INT8 NOT NULL,
-  	id INT8 NOT NULL,
-  	state_id INT NOT NULL,
-  	int_state_id INT NOT NULL,
-  	elem_name VARCHAR(255) NOT NULL,
-  	inst_scope BOOLEAN NOT NULL,
-  	inst_id INT8 NOT NULL,
-  	def_id INT8 NOT NULL,
-  	PRIMARY KEY (tenantid, id)
-);
 
 CREATE TABLE ref_biz_data_inst (
 	tenantid INT8 NOT NULL,

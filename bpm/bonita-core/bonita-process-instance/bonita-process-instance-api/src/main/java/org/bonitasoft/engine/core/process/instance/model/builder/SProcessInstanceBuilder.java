@@ -36,8 +36,6 @@ public interface SProcessInstanceBuilder {
 
     SProcessInstanceBuilder setCallerId(long callerId, SFlowNodeType callerType);
 
-    SProcessInstanceBuilder setMigrationPlanId(long migrationPlanId);
-
     SProcessInstanceBuilder setRootProcessInstanceId(long rootProcessInstanceId);
 
     SProcessInstanceBuilder setDescription(String description);

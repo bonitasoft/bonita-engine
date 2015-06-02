@@ -80,8 +80,6 @@ public interface APIAccessor extends Serializable {
      */
     ApplicationAPI getLivingApplicationAPI();
 
-    ProcessConfigurationAPI getProcessConfigurationAPI();
-    
     /**
      * Gives access to the <code>BusinessDataAPI</code>
      *

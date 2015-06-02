@@ -68,17 +68,6 @@ CREATE TABLE processcategorymapping (
 ) ENGINE = INNODB;
 
 ALTER TABLE processcategorymapping ADD CONSTRAINT fk_catmapping_catid FOREIGN KEY (tenantid, categoryid) REFERENCES category(tenantid, id) ON DELETE CASCADE;
-CREATE TABLE migration_plan (
-  tenantid BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  description VARCHAR(255) NOT NULL,
-  source_name VARCHAR(50) NOT NULL,
-  source_version VARCHAR(50) NOT NULL,
-  target_name VARCHAR(50) NOT NULL,
-  target_version VARCHAR(50) NOT NULL,
-  content MEDIUMBLOB NOT NULL,
-  PRIMARY KEY (tenantid, id)
-) ENGINE = INNODB;
 
 CREATE TABLE arch_process_comment(
   tenantid BIGINT NOT NULL,
@@ -116,7 +105,6 @@ CREATE TABLE process_definition (
   deployedBy BIGINT NOT NULL,
   activationState VARCHAR(30) NOT NULL,
   configurationState VARCHAR(30) NOT NULL,
-  migrationDate BIGINT,
   displayName VARCHAR(75),
   displayDescription VARCHAR(255),
   lastUpdateDate BIGINT,
@@ -188,7 +176,6 @@ CREATE TABLE arch_process_instance (
   lastUpdate BIGINT NOT NULL,
   rootProcessInstanceId BIGINT,
   callerId BIGINT,
-  migration_plan BIGINT,
   sourceObjectId BIGINT NOT NULL,
   stringIndex1 VARCHAR(255),
   stringIndex2 VARCHAR(255),
@@ -311,7 +298,6 @@ CREATE TABLE process_instance (
   callerId BIGINT,
   callerType VARCHAR(50),
   interruptingEventId BIGINT,
-  migration_plan BIGINT,
   stringIndex1 VARCHAR(255),
   stringIndex2 VARCHAR(255),
   stringIndex3 VARCHAR(255),
@@ -467,18 +453,6 @@ CREATE TABLE pending_mapping (
   	PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId);
-
-CREATE TABLE breakpoint (
-	tenantid BIGINT NOT NULL,
-  	id BIGINT NOT NULL,
-  	state_id INT NOT NULL,
-  	int_state_id INT NOT NULL,
-  	elem_name VARCHAR(255) NOT NULL,
-  	inst_scope BOOLEAN NOT NULL,
-  	inst_id BIGINT NOT NULL,
-  	def_id BIGINT NOT NULL,
-  	PRIMARY KEY (tenantid, id)
-) ENGINE = INNODB;
 
 CREATE TABLE ref_biz_data_inst (
 	tenantid BIGINT NOT NULL,

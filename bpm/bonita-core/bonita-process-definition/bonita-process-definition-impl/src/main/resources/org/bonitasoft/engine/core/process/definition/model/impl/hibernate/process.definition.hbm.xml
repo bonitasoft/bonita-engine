@@ -19,7 +19,6 @@
         <property name="deployedBy" column="deployedBy" />
         <property name="activationState" column="activationState" />
         <property name="configurationState" column="configurationState" />
-        <property name="migrationDate" column="migrationDate" />
         <property name="displayName" column="displayName" />
         <property name="displayDescription" column="displayDescription" />
         <property name="lastUpdateDate" column="lastUpdateDate" />

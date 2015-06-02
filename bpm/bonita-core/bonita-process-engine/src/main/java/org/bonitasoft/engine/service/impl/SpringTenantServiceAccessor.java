@@ -58,7 +58,6 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
@@ -78,8 +77,8 @@ import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.page.PageMappingService;
-import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.parameter.ParameterService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.xml.ChildrenEntriesBinding;
@@ -159,8 +158,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ExpressionService expressionService;
 
     private CommandService commandService;
-
-    private TransitionService transitionService;
 
     private ClassLoaderService classLoaderService;
 
@@ -448,14 +445,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             commandService = beanAccessor.getService(CommandService.class);
         }
         return commandService;
-    }
-
-    @Override
-    public TransitionService getTransitionInstanceService() {
-        if (transitionService == null) {
-            transitionService = beanAccessor.getService(TransitionService.class);
-        }
-        return transitionService;
     }
 
     @Override

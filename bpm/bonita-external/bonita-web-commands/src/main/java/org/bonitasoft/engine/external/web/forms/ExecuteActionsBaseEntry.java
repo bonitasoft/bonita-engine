@@ -13,29 +13,10 @@
  **/
 package org.bonitasoft.engine.external.web.forms;
 
-import java.util.Collections;
-
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -48,8 +29,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  * @author Celine Souchet
  */
 public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
-
-    protected static final String ACTIVITY_INSTANCE_ID_KEY = "ACTIVITY_INSTANCE_ID_KEY";
 
     protected static final String PROCESS_DEFINITION_ID_KEY = "PROCESS_DEFINITION_ID_KEY";
 
@@ -89,31 +68,6 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
-    }
-
-    protected SActivityInstance getSActivityInstance(final TenantServiceAccessor tenantAccessor, final long activityInstanceId) throws SActivityReadException,
-            SActivityInstanceNotFoundException {
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        return activityInstanceService.getActivityInstance(activityInstanceId);
-    }
-
-    protected ProcessInstance getProcessInstance(final TenantServiceAccessor tenantAccessor, final long processInstanceId)
-            throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
-        return ModelConvertor.toProcessInstances(Collections.singletonList(sProcessInstance), processDefinitionService).get(0);
-    }
-
-    protected ClassLoader getLocalClassLoader(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) throws SClassLoaderException {
-        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        return classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
-    }
-
-    protected SProcessDefinition getProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId)
-            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        return processDefinitionService.getProcessDefinition(processDefinitionId);
     }
 
 }

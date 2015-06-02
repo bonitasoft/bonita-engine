@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.definition;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeploymentInfoUpdateException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDisablementException;
@@ -33,7 +31,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.io.xml.XMLParseException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -98,9 +95,9 @@ public interface ProcessDefinitionService {
      * @return the processDefinition corresponding to the parameter processId
      * @throws SProcessDefinitionNotFoundException
      *         error thrown if no process definition found
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
-    SProcessDefinition getProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException;
+    SProcessDefinition getProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SBonitaReadException;
 
     /**
      * Get processDefinition by its id, if it's enabled.
@@ -108,11 +105,11 @@ public interface ProcessDefinitionService {
      * @param processDefinitionId
      *        The identifier of processDefinition
      * @return The processDefinition corresponding to the parameter processId
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      * @throws SProcessDefinitionException
      * @since 6.4.0
      */
-    SProcessDefinition getProcessDefinitionIfIsEnabled(long processDefinitionId) throws SProcessDefinitionReadException, SProcessDefinitionException;
+    SProcessDefinition getProcessDefinitionIfIsEnabled(long processDefinitionId) throws SBonitaReadException, SProcessDefinitionException;
 
     /**
      * Get deployment info of the process definition having the id given in parameter
@@ -122,9 +119,9 @@ public interface ProcessDefinitionService {
      * @return an SProcessDefinitionDeployInfo object to the process definition
      * @throws SProcessDefinitionNotFoundException
      *         error thrown if no process definition found
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
-    SProcessDefinitionDeployInfo getProcessDeploymentInfo(long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException;
+    SProcessDefinitionDeployInfo getProcessDeploymentInfo(long processId) throws SProcessDefinitionNotFoundException, SBonitaReadException;
 
     /**
      * Delete the id specified process definition and its deploy info
@@ -151,10 +148,10 @@ public interface ProcessDefinitionService {
      * @param order
      *        ASC or DESC
      * @return a list of SProcessDefinitionDeployInfo object
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
     List<SProcessDefinitionDeployInfo> getProcessDeploymentInfos(int fromIndex, int numberPerPage, String field, OrderByType order)
-            throws SProcessDefinitionReadException;
+            throws SBonitaReadException;
 
     /**
      * Enable the specific process definition, set the process as ENABLED when it's in RESOLVED state
@@ -195,18 +192,18 @@ public interface ProcessDefinitionService {
      * @param activationState
      *        the activation state
      * @return number of processes are in the given state or 0;
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
-    long getNumberOfProcessDeploymentInfosByActivationState(ActivationState activationState) throws SProcessDefinitionReadException;
+    long getNumberOfProcessDeploymentInfosByActivationState(ActivationState activationState) throws SBonitaReadException;
 
     /**
      * Gets how many processes are defined.
      * 
      * @return the number of process definitions;
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      *         occurs when an exception is thrown during method execution
      */
-    long getNumberOfProcessDeploymentInfos() throws SProcessDefinitionReadException;
+    long getNumberOfProcessDeploymentInfos() throws SBonitaReadException;
 
     /**
      * Get the process definition identifiers in the given state.
@@ -218,9 +215,9 @@ public interface ProcessDefinitionService {
      * @param numberOfResult
      *        Number of result we want to get. Maximum number of result returned
      * @return the paginated list of process definition identifiers or an empty list
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
-    List<Long> getProcessDefinitionIds(ActivationState activationState, int fromIndex, int numberOfResult) throws SProcessDefinitionReadException;
+    List<Long> getProcessDefinitionIds(ActivationState activationState, int fromIndex, int numberOfResult) throws SBonitaReadException;
 
     /**
      * Get the process definition identifiers.
@@ -230,9 +227,9 @@ public interface ProcessDefinitionService {
      * @param numberOfResult
      *        Number of result we want to get. Maximum number of result returned
      * @return the paginated list of process definition identifiers or an empty list
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
-    List<Long> getProcessDefinitionIds(int fromIndex, int numberOfResult) throws SProcessDefinitionReadException;
+    List<Long> getProcessDefinitionIds(int fromIndex, int numberOfResult) throws SBonitaReadException;
 
     /**
      * Get target flow node for the given source flow node in the specific process
@@ -260,13 +257,13 @@ public interface ProcessDefinitionService {
      *        ASC or DESC
      * @return a list of SProcessDefinitionDeployInfo objects
      * @throws SProcessDefinitionNotFoundException
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
     List<SProcessDefinitionDeployInfo> getProcessDeploymentInfos(List<Long> processIds, int fromIndex, int numberOfProcesses, String field, OrderByType order)
-            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException;
+            throws SProcessDefinitionNotFoundException, SBonitaReadException;
 
     List<SProcessDefinitionDeployInfo> getProcessDeploymentInfos(List<Long> processIds) throws SProcessDefinitionNotFoundException,
-            SProcessDefinitionReadException;
+            SBonitaReadException;
 
     /**
      * Get the processDefinitionId of the most recent version of the process
@@ -274,9 +271,9 @@ public interface ProcessDefinitionService {
      * @param processName
      *        name of process definition
      * @return the latest process definition
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
-    long getLatestProcessDefinitionId(String processName) throws SProcessDefinitionReadException, SProcessDefinitionNotFoundException;
+    long getLatestProcessDefinitionId(String processName) throws SBonitaReadException, SProcessDefinitionNotFoundException;
 
     /**
      * Get the processDefinitionId by name and version
@@ -286,10 +283,10 @@ public interface ProcessDefinitionService {
      * @param version
      *        version or process definition
      * @return identifier of process definition
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      * @throws SProcessDefinitionNotFoundException
      */
-    long getProcessDefinitionId(String name, String version) throws SProcessDefinitionReadException, SProcessDefinitionNotFoundException;
+    long getProcessDefinitionId(String name, String version) throws SBonitaReadException, SProcessDefinitionNotFoundException;
 
     /**
      * Update deployment info of the process definition having the id given in parameter
@@ -525,10 +522,10 @@ public interface ProcessDefinitionService {
      * @param archivedProcessInstantsIds
      *        identifiers of archived processInstance
      * @return a map containing identifiers of archived process instance and the corresponding SProcessDefinitionDeployInfo object
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
     Map<Long, SProcessDefinitionDeployInfo> getProcessDeploymentInfosFromArchivedProcessInstanceIds(List<Long> archivedProcessInstantsIds)
-            throws SProcessDefinitionReadException;
+            throws SBonitaReadException;
 
     /**
      * Get A list of SProcessDefinitionDeployInfos unrelated to the specific category
@@ -538,19 +535,19 @@ public interface ProcessDefinitionService {
      * @param numberPerPage
      * @param pageIndex
      * @return A list of SProcessDefinitionDeployInfos unrelated to the specific category
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
     List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosUnrelatedToCategory(long categoryId, int pageIndex, int numberPerPage,
-            ProcessDeploymentInfoCriterion pagingCriterion) throws SProcessDefinitionReadException;
+            ProcessDeploymentInfoCriterion pagingCriterion) throws SBonitaReadException;
 
     /**
      * Get number of SProcessDefinitionDeployInfos unrelated to the specific category
      * 
      * @param categoryId
      * @return Number of SProcessDefinitionDeployInfos unrelated to the specific category
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
-    Long getNumberOfProcessDeploymentInfosUnrelatedToCategory(long categoryId) throws SProcessDefinitionReadException;
+    Long getNumberOfProcessDeploymentInfosUnrelatedToCategory(long categoryId) throws SBonitaReadException;
 
     /**
      * Get process definition deploy info in a specific interval with order, this can be used for pagination
@@ -558,9 +555,9 @@ public interface ProcessDefinitionService {
      * @param queryOptions
      *        object containing query criteria
      * @return a list of SProcessDefinitionDeployInfo corresponding to the criteria
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      */
-    List<SProcessDefinitionDeployInfo> getProcessDeploymentInfos(QueryOptions queryOptions) throws SProcessDefinitionReadException;
+    List<SProcessDefinitionDeployInfo> getProcessDeploymentInfos(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * List all processes that contain at least one task which actor is mapped only to the specified group.
@@ -570,11 +567,11 @@ public interface ProcessDefinitionService {
      * @param queryOptions
      *        object containing query criteria
      * @return the list of matching processes, as a List of <code>SProcessDefinitionDeployInfo</code>
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      *         in case a read problem occurs
      */
     List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForGroup(long groupId, QueryOptions queryOptions)
-            throws SProcessDefinitionReadException;
+            throws SBonitaReadException;
 
     /**
      * List all processes that contain at least one task which actor is mapped only to the specified groups.
@@ -584,11 +581,11 @@ public interface ProcessDefinitionService {
      * @param queryOptions
      *        object containing query criteria
      * @return the list of matching processes, as a List of <code>SProcessDefinitionDeployInfo</code>
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      *         in case a read problem occurs
      */
     List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForGroups(List<Long> groupIds, QueryOptions queryOptions)
-            throws SProcessDefinitionReadException;
+            throws SBonitaReadException;
 
     /**
      * List all processes that contain at least one task which actor is mapped only to the specified role.
@@ -598,11 +595,11 @@ public interface ProcessDefinitionService {
      * @param queryOptions
      *        object containing query criteria
      * @return the list of matching processes, as a List of <code>SProcessDefinitionDeployInfo</code>
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      *         in case a read problem occurs
      */
     List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForRole(long roleId, QueryOptions queryOptions)
-            throws SProcessDefinitionReadException;
+            throws SBonitaReadException;
 
     /**
      * List all processes that contain at least one task which actor is mapped only to the specified roles.
@@ -612,11 +609,11 @@ public interface ProcessDefinitionService {
      * @param queryOptions
      *        object containing query criteria
      * @return the list of matching processes, as a List of <code>SProcessDefinitionDeployInfo</code>
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      *         in case a read problem occurs
      */
     List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForRoles(List<Long> roleIds, QueryOptions queryOptions)
-            throws SProcessDefinitionReadException;
+            throws SBonitaReadException;
 
     /**
      * List all processes that contain at least one task which actor is mapped only to the specified user.
@@ -626,11 +623,11 @@ public interface ProcessDefinitionService {
      * @param queryOptions
      *        object containing query criteria
      * @return the list of matching processes, as a List of <code>SProcessDefinitionDeployInfo</code>
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      *         in case a read problem occurs
      */
     List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForUser(long userId, QueryOptions queryOptions)
-            throws SProcessDefinitionReadException;
+            throws SBonitaReadException;
 
     /**
      * List all processes that contain at least one task which actor is mapped only to the specified users.
@@ -640,11 +637,11 @@ public interface ProcessDefinitionService {
      * @param queryOptions
      *        object containing query criteria
      * @return the list of matching processes, as a List of <code>SProcessDefinitionDeployInfo</code>
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      *         in case a read problem occurs
      */
     List<SProcessDefinitionDeployInfo> getProcessDeploymentInfosWithActorOnlyForUsers(List<Long> userIds, QueryOptions queryOptions)
-            throws SProcessDefinitionReadException;
+            throws SBonitaReadException;
 
     /**
      * Get total number of users according to specific query options, and who can start the given process definition
@@ -768,7 +765,6 @@ public interface ProcessDefinitionService {
             SObjectModificationException;
 
     /**
-     *
      * Returns a specific process definition that include informations such as tasks definition, actors...
      *
      * @param processDefinitionId
@@ -776,9 +772,9 @@ public interface ProcessDefinitionService {
      * @return The corresponding process definition with informations.
      * @throws SProcessDefinitionNotFoundException
      *         If the process definition doesn't exist.
-     * @throws SProcessDefinitionReadException
+     * @throws SBonitaReadException
      *         If the process definition design cannot be read
      * @since 7.0
      */
-    DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException;
+    DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SBonitaReadException;
 }

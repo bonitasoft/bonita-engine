@@ -41,7 +41,6 @@ import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
@@ -188,8 +187,6 @@ public class APITestUtil extends PlatformTestUtil {
 
     private TenantAdministrationAPI tenantManagementCommunityAPI;
 
-    private ProcessConfigurationAPI processConfigurationAPI;
-
     private BusinessDataAPI businessDataAPI;
 
     static {
@@ -226,7 +223,6 @@ public class APITestUtil extends PlatformTestUtil {
 
     protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessConfigurationAPI(TenantAPIAccessor.getProcessConfigurationAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
@@ -251,7 +247,6 @@ public class APITestUtil extends PlatformTestUtil {
         loginAPI.logout(session);
         setSession(null);
         setIdentityAPI(null);
-        setProcessConfigurationAPI(null);
         setProcessAPI(null);
         setCommandAPI(null);
         setProfileAPI(null);
@@ -1511,14 +1506,6 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ApplicationAPI getApplicationAPI() {
         return applicationAPI;
-    }
-
-    public ProcessConfigurationAPI getProcessConfigurationAPI() {
-        return processConfigurationAPI;
-    }
-
-    public void setProcessConfigurationAPI(ProcessConfigurationAPI processConfigurationAPI) {
-        this.processConfigurationAPI = processConfigurationAPI;
     }
 
     public void setApplicationAPI(final ApplicationAPI applicationAPI) {

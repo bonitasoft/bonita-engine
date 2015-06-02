@@ -2,7 +2,6 @@
 ALTER TABLE actor DROP FOREIGN KEY fk_actor_tenantId;
 ALTER TABLE actormember DROP FOREIGN KEY fk_actormember_tenantId;
 ALTER TABLE actormember DROP FOREIGN KEY fk_actormember_actorId;
-ALTER TABLE breakpoint DROP FOREIGN KEY fk_breakpoint_tenantId;
 -- ALTER TABLE queriable_log DROP FOREIGN KEY fk_queriable_log_tenantId;
 ALTER TABLE queriablelog_p DROP FOREIGN KEY fk_queriablelog_p_tenantId;
 ALTER TABLE category DROP FOREIGN KEY fk_category_tenantId;
@@ -20,7 +19,6 @@ ALTER TABLE flownode_instance DROP FOREIGN KEY fk_flownode_instance_tenantId;
 ALTER TABLE group_ DROP FOREIGN KEY fk_group__tenantId;
 ALTER TABLE job_desc DROP FOREIGN KEY fk_job_desc_tenantId;
 ALTER TABLE job_param DROP FOREIGN KEY fk_job_param_tenantId;
--- ALTER TABLE migration_plan DROP FOREIGN KEY fk_migration_plan_tenantId;
 ALTER TABLE custom_usr_inf_def DROP FOREIGN KEY fk_custom_usr_inf_def_tenantId;
 ALTER TABLE custom_usr_inf_val DROP FOREIGN KEY fk_custom_usr_inf_val_tenantId;
 ALTER TABLE pending_mapping DROP FOREIGN KEY fk_pending_mapping_tenantId;

@@ -27,7 +27,6 @@ public class DefaultArchivingStrategy extends AbstractArchivingStrategy {
         archives.put("org.bonitasoft.engine.core.process.comment.model.SComment", true);
         archives.put("org.bonitasoft.engine.core.document.model.SDocumentMapping", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SProcessInstance", true);
-        archives.put("org.bonitasoft.engine.core.process.instance.model.STransitionInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance", true);
@@ -41,8 +40,6 @@ public class DefaultArchivingStrategy extends AbstractArchivingStrategy {
         archives.put("org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance", true);
         archives.put("org.bonitasoft.engine.data.instance.model.SDataInstance", true);
-        // is the archived version because there is no not archived version
-        archives.put("org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance", true);
         for (Map.Entry<String, Boolean> entry : additionalConfiguration.entrySet()) {
             if (!archives.containsKey(entry.getKey())) {
                 archives.put(entry.getKey(), entry.getValue());

@@ -54,8 +54,6 @@ public interface SProcessInstanceBuilderFactory {
 
     String getInterruptingEventIdKey();
 
-    String getMigrationPlanIdKey();
-
     String getCallerIdKey();
 
 }

@@ -2,7 +2,6 @@
 ALTER TABLE actor DROP CONSTRAINT fk_actor_tenantId;
 ALTER TABLE actormember DROP CONSTRAINT fk_actormember_tenantId;
 ALTER TABLE actormember DROP CONSTRAINT fk_actormember_actorId;
-ALTER TABLE breakpoint DROP CONSTRAINT fk_breakpoint_tenantId;
 -- ALTER TABLE queriable_log DROP CONSTRAINT fk_queriable_log_tenantId;
 ALTER TABLE queriablelog_p DROP CONSTRAINT fk_queriablelog_p_tenantId;
 ALTER TABLE category DROP CONSTRAINT fk_category_tenantId;
@@ -21,7 +20,6 @@ ALTER TABLE group_ DROP CONSTRAINT fk_group__tenantId;
 ALTER TABLE job_desc DROP CONSTRAINT fk_job_desc_tenantId;
 ALTER TABLE job_param DROP CONSTRAINT fk_job_param_tenantId;
 ALTER TABLE message_instance DROP CONSTRAINT fk_message_instance_tenantId;
--- ALTER TABLE migration_plan DROP CONSTRAINT fk_migration_plan_tenantId;
 ALTER TABLE custom_usr_inf_def DROP CONSTRAINT fk_custom_usr_inf_def_tenantId;
 ALTER TABLE custom_usr_inf_val DROP CONSTRAINT fk_custom_usr_inf_val_tenantId;
 ALTER TABLE pending_mapping DROP CONSTRAINT fk_pending_mapping_tenantId;

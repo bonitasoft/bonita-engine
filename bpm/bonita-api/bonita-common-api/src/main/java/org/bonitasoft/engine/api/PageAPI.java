@@ -13,25 +13,31 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipContentException;
 import org.bonitasoft.engine.exception.InvalidPageZipInconsistentException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingAPropertyException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.exception.InvalidPageZipMissingPropertiesException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageCreator;
 import org.bonitasoft.engine.page.PageNotFoundException;
+import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.page.PageUpdater;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -202,5 +208,17 @@ public interface PageAPI {
     Properties getPageProperties(byte[] content, boolean checkIfItAlreadyExists) throws InvalidPageTokenException,
             AlreadyExistsException, InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException,
             InvalidPageZipMissingAPropertyException;
+
+    /**
+     * Resolves a Page URL from a specific key.
+     *
+     * @param key the key of the page to resolve.
+     * @return the <code>PageURL</code> containing the pageId or the complete
+     * @throws NotFoundException if the key does not match anything.
+     * @see PageURL the structured PageURL that points to the Page or URL
+     */
+    PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, UnauthorizedAccessException, ExecutionException;
+
+
 
 }

@@ -53,11 +53,12 @@ import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -1772,7 +1773,7 @@ public interface ProcessManagementAPI {
      * @return The number of parameters of a process definition
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since 7.0
+     * @since 7.0.0
      */
     int getNumberOfParameterInstances(long processDefinitionId);
 
@@ -1788,7 +1789,7 @@ public interface ProcessManagementAPI {
      *             Error thrown if the given parameter is not found.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since 7.0
+     * @since 7.0.0
      */
     ParameterInstance getParameterInstance(long processDefinitionId, String parameterName) throws NotFoundException;
 
@@ -1806,8 +1807,29 @@ public interface ProcessManagementAPI {
      * @return The ordered list of parameter instances
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since 7.0
+     * @since 7.0.0
      */
     List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort);
 
+    /**
+     * Search for form mapping
+     *
+     * @param searchOptions
+     *        search options to search for form mapping
+     * @return the result of the search
+     * @see org.bonitasoft.engine.form.FormMappingSearchDescriptor
+     * @see org.bonitasoft.engine.form.FormMappingType
+     * @since 7.0.0
+     */
+    SearchResult<FormMapping> searchFormMappings(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * @param formMappingId
+     *        the id of the form mapping to get
+     * @return
+     *         the form mapping
+     * @throws FormMappingNotFoundException
+     * @since 7.0.0
+     */
+    FormMapping getFormMapping(final long formMappingId) throws FormMappingNotFoundException;
 }

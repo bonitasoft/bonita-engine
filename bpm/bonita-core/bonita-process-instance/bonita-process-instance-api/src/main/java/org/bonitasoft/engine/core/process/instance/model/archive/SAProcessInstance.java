@@ -49,8 +49,6 @@ public interface SAProcessInstance extends SANamedElement {
 
     long getCallerId();
 
-    long getMigrationPlanId();
-
     String getStringIndex1();
 
     String getStringIndex2();

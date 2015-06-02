@@ -13,25 +13,15 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.FormMappingNotFoundException;
-import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.page.PageMappingService;
-import org.bonitasoft.engine.page.PageURL;
-import org.bonitasoft.engine.page.SAuthorizationException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -46,7 +36,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * @author Baptiste Mesta
  */
-public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
+public class ProcessConfigurationAPIImpl {
 
     protected TenantServiceAccessor getTenantAccessor() {
         try {
@@ -58,7 +48,6 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         }
     }
 
-    @Override
     public SearchResult<FormMapping> searchFormMappings(final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         FormMappingService formMappingService = tenantAccessor.getFormMappingService();
@@ -73,27 +62,10 @@ public class ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
         }
     }
 
-    @Override
-    public PageURL resolvePageOrURL(String key, Map<String, Serializable> context, boolean executeAuthorizationRules) throws NotFoundException, ExecutionException, UnauthorizedAccessException {
-        PageMappingService pageMappingService = retrievePageMappingService();
-        try {
-            return ModelConvertor.toPageURL(pageMappingService.resolvePageURL(pageMappingService.get(key), context, executeAuthorizationRules));
-        } catch (SObjectNotFoundException e) {
-            throw new NotFoundException(e);
-        } catch (SBonitaReadException e) {
-            throw new RetrieveException(e);
-        } catch (SExecutionException e) {
-            throw new ExecutionException(e);
-        } catch (SAuthorizationException e) {
-            throw new UnauthorizedAccessException(e);
-        }
-    }
-
     protected PageMappingService retrievePageMappingService() {
         return getTenantAccessor().getPageMappingService();
     }
 
-    @Override
     public FormMapping getFormMapping(long formMappingId) throws FormMappingNotFoundException {
         final FormMappingService formMappingService = getTenantAccessor().getFormMappingService();
         try {

@@ -26,7 +26,6 @@ import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -36,6 +35,7 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -108,7 +108,7 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
 
     private void initDefinition(final String... names) throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
             SProcessDefinitionNotFoundException,
-            SProcessDefinitionReadException {
+            SBonitaReadException {
         doReturn(processInstance).when(processInstanceService).getProcessInstance(45l);
         doReturn(154l).when(processInstance).getProcessDefinitionId();
         doReturn(processDefinition).when(processDefinitionService).getProcessDefinition(154l);
