@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.core.process.instance.model.builder;
 
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
 
 /**
  * @author Celine Souchet

@@ -18,37 +18,47 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
  */
 public class SProcessInstanceUpdateBuilderExt extends SProcessInstanceUpdateBuilderImpl implements SProcessInstanceUpdateBuilder {
 
+    static final String STRING_INDEX_1_KEY = "stringIndex1";
+
+    static final String STRING_INDEX_2_KEY = "stringIndex2";
+
+    static final String STRING_INDEX_3_KEY = "stringIndex3";
+
+    static final String STRING_INDEX_4_KEY = "stringIndex4";
+
+    static final String STRING_INDEX_5_KEY = "stringIndex5";
+
     public SProcessInstanceUpdateBuilderExt(final EntityUpdateDescriptor descriptor) {
         super(descriptor);
     }
     
     @Override
     public SProcessInstanceUpdateBuilder updateStringIndex1(final String stringIndex) {
-        descriptor.addField(SProcessInstanceBuilderFactoryExt.STRING_INDEX_1_KEY, stringIndex);
+        descriptor.addField(STRING_INDEX_1_KEY, stringIndex);
         return this;
     }
 
     @Override
     public SProcessInstanceUpdateBuilder updateStringIndex2(final String stringIndex) {
-        descriptor.addField(SProcessInstanceBuilderFactoryExt.STRING_INDEX_2_KEY, stringIndex);
+        descriptor.addField(STRING_INDEX_2_KEY, stringIndex);
         return this;
     }
 
     @Override
     public SProcessInstanceUpdateBuilder updateStringIndex3(final String stringIndex) {
-        descriptor.addField(SProcessInstanceBuilderFactoryExt.STRING_INDEX_3_KEY, stringIndex);
+        descriptor.addField(STRING_INDEX_3_KEY, stringIndex);
         return this;
     }
 
     @Override
     public SProcessInstanceUpdateBuilder updateStringIndex4(final String stringIndex) {
-        descriptor.addField(SProcessInstanceBuilderFactoryExt.STRING_INDEX_4_KEY, stringIndex);
+        descriptor.addField(STRING_INDEX_4_KEY, stringIndex);
         return this;
     }
 
     @Override
     public SProcessInstanceUpdateBuilder updateStringIndex5(final String stringIndex) {
-        descriptor.addField(SProcessInstanceBuilderFactoryExt.STRING_INDEX_5_KEY, stringIndex);
+        descriptor.addField(STRING_INDEX_5_KEY, stringIndex);
         return this;
     }
     

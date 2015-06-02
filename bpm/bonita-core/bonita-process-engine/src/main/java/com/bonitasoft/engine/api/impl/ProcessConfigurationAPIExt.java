@@ -25,7 +25,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
-import com.bonitasoft.engine.api.ProcessConfigurationAPI;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -35,7 +34,7 @@ import com.bonitasoft.manager.Features;
 /**
  * author Emmanuel Duchastenier
  */
-public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl implements ProcessConfigurationAPI {
+public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl {
 
     protected LicenseChecker getLicenseChecker() {
         return LicenseChecker.getInstance();
@@ -51,7 +50,6 @@ public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl impl
         }
     }
 
-    @Override
     public FormMapping updateFormMapping(final long formMappingId, final String url, Long pageId) throws FormMappingNotFoundException, UpdateException {
         getLicenseChecker().checkLicenseAndFeature(Features.LIVE_UPDATE_FORM_MAPPING);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -70,7 +68,6 @@ public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl impl
         }
     }
 
-    @Override
     public void updateExpressionContent(long processDefinitionId, long expressionDefinitionId, String content) throws ProcessDefinitionNotFoundException,
             UpdateException {
         getLicenseChecker().checkLicenseAndFeature(Features.LIVE_UPDATE_SCRIPT);

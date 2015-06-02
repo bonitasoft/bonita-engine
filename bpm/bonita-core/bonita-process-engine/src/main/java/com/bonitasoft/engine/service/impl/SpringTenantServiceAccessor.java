@@ -8,15 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service.impl;
 
-import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.impl.SpringTenantServiceAccessor implements TenantServiceAccessor {
-
-    private BreakpointService breakpointService;
 
     private ReportingService reportingService;
 
@@ -32,13 +29,7 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
         return getBeanAccessor().getService(clazz);
     }
 
-    @Override
-    public BreakpointService getBreakpointService() {
-        if (breakpointService == null) {
-            breakpointService = lookupService(BreakpointService.class);
-        }
-        return breakpointService;
-    }
+
 
     @Override
     public SearchEntitiesDescriptor getSearchEntitiesDescriptor() {

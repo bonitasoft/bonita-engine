@@ -1528,7 +1528,8 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
             waitForUserTaskAndExecuteIt(processInstance, "step0", user);
         }
         for (int i = 0; i < 10; i++) {
-            getProcessAPI().startProcess(processDefinition.getId());
+            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+            waitForUserTask(processInstance, "step0");
         }
 
         // Create the second tenant, and login on
@@ -1543,7 +1544,8 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
             waitForUserTaskAndExecuteIt(processInstance, "step0", userForTenant2);
         }
         for (int i = 0; i < 10; i++) {
-            getProcessAPI().startProcess(processDefinition2.getId());
+            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition2.getId());
+            waitForUserTask(processInstance, "step0");
         }
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
         waitForUserTask(processInstance2.getId(), "step0");

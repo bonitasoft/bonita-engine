@@ -64,7 +64,7 @@
                             <!-- cannot use generic "*.impl" because the package "*.process.impl" contains builders to be published -->
                             <excludePackageNames>
                                 *.internal,
-                                *.breakpoint,org.bonitasoft.engine.api.impl,
+                                org.bonitasoft.engine.api.impl,
                                 *.tcp,
                                 *.actor.impl,
                                 *.xml,
