@@ -5,7 +5,7 @@
     <parent>
         <artifactId>bonita-form-mapping</artifactId>
         <groupId>org.bonitasoft.engine.core</groupId>
-        <version>7.0.0.RC1</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-form-mapping-impl</artifactId>

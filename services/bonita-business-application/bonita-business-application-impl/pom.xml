@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.bonitasoft.engine.application</groupId>
     <artifactId>bonita-business-application</artifactId>
-    <version>7.0.0.RC1</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
   
   <artifactId>bonita-business-application-impl</artifactId>
