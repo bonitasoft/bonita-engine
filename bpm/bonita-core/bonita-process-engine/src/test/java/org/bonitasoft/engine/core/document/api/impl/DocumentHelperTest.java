@@ -39,7 +39,6 @@ import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -120,7 +119,7 @@ public class DocumentHelperTest {
     @Test
     public void should_isDefinedInDefinition_throw_read_ex_when_not_existing_definition() throws Exception {
         initDefinition("list1", "list2");
-        doThrow(SProcessDefinitionReadException.class).when(processDefinitionService).getProcessDefinition(154l);
+        doThrow(SBonitaReadException.class).when(processDefinitionService).getProcessDefinition(154l);
         exception.expect(SBonitaReadException.class);
         documentHelper.isListDefinedInDefinition("theList", 45);
     }
@@ -134,7 +133,7 @@ public class DocumentHelperTest {
     }
 
     private void initDefinition(String... names) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SProcessDefinitionNotFoundException,
-            SProcessDefinitionReadException {
+            SBonitaReadException {
         doReturn(processInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
         doReturn(154l).when(processInstance).getProcessDefinitionId();
         doReturn(processDefinition).when(processDefinitionService).getProcessDefinition(154l);
@@ -295,7 +294,7 @@ public class DocumentHelperTest {
         //when
         documentHelper.processDocumentOnIndex(documentValue, "theList", PROCESS_INSTANCE_ID, list, 3, AUTHOR_ID);
         //then
-        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("theList"),anyString(),eq(3));
+        verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("theList"), anyString(), eq(3));
     }
 
     @Test
@@ -303,7 +302,7 @@ public class DocumentHelperTest {
         //given
         DocumentHelper documentHelperSpy = spy(documentHelper);
         List<SMappedDocument> list = createList(5);
-        SMappedDocument documentToUpdate = list.get(list.size()-1);
+        SMappedDocument documentToUpdate = list.get(list.size() - 1);
         DocumentValue documentValue = new DocumentValue(documentToUpdate.getId(), "new url");
         //when
         documentHelperSpy.processDocumentOnIndex(documentValue, "theList", PROCESS_INSTANCE_ID, list, 3, AUTHOR_ID);
@@ -322,7 +321,6 @@ public class DocumentHelperTest {
         //then exception
     }
 
-
     @Test
     public void should_updateExistingDocument_with_unmodified_content_update_only_index() throws Exception {
         //given
@@ -330,11 +328,10 @@ public class DocumentHelperTest {
         SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
         documentToUpdate.setIndex(1);
         //when
-        documentHelper.updateExistingDocument(documentToUpdate,2,documentValue,AUTHOR_ID);
+        documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
         //then
-        verify(documentService).updateDocumentIndex(documentToUpdate,2);
+        verify(documentService).updateDocumentIndex(documentToUpdate, 2);
     }
-
 
     @Test
     public void should_updateExistingDocument_with_unmodified_content_and_index_do_nothing() throws Exception {
@@ -343,11 +340,10 @@ public class DocumentHelperTest {
         SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
         documentToUpdate.setIndex(2);
         //when
-        documentHelper.updateExistingDocument(documentToUpdate,2,documentValue,AUTHOR_ID);
+        documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
         //then
-        verify(documentService,times(0)).updateDocumentIndex(documentToUpdate,2);
+        verify(documentService, times(0)).updateDocumentIndex(documentToUpdate, 2);
     }
-
 
     @Test
     public void should_updateExistingDocument_with_modified_content_update_everything() throws Exception {
@@ -356,15 +352,15 @@ public class DocumentHelperTest {
         SMappedDocumentImpl documentToUpdate = new SMappedDocumentImpl();
         documentToUpdate.setIndex(1);
         //when
-        documentHelper.updateExistingDocument(documentToUpdate,2,documentValue,AUTHOR_ID);
+        documentHelper.updateExistingDocument(documentToUpdate, 2, documentValue, AUTHOR_ID);
         //then
-        verify(documentService).updateDocumentOfList(eq(documentToUpdate),any(SDocument.class),eq(2));
+        verify(documentService).updateDocumentOfList(eq(documentToUpdate), any(SDocument.class), eq(2));
     }
 
     @Test
     public void should_getMimeTypeOrGuessIt_return_the_original_mime_type_if_not_null() {
         //given
-        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, "myMimeType", "theFile.bin");
+        final DocumentValue documentValue = new DocumentValue(new byte[] { 1, 2 }, "myMimeType", "theFile.bin");
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
@@ -392,7 +388,6 @@ public class DocumentHelperTest {
         assertThat(mimeTypeOrGuessIt).isEqualTo("text/plain");
     }
 
-
     @Test
     public void should_getMimeTypeOrGuessIt_guess_xml_mime_type() {
         //given
@@ -413,22 +408,22 @@ public class DocumentHelperTest {
     @Test
     public void should_getMimeTypeOrGuessIt_guess_application_octet_stream_if_byte_array() {
         //given
-        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, null, "theFile.bin");
+        final DocumentValue documentValue = new DocumentValue(new byte[] { 1, 2 }, null, "theFile.bin");
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
         assertThat(mimeTypeOrGuessIt).isEqualTo("application/octet-stream");
     }
+
     @Test
     public void should_getMimeTypeOrGuessIt_do_not_fail_with_bad_filename() {
         //given
-        final DocumentValue documentValue = new DocumentValue(new byte[]{1, 2}, null, "the\0File.bin");
+        final DocumentValue documentValue = new DocumentValue(new byte[] { 1, 2 }, null, "the\0File.bin");
         //when
         final String mimeTypeOrGuessIt = documentHelper.getMimeTypeOrGuessIt(documentValue);
         //then
         assertThat(mimeTypeOrGuessIt).isNull();
     }
-
 
     @Test
     public void should_toCheckedDocumentValue_return_new_DocumentValue_for_FileInput() throws Exception {
@@ -436,11 +431,9 @@ public class DocumentHelperTest {
 
         final DocumentValue documentValue = documentHelper.toCheckedDocumentValue(fileInputValue);
 
-
         assertThat(documentValue).isEqualToIgnoringGivenFields(new DocumentValue(null, null, "theFile.txt"), "content");
         assertThat(documentValue.getContent()).isEqualTo("It's my file".getBytes());
     }
-
 
     @Test
     public void should_toCheckedList_check_null() throws Exception {

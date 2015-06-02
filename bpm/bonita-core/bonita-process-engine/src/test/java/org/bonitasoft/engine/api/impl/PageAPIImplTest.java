@@ -1,6 +1,6 @@
-/*
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+/**
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -10,10 +10,14 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
+ **/
+
 package org.bonitasoft.engine.api.impl;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.page.PageMappingService;
@@ -27,16 +31,15 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * author Emmanuel Duchastenier
+ * @author Baptiste Mesta
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ProcessConfigurationAPIImplTest {
-
-    @Mock
-    PageMappingService pageMappingService;
+public class PageAPIImplTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    @Mock
+    PageMappingService pageMappingService;
 
     @Test
     public void resolvePageOrURLShouldThrowUnauthorizedAccessExceptionIfSAuthorizRaised() throws Exception {
@@ -45,11 +48,12 @@ public class ProcessConfigurationAPIImplTest {
         doReturn(pageMapping).when(pageMappingService).get(pageKey);
         doThrow(SAuthorizationException.class).when(pageMappingService).resolvePageURL(pageMapping, null, true);
 
-        final ProcessConfigurationAPIImpl processConfigurationAPI = spy(new ProcessConfigurationAPIImpl());
+        final PageAPIImpl processConfigurationAPI = spy(new PageAPIImpl());
         doReturn(pageMappingService).when(processConfigurationAPI).retrievePageMappingService();
 
         expectedException.expect(UnauthorizedAccessException.class);
 
         processConfigurationAPI.resolvePageOrURL(pageKey, null, true);
     }
+
 }

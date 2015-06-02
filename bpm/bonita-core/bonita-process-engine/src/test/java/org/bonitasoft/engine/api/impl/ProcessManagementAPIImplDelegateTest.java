@@ -22,7 +22,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -92,7 +91,7 @@ public class ProcessManagementAPIImplDelegateTest {
 
     @Test(expected = RetrieveException.class)
     public void purgeClassLoader_should_throw_an_exception_if_a_read_exception_occurs_when_retrieving_process_info() throws Exception {
-        when(processDefinitionService.getProcessDeploymentInfo(45L)).thenThrow(new SProcessDefinitionReadException("error"));
+        when(processDefinitionService.getProcessDeploymentInfo(45L)).thenThrow(new SBonitaReadException("error"));
 
         delegate.purgeClassLoader(45L);
     }

@@ -76,12 +76,6 @@ public class SProcessInstanceBuilderImpl implements SProcessInstanceBuilder {
     }
 
     @Override
-    public SProcessInstanceBuilder setMigrationPlanId(final long migrationPlanId) {
-        entity.setMigrationPlanId(migrationPlanId);
-        return this;
-    }
-
-    @Override
     public SProcessInstanceBuilder setRootProcessInstanceId(final long rootProcessInstanceId) {
         entity.setRootProcessInstanceId(rootProcessInstanceId);
         return this;

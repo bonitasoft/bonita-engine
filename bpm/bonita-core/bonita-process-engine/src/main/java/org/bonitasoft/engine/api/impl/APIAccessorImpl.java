@@ -21,7 +21,6 @@ import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.PageAPI;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProcessConfigurationAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 
@@ -71,11 +70,6 @@ public class APIAccessorImpl implements APIAccessor {
     @Override
     public ApplicationAPI getLivingApplicationAPI() {
         return new ApplicationAPIImpl();
-    }
-
-    @Override
-    public ProcessConfigurationAPI getProcessConfigurationAPI() {
-        return new ProcessConfigurationAPIImpl();
     }
 
     @Override

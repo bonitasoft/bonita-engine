@@ -58,8 +58,6 @@ INSERT INTO sequence VALUES(${tenantid}, 10017, 1)
 GO
 INSERT INTO sequence VALUES(${tenantid}, 10018, 1)
 GO
-INSERT INTO sequence VALUES(${tenantid}, 10019, 1)
-GO
 INSERT INTO sequence VALUES(${tenantid}, 10020, 1)
 GO
 INSERT INTO sequence VALUES(${tenantid}, 10021, 1)
@@ -84,8 +82,6 @@ INSERT INTO sequence VALUES(${tenantid}, 10090, 1)
 GO
 INSERT INTO sequence VALUES(${tenantid}, 10096, 1)
 GO
-INSERT INTO sequence VALUES(${tenantid}, 10100, 1)
-GO
 INSERT INTO sequence VALUES(${tenantid}, 10120, 1)
 GO
 INSERT INTO sequence VALUES(${tenantid}, 10121, 1)
@@ -107,8 +103,6 @@ GO
 INSERT INTO sequence VALUES(${tenantid}, 20010, 1)
 GO
 INSERT INTO sequence VALUES(${tenantid}, 20011, 1)
-GO
-INSERT INTO sequence VALUES(${tenantid}, 20012, 1)
 GO
 INSERT INTO sequence VALUES(${tenantid}, 20013, 1)
 GO
