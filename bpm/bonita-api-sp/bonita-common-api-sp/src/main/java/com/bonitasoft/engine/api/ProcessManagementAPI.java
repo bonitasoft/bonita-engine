@@ -18,7 +18,10 @@ import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.exception.FormMappingNotFoundException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.form.FormMapping;
 
 import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
 import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
@@ -68,7 +71,8 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
-     * @deprecated use {@link org.bonitasoft.engine.api.ProcessManagementAPI#getParameterInstances(long, int, int, org.bonitasoft.engine.bpm.parameter.ParameterCriterion)}
+     * @deprecated use
+     *             {@link org.bonitasoft.engine.api.ProcessManagementAPI#getParameterInstances(long, int, int, org.bonitasoft.engine.bpm.parameter.ParameterCriterion)}
      */
     @Deprecated
     List<ParameterInstance> getParameterInstances(long processDefinitionId, int startIndex, int maxResults, ParameterCriterion sort);
@@ -286,4 +290,36 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      */
     long getNumberOfProcessSupervisorsForMembership(long processDefinitionId);
 
+    /**
+     * Update a form mapping with the given values
+     *
+     * @param formMappingId
+     *        the form mapping to update
+     * @param url
+     *        the name of the form or the url to the form
+     * @param pageId
+     * @throws org.bonitasoft.engine.exception.FormMappingNotFoundException
+     *         when the formMappingId is not an existing form mapping
+     * @throws UpdateException
+     *         when there is an issue when updating the form mapping
+     * @since 7.0.0
+     */
+    FormMapping updateFormMapping(final long formMappingId, final String url, Long pageId) throws FormMappingNotFoundException, UpdateException;
+
+    /**
+     * Updates an expression content at runtime, for all instances of a given process definition. Note that no check is done on the new content of the
+     * expression, no new dependency can be added, the return type will remain unchanged.
+     * Only <b>script</b> and <b>constant</b> expression content can be updated.
+     * Any further use of this expresssion will then use the new content, as if it was designed with the new content in the first place.
+     *
+     * @param processDefintionId the ID of the process on which to change the expression content
+     * @param expressionDefinitionId the ID of the expression to update
+     * @param content the new content of the expression
+     * @throws ProcessDefinitionNotFoundException if the process or the expression is not found for the given IDs.
+     * @throws UpdateException if a problem occurs during updating, or if the expression type does not support update. Only scripts and constant expression
+     *         content can be updated.
+     * @since 7.0.0
+     */
+    void updateExpressionContent(long processDefintionId, long expressionDefinitionId, String content) throws ProcessDefinitionNotFoundException,
+            UpdateException;
 }
