@@ -157,17 +157,15 @@ public class LiveUpdateIT extends CommonAPISPIT {
                         null);
 
         getCustomPageAPI().deletePage(anOtherForm.getId());
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 140);
-        builder.filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_UPDATED");
-        builder.filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId()));
-        final SearchResult<Log> logSearchResult = getLogAPI().searchLogs(builder.done());
-
+        final SearchResult<Log> logSearchResult = getLogAPI().searchLogs(new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_UPDATED").filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done());
         assertThat(logSearchResult.getResult()).hasSize(6).extracting("message")
                 .contains("Previous: pageId=<null> urlAdapter=<external> url=<a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very ve",
                         "Previous: pageId=<"+anOtherForm.getId()+"> urlAdapter=<null> url=<null>",
                         "Previous: pageId=<null> urlAdapter=<external> url=<http://newFormUrlForStep2>");
+        assertThat(getLogAPI().searchLogs(new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_CREATED").filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done()).getResult()).hasSize(4);
 
         getProcessAPI().deleteProcessDefinition(p.getId());
+        assertThat(getLogAPI().searchLogs(new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_DELETED").filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done()).getResult()).hasSize(4);
 
     }
 
