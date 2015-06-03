@@ -159,9 +159,12 @@ public class FormMappingServiceImpl implements FormMappingService {
         final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(FORM_MAPPING)
                 .setObject(sFormMapping)
                 .done();
+        FormMappingLogBuilder logBuilder = getLogBuilder(ActionType.CREATED);
         try {
             recorder.recordInsert(record, insertEvent);
+            log(sFormMapping, SQueriableLog.STATUS_OK, logBuilder, "insertFormMapping", "create");
         } catch (SRecorderException e) {
+            log(sFormMapping, SQueriableLog.STATUS_FAIL, logBuilder, "insertFormMapping", "failed to create");
             throw new SObjectCreationException(e);
         }
     }
@@ -284,12 +287,16 @@ public class FormMappingServiceImpl implements FormMappingService {
     public void delete(SFormMapping formMapping) throws SObjectModificationException {
         final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(FORM_MAPPING).setObject(formMapping)
                 .done();
+
+        FormMappingLogBuilder logBuilder = getLogBuilder(ActionType.DELETED);
         try {
             recorder.recordDelete(new DeleteRecord(formMapping), deleteEvent);
             if (formMapping.getPageMapping() != null) {
                 pageMappingService.delete(formMapping.getPageMapping());
             }
+            log(formMapping, SQueriableLog.STATUS_OK, logBuilder, "delete", "delete");
         } catch (SRecorderException | SDeletionException e) {
+            log(formMapping, SQueriableLog.STATUS_FAIL, logBuilder, "delete", "failed to delete");
             throw new SObjectModificationException(e);
         }
     }
