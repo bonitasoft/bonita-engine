@@ -71,7 +71,6 @@ public abstract class CommonAPISPIT extends APITestSPUtil {
             messages.addAll(checkNoGroups());
             messages.addAll(checkNoRoles());
             messages.addAll(checkNoSupervisors());
-            messages.addAll(checkNoBreakpoints());
             messages.addAll(checkNoReports());
             logoutOnTenant();
         }
