@@ -24,8 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
@@ -47,6 +50,8 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.Connector;
+import org.bonitasoft.engine.connector.ConnectorException;
+import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.TestConnector2;
 import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
@@ -1469,7 +1474,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     }
 
     private ProcessDefinitionBuilderExt buildProcessWithOuputConnector(final String actor, final Expression input1Expression,
-                                                                       final Expression defaultValueExpression, final String connectorId, final String CONNECTOR_VERSION, final String dataName)
+            final Expression defaultValueExpression, final String connectorId, final String CONNECTOR_VERSION, final String dataName)
             throws InvalidExpressionException {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(actor);
@@ -1555,5 +1560,54 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         BPMTestSPUtil.deactivateAndDeleteTenant(tenant2Id);
         loginOnDefaultTenantWithDefaultTechnicalUser();
         disableAndDeleteProcess(processDefinition);
+    }
+
+
+    @Test
+    public void failingWithConnectorCacheIssue() throws Exception {
+        final ProcessDefinitionBuilderExt processWithFailingConnector = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithFailingConnector", "1.0");
+        processWithFailingConnector.addAutomaticTask("step1").addConnector("failing", "failing", "1", ConnectorEvent.ON_ENTER);
+
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder()
+                .createNewBusinessArchive()
+                .setProcessDefinition(processWithFailingConnector.done())
+                .addConnectorImplementation(
+                        new BarResource("failing.impl", BuildTestUtil.buildConnectorImplementationFile("failing", "1",
+                                "failing-impl",
+                                "1", FailingConnector.class.getName()))).done();
+        final ProcessDefinition processDefinition = deployAndEnableProcess(businessArchive);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
+
+        // put in TO BE EXECUTED and restart the task
+        getProcessAPI().setConnectorInstanceState(
+                getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 1, ConnectorInstanceCriterion.DEFAULT).get(0).getId(),
+                ConnectorStateReset.TO_RE_EXECUTE);
+        getProcessAPI().replayActivity(waitForTaskToFail.getId());
+        final ActivityInstance waitForTaskToFail2 = waitForTaskToFail(processInstance);
+        List<ConnectorInstance> connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 10,
+                ConnectorInstanceCriterion.DEFAULT);
+        Assertions.assertThat(connectorInstances).extracting("state").containsExactly(ConnectorState.FAILED);
+        // failed again, put in SKIPPED and restart the task
+        getProcessAPI().setConnectorInstanceState(
+                getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail2.getId(), 0, 1, ConnectorInstanceCriterion.DEFAULT).get(0).getId(),
+                ConnectorStateReset.SKIPPED);
+        getProcessAPI().replayActivity(waitForTaskToFail2.getId());
+        // should finish
+        waitForProcessToFinish(processInstance);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    public class FailingConnector extends AbstractConnector {
+        @Override
+        public void validateInputParameters() throws ConnectorValidationException {
+
+        }
+
+        @Override
+        protected void executeBusinessLogic() throws ConnectorException {
+            int i = 1/0;
+        }
     }
 }
