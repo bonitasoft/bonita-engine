@@ -37,6 +37,7 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Before;
@@ -72,6 +73,8 @@ public class FormMappingServiceImplTest {
     @Mock
     private PageMappingService pageMappingService;
     @Mock
+    private QueriableLoggerService queriableLoggerService;
+    @Mock
     private PageService pageService;
     @Captor
     private ArgumentCaptor<SUpdateEvent> updateEventCaptor;
@@ -84,7 +87,7 @@ public class FormMappingServiceImplTest {
     @Before
     public void before() throws Exception {
         formMappingService = new FormMappingServiceImpl(recorder, persistenceService, sessionService, sessionAccessor, pageMappingService, pageService,
-                formMappingKeyGenerator, EXTERNAL, LEGACY);
+                formMappingKeyGenerator, EXTERNAL, LEGACY, queriableLoggerService);
         doThrow(SObjectNotFoundException.class).when(pageService).getPage(anyLong());
         doReturn(new SPageImpl("myPage", 0, 0, false, "page.zip")).when(pageService).getPage(PAGE_ID);
     }
