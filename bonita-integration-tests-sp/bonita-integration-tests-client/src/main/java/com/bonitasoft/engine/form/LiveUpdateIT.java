@@ -40,6 +40,7 @@ import org.bonitasoft.engine.page.AuthorizationRuleConstants;
 import org.bonitasoft.engine.page.Page;
 import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +49,8 @@ import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.log.Log;
+import com.bonitasoft.engine.log.LogSearchDescriptor;
 
 /**
  * @author Emmanuel Duchastenier
@@ -141,9 +144,31 @@ public class LiveUpdateIT extends CommonAPISPIT {
         getProcessAPI().updateFormMapping(step1Form.getId(), null, anOtherForm.getId());
         assertThat(getProcessAPI().getProcessResolutionProblems(p.getId())).as("the process should not have resolution problems").isEmpty();
         assertThat(getProcessAPI().getProcessDeploymentInfo(p.getId()).getConfigurationState()).isEqualTo(ConfigurationState.RESOLVED);
+        getProcessAPI()
+                .updateFormMapping(
+                        step1Form.getId(),
+                        "a very very very very very very very very very very very very very very very very very very very very very very "
+                                + "very very very very very very very very very very very very very very very very very very very very very very very very very very long url",
+                        null);
+        getProcessAPI()
+                .updateFormMapping(
+                        step1Form.getId(),
+                        "a normal url",
+                        null);
 
         getCustomPageAPI().deletePage(anOtherForm.getId());
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 140);
+        builder.filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_UPDATED");
+        builder.filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId()));
+        final SearchResult<Log> logSearchResult = getLogAPI().searchLogs(builder.done());
+
+        assertThat(logSearchResult.getResult()).hasSize(6).extracting("message")
+                .contains("Previous: pageId=<null> urlAdapter=<external> url=<a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very ve",
+                        "Previous: pageId=<"+anOtherForm.getId()+"> urlAdapter=<null> url=<null>",
+                        "Previous: pageId=<null> urlAdapter=<external> url=<http://newFormUrlForStep2>");
+
         getProcessAPI().deleteProcessDefinition(p.getId());
+
     }
 
     PageAPI getCustomPageAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
@@ -161,8 +186,10 @@ public class LiveUpdateIT extends CommonAPISPIT {
         final User user = getIdentityAPI().createUser("userForLiveUpdate", "bpm");
         ProcessDefinitionBuilderExt processWithExpression = new ProcessDefinitionBuilderExt().createNewInstance("LiveUpdateProcess", "4.0");
         processWithExpression.addActor("theActor");
-        processWithExpression.addUserTask("step1","theActor").addDisplayName(new ExpressionBuilder().createGroovyScriptExpression("groovyExpr", "return 'before update'", String.class.getName()));
-        processWithExpression.addUserTask("step2", "theActor").addDisplayName(new ExpressionBuilder().createConstantStringExpression("the constant before update"));
+        processWithExpression.addUserTask("step1", "theActor").addDisplayName(
+                new ExpressionBuilder().createGroovyScriptExpression("groovyExpr", "return 'before update'", String.class.getName()));
+        processWithExpression.addUserTask("step2", "theActor").addDisplayName(
+                new ExpressionBuilder().createConstantStringExpression("the constant before update"));
         ProcessDefinition processDefinition = getProcessAPI().deploy(processWithExpression.done());
         getProcessAPI().addUserToActor("theActor", processDefinition, user.getId());
         getProcessAPI().enableProcess(processDefinition.getId());
@@ -173,7 +200,6 @@ public class LiveUpdateIT extends CommonAPISPIT {
         HumanTaskInstance step2 = waitForUserTaskAndGetIt(processInstance, "step2");
         assertThat(step1.getDisplayName()).as("display name of step1 before update").isEqualTo("before update");
         assertThat(step2.getDisplayName()).as("display name of step2 before update").isEqualTo("the constant before update");
-
 
         //update expressions
         final DesignProcessDefinition designProcessDefinition = getProcessAPI().getDesignProcessDefinition(processDefinition.getId());
