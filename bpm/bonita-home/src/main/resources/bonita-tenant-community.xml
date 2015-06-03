@@ -1548,6 +1548,7 @@
         <constructor-arg name="legacyUrlAdapter">
             <util:constant static-field="org.bonitasoft.engine.page.URLAdapterConstants.LEGACY_URL_ADAPTER" />
         </constructor-arg>
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
     </bean>
 
     <bean id="syncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.SyncQueriableLoggerServiceImpl">
