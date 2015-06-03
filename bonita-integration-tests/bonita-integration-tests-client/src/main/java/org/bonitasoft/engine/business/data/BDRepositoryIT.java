@@ -210,6 +210,10 @@ public class BDRepositoryIT extends CommonAPIIT {
         employee.setDescription("Describe a simple employee");
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
+        final Query getEmployeeByPersistId = employee
+                .addQuery("findByPersistId", "SELECT e FROM Employee e WHERE e.persistenceId=:id", EMPLOYEE_QUALIFIED_NAME);
+        getEmployeeByPersistId.addQueryParameter("id", Long.class.getName());
+
         final Query getEmployeeByPhoneNumber = employee.addQuery(GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME,
                 "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)", List.class.getName());
         getEmployeeByPhoneNumber.addQueryParameter("phoneNumber", String.class.getName());
@@ -655,8 +659,8 @@ public class BDRepositoryIT extends CommonAPIIT {
         String returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
         assertThat(returnedLastName).isEqualTo("Grenoble");
 
-        Serializable nbOfAddress = evaluatedExpressions.get(COUNT_ADDRESS);
-        Serializable nbOfEmployee = evaluatedExpressions.get(COUNT_EMPLOYEE);
+        final Serializable nbOfAddress = evaluatedExpressions.get(COUNT_ADDRESS);
+        final Serializable nbOfEmployee = evaluatedExpressions.get(COUNT_EMPLOYEE);
 
         assertThat(nbOfAddress).isEqualTo(1L);
         assertThat(nbOfEmployee).isEqualTo(1L);
@@ -1586,7 +1590,24 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String address = getAddressAsAString("myAddress", processInstance.getId());
         assertThat(address).isEqualTo("Address [street=32, rue Gustave Eiffel, city=Grenoble]");
 
+        final SimpleBusinessDataReference businessDataReference = (SimpleBusinessDataReference) getBusinessDataAPI().getProcessBusinessDataReference(
+                bizDataName, processInstance.getId());
+
+        final Expression idExpression = new ExpressionBuilder().createExpression("id", String.valueOf(businessDataReference.getStorageId()),
+                Long.class.getName(), ExpressionType.TYPE_CONSTANT);
+        final Expression getEmployeeExpression = new ExpressionBuilder().createQueryBusinessDataExpression("getEmployee", "Employee.findByPersistId",
+                EMPLOYEE_QUALIFIED_NAME, idExpression);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("init", "3.2");
+        processDefBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIFIED_NAME, getEmployeeExpression);
+        processDefBuilder.addActor(ACTOR_NAME);
+        processDefBuilder.addUserTask("step2", ACTOR_NAME);
+
+        final ProcessDefinition definition2 = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, matti);
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(definition2.getId());
+        waitForUserTask(processInstance2, "step2");
+
         disableAndDeleteProcess(definition.getId());
+        disableAndDeleteProcess(definition2.getId());
     }
 
     @Test
