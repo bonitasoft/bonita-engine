@@ -250,6 +250,9 @@
                 <entry key="THEME_UPDATED:INTERNAL" value="true" />
                 <entry key="TRANSITION_INSTANCE_CREATED:INTERNAL" value="true" />
                 <entry key="TRANSITION_INSTANCE_DELETED:INTERNAL" value="true" />
+                <entry key="FORM_MAPPING_UPDATED:INTERNAL" value="true" />
+                <entry key="FORM_MAPPING_DELETED:INTERNAL" value="true" />
+                <entry key="FORM_MAPPING_CREATED:INTERNAL" value="true" />
             </map>
         </constructor-arg>
     </bean>
