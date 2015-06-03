@@ -33,7 +33,6 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -57,6 +56,7 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -257,7 +257,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final long parentId) throws SFlowNodeNotFoundException,
-            SFlowNodeReadException, SProcessDefinitionNotFoundException, SProcessDefinitionReadException, SArchivingException, SFlowNodeModificationException,
+            SFlowNodeReadException, SProcessDefinitionNotFoundException, SBonitaReadException, SArchivingException, SFlowNodeModificationException,
             SFlowNodeExecutionException, SContractDataDeletionException {
         final SFlowNodeInstance sFlowNodeInstanceChild = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
 

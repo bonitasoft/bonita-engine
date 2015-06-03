@@ -135,10 +135,6 @@ public final class TenantAPIAccessor {
         return getAPI(ApplicationAPI.class, session);
     }
 
-    public static ProcessConfigurationAPI getProcessConfigurationAPI(APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        return getAPI(ProcessConfigurationAPI.class, session);
-    }
-
     public static TenantAdministrationAPI getTenantAdministrationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
             UnknownAPITypeException {
         return getAPI(TenantAdministrationAPI.class, session);

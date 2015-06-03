@@ -38,7 +38,6 @@
 			</type>
 		</property>
 		<property name="interruptingEventId" column="interruptingEventId" />
-		<property name="migrationPlanId" column="migration_plan" />
 		<property name="stringIndex1" column="stringIndex1" />
 		<property name="stringIndex2" column="stringIndex2" />
 		<property name="stringIndex3" column="stringIndex3" />

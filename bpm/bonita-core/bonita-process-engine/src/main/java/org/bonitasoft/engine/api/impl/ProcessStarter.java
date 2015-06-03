@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
@@ -31,7 +30,6 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
@@ -49,6 +47,7 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
@@ -103,7 +102,7 @@ public class ProcessStarter {
             return start(null);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SProcessDefinitionReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (final SProcessDefinitionException e) {
             throw new ProcessActivationException(e);
@@ -114,7 +113,7 @@ public class ProcessStarter {
 
     // For commands
     public ProcessInstance start(final List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SProcessInstanceCreationException,
-            SProcessDefinitionReadException, SProcessDefinitionException, SContractViolationException {
+            SBonitaReadException, SProcessDefinitionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();

@@ -35,8 +35,6 @@ public interface SProcessDefinitionDeployInfo extends PersistentObject {
 
     long getDeployedBy();
 
-    long getMigrationDate();
-
     long getSupervisorId();
 
     String getDisplayName();

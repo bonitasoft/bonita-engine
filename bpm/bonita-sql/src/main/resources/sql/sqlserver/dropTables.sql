@@ -48,8 +48,6 @@ DROP TABLE waiting_event
 GO
 DROP TABLE message_instance
 GO
-DROP TABLE breakpoint
-GO
 DROP TABLE report
 GO
 DROP TABLE processsupervisor

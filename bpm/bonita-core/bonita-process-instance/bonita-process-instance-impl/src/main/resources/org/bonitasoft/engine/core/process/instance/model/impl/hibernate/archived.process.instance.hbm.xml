@@ -24,7 +24,6 @@
         <property name="lastUpdate" column="lastUpdate" />
         <property name="rootProcessInstanceId" column="rootProcessInstanceId" />
         <property name="callerId" column="callerId" />
-        <property name="migrationPlanId" column="migration_plan" />
         <property name="stringIndex1" column="stringIndex1" />
         <property name="stringIndex2" column="stringIndex2" />
         <property name="stringIndex3" column="stringIndex3" />
@@ -168,40 +167,5 @@
               extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAThrowEventInstanceImpl" />
 
     <subclass name="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAEndEventInstanceImpl" discriminator-value="endEvent" extends="org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAThrowEventInstanceImpl" />
-
-    <class name="SATransitionInstanceImpl" table="arch_transition_instance">
-        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-            <key-property name="tenantId" column="tenantid" type="long" />
-            <key-property name="id" column="id" type="long" />
-        </composite-id>
-        <property name="rootContainerId" column="rootContainerId" />
-        <property name="parentContainerId" column="parentContainerId" />
-        <property name="source" column="source" type="long" />
-        <property name="target" column="target" type="long" />
-        <property name="state" column="state">
-            <type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
-                <param name="enumClass">
-                    org.bonitasoft.engine.core.process.definition.model.TransitionState
-                </param>
-            </type>
-        </property>
-        <property name="terminal" column="terminal" type="boolean" />
-        <property name="stable" column="stable" type="boolean" />
-        <property name="stateCategory" column="stateCategory">
-            <type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
-                <param name="enumClass">
-                    org.bonitasoft.engine.core.process.instance.model.SStateCategory
-                </param>
-            </type>
-        </property>
-        <property name="logicalGroup1" column="logicalGroup1" />
-        <property name="logicalGroup2" column="logicalGroup2" />
-        <property name="logicalGroup3" column="logicalGroup3" />
-        <property name="logicalGroup4" column="logicalGroup4" />
-        <property name="description" column="description" />
-        <property name="archiveDate" column="archiveDate" />
-        <property name="sourceObjectId" column="sourceObjectId" type="long" />
-        <filter name="tenantFilter" />
-    </class>
 
 </hibernate-mapping>

@@ -120,7 +120,6 @@ CREATE TABLE process_definition (
   deployedBy NUMERIC(19, 0) NOT NULL,
   activationState NVARCHAR(30) NOT NULL,
   configurationState NVARCHAR(30) NOT NULL,
-  migrationDate NUMERIC(19, 0),
   displayName NVARCHAR(75),
   displayDescription NVARCHAR(255),
   lastUpdateDate NUMERIC(19, 0),
@@ -195,7 +194,6 @@ CREATE TABLE arch_process_instance (
   lastUpdate NUMERIC(19, 0) NOT NULL,
   rootProcessInstanceId NUMERIC(19, 0),
   callerId NUMERIC(19, 0),
-  migration_plan NUMERIC(19, 0),
   sourceObjectId NUMERIC(19, 0) NOT NULL,
   stringIndex1 NVARCHAR(255),
   stringIndex2 NVARCHAR(255),
@@ -330,7 +328,6 @@ CREATE TABLE process_instance (
   callerId NUMERIC(19, 0),
   callerType NVARCHAR(50),
   interruptingEventId NUMERIC(19, 0),
-  migration_plan NUMERIC(19, 0),
   stringIndex1 NVARCHAR(255),
   stringIndex2 NVARCHAR(255),
   stringIndex3 NVARCHAR(255),
@@ -500,19 +497,6 @@ CREATE TABLE pending_mapping (
 )
 GO
 CREATE UNIQUE INDEX idx_UQ_pending_mapping ON pending_mapping (tenantid, activityId, userId, actorId)
-GO
-
-CREATE TABLE breakpoint (
-	tenantid NUMERIC(19, 0) NOT NULL,
-  	id NUMERIC(19, 0) NOT NULL,
-  	state_id INT NOT NULL,
-  	int_state_id INT NOT NULL,
-  	elem_name NVARCHAR(255) NOT NULL,
-  	inst_scope BIT NOT NULL,
-  	inst_id NUMERIC(19, 0) NOT NULL,
-  	def_id NUMERIC(19, 0) NOT NULL,
-  	PRIMARY KEY (tenantid, id)
-)
 GO
 
 CREATE TABLE ref_biz_data_inst (

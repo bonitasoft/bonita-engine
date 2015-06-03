@@ -47,8 +47,6 @@ public interface ProcessInstanceService {
 
     String PROCESSINSTANCE_STATE = "PROCESSINSTANCE_STATE";
 
-    String MIGRATION_PLAN = "MIGRATION_PLAN";
-
     String PROCESS_INSTANCE_CATEGORY_STATE = "PROCESS_INSTANCE_CATEGORY_STATE";
 
     String PROCESSINSTANCE_STATE_UPDATED = "PROCESSINSTANCE_STATE_UPDATED";
@@ -511,15 +509,6 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceModificationException
      */
     void updateProcess(SProcessInstance processInstance, EntityUpdateDescriptor descriptor) throws SProcessInstanceModificationException;
-
-    /**
-     * set reference to the migration plan on the process instance
-     *
-     * @param processInstance
-     * @param migrationPlanId
-     * @throws SProcessInstanceModificationException
-     */
-    void setMigrationPlanId(SProcessInstance processInstance, long migrationPlanId) throws SProcessInstanceModificationException;
 
     /**
      * @param flowNodeInstance

@@ -48,8 +48,6 @@ DELETE FROM flownode_instance
 GO
 DELETE FROM process_instance
 GO
-DELETE FROM breakpoint
-GO
 DELETE FROM report
 GO
 DELETE FROM processsupervisor

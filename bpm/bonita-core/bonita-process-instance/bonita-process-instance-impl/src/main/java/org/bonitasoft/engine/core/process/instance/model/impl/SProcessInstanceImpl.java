@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.impl;
 
+import java.util.Objects;
+
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
@@ -68,8 +70,6 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
     private String stringIndex4;
 
     private String stringIndex5;
-
-    private long migrationPlanId;
 
     public SProcessInstanceImpl() {
         super();
@@ -226,15 +226,6 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
     }
 
     @Override
-    public long getMigrationPlanId() {
-        return migrationPlanId;
-    }
-
-    public void setMigrationPlanId(final long migrationPlanId) {
-        this.migrationPlanId = migrationPlanId;
-    }
-
-    @Override
     public String getStringIndex1() {
         return stringIndex1;
     }
@@ -286,60 +277,39 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SProcessInstanceImpl)) return false;
-        if (!super.equals(o)) return false;
-
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         SProcessInstanceImpl that = (SProcessInstanceImpl) o;
-
-        if (callerId != that.callerId) return false;
-        if (containerId != that.containerId) return false;
-        if (endDate != that.endDate) return false;
-        if (interruptingEventId != that.interruptingEventId) return false;
-        if (lastUpdate != that.lastUpdate) return false;
-        if (migrationPlanId != that.migrationPlanId) return false;
-        if (processDefinitionId != that.processDefinitionId) return false;
-        if (rootProcessInstanceId != that.rootProcessInstanceId) return false;
-        if (startDate != that.startDate) return false;
-        if (startedBy != that.startedBy) return false;
-        if (startedBySubstitute != that.startedBySubstitute) return false;
-        if (stateId != that.stateId) return false;
-        if (callerType != that.callerType) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (stateCategory != that.stateCategory) return false;
-        if (stringIndex1 != null ? !stringIndex1.equals(that.stringIndex1) : that.stringIndex1 != null) return false;
-        if (stringIndex2 != null ? !stringIndex2.equals(that.stringIndex2) : that.stringIndex2 != null) return false;
-        if (stringIndex3 != null ? !stringIndex3.equals(that.stringIndex3) : that.stringIndex3 != null) return false;
-        if (stringIndex4 != null ? !stringIndex4.equals(that.stringIndex4) : that.stringIndex4 != null) return false;
-        if (stringIndex5 != null ? !stringIndex5.equals(that.stringIndex5) : that.stringIndex5 != null) return false;
-
-        return true;
+        return Objects.equals(processDefinitionId, that.processDefinitionId) &&
+                Objects.equals(stateId, that.stateId) &&
+                Objects.equals(startDate, that.startDate) &&
+                Objects.equals(startedBy, that.startedBy) &&
+                Objects.equals(startedBySubstitute, that.startedBySubstitute) &&
+                Objects.equals(endDate, that.endDate) &&
+                Objects.equals(lastUpdate, that.lastUpdate) &&
+                Objects.equals(containerId, that.containerId) &&
+                Objects.equals(rootProcessInstanceId, that.rootProcessInstanceId) &&
+                Objects.equals(callerId, that.callerId) &&
+                Objects.equals(interruptingEventId, that.interruptingEventId) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(callerType, that.callerType) &&
+                Objects.equals(stateCategory, that.stateCategory) &&
+                Objects.equals(stringIndex1, that.stringIndex1) &&
+                Objects.equals(stringIndex2, that.stringIndex2) &&
+                Objects.equals(stringIndex3, that.stringIndex3) &&
+                Objects.equals(stringIndex4, that.stringIndex4) &&
+                Objects.equals(stringIndex5, that.stringIndex5);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (int) (processDefinitionId ^ (processDefinitionId >>> 32));
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + stateId;
-        result = 31 * result + (int) (startDate ^ (startDate >>> 32));
-        result = 31 * result + (int) (startedBy ^ (startedBy >>> 32));
-        result = 31 * result + (int) (startedBySubstitute ^ (startedBySubstitute >>> 32));
-        result = 31 * result + (int) (endDate ^ (endDate >>> 32));
-        result = 31 * result + (int) (lastUpdate ^ (lastUpdate >>> 32));
-        result = 31 * result + (int) (containerId ^ (containerId >>> 32));
-        result = 31 * result + (int) (rootProcessInstanceId ^ (rootProcessInstanceId >>> 32));
-        result = 31 * result + (int) (callerId ^ (callerId >>> 32));
-        result = 31 * result + (callerType != null ? callerType.hashCode() : 0);
-        result = 31 * result + (int) (interruptingEventId ^ (interruptingEventId >>> 32));
-        result = 31 * result + (stateCategory != null ? stateCategory.hashCode() : 0);
-        result = 31 * result + (stringIndex1 != null ? stringIndex1.hashCode() : 0);
-        result = 31 * result + (stringIndex2 != null ? stringIndex2.hashCode() : 0);
-        result = 31 * result + (stringIndex3 != null ? stringIndex3.hashCode() : 0);
-        result = 31 * result + (stringIndex4 != null ? stringIndex4.hashCode() : 0);
-        result = 31 * result + (stringIndex5 != null ? stringIndex5.hashCode() : 0);
-        result = 31 * result + (int) (migrationPlanId ^ (migrationPlanId >>> 32));
-        return result;
+        return Objects.hash(super.hashCode(), processDefinitionId, description, stateId, startDate, startedBy, startedBySubstitute, endDate, lastUpdate,
+                containerId, rootProcessInstanceId, callerId, callerType, interruptingEventId, stateCategory, stringIndex1, stringIndex2, stringIndex3,
+                stringIndex4, stringIndex5);
     }
 
     @Override
@@ -364,7 +334,6 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
                 ", stringIndex3='" + stringIndex3 + '\'' +
                 ", stringIndex4='" + stringIndex4 + '\'' +
                 ", stringIndex5='" + stringIndex5 + '\'' +
-                ", migrationPlanId=" + migrationPlanId +
-                '}';
+                "} " + super.toString();
     }
 }

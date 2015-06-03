@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.operation;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +25,6 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
@@ -99,9 +98,7 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
                             + "We advise you to change the design of your process. If you understand the risks and want to hide this warning, change the logging level of this class to error.");
             transientDataService.updateDataInstance(dataInstance, descriptor);
             return newValue;
-        } catch (final SDataInstanceException e) {
-            throw new SOperationExecutionException("Unable to update the transient data", e);
-        } catch (final SBonitaReadException e) {
+        } catch (final SDataInstanceException | SBonitaReadException e) {
             throw new SOperationExecutionException("Unable to update the transient data", e);
         }
     }
@@ -166,19 +163,9 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
                         + "> process definition=<" + processDefinition.getName() + "," + processDefinition.getVersion() + "> flow node=<"
                                 + flowNode.getName() + ">");
             }
-            bpmInstancesCreator.createDataInstances(Arrays.asList(theTransientData), containerId, DataInstanceContainer.ACTIVITY_INSTANCE,
+            bpmInstancesCreator.createDataInstances(Collections.singletonList(theTransientData), containerId, DataInstanceContainer.ACTIVITY_INSTANCE,
                     new SExpressionContext(containerId, containerType, processDefinitionId));
-        } catch (final SDataInstanceException e) {
-            throwBonitaReadException(name, e);
-        } catch (final SExpressionException e) {
-            throwBonitaReadException(name, e);
-        } catch (final SFlowNodeNotFoundException e) {
-            throwBonitaReadException(name, e);
-        } catch (final SFlowNodeReadException e) {
-            throwBonitaReadException(name, e);
-        } catch (final SProcessDefinitionReadException e) {
-            throwBonitaReadException(name, e);
-        } catch (final SProcessDefinitionNotFoundException e) {
+        } catch (final SDataInstanceException | SProcessDefinitionNotFoundException | SBonitaReadException | SFlowNodeReadException | SFlowNodeNotFoundException | SExpressionException e) {
             throwBonitaReadException(name, e);
         }
     }

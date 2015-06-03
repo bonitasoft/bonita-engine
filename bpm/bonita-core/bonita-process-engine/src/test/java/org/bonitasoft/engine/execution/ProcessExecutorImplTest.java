@@ -58,7 +58,6 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.events.EventService;
@@ -160,9 +159,6 @@ public class ProcessExecutorImplTest {
 
     @Mock
     private TransactionExecutor transactionExecutor;
-
-    @Mock
-    private TransitionService transitionService;
 
     @Mock
     private WorkService workService;

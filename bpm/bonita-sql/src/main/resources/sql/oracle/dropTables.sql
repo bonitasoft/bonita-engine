@@ -23,7 +23,6 @@ DROP TABLE process_instance cascade constraints purge;
 DROP TABLE event_trigger_instance cascade constraints purge;
 DROP TABLE waiting_event cascade constraints purge;
 DROP TABLE message_instance cascade constraints purge;
-DROP TABLE breakpoint cascade constraints purge;
 DROP TABLE report cascade constraints purge;
 DROP TABLE processsupervisor cascade constraints purge;
 DROP TABLE business_app_menu cascade constraints purge;
