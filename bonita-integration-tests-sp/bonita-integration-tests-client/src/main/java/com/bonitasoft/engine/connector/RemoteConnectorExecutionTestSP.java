@@ -1592,10 +1592,6 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
                 getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail2.getId(), 0, 1, ConnectorInstanceCriterion.DEFAULT).get(0).getId(),
                 ConnectorStateReset.SKIPPED);
         getProcessAPI().replayActivity(waitForTaskToFail2.getId());
-
-        connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(waitForTaskToFail.getId(), 0, 10,
-                ConnectorInstanceCriterion.DEFAULT);
-        Assertions.assertThat(connectorInstances).extracting("state").containsExactly(ConnectorState.SKIPPED);
         // should finish
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
