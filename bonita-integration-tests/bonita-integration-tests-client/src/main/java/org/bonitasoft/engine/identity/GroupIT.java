@@ -523,7 +523,7 @@ public class GroupIT extends TestWithTechnicalUser {
         final Group groupD = createGroup("d", "labelD", "descrtptionD");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.filter(GroupSearchDescriptor.ID, String.valueOf(groupC.getId()));
+        builder.filter(GroupSearchDescriptor.ID, groupC.getId());
         final SearchResult<Group> searchGroups = getIdentityAPI().searchGroups(builder.done());
         assertNotNull(searchGroups);
         assertEquals(1, searchGroups.getCount());
