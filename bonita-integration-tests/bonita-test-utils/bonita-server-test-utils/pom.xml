@@ -66,6 +66,11 @@
 			<groupId>com.microsoft.jdbc</groupId>
 			<artifactId>sqlserver</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.ibm.db2.jcc</groupId>
+            <artifactId>db2jcc4</artifactId>
+        </dependency>
+
 
 		<!-- Transaction -->
 		<dependency>
