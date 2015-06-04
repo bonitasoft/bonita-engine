@@ -13,44 +13,25 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.L_PARENTHESIS;
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.R_PARENTHESIS;
-import static org.bonitasoft.engine.persistence.search.FilterOperationType.isNormalOperator;
+import static org.bonitasoft.engine.persistence.search.FilterOperationType.*;
 
-import java.io.IOException;
-import java.net.URL;
+import javax.sql.DataSource;
+import java.lang.InstantiationException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.EnumToObjectConvertible;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.UpdateDescriptor;
-import org.hibernate.AssertionFailure;
-import org.hibernate.HibernateException;
-import org.hibernate.Interceptor;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.StaleStateException;
+import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.LockAcquisitionException;
 import org.hibernate.mapping.PersistentClass;
@@ -147,6 +128,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         if (dialect != null) {
             if (dialect.contains("PostgreSQL")) {
                 configuration.setInterceptor(new PostgresInterceptor());
+
+                configuration.registerTypeOverride(new PostgresMaterializedBlobType());
             } else if (dialect.contains("SQLServer")) {
                 configuration.setInterceptor(new SQLServerInterceptor());
             }

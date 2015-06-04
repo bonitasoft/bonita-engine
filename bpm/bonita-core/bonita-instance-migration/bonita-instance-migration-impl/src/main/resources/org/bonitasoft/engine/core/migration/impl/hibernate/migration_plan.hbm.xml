@@ -16,7 +16,7 @@
 		<property name="sourceProcessVersion" column="source_version" />
 		<property name="targetProcessName" column="target_name" />
 		<property name="targetProcessVersion" column="target_version" />
-		<property name="content" column="content" />
+		<property name="content" type="materialized_blob"  column="content" />
 		<filter name="tenantFilter" />
 	</class>
 </hibernate-mapping>

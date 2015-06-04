@@ -62,7 +62,7 @@
 	</subclass>
 
 	<subclass name="SABlobDataInstanceImpl" abstract="false" discriminator-value="SABlobDataInstanceImpl" extends="SADataInstanceImpl">
-		<property name="value" column="blobValue" />
+		<property name="value" type="materialized_blob" column="blobValue" />
 	</subclass>
 
 	<subclass name="SADateDataInstanceImpl" abstract="false" discriminator-value="SADateDataInstanceImpl" extends="SADataInstanceImpl">

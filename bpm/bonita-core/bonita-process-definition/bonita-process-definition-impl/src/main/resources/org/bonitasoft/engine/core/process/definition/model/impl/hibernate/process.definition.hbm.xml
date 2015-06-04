@@ -36,7 +36,7 @@
             <key-property name="tenantId" column="tenantid" type="long" />
             <key-property name="id" column="id" type="long" />
         </composite-id>
-        <property name="content" column="content" />
+        <property name="content" type="materialized_clob" column="content" />
     </class>
 
 </hibernate-mapping>

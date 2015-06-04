@@ -56,7 +56,7 @@
 	</subclass>
 
 	<subclass name="SBlobDataInstanceImpl" abstract="false" discriminator-value="SBlobDataInstanceImpl" extends="SDataInstanceImpl">
-		<property name="value" column="blobValue" />
+		<property name="value" type="materialized_blob" column="blobValue" />
 	</subclass>
 
 	<subclass name="SXMLObjectDataInstanceImpl" abstract="false" discriminator-value="SXMLObjectDataInstanceImpl" extends="SDataInstanceImpl">
