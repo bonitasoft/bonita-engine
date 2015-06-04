@@ -16,6 +16,7 @@ package org.bonitasoft.engine.transaction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.transaction.HeuristicMixedException;
@@ -42,14 +43,19 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private final TransactionServiceContextThreadLocal txContextThreadLocal;
 
+	/**
+     * We maintain a list of Callables that must be executed just before the real commit (and before the beforeCompletion method is called), so that we ensure
+     * that Hibernate has not already flushed its session.
+     */
     private final ThreadLocal<List<Callable<Void>>> beforeCommitCallables = new ThreadLocal<>();
+   
 
     private ThreadLocal<String> txLastBegin = new ThreadLocal<>();
 
     public JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager) {
         this.logger = logger;
         if (txManager == null) {
-            throw new IllegalArgumentException("The parameter txManager can't be null.");
+            throw new IllegalArgumentException("The TransactionManager cannot be null.");
         }
         this.txManager = txManager;
         txContextThreadLocal = new TransactionServiceContextThreadLocal(txManager);
@@ -59,7 +65,7 @@ public class JTATransactionServiceImpl implements TransactionService {
     public void begin() throws STransactionCreationException {
         try {
             final TransactionServiceContext txContext = txContextThreadLocal.get();
-            if (txContext.reentrantCounter() == 1) {
+            if (txContext.isTransactionActiveOnThread()) {
                 TransactionState txState = null;
                 try {
                     txState = getState();
@@ -72,12 +78,11 @@ public class JTATransactionServiceImpl implements TransactionService {
                 }
                 throw new STransactionCreationException(message);
             }
-            txContext.incrementReentrantCounter();
+            txContext.setTransactionActiveOnThread();
 
-            if (!txContext.isAlreadyManaged()) {
+            if (!txContext.isExternallyManaged()) {
                 beforeCommitCallables.remove();
-                final boolean transactionStarted = false;
-                createTransaction(transactionStarted);
+                createTransaction(false);
             }
 
             // Either we initiated the transaction or it has already been initiated outside of the service :
@@ -89,7 +94,11 @@ public class JTATransactionServiceImpl implements TransactionService {
                 registerSynchronization(tx);
             }
         } catch (final SystemException e) {
+            resetTxCounter(txContextThreadLocal.get());
             throw new STransactionCreationException(e);
+        } catch (final STransactionCreationException e) {
+            resetTxCounter(txContextThreadLocal.get());
+            throw e;
         }
     }
 
@@ -105,7 +114,7 @@ public class JTATransactionServiceImpl implements TransactionService {
         }
     }
 
-    private void createTransaction(boolean transactionStarted) throws STransactionCreationException, SystemException {
+    void createTransaction(boolean transactionStarted) throws STransactionCreationException, SystemException {
         try {
             txManager.begin();
             transactionStarted = true;
@@ -154,8 +163,8 @@ public class JTATransactionServiceImpl implements TransactionService {
             }
 
             final TransactionServiceContext txContext = txContextThreadLocal.get();
-            if (txContext.isAlreadyManaged()) {
-                txContext.decrementReentrantCounter();
+            if (txContext.isExternallyManaged()) {
+                resetTxCounter(txContext);
                 return; // We do not manage the transaction boundaries
             }
 
@@ -166,11 +175,22 @@ public class JTATransactionServiceImpl implements TransactionService {
             }
             this.txLastBegin.set(null);
         } catch (final SystemException e) {
+            resetTxCounter(txContextThreadLocal.get());
             throw new STransactionCommitException(e);
+        } catch (final STransactionCommitException e) {
+            resetTxCounter(txContextThreadLocal.get());
+            throw e;
+        } catch (final STransactionRollbackException e) {
+            resetTxCounter(txContextThreadLocal.get());
+            throw e;
         }
     }
 
-    private void commit() throws SystemException, STransactionCommitException {
+    protected void resetTxCounter(TransactionServiceContext txContext) {
+        txContext.resetActiveTransaction();
+    }
+
+    void commit() throws SystemException, STransactionCommitException {
         try {
             final List<Callable<Void>> callables = beforeCommitCallables.get();
             if (callables != null) {
@@ -208,18 +228,18 @@ public class JTATransactionServiceImpl implements TransactionService {
             final int status = txManager.getStatus();
 
             switch (status) {
-            case Status.STATUS_ACTIVE:
-                return TransactionState.ACTIVE;
-            case Status.STATUS_COMMITTED:
-                return TransactionState.COMMITTED;
-            case Status.STATUS_MARKED_ROLLBACK:
-                return TransactionState.ROLLBACKONLY;
-            case Status.STATUS_ROLLEDBACK:
-                return TransactionState.ROLLEDBACK;
-            case Status.STATUS_NO_TRANSACTION:
-                return TransactionState.NO_TRANSACTION;
-            default:
-                throw new STransactionException("Can't map the JTA status : " + status);
+                case Status.STATUS_ACTIVE:
+                    return TransactionState.ACTIVE;
+                case Status.STATUS_COMMITTED:
+                    return TransactionState.COMMITTED;
+                case Status.STATUS_MARKED_ROLLBACK:
+                    return TransactionState.ROLLBACKONLY;
+                case Status.STATUS_ROLLEDBACK:
+                    return TransactionState.ROLLEDBACK;
+                case Status.STATUS_NO_TRANSACTION:
+                    return TransactionState.NO_TRANSACTION;
+                default:
+                    throw new STransactionException("Can't map the JTA status : " + status);
             }
         } catch (final SystemException e) {
             throw new STransactionException(e);
@@ -354,9 +374,10 @@ public class JTATransactionServiceImpl implements TransactionService {
         }
     }
 
-    private static class TransactionServiceContext {
+    static class TransactionServiceContext {
 
-        private final AtomicLong reentrantCounter = new AtomicLong();
+        // Default value is false:
+        private final AtomicBoolean txAlreadyActive = new AtomicBoolean();
 
         private final boolean boundaryManagedOutside;
 
@@ -364,19 +385,19 @@ public class JTATransactionServiceImpl implements TransactionService {
             this.boundaryManagedOutside = boundaryManagedOutside;
         }
 
-        public long incrementReentrantCounter() {
-            return reentrantCounter.getAndIncrement();
+        public void setTransactionActiveOnThread() {
+            txAlreadyActive.set(true);
         }
 
-        public long decrementReentrantCounter() {
-            return reentrantCounter.getAndDecrement();
+        public void resetActiveTransaction() {
+            txAlreadyActive.set(false);
         }
 
-        public long reentrantCounter() {
-            return reentrantCounter.get();
+        public boolean isTransactionActiveOnThread() {
+            return txAlreadyActive.get();
         }
 
-        public boolean isAlreadyManaged() {
+        public boolean isExternallyManaged() {
             return boundaryManagedOutside;
         }
     }
