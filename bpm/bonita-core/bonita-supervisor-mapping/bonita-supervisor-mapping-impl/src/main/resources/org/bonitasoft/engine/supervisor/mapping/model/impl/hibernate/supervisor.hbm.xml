@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.supervisor.mapping.model.impl">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.core.migration.model.impl">
 
 	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
 		<filter-param name="tenantId" type="long" />
@@ -17,5 +17,4 @@
 		<property name="roleId" type="long" column="roleId" />
 		<filter name="tenantFilter" />
 	</class>
-
 </hibernate-mapping>

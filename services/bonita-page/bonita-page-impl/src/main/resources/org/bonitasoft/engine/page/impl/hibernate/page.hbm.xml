@@ -39,7 +39,7 @@
 		<property name="lastModificationDate" column="lastModificationDate" />
 		<property name="lastUpdatedBy" column="lastUpdatedBy" />
 		<property name="contentName" column="contentName" />
-		<property name="content" column="content" />
+		<property name="content" type="materialized_blob" column="content" />
         <property name="contentType" column="contentType" />
         <property name="processDefinitionId" column="processDefinitionId" />
 		<filter name="tenantFilter" />
@@ -50,7 +50,7 @@
             <key-property name="tenantId" column="tenantId" type="long" />
             <key-property name="id" column="id" type="long" />
         </composite-id>
-        <property name="content" column="content" />
+        <property name="content" type="materialized_blob" column="content" />
         <filter name="tenantFilter" />
     </class>
 
