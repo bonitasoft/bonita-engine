@@ -189,7 +189,9 @@ public class ServerProxyfier {
                         for (final Entity e : entities) {
                             realEntities.add(unProxyfyIfNeeded(e));
                         }
-                        field.set(entity, realEntities);
+                        list.clear();
+                        list.addAll(realEntities);
+                        field.set(entity, list);
                     }
                 }
             }
