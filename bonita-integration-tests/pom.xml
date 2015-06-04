@@ -41,6 +41,11 @@
 				<artifactId>sqlserver</artifactId>
 				<version>4.0.2206.100</version>
 			</dependency>
+            <dependency>
+                <groupId>com.ibm.db2.jcc</groupId>
+                <artifactId>db2jcc4</artifactId>
+                <version>10.5-FP5</version>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 	
