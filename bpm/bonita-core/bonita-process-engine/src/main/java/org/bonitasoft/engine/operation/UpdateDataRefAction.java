@@ -17,15 +17,13 @@ package org.bonitasoft.engine.operation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.business.data.RefBusinessDataRetriever;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-
-import org.bonitasoft.engine.bdm.Entity;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -33,18 +31,17 @@ import org.bonitasoft.engine.bdm.Entity;
 public class UpdateDataRefAction implements EntityAction {
 
     private final RefBusinessDataService refBusinessDataService;
-    private final FlowNodeInstanceService flowNodeInstanceService;
+    private final RefBusinessDataRetriever refBusinessDataRetriever;
 
-    public UpdateDataRefAction(RefBusinessDataService refBusinessDataService,
-            FlowNodeInstanceService flowNodeInstanceService) {
+    public UpdateDataRefAction(RefBusinessDataService refBusinessDataService, RefBusinessDataRetriever refBusinessDataRetriever) {
         this.refBusinessDataService = refBusinessDataService;
-        this.flowNodeInstanceService = flowNodeInstanceService;
+        this.refBusinessDataRetriever = refBusinessDataRetriever;
     }
 
     @Override
     public Entity execute(final Entity entity, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
         try {
-            SRefBusinessDataInstance reference = getRefBusinessDataInstance(businessDataContext);
+            SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext);
             checkThatIsSimpleRef(reference);
             SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
             if (!entity.getPersistenceId().equals(simpleRef.getDataId())) {
@@ -63,23 +60,10 @@ public class UpdateDataRefAction implements EntityAction {
         }
     }
 
-    private SRefBusinessDataInstance getRefBusinessDataInstance(BusinessDataContext context)
-            throws SBonitaException {
-        if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(context.getContainer().getType())) {
-            return refBusinessDataService.getRefBusinessDataInstance(context.getName(), context.getContainer().getId());
-        }
-        try {
-            return refBusinessDataService.getFlowNodeRefBusinessDataInstance(context.getName(), context.getContainer().getId());
-        } catch (final SBonitaException sbe) {
-            final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(context.getContainer().getId(), context.getContainer().getType());
-            return refBusinessDataService.getRefBusinessDataInstance(context.getName(), processInstanceId);
-        }
-    }
-
     @Override
     public List<Entity> execute(final List<Entity> entities, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
         try {
-            SRefBusinessDataInstance reference = getRefBusinessDataInstance(businessDataContext);
+            SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext);
             checkThatIsMultiRef(reference);
             SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
             ArrayList<Long> dataIds = buildDataIdsList(entities);

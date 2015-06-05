@@ -15,8 +15,8 @@
 package org.bonitasoft.engine.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
@@ -24,17 +24,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.business.data.BusinessDataReference;
+import org.bonitasoft.engine.business.data.RefBusinessDataRetriever;
 import org.bonitasoft.engine.business.data.impl.SimpleBusinessDataReferenceImpl;
+import org.bonitasoft.engine.commons.Container;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SFlowNodeSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SProcessSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SFlowNodeSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
+import org.bonitasoft.engine.operation.BusinessDataContext;
+import org.bonitasoft.engine.operation.BusinessDataContextMatcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -45,9 +48,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class BusinessDataReferenceExpressionExecutorStrategyTest {
 
     @Mock
-    private RefBusinessDataService refBusinessDataService;
-    @Mock
-    private FlowNodeInstanceService flowNodeInstanceService;
+    private RefBusinessDataRetriever refBusinessDataRetriever;
+
     @InjectMocks
     private BusinessDataReferenceExpressionExecutorStrategy businessDataExpressionExecutorStrategy;
 
@@ -59,58 +61,43 @@ public class BusinessDataReferenceExpressionExecutorStrategyTest {
 
     @Test
     public void should_evaluate_return_a_simple_ref_on_process() throws Exception {
-        String bizDataName = "BizDataName";
-        Map<String, Object> context = createContext(112l, "PROCESS_INSTANCE");
-        doReturn(createProcessSimpleDataReference("BizDataName", 112l, "com.objects.MyObject", 150l)).when(refBusinessDataService).getRefBusinessDataInstance("BizDataName", 112l);
-        Object evaluate = businessDataExpressionExecutorStrategy.evaluate(createExpression(bizDataName), context, null, null);
+        final String bizDataName = "BizDataName";
+        final Map<String, Object> context = createContext(112l, "PROCESS_INSTANCE");
+        doReturn(createProcessSimpleDataReference("BizDataName", 112l, "com.objects.MyObject", 150l))
+                .when(refBusinessDataRetriever)
+                .getRefBusinessDataInstance(
+                        argThat(new BusinessDataContextMatcher(new BusinessDataContext("BizDataName", new Container(112l,
+                                DataInstanceContainer.PROCESS_INSTANCE.name())))));
+
+        final Object evaluate = businessDataExpressionExecutorStrategy.evaluate(createExpression(bizDataName), context, null, null);
 
         assertThat(evaluate).isEqualTo(new SimpleBusinessDataReferenceImpl("BizDataName", "com.objects.MyObject", 150l));
     }
 
     @Test
     public void should_evaluate_return_a_simple_ref_on_activity() throws Exception {
-        String bizDataName = "BizDataName";
-        Map<String, Object> context = createContext(112l, "ACTIVITY_INSTANCE");
-        doReturn(createFlowNodeSimpleDataReference("BizDataName", 112l, "com.objects.MyObject", 150l)).when(refBusinessDataService).getFlowNodeRefBusinessDataInstance("BizDataName", 112l);
-        Object evaluate = businessDataExpressionExecutorStrategy.evaluate(createExpression(bizDataName), context, null, null);
-
-        assertThat(evaluate).isEqualTo(new SimpleBusinessDataReferenceImpl("BizDataName", "com.objects.MyObject", 150l));
-    }
-
-    @Test
-    public void should_evaluate_return_a_simple_ref_on_process_with_activity_context() throws Exception {
-        String bizDataName = "BizDataName";
-        Map<String, Object> context = createContext(112l, "ACTIVITY_INSTANCE");
-        doThrow(SRefBusinessDataInstanceNotFoundException.class).when(refBusinessDataService).getFlowNodeRefBusinessDataInstance("BizDataName", 112l);
-        doReturn(createProcessSimpleDataReference("BizDataName", 114564l, "com.objects.MyObject", 150l)).when(refBusinessDataService).getRefBusinessDataInstance("BizDataName", 114564l);
-        doReturn(114564l).when(flowNodeInstanceService).getProcessInstanceId(112l, "ACTIVITY_INSTANCE");
-        Object evaluate = businessDataExpressionExecutorStrategy.evaluate(createExpression(bizDataName), context, null, null);
+        final String bizDataName = "BizDataName";
+        final Map<String, Object> context = createContext(112l, "ACTIVITY_INSTANCE");
+        doReturn(createFlowNodeSimpleDataReference("BizDataName", 112l, "com.objects.MyObject", 150l)).when(refBusinessDataRetriever)
+                .getRefBusinessDataInstance(
+                argThat(new BusinessDataContextMatcher(new BusinessDataContext("BizDataName", new Container(112l,
+                                DataInstanceContainer.ACTIVITY_INSTANCE.name())))));
+        final Object evaluate = businessDataExpressionExecutorStrategy.evaluate(createExpression(bizDataName), context, null, null);
 
         assertThat(evaluate).isEqualTo(new SimpleBusinessDataReferenceImpl("BizDataName", "com.objects.MyObject", 150l));
     }
 
     @Test(expected = SExpressionEvaluationException.class)
-    public void should_evaluate_throw_evaluation_exception_when_not_found_on_activity() throws Exception {
-        String bizDataName = "BizDataName";
-        Map<String, Object> context = createContext(112l, "ACTIVITY_INSTANCE");
-        doThrow(new SRefBusinessDataInstanceNotFoundException(112l,"exception")).when(refBusinessDataService).getFlowNodeRefBusinessDataInstance(anyString(), anyLong());
-        doThrow(new SRefBusinessDataInstanceNotFoundException(112l,"exception")).when(refBusinessDataService).getRefBusinessDataInstance(anyString(), anyLong());
-        doReturn(114564l).when(flowNodeInstanceService).getProcessInstanceId(112l, "ACTIVITY_INSTANCE");
+    public void should_evaluate_throw_evaluation_exception_when_not_found() throws Exception {
+        final String bizDataName = "BizDataName";
+        final Map<String, Object> context = createContext(112l, "ACTIVITY_INSTANCE");
+        doThrow(new SRefBusinessDataInstanceNotFoundException(112l, "exception")).when(refBusinessDataRetriever).getRefBusinessDataInstance(
+                any(BusinessDataContext.class));
         businessDataExpressionExecutorStrategy.evaluate(createExpression(bizDataName), context, null, null);
     }
 
-    @Test(expected = SExpressionEvaluationException.class)
-    public void should_evaluate_throw_evaluation_exception_when_not_found_on_process() throws Exception {
-        String bizDataName = "BizDataName";
-        Map<String, Object> context = createContext(112l, "PROCESS_INSTANCE");
-        doThrow(new SRefBusinessDataInstanceNotFoundException(112l,"exception")).when(refBusinessDataService).getFlowNodeRefBusinessDataInstance(anyString(), anyLong());
-        doThrow(new SRefBusinessDataInstanceNotFoundException(112l,"exception")).when(refBusinessDataService).getRefBusinessDataInstance(anyString(), anyLong());
-        doReturn(114564l).when(flowNodeInstanceService).getProcessInstanceId(112l, "ACTIVITY_INSTANCE");
-        businessDataExpressionExecutorStrategy.evaluate(createExpression(bizDataName), context, null, null);
-    }
-
-    SProcessSimpleRefBusinessDataInstance createProcessSimpleDataReference(String name, long processInstanceId, String type, long businessDataId) {
-        SProcessSimpleRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstanceImpl();
+    SProcessSimpleRefBusinessDataInstance createProcessSimpleDataReference(final String name, final long processInstanceId, final String type, final long businessDataId) {
+        final SProcessSimpleRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SProcessSimpleRefBusinessDataInstanceImpl();
         sProcessSimpleRefBusinessDataInstance.setName(name);
         sProcessSimpleRefBusinessDataInstance.setProcessInstanceId(processInstanceId);
         sProcessSimpleRefBusinessDataInstance.setDataClassName(type);
@@ -118,8 +105,8 @@ public class BusinessDataReferenceExpressionExecutorStrategyTest {
         return sProcessSimpleRefBusinessDataInstance;
     }
 
-    SFlowNodeSimpleRefBusinessDataInstance createFlowNodeSimpleDataReference(String name, long flowNodeInstanceId, String type, long businessDataId) {
-        SFlowNodeSimpleRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SFlowNodeSimpleRefBusinessDataInstanceImpl();
+    SFlowNodeSimpleRefBusinessDataInstance createFlowNodeSimpleDataReference(final String name, final long flowNodeInstanceId, final String type, final long businessDataId) {
+        final SFlowNodeSimpleRefBusinessDataInstanceImpl sProcessSimpleRefBusinessDataInstance = new SFlowNodeSimpleRefBusinessDataInstanceImpl();
         sProcessSimpleRefBusinessDataInstance.setName(name);
         sProcessSimpleRefBusinessDataInstance.setFlowNodeInstanceId(flowNodeInstanceId);
         sProcessSimpleRefBusinessDataInstance.setDataClassName(type);
@@ -127,14 +114,14 @@ public class BusinessDataReferenceExpressionExecutorStrategyTest {
         return sProcessSimpleRefBusinessDataInstance;
     }
 
-    Map<String, Object> createContext(long id, String type) {
-        Map<String, Object> context = new HashMap<>();
+    Map<String, Object> createContext(final long id, final String type) {
+        final Map<String, Object> context = new HashMap<>();
         context.put(SExpressionContext.CONTAINER_ID_KEY, id);
         context.put(SExpressionContext.CONTAINER_TYPE_KEY, type);
         return context;
     }
 
-    SExpressionImpl createExpression(String bizDataName) {
+    SExpressionImpl createExpression(final String bizDataName) {
         return new SExpressionImpl("theData", bizDataName, ExpressionExecutorStrategy.TYPE_BUSINESS_DATA_REFERENCE, BusinessDataReference.class.getName(), null, null);
     }
 

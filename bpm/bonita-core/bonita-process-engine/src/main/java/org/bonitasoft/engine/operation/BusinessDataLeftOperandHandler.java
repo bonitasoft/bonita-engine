@@ -19,14 +19,13 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
+import org.bonitasoft.engine.business.data.RefBusinessDataRetriever;
 import org.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import org.bonitasoft.engine.commons.Container;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
@@ -42,20 +41,20 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
 
     protected final RefBusinessDataService refBusinessDataService;
 
-    protected final FlowNodeInstanceService flowNodeInstanceService;
     private final EntitiesActionsExecutor entitiesActionsExecutor;
     private final UpdateDataRefAction updateDataRefAction;
+    private final RefBusinessDataRetriever refBusinessDataRetriever;
 
     private final BusinessDataRepository businessDataRepository;
 
     protected BusinessDataLeftOperandHandler(final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService,
-            final FlowNodeInstanceService flowNodeInstanceService, EntitiesActionsExecutor entitiesActionsExecutor, UpdateDataRefAction updateDataRefAction) {
+            RefBusinessDataRetriever refBusinessDataRetriever, EntitiesActionsExecutor entitiesActionsExecutor, UpdateDataRefAction updateDataRefAction) {
         super();
         this.businessDataRepository = businessDataRepository;
         this.refBusinessDataService = refBusinessDataService;
-        this.flowNodeInstanceService = flowNodeInstanceService;
         this.entitiesActionsExecutor = entitiesActionsExecutor;
         this.updateDataRefAction = updateDataRefAction;
+        this.refBusinessDataRetriever = refBusinessDataRetriever;
     }
 
     @Override
@@ -78,7 +77,8 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     @SuppressWarnings("unchecked")
     protected Object getBusinessData(final String businessDataName, final long containerId, final String containerType) throws SBonitaReadException {
         try {
-            final SRefBusinessDataInstance reference = getRefBusinessDataInstance(businessDataName, containerId, containerType);
+            final SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(new BusinessDataContext(businessDataName,
+                    new Container(containerId, containerType)));
             final Class<Entity> dataClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(reference.getDataClassName());
             if (reference instanceof SSimpleRefBusinessDataInstance) {
                 final SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
@@ -102,24 +102,12 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     @Override
     public void delete(final SLeftOperand sLeftOperand, final long containerId, final String containerType) throws SOperationExecutionException {
         try {
-            final SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataRetriever.getRefBusinessDataInstance(new BusinessDataContext(sLeftOperand
+                    .getName(), new Container(containerId, containerType)));
             removeBusinessData(refBusinessDataInstance);
             dereferenceBusinessData(refBusinessDataInstance);
         } catch (final Exception e) {
             throw new SOperationExecutionException(e);
-        }
-    }
-
-    protected SRefBusinessDataInstance getRefBusinessDataInstance(final String businessDataName, final long containerId, final String containerType)
-            throws SBonitaException {
-        if ("PROCESS_INSTANCE".equals(containerType)) {
-            return refBusinessDataService.getRefBusinessDataInstance(businessDataName, containerId);
-        }
-        try {
-            return refBusinessDataService.getFlowNodeRefBusinessDataInstance(businessDataName, containerId);
-        } catch (final SBonitaException sbe) {
-            final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
-            return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
         }
     }
 
@@ -168,6 +156,5 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
             loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
         }
     }
-
 
 }
