@@ -157,15 +157,26 @@ public class LiveUpdateIT extends CommonAPISPIT {
                         null);
 
         getCustomPageAPI().deletePage(anOtherForm.getId());
-        final SearchResult<Log> logSearchResult = getLogAPI().searchLogs(new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_UPDATED").filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done());
-        assertThat(logSearchResult.getResult()).hasSize(6).extracting("message")
-                .contains("Previous: pageId=<null> urlAdapter=<external> url=<a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very ve",
-                        "Previous: pageId=<"+anOtherForm.getId()+"> urlAdapter=<null> url=<null>",
+        final SearchResult<Log> logSearchResult = getLogAPI().searchLogs(
+                new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_UPDATED")
+                        .filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done());
+        assertThat(logSearchResult.getResult())
+                .hasSize(6)
+                .extracting("message")
+                .contains(
+                        "Previous: pageId=<null> urlAdapter=<external> url=<a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very ve",
+                        "Previous: pageId=<" + anOtherForm.getId() + "> urlAdapter=<null> url=<null>",
                         "Previous: pageId=<null> urlAdapter=<external> url=<http://newFormUrlForStep2>");
-        assertThat(getLogAPI().searchLogs(new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_CREATED").filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done()).getResult()).hasSize(4);
+        assertThat(
+                getLogAPI().searchLogs(
+                        new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_CREATED")
+                                .filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done()).getResult()).hasSize(4);
 
         getProcessAPI().deleteProcessDefinition(p.getId());
-        assertThat(getLogAPI().searchLogs(new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_DELETED").filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done()).getResult()).hasSize(4);
+        assertThat(
+                getLogAPI().searchLogs(
+                        new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "FORM_MAPPING_DELETED")
+                                .filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(p.getId())).done()).getResult()).hasSize(4);
 
     }
 
@@ -184,10 +195,12 @@ public class LiveUpdateIT extends CommonAPISPIT {
         final User user = getIdentityAPI().createUser("userForLiveUpdate", "bpm");
         ProcessDefinitionBuilderExt processWithExpression = new ProcessDefinitionBuilderExt().createNewInstance("LiveUpdateProcess", "4.0");
         processWithExpression.addActor("theActor");
+        final Expression groovyExpr = new ExpressionBuilder().createGroovyScriptExpression("groovyExpr", "return 'before update'", String.class.getName());
         processWithExpression.addUserTask("step1", "theActor").addDisplayName(
-                new ExpressionBuilder().createGroovyScriptExpression("groovyExpr", "return 'before update'", String.class.getName()));
+                groovyExpr);
+        final Expression constantStringExpression = new ExpressionBuilder().createConstantStringExpression("the constant before update");
         processWithExpression.addUserTask("step2", "theActor").addDisplayName(
-                new ExpressionBuilder().createConstantStringExpression("the constant before update"));
+                constantStringExpression);
         ProcessDefinition processDefinition = getProcessAPI().deploy(processWithExpression.done());
         getProcessAPI().addUserToActor("theActor", processDefinition, user.getId());
         getProcessAPI().enableProcess(processDefinition.getId());
@@ -212,6 +225,15 @@ public class LiveUpdateIT extends CommonAPISPIT {
         step2 = waitForUserTaskAndGetIt(processInstance, "step2");
         assertThat(step1.getDisplayName()).as("display name of step1 before update").isEqualTo("groovy after update");
         assertThat(step2.getDisplayName()).as("display name of step2 before update").isEqualTo("the constant after update");
+
+        assertThat(
+                getLogAPI().searchLogs(
+                        new SearchOptionsBuilder(0, 140).filter(LogSearchDescriptor.ACTION_TYPE, "PROCESS_DEFINITION_UPDATED")
+                                .filter(LogSearchDescriptor.ACTION_SCOPE, String.valueOf(processDefinition.getId())).done()).getResult())
+                .hasSize(3)
+                .extracting("message")
+                .containsOnly("Enabling the process", "Update expression <" + groovyExpr.getId() + ">, old content is <return 'before update'>",
+                        "Update expression <" + constantStringExpression.getId() + ">, old content is <the constant before update>");
 
         disableAndDeleteProcess(processDefinition.getId());
         deleteUser(user);
