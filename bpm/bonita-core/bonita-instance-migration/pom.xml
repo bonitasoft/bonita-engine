@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-core</artifactId>
 		<groupId>org.bonitasoft.engine.core</groupId>
-		<version>6.5.3-SNAPSHOT</version>
+		<version>6.5.3</version>
 	</parent>
 	<artifactId>bonita-instance-migration</artifactId>
 	<packaging>pom</packaging>
