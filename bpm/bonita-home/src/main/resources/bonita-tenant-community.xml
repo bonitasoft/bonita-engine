@@ -1200,6 +1200,7 @@
         <constructor-arg ref="sessionService" />
         <constructor-arg ref="sessionAccessor" />
         <constructor-arg ref="identityService" />
+        <constructor-arg ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="genericAuthenticationServiceAccessor" class="org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor">
