@@ -465,6 +465,13 @@
 		AND (s.eventType = 'START_EVENT' OR s.eventType = 'EVENT_SUB_PROCESS')
 	</query>
 
+	<query name="getWaitingEventsOfFlowNode">
+		SELECT s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl AS s
+		WHERE s.flowNodeInstanceId = :flowNodeInstanceId
+	</query>
+
+
 	<query name="resetProgressMessageInstances">
 		UPDATE org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl AS m
 		SET m.handled = false

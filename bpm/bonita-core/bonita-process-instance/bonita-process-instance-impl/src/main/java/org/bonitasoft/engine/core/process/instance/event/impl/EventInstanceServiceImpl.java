@@ -62,8 +62,6 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -85,10 +83,8 @@ import org.bonitasoft.engine.services.SPersistenceException;
  */
 public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl implements EventInstanceService {
 
-    private static final String QUERY_RESET_PROGRESS_MESSAGE_INSTANCES = "resetProgressMessageInstances";
-
     public static final String QUERY_RESET_IN_PROGRESS_WAITING_EVENTS = "resetInProgressWaitingEvents";
-
+    private static final String QUERY_RESET_PROGRESS_MESSAGE_INSTANCES = "resetProgressMessageInstances";
     private final EventService eventService;
 
     public EventInstanceServiceImpl(final Recorder recorder, final PersistenceService persistenceService, final EventService eventService,
@@ -233,20 +229,13 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
 
     @Override
     public void deleteWaitingEvents(final SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SBonitaReadException {
-        final OrderByOption orderByOption = new OrderByOption(SWaitingEvent.class, BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
-                .getFlowNodeNameKey(), OrderByType.ASC);
-        final FilterOption filterOption = new FilterOption(SWaitingEvent.class, BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
-                .getFlowNodeInstanceIdKey(), flowNodeInstance.getId());
-        final List<FilterOption> filters = Collections.singletonList(filterOption);
-        final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderByOption), filters, null);
-
-        List<SWaitingEvent> waitingEvents = searchWaitingEvents(SWaitingEvent.class, queryOptions);
+        List<SWaitingEvent> waitingEvents;
         do {
+            waitingEvents = getPersistenceService().selectList(new SelectListDescriptor<SWaitingEvent>("getWaitingEventsOfFlowNode", Collections.<String, Object>singletonMap("flowNodeInstanceId", flowNodeInstance.getId()), SWaitingEvent.class, new QueryOptions(0, 100)));
             for (final SWaitingEvent sWaitingEvent : waitingEvents) {
                 deleteWaitingEvent(sWaitingEvent);
             }
-            waitingEvents = searchWaitingEvents(SWaitingEvent.class, queryOptions);
-        } while (waitingEvents.size() > 0);
+        } while (waitingEvents.size() == 100);
     }
 
     @Override
