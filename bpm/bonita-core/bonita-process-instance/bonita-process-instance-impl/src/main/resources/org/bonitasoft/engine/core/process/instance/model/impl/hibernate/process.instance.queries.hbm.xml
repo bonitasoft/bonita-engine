@@ -1120,7 +1120,7 @@
 		WHERE p.callerId = a.id and a.logicalGroup4 = :processInstanceId
 	</query>
 
-	<query name="getChildInstanceIdsOfProcessInstance">
+	<query name="getChildOfActivity">
 		SELECT p
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
 		WHERE p.callerId = :activityInstanceId
