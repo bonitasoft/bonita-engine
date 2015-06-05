@@ -1119,6 +1119,12 @@
 			org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE p.callerId = a.id and a.logicalGroup4 = :processInstanceId
 	</query>
+
+	<query name="getChildInstanceIdsOfProcessInstance">
+		SELECT p
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		WHERE p.callerId = :activityInstanceId
+	</query>
     
     <query name="getNumberOfSProcessInstanceFailedAndSupervisedBy">
         SELECT COUNT(DISTINCT p.id)
