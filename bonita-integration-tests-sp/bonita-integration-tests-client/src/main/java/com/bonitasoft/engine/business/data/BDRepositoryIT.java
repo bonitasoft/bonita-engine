@@ -253,10 +253,27 @@ public class BDRepositoryIT extends CommonAPISPIT {
         products.setNullable(Boolean.TRUE);
         products.setReference(productBO);
 
+        final SimpleField releaseYear = new SimpleField();
+        releaseYear.setName("releaseYear");
+        releaseYear.setType(FieldType.STRING);
+
+        final BusinessObject editionBO = new BusinessObject();
+        editionBO.setQualifiedName("org.bonita.pojo.Edition");
+        editionBO.addField(releaseYear);
+
+        final RelationField editionField = new RelationField();
+        editionField.setType(RelationField.Type.COMPOSITION);
+        editionField.setFetchType(RelationField.FetchType.EAGER);
+        editionField.setName("editions");
+        editionField.setCollection(Boolean.TRUE);
+        editionField.setNullable(Boolean.TRUE);
+        editionField.setReference(editionBO);
+
         final BusinessObject catalogBO = new BusinessObject();
         catalogBO.setQualifiedName("org.bonita.pojo.ProductCatalog");
         catalogBO.addField(name);
         catalogBO.addField(products);
+        catalogBO.addField(editionField);
 
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
@@ -264,6 +281,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         model.addBusinessObject(addressBO);
         model.addBusinessObject(countryBO);
         model.addBusinessObject(productBO);
+        model.addBusinessObject(editionBO);
         model.addBusinessObject(catalogBO);
         return model;
     }
@@ -1466,11 +1484,42 @@ public class BDRepositoryIT extends CommonAPISPIT {
         disableAndDeleteProcess(definition.getId());
     }
 
+    @Test
+    public void should_update_composition_entities() throws Exception {
+        final StringBuilder initCatalog = new StringBuilder();
+        initCatalog.append("import ").append("org.bonita.pojo.ProductCatalog").append("\n");
+        initCatalog.append("import ").append("org.bonita.pojo.Edition").append("\n");
+        initCatalog.append("Edition edition = new Edition() \n");
+        initCatalog.append("edition.releaseYear = '2015' \n");
+        initCatalog.append("ProductCatalog pc = new ProductCatalog() \n");
+        initCatalog.append("pc.name = 'MyFirstCatalog' \n");
+        initCatalog.append("pc.setEditions([edition]) \n");
+        initCatalog.append("pc\n");
+
+        final Expression initCatalogExpression = new ExpressionBuilder().createGroovyScriptExpression("initCatalog", initCatalog.toString(),
+                "org.bonita.pojo.ProductCatalog");
+
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("compo", "8.2");
+        builder.addActor(ACTOR_NAME);
+        builder.addBusinessData("productCatalog", "org.bonita.pojo.ProductCatalog", initCatalogExpression);
+        builder.addUserTask("updateCatalog", ACTOR_NAME)
+                .addOperation(
+                        new OperationBuilder().createBusinessDataSetAttributeOperation("productCatalog", "setName", String.class.getName(),
+                                new ExpressionBuilder().createConstantStringExpression("myUdaptedCatalog")));
+        builder.addUserTask("result", ACTOR_NAME);
+        builder.addTransition("updateCatalog", "result");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTaskAndExecuteIt("updateCatalog", matti);
+        waitForUserTask(processInstance, "result");
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
     private String getClientBdmJarClassPath(final String bonitaHomePath) {
-        String clientBdmJarPath;
-        clientBdmJarPath = new StringBuilder().append(bonitaHomePath).append(File.separator).append("server").append(File.separator).append("tenants")
+        return new StringBuilder().append(bonitaHomePath).append(File.separator).append("server").append(File.separator).append("tenants")
                 .append(File.separator).append(tenantId).append(File.separator).append("data-management").append(File.separator).append("client").toString();
-        return clientBdmJarPath;
     }
 
     @Test
