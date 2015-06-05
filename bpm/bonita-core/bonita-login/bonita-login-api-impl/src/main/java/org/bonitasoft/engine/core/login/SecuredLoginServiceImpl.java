@@ -13,10 +13,8 @@
  **/
 package org.bonitasoft.engine.core.login;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -31,7 +29,8 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.io.PropertiesManager;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SSessionException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
@@ -40,6 +39,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Anthony Birembaut add technical logs
  */
 public class SecuredLoginServiceImpl implements LoginService {
 
@@ -52,37 +52,33 @@ public class SecuredLoginServiceImpl implements LoginService {
     private final SessionAccessor sessionAccessor;
 
     private final IdentityService identityService;
+    
+    private final TechnicalLoggerService logger;
 
     @Deprecated
     public SecuredLoginServiceImpl(@SuppressWarnings("deprecation") final AuthenticationService authenticationService, final SessionService sessionService,
-            final SessionAccessor sessionAccessor, final IdentityService identityService) {
+            final SessionAccessor sessionAccessor, final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService) {
         this.authenticationService = authenticationService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.identityService = identityService;
+        this.logger = tenantTechnicalLoggerService;
     }
 
     public SecuredLoginServiceImpl(final GenericAuthenticationService genericAuthenticationService, final SessionService sessionService,
-            final SessionAccessor sessionAccessor, final IdentityService identityService) {
+            final SessionAccessor sessionAccessor, final IdentityService identityService, TechnicalLoggerService tenantTechnicalLoggerService) {
         this.genericAuthenticationService = genericAuthenticationService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.identityService = identityService;
-    }
-
-    @Override
-    @Deprecated
-    public SSession login(final long tenantId, final String userName, final String password) throws SLoginException {
-        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
-        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, String.valueOf(tenantId));
-        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-        credentials.put(AuthenticationConstants.BASIC_USERNAME, userName);
-        return this.login(credentials);
-
+        this.logger = tenantTechnicalLoggerService;
     }
 
     @Override
     public SSession login(final Map<String, Serializable> credentials) throws SLoginException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Loging in");
+        }
         if (credentials == null) {
             throw new SLoginException("invalid credentials, map is null");
         }
@@ -100,14 +96,23 @@ public class SecuredLoginServiceImpl implements LoginService {
 
             if (technicalUser.getUserName().equals(userName)
                     && technicalUser.getPassword().equals(String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD)))) {
+                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Authenticated as technical user");
+                }
                 isTechnicalUser = true;
                 userId = -1;
             } else {
                 userName = loginChoosingAppropriateAuthenticationService(credentials);
                 if (StringUtils.isNotBlank(userName)) {
+                    if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Authenticated as regular user");
+                    }
                     final SUser user = identityService.getUserByUserName(userName);
                     userId = user.getId();
                 } else {
+                    if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Authentication failed");
+                    }
                     // now we are sure authentication Failed
                     authenticationFailed();
                 }
@@ -121,6 +126,9 @@ public class SecuredLoginServiceImpl implements LoginService {
             sessionAccessor.deleteSessionId();
         }
         try {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Session creation");
+            }
             return sessionService.createSession(tenantId, userId, userName, isTechnicalUser);
         } catch (final SSessionException e) {
             throw new SLoginException(e);
@@ -156,6 +164,9 @@ public class SecuredLoginServiceImpl implements LoginService {
      */
     protected String loginChoosingAppropriateAuthenticationService(final Map<String, Serializable> credentials) throws AuthenticationException, SLoginException {
         if (authenticationService != null) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Authenticating with authentication service: " + authenticationService.getClass().getName());
+            }
             final String userName = retrieveUsernameFromCredentials(credentials);
             final String password = retrievePasswordFromCredentials(credentials);
             if (authenticationService.checkUserCredentials(userName, password)) {
@@ -163,6 +174,9 @@ public class SecuredLoginServiceImpl implements LoginService {
             }
             return null;
         } else if (genericAuthenticationService != null) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Authenticating with generic authentication service: " + genericAuthenticationService.getClass().getName());
+            }
             return genericAuthenticationService.checkUserCredentials(credentials);
         }
         throw new AuthenticationException("no implementation of authentication supplied");
