@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-archive</artifactId>
 		<groupId>com.bonitasoft.engine.archive</groupId>
-		<version>6.5.3-SNAPSHOT</version>
+		<version>6.5.3</version>
 	</parent>
 
 	<artifactId>bonita-archive-impl</artifactId>
