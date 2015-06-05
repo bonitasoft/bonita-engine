@@ -171,12 +171,10 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         //getAllContainers from me to root
         final List<Pair<Long, String>> containerHierarchy;
         try {
-            containerHierarchy = parentContainerResolver.getContainerHierarchy(new Pair<Long, String>(containerId, containerType));
-        } catch (SObjectNotFoundException e) {
+            containerHierarchy = parentContainerResolver.getContainerHierarchy(new Pair<>(containerId, containerType));
+        } catch (SObjectNotFoundException | SObjectReadException e) {
             throw new SDataInstanceNotFoundException(e);
-        } catch (SObjectReadException e) {
-            throw new SDataInstanceNotFoundException(e);
-    }
+        }
 
         final Map<String, List<Long>> containers = buildContainersMap(containerHierarchy, inputParameters);
 
