@@ -27,7 +27,7 @@ public class ApplicationTokenValidator {
             StringBuilder stb = new StringBuilder("The token '");
             stb.append(token);
             stb.append("' is invalid: the token can not be null or empty and should contain only alpha numeric characters and the following ");
-            stb.append("special characters '-', '.', '_' or '~'. In addition, the following words are reserved key words and cannot be used as token: 'api', 'content', 'theme'.");
+            stb.append("special characters '-', '.', '_' or '~'. In addition, the following words are reserved keywords and cannot be used as token: 'api', 'content', 'theme'.");
             return new ValidationStatus(false, stb.toString());
         }
         return new ValidationStatus(true);
