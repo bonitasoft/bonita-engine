@@ -21,10 +21,10 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -157,15 +157,14 @@ public class EventInstanceServiceImplForWaitingTest {
         // Given
         final SIntermediateCatchEventInstanceImpl sIntermediateCatchEventInstanceImpl = new SIntermediateCatchEventInstanceImpl();
         final SWaitingMessageEventImpl waitingMessageEventImpl = new SWaitingMessageEventImpl();
-        doReturn(Arrays.asList(waitingMessageEventImpl)).doReturn(Arrays.asList()).when(eventInstanceServiceImpl)
-                .searchWaitingEvents(eq(SWaitingEvent.class), any(QueryOptions.class));
+        doReturn(Collections.singletonList(waitingMessageEventImpl)).doReturn(Collections.emptyList()).when(persistenceService)
+                .selectList(any(SelectListDescriptor.class));
         doNothing().when(eventInstanceServiceImpl).deleteWaitingEvent(waitingMessageEventImpl);
 
         // When
         eventInstanceServiceImpl.deleteWaitingEvents(sIntermediateCatchEventInstanceImpl);
 
         // Then
-        verify(eventInstanceServiceImpl, times(2)).searchWaitingEvents(eq(SWaitingEvent.class), any(QueryOptions.class));
         verify(eventInstanceServiceImpl).deleteWaitingEvent(waitingMessageEventImpl);
     }
 
@@ -174,7 +173,7 @@ public class EventInstanceServiceImplForWaitingTest {
         // Given
         final SIntermediateCatchEventInstanceImpl sIntermediateCatchEventInstanceImpl = new SIntermediateCatchEventInstanceImpl();
         final SWaitingSignalEventImpl waitingMessageEventImpl = new SWaitingSignalEventImpl();
-        doReturn(Arrays.asList(waitingMessageEventImpl)).when(eventInstanceServiceImpl).searchWaitingEvents(eq(SWaitingEvent.class), any(QueryOptions.class));
+        doReturn(Collections.singletonList(waitingMessageEventImpl)).when(persistenceService).selectList(any(SelectListDescriptor.class));
         doThrow(new SWaitingEventModificationException(new Exception(""))).when(eventInstanceServiceImpl).deleteWaitingEvent(waitingMessageEventImpl);
 
         // When
@@ -185,8 +184,7 @@ public class EventInstanceServiceImplForWaitingTest {
     public final void deleteWaitingEvents_should_throw_exception_when_cant_search_waiting_event() throws Exception {
         // Given
         final SIntermediateCatchEventInstanceImpl sIntermediateCatchEventInstanceImpl = new SIntermediateCatchEventInstanceImpl();
-        doThrow(new SBonitaReadException(new Exception(""))).when(eventInstanceServiceImpl).searchWaitingEvents(eq(SWaitingEvent.class),
-                any(QueryOptions.class));
+        doThrow(new SBonitaReadException(new Exception(""))).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         // When
         eventInstanceServiceImpl.deleteWaitingEvents(sIntermediateCatchEventInstanceImpl);
