@@ -18,17 +18,16 @@ import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.tracking.AbstractTimeTrackerTest;
-import org.bonitasoft.engine.tracking.FlushResult;
+import org.bonitasoft.engine.tracking.FlushEvent;
 import org.bonitasoft.engine.tracking.Record;
-import org.bonitasoft.engine.tracking.TimeTracker;
 import org.junit.After;
 import org.junit.Test;
 
@@ -51,6 +50,7 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
         }
     }
 
+    @Test
     public void should_work_if_output_folder_is_a_folder() {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         new CSVFlushEventListener(logger, IOUtil.TMP_DIRECTORY, ";");
@@ -75,17 +75,11 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
     public void flushedCsv() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final CSVFlushEventListener csvFlushEventListener = new CSVFlushEventListener(logger, System.getProperty("java.io.tmpdir"), ";");
-        final List<CSVFlushEventListener> flushEventListeners = Collections.singletonList(csvFlushEventListener);
         final Record rec1 = new Record(System.currentTimeMillis(), "rec", "rec1Desc", 100);
         final Record rec2 = new Record(System.currentTimeMillis(), "rec", "rec2Desc", 200);
-        final TimeTracker tracker = new TimeTracker(logger, false, flushEventListeners, 10, 2, "rec");
-        tracker.start();
-        tracker.track(rec1);
-        tracker.track(rec2);
 
-        final List<FlushResult> flushResults = tracker.flush();
-        assertEquals(1, flushResults.size());
-        final CSVFlushResult csvFlushResult = (CSVFlushResult) flushResults.get(0);
+        final CSVFlushResult csvFlushResult = csvFlushEventListener.flush(new FlushEvent(Arrays.asList(rec1, rec2)));
+
 
         final File csvFile = csvFlushResult.getOutputFile();
         final List<List<String>> csvValues = CSVUtil.readCSV(true, csvFile, ";");
@@ -97,7 +91,6 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
         assertEquals(2, records.size());
         checkRecord(rec1, records.get(0));
         checkRecord(rec2, records.get(1));
-        tracker.stop();
     }
 
     private void checkCSVRecord(final Record record, final List<String> csvValues) {
