@@ -30,7 +30,7 @@
             </applicationMenu>
         </applicationMenus>
     </application>
-    <application state="ACTIVATED" token="My" version="2.0" layout="custompage_layout" theme="custompage_theme">
+    <application state="ACTIVATED" token="My" version="2.0" layout="custompage_defaultlayout" theme="custompage_defaulttheme">
         <displayName>Marketing</displayName>
     </application>
 </applications>
