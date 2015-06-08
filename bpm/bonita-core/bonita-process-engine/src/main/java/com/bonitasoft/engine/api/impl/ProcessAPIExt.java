@@ -21,6 +21,27 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import com.bonitasoft.engine.api.ProcessAPI;
+import com.bonitasoft.engine.api.impl.connector.ResetConnectorToSpecificStatesStrategy;
+import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
+import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
+import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
+import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
+import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
+import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
+import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
+import com.bonitasoft.engine.bpm.process.Index;
+import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
+import com.bonitasoft.engine.businessdata.impl.MultipleBusinessDataReferenceImpl;
+import com.bonitasoft.engine.businessdata.impl.SimpleBusinessDataReferenceImpl;
+import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
+import com.bonitasoft.manager.Features;
 import org.bonitasoft.engine.api.impl.DocumentAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessManagementAPIImplDelegate;
@@ -135,28 +156,6 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
-import com.bonitasoft.engine.api.ProcessAPI;
-import com.bonitasoft.engine.api.impl.connector.ResetConnectorToSpecificStatesStrategy;
-import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
-import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
-import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
-import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
-import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
-import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
-import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
-import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
-import com.bonitasoft.engine.bpm.process.Index;
-import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
-import com.bonitasoft.engine.businessdata.BusinessDataReference;
-import com.bonitasoft.engine.businessdata.impl.MultipleBusinessDataReferenceImpl;
-import com.bonitasoft.engine.businessdata.impl.SimpleBusinessDataReferenceImpl;
-import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.LicenseChecker;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
-import com.bonitasoft.manager.Features;
-
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -184,16 +183,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public void importParameters(final long processDefinitionId, final byte[] parameters) throws ImportParameterException {
         final org.bonitasoft.engine.service.TenantServiceAccessor tenantAccessor = getTenantAccessor();
         SProcessDefinition sDefinition;
-        if (processDefinitionId > 0) {
             final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
             try {
                 sDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             } catch (SProcessDefinitionNotFoundException | SBonitaReadException e) {
                 throw new ImportParameterException(e);
             }
-        } else {
-            throw new ImportParameterException("The identifier of the process definition have to be a positif number.");
-        }
 
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final Set<SParameterDefinition> params = sDefinition.getParameters();
@@ -223,7 +218,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
         try {
             parameterService.addAll(sDefinition.getId(), storedParameters);
-        } catch (final SParameterProcessNotFoundException e) {
+        } catch (final SBonitaException e) {
             throw new ImportParameterException(e);
         }
 
@@ -513,7 +508,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void replayActivity(final long activityInstanceId) throws ActivityExecutionException, ActivityInstanceNotFoundException {
-        replayActivity(activityInstanceId, Collections.<Long, ConnectorStateReset> emptyMap());
+        replayActivity(activityInstanceId, Collections.<Long, ConnectorStateReset>emptyMap());
     }
 
     @Override
@@ -532,12 +527,15 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     // TODO delete files after use/if an exception occurs
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
         try {
-            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(getTenantAccessor().getTenantId(), processDefinitionId,
-                    exportActorMapping(processDefinitionId));
+            final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+            return BonitaHomeServer.getInstance().getProcessManager().exportBarProcessContentUnderHome(tenantAccessor.getTenantId(), processDefinitionId,
+                    exportActorMapping(processDefinitionId), exportParameters(tenantAccessor, processDefinitionId));
         } catch (Exception e) {
             throw new ProcessExportException(e);
         }
     }
+
+
 
     @Override
     public int getNumberOfParameterInstances(final long processDefinitionId) {
