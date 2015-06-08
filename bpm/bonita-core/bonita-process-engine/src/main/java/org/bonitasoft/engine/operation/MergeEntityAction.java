@@ -22,6 +22,7 @@ import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Matthieu Chaffotte
  */
 public class MergeEntityAction implements EntityAction {
 
@@ -50,6 +51,11 @@ public class MergeEntityAction implements EntityAction {
             mergedEntities.add(execute(entity, businessDataContext));
         }
         return mergedEntities;
+    }
+
+    @Override
+    public void handleNull(final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
+        throw new SEntityActionExecutionException("Cannot save a null entity");
     }
 
 }

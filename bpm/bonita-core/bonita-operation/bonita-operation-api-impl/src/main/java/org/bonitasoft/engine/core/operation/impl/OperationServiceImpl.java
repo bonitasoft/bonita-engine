@@ -56,7 +56,7 @@ public class OperationServiceImpl implements OperationService {
 
     public OperationServiceImpl(final OperationExecutorStrategyProvider operationExecutorStrategyProvider,
             final LeftOperandHandlerProvider leftOperandHandlerProvider, final ExpressionResolverService expressionResolverService,
-            PersistRightOperandResolver persistRightOperandResolver,
+            final PersistRightOperandResolver persistRightOperandResolver,
             final TechnicalLoggerService logger) {
         super();
         this.operationExecutorStrategyProvider = operationExecutorStrategyProvider;
@@ -100,9 +100,9 @@ public class OperationServiceImpl implements OperationService {
             throws SOperationExecutionException {
         final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperandsToUpdate = new HashMap<>();
         for (int i = 0; i < operations.size(); i++) {
-            SOperation currentOperation = operations.get(i);
-            boolean shouldPersistValue = persistRightOperandResolver.shouldPersist(i, operations);
-            LeftOperandUpdateStatus currentUpdateStatus = calculateRightOperandValue(currentOperation, expressionContext, shouldPersistValue);
+            final SOperation currentOperation = operations.get(i);
+            final boolean shouldPersistValue = persistRightOperandResolver.shouldPersist(i, operations);
+            final LeftOperandUpdateStatus currentUpdateStatus = calculateRightOperandValue(currentOperation, expressionContext, shouldPersistValue);
             if (shouldUpdateLeftOperandContext(leftOperandsToUpdate, currentOperation.getLeftOperand(), currentUpdateStatus)) {
                 leftOperandsToUpdate.put(currentOperation.getLeftOperand(), currentUpdateStatus);
             }
@@ -114,11 +114,12 @@ public class OperationServiceImpl implements OperationService {
             final boolean shouldPersistValue)
             throws SOperationExecutionException {
         final SLeftOperand leftOperand = operation.getLeftOperand();
-        LeftOperandUpdateStatus currentUpdateStatus = new LeftOperandUpdateStatus(operation.getType());
+        final LeftOperandUpdateStatus currentUpdateStatus = new LeftOperandUpdateStatus(operation.getType());
         if (currentUpdateStatus.shouldUpdate()) {
             final OperationExecutorStrategy operationExecutorStrategy = operationExecutorStrategyProvider.getOperationExecutorStrategy(operation);
             final Object rightOperandValue = evaluateRightOperandExpression(operation, expressionContext, operation.getRightOperand());
-            Object value = operationExecutorStrategy.computeNewValueForLeftOperand(operation, rightOperandValue, expressionContext, shouldPersistValue);
+            final Object value = operationExecutorStrategy.computeNewValueForLeftOperand(operation, rightOperandValue, expressionContext,
+                    rightOperandValue != null && shouldPersistValue);
             expressionContext.getInputValues().put(leftOperand.getName(), value);
             logOperation(TechnicalLogSeverity.DEBUG, operation, rightOperandValue, expressionContext);
         }
@@ -127,7 +128,7 @@ public class OperationServiceImpl implements OperationService {
 
     boolean shouldUpdateLeftOperandContext(final Map<SLeftOperand, LeftOperandUpdateStatus> updateLeftOperands, final SLeftOperand leftOperand,
             final LeftOperandUpdateStatus currentUpdateStatus) {
-        LeftOperandUpdateStatus previousStatus = updateLeftOperands.get(leftOperand);
+        final LeftOperandUpdateStatus previousStatus = updateLeftOperands.get(leftOperand);
         return previousStatus == null || !previousStatus.shouldDelete() && currentUpdateStatus.shouldDelete();
     }
 
@@ -158,12 +159,12 @@ public class OperationServiceImpl implements OperationService {
         final Map<String, Object> inputValues = expressionContext.getInputValues();
 
         //if the container where we execute the operation is not the same than the container of the expression (call activity data mapping) we skip the loading of left operand
-        String containerType = expressionContext.getContainerType();
-        Long containerId = expressionContext.getContainerId();
+        final String containerType = expressionContext.getContainerType();
+        final Long containerId = expressionContext.getContainerId();
         if (containerId == null || containerId != dataContainerId || containerType == null || !containerType.equals(dataContainerType)) {
             return;
         }
-        HashMap<String, List<SLeftOperand>> leftOperandHashMap = new HashMap<>();
+        final HashMap<String, List<SLeftOperand>> leftOperandHashMap = new HashMap<>();
         for (final SOperation operation : operations) {
             // this operation will set a data, we retrieve it and put it in context
             final SLeftOperand leftOperand = operation.getLeftOperand();
@@ -172,7 +173,7 @@ public class OperationServiceImpl implements OperationService {
             }
             leftOperandHashMap.get(leftOperand.getType()).add(leftOperand);
         }
-        for (Entry<String, List<SLeftOperand>> leftOperandByType : leftOperandHashMap.entrySet()) {
+        for (final Entry<String, List<SLeftOperand>> leftOperandByType : leftOperandHashMap.entrySet()) {
             try {
                 getLeftOperandHandler(leftOperandByType.getKey()).loadLeftOperandInContext(leftOperandByType.getValue(),
                         expressionContext, inputValues);

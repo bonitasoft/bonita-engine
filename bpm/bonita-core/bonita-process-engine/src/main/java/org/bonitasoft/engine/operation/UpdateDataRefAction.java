@@ -11,7 +11,6 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-
 package org.bonitasoft.engine.operation;
 
 import java.util.ArrayList;
@@ -27,13 +26,14 @@ import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRe
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Matthieu Chaffotte
  */
 public class UpdateDataRefAction implements EntityAction {
 
     private final RefBusinessDataService refBusinessDataService;
     private final RefBusinessDataRetriever refBusinessDataRetriever;
 
-    public UpdateDataRefAction(RefBusinessDataService refBusinessDataService, RefBusinessDataRetriever refBusinessDataRetriever) {
+    public UpdateDataRefAction(final RefBusinessDataService refBusinessDataService, final RefBusinessDataRetriever refBusinessDataRetriever) {
         this.refBusinessDataService = refBusinessDataService;
         this.refBusinessDataRetriever = refBusinessDataRetriever;
     }
@@ -41,13 +41,13 @@ public class UpdateDataRefAction implements EntityAction {
     @Override
     public Entity execute(final Entity entity, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
         try {
-            SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext);
+            final SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext);
             checkThatIsSimpleRef(reference);
-            SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
+            final SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
             if (!entity.getPersistenceId().equals(simpleRef.getDataId())) {
                 refBusinessDataService.updateRefBusinessDataInstance(simpleRef, entity.getPersistenceId());
             }
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new SEntityActionExecutionException(e);
         }
         return entity;
@@ -63,14 +63,14 @@ public class UpdateDataRefAction implements EntityAction {
     @Override
     public List<Entity> execute(final List<Entity> entities, final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
         try {
-            SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext);
+            final SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext);
             checkThatIsMultiRef(reference);
-            SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
-            ArrayList<Long> dataIds = buildDataIdsList(entities);
+            final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
+            final ArrayList<Long> dataIds = buildDataIdsList(entities);
             if (!multiRef.getDataIds().containsAll(dataIds) || multiRef.getDataIds().size() != dataIds.size()) {
                 refBusinessDataService.updateRefBusinessDataInstance(multiRef, dataIds);
             }
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new SEntityActionExecutionException(e);
         }
         return entities;
@@ -86,8 +86,8 @@ public class UpdateDataRefAction implements EntityAction {
     }
 
     private ArrayList<Long> buildDataIdsList(final List<Entity> entities) throws SEntityActionExecutionException {
-        ArrayList<Long> businessDataIds = new ArrayList<>(entities.size());
-        for (Entity entity : entities) {
+        final ArrayList<Long> businessDataIds = new ArrayList<>(entities.size());
+        for (final Entity entity : entities) {
             checkNotNull(entity);
             businessDataIds.add(entity.getPersistenceId());
         }
@@ -99,4 +99,21 @@ public class UpdateDataRefAction implements EntityAction {
             throw new SEntityActionExecutionException("The list of entities contains some null elements. Unable to execute action against null entity.");
         }
     }
+
+    @Override
+    public void handleNull(final BusinessDataContext businessDataContext) throws SEntityActionExecutionException {
+        try {
+            final SRefBusinessDataInstance reference = refBusinessDataRetriever.getRefBusinessDataInstance(businessDataContext);
+            if (reference instanceof SSimpleRefBusinessDataInstance) {
+                final SSimpleRefBusinessDataInstance simpleReference = (SSimpleRefBusinessDataInstance) reference;
+                refBusinessDataService.updateRefBusinessDataInstance(simpleReference, null);
+            } else {
+                final SMultiRefBusinessDataInstance multiReference = (SMultiRefBusinessDataInstance) reference;
+                refBusinessDataService.updateRefBusinessDataInstance(multiReference, new ArrayList<Long>());
+            }
+        } catch (final SBonitaException sbe) {
+            throw new SEntityActionExecutionException(sbe);
+        }
+    }
+
 }
