@@ -29,6 +29,7 @@ import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.page.AuthorizationRuleConstants;
 import org.bonitasoft.engine.page.Page;
@@ -226,6 +227,38 @@ public class FormMappingIT extends TestWithUser {
 
         getPageAPI().deletePage(custompage_globalpage.getId());
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void processWithEventSubProcess() throws Exception {
+        ProcessDefinitionBuilder p1Builder = new ProcessDefinitionBuilder().createNewInstance("P1", "1.0");
+        p1Builder.addUserTask("step1", "actor").addUserTask("step2", "actor");
+        p1Builder.addActor("actor");
+        final SubProcessDefinitionBuilder eventSubProc = p1Builder.addSubProcess("eventSubProc", true).getSubProcessBuilder();
+        eventSubProc.addUserTask("subTask", "actor");
+        eventSubProc.addStartEvent("start").addSignalEventTrigger("theSignal");
+        eventSubProc.addTransition("start","subTask");
+
+        BusinessArchiveBuilder bar1 = new BusinessArchiveBuilder()
+                .createNewBusinessArchive()
+                .setProcessDefinition(p1Builder.done())
+                .setFormMappings(
+                        FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
+                                .addTaskForm("task1Form", FormMappingTarget.INTERNAL, "step1")
+                                .addTaskForm("urlForThesubTask", FormMappingTarget.URL, "subTask")
+                                .addProcessOverviewForm("process1OverviewForm", FormMappingTarget.INTERNAL).build());
+
+
+
+        ProcessDefinition p1 = getProcessAPI().deploy(bar1.done());
+
+        SearchResult<FormMapping> formMappingSearchResult = getProcessAPI().searchFormMappings(new SearchOptionsBuilder(0, 100).sort(
+                FormMappingSearchDescriptor.ID, Order.DESC).filter(FormMappingSearchDescriptor.TASK, "subTask").done());
+        assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
+        assertThat(formMappingSearchResult.getResult().get(0).getURL()).isEqualTo("urlForThesubTask");
+
+        disableAndDeleteProcess(p1);
+
     }
 
 }
