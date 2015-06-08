@@ -48,13 +48,10 @@ import org.bonitasoft.engine.io.PropertiesManager;
  */
 public class BonitaHomeServer extends BonitaHome {
 
-    private static final String SERVER_API_IMPLEMENTATION = "serverApi";
-
-    private Properties platformProperties = null;
-
-    private String version;
-
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
+    private static final String SERVER_API_IMPLEMENTATION = "serverApi";
+    private Properties platformProperties = null;
+    private String version;
 
     private BonitaHomeServer() {
         platformProperties = null;
@@ -62,6 +59,14 @@ public class BonitaHomeServer extends BonitaHome {
 
     public static BonitaHomeServer getInstance() {
         return INSTANCE;
+    }
+
+    private static List<File> getXmlResourcesOfFolder(final Folder folder, final FileFilter filter) throws IOException {
+        //sort this to have always the same order
+        File[] listFiles = folder.listFiles(filter);
+        List<File> listFilesCollection = Arrays.asList(listFiles);
+        Collections.sort(listFilesCollection);
+        return listFilesCollection;
     }
 
     private String getBonitaHomeProperty(final String propertyName) throws IllegalStateException {
@@ -91,10 +96,7 @@ public class BonitaHomeServer extends BonitaHome {
                 resources.add(file.getAbsolutePath());
             }
         }
-        //System.err.println(this.getClass().getName() + "-" + "getResourcesFromFiles" + ":" + "resources=" + resources);
-        final String[] strings = resources.toArray(new String[resources.size()]);
-        //System.err.println(this.getClass().getName() + "-" + "getResourcesFromFiles" + ":" + "strings=" + strings);
-        return strings;
+        return resources.toArray(new String[resources.size()]);
     }
 
     public FileHandler getIncidentFileHandler(long tenantId) throws BonitaHomeNotSetException, IOException {
@@ -134,38 +136,6 @@ public class BonitaHomeServer extends BonitaHome {
         file.delete();
         file.createNewFile();
         return file;
-    }
-
-    private static class XmlFilesFilter implements FileFilter {
-
-        @Override
-        public boolean accept(final File pathname) {
-            return pathname.isFile() && pathname.getName().endsWith(".xml") && !pathname.getName().endsWith("-cache.xml");
-        }
-    }
-
-    private static class NonClusterXmlFilesFilter extends XmlFilesFilter {
-
-        @Override
-        public boolean accept(final File pathname) {
-            return super.accept(pathname) && !pathname.getName().contains("cluster");
-        }
-    }
-
-    private static class ClusterXmlFilesFilter extends XmlFilesFilter {
-
-        @Override
-        public boolean accept(final File pathname) {
-            return super.accept(pathname) && pathname.getName().contains("cluster");
-        }
-    }
-
-    private static List<File> getXmlResourcesOfFolder(final Folder folder, final FileFilter filter) throws IOException {
-        //sort this to have always the same order
-        File[] listFiles = folder.listFiles(filter);
-        List<File> listFilesCollection = Arrays.asList(listFiles);
-        Collections.sort(listFilesCollection);
-        return listFilesCollection;
     }
 
     private String[] getConfigurationFiles(final Folder... folders) throws BonitaHomeNotSetException, IOException {
@@ -220,9 +190,7 @@ public class BonitaHomeServer extends BonitaHome {
 
     @Override
     protected void refresh() {
-        //System.err.println("----- REFRESH Thread: " + Thread.currentThread().getId() + "-----");
         platformProperties = null;
-        //System.err.println("----- END REFRESH Thread: " + Thread.currentThread().getId() + "-----");
     }
 
     private Properties mergeProperties(final Folder folder, Properties mergeInto) throws IOException {
@@ -232,19 +200,13 @@ public class BonitaHomeServer extends BonitaHome {
                 return filename.endsWith(".properties");
             }
         };
-
         final List<File> files = folder.listFiles(filter);
         for (File file : files) {
-            //System.out.println("load properties " + file);
             Properties properties = getProperties(file);
             for (Map.Entry<Object, Object> property : properties.entrySet()) {
                 Object put = mergeInto.put(property.getKey(), property.getValue());
-                if (put != null) {
-                    //System.out.println("Overriding " + property.getKey() + " with " + property.getValue());
                 }
             }
-            properties.putAll(properties);
-        }
         return mergeInto;
     }
 
@@ -275,10 +237,7 @@ public class BonitaHomeServer extends BonitaHome {
             } catch (Exception e) {
                 throw new IllegalStateException("Error while reading file" + versionFile, e);
             }
-            if (version == null) {
-                throw new IllegalStateException("Invalid version file: " + versionFile);
             }
-        }
         return version;
     }
 
@@ -299,10 +258,6 @@ public class BonitaHomeServer extends BonitaHome {
 
     private Folder getProcessFolder(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
         return FolderMgr.getTenantWorkProcessFolder(getBonitaHomeFolder(), tenantId, processId);
-    }
-
-    public File getProcessDefinitionFile(long tenantId, long processId, String fileName) throws BonitaHomeNotSetException, IOException {
-        return getProcessFolder(tenantId, processId).getFile(fileName);
     }
 
     public FileOutputStream getProcessDefinitionFileOutputstream(long tenantId, long processId, String fileName) throws BonitaHomeNotSetException, IOException {
@@ -385,8 +340,8 @@ public class BonitaHomeServer extends BonitaHome {
         final File newFile = getConnectorsFolder(tenantId, processId).getFile(resourceName);
         final File parentFile = newFile.getParentFile();
         if (createFoldersIfNecessary(parentFile)) {
-            IOUtil.write(newFile, resourceContent);
-        }
+        IOUtil.write(newFile, resourceContent);
+    }
     }
 
     /**
@@ -400,19 +355,13 @@ public class BonitaHomeServer extends BonitaHome {
     }
 
     public void storeSecurityScript(long tenantId, String scriptFileContent, String fileName, String[] folders) throws IOException, BonitaHomeNotSetException {
-        final Folder secuFolder = FolderMgr.getTenantWorkSecurityFolder(getBonitaHomeFolder(), tenantId);
-        Folder current = secuFolder;
+        Folder current = FolderMgr.getTenantWorkSecurityFolder(getBonitaHomeFolder(), tenantId);
         for (String folder : folders) {
             current = new Folder(current, folder);
             current.create();
         }
         final File fileToWrite = current.newFile(fileName);
         org.bonitasoft.engine.commons.io.IOUtil.writeFile(fileToWrite, scriptFileContent);
-    }
-
-    public void createProcess(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        FolderMgr.createTenantWorkProcessFolder(getBonitaHomeFolder(), tenantId, processId);
-        FolderMgr.createTenantTempProcessFolder(getBonitaHomeFolder(), tenantId, processId);
     }
 
     private File getParameterFile(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
@@ -466,8 +415,6 @@ public class BonitaHomeServer extends BonitaHome {
             BonitaHomeNotSetException {
         final FileOutputStream actorMappingOS = getProcessDefinitionFileOutputstream(tenantId, processId, "actorMapping.xml");
         IOUtil.writeContentToFileOutputStream(actorMappingContent, actorMappingOS);
-        //final FileOutputStream parametersOS = getProcessDefinitionFileOutputstream(tenantId, processId, "current-parameters.properties");
-        //IOUtil.writeContentToFileOutputStream(parametersContent, parametersOS);
         final Folder processFolder = getProcessFolder(tenantId, processId);
         return processFolder.zip(processFolder);
     }
@@ -478,6 +425,30 @@ public class BonitaHomeServer extends BonitaHome {
 
     public URI getLocalTemporaryFolder(final String artifactType, final long artifactId) throws BonitaHomeNotSetException, IOException {
         return FolderMgr.getPlatformLocalClassLoaderFolder(getBonitaHomeFolder(), artifactType, artifactId).toURI();
+    }
+
+    private static class XmlFilesFilter implements FileFilter {
+
+        @Override
+        public boolean accept(final File pathname) {
+            return pathname.isFile() && pathname.getName().endsWith(".xml") && !pathname.getName().endsWith("-cache.xml");
+        }
+    }
+
+    private static class NonClusterXmlFilesFilter extends XmlFilesFilter {
+
+        @Override
+        public boolean accept(final File pathname) {
+            return super.accept(pathname) && !pathname.getName().contains("cluster");
+        }
+    }
+
+    private static class ClusterXmlFilesFilter extends XmlFilesFilter {
+
+        @Override
+        public boolean accept(final File pathname) {
+            return super.accept(pathname) && pathname.getName().contains("cluster");
+        }
     }
 
 }
