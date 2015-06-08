@@ -15,21 +15,16 @@ package org.bonitasoft.engine.home;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.FileHandler;
 
-import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
@@ -50,15 +45,79 @@ public class BonitaHomeServer extends BonitaHome {
 
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
     private static final String SERVER_API_IMPLEMENTATION = "serverApi";
+    private final ProcessManager processManager;
+    private final TenantManager tenantManager;
+    private final TenantStorage tenantStorage;
     private Properties platformProperties = null;
     private String version;
 
     private BonitaHomeServer() {
         platformProperties = null;
+        processManager = new ProcessManager(this);
+        tenantManager = new TenantManager(this);
+        tenantStorage = new TenantStorage(this);
     }
 
     public static BonitaHomeServer getInstance() {
         return INSTANCE;
+    }
+
+    /*
+     * =================================================
+     * process/tenant management
+     * =================================================
+     */
+
+    public ProcessManager getProcessManager() {
+        return processManager;
+    }
+
+    public TenantManager getTenantManager() {
+        return tenantManager;
+    }
+
+    public TenantStorage getTenantStorage() {
+        return tenantStorage;
+    }
+
+    /*
+     * =================================================
+     * Bootstrap the engine
+     * =================================================
+     */
+    public String[] getPrePlatformInitConfigurationFiles() throws BonitaHomeNotSetException, IOException {
+        final Folder f1 = FolderMgr.getPlatformInitWorkFolder(getBonitaHomeFolder());
+        final Folder f2 = FolderMgr.getPlatformInitConfFolder(getBonitaHomeFolder());
+        return getConfigurationFiles(f1, f2);
+    }
+
+    public String[] getPlatformConfigurationFiles() throws BonitaHomeNotSetException, IOException {
+        final Folder f1 = FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder());
+        final Folder f2 = FolderMgr.getPlatformConfFolder(getBonitaHomeFolder());
+        return getConfigurationFiles(f1, f2);
+    }
+
+    public String[] getTenantConfigurationFiles(final long tenantId) throws BonitaHomeNotSetException, IOException {
+        final Folder f1 = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId);
+        final Folder f2 = FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId);
+        return getConfigurationFiles(f1, f2);
+    }
+
+    private String[] getConfigurationFiles(final Folder... folders) throws BonitaHomeNotSetException, IOException {
+        final Properties platformProperties = getPlatformProperties();
+        final List<File> files = new ArrayList<>();
+        for (Folder folder : folders) {
+            files.addAll(getXmlResourcesOfFolder(folder, new NonClusterXmlFilesFilter()));
+        }
+        //if cluster is activated, add cluster files at the end. We have to ensure cluster files are loaded "last"
+        final boolean cluster = Boolean.valueOf(platformProperties.getProperty("bonita.cluster", "false"));
+        if (cluster) {
+            for (Folder folder : folders) {
+                files.addAll(getXmlResourcesOfFolder(folder, new ClusterXmlFilesFilter()));
+            }
+        }
+
+        return getResourcesFromFiles(files);
     }
 
     private static List<File> getXmlResourcesOfFolder(final Folder folder, final FileFilter filter) throws IOException {
@@ -69,6 +128,21 @@ public class BonitaHomeServer extends BonitaHome {
         return listFilesCollection;
     }
 
+    private String[] getResourcesFromFiles(final List<File> files) {
+        final List<String> resources = new ArrayList<>();
+        if (files != null) {
+            for (File file : files) {
+                resources.add(file.getAbsolutePath());
+            }
+        }
+        return resources.toArray(new String[resources.size()]);
+    }
+
+    /*
+     * =================================================
+     * Configuration
+     * =================================================
+     */
     private String getBonitaHomeProperty(final String propertyName) throws IllegalStateException {
         try {
             return getPlatformProperties().getProperty(propertyName);
@@ -89,110 +163,6 @@ public class BonitaHomeServer extends BonitaHome {
         return getBonitaHomeProperty(SERVER_API_IMPLEMENTATION);
     }
 
-    private String[] getResourcesFromFiles(final List<File> files) {
-        final List<String> resources = new ArrayList<>();
-        if (files != null) {
-            for (File file : files) {
-                resources.add(file.getAbsolutePath());
-            }
-        }
-        return resources.toArray(new String[resources.size()]);
-    }
-
-    public FileHandler getIncidentFileHandler(long tenantId) throws BonitaHomeNotSetException, IOException {
-        final File incidentFile = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile("incidents.log");
-        return new FileHandler(incidentFile.getAbsolutePath());
-
-    }
-
-    private File getBDMFile(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        final Folder bdmFolder = FolderMgr.getTenantWorkBDMFolder(getBonitaHomeFolder(), tenantId);
-        return bdmFolder.getFile("client-bdm.zip");
-    }
-
-    public byte[] getClientBDMZip(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        final File bdmFile = getBDMFile(tenantId);
-        return IOUtil.getAllContentFrom(bdmFile);
-    }
-
-    public void writeClientBDMZip(final long tenantId, byte[] clientBdmJar) throws BonitaHomeNotSetException, IOException {
-        final File bdmFile = getBDMFile(tenantId);
-        if (bdmFile.exists()) {
-            bdmFile.delete();
-        }
-        IOUtil.write(bdmFile, clientBdmJar);
-    }
-
-    public void removeBDMZip(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        final File bdmFile = getBDMFile(tenantId);
-        if (bdmFile.exists()) {
-            bdmFile.delete();
-        }
-    }
-
-    public File getPlatformTempFile(final String fileName) throws BonitaHomeNotSetException, IOException {
-        final Folder tempFolder = FolderMgr.getPlatformTempFolder(getBonitaHomeFolder());
-        final File file = tempFolder.getFile(fileName);
-        file.delete();
-        file.createNewFile();
-        return file;
-    }
-
-    private String[] getConfigurationFiles(final Folder... folders) throws BonitaHomeNotSetException, IOException {
-        final Properties platformProperties = getPlatformProperties();
-        final List<File> files = new ArrayList<>();
-        for (Folder folder : folders) {
-            files.addAll(getXmlResourcesOfFolder(folder, new NonClusterXmlFilesFilter()));
-        }
-        //if cluster is activated, add cluster files at the end. We have to ensure cluster files are loaded "last"
-        final boolean cluster = Boolean.valueOf(platformProperties.getProperty("bonita.cluster", "false"));
-        if (cluster) {
-            for (Folder folder : folders) {
-                files.addAll(getXmlResourcesOfFolder(folder, new ClusterXmlFilesFilter()));
-            }
-        }
-
-        return getResourcesFromFiles(files);
-    }
-
-    public String[] getPrePlatformInitConfigurationFiles() throws BonitaHomeNotSetException, IOException {
-        final Folder f1 = FolderMgr.getPlatformInitWorkFolder(getBonitaHomeFolder());
-        final Folder f2 = FolderMgr.getPlatformInitConfFolder(getBonitaHomeFolder());
-        return getConfigurationFiles(f1, f2);
-    }
-
-    public String[] getPlatformConfigurationFiles() throws BonitaHomeNotSetException, IOException {
-        final Folder f1 = FolderMgr.getPlatformWorkFolder(getBonitaHomeFolder());
-        final Folder f2 = FolderMgr.getPlatformConfFolder(getBonitaHomeFolder());
-        return getConfigurationFiles(f1, f2);
-    }
-
-    public String[] getTenantConfigurationFiles(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        final Folder f1 = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId);
-        final Folder f2 = FolderMgr.getTenantConfFolder(getBonitaHomeFolder(), tenantId);
-        return getConfigurationFiles(f1, f2);
-    }
-
-    public void createTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        FolderMgr.createTenant(getBonitaHomeFolder(), tenantId);
-
-        //put the right id in tenant properties file
-        final File file = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile("bonita-tenant-id.properties");
-        //maybe a replace is better?
-        final Properties tenantProperties = new Properties();
-        tenantProperties.put("tenantId", String.valueOf(tenantId));
-        PropertiesManager.saveProperties(tenantProperties, file);
-    }
-
-    public void deleteTenant(final long tenantId) throws BonitaHomeNotSetException, IOException {
-        FolderMgr.deleteTenant(getBonitaHomeFolder(), tenantId);
-    }
-
-    @Override
-    protected void refresh() {
-        platformProperties = null;
-    }
-
     private Properties mergeProperties(final Folder folder, Properties mergeInto) throws IOException {
         final FilenameFilter filter = new FilenameFilter() {
 
@@ -204,9 +174,9 @@ public class BonitaHomeServer extends BonitaHome {
         for (File file : files) {
             Properties properties = getProperties(file);
             for (Map.Entry<Object, Object> property : properties.entrySet()) {
-                Object put = mergeInto.put(property.getKey(), property.getValue());
-                }
+                mergeInto.put(property.getKey(), property.getValue());
             }
+        }
         return mergeInto;
     }
 
@@ -225,7 +195,7 @@ public class BonitaHomeServer extends BonitaHome {
 
     /**
      * get the version of the bonita home
-     * 
+     *
      * @return the version of the bonita home
      */
     public String getVersion() {
@@ -237,7 +207,7 @@ public class BonitaHomeServer extends BonitaHome {
             } catch (Exception e) {
                 throw new IllegalStateException("Error while reading file" + versionFile, e);
             }
-            }
+        }
         return version;
     }
 
@@ -256,167 +226,23 @@ public class BonitaHomeServer extends BonitaHome {
         return preInitProperties;
     }
 
-    private Folder getProcessFolder(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        return FolderMgr.getTenantWorkProcessFolder(getBonitaHomeFolder(), tenantId, processId);
+    @Override
+    protected void refresh() {
+        platformProperties = null;
     }
 
-    public FileOutputStream getProcessDefinitionFileOutputstream(long tenantId, long processId, String fileName) throws BonitaHomeNotSetException, IOException {
-        final Folder processFolder = getProcessFolder(tenantId, processId);
-        final File file = processFolder.getFile(fileName);
-        return new FileOutputStream(file);
-    }
-
-    private Folder getProcessClasspathFolder(final long tenantId, final long processId) throws BonitaHomeNotSetException, IOException {
-        return FolderMgr.getTenantWorkProcessClasspathFolder(getBonitaHomeFolder(), tenantId, processId);
-    }
-
-    public Map<String, byte[]> getProcessClasspath(final long tenantId, final long processId) throws BonitaHomeNotSetException, IOException {
-        final Map<String, byte[]> resources = new HashMap<>();
-        final Folder processClasspathFolder = getProcessClasspathFolder(tenantId, processId);
-        final File[] listFiles = processClasspathFolder.listFiles();
-        for (final File jarFile : listFiles) {
-            final String name = jarFile.getName();
-            final byte[] jarContent = FileUtils.readFileToByteArray(jarFile);
-            resources.put(name, jarContent);
-        }
-        return resources;
-    }
-
-    public void deleteProcess(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        FolderMgr.deleteTenantWorkProcessFolder(getBonitaHomeFolder(), tenantId, processId);
-        FolderMgr.deleteTenantTempProcessFolder(getBonitaHomeFolder(), tenantId, processId);
-    }
-
-    public Map<String, byte[]> getProcessResources(long tenantId, long processId, String filenamesPattern) throws BonitaHomeNotSetException, IOException {
-        final Folder processFolder = getProcessFolder(tenantId, processId);
-        return processFolder.getResources(filenamesPattern);
-    }
-
-    public byte[] getProcessDocument(long tenantId, long processId, String documentName) throws BonitaHomeNotSetException, IOException {
-        final Folder documentsFolder = FolderMgr.getTenantWorkProcessDocumentFolder(getBonitaHomeFolder(), tenantId, processId);
-        return FileUtils.readFileToByteArray(documentsFolder.getFile(documentName));
-    }
-
-    public File getTenantWorkFile(long tenantId, String fileName) throws BonitaHomeNotSetException, IOException {
-        return FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId).getFile(fileName);
-    }
-
-    public void writeBusinessArchive(long tenantId, long processId, BusinessArchive businessArchive) throws BonitaHomeNotSetException, IOException {
-        final Folder processFolder = getProcessFolder(tenantId, processId);
-        processFolder.create();
-        processFolder.writeBusinessArchive(businessArchive);
-    }
-
-    public Map<String, byte[]> getConnectorFiles(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        return getConnectorsFolder(tenantId, processId).listFilesAsResources();
-    }
-
-    private Folder getConnectorsFolder(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        return FolderMgr.getTenantWorkProcessConnectorsFolder(getBonitaHomeFolder(), tenantId, processId);
-    }
-
-    public void deleteConnectorFile(long tenantId, long processId, String fileName) throws BonitaHomeNotSetException, IOException {
-        final Folder connectorsFolder = getConnectorsFolder(tenantId, processId);
-        connectorsFolder.deleteFile(fileName);
-    }
-
-    public void deleteClasspathFiles(long tenantId, long processId, String... resourceNames) throws BonitaHomeNotSetException, IOException {
-        if (resourceNames != null) {
-            final Folder classpathFolder = getProcessClasspathFolder(tenantId, processId);
-            for (String resourceName : resourceNames) {
-                classpathFolder.deleteFile(resourceName);
-            }
-        }
-    }
-
-    public void storeClasspathFile(long tenantId, final long processId, String resourceName, byte[] resourceContent) throws BonitaHomeNotSetException,
-            IOException {
-        final File newFile = getProcessClasspathFolder(tenantId, processId).getFile(resourceName);
-        IOUtil.write(newFile, resourceContent);
-    }
-
-    public void storeConnectorFile(long tenantId, final long processId, String resourceName, byte[] resourceContent) throws BonitaHomeNotSetException,
-            IOException {
-        final File newFile = getConnectorsFolder(tenantId, processId).getFile(resourceName);
-        final File parentFile = newFile.getParentFile();
-        if (createFoldersIfNecessary(parentFile)) {
-        IOUtil.write(newFile, resourceContent);
-    }
-    }
-
-    /**
-     * Creates necessary folders, if necessary.
-     * 
-     * @param folder the deep folder to create (or check it already exists)
-     * @return true if the folders exist after call to this method (they already existed, or they have just been created)
+    /*
+     * =================================================
+     * temporary files
+     * =================================================
      */
-    protected boolean createFoldersIfNecessary(File folder) {
-        return folder.exists() || folder.mkdirs();
-    }
 
-    public void storeSecurityScript(long tenantId, String scriptFileContent, String fileName, String[] folders) throws IOException, BonitaHomeNotSetException {
-        Folder current = FolderMgr.getTenantWorkSecurityFolder(getBonitaHomeFolder(), tenantId);
-        for (String folder : folders) {
-            current = new Folder(current, folder);
-            current.create();
-        }
-        final File fileToWrite = current.newFile(fileName);
-        org.bonitasoft.engine.commons.io.IOUtil.writeFile(fileToWrite, scriptFileContent);
-    }
-
-    private File getParameterFile(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        return getProcessFolder(tenantId, processId).getFile("parameters.properties");
-    }
-
-    public Properties getParameters(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        return PropertiesManager.getProperties(getParameterFile(tenantId, processId));
-    }
-
-    public void storeParameters(long tenantId, long processId, Properties properties) throws BonitaHomeNotSetException, IOException {
-        PropertiesManager.saveProperties(properties, getParameterFile(tenantId, processId));
-    }
-
-    public boolean hasParameters(long tenantId, long processId) throws IOException, BonitaHomeNotSetException {
-        final File file = getParameterFile(tenantId, processId);
-        return file.exists();
-    }
-
-    public boolean deleteParameters(long tenantId, long processId) throws IOException, BonitaHomeNotSetException {
-        final File file = getParameterFile(tenantId, processId);
-        return file.delete();
-    }
-
-    public File[] getUserFiltersFiles(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        return getUserFiltersFolder(tenantId, processId).listFiles();
-    }
-
-    private Folder getUserFiltersFolder(long tenantId, long processId) throws BonitaHomeNotSetException, IOException {
-        return FolderMgr.getTenantWorkProcessUserFiltersFolder(getBonitaHomeFolder(), tenantId, processId);
-    }
-
-    public File getSecurityScriptsFolder(long tenantId) throws BonitaHomeNotSetException, IOException {
-        return FolderMgr.getTenantWorkSecurityFolder(getBonitaHomeFolder(), tenantId).getFile();
-    }
-
-    public void modifyTechnicalUser(long tenantId, String userName, String password) throws IOException, BonitaHomeNotSetException {
-        final Folder workFolder = FolderMgr.getTenantWorkFolder(getBonitaHomeFolder(), tenantId);
-        final File propertiesFile = workFolder.getFile("bonita-tenant-community.properties");
-        final Map<String, String> pairs = new HashMap<>();
-        if (userName != null) {
-            pairs.put("userName", userName);
-        }
-        if (password != null) {
-            pairs.put("userPassword", password);
-        }
-        org.bonitasoft.engine.commons.io.IOUtil.updatePropertyValue(propertiesFile, pairs);
-    }
-
-    public byte[] exportBarProcessContentUnderHome(long tenantId, long processId, final String actorMappingContent) throws IOException,
-            BonitaHomeNotSetException {
-        final FileOutputStream actorMappingOS = getProcessDefinitionFileOutputstream(tenantId, processId, "actorMapping.xml");
-        IOUtil.writeContentToFileOutputStream(actorMappingContent, actorMappingOS);
-        final Folder processFolder = getProcessFolder(tenantId, processId);
-        return processFolder.zip(processFolder);
+    public File getPlatformTempFile(final String fileName) throws BonitaHomeNotSetException, IOException {
+        final Folder tempFolder = FolderMgr.getPlatformTempFolder(getBonitaHomeFolder());
+        final File file = tempFolder.getFile(fileName);
+        file.delete();
+        file.createNewFile();
+        return file;
     }
 
     public URI getGlobalTemporaryFolder() throws BonitaHomeNotSetException, IOException {
