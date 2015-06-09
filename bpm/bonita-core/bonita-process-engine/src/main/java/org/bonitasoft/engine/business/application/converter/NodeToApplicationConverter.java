@@ -50,8 +50,8 @@ public class NodeToApplicationConverter {
         String token = applicationNode.getToken();
         validator.validate(token);
         final ImportStatus importStatus = new ImportStatus(token);
-        Long layoutId = getPageId(getLayoutName(applicationNode), token, importStatus);
-        Long themeId = getPageId(getThemeName(applicationNode), token, importStatus);
+        Long layoutId = getLayoutId(getLayoutName(applicationNode), token, importStatus);
+        Long themeId = getThemeId(getThemeName(applicationNode), token, importStatus);
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(token,
                 applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy, layoutId, themeId);
         builder.setIconPath(applicationNode.getIconPath());
@@ -67,17 +67,30 @@ public class NodeToApplicationConverter {
         return new ImportResult(application, importStatus);
     }
 
-    private Long getPageId(final String pageName, final String applicationToken, final ImportStatus importStatus) throws SBonitaReadException, ImportException {
-        SPage layout = pageService.getPageByName(pageName);
+    private Long getLayoutId(final String layoutName, final String applicationToken, final ImportStatus importStatus) throws SBonitaReadException, ImportException {
+        SPage layout = pageService.getPageByName(layoutName);
         if (layout == null) {
-            return handleMissingPage(pageName, applicationToken, importStatus);
+            return handleMissingLayout(layoutName, applicationToken, importStatus);
         }
         return layout.getId();
     }
 
-    protected Long handleMissingPage(final String pageName, final String applicationToken, final ImportStatus importStatus) throws ImportException {
-        throw new ImportException(String.format("Unable to import application with token '%s' because the page '%s' was not found.",
-                applicationToken, pageName));
+    private Long getThemeId(final String themeName, final String applicationToken, final ImportStatus importStatus) throws SBonitaReadException, ImportException {
+        SPage theme = pageService.getPageByName(themeName);
+        if (theme == null) {
+            return handleMissingTheme(themeName, applicationToken, importStatus);
+        }
+        return theme.getId();
+    }
+
+    protected Long handleMissingLayout(final String layoutName, final String applicationToken, final ImportStatus importStatus) throws ImportException, SBonitaReadException {
+        throw new ImportException(String.format("Unable to import application with token '%s' because the layout '%s' was not found.",
+                applicationToken, layoutName));
+    }
+
+    protected Long handleMissingTheme(final String themeName, final String applicationToken, final ImportStatus importStatus) throws ImportException, SBonitaReadException {
+        throw new ImportException(String.format("Unable to import application with token '%s' because the theme '%s' was not found.",
+                applicationToken, themeName));
     }
 
     protected String getLayoutName(final ApplicationNode applicationNode) {
@@ -101,4 +114,7 @@ public class NodeToApplicationConverter {
         return importError;
     }
 
+    protected PageService getPageService() {
+        return pageService;
+    }
 }
