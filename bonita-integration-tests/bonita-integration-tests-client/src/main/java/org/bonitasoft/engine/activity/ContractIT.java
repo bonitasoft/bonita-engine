@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +52,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ContractDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnectorWithAPICall;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -62,7 +64,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class UserTaskContractITest extends CommonAPIIT {
+public class ContractIT extends CommonAPIIT {
 
     private static final String TASK2 = "task2";
     private static final String TASK1 = "task1";
@@ -123,6 +125,32 @@ public class UserTaskContractITest extends CommonAPIIT {
         final Serializable processInstanciationInputValue = getProcessAPI().getProcessInputValueAfterInitialization(processInstance.getId(),
                 numberOfDaysProcessContractData);
         assertThat(processInstanciationInputValue).isEqualTo(value);
+
+        //clean up
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void should_process_contract_work_with_event_sub_process() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contractAndEventSub", "1.0");
+        builder.addShortTextData("name",
+                new ExpressionBuilder().createContractInputExpression("nameInput", String.class.getName()));
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask(TASK1, ACTOR_NAME);
+        final ContractDefinitionBuilder contract = builder.addContract();
+        contract.addInput("nameInput", Type.TEXT, "the name", false);
+        final SubProcessDefinitionBuilder signalEventSubProcess = builder.addSubProcess("SignalEventSubProcess", true).getSubProcessBuilder();
+        signalEventSubProcess.addStartEvent("signalStart").addSignalEventTrigger("*Bip Bip*");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcessWithInputs(processDefinition.getId(), Collections.<String, Serializable>singletonMap("nameInput", "john"));
+        assertThat(getProcessAPI().getProcessDataInstance("name", processInstance.getId()).getValue()).as("value of the data 'name' of the process").isEqualTo("john");
+        waitForUserTask(TASK1);
+
+        getProcessAPI().sendSignal("*Bip Bip*");
+
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
 
         //clean up
         disableAndDeleteProcess(processDefinition);
@@ -291,7 +319,8 @@ public class UserTaskContractITest extends CommonAPIIT {
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         final ContractDefinitionBuilder contractDefinitionBuilder = userTaskDefinitionBuilder.addContract();
         contractDefinitionBuilder
-                .addComplexInput("expenseReport", "expense report with several expense lines", true).addInput("expenseType", Type.TEXT, "describe expense type")
+                .addComplexInput("expenseReport", "expense report with several expense lines", true)
+                .addInput("expenseType", Type.TEXT, "describe expense type")
                 .addInput("expenseAmount", Type.DECIMAL, "expense amount")
                 .addInput("expenseDate", Type.DATE, "expense date")
                 .addInput("expenseProof", Type.BYTE_ARRAY, "expense proof");

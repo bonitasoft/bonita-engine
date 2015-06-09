@@ -796,7 +796,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
 
         // Validate start process contract inputs:
-        validateContractInputs(processInputs, sProcessDefinition);
+        if (selector.getSubProcessDefinitionId() <= 0) {
+            validateContractInputs(processInputs, sProcessDefinition);
+        }
 
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
