@@ -226,7 +226,7 @@ public class FormMappingIT extends TestWithUser {
         assertThat(getProcessAPI().getProcessResolutionProblems(processDefinition.getId())).hasSize(1);
 
         getPageAPI().deletePage(custompage_globalpage.getId());
-        deleteProcess(processDefinition);
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -257,7 +257,7 @@ public class FormMappingIT extends TestWithUser {
         assertThat(formMappingSearchResult.getCount()).isEqualTo(1);
         assertThat(formMappingSearchResult.getResult().get(0).getURL()).isEqualTo("urlForThesubTask");
 
-        disableAndDeleteProcess(p1);
+        deleteProcess(p1);
 
     }
 
