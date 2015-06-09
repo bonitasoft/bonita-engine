@@ -537,13 +537,18 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public SProcessDefinitionDeployInfo updateProcessDefinitionDeployInfo(final long processId, final EntityUpdateDescriptor descriptor)
             throws SProcessDefinitionNotFoundException, SProcessDeploymentInfoUpdateException {
+        final String logMessage = "Updating a processDefinitionDeployInfo";
+        return updateProcessDefinitionDeployInfo(processId, descriptor, logMessage);
+    }
+
+    SProcessDefinitionDeployInfo updateProcessDefinitionDeployInfo(long processId, EntityUpdateDescriptor descriptor, String logMessage) throws SProcessDefinitionNotFoundException, SProcessDeploymentInfoUpdateException {
         SProcessDefinitionDeployInfo processDefinitionDeployInfo;
         try {
             processDefinitionDeployInfo = getProcessDeploymentInfo(processId);
         } catch (final SBonitaReadException e) {
             throw new SProcessDefinitionNotFoundException(e, processId);
         }
-        final SProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating a processDefinitionDeployInfo");
+        final SProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, truncate(logMessage));
         final UpdateRecord updateRecord = getUpdateRecord(descriptor, processDefinitionDeployInfo);
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(PROCESSDEFINITION_DEPLOY_INFO, EventActionType.UPDATED)) {
@@ -965,16 +970,21 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 throw new SObjectModificationException("Updating an Expression of type " + expression.getExpressionType()
                         + " is not supported. Only Groovy scripts and constants are allowed.");
             }
+            final String oldContent = expression.getContent();
             expression.setContent(content);
             final String processDefinitionAsXMLString = getProcessContent(designProcessDefinition);
             final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
                     .createNewInstance().updateDesignContent(processDefinitionAsXMLString).done();
-            updateProcessDefinitionDeployInfo(processDefinitionId, updateDescriptor);
+            updateProcessDefinitionDeployInfo(processDefinitionId, updateDescriptor, "Update expression <" + expressionDefinitionId + ">, old content is <" + oldContent + ">");
         } catch (IOException e) {
             throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
         } catch (SBonitaReadException | SProcessDeploymentInfoUpdateException e) {
             throw new SObjectModificationException(e);
         }
+    }
+
+    String truncate(String logMessage) {
+        return logMessage.substring(0, Math.min(255, logMessage.length()));
     }
 
     protected boolean isValidExpressionTypeToUpdate(String type) {

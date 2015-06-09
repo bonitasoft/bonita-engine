@@ -1008,7 +1008,7 @@
 
     <bean id="timeTracker" class="org.bonitasoft.engine.tracking.TimeTracker">
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="startFlushThread" value="${bonita.tenant.timetracker.startFlushThread}" />
+        <constructor-arg name="enabled" value="${bonita.tenant.timetracker.enable}" />
         <constructor-arg name="flushEventListeners" ref="flushEventListeners" />
         <constructor-arg name="maxSize" value="${bonita.tenant.timetracker.maxSize}" />
         <constructor-arg name="flushIntervalInSeconds"
@@ -1203,6 +1203,7 @@
         <constructor-arg ref="sessionService" />
         <constructor-arg ref="sessionAccessor" />
         <constructor-arg ref="identityService" />
+        <constructor-arg ref="tenantTechnicalLoggerService" />
     </bean>
 
     <bean id="genericAuthenticationServiceAccessor" class="org.bonitasoft.engine.authentication.GenericAuthenticationServiceAccessor">
@@ -1551,6 +1552,7 @@
         <constructor-arg name="legacyUrlAdapter">
             <util:constant static-field="org.bonitasoft.engine.page.URLAdapterConstants.LEGACY_URL_ADAPTER" />
         </constructor-arg>
+        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
     </bean>
 
     <bean id="syncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.SyncQueriableLoggerServiceImpl">

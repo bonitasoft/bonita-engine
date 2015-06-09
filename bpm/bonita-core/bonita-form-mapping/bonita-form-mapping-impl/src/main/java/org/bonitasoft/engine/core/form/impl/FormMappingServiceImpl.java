@@ -13,7 +13,13 @@
  */
 package org.bonitasoft.engine.core.form.impl;
 
-import static org.bonitasoft.engine.page.AuthorizationRuleConstants.*;
+import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_ACTOR_INITIATOR;
+import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_ADMIN;
+import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_INVOLVED_IN_PROCESS_INSTANCE;
+import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_PROCESS_INITIATOR;
+import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_PROCESS_OWNER;
+import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_TASK_AVAILABLE_FOR_USER;
+import static org.bonitasoft.engine.page.AuthorizationRuleConstants.IS_TASK_PERFORMER;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,12 +51,20 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
+import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
+import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -73,10 +87,11 @@ public class FormMappingServiceImpl implements FormMappingService {
     private final String externalUrlAdapter;
     private final String legacyUrlAdapter;
     private final Map<FormMappingType, List<String>> authorizationRulesMap;
+    private QueriableLoggerService queriableLoggerService;
 
     public FormMappingServiceImpl(Recorder recorder, ReadPersistenceService persistenceService, SessionService sessionService,
             ReadSessionAccessor sessionAccessor, PageMappingService pageMappingService, PageService pageService,
-            FormMappingKeyGenerator formMappingKeyGenerator, String externalUrlAdapter, String legacyUrlAdapter) {
+            FormMappingKeyGenerator formMappingKeyGenerator, String externalUrlAdapter, String legacyUrlAdapter, QueriableLoggerService queriableLoggerService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
@@ -86,6 +101,7 @@ public class FormMappingServiceImpl implements FormMappingService {
         this.formMappingKeyGenerator = formMappingKeyGenerator;
         this.externalUrlAdapter = externalUrlAdapter;
         this.legacyUrlAdapter = legacyUrlAdapter;
+        this.queriableLoggerService = queriableLoggerService;
 
         authorizationRulesMap = new HashMap<>(3);
         authorizationRulesMap.put(FormMappingType.PROCESS_START, Arrays.asList(IS_ADMIN, IS_PROCESS_OWNER, IS_ACTOR_INITIATOR));
@@ -143,41 +159,84 @@ public class FormMappingServiceImpl implements FormMappingService {
         final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(FORM_MAPPING)
                 .setObject(sFormMapping)
                 .done();
+        FormMappingLogBuilder logBuilder = getLogBuilder(ActionType.CREATED);
         try {
             recorder.recordInsert(record, insertEvent);
+            log(sFormMapping, SQueriableLog.STATUS_OK, logBuilder, "insertFormMapping", "create");
         } catch (SRecorderException e) {
+            log(sFormMapping, SQueriableLog.STATUS_FAIL, logBuilder, "insertFormMapping", "failed to create");
             throw new SObjectCreationException(e);
         }
     }
 
     @Override
     public void update(SFormMapping formMapping, String url, Long pageId) throws SObjectModificationException {
-        String urlAdapter = null;
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(FORM_MAPPING).setObject(formMapping)
                 .done();
         checkExclusiveUrlOrPageId(url, pageId);
-        urlAdapter = checkAndGetUrlAdapter(url, urlAdapter);
+        String urlAdapter = checkAndGetUrlAdapter(url);
         checkThatInternalPageExists(pageId);
+        FormMappingLogBuilder logBuilder = getLogBuilder(ActionType.UPDATED);
+        EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+
         try {
-            EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+            Long oldPageId = null;
+            String oldUrlAdapter = null;
+            String oldUrl = null;
             entityUpdateDescriptor.addField("lastUpdatedBy", getSessionUserId());
             entityUpdateDescriptor.addField("lastUpdateDate", System.currentTimeMillis());
-
             // case where page mapping did not exist already (TARGET == UNDEFINED):
             if (formMapping.getPageMapping() == null) {
                 SPageMapping sPageMapping = createPageMappingForExistingFormMapping(formMapping, url, pageId);
                 ((SFormMappingImpl) formMapping).setPageMapping(sPageMapping);
             } else {
+                oldPageId = formMapping.getPageMapping().getPageId();
+                oldUrlAdapter = formMapping.getPageMapping().getUrlAdapter();
+                oldUrl = formMapping.getPageMapping().getUrl();
                 // Update the existing page mapping:
                 entityUpdateDescriptor.addField("pageMapping.url", url);
                 entityUpdateDescriptor.addField("pageMapping.urlAdapter", urlAdapter);
                 entityUpdateDescriptor.addField("pageMapping.pageId", pageId);
             }
-
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(formMapping, entityUpdateDescriptor);
             recorder.recordUpdate(updateRecord, updateEvent);
+            final String rawMessage = "Previous: pageId=<" + oldPageId + "> urlAdapter=<" + oldUrlAdapter + "> url=<"
+                    + oldUrl + ">";
+            log(formMapping, SQueriableLog.STATUS_OK, logBuilder, "update", truncate(rawMessage));
         } catch (SBonitaException e) {
+            log(formMapping, SQueriableLog.STATUS_FAIL, logBuilder, "update", "failed to update");
             throw new SObjectModificationException(e);
+        }
+    }
+
+    String truncate(String rawMessage) {
+        return rawMessage.substring(0,Math.min(255,rawMessage.length()));
+    }
+
+    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder) {
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL);
+    }
+
+    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
+        logBuilder.setActionType(actionType);
+    }
+
+    private FormMappingLogBuilder getLogBuilder(final ActionType actionType) {
+        final FormMappingLogBuilder logBuilder = new FormMappingLogBuilder();
+        this.initializeLogBuilder(logBuilder);
+        this.updateLog(actionType, logBuilder);
+        return logBuilder;
+    }
+
+    private void log(final SFormMapping formMapping, final int sQueriableLogStatus, final FormMappingLogBuilder logBuilder, final String callerMethodName,
+            String rawMessage) {
+        logBuilder.actionScope(String.valueOf(formMapping.getProcessDefinitionId()));
+        logBuilder.actionStatus(sQueriableLogStatus);
+        logBuilder.objectId(formMapping.getId());
+        logBuilder.rawMessage(rawMessage);
+        final SQueriableLog log = logBuilder.done();
+        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
+            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
     }
 
@@ -200,12 +259,12 @@ public class FormMappingServiceImpl implements FormMappingService {
         }
     }
 
-    protected String checkAndGetUrlAdapter(String url, String urlAdapter) throws SObjectModificationException {
-        if (url != null) {
-            checkUrlNotEmpty(url);
-            urlAdapter = externalUrlAdapter;
+    protected String checkAndGetUrlAdapter(String url) throws SObjectModificationException {
+        if (url == null) {
+            return null;
         }
-        return urlAdapter;
+        checkUrlNotEmpty(url);
+        return externalUrlAdapter;
     }
 
     protected void checkUrlNotEmpty(String url) throws SObjectModificationException {
@@ -228,12 +287,16 @@ public class FormMappingServiceImpl implements FormMappingService {
     public void delete(SFormMapping formMapping) throws SObjectModificationException {
         final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(FORM_MAPPING).setObject(formMapping)
                 .done();
+
+        FormMappingLogBuilder logBuilder = getLogBuilder(ActionType.DELETED);
         try {
             recorder.recordDelete(new DeleteRecord(formMapping), deleteEvent);
             if (formMapping.getPageMapping() != null) {
                 pageMappingService.delete(formMapping.getPageMapping());
             }
+            log(formMapping, SQueriableLog.STATUS_OK, logBuilder, "delete", "delete");
         } catch (SRecorderException | SDeletionException e) {
+            log(formMapping, SQueriableLog.STATUS_FAIL, logBuilder, "delete", "failed to delete");
             throw new SObjectModificationException(e);
         }
     }
@@ -297,4 +360,26 @@ public class FormMappingServiceImpl implements FormMappingService {
         return persistenceService.searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
     }
 
+    private static class FormMappingLogBuilder extends CRUDELogBuilder implements SPersistenceLogBuilder {
+
+        /*
+         * resulting log example
+         * 1 54 1433257801158 2015 6 153 23 william.jobs 1 7.0.0-SNAPSHOT INTERNAL FORM_MAPPING_UPDATED 1 1 update the formmapping
+         * org.bonitasoft.engine.core.form.impl.FormMappingServiceImpl update -1 -1 1 -1 -1
+         */
+        @Override
+        protected String getActionTypePrefix() {
+            return FORM_MAPPING;
+        }
+
+        @Override
+        protected void checkExtraRules(SQueriableLog log) {
+        }
+
+        @Override
+        public SPersistenceLogBuilder objectId(long objectId) {
+            queriableLogBuilder.numericIndex(2, objectId);
+            return this;
+        }
+    }
 }
