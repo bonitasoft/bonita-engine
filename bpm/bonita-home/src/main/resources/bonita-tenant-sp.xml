@@ -250,8 +250,9 @@
                 <entry key="THEME_CREATED:INTERNAL" value="${bonita.tenant.queriable.log.THEME_CREATED.INTERNAL:true}" />
                 <entry key="THEME_DELETED:INTERNAL" value="${bonita.tenant.queriable.log.THEME_DELETED.INTERNAL:true}" />
                 <entry key="THEME_UPDATED:INTERNAL" value="${bonita.tenant.queriable.log.THEME_UPDATED.INTERNAL:true}" />
-                <entry key="TRANSITION_INSTANCE_CREATED:INTERNAL" value="${bonita.tenant.queriable.log.TRANSITION_INSTANCE_CREATED.INTERNAL:true}" />
-                <entry key="TRANSITION_INSTANCE_DELETED:INTERNAL" value="${bonita.tenant.queriable.log.TRANSITION_INSTANCE_DELETED.INTERNAL:true}" />
+                <entry key="FORM_MAPPING_UPDATED:INTERNAL" value="${bonita.tenant.queriable.log.FORM_MAPPING_UPDATED.INTERNAL:true}" />
+                <entry key="FORM_MAPPING_DELETED:INTERNAL" value="${bonita.tenant.queriable.log.FORM_MAPPING_DELETED.INTERNAL:true}" />
+                <entry key="FORM_MAPPING_CREATED:INTERNAL" value="${bonita.tenant.queriable.log.FORM_MAPPING_CREATED.INTERNAL:true}" />
             </map>
         </constructor-arg>
     </bean>
