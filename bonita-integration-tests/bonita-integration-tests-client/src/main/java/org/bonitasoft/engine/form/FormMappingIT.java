@@ -226,7 +226,7 @@ public class FormMappingIT extends TestWithUser {
         assertThat(getProcessAPI().getProcessResolutionProblems(processDefinition.getId())).hasSize(1);
 
         getPageAPI().deletePage(custompage_globalpage.getId());
-        disableAndDeleteProcess(processDefinition);
+        deleteProcess(processDefinition);
     }
 
     @Test
