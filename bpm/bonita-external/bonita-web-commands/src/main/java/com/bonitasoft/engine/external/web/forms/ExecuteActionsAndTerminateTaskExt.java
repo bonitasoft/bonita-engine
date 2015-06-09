@@ -98,7 +98,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             expcontext.setContainerId(sActivityInstanceID);
             expcontext.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
             expcontext.setProcessDefinitionId(processDefinitionId);
-            final ConnectorResult result = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinition.getConnectorId(),
+            final ConnectorResult result = connectorService.executeMultipleEvaluation(processDefinitionId, connectorDefinition.getConnectorId(),
                     connectorDefinition.getVersion(), connectorsExps, contextMap, Thread.currentThread().getContextClassLoader(), expcontext);
             final List<Operation> outputs = connectorDefinition.getOutputs();
             final ArrayList<SOperation> operations = new ArrayList<SOperation>(outputs.size());

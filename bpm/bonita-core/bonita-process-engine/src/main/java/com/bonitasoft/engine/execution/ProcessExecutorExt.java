@@ -16,6 +16,7 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
 import com.bonitasoft.engine.service.platform.PlatformInformationManager;
 import com.bonitasoft.engine.service.platform.SynchronizationPlatformInfoManager;
+import org.bonitasoft.engine.bar.ResourcesService;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -36,7 +37,6 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
@@ -61,7 +61,6 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -78,19 +77,19 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
     private final PlatformVerifier platformVerifier;
 
     public ProcessExecutorExt(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
-            final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
-            final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
-            final EventInstanceService eventInstanceService, final ConnectorService connectorService,
-            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
-            final ExpressionResolverService expressionResolverService, final ExpressionService expressionService, final EventService eventService,
-            final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
-            final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
-            final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
-            final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService, TransitionEvaluator transitionEvaluator,
-            final ContractDataService contractDataService, SynchronizationPlatformInfoManager platformInformationManager, PlatformVerifier platformVerifier) {
+                              final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
+                              final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
+                              final ResourcesService resourcesService, final ConnectorService connectorService,
+                              final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
+                              final ExpressionResolverService expressionResolverService, final ExpressionService expressionService, final EventService eventService,
+                              final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
+                              final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
+                              final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
+                              final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService, TransitionEvaluator transitionEvaluator,
+                              final ContractDataService contractDataService, SynchronizationPlatformInfoManager platformInformationManager, PlatformVerifier platformVerifier) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
-                eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
-                expressionResolverService, expressionService, eventService, handlers, documentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
+                resourcesService, connectorService, connectorInstanceService, classLoaderService, operationService,
+                expressionResolverService, expressionService, eventService, handlers, documentService, containerRegistry, bpmInstancesCreator,
                 eventsHandler, flowNodeStateManager, businessDataRepository, refBusinessDataService, transitionEvaluator, contractDataService);
         this.platformInformationManager = platformInformationManager;
         this.platformVerifier = platformVerifier;

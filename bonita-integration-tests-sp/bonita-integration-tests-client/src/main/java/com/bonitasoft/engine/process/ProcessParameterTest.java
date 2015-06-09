@@ -23,6 +23,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -32,6 +33,7 @@ import org.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -305,6 +307,8 @@ public class ProcessParameterTest extends CommonAPISPIT {
         final BusinessArchive businessArchive = BusinessArchiveFactory.readBusinessArchive(baiStream);
         final ProcessDefinition processDef = deployProcess(businessArchive);
         final long processDefinitionId = processDef.getId();
+        final List<Problem> processResolutionProblems = getProcessAPI().getProcessResolutionProblems(processDefinitionId);
+        Assertions.assertThat(processResolutionProblems).isEmpty();
         getProcessAPI().enableProcess(processDefinitionId);
         processInstance = getProcessAPI().startProcess(processDefinitionId);
         waitForUserTask(processInstance, "step2");

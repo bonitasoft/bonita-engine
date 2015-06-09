@@ -103,7 +103,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     private void resolveDependenciesForAllProcesses() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        tenantAccessor.getDependencyResolver().resolveDependenciesForAllProcesses(tenantAccessor);
+        tenantAccessor.getBusinessArchiveArtifactsManager().resolveDependenciesForAllProcesses(tenantAccessor);
     }
 
     private void setTenantPaused(final boolean shouldBePaused) throws UpdateException {
