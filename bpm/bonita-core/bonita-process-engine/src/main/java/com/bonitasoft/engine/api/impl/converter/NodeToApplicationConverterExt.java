@@ -12,10 +12,13 @@ package com.bonitasoft.engine.api.impl.converter;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.validator.ApplicationImportValidator;
+import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.converter.NodeToApplicationConverter;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
+import org.bonitasoft.engine.page.SPage;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 
 /**
@@ -38,8 +41,26 @@ public class NodeToApplicationConverterExt extends NodeToApplicationConverter {
     }
 
     @Override
-    protected Long handleMissingPage(final String pageName, final String applicationToken, final ImportStatus importStatus) throws ImportException {
-        importStatus.addError(new ImportError(pageName, ImportError.Type.PAGE));
-        return null;
+    protected Long handleMissingLayout(final String layoutName, final String applicationToken, final ImportStatus importStatus) throws ImportException, SBonitaReadException {
+        importStatus.addError(new ImportError(layoutName, ImportError.Type.LAYOUT));
+        SPage layout = getPageService().getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME);
+            if(layout == null) {
+                throw new ImportException(String.format("Unable to import application with token '%s' because neither the layout '%s', neither the default layout (%s) was found.",
+                        applicationToken, layoutName, ApplicationService.DEFAULT_LAYOUT_NAME));
+            }
+
+        return layout.getId();
+    }
+
+    @Override
+    protected Long handleMissingTheme(final String themeName, final String applicationToken, final ImportStatus importStatus) throws ImportException, SBonitaReadException {
+        importStatus.addError(new ImportError(themeName, ImportError.Type.THEME));
+        SPage theme = getPageService().getPageByName(ApplicationService.DEFAULT_THEME_NAME);
+        if(theme == null) {
+            throw new ImportException(String.format("Unable to import application with token '%s' because neither the theme '%s', neither the default theme (%s) was found.",
+                    applicationToken, themeName, ApplicationService.DEFAULT_THEME_NAME));
+        }
+
+        return theme.getId();
     }
 }
