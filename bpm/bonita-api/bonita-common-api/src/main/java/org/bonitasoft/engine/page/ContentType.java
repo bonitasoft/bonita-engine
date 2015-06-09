@@ -10,4 +10,10 @@ public interface ContentType {
     String FORM = "form";
 
     String API_EXTENSION= "apiExtension";
+
+    String LAYOUT= "layout";
+
+    String THEME= "theme";
+
+
 }
