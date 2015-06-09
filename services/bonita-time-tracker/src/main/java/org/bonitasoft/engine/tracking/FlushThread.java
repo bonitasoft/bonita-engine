@@ -3,9 +3,6 @@ package org.bonitasoft.engine.tracking;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-
 public class FlushThread extends Thread {
 
     private final TimeTracker timeTracker;
@@ -18,6 +15,9 @@ public class FlushThread extends Thread {
 
     private final TechnicalLoggerService logger;
 
+    /**
+     * the flush will be stopped at the next iteration
+     */
     public boolean askStop;
 
     private String msgState = "";
@@ -39,7 +39,7 @@ public class FlushThread extends Thread {
         return flushIntervalInSeconds;
     }
 
-    public void setFlushIntervalInSeconds(long flushIntervalInSeconds) {
+    public void setFlushIntervalInSeconds(final long flushIntervalInSeconds) {
         this.flushIntervalInSeconds = flushIntervalInSeconds;
     }
 
@@ -51,17 +51,17 @@ public class FlushThread extends Thread {
     public void run() {
 
         msgState = "Started;";
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting "
-                    + this.getName() + "...");
+                    + getName() + "...");
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         askStop = false;
         while (true) {
             msgState += "Sleep " + flushIntervalInSeconds + " s;";
             try {
                 clock.sleep(flushIntervalInSeconds * 1000);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 break;
             }
             currentDate = new Date();
@@ -69,11 +69,11 @@ public class FlushThread extends Thread {
             msgState += "Wakeup at " + sdf.format(currentDate) + " ;";
 
             try {
-                this.timeTracker.flush();
-            } catch (Exception e) {
-                if (this.logger.isLoggable(getClass(),
+                timeTracker.flush();
+            } catch (final Exception e) {
+                if (logger.isLoggable(getClass(),
                         TechnicalLogSeverity.WARNING)) {
-                    this.logger.log(
+                    logger.log(
                             getClass(),
                             TechnicalLogSeverity.WARNING,
                             "Exception caught while flushing: "
@@ -84,16 +84,16 @@ public class FlushThread extends Thread {
             }
             if (askStop) {
                 msgState += "AskStop;";
-                if (this.logger.isLoggable(getClass(),
+                if (logger.isLoggable(getClass(),
                         TechnicalLogSeverity.INFO)) {
                     logger.log(getClass(), TechnicalLogSeverity.INFO,
-                            this.getName() + " ASK STOP.");
+                            getName() + " ASK STOP.");
                 }
                 return;
             }
         }
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, this.getName()
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(getClass(), TechnicalLogSeverity.INFO, getName()
                     + " stopped.");
         }
     }

@@ -2,7 +2,6 @@ package org.bonitasoft.engine.tracking.collector;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -26,6 +25,9 @@ public class CollectorFlushEventListener implements FlushEventListener {
     {
     };
 
+    /**
+     * return the static instance
+     */
     public static CollectorFlushEventListener getInstance()
     {
         return collectorFlushEventListener;
@@ -34,20 +36,23 @@ public class CollectorFlushEventListener implements FlushEventListener {
     // format is date, listOfRecord. Date is "20140432" in order to remove it.
     public HashMap<String, ArrayList<Record>> collectors = new HashMap<String, ArrayList<Record>>();
 
-    public FlushResult flush(FlushEvent flushEvent) throws Exception {
-        Logger logger = Logger.getLogger("org.bonitasoft");
+    @Override
+    public FlushResult flush(final FlushEvent flushEvent) throws Exception {
+        final Logger logger = Logger.getLogger("org.bonitasoft");
 
-        if (flushEvent.getRecords().size() == 0)
+        if (flushEvent.getRecords().size() == 0) {
             return new FlushResult(flushEvent);
+        }
 
         // logger.info("org.bonitasoft.engine.tracking.collector.CollectorFlushEvent.flush : ____________________________"+this+" Receive a FlushEvent [" + flushEvent.getRecords().size()+"]");
         // keep all theses new event
         final List<Record> records = flushEvent.getRecords();
-        Calendar currentDate = Calendar.getInstance();
-        String key = String.valueOf(currentDate.get(Calendar.YEAR)) + String.valueOf(currentDate.get(Calendar.DAY_OF_YEAR));
+        final Calendar currentDate = Calendar.getInstance();
+        final String key = String.valueOf(currentDate.get(Calendar.YEAR)) + String.valueOf(currentDate.get(Calendar.DAY_OF_YEAR));
         ArrayList<Record> listOfDay = collectors.get(key);
-        if (listOfDay == null)
+        if (listOfDay == null) {
             listOfDay = new ArrayList<Record>();
+        }
         listOfDay.addAll(records);
         collectors.put(key, listOfDay);
         if (collectors.size() > 1) {
@@ -63,14 +68,14 @@ public class CollectorFlushEventListener implements FlushEventListener {
 
     /**
      * get all Records
-     * 
+     *
      * @return
      */
     public List<Record> getRecords() {
-        Logger logger = Logger.getLogger("org.bonitasoft");
-        Calendar currentDate = Calendar.getInstance();
-        String key = String.valueOf(currentDate.get(Calendar.YEAR)) + String.valueOf(currentDate.get(Calendar.DAY_OF_YEAR));
-        List<Record> listRecord = collectors.get(key);
+        final Logger logger = Logger.getLogger("org.bonitasoft");
+        final Calendar currentDate = Calendar.getInstance();
+        final String key = String.valueOf(currentDate.get(Calendar.YEAR)) + String.valueOf(currentDate.get(Calendar.DAY_OF_YEAR));
+        final List<Record> listRecord = collectors.get(key);
         logger.info("org.bonitasoft.engine.tracking.collector.CollectorFlushEvent.getRecords: ________________: " + this + " Collector [" + collectors.size()
                 + "] key[" + key + "] nbInDay["
                 + (collectors.get(key) == null ? "null" : collectors.get(key).size()) + "]");

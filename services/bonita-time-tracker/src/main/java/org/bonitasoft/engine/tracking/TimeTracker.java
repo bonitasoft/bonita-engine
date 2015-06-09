@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.EventListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
@@ -13,9 +12,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public class TimeTracker implements TenantLifecycleService {
 
@@ -24,7 +20,7 @@ public class TimeTracker implements TenantLifecycleService {
     private final FlushThread flushThread;
 
     // private List<? extends FlushEventListener> flushEventListeners;
-    private List<FlushEventListener> flushEventListeners;
+    private final List<FlushEventListener> flushEventListeners;
 
     private final TechnicalLoggerService logger;
 
@@ -38,6 +34,9 @@ public class TimeTracker implements TenantLifecycleService {
      */
     private final Queue<Record> allRecords;
 
+    /**
+     * the marker to indicate if the flush is activated or not
+     */
     private boolean started;
 
     private final boolean startFlushThread;
@@ -77,8 +76,9 @@ public class TimeTracker implements TenantLifecycleService {
                     "Time tracker is activated for some records. This may not be used in production as performances may be strongly impacted: "
                             + activatedRecords);
         }
-        if (!startFlushThread)
+        if (!startFlushThread) {
             msgTimeTracker = "FLUSH NOT ALLOWED TO START. Check parameter[startFlushThread] in service;";
+        }
 
         flushThread = new FlushThread(clock, flushIntervalInSeconds, this, logger);
 
@@ -117,7 +117,7 @@ public class TimeTracker implements TenantLifecycleService {
 
     /**
      * flush is call by only one thread, from the FlushTread class
-     * 
+     *
      * @return
      */
     public List<FlushResult> flush() {
@@ -130,8 +130,9 @@ public class TimeTracker implements TenantLifecycleService {
         do
         {
             oneRecord = recordsInQueue.poll();
-            if (oneRecord != null)
+            if (oneRecord != null) {
                 listRecords.add(oneRecord);
+            }
         } while (oneRecord != null);
 
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -141,7 +142,7 @@ public class TimeTracker implements TenantLifecycleService {
         final List<FlushResult> flushResults = new ArrayList<FlushResult>();
 
         // build the flushEvent array from the queue
-        if ((listRecords.size() > 0) && (flushEventListeners != null))
+        if (listRecords.size() > 0 && flushEventListeners != null)
         {
             final FlushEvent flushEvent = new FlushEvent(listRecords);
 
@@ -170,9 +171,10 @@ public class TimeTracker implements TenantLifecycleService {
         return Arrays.asList(allRecords.toArray(new Record[] {}));
     }
 
+    @Override
     public void start() {
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting TimeTracker..." + startFlushThread + " && " + (!flushThread.isAlive())
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting TimeTracker..." + startFlushThread + " && " + !flushThread.isAlive()
                     + "] listEventListener[" + flushEventListeners.size() + "]");
         }
 
@@ -186,6 +188,7 @@ public class TimeTracker implements TenantLifecycleService {
         }
     }
 
+    @Override
     public void stop() {
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Stopping TimeTracker...");
@@ -200,10 +203,12 @@ public class TimeTracker implements TenantLifecycleService {
         }
     }
 
+    @Override
     public void pause() {
         // nothing to do as this service is not for production, we don't want to spend time on this
     }
 
+    @Override
     public void resume() {
         // nothing to do as this service is not for production, we don't want to spend time on this
     }
@@ -221,14 +226,14 @@ public class TimeTracker implements TenantLifecycleService {
         return flushThread.getFlushIntervalInSeconds();
     }
 
-    public void setFlushIntervalInSeconds(long flushIntervalInSeconds)
+    public void setFlushIntervalInSeconds(final long flushIntervalInSeconds)
     {
         flushThread.setFlushIntervalInSeconds(flushIntervalInSeconds);
     }
 
     /**
      * return null if the flush is never made
-     * 
+     *
      * @return
      */
     public Date getLastFlushExecutionTime()
@@ -239,7 +244,7 @@ public class TimeTracker implements TenantLifecycleService {
     public String getFlushMsgState()
     {
         return msgTimeTracker
-                + (this.activatedRecords.size() == 0 ? "NoRecordActivated;" : this.activatedRecords.size() + " events recorded;")
+                + (activatedRecords.size() == 0 ? "NoRecordActivated;" : activatedRecords.size() + " events recorded;")
                 + (flushThread.isAlive() ? "Flush Alive;" : "Flush not started;")
                 + flushThread.getMsgState();
     }
@@ -247,7 +252,7 @@ public class TimeTracker implements TenantLifecycleService {
     /**
      * return the list of different activated record.
      * Different string have constants, and can be found at org.bonitasoft.engine.tracking.TimeTrackerRecords
-     * 
+     *
      * @return
      * @see org.bonitasoft.engine.tracking.TimeTrackerRecords
      */
@@ -258,40 +263,40 @@ public class TimeTracker implements TenantLifecycleService {
 
     /**
      * Set the list of different string.
-     * 
+     *
      * @param activatedRecords
      * @see org.bonitasoft.engine.tracking.TimeTrackerRecords
      * @see
      */
-    public void setActivatedRecords(Set<String> activatedRecords)
+    public void setActivatedRecords(final Set<String> activatedRecords)
     {
         this.activatedRecords = activatedRecords;
     }
 
     /**
      * Add a new register event
-     * 
+     *
      * @param flushEventListener
      */
-    public void registerListener(FlushEventListener flushEventListener)
+    public void registerListener(final FlushEventListener flushEventListener)
     {
-        this.flushEventListeners.add(flushEventListener);
+        flushEventListeners.add(flushEventListener);
     }
 
-    public void unRegisterListener(FlushEventListener flushEventListener)
+    public void unRegisterListener(final FlushEventListener flushEventListener)
     {
-        this.flushEventListeners.remove(flushEventListener);
+        flushEventListeners.remove(flushEventListener);
     }
 
     public List<FlushEventListener> getListEventListener()
     {
-        return this.flushEventListeners;
+        return flushEventListeners;
     }
 
     public String getListEventListenerSt()
     {
-        StringBuffer result = new StringBuffer();
-        for (FlushEventListener eventListener : this.flushEventListeners)
+        final StringBuffer result = new StringBuffer();
+        for (final FlushEventListener eventListener : flushEventListeners)
         {
             result.append(eventListener.toString() + ";");
         }
