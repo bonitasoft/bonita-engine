@@ -20,10 +20,13 @@ import org.bonitasoft.engine.business.application.ApplicationService;
 import org.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.business.application.xml.ApplicationNode;
+import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.page.PageService;
 import org.bonitasoft.engine.page.SPage;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -49,6 +52,9 @@ public class NodeToApplicationConverterExtTest {
 
     private static final long DEFAULT_LAYOUT_ID = 100L;
     private static final long DEFAULT_THEME_ID = 200L;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
@@ -119,7 +125,7 @@ public class NodeToApplicationConverterExtTest {
     }
 
     @Test
-    public void toSApplication_should_return_Import_result_with_errors_when_layout_is_not_found() throws Exception {
+    public void toSApplication_should_use_default_layout_and_return_Import_result_with_errors_when_layout_is_not_found() throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setLayout("notAvailableLayout");
@@ -131,12 +137,35 @@ public class NodeToApplicationConverterExtTest {
         final ImportResult importResult = converter.toSApplication(node, 1L);
 
         //then
-        assertThat(importResult.getApplication().getLayoutId()).isNull();
+        assertThat(importResult.getApplication().getLayoutId()).isEqualTo(DEFAULT_LAYOUT_ID);
 
         final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        assertThat(importStatus.getErrors()).containsExactly(new ImportError("notAvailableLayout", ImportError.Type.PAGE));
+        assertThat(importStatus.getErrors()).containsExactly(new ImportError("notAvailableLayout", ImportError.Type.LAYOUT));
+    }
+
+    @Test
+    public void toSApplication_should_throw_importException_when_neither_specified_layout_neither_default_layout_is_found() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        String notAvailableLayout = "notAvailableLayout";
+        node.setLayout(notAvailableLayout);
+        String token = "app";
+        node.setToken(token);
+
+        given(pageService.getPageByName(notAvailableLayout)).willReturn(null);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_LAYOUT_NAME)).willReturn(null);
+
+        //then
+        expectedException.expect(ImportException.class);
+        expectedException.expectMessage(String.format("Unable to import application with token '%s' because neither the layout '%s', neither the default layout (%s) was found.",
+                token, notAvailableLayout, ApplicationService.DEFAULT_LAYOUT_NAME));
+
+
+        //when
+        converter.toSApplication(node, 1L);
+
     }
 
     @Test
@@ -189,7 +218,7 @@ public class NodeToApplicationConverterExtTest {
     }
 
     @Test
-    public void toSApplication_should_return_Import_result_with_errors_when_theme_is_not_found() throws Exception {
+    public void toSApplication_should_use_default_theme_and_return_Import_result_with_errors_when_theme_is_not_found() throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setTheme("notAvailable");
@@ -201,12 +230,32 @@ public class NodeToApplicationConverterExtTest {
         final ImportResult importResult = converter.toSApplication(node, 1L);
 
         //then
-        assertThat(importResult.getApplication().getThemeId()).isNull();
+        assertThat(importResult.getApplication().getThemeId()).isEqualTo(DEFAULT_THEME_ID);
 
         final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        assertThat(importStatus.getErrors()).containsExactly(new ImportError("notAvailable", ImportError.Type.PAGE));
+        assertThat(importStatus.getErrors()).containsExactly(new ImportError("notAvailable", ImportError.Type.THEME));
+    }
+
+    @Test
+    public void toSApplication_should_throw_ImportException_when_neither_specified_theme_neither_default_theme_is_found() throws Exception {
+        //given
+        final ApplicationNode node = new ApplicationNode();
+        node.setTheme("notAvailable");
+        node.setToken("app");
+
+        given(pageService.getPageByName("notAvailable")).willReturn(null);
+        given(pageService.getPageByName(ApplicationService.DEFAULT_THEME_NAME)).willReturn(null);
+
+        //then
+        expectedException.expect(ImportException.class);
+        expectedException.expectMessage(String.format("Unable to import application with token '%s' because neither the theme '%s', neither the default theme (%s) was found.",
+                "app", "notAvailable", ApplicationService.DEFAULT_THEME_NAME));
+
+        //when
+        converter.toSApplication(node, 1L);
+
     }
 
 }

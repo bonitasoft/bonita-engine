@@ -163,8 +163,8 @@ public class ApplicationImportExportExtIT extends org.bonitasoft.engine.business
         assertThat(importStatus).hasSize(1);
         assertThat(importStatus.get(0).getName()).isEqualTo("HR-dashboard");
         assertThat(importStatus.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        ImportError layoutError = new ImportError("ThisLayoutDoesNotExist", ImportError.Type.PAGE);
-        ImportError themeError = new ImportError("ThisThemeDoesNotExist", ImportError.Type.PAGE);
+        ImportError layoutError = new ImportError("ThisLayoutDoesNotExist", ImportError.Type.LAYOUT);
+        ImportError themeError = new ImportError("ThisThemeDoesNotExist", ImportError.Type.THEME);
         ImportError profileError = new ImportError("ThisProfileDoesNotExist", ImportError.Type.PROFILE);
         ImportError customPageError = new ImportError("custompage_notexists", ImportError.Type.PAGE);
         ImportError appPageError1 = new ImportError("will-not-be-imported", ImportError.Type.APPLICATION_PAGE);
