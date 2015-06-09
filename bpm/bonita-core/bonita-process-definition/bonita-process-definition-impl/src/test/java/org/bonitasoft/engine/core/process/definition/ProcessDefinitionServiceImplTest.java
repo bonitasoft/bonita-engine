@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
@@ -69,6 +70,7 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -81,6 +83,8 @@ import org.bonitasoft.engine.xml.ElementBindingsFactory;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
 import org.bonitasoft.engine.xml.XMLWriter;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -451,6 +455,46 @@ public class ProcessDefinitionServiceImplTest {
         // Then
         assertNotNull(result);
         assertEquals(sProcessDefinitionDeployInfo, result);
+    }
+
+    @Test
+    public void updateProcessDefinitionDeployInfo_create_business_log() throws Exception {
+        // Given
+        doReturn(true).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
+        doReturn(3L).when(sProcessDefinitionDeployInfo).getId();
+        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
+                .createNewInstance();
+        updateBuilder.updateDisplayName("newDisplayName");
+        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>> any());
+        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
+
+        // When
+        processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done(), "the business log");
+
+        verify(queriableLoggerService).log(anyString(), eq("updateProcessDeploymentInfo"), argThat(new SQueriableLogMatcher("the business log")));
+    }
+
+    @Test
+    public void updateProcessDefinitionDeployInfo_truncate_log_when_too_long() throws Exception {
+        // Given
+        doReturn(true).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+        final SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo = mock(SProcessDefinitionDeployInfo.class);
+        doReturn(3L).when(sProcessDefinitionDeployInfo).getId();
+        final SProcessDefinitionDeployInfoUpdateBuilder updateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class)
+                .createNewInstance();
+        updateBuilder.updateDisplayName("newDisplayName");
+        doReturn(sProcessDefinitionDeployInfo).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProcessDefinitionDeployInfo>> any());
+        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
+
+        // When
+        String string1024 = "";
+        for (int i = 0; i < 1024; i++) {
+            string1024 += "H";
+        }
+        processDefinitionServiceImpl.updateProcessDefinitionDeployInfo(3, updateBuilder.done(), string1024);
+
+        verify(queriableLoggerService).log(anyString(), eq("updateProcessDeploymentInfo"), argThat(new SQueriableLogMatcher(string1024.substring(0, 255))));
     }
 
     @Test
@@ -1639,19 +1683,19 @@ public class ProcessDefinitionServiceImplTest {
 
     @Test
     public void updateShouldWorkForGroovyExpression() throws Exception {
-        final long processDefinitionId = 415L;
         final long expressionDefinitionId = 77L;
         final DesignProcessDefinition designProcessDefinition = mock(DesignProcessDefinition.class);
-        doReturn(designProcessDefinition).when(processDefinitionServiceImpl).getDesignProcessDefinition(processDefinitionId);
+        doReturn(designProcessDefinition).when(processDefinitionServiceImpl).getDesignProcessDefinition(PROCESS_ID);
         final ExpressionImpl expression = mock(ExpressionImpl.class);
         doReturn(expression).when(processDefinitionServiceImpl).getExpression(designProcessDefinition, expressionDefinitionId);
         doReturn("someXMLContent").when(processDefinitionServiceImpl).getProcessContent(designProcessDefinition);
-        doReturn(null).when(processDefinitionServiceImpl).updateProcessDefinitionDeployInfo(eq(processDefinitionId), any(EntityUpdateDescriptor.class));
+        doReturn(null).when(processDefinitionServiceImpl).updateProcessDefinitionDeployInfo(eq(PROCESS_ID), any(EntityUpdateDescriptor.class));
         doReturn(true).when(processDefinitionServiceImpl).isValidExpressionTypeToUpdate(anyString());
 
-        processDefinitionServiceImpl.updateExpressionContent(processDefinitionId, expressionDefinitionId, "string");
+        processDefinitionServiceImpl.updateExpressionContent(PROCESS_ID, expressionDefinitionId, "string");
 
-        verify(processDefinitionServiceImpl).updateProcessDefinitionDeployInfo(eq(processDefinitionId), any(EntityUpdateDescriptor.class));
+        verify(processDefinitionServiceImpl).updateProcessDefinitionDeployInfo(eq(PROCESS_ID), any(EntityUpdateDescriptor.class),
+                eq("Update expression <77>, old content is <null>"));
     }
 
     @Test(expected = SObjectModificationException.class)
@@ -1679,6 +1723,25 @@ public class ProcessDefinitionServiceImplTest {
                 default:
                     assertThat(isValid).as("Expression of type " + expressionType + " should NOT be valid for update").isFalse();
             }
+        }
+    }
+
+    private static class SQueriableLogMatcher extends BaseMatcher<SQueriableLog> {
+
+        private String anObject;
+
+        public SQueriableLogMatcher(String anObject) {
+            this.anObject = anObject;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("expected <"+anObject+"> as raw message");
+        }
+
+        @Override
+        public boolean matches(Object item) {
+            return ((SQueriableLog) item).getRawMessage().equals(anObject);
         }
     }
 }

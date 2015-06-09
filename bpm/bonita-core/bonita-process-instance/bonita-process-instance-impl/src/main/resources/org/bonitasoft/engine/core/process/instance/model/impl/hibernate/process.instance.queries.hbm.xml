@@ -465,6 +465,13 @@
 		AND (s.eventType = 'START_EVENT' OR s.eventType = 'EVENT_SUB_PROCESS')
 	</query>
 
+	<query name="getWaitingEventsOfFlowNode">
+		SELECT s
+		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl AS s
+		WHERE s.flowNodeInstanceId = :flowNodeInstanceId
+	</query>
+
+
 	<query name="resetProgressMessageInstances">
 		UPDATE org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl AS m
 		SET m.handled = false
@@ -1111,6 +1118,12 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
 			org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl AS a
 		WHERE p.callerId = a.id and a.logicalGroup4 = :processInstanceId
+	</query>
+
+	<query name="getChildOfActivity">
+		SELECT p
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		WHERE p.callerId = :activityInstanceId
 	</query>
     
     <query name="getNumberOfSProcessInstanceFailedAndSupervisedBy">

@@ -36,9 +36,7 @@ public class FlushThread extends Thread {
 
     @Override
     public void run() {
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting " + this.getName() + "...");
-        }
+        info("Starting " + this.getName() + "...");
         while (true) {
             try {
                 clock.sleep(flushIntervalInMilliSeconds);
@@ -53,9 +51,17 @@ public class FlushThread extends Thread {
                 }
             }
         }
+        info(this.getName() + " stopped.");
+    }
+
+    void info(String message) {
         if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, this.getName() + " stopped.");
+            logger.log(getClass(), TechnicalLogSeverity.INFO, message);
         }
+    }
+
+    public boolean isStarted(){
+        return isAlive();
     }
 
 }

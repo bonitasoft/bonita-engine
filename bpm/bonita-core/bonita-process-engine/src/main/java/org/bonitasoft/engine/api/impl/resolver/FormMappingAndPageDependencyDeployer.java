@@ -27,9 +27,11 @@ import org.bonitasoft.engine.api.impl.converter.PageModelConverter;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
+import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
+import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProblemImpl;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -164,22 +166,32 @@ public class FormMappingAndPageDependencyDeployer implements ProcessDependencyDe
             throws ProcessDeployException {
         FormMappingService formMappingService = tenantAccessor.getFormMappingService();
         final List<FormMappingDefinition> formMappings = businessArchive.getFormMappingModel().getFormMappings();
-        final List<ActivityDefinition> activities = businessArchive.getProcessDefinition().getFlowElementContainer().getActivities();
+        final FlowElementContainerDefinition flowElementContainer = businessArchive.getProcessDefinition().getFlowElementContainer();
+        final List<ActivityDefinition> activities = flowElementContainer.getActivities();
         try {
             // Deals with human tasks declared in process definition:
             for (final ActivityDefinition activity : activities) {
-                if (isHumanTask(activity)) {
-                    // create mapping as declared in form mapping:
-                    createFormMapping(formMappingService, processDefinitionId, getFormMappingForHumanTask(activity.getName(), formMappings),
-                            FormMappingType.TASK.getId(),
-                            activity.getName());
-                }
+                createFormMapping(processDefinitionId, formMappingService, formMappings, activity);
             }
             // Deals with the process start / process overview forms:
             createFormMapping(formMappingService, processDefinitionId, getFormMappingForType(formMappings, PROCESS_START), PROCESS_START.getId(), null);
             createFormMapping(formMappingService, processDefinitionId, getFormMappingForType(formMappings, PROCESS_OVERVIEW), PROCESS_OVERVIEW.getId(), null);
         } catch (final SObjectCreationException | SBonitaReadException e) {
             throw new ProcessDeployException(e);
+        }
+    }
+
+    void createFormMapping(long processDefinitionId, FormMappingService formMappingService, List<FormMappingDefinition> formMappings, ActivityDefinition activity) throws SObjectCreationException, SBonitaReadException {
+        if (isHumanTask(activity)) {
+            // create mapping as declared in form mapping:
+            createFormMapping(formMappingService, processDefinitionId, getFormMappingForHumanTask(activity.getName(), formMappings),
+                    FormMappingType.TASK.getId(),
+                    activity.getName());
+        }else if(activity instanceof SubProcessDefinition){
+            final org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition subProcessContainer = ((SubProcessDefinition) activity).getSubProcessContainer();
+            for (ActivityDefinition activityDefinition : subProcessContainer.getActivities()) {
+                createFormMapping(processDefinitionId, formMappingService, formMappings, activityDefinition);
+            }
         }
     }
 
