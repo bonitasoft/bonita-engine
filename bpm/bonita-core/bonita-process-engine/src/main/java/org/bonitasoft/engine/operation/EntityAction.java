@@ -11,7 +11,6 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-
 package org.bonitasoft.engine.operation;
 
 import java.util.List;
@@ -20,12 +19,21 @@ import org.bonitasoft.engine.bdm.Entity;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Matthieu Chaffotte
  */
 public interface EntityAction {
 
     /**
+     * Executes an action against a null entity.
+     *
+     * @param businessDataContext the business data context
+     * @throws SEntityActionExecutionException
+     */
+    void handleNull(final BusinessDataContext businessDataContext) throws SEntityActionExecutionException;
+
+    /**
      * Executes an action against an entity.
-     * 
+     *
      * @param entity the entity
      * @param businessDataContext the  business data context
      * @return the entity after the action execution.
@@ -34,7 +42,7 @@ public interface EntityAction {
 
     /**
      * Executes an action against a a list of entities.
-     * 
+     *
      * @param entities the list of entities
      * @param businessDataContext the business data context
      * @return the list of entities after the action execution.

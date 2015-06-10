@@ -1594,13 +1594,22 @@ public class BDRepositoryIT extends CommonAPIIT {
                 .addOperation(
                         new OperationBuilder().createBusinessDataSetAttributeOperation("productCatalog", "setName", String.class.getName(),
                                 new ExpressionBuilder().createConstantStringExpression("myUdaptedCatalog")));
+        builder.addUserTask("unreferenceCatalog", ACTOR_NAME)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("productCatalog"), OperatorType.ASSIGNMENT, null, null,
+                        new ExpressionBuilder().createGroovyScriptExpression("nullExpression", "null", PRODUCT_CATALOG_QUALIFIED_NAME));
         builder.addUserTask("result", ACTOR_NAME);
-        builder.addTransition("updateCatalog", "result");
+        builder.addTransition("updateCatalog", "unreferenceCatalog");
+        builder.addTransition("unreferenceCatalog", "result");
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTaskAndExecuteIt("updateCatalog", matti);
+        waitForUserTaskAndExecuteIt("unreferenceCatalog", matti);
         waitForUserTask(processInstance, "result");
+
+        final SimpleBusinessDataReference businessDataReference = (SimpleBusinessDataReference) getBusinessDataAPI().getProcessBusinessDataReference(
+                "productCatalog", processInstance.getId());
+        assertThat(businessDataReference.getStorageId()).isNull();
 
         disableAndDeleteProcess(definition.getId());
     }

@@ -11,7 +11,6 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-
 package org.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,14 +20,13 @@ import static org.mockito.Mockito.mock;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import org.bonitasoft.engine.bdm.Entity;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MergeEntityActionTest {
@@ -42,12 +40,12 @@ public class MergeEntityActionTest {
     @Test
     public void execute_should_return_merged_entity() throws Exception {
         //given
-        Entity entity = mock(Entity.class);
-        Entity mergedEntity = mock(Entity.class);
+        final Entity entity = mock(Entity.class);
+        final Entity mergedEntity = mock(Entity.class);
         given(repository.merge(entity)).willReturn(mergedEntity);
 
         //when
-        Entity actionResult = mergeEntityAction.execute(entity, null);
+        final Entity actionResult = mergeEntityAction.execute(entity, null);
 
         //then
         assertThat(actionResult).isEqualTo(mergedEntity);
@@ -72,18 +70,23 @@ public class MergeEntityActionTest {
     @Test
     public void execute_should_return_list_of_merged_entities() throws Exception {
         //given
-        Entity entity1 = mock(Entity.class);
-        Entity entity2 = mock(Entity.class);
-        Entity mergedEntity1 = mock(Entity.class);
-        Entity mergedEntity2 = mock(Entity.class);
+        final Entity entity1 = mock(Entity.class);
+        final Entity entity2 = mock(Entity.class);
+        final Entity mergedEntity1 = mock(Entity.class);
+        final Entity mergedEntity2 = mock(Entity.class);
         given(repository.merge(entity1)).willReturn(mergedEntity1);
         given(repository.merge(entity2)).willReturn(mergedEntity2);
 
         //when
-        List<Entity> actionResult = mergeEntityAction.execute(Arrays.asList(entity1, entity2), null);
+        final List<Entity> actionResult = mergeEntityAction.execute(Arrays.asList(entity1, entity2), null);
 
         //then
         assertThat(actionResult).containsExactly(mergedEntity1, mergedEntity2);
+    }
+
+    @Test(expected = SEntityActionExecutionException.class)
+    public void handleNull_throw_an_exception_impossible_to_merge_a_null_entity() throws Exception {
+        mergeEntityAction.handleNull(null);
     }
 
 }

@@ -11,7 +11,6 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-
 package org.bonitasoft.engine.operation;
 
 import java.util.List;
@@ -20,25 +19,27 @@ import org.bonitasoft.engine.bdm.Entity;
 
 /**
  * Allows the execution of an action against an Object that is instance of Entity or List<Entity>
- * 
+ *
  * @author Elias Ricken de Medeiros
+ * @author Matthieu Chaffotte
  */
 public class EntitiesActionsExecutor {
 
     /**
      * Executes of an action against an Object that is instance of Entity or List<Entity>.
-     * 
+     *
      * @param value an Entity or List<Entity>
      * @param businessDataContext the business data context
      * @param action the action to be executed
      * @return the initial object after executing the action.
      */
-    public Object executeAction(Object value, final BusinessDataContext businessDataContext, EntityAction action) throws SEntityActionExecutionException {
+    public Object executeAction(final Object value, final BusinessDataContext businessDataContext, final EntityAction action) throws SEntityActionExecutionException {
         if (value == null) {
-            throw new SEntityActionExecutionException("Cannot execute action on null entity");
+            action.handleNull(businessDataContext);
+            return null;
         }
         if (value instanceof Entity) {
-            return action.execute(((Entity) value), businessDataContext);
+            return action.execute((Entity) value, businessDataContext);
         }
         if (value instanceof List<?>) {
             return action.execute((List<Entity>) value, businessDataContext);

@@ -162,8 +162,8 @@ public class OperationServiceImplTest {
         return sOperationImpl;
     }
 
-    private SOperationImpl buildOperation(final String type, final String dataName, final SOperatorType operatorType, SExpression rightOperand) {
-        SOperationImpl operation = buildOperation(type, dataName, operatorType);
+    private SOperationImpl buildOperation(final String type, final String dataName, final SOperatorType operatorType, final SExpression rightOperand) {
+        final SOperationImpl operation = buildOperation(type, dataName, operatorType);
         operation.setRightOperand(rightOperand);
         return operation;
     }
@@ -212,20 +212,22 @@ public class OperationServiceImplTest {
     @Test
     public void executeOperator_should_call_OperationStrategies() throws Exception {
         // given
-        final SOperation op1 = buildOperation(TYPE_1, "data1", SOperatorType.ASSIGNMENT, mock(SExpression.class));
-        final SOperation op2 = buildOperation(TYPE_2, "data2", SOperatorType.XPATH_UPDATE_QUERY, mock(SExpression.class));
-        final SOperation op3 = buildOperation(TYPE_2, "data2", SOperatorType.JAVA_METHOD, mock(SExpression.class));
+        final SExpression sExpression = mock(SExpression.class);
+        final SOperation op1 = buildOperation(TYPE_1, "data1", SOperatorType.ASSIGNMENT, sExpression);
+        final SOperation op2 = buildOperation(TYPE_2, "data2", SOperatorType.XPATH_UPDATE_QUERY, sExpression);
+        final SOperation op3 = buildOperation(TYPE_2, "data2", SOperatorType.JAVA_METHOD, sExpression);
         final Map<String, Object> inputValues = new HashMap<>();
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
 
-        List<SOperation> operations = Arrays.asList(op1, op2, op3);
+        final List<SOperation> operations = Arrays.asList(op1, op2, op3);
         given(persistRightOperandResolver.shouldPersist(0, operations)).willReturn(true);
         given(persistRightOperandResolver.shouldPersist(1, operations)).willReturn(false);
         given(persistRightOperandResolver.shouldPersist(2, operations)).willReturn(true);
+        given(expressionResolverService.evaluate(sExpression, expressionContext)).willReturn(1983L);
 
-        doReturn("value1").when(assignmentOperationExecutorStrategy).computeNewValueForLeftOperand(op1, null, expressionContext, true);
+        doReturn("value1").when(assignmentOperationExecutorStrategy).computeNewValueForLeftOperand(op1, 1983L, expressionContext, true);
         doReturn("value2").when(xPathOperationExecutorStrategy).computeNewValueForLeftOperand(op2, null, expressionContext, false);
-        doReturn("value3").when(javaMethodOperationExecutorStrategy).computeNewValueForLeftOperand(op3, null, expressionContext, true);
+        doReturn("value3").when(javaMethodOperationExecutorStrategy).computeNewValueForLeftOperand(op3, 1983L, expressionContext, true);
 
         // when
         operationServiceImpl.executeOperators(operations, expressionContext);
@@ -254,8 +256,8 @@ public class OperationServiceImplTest {
     @Test
     public void executeOperatorsShouldReturnASingleUpdateForTheSameDataOfTheSameOperator() throws Exception {
         // given
-        SOperation operation1 = buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD);
-        SOperation operation2 = buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD);
+        final SOperation operation1 = buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD);
+        final SOperation operation2 = buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD);
         final List<SOperation> operations = Arrays.asList(operation1, operation2);
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
                 "givenValue"));
@@ -265,7 +267,7 @@ public class OperationServiceImplTest {
 
         // then
         assertThat(updates).hasSize(1);
-        SLeftOperandImpl leftOperand = buildLeftOperand("type1", "data1");
+        final SLeftOperandImpl leftOperand = buildLeftOperand("type1", "data1");
         assertThat(updates.containsKey(leftOperand));
         assertThat(updates.get(leftOperand)).isEqualToComparingFieldByField(new LeftOperandUpdateStatus(SOperatorType.JAVA_METHOD));
     }
@@ -286,8 +288,8 @@ public class OperationServiceImplTest {
 
         // then
         assertThat(updates).hasSize(2);
-        SLeftOperandImpl data2Key = buildLeftOperand("type1", "data2");
-        SLeftOperandImpl data1Key = buildLeftOperand("type1", "data1");
+        final SLeftOperandImpl data2Key = buildLeftOperand("type1", "data2");
+        final SLeftOperandImpl data1Key = buildLeftOperand("type1", "data1");
         assertThat(updates).containsKeys(data2Key, data1Key);
         assertThat(updates.get(data1Key)).isEqualToComparingFieldByField(new LeftOperandUpdateStatus(SOperatorType.JAVA_METHOD));
         assertThat(updates.get(data2Key)).isEqualToComparingFieldByField(new LeftOperandUpdateStatus(SOperatorType.JAVA_METHOD));
@@ -302,7 +304,7 @@ public class OperationServiceImplTest {
         operations.add(buildOperation(TYPE_2, "data3", SOperatorType.ASSIGNMENT));
         operations.add(buildOperation(TYPE_2, "data4", SOperatorType.ASSIGNMENT));
         operations.add(buildOperation(TYPE_2, "data5", SOperatorType.ASSIGNMENT));
-        HashMap<String, Object> inputValues = new HashMap<>();
+        final HashMap<String, Object> inputValues = new HashMap<>();
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
 
         //when
@@ -311,8 +313,8 @@ public class OperationServiceImplTest {
         //then
         verify(leftOperandHandler1, times(1)).loadLeftOperandInContext(leftOperandCaptor1.capture(), eq(expressionContext), eq(inputValues));
         verify(leftOperandHandler2, times(1)).loadLeftOperandInContext(leftOperandCaptor2.capture(), eq(expressionContext), eq(inputValues));
-        List<SLeftOperand> value1 = leftOperandCaptor1.getValue();
-        List<SLeftOperand> value2 = leftOperandCaptor2.getValue();
+        final List<SLeftOperand> value1 = leftOperandCaptor1.getValue();
+        final List<SLeftOperand> value2 = leftOperandCaptor2.getValue();
         assertThat(value1).containsOnly(operations.get(0).getLeftOperand(), operations.get(1).getLeftOperand());
         assertThat(value2).containsOnly(operations.get(2).getLeftOperand(), operations.get(3).getLeftOperand(), operations.get(4).getLeftOperand());
     }
@@ -323,7 +325,7 @@ public class OperationServiceImplTest {
         final List<SOperation> operations = new ArrayList<>();
         operations.add(buildOperation(TYPE_1, "data1", SOperatorType.JAVA_METHOD));
         operations.add(buildOperation(TYPE_1, "data2", SOperatorType.ASSIGNMENT));
-        HashMap<String, Object> inputValues = new HashMap<>();
+        final HashMap<String, Object> inputValues = new HashMap<>();
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
 
         //when
@@ -340,11 +342,11 @@ public class OperationServiceImplTest {
     @Test
     public void should_not_update_left_operand_context_when_new_update() throws Exception {
         //given
-        Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus> singletonMap(
+        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus> singletonMap(
                 buildLeftOperand("type1", "data1"), new LeftOperandUpdateStatus(SOperatorType.ASSIGNMENT));
 
         //when
-        boolean shouldUpdateLeftOperandContext = operationServiceImpl.shouldUpdateLeftOperandContext(leftOperands, buildLeftOperand("type1", "data1"),
+        final boolean shouldUpdateLeftOperandContext = operationServiceImpl.shouldUpdateLeftOperandContext(leftOperands, buildLeftOperand("type1", "data1"),
                 new LeftOperandUpdateStatus(
                         SOperatorType.JAVA_METHOD));
 
@@ -355,11 +357,11 @@ public class OperationServiceImplTest {
     @Test
     public void should_not_update_left_operand_context_when_previous_was_a_deletion() throws Exception {
         //given
-        Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus> singletonMap(
+        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus> singletonMap(
                 buildLeftOperand("type1", "data1"), new LeftOperandUpdateStatus(SOperatorType.DELETION));
 
         //when
-        boolean shouldUpdateLeftOperandContext = operationServiceImpl.shouldUpdateLeftOperandContext(leftOperands, buildLeftOperand("type1", "data1"),
+        final boolean shouldUpdateLeftOperandContext = operationServiceImpl.shouldUpdateLeftOperandContext(leftOperands, buildLeftOperand("type1", "data1"),
                 new LeftOperandUpdateStatus(
                         SOperatorType.JAVA_METHOD));
 
@@ -370,10 +372,10 @@ public class OperationServiceImplTest {
     @Test
     public void should_update_left_operand_context_when_not_in_the_context() throws Exception {
         //given
-        Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.emptyMap();
+        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.emptyMap();
 
         //when
-        boolean shouldUpdateLeftOperandContext = operationServiceImpl.shouldUpdateLeftOperandContext(leftOperands, buildLeftOperand("type1", "data1"),
+        final boolean shouldUpdateLeftOperandContext = operationServiceImpl.shouldUpdateLeftOperandContext(leftOperands, buildLeftOperand("type1", "data1"),
                 new LeftOperandUpdateStatus(
                         SOperatorType.JAVA_METHOD));
 
@@ -384,12 +386,12 @@ public class OperationServiceImplTest {
     @Test
     public void should_update_left_operand_context_when_new_operation_is_deletion() throws Exception {
         //given
-        LeftOperandUpdateStatus previousUpdateState = new LeftOperandUpdateStatus(SOperatorType.JAVA_METHOD);
-        Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus> singletonMap(
+        final LeftOperandUpdateStatus previousUpdateState = new LeftOperandUpdateStatus(SOperatorType.JAVA_METHOD);
+        final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperands = Collections.<SLeftOperand, LeftOperandUpdateStatus> singletonMap(
                 buildLeftOperand("type1", "data1"), previousUpdateState);
 
         //when new java method must be persisted again
-        boolean shouldUpdateLeftOperandContext = operationServiceImpl.shouldUpdateLeftOperandContext(leftOperands, buildLeftOperand("type1", "data1"),
+        final boolean shouldUpdateLeftOperandContext = operationServiceImpl.shouldUpdateLeftOperandContext(leftOperands, buildLeftOperand("type1", "data1"),
                 new LeftOperandUpdateStatus(
                         SOperatorType.DELETION));
 
