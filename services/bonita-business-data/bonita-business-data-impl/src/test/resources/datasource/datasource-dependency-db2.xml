@@ -14,7 +14,8 @@
                 <prop key="db.database.name">bonita</prop>
 				<prop key="db.user">db2inst1</prop>
 				<prop key="db.password">db2inst1-pwd</prop>
-                <prop key="db.url">jdbc:db2://${db.server.name}:${db.server.port}/${db.database.name}</prop>
+                <prop key="db.database.options">retrieveMessagesFromServerOnGetMessage=true</prop>
+                <prop key="db.url">jdbc:db2://${db.server.name}:${db.server.port}/${db.database.name}:${db.database.options};</prop>
 			</props>
 		</property>
 	</bean>
@@ -27,6 +28,7 @@
                 <prop key="serverName">${db.server.name}</prop>
                 <prop key="portNumber">${db.server.port}</prop>
                 <prop key="databaseName">${db.database.name}</prop>
+                <prop key="retrieveMessagesFromServerOnGetMessage">true</prop>
 			</props>
 		</property>
 	</bean>

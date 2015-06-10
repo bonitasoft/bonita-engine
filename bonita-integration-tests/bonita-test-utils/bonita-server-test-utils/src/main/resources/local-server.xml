@@ -125,6 +125,7 @@
                 <prop key="serverName">${db2.db.server.name}</prop>
                 <prop key="portNumber">${db2.db.server.port}</prop>
                 <prop key="databaseName">${db2.db.database.name}</prop>
+                <prop key="retrieveMessagesFromServerOnGetMessage">true</prop>
                 <prop key="driverType">4</prop>
             </props>
         </property>
