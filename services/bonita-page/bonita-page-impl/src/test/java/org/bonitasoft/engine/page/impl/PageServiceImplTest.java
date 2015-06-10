@@ -115,6 +115,11 @@ public class PageServiceImplTest {
 
     public static final long USER_ID = 98989L;
 
+    public static final String BONITA_DEFAULT_THEME_ZIP_NAME = "bonita-default-theme.zip";
+    public static final String BONITA_DEFAULT_LAYOUT_ZIP_NAME = "bonita-default-layout.zip";
+    public static final String DEFAULT_THEME_NAME = "custompage_defaulttheme";
+    public static final String DEFAULT_LAYOUT_NAME = "custompage_defaultlayout";
+
     @Mock
     private EventService eventService;
 
@@ -335,8 +340,8 @@ public class PageServiceImplTest {
                 "bonita-groovy-page-example.zip",
                 "bonita-home-page.zip",
                 "bonita-html-page-example.zip",
-                "bonita-layout-page.zip",
-                "bonita-theme-page.zip"));
+                BONITA_DEFAULT_LAYOUT_ZIP_NAME,
+                BONITA_DEFAULT_THEME_ZIP_NAME));
 
         Answer<SPage> answer = new Answer<SPage>() {
 
@@ -345,11 +350,11 @@ public class PageServiceImplTest {
                 final SPage sPage = (SPage) invocation.getArguments()[0];
 
                 Map<String, String> map = new HashMap<>();
-                map.put("custompage_layout", "layout");
+                map.put(DEFAULT_LAYOUT_NAME, "layout");
                 map.put("custompage_htmlexample", "page");
                 map.put("custompage_groovyexample", "page");
                 map.put("custompage_home", "page");
-                map.put("custompage_theme", "theme");
+                map.put(DEFAULT_THEME_NAME, "theme");
 
                 assertThat(map).contains(entry(sPage.getName(), sPage.getContentType()));
 
@@ -390,13 +395,13 @@ public class PageServiceImplTest {
                 CONTENT_NAME);
         currentHomePage.setId(14);
 
-        final SPageImpl currentLayoutPage = new SPageImpl("custompage_layout", "example of layout", "Layout Example", System.currentTimeMillis(), -1, true,
+        final SPageImpl currentLayoutPage = new SPageImpl(DEFAULT_LAYOUT_NAME, "example of layout", "Layout Example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
         currentLayoutPage.setId(15);
 
-        final SPageImpl currentThemePage = new SPageImpl("custompage_theme", "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
+        final SPageImpl currentThemePage = new SPageImpl(DEFAULT_THEME_NAME, "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
@@ -405,8 +410,8 @@ public class PageServiceImplTest {
         doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
         doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
         doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_home");
-        doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName("custompage_layout");
-        doReturn(currentThemePage).when(pageServiceImpl).getPageByName("custompage_theme");
+        doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName(DEFAULT_LAYOUT_NAME);
+        doReturn(currentThemePage).when(pageServiceImpl).getPageByName(DEFAULT_THEME_NAME);
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(12);
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(13);
         doReturn(new byte[] { 1, 2, 3 }).when(pageServiceImpl).getPageContent(14);
@@ -422,8 +427,8 @@ public class PageServiceImplTest {
                 "bonita-groovy-page-example.zip",
                 "bonita-home-page.zip",
                 "bonita-html-page-example.zip",
-                "bonita-layout-page.zip",
-                "bonita-theme-page.zip"));
+                BONITA_DEFAULT_LAYOUT_ZIP_NAME,
+                BONITA_DEFAULT_THEME_ZIP_NAME));
         pageServiceImpl.start();
 
         // then
@@ -431,8 +436,8 @@ public class PageServiceImplTest {
         verify(pageServiceImpl, times(1)).updatePageContent(eq(13L), any(byte[].class), eq("bonita-html-page-example.zip"));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(12L), any(byte[].class), eq("bonita-groovy-page-example.zip"));
         verify(pageServiceImpl, times(1)).updatePageContent(eq(14L), any(byte[].class), eq("bonita-home-page.zip"));
-        verify(pageServiceImpl, times(1)).updatePageContent(eq(15L), any(byte[].class), eq("bonita-layout-page.zip"));
-        verify(pageServiceImpl, times(1)).updatePageContent(eq(16L), any(byte[].class), eq("bonita-theme-page.zip"));
+        verify(pageServiceImpl, times(1)).updatePageContent(eq(15L), any(byte[].class), eq(BONITA_DEFAULT_LAYOUT_ZIP_NAME));
+        verify(pageServiceImpl, times(1)).updatePageContent(eq(16L), any(byte[].class), eq(BONITA_DEFAULT_THEME_ZIP_NAME));
     }
 
     @Test
@@ -522,13 +527,13 @@ public class PageServiceImplTest {
                 CONTENT_NAME);
         currentHomePage.setId(14);
 
-        final SPageImpl currentLayoutPage = new SPageImpl("custompage_layout", "example of layout", "Layout Example", System.currentTimeMillis(), -1, true,
+        final SPageImpl currentLayoutPage = new SPageImpl(DEFAULT_LAYOUT_NAME, "example of layout", "Layout Example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
         currentLayoutPage.setId(15);
 
-        final SPageImpl currentThemePage = new SPageImpl("custompage_theme", "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
+        final SPageImpl currentThemePage = new SPageImpl(DEFAULT_THEME_NAME, "example of theme", "Theme Example", System.currentTimeMillis(), -1, true,
                 System.currentTimeMillis(),
                 -1,
                 CONTENT_NAME);
@@ -537,14 +542,14 @@ public class PageServiceImplTest {
         doReturn(currentGroovyPage).when(pageServiceImpl).getPageByName("custompage_groovyexample");
         doReturn(currentHtmlPage).when(pageServiceImpl).getPageByName("custompage_htmlexample");
         doReturn(currentHomePage).when(pageServiceImpl).getPageByName("custompage_home");
-        doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName("custompage_layout");
-        doReturn(currentThemePage).when(pageServiceImpl).getPageByName("custompage_theme");
+        doReturn(currentLayoutPage).when(pageServiceImpl).getPageByName(DEFAULT_LAYOUT_NAME);
+        doReturn(currentThemePage).when(pageServiceImpl).getPageByName(DEFAULT_THEME_NAME);
 
         final InputStream resourceGroovyAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-groovy-page-example.zip");
         final InputStream resourceHtmlAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-html-page-example.zip");
         final InputStream resourceHomeAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-home-page.zip");
-        final InputStream resourceLayoutAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-layout-page.zip");
-        final InputStream resourceThemeAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bonita-theme-page.zip");
+        final InputStream resourceLayoutAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(BONITA_DEFAULT_LAYOUT_ZIP_NAME);
+        final InputStream resourceThemeAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(BONITA_DEFAULT_THEME_ZIP_NAME);
         doReturn(IOUtil.getAllContentFrom(resourceGroovyAsStream)).when(pageServiceImpl).getPageContent(12);
         doReturn(IOUtil.getAllContentFrom(resourceHtmlAsStream)).when(pageServiceImpl).getPageContent(13);
         doReturn(IOUtil.getAllContentFrom(resourceHomeAsStream)).when(pageServiceImpl).getPageContent(14);

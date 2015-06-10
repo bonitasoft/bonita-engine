@@ -40,8 +40,8 @@ import org.junit.Before;
  */
 public class TestWithApplication extends CommonAPIIT {
 
-    public static final String DEFAULT_LAYOUT_NAME = "custompage_layout";
-    public static final String DEFAULT_THEME_NAME = "custompage_theme";
+    public static final String DEFAULT_LAYOUT_NAME = "custompage_defaultlayout";
+    public static final String DEFAULT_THEME_NAME = "custompage_defaulttheme";
     private User user;
 
     @Before
