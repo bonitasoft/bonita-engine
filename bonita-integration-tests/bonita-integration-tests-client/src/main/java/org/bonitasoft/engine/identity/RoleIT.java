@@ -114,7 +114,7 @@ public class RoleIT extends TestWithTechnicalUser {
 
     @Test
     public void roleNameAndDisplayNameShouldAccept255Chars() throws BonitaException {
-        final String stringIndex_255_chars = "abcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxy12345";
+        final String stringIndex_255_chars = "a\uD83C\uDC40\uD83C\uDCBDツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッツッ";
         final Role role = getIdentityAPI().createRole(new RoleCreator(stringIndex_255_chars).setDisplayName(stringIndex_255_chars));
 
         // Should be no exception:
@@ -124,13 +124,13 @@ public class RoleIT extends TestWithTechnicalUser {
 
     @Test(expected = Exception.class)
     public void roleNameShouldNotAccept256Chars() throws BonitaException {
-        final String stringIndex_256_chars = "_abcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxy12345";
+        final String stringIndex_256_chars = "ッッッシシジジッシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシシ";
         getIdentityAPI().createRole(stringIndex_256_chars);
     }
 
     @Test(expected = Exception.class)
     public void roleDisplayNameShouldNotAccept256Chars() throws BonitaException {
-        final String stringIndex_256_chars = "_abcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxyabcdefghijklmnopqrstuvwxy12345";
+        final String stringIndex_256_chars = "ッッッツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツツヅ";
         getIdentityAPI().createRole(new RoleCreator("someName").setDisplayName(stringIndex_256_chars));
     }
 
