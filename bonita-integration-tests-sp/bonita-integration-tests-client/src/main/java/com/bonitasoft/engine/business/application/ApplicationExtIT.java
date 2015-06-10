@@ -65,7 +65,7 @@ public class ApplicationExtIT extends org.bonitasoft.engine.business.application
     @Test
     public void createApplication_without_specific_layout_returns_application_with_given_default_layout() throws Exception {
         //given
-        Page layout = getPageAPI().getPageByName("custompage_layout");
+        Page layout = getPageAPI().getPageByName("custompage_defaultlayout");
         ApplicationCreatorExt creator = new ApplicationCreatorExt("My-Application", "My application display name", "1.0");
 
         //when
