@@ -349,8 +349,8 @@ public class ApplicationPageIT extends TestWithCustomPage {
         List<String> allPagesForProfile2 = getApplicationAPI().getAllPagesForProfile(profile2.getId());
 
         //then
-        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_layout", "custompage_page1", "custompage_page2", "custompage_page3", "custompage_theme"));
-        assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_layout", "custompage_page4", "custompage_theme"));
+        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_defaultlayout", "custompage_defaulttheme", "custompage_page1", "custompage_page2", "custompage_page3"));
+        assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_defaultlayout", "custompage_defaulttheme", "custompage_page4"));
 
         //clean
         getApplicationAPI().deleteApplication(app1.getId());

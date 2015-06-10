@@ -15,7 +15,7 @@ package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.accessors.TenantAccessorTest;
 import org.bonitasoft.engine.activity.TaskTests;
-import org.bonitasoft.engine.activity.UserTaskContractITest;
+import org.bonitasoft.engine.activity.ContractIT;
 import org.bonitasoft.engine.business.data.BDRepositoryIT;
 import org.bonitasoft.engine.command.CommandsTests;
 import org.bonitasoft.engine.command.ExecuteBDMQueryCommandIT;
@@ -50,7 +50,7 @@ import org.junit.runners.Suite.SuiteClasses;
         TaskTests.class,
         TenantAccessorTest.class,
         MultiThreadCallsIT.class,
-        UserTaskContractITest.class,
+        ContractIT.class,
         BDRepositoryIT.class,
         ExecuteBDMQueryCommandIT.class
 })
