@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.operation;
 
-
 import org.bonitasoft.engine.business.data.BusinessDataService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -32,8 +31,8 @@ public class BusinessDataJavaMethodOperationExecutorStrategy extends JavaMethodO
     private final EntitiesActionsExecutor entitiesActionsExecutor;
     private final MergeEntityAction mergeEntityAction;
 
-    public BusinessDataJavaMethodOperationExecutorStrategy(final BusinessDataService businessDataService, EntitiesActionsExecutor entitiesActionsExecutor,
-            MergeEntityAction mergeEntityAction) {
+    public BusinessDataJavaMethodOperationExecutorStrategy(final BusinessDataService businessDataService, final EntitiesActionsExecutor entitiesActionsExecutor,
+            final MergeEntityAction mergeEntityAction) {
         this.businessDataService = businessDataService;
         this.entitiesActionsExecutor = entitiesActionsExecutor;
         this.mergeEntityAction = mergeEntityAction;
@@ -50,14 +49,12 @@ public class BusinessDataJavaMethodOperationExecutorStrategy extends JavaMethodO
     }
 
     protected Object computeJavaOperation(final SOperation operation, final Object valueToSetObjectWith, final SExpressionContext expressionContext,
-            final boolean shouldPersistValue)
-            throws SOperationExecutionException {
+            final boolean shouldPersistValue) throws SOperationExecutionException {
         return super.computeNewValueForLeftOperand(operation, valueToSetObjectWith, expressionContext, shouldPersistValue);
     }
 
     private Object delegateBusinessValueForLeftOperand(final SOperation operation, final Object valueToSetObjectWith,
-            final SExpressionContext expressionContext, final boolean shouldPersistValue)
-            throws SOperationExecutionException {
+            final SExpressionContext expressionContext, final boolean shouldPersistValue) throws SOperationExecutionException {
         final Object businessObject = extractObjectToInvokeFromContext(operation, expressionContext);
         final String methodName = extractMethodName(operation);
         final String parameterType = extractParameterType(operation);
@@ -75,4 +72,5 @@ public class BusinessDataJavaMethodOperationExecutorStrategy extends JavaMethodO
     private boolean isBusinessData(final SOperation operation) {
         return SLeftOperand.TYPE_BUSINESS_DATA.equals(operation.getLeftOperand().getType());
     }
+
 }

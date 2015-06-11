@@ -18,14 +18,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.business.data.RefBusinessDataRetriever;
+import org.bonitasoft.engine.commons.Container;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.operation.BusinessDataContext;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 
@@ -37,10 +38,10 @@ import org.bonitasoft.engine.service.ModelConvertor;
  */
 public class BusinessDataReferenceExpressionExecutorStrategy extends CommonBusinessDataExpressionExecutorStrategy {
 
+    private final RefBusinessDataRetriever refBusinessDataRetriever;
 
-    public BusinessDataReferenceExpressionExecutorStrategy(final RefBusinessDataService refBusinessDataService,
-                                                           final FlowNodeInstanceService flowNodeInstanceService) {
-        super(refBusinessDataService, flowNodeInstanceService);
+    public BusinessDataReferenceExpressionExecutorStrategy(final RefBusinessDataRetriever refBusinessDataRetriever) {
+        this.refBusinessDataRetriever = refBusinessDataRetriever;
     }
 
     @Override
@@ -55,7 +56,8 @@ public class BusinessDataReferenceExpressionExecutorStrategy extends CommonBusin
         final Long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
         final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
         try {
-            final SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(businessDataName, containerId, containerType);
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataRetriever.getRefBusinessDataInstance(new BusinessDataContext(
+                    businessDataName, new Container(containerId, containerType)));
             return ModelConvertor.toBusinessDataReference(refBusinessDataInstance);
         } catch (final SBonitaReadException e) {
             throw new SExpressionEvaluationException(e, "Unable to retrieve business data instance with name " + businessDataName);

@@ -25,14 +25,13 @@ import static org.mockito.Mockito.verify;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.commons.Container;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import org.bonitasoft.engine.bdm.Entity;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EntitiesActionsExecutorTest {
@@ -43,17 +42,17 @@ public class EntitiesActionsExecutorTest {
     @Mock
     private EntityAction action;
 
-    private BusinessDataContext businessDataContext = new BusinessDataContext("data", new Container(1L, "process"));
+    private final BusinessDataContext businessDataContext = new BusinessDataContext("data", new Container(1L, "process"));
 
     @Test
     public void executeAction_should_execute_action_on_entity_if_its_a_simple_entity() throws Exception {
         //given
-        Entity entity = mock(Entity.class);
-        Entity entityAfterAction = mock(Entity.class);
+        final Entity entity = mock(Entity.class);
+        final Entity entityAfterAction = mock(Entity.class);
         given(action.execute(entity, businessDataContext)).willReturn(entityAfterAction);
 
         //when
-        Object actionResult = actionsExecutor.executeAction(entity, businessDataContext, action);
+        final Object actionResult = actionsExecutor.executeAction(entity, businessDataContext, action);
 
         //then
         assertThat(actionResult).isEqualTo(entityAfterAction);
@@ -63,12 +62,12 @@ public class EntitiesActionsExecutorTest {
     @Test
     public void executeAction_should_execute_action_on_list_if_its_a_list_of_entities() throws Exception {
         //given
-        List<Entity> entities = Collections.singletonList(mock(Entity.class));
-        List<Entity> entitiesAfterAction = Collections.singletonList(mock(Entity.class));
+        final List<Entity> entities = Collections.singletonList(mock(Entity.class));
+        final List<Entity> entitiesAfterAction = Collections.singletonList(mock(Entity.class));
         given(action.execute(entities, businessDataContext)).willReturn(entitiesAfterAction);
 
         //when
-        Object actionResult = actionsExecutor.executeAction(entities, businessDataContext, action);
+        final Object actionResult = actionsExecutor.executeAction(entities, businessDataContext, action);
 
         //then
         assertThat(actionResult).isEqualTo(entitiesAfterAction);
@@ -83,12 +82,13 @@ public class EntitiesActionsExecutorTest {
         //then exception
     }
 
-    @Test(expected = SEntityActionExecutionException.class)
-    public void execute_should_throws_exception_if_value_is_null() throws Exception {
+    @Test
+    public void execute_should_handle_the_value_nullity() throws Exception {
         //when
         actionsExecutor.executeAction(null, businessDataContext, action);
 
         //then exception
+        verify(action).handleNull(businessDataContext);
     }
 
 }

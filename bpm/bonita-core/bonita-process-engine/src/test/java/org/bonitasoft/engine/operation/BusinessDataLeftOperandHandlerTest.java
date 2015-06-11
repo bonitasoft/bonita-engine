@@ -19,6 +19,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -34,16 +35,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
+import org.bonitasoft.engine.business.data.RefBusinessDataRetriever;
 import org.bonitasoft.engine.commons.Container;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.operation.pojo.Employee;
 import org.bonitasoft.engine.operation.pojo.Travel;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -59,11 +61,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class BusinessDataLeftOperandHandlerTest {
 
+    public static final String PROCESS_INSTANCE = DataInstanceContainer.PROCESS_INSTANCE.name();
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private FlowNodeInstanceService flowNodeInstanceService;
+    private RefBusinessDataRetriever refBusinessDataRetriever;
 
     @Mock
     private BusinessDataRepository repository;
@@ -115,11 +118,12 @@ public class BusinessDataLeftOperandHandlerTest {
         final SSimpleRefBusinessDataInstance refInstance = mock(SSimpleRefBusinessDataInstance.class);
         final String bizDataName = "employee";
         final int processInstanceId = 457;
-        when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
+        BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName, new Container(processInstanceId, PROCESS_INSTANCE));
+        when(refBusinessDataRetriever.getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(businessDataContext)))).thenReturn(refInstance);
         when(refInstance.getDataId()).thenReturn(null);
         when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
 
-        final Employee employee = (Employee) leftOperandHandler.getBusinessData(bizDataName, processInstanceId, "PROCESS_INSTANCE");
+        final Employee employee = (Employee) leftOperandHandler.getBusinessData(bizDataName, processInstanceId, PROCESS_INSTANCE);
 
         assertThat(employee).isNotNull();
         assertThat(employee.getPersistenceId()).isNull();
@@ -136,7 +140,7 @@ public class BusinessDataLeftOperandHandlerTest {
         when(refInstance.getDataId()).thenReturn(null);
         when(refInstance.getDataClassName()).thenReturn("fr.bonitasoft.engine.Employee");
 
-        leftOperandHandler.getBusinessData(bizDataName, processInstanceId, "PROCESS_INSTANCE");
+        leftOperandHandler.getBusinessData(bizDataName, processInstanceId, PROCESS_INSTANCE);
     }
 
     @Test(expected = SBonitaReadException.class)
@@ -148,7 +152,7 @@ public class BusinessDataLeftOperandHandlerTest {
         when(refInstance.getDataId()).thenReturn(null);
         when(refInstance.getDataClassName()).thenReturn(List.class.getName());
 
-        leftOperandHandler.getBusinessData(bizDataName, processInstanceId, "PROCESS_INSTANCE");
+        leftOperandHandler.getBusinessData(bizDataName, processInstanceId, PROCESS_INSTANCE);
     }
 
     @Test
@@ -156,22 +160,31 @@ public class BusinessDataLeftOperandHandlerTest {
         final SLeftOperandImpl leftOperand = new SLeftOperandImpl();
         leftOperand.setName("address");
         final SSimpleRefBusinessDataInstance instance = mock(SSimpleRefBusinessDataInstance.class);
-        when(refBusinessDataService.getRefBusinessDataInstance("address", 45)).thenReturn(instance);
+        when(
+                refBusinessDataRetriever.getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(new BusinessDataContext("address", new Container(45,
+                        PROCESS_INSTANCE)))))).thenReturn(instance);
         when(instance.getDataClassName()).thenReturn(Address.class.getName());
 
-        leftOperandHandler.delete(leftOperand, 45, "PROCESS_INSTANCE");
+        leftOperandHandler.delete(leftOperand, 45, PROCESS_INSTANCE);
 
         verify(refBusinessDataService).updateRefBusinessDataInstance(instance, null);
         verify(repository).remove(any(Address.class));
     }
 
-    @Test(expected = SOperationExecutionException.class)
+    @Test
     public void deleteThrowsExceptionIfAnInternalExceptionOccurs() throws Exception {
+        //given
         final SLeftOperandImpl leftOperand = new SLeftOperandImpl();
         leftOperand.setName("address");
-        when(flowNodeInstanceService.getProcessInstanceId(45, "PROCESS_INSTANCE")).thenThrow(new SFlowNodeNotFoundException(45));
 
-        leftOperandHandler.delete(leftOperand, 45, "PROCESS_INSTANCE");
+        given(refBusinessDataRetriever.getRefBusinessDataInstance(new BusinessDataContext(leftOperand.getName(), new Container(45, PROCESS_INSTANCE))))
+                .willThrow(new SFlowNodeNotFoundException(45));
+
+        //then
+        expectedException.expect(SOperationExecutionException.class);
+
+        //when
+        leftOperandHandler.delete(leftOperand, 45, PROCESS_INSTANCE);
     }
 
     @Test
@@ -179,12 +192,14 @@ public class BusinessDataLeftOperandHandlerTest {
         final SLeftOperandImpl leftOperand = new SLeftOperandImpl();
         leftOperand.setName("address");
         final SMultiRefBusinessDataInstance ref = mock(SMultiRefBusinessDataInstance.class);
-        doReturn(ref).when(refBusinessDataService).getRefBusinessDataInstance("employees", 123l);
-        when(refBusinessDataService.getRefBusinessDataInstance("address", 45)).thenReturn(ref);
+        BusinessDataContext employeesContext = new BusinessDataContext("employees", new Container(123l, PROCESS_INSTANCE));
+        BusinessDataContext addressContext = new BusinessDataContext("address", new Container(45, PROCESS_INSTANCE));
+        doReturn(ref).when(refBusinessDataRetriever).getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(employeesContext)));
+        when(refBusinessDataRetriever.getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(addressContext)))).thenReturn(ref);
         when(ref.getDataClassName()).thenReturn(Address.class.getName());
         when(ref.getDataIds()).thenReturn(Arrays.asList(486L));
 
-        leftOperandHandler.delete(leftOperand, 45, "PROCESS_INSTANCE");
+        leftOperandHandler.delete(leftOperand, 45, PROCESS_INSTANCE);
 
         verify(refBusinessDataService).updateRefBusinessDataInstance(ref, new ArrayList<Long>());
         verify(repository).remove(any(Address.class));
@@ -195,11 +210,12 @@ public class BusinessDataLeftOperandHandlerTest {
         final SMultiRefBusinessDataInstance refInstance = mock(SMultiRefBusinessDataInstance.class);
         final String bizDataName = "employee";
         final int processInstanceId = 457;
-        when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
+        BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName, new Container(processInstanceId, PROCESS_INSTANCE));
+        when(refBusinessDataRetriever.getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(businessDataContext)))).thenReturn(refInstance);
         when(refInstance.getDataIds()).thenReturn(Arrays.asList(45l));
         when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
 
-        leftOperandHandler.getBusinessData(bizDataName, processInstanceId, "PROCESS_INSTANCE");
+        leftOperandHandler.getBusinessData(bizDataName, processInstanceId, PROCESS_INSTANCE);
 
         verify(repository).findByIds(Employee.class, Arrays.asList(45l));
     }
@@ -209,12 +225,14 @@ public class BusinessDataLeftOperandHandlerTest {
         final SMultiRefBusinessDataInstance refInstance = mock(SMultiRefBusinessDataInstance.class);
         final String bizDataName = "employee";
         final long processInstanceId = 457;
-        when(flowNodeInstanceService.getProcessInstanceId(processInstanceId, "PROCESS_INSTANCE")).thenReturn(processInstanceId);
-        when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
+        BusinessDataContext businessDataContext = new BusinessDataContext(bizDataName, new Container(processInstanceId,
+                PROCESS_INSTANCE));
+        when(
+                refBusinessDataRetriever.getRefBusinessDataInstance(argThat(new BusinessDataContextMatcher(businessDataContext)))).thenReturn(refInstance);
         when(refInstance.getDataIds()).thenReturn(new ArrayList<Long>());
         when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
 
-        final List<Employee> employees = (List<Employee>) leftOperandHandler.getBusinessData(bizDataName, processInstanceId, "PROCESS_INSTANCE");
+        final List<Employee> employees = (List<Employee>) leftOperandHandler.getBusinessData(bizDataName, processInstanceId, PROCESS_INSTANCE);
         assertThat(employees).isEmpty();
     }
 
@@ -249,7 +267,7 @@ public class BusinessDataLeftOperandHandlerTest {
                 new SEntityActionExecutionException(""));
 
         //when
-        leftOperandHandler.update(createLeftOperand(businessDataName), Collections.<String, Object>emptyMap(), address, containerId, containerType);
+        leftOperandHandler.update(createLeftOperand(businessDataName), Collections.<String, Object> emptyMap(), address, containerId, containerType);
 
         //then exception
     }
