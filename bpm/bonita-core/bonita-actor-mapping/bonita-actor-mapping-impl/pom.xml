@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-actor-mapping</artifactId>
 		<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
-		<version>7.0.0-SNAPSHOT</version>
+		<version>7.0.0</version>
 	</parent>
 
 	<artifactId>bonita-actor-mapping-impl</artifactId>
