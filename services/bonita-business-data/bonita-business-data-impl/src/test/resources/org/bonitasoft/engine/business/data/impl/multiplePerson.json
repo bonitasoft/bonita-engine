@@ -2,6 +2,8 @@
   {
     "persistenceId": 1,
     "persistenceVersion": 2,
+    "persistenceId_string": "1",
+    "persistenceVersion_string": "2",
     "name": "John",
     "age": 50,
     "phones": [
@@ -33,6 +35,8 @@
   {
     "persistenceId": 2,
     "persistenceVersion": 2,
+    "persistenceId_string": "2",
+    "persistenceVersion_string": "2",
     "name": "John",
     "age": 50,
     "phones": [

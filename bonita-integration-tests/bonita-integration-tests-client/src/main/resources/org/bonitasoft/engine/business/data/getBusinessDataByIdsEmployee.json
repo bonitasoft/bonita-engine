@@ -1,6 +1,8 @@
 [{
   "persistenceId": 1,
   "persistenceVersion": 0,
+  "persistenceId_string": "1",
+  "persistenceVersion_string": "0",
   "firstName": "Alphonse",
   "lastName": "Dupond",
   "hireDate":"123456789",
@@ -10,6 +12,8 @@
     {
       "persistenceId": 2,
       "persistenceVersion": 0,
+      "persistenceId_string": "2",
+      "persistenceVersion_string": "0",
       "street": "32, rue Gustave Eiffel",
       "city": "Grenoble",
       "links": [
