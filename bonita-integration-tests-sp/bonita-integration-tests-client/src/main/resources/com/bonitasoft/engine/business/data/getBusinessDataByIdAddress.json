@@ -1,6 +1,8 @@
 {
   "persistenceId": 2,
   "persistenceVersion": 0,
+  "persistenceId_string": "2",
+  "persistenceVersion_string": "0",
   "street": "32, rue Gustave Eiffel",
   "city": "Grenoble",
   "links": [
