@@ -28,4 +28,12 @@ public interface SimpleBusinessDataReference extends BusinessDataReference {
      */
     Long getStorageId();
 
+    /**
+     * Returns the identifier of the business data.
+     * It can be null, if no business data is attached to the reference.
+     *
+     * @return the identifier of the business data as String
+     */
+    String getStorageIdAsString();
+
 }

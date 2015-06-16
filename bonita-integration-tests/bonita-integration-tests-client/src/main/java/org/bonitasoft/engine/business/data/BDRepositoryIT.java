@@ -1610,6 +1610,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final SimpleBusinessDataReference businessDataReference = (SimpleBusinessDataReference) getBusinessDataAPI().getProcessBusinessDataReference(
                 "productCatalog", processInstance.getId());
         assertThat(businessDataReference.getStorageId()).isNull();
+        assertThat(businessDataReference.getStorageIdAsString()).isNull();
 
         disableAndDeleteProcess(definition.getId());
     }
