@@ -16,12 +16,8 @@ package org.bonitasoft.engine.business.data.impl;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -31,11 +27,13 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import javassist.util.proxy.MethodHandler;
 import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.business.data.impl.utils.JsonNumberSerializerHelper;
 import org.bonitasoft.engine.commons.ClassReflector;
 
 public class EntitySerializer extends JsonSerializer<Entity> {
 
     public static final String STRING_SUFFIX = "_string";
+    private final JsonNumberSerializerHelper jsonNumberSerializerHelper;
     private String patternURI;
 
     public void setPatternURI(final String patternURI) {
@@ -44,17 +42,12 @@ public class EntitySerializer extends JsonSerializer<Entity> {
 
     private String buildURI(final Entity result, final String businessDataURIPattern, final Field entityField) {
         String uri = businessDataURIPattern.replace("{className}", result.getClass().getName());
-        uri = uri.replace("{id}", result.getPersistenceId().toString());
+        uri = uri.replace("{id}", jsonNumberSerializerHelper.convertToString(result.getPersistenceId()));
         return uri.replace("{field}", entityField.getName());
     }
 
-    private Set<String> numberTypes;
-
-    public EntitySerializer() {
-        numberTypes = new HashSet<>();
-        numberTypes.add(Long.class.getCanonicalName());
-        numberTypes.add(Float.class.getCanonicalName());
-        numberTypes.add(Double.class.getCanonicalName());
+    public EntitySerializer(JsonNumberSerializerHelper jsonNumberSerializerHelper) {
+        this.jsonNumberSerializerHelper = jsonNumberSerializerHelper;
     }
 
     @Override
@@ -78,11 +71,11 @@ public class EntitySerializer extends JsonSerializer<Entity> {
                 declaredMethod = valueClass.getDeclaredMethod(getterName);
                 final Object invoke = declaredMethod.invoke(value);
                 jgen.writeObjectField(field.getName(), invoke);
-                if (invoke != null && shouldAddStringRepresentationForNumber(field)) {
-                    jgen.writeObjectField(field.getName().concat(STRING_SUFFIX), invoke.toString());
+                if (jsonNumberSerializerHelper.shouldAddStringRepresentationForNumber(field)) {
+                    jgen.writeObjectField(field.getName().concat(STRING_SUFFIX), jsonNumberSerializerHelper.convertToString(invoke));
                 }
-                if (invoke != null && shouldAddStringRepresentationForNumberList(field)) {
-                    jgen.writeObjectField(field.getName().concat(STRING_SUFFIX), convertToStringList((List) invoke));
+                if (jsonNumberSerializerHelper.shouldAddStringRepresentationForNumberList(field)) {
+                    jgen.writeObjectField(field.getName().concat(STRING_SUFFIX), jsonNumberSerializerHelper.convertToStringList((List) invoke));
                 }
             } catch (final NoSuchMethodException e) {
                 // nothing to do
@@ -99,27 +92,6 @@ public class EntitySerializer extends JsonSerializer<Entity> {
             jgen.writeEndArray();
         }
         jgen.writeEndObject();
-    }
-
-    private List<String> convertToStringList(List numberList) {
-        ArrayList<String> strings = new ArrayList<>();
-        for (Object item : numberList) {
-            strings.add(item.toString());
-        }
-        return strings;
-    }
-
-    private boolean shouldAddStringRepresentationForNumberList(Field field) {
-        if (field.getType().equals(List.class)) {
-            ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-            Type type = parameterizedType.getActualTypeArguments()[0];
-            return numberTypes.contains(((Class) type).getCanonicalName());
-        }
-        return false;
-    }
-
-    private boolean shouldAddStringRepresentationForNumber(Field field) {
-        return numberTypes.contains(field.getType().getCanonicalName());
     }
 
     protected boolean shouldReplaceFieldByLink(Field field) {

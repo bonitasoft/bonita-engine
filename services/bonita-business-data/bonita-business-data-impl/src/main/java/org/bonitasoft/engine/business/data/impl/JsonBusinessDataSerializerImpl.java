@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bdm.Entity;
 import org.bonitasoft.engine.business.data.JsonBusinessDataSerializer;
+import org.bonitasoft.engine.business.data.impl.utils.JsonNumberSerializerHelper;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -33,7 +34,7 @@ public class JsonBusinessDataSerializerImpl implements JsonBusinessDataSerialize
 
     public JsonBusinessDataSerializerImpl() {
         mapper = new ObjectMapper();
-        serializer = new EntitySerializer();
+        serializer = new EntitySerializer(new JsonNumberSerializerHelper());
         final SimpleModule hbm = new SimpleModule();
         hbm.addSerializer(serializer);
         mapper.registerModule(hbm);
