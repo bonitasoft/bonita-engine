@@ -4,7 +4,7 @@
     <parent>
         <artifactId>bonita-data-instance</artifactId>
         <groupId>org.bonitasoft.engine.data.instance</groupId>
-        <version>6.5.3-SNAPSHOT</version>
+        <version>6.5.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-data-instance-impl</artifactId>
