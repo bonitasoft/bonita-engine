@@ -13,20 +13,10 @@
  **/
 package org.bonitasoft.engine.core.connector.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
-
+import static org.powermock.api.mockito.PowerMockito.*;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -126,7 +116,7 @@ public class ConnectorServiceImplTest {
 
     @Test(expected = SInvalidConnectorImplementationException.class)
     public void checkConnectorImplementationIsValidWithZipHavingNoImpl() throws Exception {
-        final byte[] zip = IOUtil.zip(Collections.<String, byte[]> singletonMap("connector.notImpl", "mocked".getBytes()));
+        final byte[] zip = IOUtil.zip(Collections.singletonMap("connector.notImpl", "mocked".getBytes()));
         connectorService.checkConnectorImplementationIsValid(zip, "myConnector", "1.0.0");
     }
 
@@ -135,7 +125,7 @@ public class ConnectorServiceImplTest {
         when(parser.getObjectFromXML(eq("mocked".getBytes()))).thenReturn(
                 new SConnectorImplementationDescriptor("org.Test", "myConnector", "1.0.0", "myConnector", "1.0.0", new JarDependencies(Collections
                         .<String> emptyList())));
-        final byte[] zip = IOUtil.zip(Collections.<String, byte[]> singletonMap("connector.impl", "mocked".getBytes()));
+        final byte[] zip = IOUtil.zip(Collections.singletonMap("connector.impl", "mocked".getBytes()));
         connectorService.checkConnectorImplementationIsValid(zip, "myConnector", "1.0.0");
     }
 
@@ -144,7 +134,7 @@ public class ConnectorServiceImplTest {
         when(parser.getObjectFromXML(eq("mocked".getBytes()))).thenReturn(
                 new SConnectorImplementationDescriptor("org.Test", "myConnector", "1.0.0", "myConnectorWrong", "1.0.0", new JarDependencies(Collections
                         .<String> emptyList())));
-        final byte[] zip = IOUtil.zip(Collections.<String, byte[]> singletonMap("connector.impl", "mocked".getBytes()));
+        final byte[] zip = IOUtil.zip(Collections.singletonMap("connector.impl", "mocked".getBytes()));
         connectorService.checkConnectorImplementationIsValid(zip, "myConnector", "1.0.0");
     }
 
