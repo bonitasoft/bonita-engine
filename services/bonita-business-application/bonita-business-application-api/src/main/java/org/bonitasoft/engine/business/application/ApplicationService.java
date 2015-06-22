@@ -39,7 +39,7 @@ public interface ApplicationService {
 
     String DEFAULT_LAYOUT_NAME="custompage_defaultlayout";
 
-    String DEFAULT_THEME_NAME="custompage_defaulttheme";
+    String DEFAULT_THEME_NAME="custompage_bootstrapdefaulttheme";
 
     SApplication createApplication(SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException;
 
