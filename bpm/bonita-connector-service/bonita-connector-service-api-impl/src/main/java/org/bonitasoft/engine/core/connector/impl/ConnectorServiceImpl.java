@@ -483,7 +483,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         }
     }
 
-    private void unzipNewImplementation(final SProcessDefinition sDefinition, final long tenantId, final byte[] connectorImplementationArchive,
+    protected void unzipNewImplementation(final SProcessDefinition sDefinition, final long tenantId, final byte[] connectorImplementationArchive,
             final String connectorId, final String connectorVersion) throws SInvalidConnectorImplementationException {
         try (ZipInputStream zipInputstream = new ZipInputStream(new ByteArrayInputStream(connectorImplementationArchive)))
         {
@@ -515,7 +515,9 @@ public class ConnectorServiceImpl implements ConnectorService {
                 final byte[] fileContent = IOUtil.getBytes(zipInputstream);
                 if (entryName.endsWith(".jar")) {
                     BonitaHomeServer.getInstance().storeClasspathFile(tenantId, sDefinition.getId(), entryName, fileContent);
-                } else {
+                }
+                // Ignore source files when deploying new Connector implementation:
+                else if (!entryName.endsWith(".java")) {
                     BonitaHomeServer.getInstance().storeConnectorFile(tenantId, sDefinition.getId(), entryName, fileContent);
                 }
 
@@ -543,7 +545,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         }
     }
 
-    private void deleteOldImplementation(final long tenantId, final long processId, final String connectorId, final String connectorVersion)
+    protected void deleteOldImplementation(final long tenantId, final long processId, final String connectorId, final String connectorVersion)
             throws SInvalidConnectorImplementationException, BonitaHomeNotSetException, IOException {
         final Map<String, byte[]> listFiles = BonitaHomeServer.getInstance().getConnectorFiles(tenantId, processId);
         final Pattern pattern = Pattern.compile("^.*\\" + IMPLEMENTATION_EXT + "$");
