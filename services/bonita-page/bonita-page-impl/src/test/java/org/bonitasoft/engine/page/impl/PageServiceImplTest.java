@@ -115,7 +115,7 @@ public class PageServiceImplTest {
 
     public static final long USER_ID = 98989L;
 
-    public static final String BONITA_DEFAULT_THEME_ZIP_NAME = "bonita-default-theme.zip";
+    public static final String BONITA_DEFAULT_THEME_ZIP_NAME = "bonita-bootstrap-default-theme.zip";
     public static final String BONITA_DEFAULT_LAYOUT_ZIP_NAME = "bonita-default-layout.zip";
     public static final String DEFAULT_THEME_NAME = "custompage_defaulttheme";
     public static final String DEFAULT_LAYOUT_NAME = "custompage_defaultlayout";
