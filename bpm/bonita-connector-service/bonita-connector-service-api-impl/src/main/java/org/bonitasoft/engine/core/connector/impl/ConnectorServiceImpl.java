@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.connector.impl;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,7 +55,6 @@ import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -264,19 +262,19 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     protected String buildConnectorImplementationKey(final long rootDefinitionId, final String connectorId, final String version) {
         return new StringBuilder()
-        .append(rootDefinitionId)
-        .append(":")
-        .append(connectorId)
-        .append("-")
-        .append(version)
-        .toString();
+                .append(rootDefinitionId)
+                .append(":")
+                .append(connectorId)
+                .append("-")
+                .append(version)
+                .toString();
     }
 
     @Override
     public ConnectorResult executeMutipleEvaluation(final long processDefinitionId, final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, SExpression> connectorInputParameters,
             final Map<String, Map<String, Serializable>> inputValues, final ClassLoader classLoader, final SExpressionContext sexpContext)
-                    throws SConnectorException {
+            throws SConnectorException {
         try {
             final SConnectorImplementationDescriptor implementation = getImplementation(processDefinitionId, String.valueOf(sessionAccessor.getTenantId()),
                     connectorDefinitionId, connectorDefinitionVersion);
@@ -438,7 +436,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         for (final Map.Entry<String, byte[]> file : classpath.entrySet()) {
             final String name = file.getKey();
             final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class)
-                        .createNewInstance(name, processDefinitionId, ScopeType.PROCESS, name + ".jar", file.getValue()).done();
+                    .createNewInstance(name, processDefinitionId, ScopeType.PROCESS, name + ".jar", file.getValue()).done();
             dependencies.add(sDependency);
         }
         dependencyService.updateDependenciesOfArtifact(processDefinitionId, ScopeType.PROCESS, dependencies);
@@ -457,7 +455,8 @@ public class ConnectorServiceImpl implements ConnectorService {
             while (zipEntry != null) {
                 final String entryName = zipEntry.getName();
                 if (entryName.endsWith(".impl")) {
-                    final SConnectorImplementationDescriptor connectorImplementationDescriptor = getConnectorImplementationDescriptor(IOUtil.getBytes(zipInputstream));
+                    final SConnectorImplementationDescriptor connectorImplementationDescriptor = getConnectorImplementationDescriptor(IOUtil
+                            .getBytes(zipInputstream));
                     if (!connectorImplementationDescriptor.getDefinitionId().equals(connectorId)
                             || !connectorImplementationDescriptor.getDefinitionVersion().equals(connectorVersion)) {
                         throw new SInvalidConnectorImplementationException("The connector must implement the connectorDefinition with id = <" + connectorId
@@ -484,17 +483,15 @@ public class ConnectorServiceImpl implements ConnectorService {
         }
     }
 
-    private void unzipNewImplementation(final SProcessDefinition sDefinition, final long tenantId, final byte[] connectorImplementationArchive,
+    protected void unzipNewImplementation(final SProcessDefinition sDefinition, final long tenantId, final byte[] connectorImplementationArchive,
             final String connectorId, final String connectorVersion) throws SInvalidConnectorImplementationException {
-        ZipInputStream zipInputstream = null;
-        try {
-
+        try (ZipInputStream zipInputstream = new ZipInputStream(new ByteArrayInputStream(connectorImplementationArchive)))
+        {
             // First delete the old implementation before trying to unzip the new one:
             deleteOldImplementation(tenantId, sDefinition.getId(), connectorId, connectorVersion);
 
-            zipInputstream = new ZipInputStream(new ByteArrayInputStream(connectorImplementationArchive));
-            ZipEntry zipEntry = zipInputstream.getNextEntry();
-            while (zipEntry != null) {
+            ZipEntry zipEntry;
+            while ((zipEntry = zipInputstream.getNextEntry()) != null) {
                 String entryName = zipEntry.getName();
                 if (entryName.endsWith(".jar")) {
                     final int startIndex = Math.max(0, entryName.lastIndexOf('/'));
@@ -507,38 +504,29 @@ public class ConnectorServiceImpl implements ConnectorService {
                 // if File already exists and is any other file than .impl, then skip it, because we already deleted the old implementation jars, so better not
                 // overwrite existing common global process jar files:
                 if (newFile.exists() && !entryName.endsWith(".impl")) {
-                    zipEntry = zipInputstream.getNextEntry();
                     continue;
                 }
                 if (zipEntry.isDirectory()) {
                     if (!newFile.mkdirs()) {
                         break;
                     }
-                    zipEntry = zipInputstream.getNextEntry();
                     continue;
                 }
                 final byte[] fileContent = IOUtil.getBytes(zipInputstream);
                 if (entryName.endsWith(".jar")) {
                     BonitaHomeServer.getInstance().storeClasspathFile(tenantId, sDefinition.getId(), entryName, fileContent);
-                } else {
+                }
+                // Ignore source files when deploying new Connector implementation:
+                else if (!entryName.endsWith(".java")) {
                     BonitaHomeServer.getInstance().storeConnectorFile(tenantId, sDefinition.getId(), entryName, fileContent);
                 }
 
                 zipInputstream.closeEntry();
-                zipEntry = zipInputstream.getNextEntry();
             }
         } catch (final IOException e) {
             throw new SInvalidConnectorImplementationException(e);
         } catch (final BonitaHomeNotSetException e) {
             throw new SInvalidConnectorImplementationException(e);
-        } finally {
-            try {
-                if (zipInputstream != null) {
-                    zipInputstream.close();
-                }
-            } catch (final IOException e) {
-                throw new SInvalidConnectorImplementationException(e);
-            }
         }
     }
 
@@ -557,7 +545,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         }
     }
 
-    private void deleteOldImplementation(final long tenantId, final long processId, final String connectorId, final String connectorVersion)
+    protected void deleteOldImplementation(final long tenantId, final long processId, final String connectorId, final String connectorVersion)
             throws SInvalidConnectorImplementationException, BonitaHomeNotSetException, IOException {
         final Map<String, byte[]> listFiles = BonitaHomeServer.getInstance().getConnectorFiles(tenantId, processId);
         final Pattern pattern = Pattern.compile("^.*\\" + IMPLEMENTATION_EXT + "$");
@@ -676,7 +664,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     /**
      * @param connectorImplementationDescriptor
-     *            check the implementation has all required properties or not
+     *        check the implementation has all required properties or not
      * @return
      */
     private boolean isGoodImplementation(final SConnectorImplementationDescriptor connectorImplementationDescriptor) {
