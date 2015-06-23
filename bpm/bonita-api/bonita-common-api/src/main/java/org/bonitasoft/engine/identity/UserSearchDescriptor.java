@@ -18,11 +18,15 @@ package org.bonitasoft.engine.identity;
  *
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @author Anthony Birembaut
  * @see User
  * @since 6.0.0
  */
 public final class UserSearchDescriptor {
 
+    /** filter search on User's id */
+    public static final String ID = "id";
+    
     /** filter search on User's username */
     public static final String USER_NAME = "userName";
 
