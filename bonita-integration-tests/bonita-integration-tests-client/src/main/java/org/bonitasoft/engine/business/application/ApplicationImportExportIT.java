@@ -35,9 +35,6 @@ import org.junit.Test;
  */
 public class ApplicationImportExportIT extends TestWithApplication {
 
-    public static final String DEFAULT_LAYOUT_NAME = "custompage_defaultlayout";
-    public static final String DEFAULT_THEME_NAME = "custompage_defaulttheme";
-
     private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
         return getAppSearchBuilderOrderById(startIndex, maxResults).done();
     }
