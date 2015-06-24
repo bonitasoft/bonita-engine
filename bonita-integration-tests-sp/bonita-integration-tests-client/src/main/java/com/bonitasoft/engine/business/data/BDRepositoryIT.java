@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2015 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -265,10 +265,27 @@ public class BDRepositoryIT extends CommonAPISPIT {
         products.setNullable(Boolean.TRUE);
         products.setReference(productBO);
 
+        final SimpleField releaseYear = new SimpleField();
+        releaseYear.setName("releaseYear");
+        releaseYear.setType(FieldType.STRING);
+
+        final BusinessObject editionBO = new BusinessObject();
+        editionBO.setQualifiedName("org.bonita.pojo.Edition");
+        editionBO.addField(releaseYear);
+
+        final RelationField editionField = new RelationField();
+        editionField.setType(RelationField.Type.COMPOSITION);
+        editionField.setFetchType(RelationField.FetchType.EAGER);
+        editionField.setName("editions");
+        editionField.setCollection(Boolean.TRUE);
+        editionField.setNullable(Boolean.TRUE);
+        editionField.setReference(editionBO);
+
         final BusinessObject catalogBO = new BusinessObject();
         catalogBO.setQualifiedName(PRODUCT_CATALOG_QUALIFIED_NAME);
         catalogBO.addField(name);
         catalogBO.addField(products);
+        catalogBO.addField(editionField);
 
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
@@ -276,6 +293,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         model.addBusinessObject(addressBO);
         model.addBusinessObject(countryBO);
         model.addBusinessObject(productBO);
+        model.addBusinessObject(editionBO);
         model.addBusinessObject(catalogBO);
         return model;
     }
@@ -851,8 +869,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
             "intermixed" }, jira = "BS-8591", story = "Create business data using intermixed java setter operations.")
     @Test
     public void shouldBeAbleToCreate2BusinessDataUsingIntermixedBizDataJavaSetterOperations() throws Exception {
-        final Expression countryQueryNameParameter = new ExpressionBuilder().createExpression("name", "France", String.class.getName(),
-                ExpressionType.TYPE_CONSTANT);
+        final Expression countryQueryNameParameter = new ExpressionBuilder().createExpression("name", "France", String.class.getName(), ExpressionType.TYPE_CONSTANT);
         final Expression countryQueryExpression = new ExpressionBuilder().createQueryBusinessDataExpression("country", "Country.findByName",
                 COUNTRY_QUALIFIED_NAME, countryQueryNameParameter);
         final Expression createNewAddressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
@@ -1523,6 +1540,39 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTaskAndExecuteIt(processInstance, "next", matti);
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
+    @Test
+    public void should_update_composition_entities() throws Exception {
+        final StringBuilder initCatalog = new StringBuilder();
+        initCatalog.append("import ").append("org.bonita.pojo.ProductCatalog").append("\n");
+        initCatalog.append("import ").append("org.bonita.pojo.Edition").append("\n");
+        initCatalog.append("Edition edition = new Edition() \n");
+        initCatalog.append("edition.releaseYear = '2015' \n");
+        initCatalog.append("ProductCatalog pc = new ProductCatalog() \n");
+        initCatalog.append("pc.name = 'MyFirstCatalog' \n");
+        initCatalog.append("pc.setEditions([edition]) \n");
+        initCatalog.append("pc\n");
+
+        final Expression initCatalogExpression = new ExpressionBuilder().createGroovyScriptExpression("initCatalog", initCatalog.toString(),
+                "org.bonita.pojo.ProductCatalog");
+
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("compo", "8.2");
+        builder.addActor(ACTOR_NAME);
+        builder.addBusinessData("productCatalog", "org.bonita.pojo.ProductCatalog", initCatalogExpression);
+        builder.addUserTask("updateCatalog", ACTOR_NAME)
+                .addOperation(
+                        new OperationBuilder().createBusinessDataSetAttributeOperation("productCatalog", "setName", String.class.getName(),
+                                new ExpressionBuilder().createConstantStringExpression("myUdaptedCatalog")));
+        builder.addUserTask("result", ACTOR_NAME);
+        builder.addTransition("updateCatalog", "result");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTaskAndExecuteIt("updateCatalog", matti);
+        waitForUserTask(processInstance, "result");
 
         disableAndDeleteProcess(definition.getId());
     }
