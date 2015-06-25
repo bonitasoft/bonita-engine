@@ -78,7 +78,7 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
         final Record rec1 = new Record(System.currentTimeMillis(), "rec", "rec1Desc", 100);
         final Record rec2 = new Record(System.currentTimeMillis(), "rec", "rec2Desc", 200);
 
-        final CSVFlushEventListenerResult csvFlushResult = csvFlushEventListener.flush(logger, new FlushEvent(System.currentTimeMillis(), Arrays.asList(rec1, rec2)));
+        final CSVFlushEventListenerResult csvFlushResult = csvFlushEventListener.flush(new FlushEvent(System.currentTimeMillis(), Arrays.asList(rec1, rec2)));
 
 
         final File csvFile = csvFlushResult.getOutputFile();

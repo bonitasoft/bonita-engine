@@ -18,12 +18,15 @@ public class MemoryFlushEventListener implements FlushEventListener {
     private final int maxSize;
     private DayRecord dayRecord;
 
-    public MemoryFlushEventListener(final int maxSize) {
+    private final TechnicalLoggerService logger;
+
+    public MemoryFlushEventListener(final TechnicalLoggerService logger, final int maxSize) {
         this.maxSize = maxSize;
+        this.logger = logger;
     }
     
     @Override
-    public synchronized FlushEventListenerResult flush(final TechnicalLoggerService logger, final FlushEvent flushEvent) throws Exception {
+    public synchronized FlushEventListenerResult flush(final FlushEvent flushEvent) throws Exception {
 
         if (flushEvent.getRecords().size() == 0) {
             return new FlushEventListenerResult(flushEvent);

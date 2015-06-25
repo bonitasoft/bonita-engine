@@ -17,7 +17,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public interface FlushEventListener {
 
-    FlushEventListenerResult flush(final TechnicalLoggerService logger, final FlushEvent flushEvent) throws Exception;
+    FlushEventListenerResult flush(final FlushEvent flushEvent) throws Exception;
 
     String getStatus();
 

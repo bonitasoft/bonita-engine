@@ -972,6 +972,7 @@
         <property name="sourceList">
             <list>
                 <ref bean="csvFlushEventListener" />
+                <ref bean="memoryFlushEventListener" />
             </list>
         </property>
     </bean>
@@ -1020,6 +1021,11 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="outputFolder" value="${bonita.tenant.timetracker.csv.folder}" />
         <constructor-arg name="csvSeparator" value="${bonita.tenant.timetracker.csv.separator}" />
+    </bean>
+
+    <bean id="memoryFlushEventListener" class="org.bonitasoft.engine.tracking.memory.MemoryFlushEventListener">
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
+        <constructor-arg name="maxSize" value="${bonita.tenant.timetracker.memory.maxSize}" />
     </bean>
 
     <bean id="themeService" class="org.bonitasoft.engine.theme.impl.ThemeServiceImpl">
