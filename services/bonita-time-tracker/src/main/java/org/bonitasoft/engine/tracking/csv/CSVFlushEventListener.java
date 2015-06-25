@@ -69,6 +69,14 @@ public class CSVFlushEventListener implements FlushEventListener {
         return new CSVFlushResult(flushEvent, outputFile);
     }
 
+    @Override
+    public String getStatus() {
+        String result = this.getClass().getName() + ": \n";
+        result += "outputFolder: " + outputFolder + "\n";
+        return result;
+    }
+
+
     private List<String> getRow(final Record record) {
         final long timestamp = record.getTimestamp();
         final GregorianCalendar cal = new GregorianCalendar();

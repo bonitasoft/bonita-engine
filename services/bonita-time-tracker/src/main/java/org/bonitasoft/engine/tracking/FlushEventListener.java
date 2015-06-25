@@ -17,4 +17,5 @@ public interface FlushEventListener {
 
     FlushResult flush(final FlushEvent flushEvent) throws Exception;
 
+    String getStatus();
 }

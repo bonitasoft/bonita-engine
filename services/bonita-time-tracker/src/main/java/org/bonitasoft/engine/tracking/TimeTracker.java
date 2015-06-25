@@ -16,6 +16,7 @@ package org.bonitasoft.engine.tracking;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
@@ -28,34 +29,37 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public class TimeTracker implements TenantLifecycleService {
 
-    private final boolean enabled;
+    private final boolean trackingEnabled;
+    private final long flushIntervalInSeconds;
     private final Set<String> activatedRecords;
     private final FlushThread flushThread;
     private final List<? extends FlushEventListener> flushEventListeners;
     private final TechnicalLoggerService logger;
     private final Queue<Record> records;
     private boolean started;
+    private long lastFlushTimestamp = 0L;
 
     public TimeTracker(
             final TechnicalLoggerService logger,
-            final boolean enabled,
+            final boolean trackingEnabled,
             final List<? extends FlushEventListener> flushEventListeners,
             final int maxSize,
             final int flushIntervalInSeconds,
             final String... activatedRecords) {
-        this(logger, new ThreadSleepClockImpl(), enabled, flushEventListeners, maxSize, flushIntervalInSeconds * 1000, activatedRecords);
+        this(logger, new ThreadSleepClockImpl(), trackingEnabled, flushEventListeners, maxSize, flushIntervalInSeconds * 1000, activatedRecords);
     }
 
     public TimeTracker(
             final TechnicalLoggerService logger,
             final Clock clock,
-            final boolean enabled,
+            final boolean trackingEnabled,
             final List<? extends FlushEventListener> flushEventListeners,
             final int maxSize,
             final int flushIntervalInSeconds,
             final String... activatedRecords) {
         super();
-        this.enabled = enabled;
+        this.flushIntervalInSeconds = flushIntervalInSeconds;
+        this.trackingEnabled = trackingEnabled;
         records = new CircularFifoQueue<>(maxSize);
         started = false;
         this.logger = logger;
@@ -65,21 +69,68 @@ public class TimeTracker implements TenantLifecycleService {
         } else {
             this.activatedRecords = new HashSet<>(Arrays.asList(activatedRecords));
         }
-        if (enabled && activatedRecords != null && activatedRecords.length > 0 && logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            this.logger.log(getClass(), TechnicalLogSeverity.INFO,
-                    "Time tracker is activated for some records. This may not be used in production as performances may be strongly impacted: "
-                            + Arrays.toString(activatedRecords));
-        }
         flushThread = createFlushThread(logger, clock, flushIntervalInSeconds);
-
+        if (trackingEnabled && logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+            this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                    "Time tracker is activated. This may not be used in production as performances may be strongly impacted.");
+        }
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            this.logger.log(getClass(), TechnicalLogSeverity.INFO,
+                    getStatus());
+        }
     }
 
+    public String getStatus() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("-----");
+        sb.append("\n");
+
+        sb.append("Time Tracker '");
+        sb.append(this.getClass().getName());
+        sb.append("':");
+        sb.append("\n");
+
+        sb.append("  - trackingEnabled: ");
+        sb.append(trackingEnabled);
+        sb.append("\n");
+
+        sb.append("  - flushIntervalInSeconds: ");
+        sb.append(flushIntervalInSeconds);
+        sb.append("\n");
+
+        sb.append("  - activatedRecords: ");
+        for (String activatedRecord : activatedRecords) {
+            sb.append(activatedRecord);
+            sb.append(" ");
+        }
+        sb.append("\n");
+
+        sb.append("  - flushEventListeners: ");
+        for (FlushEventListener flushEventListener : flushEventListeners) {
+            sb.append(flushEventListener.getStatus());
+            sb.append(" ");
+        }
+        sb.append("\n");
+
+        sb.append("  - records.size: ");
+        sb.append(records.size());
+        sb.append("\n");
+
+        sb.append("  - last flush occurrence: ");
+        sb.append(new Date(lastFlushTimestamp).toString());
+        sb.append("\n");
+
+        sb.append("\n");
+        sb.append("-----");
+        return sb.toString();
+    }
+    
     FlushThread createFlushThread(TechnicalLoggerService logger, Clock clock, int flushIntervalInSeconds) {
         return new FlushThread(clock, flushIntervalInSeconds, this, logger);
     }
 
     public boolean isTrackable(final String recordName) {
-        return enabled && started && activatedRecords.contains(recordName);
+        return trackingEnabled && started && activatedRecords.contains(recordName);
     }
 
     public void track(final String recordName, final String recordDescription, final long duration) {
@@ -100,10 +151,11 @@ public class TimeTracker implements TenantLifecycleService {
     }
 
     public List<FlushResult> flush() {
-        if (!enabled) {
+        if (!trackingEnabled) {
             return Collections.emptyList();
         }
         debug(TechnicalLogSeverity.INFO, "Flushing...");
+        lastFlushTimestamp = System.currentTimeMillis();
         final List<Record> records = getRecords();
         final FlushEvent flushEvent = new FlushEvent(records);
         final List<FlushResult> flushResults = new ArrayList<>();
@@ -135,7 +187,7 @@ public class TimeTracker implements TenantLifecycleService {
 
     @Override
     public void start() {
-        if (!enabled) {
+        if (!trackingEnabled) {
             return;
         }
         debug(TechnicalLogSeverity.INFO, "Starting TimeTracker...");
@@ -152,7 +204,7 @@ public class TimeTracker implements TenantLifecycleService {
 
     @Override
     public void stop() {
-        if (!enabled) {
+        if (!trackingEnabled) {
             return;
         }
         debug(TechnicalLogSeverity.INFO, "Stopping TimeTracker...");

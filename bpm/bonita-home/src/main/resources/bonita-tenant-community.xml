@@ -1008,7 +1008,7 @@
 
     <bean id="timeTracker" class="org.bonitasoft.engine.tracking.TimeTracker">
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-        <constructor-arg name="enabled" value="${bonita.tenant.timetracker.enable}" />
+        <constructor-arg name="trackingEnabled" value="${bonita.tenant.timetracker.enableTracking}" />
         <constructor-arg name="flushEventListeners" ref="flushEventListeners" />
         <constructor-arg name="maxSize" value="${bonita.tenant.timetracker.maxSize}" />
         <constructor-arg name="flushIntervalInSeconds"
