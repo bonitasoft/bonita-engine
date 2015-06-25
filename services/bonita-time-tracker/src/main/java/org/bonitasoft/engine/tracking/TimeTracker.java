@@ -32,7 +32,7 @@ public class TimeTracker implements TenantLifecycleService {
 
     private final Set<String> activatedRecords;
     private final FlushThread flushThread;
-    private final List<? extends FlushEventListener> flushEventListeners;
+    private final List<FlushEventListener> flushEventListeners;
     private final TechnicalLoggerService logger;
     private final Queue<Record> records;
     private final Clock clock;
@@ -47,7 +47,7 @@ public class TimeTracker implements TenantLifecycleService {
     public TimeTracker(
             final TechnicalLoggerService logger,
             final boolean startTracking,
-            final List<? extends FlushEventListener> flushEventListeners,
+            final List<FlushEventListener> flushEventListeners,
             final int maxSize,
             final int flushIntervalInSeconds,
             final String... activatedRecords) {
@@ -58,7 +58,7 @@ public class TimeTracker implements TenantLifecycleService {
             final TechnicalLoggerService logger,
             final Clock clock,
             final boolean startTracking,
-            final List<? extends FlushEventListener> flushEventListeners,
+            final List<FlushEventListener> flushEventListeners,
             final int maxSize,
             final int flushIntervalInMS,
             final String... activatedRecords) {
@@ -80,6 +80,20 @@ public class TimeTracker implements TenantLifecycleService {
             this.logger.log(getClass(), TechnicalLogSeverity.INFO,
                     getStatus());
         }
+    }
+
+    public void addFlushEventListener(final FlushEventListener flushEventListener) {
+        this.flushEventListeners.add(flushEventListener);
+    }
+    public void removeFlushEventListener(final FlushEventListener flushEventListener) {
+        this.flushEventListeners.remove(flushEventListener);
+    }
+    public void addActivatedRecord(final String activatedRecord) {
+        this.activatedRecords.add(activatedRecord);
+    }
+
+    public void removeActivatedRecord(final String activatedRecord) {
+        this.activatedRecords.remove(activatedRecord);
     }
 
     public void startTracking() {

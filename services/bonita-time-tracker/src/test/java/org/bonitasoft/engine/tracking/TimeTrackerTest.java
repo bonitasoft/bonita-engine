@@ -56,7 +56,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         };
     }
 
-    TimeTracker createTimeTracker(boolean enabled, List<? extends FlushEventListener> flushEventListeners, int maxSize,
+    TimeTracker createTimeTracker(boolean enabled, List<FlushEventListener> flushEventListeners, int maxSize,
             int flushIntervalInSeconds, String... records) {
         return new TimeTracker(logger, enabled, flushEventListeners, maxSize, flushIntervalInSeconds, records) {
 
