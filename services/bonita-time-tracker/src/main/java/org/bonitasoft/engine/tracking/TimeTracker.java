@@ -257,7 +257,7 @@ public class TimeTracker implements TenantLifecycleService {
         return Arrays.asList(records.toArray(new Record[records.size()]));
     }
 
-    private void clearRecords() {
+    public void clearRecords() {
         records.clear();
     }
 
