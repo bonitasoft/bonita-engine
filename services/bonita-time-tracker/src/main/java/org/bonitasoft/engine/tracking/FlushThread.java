@@ -27,7 +27,7 @@ public class FlushThread extends Thread {
     private final TechnicalLoggerService logger;
 
     public FlushThread(final Clock clock, final long flushIntervalInMilliSeconds, final TimeTracker timeTracker, final TechnicalLoggerService logger) {
-        super("TimeTracker-FlushThread");
+        super("Bonita-TimeTracker-FlushThread");
         this.clock = clock;
         this.logger = logger;
         this.flushIntervalInMilliSeconds = flushIntervalInMilliSeconds;
