@@ -29,11 +29,11 @@ public class FlushThreadTest {
         final TimeTracker timeTracker = mock(TimeTracker.class);
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final Clock clock = mock(Clock.class);
-        final long flushIntervalInMilliSeconds = 10;
+        final long flushIntervalInMilliSeconds = 0L;
 
         when(timeTracker.getClock()).thenReturn(clock);
         when(timeTracker.getLogger()).thenReturn(logger);
-        when(timeTracker.getFlushIntervalInSeconds()).thenReturn(flushIntervalInMilliSeconds);
+        when(timeTracker.getFlushIntervalInMS()).thenReturn(flushIntervalInMilliSeconds);
 
         when(clock.sleep(flushIntervalInMilliSeconds)).thenReturn(true).thenReturn(true).thenReturn(true).thenThrow(InterruptedException.class);
         final FlushThread flushThread = new FlushThread(timeTracker);

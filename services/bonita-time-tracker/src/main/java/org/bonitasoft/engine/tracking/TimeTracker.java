@@ -29,7 +29,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public class TimeTracker implements TenantLifecycleService {
 
-    private final long flushIntervalInSeconds;
+
     private final Set<String> activatedRecords;
     private final FlushThread flushThread;
     private final List<? extends FlushEventListener> flushEventListeners;
@@ -37,6 +37,7 @@ public class TimeTracker implements TenantLifecycleService {
     private final Queue<Record> records;
     private final Clock clock;
 
+    private long flushIntervalInMS;
     private boolean startTracking = false;
 
     private boolean serviceStarted;
@@ -59,12 +60,12 @@ public class TimeTracker implements TenantLifecycleService {
             final boolean startTracking,
             final List<? extends FlushEventListener> flushEventListeners,
             final int maxSize,
-            final int flushIntervalInSeconds,
+            final int flushIntervalInMS,
             final String... activatedRecords) {
         super();
         this.startTracking = startTracking;
         this.clock = clock;
-        this.flushIntervalInSeconds = flushIntervalInSeconds;
+        this.flushIntervalInMS = flushIntervalInMS;
         records = new CircularFifoQueue<>(maxSize);
         serviceStarted = false;
         this.logger = logger;
@@ -139,8 +140,16 @@ public class TimeTracker implements TenantLifecycleService {
         return flushThread.isStarted();
     }
 
-    public long getFlushIntervalInSeconds() {
-        return flushIntervalInSeconds;
+    public long getFlushIntervalInMS() {
+        return flushIntervalInMS;
+    }
+
+    public void setFlushIntervalInSeconds(long flushIntervalInSeconds) {
+        this.flushIntervalInMS = flushIntervalInSeconds * 1000;
+    }
+
+    public void setFlushIntervalInMS(long flushIntervalInMS) {
+        this.flushIntervalInMS = flushIntervalInMS;
     }
 
     public Clock getClock() {
@@ -162,7 +171,7 @@ public class TimeTracker implements TenantLifecycleService {
         sb.append("\n");
 
         sb.append("  - flushIntervalInSeconds: ");
-        sb.append(flushIntervalInSeconds);
+        sb.append(flushIntervalInMS);
         sb.append("\n");
 
         sb.append("  - activatedRecords: ");

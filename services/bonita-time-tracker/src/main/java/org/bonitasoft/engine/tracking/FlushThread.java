@@ -35,7 +35,7 @@ public class FlushThread extends Thread {
         while (true) {
             try {
                 final long flushDuration = System.currentTimeMillis() - lastFlushTimestamp;
-                final long sleepTime = this.timeTracker.getFlushIntervalInSeconds() - flushDuration;
+                final long sleepTime = this.timeTracker.getFlushIntervalInMS() - flushDuration;
                 this.timeTracker.getClock().sleep(sleepTime);
             } catch (InterruptedException e) {
                 break;
