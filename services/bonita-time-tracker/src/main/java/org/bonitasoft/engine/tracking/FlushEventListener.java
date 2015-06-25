@@ -22,4 +22,6 @@ public interface FlushEventListener {
     String getStatus();
 
     String getName();
+
+    void notifyStopTracking();
 }

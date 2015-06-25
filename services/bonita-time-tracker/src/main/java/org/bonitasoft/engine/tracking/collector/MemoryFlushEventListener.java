@@ -64,6 +64,11 @@ public class MemoryFlushEventListener implements FlushEventListener {
         return this.getClass().getSimpleName();
     }
 
+    @Override
+    public void notifyStopTracking() {
+        this.dayRecord = null;
+    }
+
     public synchronized DayRecord getDayRecord() {
         return this.dayRecord;
     }

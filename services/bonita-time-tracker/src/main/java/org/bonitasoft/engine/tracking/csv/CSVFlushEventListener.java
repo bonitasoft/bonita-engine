@@ -86,9 +86,16 @@ public class CSVFlushEventListener implements FlushEventListener {
         return status;
     }
 
+
+
     @Override
     public String getName() {
         return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public void notifyStopTracking() {
+        //nothing to do
     }
 
 
