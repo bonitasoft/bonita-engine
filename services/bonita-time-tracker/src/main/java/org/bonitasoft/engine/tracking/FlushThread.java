@@ -31,13 +31,17 @@ public class FlushThread extends Thread {
     @Override
     public void run() {
         info("Starting " + this.getName() + "...");
+        long lastFlushTimestamp = System.currentTimeMillis();
         while (true) {
             try {
-                this.timeTracker.getClock().sleep(this.timeTracker.getFlushIntervalInSeconds());
+                final long flushDuration = System.currentTimeMillis() - lastFlushTimestamp;
+                final long sleepTime = this.timeTracker.getFlushIntervalInSeconds() - flushDuration;
+                this.timeTracker.getClock().sleep(sleepTime);
             } catch (InterruptedException e) {
                 break;
             }
             try {
+                lastFlushTimestamp = System.currentTimeMillis();
                 this.timeTracker.flush();
             } catch (Exception e) {
                 if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
