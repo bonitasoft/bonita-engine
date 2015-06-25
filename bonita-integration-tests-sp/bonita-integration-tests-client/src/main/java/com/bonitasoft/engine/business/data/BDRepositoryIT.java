@@ -869,7 +869,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
             "intermixed" }, jira = "BS-8591", story = "Create business data using intermixed java setter operations.")
     @Test
     public void shouldBeAbleToCreate2BusinessDataUsingIntermixedBizDataJavaSetterOperations() throws Exception {
-        final Expression countryQueryNameParameter = new ExpressionBuilder().createExpression("name", "France", String.class.getName(), ExpressionType.TYPE_CONSTANT);
+        final Expression countryQueryNameParameter = new ExpressionBuilder().createExpression("name", "France", String.class.getName(),
+                ExpressionType.TYPE_CONSTANT);
         final Expression countryQueryExpression = new ExpressionBuilder().createQueryBusinessDataExpression("country", "Country.findByName",
                 COUNTRY_QUALIFIED_NAME, countryQueryNameParameter);
         final Expression createNewAddressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
@@ -1547,7 +1548,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
     @Test
     public void should_update_composition_entities() throws Exception {
         final StringBuilder initCatalog = new StringBuilder();
-        initCatalog.append("import ").append("org.bonita.pojo.ProductCatalog").append("\n");
+        initCatalog.append("import ").append(PRODUCT_CATALOG_QUALIFIED_NAME).append("\n");
         initCatalog.append("import ").append("org.bonita.pojo.Edition").append("\n");
         initCatalog.append("Edition edition = new Edition() \n");
         initCatalog.append("edition.releaseYear = '2015' \n");
@@ -1557,11 +1558,11 @@ public class BDRepositoryIT extends CommonAPISPIT {
         initCatalog.append("pc\n");
 
         final Expression initCatalogExpression = new ExpressionBuilder().createGroovyScriptExpression("initCatalog", initCatalog.toString(),
-                "org.bonita.pojo.ProductCatalog");
+                PRODUCT_CATALOG_QUALIFIED_NAME);
 
         final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("compo", "8.2");
         builder.addActor(ACTOR_NAME);
-        builder.addBusinessData("productCatalog", "org.bonita.pojo.ProductCatalog", initCatalogExpression);
+        builder.addBusinessData("productCatalog", PRODUCT_CATALOG_QUALIFIED_NAME, initCatalogExpression);
         builder.addUserTask("updateCatalog", ACTOR_NAME)
                 .addOperation(
                         new OperationBuilder().createBusinessDataSetAttributeOperation("productCatalog", "setName", String.class.getName(),
