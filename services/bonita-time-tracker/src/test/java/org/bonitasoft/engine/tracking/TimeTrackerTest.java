@@ -22,6 +22,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         return new TimeTracker(logger, clock, enabled, listeners, maxSize, flushIntervalInSeconds, rec) {
 
             @Override
-            FlushThread createFlushThread(TechnicalLoggerService logger, Clock clock, int flushIntervalInSeconds) {
+            FlushThread createFlushThread() {
                 return flushThread;
             }
         };
@@ -60,7 +61,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         return new TimeTracker(logger, enabled, flushEventListeners, maxSize, flushIntervalInSeconds, records) {
 
             @Override
-            FlushThread createFlushThread(TechnicalLoggerService logger, Clock clock, int flushIntervalInSeconds) {
+            FlushThread createFlushThread() {
                 return flushThread;
             }
         };
@@ -74,6 +75,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void isTrackable() {
+        when(flushThread.isStarted()).thenReturn(true);
         tracker = createTimeTracker(true, null, 10, 2, "rec1", "rec2");
         tracker.start();
         assertTrue(tracker.isTrackable("rec1"));
@@ -84,6 +86,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void trackRecords() {
+        when(flushThread.isStarted()).thenReturn(true);
         tracker = createTimeTracker(true, null, 10, 2, "rec1", "rec2");
         tracker.start();
         tracker.track("rec1", "rec11Desc", 100);
@@ -129,6 +132,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void timestamp() throws Exception {
+        when(flushThread.isStarted()).thenReturn(true);
         tracker = createTimeTracker(true, null, 10, 2, "rec1");
         tracker.start();
         tracker.track("rec1", "desc2", 100);
@@ -182,9 +186,9 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_stop_flush_thread_is_running() {
-        doReturn(true).when(flushThread).isStarted();
-        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        when(flushThread.isStarted()).thenReturn(true);
         tracker = createTimeTracker(true, null, 10, 2);
+        tracker.start();
         tracker.stop();
         verify(flushThread).interrupt();
     }
@@ -199,6 +203,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_flush_ignore_flush_listeners_exceptions() throws Exception {
+        when(flushThread.isStarted()).thenReturn(true);
         final Clock clock = mock(Clock.class);
 
         final FlushEventListener listener1 = mock(FlushEventListener.class);
@@ -225,6 +230,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_flush_call_all_flush_listeners() throws Exception {
+        when(flushThread.isStarted()).thenReturn(true);
         final Clock clock = mock(Clock.class);
 
         final FlushEventListener listener1 = mock(FlushEventListener.class);
@@ -246,6 +252,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void rollingRecords() {
+        when(flushThread.isStarted()).thenReturn(true);
         tracker = createTimeTracker(true, null, 2, 2, "rec");
         tracker.start();
         tracker.track("rec", "rec1", 100);

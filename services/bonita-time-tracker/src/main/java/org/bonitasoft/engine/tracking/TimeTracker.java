@@ -29,39 +29,44 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public class TimeTracker implements TenantLifecycleService {
 
-    private final boolean trackingEnabled;
     private final long flushIntervalInSeconds;
     private final Set<String> activatedRecords;
     private final FlushThread flushThread;
     private final List<? extends FlushEventListener> flushEventListeners;
     private final TechnicalLoggerService logger;
     private final Queue<Record> records;
-    private boolean started;
+    private final Clock clock;
+
+    private boolean startTracking = false;
+
+    private boolean serviceStarted;
     private long lastFlushTimestamp = 0L;
+
 
     public TimeTracker(
             final TechnicalLoggerService logger,
-            final boolean trackingEnabled,
+            final boolean startTracking,
             final List<? extends FlushEventListener> flushEventListeners,
             final int maxSize,
             final int flushIntervalInSeconds,
             final String... activatedRecords) {
-        this(logger, new ThreadSleepClockImpl(), trackingEnabled, flushEventListeners, maxSize, flushIntervalInSeconds * 1000, activatedRecords);
+        this(logger, new ThreadSleepClockImpl(), startTracking, flushEventListeners, maxSize, flushIntervalInSeconds * 1000, activatedRecords);
     }
 
     public TimeTracker(
             final TechnicalLoggerService logger,
             final Clock clock,
-            final boolean trackingEnabled,
+            final boolean startTracking,
             final List<? extends FlushEventListener> flushEventListeners,
             final int maxSize,
             final int flushIntervalInSeconds,
             final String... activatedRecords) {
         super();
+        this.startTracking = startTracking;
+        this.clock = clock;
         this.flushIntervalInSeconds = flushIntervalInSeconds;
-        this.trackingEnabled = trackingEnabled;
         records = new CircularFifoQueue<>(maxSize);
-        started = false;
+        serviceStarted = false;
         this.logger = logger;
         this.flushEventListeners = flushEventListeners;
         if (activatedRecords == null || activatedRecords.length == 0) {
@@ -69,15 +74,77 @@ public class TimeTracker implements TenantLifecycleService {
         } else {
             this.activatedRecords = new HashSet<>(Arrays.asList(activatedRecords));
         }
-        flushThread = createFlushThread(logger, clock, flushIntervalInSeconds);
-        if (trackingEnabled && logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-            this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                    "Time tracker is activated. This may not be used in production as performances may be strongly impacted.");
-        }
+        flushThread = createFlushThread();
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             this.logger.log(getClass(), TechnicalLogSeverity.INFO,
                     getStatus());
         }
+    }
+
+    public void startTracking() {
+        if (!serviceStarted) {
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                        "Cannot start Time tracker tracking because service is not started.");
+            }
+            return;
+        }
+        startTracking = true;
+        startFlushThread();
+    }
+
+    public void stopTracking() {
+        startTracking = false;
+        stopFlushThread();
+    }
+
+    FlushThread createFlushThread() {
+        return new FlushThread(this);
+    }
+
+
+    private void startFlushThread() {
+        if (startTracking) {
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                        "Starting Time tracker tracking...");
+            }
+            if (!flushThread.isStarted()) {
+                flushThread.start();
+            }
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                        "Time tracker tracking is activated. This may not be used in production as performances may be strongly impacted.");
+            }
+        }
+    }
+
+    private void stopFlushThread() {
+        if (isTracking()) {
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                        "Stopping Time tracker tracking...");
+            }
+            if (flushThread.isStarted()) {
+                flushThread.interrupt();
+            }
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
+                        "Time tracker tracking is deactivated.");
+            }
+        }
+    }
+
+    public boolean isTracking() {
+        return flushThread.isStarted();
+    }
+
+    public long getFlushIntervalInSeconds() {
+        return flushIntervalInSeconds;
+    }
+
+    public Clock getClock() {
+        return clock;
     }
 
     public String getStatus() {
@@ -91,7 +158,7 @@ public class TimeTracker implements TenantLifecycleService {
         sb.append("\n");
 
         sb.append("  - trackingEnabled: ");
-        sb.append(trackingEnabled);
+        sb.append(isTracking());
         sb.append("\n");
 
         sb.append("  - flushIntervalInSeconds: ");
@@ -124,13 +191,13 @@ public class TimeTracker implements TenantLifecycleService {
         sb.append("-----");
         return sb.toString();
     }
-    
-    FlushThread createFlushThread(TechnicalLoggerService logger, Clock clock, int flushIntervalInSeconds) {
-        return new FlushThread(clock, flushIntervalInSeconds, this, logger);
-    }
 
     public boolean isTrackable(final String recordName) {
-        return trackingEnabled && started && activatedRecords.contains(recordName);
+        return isTracking() && activatedRecords.contains(recordName);
+    }
+
+    public TechnicalLoggerService getLogger() {
+        return logger;
     }
 
     public void track(final String recordName, final String recordDescription, final long duration) {
@@ -151,7 +218,7 @@ public class TimeTracker implements TenantLifecycleService {
     }
 
     public List<FlushResult> flush() {
-        if (!trackingEnabled) {
+        if (!isTracking()) {
             return Collections.emptyList();
         }
         debug(TechnicalLogSeverity.INFO, "Flushing...");
@@ -187,44 +254,35 @@ public class TimeTracker implements TenantLifecycleService {
 
     @Override
     public void start() {
-        if (!trackingEnabled) {
+        if (serviceStarted) {
             return;
         }
         debug(TechnicalLogSeverity.INFO, "Starting TimeTracker...");
+        serviceStarted = true;
         startFlushThread();
-        started = true;
         debug(TechnicalLogSeverity.INFO, "TimeTracker started.");
     }
 
-    void startFlushThread() {
-        if (flushThread != null && !flushThread.isStarted()) {
-            flushThread.start();
-        }
-    }
 
     @Override
     public void stop() {
-        if (!trackingEnabled) {
+        if (!serviceStarted) {
             return;
         }
         debug(TechnicalLogSeverity.INFO, "Stopping TimeTracker...");
-        interruptFlushThread();
-        started = false;
+        serviceStarted = false;
+        stopFlushThread();
         debug(TechnicalLogSeverity.INFO, "TimeTracker stopped.");
-    }
-
-    void interruptFlushThread() {
-        if (flushThread != null && flushThread.isStarted()) {
-            flushThread.interrupt();
-        }
     }
 
     @Override
     public void pause() {
+        stop();
     }
 
     @Override
     public void resume() {
+        start();
     }
 
 }

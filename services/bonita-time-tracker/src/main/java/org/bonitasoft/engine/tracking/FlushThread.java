@@ -20,17 +20,11 @@ public class FlushThread extends Thread {
 
     private final TimeTracker timeTracker;
 
-    private final long flushIntervalInMilliSeconds;
-
-    private final Clock clock;
-
     private final TechnicalLoggerService logger;
 
-    public FlushThread(final Clock clock, final long flushIntervalInMilliSeconds, final TimeTracker timeTracker, final TechnicalLoggerService logger) {
+    public FlushThread(final TimeTracker timeTracker) {
         super("Bonita-TimeTracker-FlushThread");
-        this.clock = clock;
-        this.logger = logger;
-        this.flushIntervalInMilliSeconds = flushIntervalInMilliSeconds;
+        this.logger = timeTracker.getLogger();
         this.timeTracker = timeTracker;
     }
 
@@ -39,7 +33,7 @@ public class FlushThread extends Thread {
         info("Starting " + this.getName() + "...");
         while (true) {
             try {
-                clock.sleep(flushIntervalInMilliSeconds);
+                this.timeTracker.getClock().sleep(this.timeTracker.getFlushIntervalInSeconds());
             } catch (InterruptedException e) {
                 break;
             }

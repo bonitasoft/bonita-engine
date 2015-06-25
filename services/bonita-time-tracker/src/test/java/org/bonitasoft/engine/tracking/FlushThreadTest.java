@@ -28,11 +28,15 @@ public class FlushThreadTest {
     public void should_flush_thread_flush_until_interruption() throws Exception {
         final TimeTracker timeTracker = mock(TimeTracker.class);
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        final Clock clock = mock(Clock.class);
         final long flushIntervalInMilliSeconds = 10;
 
-        final Clock clock = mock(Clock.class);
+        when(timeTracker.getClock()).thenReturn(clock);
+        when(timeTracker.getLogger()).thenReturn(logger);
+        when(timeTracker.getFlushIntervalInSeconds()).thenReturn(flushIntervalInMilliSeconds);
+
         when(clock.sleep(flushIntervalInMilliSeconds)).thenReturn(true).thenReturn(true).thenReturn(true).thenThrow(InterruptedException.class);
-        final FlushThread flushThread = new FlushThread(clock, flushIntervalInMilliSeconds, timeTracker, logger);
+        final FlushThread flushThread = new FlushThread(timeTracker);
         flushThread.start();
         // wait max 1 minute to not freeze CI in case of a bug
         flushThread.join(60000);
