@@ -264,7 +264,7 @@ public class TimeTracker implements TenantLifecycleService {
         }
         for (final FlushEventListener listener : flushEventListeners) {
             try {
-                final FlushEventListenerResult flushEventListenerResult = listener.flush(flushEvent);
+                final FlushEventListenerResult flushEventListenerResult = listener.flush(logger, flushEvent);
                 flushEventListenerResults.add(flushEventListenerResult);
             } catch (final Exception e) {
                 log(TechnicalLogSeverity.WARNING, "Exception while flushing: " + flushEvent + " on listener " + listener);
