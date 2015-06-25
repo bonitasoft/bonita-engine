@@ -206,13 +206,13 @@ public class TimeTracker implements TenantLifecycleService {
         }
         final long timestamp = System.currentTimeMillis();
         final Record record = new Record(timestamp, recordName, recordDescription, duration);
-        debug(TechnicalLogSeverity.DEBUG, "Tracking record: " + record);
+        log(TechnicalLogSeverity.DEBUG, "Tracking record: " + record);
         synchronized (this) {
             records.add(record);
         }
     }
 
-    void debug(TechnicalLogSeverity debug, String message) {
+    void log(TechnicalLogSeverity debug, String message) {
         if (logger.isLoggable(getClass(), debug)) {
             logger.log(getClass(), debug, message);
         }
@@ -222,7 +222,7 @@ public class TimeTracker implements TenantLifecycleService {
         if (!isTracking()) {
             return Collections.emptyList();
         }
-        debug(TechnicalLogSeverity.INFO, "Flushing...");
+        log(TechnicalLogSeverity.INFO, "Flushing...");
         lastFlushTimestamp = System.currentTimeMillis();
         final List<Record> records;
         synchronized (this) {
@@ -232,7 +232,7 @@ public class TimeTracker implements TenantLifecycleService {
         final FlushEvent flushEvent = new FlushEvent(records);
         final List<FlushResult> flushResults = new ArrayList<>();
         flushListeners(flushEvent, flushResults);
-        debug(TechnicalLogSeverity.INFO, "Flush finished: " + flushEvent);
+        log(TechnicalLogSeverity.INFO, "Flush finished: " + flushEvent);
         return flushResults;
     }
 
@@ -249,7 +249,7 @@ public class TimeTracker implements TenantLifecycleService {
         try {
             flushResults.add(listener.flush(flushEvent));
         } catch (final Exception e) {
-            debug(TechnicalLogSeverity.WARNING, "Exception while flushing: " + flushEvent + " on listener " + listener);
+            log(TechnicalLogSeverity.WARNING, "Exception while flushing: " + flushEvent + " on listener " + listener);
         }
     }
 
@@ -266,10 +266,10 @@ public class TimeTracker implements TenantLifecycleService {
         if (serviceStarted) {
             return;
         }
-        debug(TechnicalLogSeverity.INFO, "Starting TimeTracker...");
+        log(TechnicalLogSeverity.INFO, "Starting TimeTracker...");
         serviceStarted = true;
         startFlushThread();
-        debug(TechnicalLogSeverity.INFO, "TimeTracker started.");
+        log(TechnicalLogSeverity.INFO, "TimeTracker started.");
     }
 
 
@@ -278,10 +278,10 @@ public class TimeTracker implements TenantLifecycleService {
         if (!serviceStarted) {
             return;
         }
-        debug(TechnicalLogSeverity.INFO, "Stopping TimeTracker...");
+        log(TechnicalLogSeverity.INFO, "Stopping TimeTracker...");
         serviceStarted = false;
         stopFlushThread();
-        debug(TechnicalLogSeverity.INFO, "TimeTracker stopped.");
+        log(TechnicalLogSeverity.INFO, "TimeTracker stopped.");
     }
 
     @Override
