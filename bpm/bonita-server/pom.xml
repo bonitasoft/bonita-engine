@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<artifactId>bpm</artifactId>
@@ -8,28 +8,28 @@
 		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-server</artifactId>
+    <artifactId>bonita-server</artifactId>
 
-	<name>Bonita Server</name>
+    <name>Bonita Server</name>
 
-	<dependencies>
-		<!-- Engine -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core</groupId>
-			<artifactId>bonita-process-engine</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-			    <exclusion>
-			        <groupId>org.bonitasoft.engine.api</groupId>
-			        <artifactId>bonita-common-api</artifactId>
-			    </exclusion>
-			    <exclusion>
-			        <groupId>org.bonitasoft.engine.api</groupId>
-			        <artifactId>bonita-common-api-impl</artifactId>
-			    </exclusion>
-			</exclusions>
-		</dependency>
-        
+    <dependencies>
+        <!-- Engine -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core</groupId>
+            <artifactId>bonita-process-engine</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <!-- Builder Factory -->
         <dependency>
             <groupId>org.bonitasoft.engine</groupId>
@@ -37,32 +37,32 @@
             <version>${project.version}</version>
         </dependency>
 
-		<!-- Actor Mapping -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
-			<artifactId>bonita-actor-mapping-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Actor Mapping -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
+            <artifactId>bonita-actor-mapping-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- API -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-server-api-http</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
-            		<artifactId>bonita-common-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <!-- API -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.api</groupId>
+            <artifactId>bonita-server-api-http</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- Archive -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.archive</groupId>
-			<artifactId>bonita-archive-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Archive -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.archive</groupId>
+            <artifactId>bonita-archive-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 		<!-- Authentication -->
 		<dependency>
@@ -103,12 +103,12 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Category -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.category</groupId>
-			<artifactId>bonita-category-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Category -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.category</groupId>
+            <artifactId>bonita-category-api-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 		<!-- Classloader -->
 		<dependency>
@@ -123,12 +123,12 @@
 			</exclusions>
 		</dependency>
 
-		<!-- Command -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.command</groupId>
-			<artifactId>bonita-command-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Command -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.command</groupId>
+            <artifactId>bonita-command-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Contract Data -->
         <dependency>
@@ -144,73 +144,73 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Connector -->
-		<dependency>
-			<artifactId>bonita-connector-service-api-impl</artifactId>
-			<groupId>org.bonitasoft.engine.core.connector</groupId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
-            		<artifactId>bonita-common-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <!-- Connector -->
+        <dependency>
+            <artifactId>bonita-connector-service-api-impl</artifactId>
+            <groupId>org.bonitasoft.engine.core.connector</groupId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- Data Definition -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.data.definition</groupId>
-			<artifactId>bonita-data-definition-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Data Definition -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.data.definition</groupId>
+            <artifactId>bonita-data-definition-model-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Data Instance -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Data Instance -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.data.instance</groupId>
+            <artifactId>bonita-data-instance-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Dependency -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Dependency -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.dependency</groupId>
+            <artifactId>bonita-dependency-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Event -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Event -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.events</groupId>
+            <artifactId>bonita-events-api-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Expression -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Expression -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.expression</groupId>
+            <artifactId>bonita-expression-api-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Expression Resolver -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core</groupId>
-			<artifactId>bonita-expression-resolver-api-impl</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-			    <exclusion>
-			        <artifactId>bonita-common-api</artifactId>
-			        <groupId>org.bonitasoft.engine.api</groupId>
-			    </exclusion>
-			</exclusions>
-		</dependency>
+        <!-- Expression Resolver -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core</groupId>
+            <artifactId>bonita-expression-resolver-api-impl</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- External Identity Mapping -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.external.identity.mapping</groupId>
-			<artifactId>bonita-external-identity-mapping-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- External Identity Mapping -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.external.identity.mapping</groupId>
+            <artifactId>bonita-external-identity-mapping-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.bonitasoft.engine.core</groupId>
@@ -225,57 +225,57 @@
 		</dependency>
 		<!-- Home Server -->
 
-		<!-- Incident -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.incident</groupId>
-			<artifactId>bonita-incident-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.incident</groupId>
-			<artifactId>bonita-incident-log</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-			    <exclusion>
-			        <artifactId>bonita-common-api</artifactId>
-			        <groupId>org.bonitasoft.engine.api</groupId>
-			    </exclusion>
-			</exclusions>
-		</dependency>
+        <!-- Incident -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.incident</groupId>
+            <artifactId>bonita-incident-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.incident</groupId>
+            <artifactId>bonita-incident-log</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- Identity -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Identity -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.identity</groupId>
+            <artifactId>bonita-identity-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Lock -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.lock</groupId>
-			<artifactId>bonita-lock-api-memory-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Lock -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.lock</groupId>
+            <artifactId>bonita-lock-api-memory-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Login -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.login</groupId>
-			<artifactId>bonita-login-api-impl</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
-            		<artifactId>bonita-common-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <!-- Login -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.login</groupId>
+            <artifactId>bonita-login-api-impl</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- Logs -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Logs -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.log</groupId>
+            <artifactId>bonita-log-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 		<!-- Operation -->
 		<dependency>
@@ -316,49 +316,49 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Platform -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Platform -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.platform</groupId>
+            <artifactId>bonita-platform-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Platform Authentication -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.authentication</groupId>
-			<artifactId>bonita-platform-authentication-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Platform Authentication -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.platform.authentication</groupId>
+            <artifactId>bonita-platform-authentication-api-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Platform Command -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.command</groupId>
-			<artifactId>bonita-platform-command-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Platform Command -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.platform.command</groupId>
+            <artifactId>bonita-platform-command-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Platform Login -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.platform.login</groupId>
-			<artifactId>bonita-platform-login-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Platform Login -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.platform.login</groupId>
+            <artifactId>bonita-platform-login-api-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Platform Session -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.session</groupId>
-			<artifactId>bonita-platform-session-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Platform Session -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.platform.session</groupId>
+            <artifactId>bonita-platform-session-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Process Comment -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.comment</groupId>
-			<artifactId>bonita-process-comment-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Process Comment -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.process.comment</groupId>
+            <artifactId>bonita-process-comment-api-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Process Definition -->
+        <!-- Process Definition -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.process.definition</groupId>
             <artifactId>bonita-process-definition-api</artifactId>
@@ -370,182 +370,182 @@
                 </exclusion>
             </exclusions>
         </dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-impl</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-			    <exclusion>
-			        <groupId>org.bonitasoft.engine.api</groupId>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.process.definition</groupId>
+            <artifactId>bonita-process-definition-impl</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
                     <artifactId>bonita-common-api</artifactId>
-			    </exclusion>
-			    <exclusion>
-			        <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
                     <artifactId>bonita-common-api-impl</artifactId>
-			    </exclusion>
-			</exclusions>
-		</dependency>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- Process Document -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.document</groupId>
-			<artifactId>bonita-document-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Process Document -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.document</groupId>
+            <artifactId>bonita-document-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Process Instance -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-impl</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-			    <exclusion>
-			        <artifactId>bonita-common-api</artifactId>
-			        <groupId>org.bonitasoft.engine.api</groupId>
-			    </exclusion>
-			</exclusions>
-		</dependency>
+        <!-- Process Instance -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.process.instance</groupId>
+            <artifactId>bonita-process-instance-impl</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- Recorder -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.recorder</groupId>
-			<artifactId>bonita-recorder-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Recorder -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.recorder</groupId>
+            <artifactId>bonita-recorder-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Scheduler -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bonita-scheduler-quartz</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Scheduler -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.scheduler</groupId>
+            <artifactId>bonita-scheduler-quartz</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Service Commons -->
+        <!-- Service Commons -->
 
-		<!-- Sequence -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-sequence-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-sequence-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Sequence -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.persistence</groupId>
+            <artifactId>bonita-sequence-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.persistence</groupId>
+            <artifactId>bonita-sequence-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Session -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.session</groupId>
-			<artifactId>bonita-session-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Session -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.session</groupId>
+            <artifactId>bonita-session-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Session Accessor -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.sessionaccessor</groupId>
-			<artifactId>bonita-session-accessor-threadlocal</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Session Accessor -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.sessionaccessor</groupId>
+            <artifactId>bonita-session-accessor-threadlocal</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Supervisor Mapping -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
-			<artifactId>bonita-supervisor-mapping-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Supervisor Mapping -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
+            <artifactId>bonita-supervisor-mapping-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Synchro-repository -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.synchro</groupId>
-			<artifactId>bonita-synchro-service</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.synchro</groupId>
-			<artifactId>bonita-synchro-service-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.synchro</groupId>
-			<artifactId>bonita-synchro-register</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Synchro-repository -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.synchro</groupId>
+            <artifactId>bonita-synchro-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.synchro</groupId>
+            <artifactId>bonita-synchro-service-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.synchro</groupId>
+            <artifactId>bonita-synchro-register</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-    	<!-- Time Tracker -->
+        <!-- Time Tracker -->
         <dependency>
             <groupId>org.bonitasoft.engine</groupId>
             <artifactId>bonita-time-tracker</artifactId>
             <version>${project.version}</version>
         </dependency>
-		<!-- Transaction -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.transaction</groupId>
-			<artifactId>bonita-transaction-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Transaction -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.transaction</groupId>
+            <artifactId>bonita-transaction-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Transient Data -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.data</groupId>
-			<artifactId>bonita-data-instance-transient</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Transient Data -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.data</groupId>
+            <artifactId>bonita-data-instance-transient</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Technical Logs -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-technical-slf4j</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Technical Logs -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.log</groupId>
+            <artifactId>bonita-log-technical-slf4j</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- User Filter -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.filter</groupId>
-			<artifactId>bonita-user-filter-impl</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
-            		<artifactId>bonita-common-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <!-- User Filter -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.filter</groupId>
+            <artifactId>bonita-user-filter-impl</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- Work -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.work</groupId>
-			<artifactId>bonita-work-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Work -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.work</groupId>
+            <artifactId>bonita-work-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- XML -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.xml</groupId>
-			<artifactId>bonita-xml-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- XML -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.xml</groupId>
+            <artifactId>bonita-xml-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Web Command (???) -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.external</groupId>
-			<artifactId>bonita-web-commands</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Web Command (???) -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.external</groupId>
+            <artifactId>bonita-web-commands</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- Web Profile -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.profile</groupId>
-			<artifactId>bonita-profile-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<!-- Web Theme -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.theme</groupId>
-			<artifactId>bonita-theme-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <!-- Web Profile -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.profile</groupId>
+            <artifactId>bonita-profile-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Web Theme -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.theme</groupId>
+            <artifactId>bonita-theme-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.bonitasoft.engine</groupId>
@@ -553,38 +553,38 @@
             <version>${project.version}</version>
         </dependency>
 
-		<!-- Not in shade -->
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-common</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-			    <exclusion>
-			        <artifactId>bonita-common-api</artifactId>
-			        <groupId>org.bonitasoft.engine.api</groupId>
-			    </exclusion>
-			    <exclusion>
-			        <artifactId>bonita-common-api-impl</artifactId>
-			        <groupId>org.bonitasoft.engine.api</groupId>
-			    </exclusion>
-			</exclusions>
-		</dependency>
-	</dependencies>
+        <!-- Not in shade -->
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-common</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bonita-common-api-impl</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<includes>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
                                     <!-- Builder Factory -->
                                     <include>org.bonitasoft.engine:bonita-builder</include>
                                     <!-- Time Tracker -->
@@ -766,47 +766,47 @@
 									<!-- Engine -->
 									<include>org.bonitasoft.engine.core:bonita-process-engine</include>
                                     <!-- SQL files -->
-									<include>org.bonitasoft.engine:bonita-sql</include>
-								</includes>
-							</artifactSet>
-							<outputDirectory>${project.build.directory}</outputDirectory>
-							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
-							<createDependencyReducedPom>true</createDependencyReducedPom>
-							<createSourcesJar>true</createSourcesJar>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-	
-	<profiles>
-		<profile>
-			<id>deploy</id>
-			<properties>
-				<maven.javadoc.skip>false</maven.javadoc.skip>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>javadoc-jar</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-								<configuration>
-									<doctitle>Bonita BPM Engine ${project.version} server API</doctitle>
-									<windowtitle>Bonita BPM Engine ${project.version} server API</windowtitle>
-									<includeDependencySources>true</includeDependencySources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+                                    <include>org.bonitasoft.engine:bonita-sql</include>
+                                </includes>
+                            </artifactSet>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <createSourcesJar>true</createSourcesJar>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>deploy</id>
+            <properties>
+                <maven.javadoc.skip>false</maven.javadoc.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>javadoc-jar</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <doctitle>Bonita BPM Engine ${project.version} server API</doctitle>
+                                    <windowtitle>Bonita BPM Engine ${project.version} server API</windowtitle>
+                                    <includeDependencySources>true</includeDependencySources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

@@ -13,20 +13,10 @@
  **/
 package org.bonitasoft.engine.core.connector.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
-
+import static org.powermock.api.mockito.PowerMockito.*;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -126,7 +116,7 @@ public class ConnectorServiceImplTest {
 
     @Test(expected = SInvalidConnectorImplementationException.class)
     public void checkConnectorImplementationIsValidWithZipHavingNoImpl() throws Exception {
-        final byte[] zip = IOUtil.zip(Collections.<String, byte[]> singletonMap("connector.notImpl", "mocked".getBytes()));
+        final byte[] zip = IOUtil.zip(Collections.singletonMap("connector.notImpl", "mocked".getBytes()));
         connectorService.checkConnectorImplementationIsValid(zip, "myConnector", "1.0.0");
     }
 
@@ -135,7 +125,7 @@ public class ConnectorServiceImplTest {
         when(parser.getObjectFromXML(eq("mocked".getBytes()))).thenReturn(
                 new SConnectorImplementationDescriptor("org.Test", "myConnector", "1.0.0", "myConnector", "1.0.0", new JarDependencies(Collections
                         .<String> emptyList())));
-        final byte[] zip = IOUtil.zip(Collections.<String, byte[]> singletonMap("connector.impl", "mocked".getBytes()));
+        final byte[] zip = IOUtil.zip(Collections.singletonMap("connector.impl", "mocked".getBytes()));
         connectorService.checkConnectorImplementationIsValid(zip, "myConnector", "1.0.0");
     }
 
@@ -144,7 +134,7 @@ public class ConnectorServiceImplTest {
         when(parser.getObjectFromXML(eq("mocked".getBytes()))).thenReturn(
                 new SConnectorImplementationDescriptor("org.Test", "myConnector", "1.0.0", "myConnectorWrong", "1.0.0", new JarDependencies(Collections
                         .<String> emptyList())));
-        final byte[] zip = IOUtil.zip(Collections.<String, byte[]> singletonMap("connector.impl", "mocked".getBytes()));
+        final byte[] zip = IOUtil.zip(Collections.singletonMap("connector.impl", "mocked".getBytes()));
         connectorService.checkConnectorImplementationIsValid(zip, "myConnector", "1.0.0");
     }
 
@@ -160,23 +150,24 @@ public class ConnectorServiceImplTest {
         final String connectorImplId = "org.bonitasoft.connector.HoogardenConnector";
         final String connectorImplVersion = "1.0";
         final String implementationClassName = "org.bonitasoft.engine.connectors.HoogardenBeerConnector";
-        final SConnectorImplementationDescriptor hoogardenConnectorDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
+        final SConnectorImplementationDescriptor hoogardenConnectorDescriptor = new SConnectorImplementationDescriptor(implementationClassName,
+                connectorImplId,
                 connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList("some1.jar", "HoogardenConnector.jar")));
         final SConnectorImplementationDescriptor oldConnectorDescriptor = new SConnectorImplementationDescriptor(implementationClassName, connectorImplId,
                 connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList("file.jar")));
 
-        Map<String, byte[]> zipFileMap = new HashMap<String, byte[]>(3);
+        Map<String, byte[]> zipFileMap = new HashMap<>(3);
         final byte[] implBytes = "tototo".getBytes();
         zipFileMap.put("HoogardenBeerConnector.impl", implBytes);
-        final byte[] dep1Bytes = {12, 94, 14, 12};
+        final byte[] dep1Bytes = { 12, 94, 14, 12 };
         zipFileMap.put("some1.jar", dep1Bytes);
-        final byte[] hoogardenConnectorBytes = {12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65};
+        final byte[] hoogardenConnectorBytes = { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 };
         zipFileMap.put("HoogardenConnector.jar", hoogardenConnectorBytes);
         final byte[] zip1 = IOUtil.zip(zipFileMap);
-        final Map<String, byte[]> returnedMap = new HashMap<String, byte[]>();
-        returnedMap.put("file.jar", new byte[]{1});
-        returnedMap.put("file.impl", new byte[]{2});
-        when(parser.getObjectFromXML(eq(new byte[]{2}))).thenReturn(oldConnectorDescriptor);
+        final Map<String, byte[]> returnedMap = new HashMap<>();
+        returnedMap.put("file.jar", new byte[] { 1 });
+        returnedMap.put("file.impl", new byte[] { 2 });
+        when(parser.getObjectFromXML(eq(new byte[] { 2 }))).thenReturn(oldConnectorDescriptor);
         when(parser.getObjectFromXML(eq(implBytes))).thenReturn(hoogardenConnectorDescriptor);
 
         doReturn(returnedMap).when(bonitaHomeServer).getConnectorFiles(tenantId, processDefId);
@@ -188,8 +179,28 @@ public class ConnectorServiceImplTest {
         verify(bonitaHomeServer, times(1)).deleteConnectorFile(tenantId, processDefId, "file.impl");
     }
 
+    @Test
+    public void setNewConnectorImplemShouldIgnoreSourceFiles() throws Exception {
+        final long tenantId = 24L;
+        final long processDefId = 1324565477444L;
+
+        final SProcessDefinition sProcessDef = mock(SProcessDefinition.class);
+        final String connectorDefId = "org.bonitasoft.connector.BeerConnector";
+        final String connectorDefVersion = "1.0.0";
+        Map<String, byte[]> zipFileMap = new HashMap<>(1);
+        zipFileMap.put("src/net/company/MyImplem.java", "some Java source file content".getBytes());
+        final byte[] zip = IOUtil.zip(zipFileMap);
+
+        final ConnectorServiceImpl spy = spy(connectorService);
+        doNothing().when(spy).deleteOldImplementation(tenantId, processDefId, connectorDefId, connectorDefVersion);
+
+        spy.unzipNewImplementation(sProcessDef, tenantId, zip, connectorDefId, connectorDefVersion);
+
+        verify(bonitaHomeServer, times(0)).storeConnectorFile(eq(tenantId), eq(processDefId), anyString(), any(byte[].class));
+    }
+
     private List<String> names(final List<File> files) {
-        final ArrayList<String> names = new ArrayList<String>();
+        final ArrayList<String> names = new ArrayList<>();
         for (final File file : files) {
             names.add(file.getName());
         }
@@ -239,7 +250,7 @@ public class ConnectorServiceImplTest {
                 connectorImplVersion, connectorDefId, connectorDefVersion, new JarDependencies(Arrays.asList("some1.jar", "HoogardenConnector.jar")));
         when(parser.getObjectFromXML(eq("tototo".getBytes()))).thenReturn(connectorImplDescriptor);
 
-        final Map<String, byte[]> zipFileMap = new HashMap<String, byte[]>(3);
+        final Map<String, byte[]> zipFileMap = new HashMap<>(3);
         zipFileMap.put("HoogardenBeerConnector.impl", "tototo".getBytes());
         zipFileMap.put("some1.jar", new byte[] { 12, 94, 14, 12 });
         zipFileMap.put("HoogardenConnector.jar", new byte[] { 12, 94, 14, 9, 54, 65, 98, 54, 21, 32, 65 });

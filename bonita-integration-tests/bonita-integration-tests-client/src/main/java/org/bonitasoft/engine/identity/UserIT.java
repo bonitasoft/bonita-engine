@@ -734,6 +734,25 @@ public class UserIT extends TestWithTechnicalUser {
 
         deleteUsers(users);
     }
+    
+    @Test
+    public void searchUserSortedById() throws BonitaException {
+        final List<User> users = new ArrayList<User>();
+        users.add(getIdentityAPI().createUser("jgrGF[|00", "bpm", "John", "Taylor"));
+        users.add(getIdentityAPI().createUser("user02", "bpm", "Pierre", "Smith"));
+        users.add(getIdentityAPI().createUser("User00", "bpm", "Marie", "Taylor"));
+
+        // Search ordered by id
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(UserSearchDescriptor.ID, Order.ASC);
+        List<User> usersResult = getIdentityAPI().searchUsers(builder.done()).getResult();
+        
+        assertEquals(3, usersResult.size());
+        assertThat(usersResult.get(0).getId()).isLessThan(usersResult.get(1).getId());
+        assertThat(usersResult.get(1).getId()).isLessThan(usersResult.get(2).getId());
+
+        deleteUsers(users);
+    }
 
     @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Search", "User", "Enabled", "Disabled" }, story = "Search enabled/disabled users", jira = "ENGINE-821")
     @Test
