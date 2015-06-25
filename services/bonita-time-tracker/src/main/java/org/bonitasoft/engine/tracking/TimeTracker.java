@@ -207,8 +207,9 @@ public class TimeTracker implements TenantLifecycleService {
         final long timestamp = System.currentTimeMillis();
         final Record record = new Record(timestamp, recordName, recordDescription, duration);
         debug(TechnicalLogSeverity.DEBUG, "Tracking record: " + record);
-        // TODO needs a synchro?
-        records.add(record);
+        synchronized (this) {
+            records.add(record);
+        }
     }
 
     void debug(TechnicalLogSeverity debug, String message) {
@@ -223,7 +224,11 @@ public class TimeTracker implements TenantLifecycleService {
         }
         debug(TechnicalLogSeverity.INFO, "Flushing...");
         lastFlushTimestamp = System.currentTimeMillis();
-        final List<Record> records = getRecords();
+        final List<Record> records;
+        synchronized (this) {
+            records = getRecords();
+            clearRecords();
+        }
         final FlushEvent flushEvent = new FlushEvent(records);
         final List<FlushResult> flushResults = new ArrayList<>();
         flushListeners(flushEvent, flushResults);
@@ -250,6 +255,10 @@ public class TimeTracker implements TenantLifecycleService {
 
     public List<Record> getRecords() {
         return Arrays.asList(records.toArray(new Record[records.size()]));
+    }
+
+    private void clearRecords() {
+        records.clear();
     }
 
     @Override
