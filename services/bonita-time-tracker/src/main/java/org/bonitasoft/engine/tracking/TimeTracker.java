@@ -105,12 +105,12 @@ public class TimeTracker implements TenantLifecycleService {
             return;
         }
         startTracking = true;
-        startFlushThread();
+        internalStartTracking();
     }
 
     public void stopTracking() {
         startTracking = false;
-        stopFlushThread();
+        internalStopTracking();
     }
 
     FlushThread createFlushThread() {
@@ -118,7 +118,7 @@ public class TimeTracker implements TenantLifecycleService {
     }
 
 
-    private void startFlushThread() {
+    private void internalStartTracking() {
         if (startTracking) {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
                 this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
@@ -134,7 +134,7 @@ public class TimeTracker implements TenantLifecycleService {
         }
     }
 
-    private void stopFlushThread() {
+    private void internalStopTracking() {
         if (isTracking()) {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
                 this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
@@ -287,7 +287,7 @@ public class TimeTracker implements TenantLifecycleService {
         }
         log(TechnicalLogSeverity.INFO, "Starting TimeTracker...");
         serviceStarted = true;
-        startFlushThread();
+        internalStartTracking();
         log(TechnicalLogSeverity.INFO, "TimeTracker started.");
     }
 
@@ -299,7 +299,7 @@ public class TimeTracker implements TenantLifecycleService {
         }
         log(TechnicalLogSeverity.INFO, "Stopping TimeTracker...");
         serviceStarted = false;
-        stopFlushThread();
+        internalStopTracking();
         log(TechnicalLogSeverity.INFO, "TimeTracker stopped.");
     }
 
