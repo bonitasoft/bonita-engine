@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.tracking.collector;
+package org.bonitasoft.engine.tracking.memory;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;

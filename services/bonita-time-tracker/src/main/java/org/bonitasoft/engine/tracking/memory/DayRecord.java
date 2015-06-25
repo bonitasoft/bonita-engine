@@ -1,6 +1,5 @@
-package org.bonitasoft.engine.tracking.collector;
+package org.bonitasoft.engine.tracking.memory;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
