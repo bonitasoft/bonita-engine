@@ -50,10 +50,13 @@ public class MemoryFlushEventListener implements FlushEventListener {
 
     @Override
     public String getStatus() {
+        String status = getName() + ": ";
         if (this.dayRecord == null) {
-            return "No DayRecord registered in memory.";
+            status += "No DayRecord registered in memory.";
+        } else {
+            status += ", dayRecord: " + this.dayRecord.toString();
         }
-        return this.dayRecord.toString();
+        return status;
     }
 
     @Override

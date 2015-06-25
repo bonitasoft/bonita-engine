@@ -81,9 +81,9 @@ public class CSVFlushEventListener implements FlushEventListener {
 
     @Override
     public String getStatus() {
-        String result = this.getClass().getName() + ": \n";
-        result += "outputFolder: " + outputFolder + "\n";
-        return result;
+        String status = getName() + ": \n";
+        status += "outputFolder: " + outputFolder + "\n";
+        return status;
     }
 
     @Override
