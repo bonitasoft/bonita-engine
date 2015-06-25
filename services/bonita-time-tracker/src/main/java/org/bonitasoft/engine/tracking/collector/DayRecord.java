@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Queue;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.bonitasoft.engine.tracking.Record;
 
 /**
@@ -13,18 +15,19 @@ import org.bonitasoft.engine.tracking.Record;
 public class DayRecord {
 
     private final String dayKey;
-    private final List<Record> records = new ArrayList<>();
+    private final Queue<Record> records;
 
 
-    public DayRecord(final long timestamp) {
+    public DayRecord(final long timestamp, final int maxSize) {
         this.dayKey = getDayKey(timestamp);
+        this.records = new CircularFifoQueue(maxSize);
     }
 
     public String getDayKey() {
         return dayKey;
     }
 
-    public List<Record> getRecords() {
+    public Queue<Record> getRecords() {
         return records;
     }
 

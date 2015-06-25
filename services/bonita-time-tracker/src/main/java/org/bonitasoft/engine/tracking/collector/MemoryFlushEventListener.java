@@ -15,8 +15,13 @@ import org.bonitasoft.engine.tracking.Record;
 
 public class MemoryFlushEventListener implements FlushEventListener {
 
+    private final int maxSize;
     private DayRecord dayRecord;
 
+    public MemoryFlushEventListener(final int maxSize) {
+        this.maxSize = maxSize;
+    }
+    
     @Override
     public synchronized FlushEventListenerResult flush(final TechnicalLoggerService logger, final FlushEvent flushEvent) throws Exception {
 
@@ -30,7 +35,7 @@ public class MemoryFlushEventListener implements FlushEventListener {
 
         final long flushTime = flushEvent.getFlushTime();
         if (this.dayRecord == null || !this.dayRecord.isExpectedDayKey(flushTime)) {
-            this.dayRecord = new DayRecord(flushTime);
+            this.dayRecord = new DayRecord(flushTime, maxSize);
         }
         this.dayRecord.addRecords(flushEvent.getRecords());
 
