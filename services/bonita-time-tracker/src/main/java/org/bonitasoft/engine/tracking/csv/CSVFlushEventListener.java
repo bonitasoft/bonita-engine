@@ -53,7 +53,7 @@ public class CSVFlushEventListener implements FlushEventListener {
     }
 
     @Override
-    public CSVFlushEventListenerResult flush(final FlushEvent flushEvent) throws Exception {
+    public CSVFlushEventListenerResult flush(final TechnicalLoggerService logger, final FlushEvent flushEvent) throws Exception {
         final long flushTime = flushEvent.getFlushTime();
         final List<Record> records = flushEvent.getRecords();
         final List<List<String>> csvContent = new ArrayList<List<String>>();
