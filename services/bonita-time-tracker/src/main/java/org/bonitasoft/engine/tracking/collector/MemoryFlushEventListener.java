@@ -2,7 +2,7 @@ package org.bonitasoft.engine.tracking.collector;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -15,62 +15,48 @@ import org.bonitasoft.engine.tracking.Record;
 
 public class MemoryFlushEventListener implements FlushEventListener {
 
-    // format is <date, listOfRecord>.
-    // //Date format is "20140432"
-    public HashMap<String, ArrayList<Record>> collectors = new HashMap<String, ArrayList<Record>>();
+    private DayRecord dayRecord;
 
     @Override
-    public FlushEventListenerResult flush(final TechnicalLoggerService logger, final FlushEvent flushEvent) throws Exception {
+    public synchronized FlushEventListenerResult flush(final TechnicalLoggerService logger, final FlushEvent flushEvent) throws Exception {
 
         if (flushEvent.getRecords().size() == 0) {
             return new FlushEventListenerResult(flushEvent);
         }
 
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "org.bonitasoft.engine.tracking.collector.CollectorFlushEvent.flush : ____________________________" + this + " Receive a FlushEvent [" + flushEvent.getRecords().size() + "]");
-        }
-        // keep all theses new event
-        final List<Record> records = flushEvent.getRecords();
-        final Calendar currentDate = Calendar.getInstance();
-        final String key = String.valueOf(currentDate.get(Calendar.YEAR)) + String.valueOf(currentDate.get(Calendar.DAY_OF_YEAR));
-        ArrayList<Record> listOfDay = collectors.get(key);
-        if (listOfDay == null) {
-            listOfDay = new ArrayList<Record>();
-        }
-        listOfDay.addAll(records);
-        collectors.put(key, listOfDay);
-        if (collectors.size() > 1) {
-            // purge old days
-            collectors.clear();
-            collectors.put(key, listOfDay);
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "FlushEvent received with " + flushEvent.getRecords().size() + " records.");
         }
 
+        final long flushTime = flushEvent.getFlushTime();
+        if (this.dayRecord == null || !this.dayRecord.isExpectedDayKey(flushTime)) {
+            this.dayRecord = new DayRecord(flushTime);
+        }
+        this.dayRecord.addRecords(flushEvent.getRecords());
+
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "org.bonitasoft.engine.tracking.collector.CollectorFlushEvent.flush :________________  Collects [" + flushEvent.getRecords().size()
-                    + "] tank:[" + collectors.size() + "] Day[" + key + "] nbInDay[" + collectors.get(key).size() + "]");
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Adding '" + flushEvent.getRecords().size()
+                    + "' records to DayRecord with dayKey '" + this.dayRecord.getDayKey() + "'");
         }
         return new FlushEventListenerResult(flushEvent);
     }
 
+
+
     @Override
     public String getStatus() {
-        return null;
+        if (this.dayRecord == null) {
+            return "No DayRecord registered in memory.";
+        }
+        return this.dayRecord.toString();
     }
 
-    public List<Record> getRecords() {
-        final Logger logger = Logger.getLogger("org.bonitasoft");
-        final Calendar currentDate = Calendar.getInstance();
-        final String key = String.valueOf(currentDate.get(Calendar.YEAR)) + String.valueOf(currentDate.get(Calendar.DAY_OF_YEAR));
-        final List<Record> listRecord = collectors.get(key);
-        logger.info("org.bonitasoft.engine.tracking.collector.CollectorFlushEvent.getRecords: ________________: " + this + " Collector [" + collectors.size()
-                + "] key[" + key + "] nbInDay["
-                + (collectors.get(key) == null ? "null" : collectors.get(key).size()) + "]");
-
-        return listRecord == null ? new ArrayList<Record>() : listRecord;
+    public synchronized DayRecord getDayRecord() {
+        return this.dayRecord;
     }
 
-    public void clear() {
-        collectors.clear();
+    public synchronized void clear() {
+        this.dayRecord = null;
     }
 
 }

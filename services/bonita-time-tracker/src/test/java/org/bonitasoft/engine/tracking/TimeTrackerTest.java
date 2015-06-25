@@ -210,7 +210,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         final FlushEventListener listener2 = mock(FlushEventListener.class);
         final FlushEventListener listener3 = mock(FlushEventListener.class);
 
-        Mockito.when(listener2.flush(Mockito.any(FlushEvent.class))).thenThrow(new Exception());
+        Mockito.when(listener2.flush(Mockito.any(TechnicalLoggerService.class), Mockito.any(FlushEvent.class))).thenThrow(new Exception());
 
         final List<FlushEventListener> listeners = new ArrayList<>();
         listeners.add(listener1);
@@ -223,9 +223,9 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
         tracker.flush();
 
-        verify(listener1, times(1)).flush(Mockito.any(FlushEvent.class));
-        verify(listener2, times(1)).flush(Mockito.any(FlushEvent.class));
-        verify(listener3, times(1)).flush(Mockito.any(FlushEvent.class));
+        verify(listener1, times(1)).flush(Mockito.any(TechnicalLoggerService.class), Mockito.any(FlushEvent.class));
+        verify(listener2, times(1)).flush(Mockito.any(TechnicalLoggerService.class), Mockito.any(FlushEvent.class));
+        verify(listener3, times(1)).flush(Mockito.any(TechnicalLoggerService.class), Mockito.any(FlushEvent.class));
     }
 
     @Test
@@ -246,8 +246,8 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
         tracker.flush();
 
-        verify(listener1, times(1)).flush(Mockito.any(FlushEvent.class));
-        verify(listener2, times(1)).flush(Mockito.any(FlushEvent.class));
+        verify(listener1, times(1)).flush(Mockito.any(TechnicalLoggerService.class), Mockito.any(FlushEvent.class));
+        verify(listener2, times(1)).flush(Mockito.any(TechnicalLoggerService.class), Mockito.any(FlushEvent.class));
     }
 
     @Test
