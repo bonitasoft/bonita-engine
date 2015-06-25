@@ -20,4 +20,6 @@ public interface FlushEventListener {
     FlushEventListenerResult flush(final TechnicalLoggerService logger, final FlushEvent flushEvent) throws Exception;
 
     String getStatus();
+
+    String getName();
 }

@@ -78,11 +78,17 @@ public class CSVFlushEventListener implements FlushEventListener {
         return new CSVFlushEventListenerResult(flushEvent, outputFile);
     }
 
+
     @Override
     public String getStatus() {
         String result = this.getClass().getName() + ": \n";
         result += "outputFolder: " + outputFolder + "\n";
         return result;
+    }
+
+    @Override
+    public String getName() {
+        return this.getClass().getSimpleName();
     }
 
 

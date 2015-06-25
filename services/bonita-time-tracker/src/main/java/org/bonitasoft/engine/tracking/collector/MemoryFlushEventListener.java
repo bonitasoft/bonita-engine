@@ -56,6 +56,11 @@ public class MemoryFlushEventListener implements FlushEventListener {
         return this.dayRecord.toString();
     }
 
+    @Override
+    public String getName() {
+        return this.getClass().getSimpleName();
+    }
+
     public synchronized DayRecord getDayRecord() {
         return this.dayRecord;
     }
