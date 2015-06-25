@@ -241,38 +241,34 @@ public class TimeTracker implements TenantLifecycleService {
         }
     }
 
-    public List<FlushResult> flush() {
-        if (!isTracking()) {
-            return Collections.emptyList();
-        }
+    public FlushResult flush() {
         log(TechnicalLogSeverity.INFO, "Flushing...");
         lastFlushTimestamp = System.currentTimeMillis();
+        final List<FlushEventListenerResult> flushEventListenerResults = new ArrayList<>();
+        final FlushResult flushResult = new FlushResult(lastFlushTimestamp, flushEventListenerResults);
         final List<Record> records;
         synchronized (this) {
             records = getRecordsCopy();
             clearRecords();
         }
-        final FlushEvent flushEvent = new FlushEvent(records);
-        final List<FlushResult> flushResults = new ArrayList<>();
-        flushListeners(flushEvent, flushResults);
+        final FlushEvent flushEvent = new FlushEvent(lastFlushTimestamp, records);
+
+        flushListeners(flushEvent, flushEventListenerResults);
         log(TechnicalLogSeverity.INFO, "Flush finished: " + flushEvent);
-        return flushResults;
+        return flushResult;
     }
 
-    void flushListeners(FlushEvent flushEvent, List<FlushResult> flushResults) {
+    void flushListeners(FlushEvent flushEvent, List<FlushEventListenerResult> flushEventListenerResults) {
         if (flushEventListeners == null) {
             return;
         }
         for (final FlushEventListener listener : flushEventListeners) {
-            flushListener(flushEvent, flushResults, listener);
-        }
-    }
-
-    void flushListener(FlushEvent flushEvent, List<FlushResult> flushResults, FlushEventListener listener) {
-        try {
-            flushResults.add(listener.flush(flushEvent));
-        } catch (final Exception e) {
-            log(TechnicalLogSeverity.WARNING, "Exception while flushing: " + flushEvent + " on listener " + listener);
+            try {
+                final FlushEventListenerResult flushEventListenerResult = listener.flush(flushEvent);
+                flushEventListenerResults.add(flushEventListenerResult);
+            } catch (final Exception e) {
+                log(TechnicalLogSeverity.WARNING, "Exception while flushing: " + flushEvent + " on listener " + listener);
+            }
         }
     }
 

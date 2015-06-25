@@ -36,13 +36,16 @@ public class FlushThread extends Thread {
             try {
                 final long flushDuration = System.currentTimeMillis() - lastFlushTimestamp;
                 final long sleepTime = this.timeTracker.getFlushIntervalInMS() - flushDuration;
+                if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                    this.logger.log(getClass(), TechnicalLogSeverity.DEBUG, "FlushThread: sleeping for: " + sleepTime + "ms");
+                }
                 this.timeTracker.getClock().sleep(sleepTime);
             } catch (InterruptedException e) {
                 break;
             }
             try {
-                lastFlushTimestamp = System.currentTimeMillis();
-                this.timeTracker.flush();
+                final FlushResult flushResult = this.timeTracker.flush();
+                lastFlushTimestamp = flushResult.getFlushTime();
             } catch (Exception e) {
                 if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
                     this.logger.log(getClass(), TechnicalLogSeverity.WARNING, "Exception caught while flushing: " + e.getMessage(), e);

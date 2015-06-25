@@ -11,39 +11,24 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.tracking;
+package org.bonitasoft.engine.tracking.csv;
 
-import java.util.Collections;
-import java.util.List;
+import java.io.File;
 
-public final class FlushEvent {
+import org.bonitasoft.engine.tracking.FlushEvent;
+import org.bonitasoft.engine.tracking.FlushEventListenerResult;
 
-    private final List<Record> records;
+public class CSVFlushEventListenerResult extends FlushEventListenerResult {
 
-    private final long flushTime;
+    private final File outputFile;
 
-    public FlushEvent(final long flushTime, final List<Record> records) {
-        if (records != null) {
-            this.records = records;
-        } else {
-            this.records = Collections.emptyList();
-        }
-        this.flushTime = flushTime;
+    public CSVFlushEventListenerResult(final FlushEvent flushEvent, final File outputFile) {
+        super(flushEvent);
+        this.outputFile = outputFile;
     }
 
-    public List<Record> getRecords() {
-        return records;
+    public File getOutputFile() {
+        return outputFile;
     }
 
-    public long getFlushTime() {
-        return flushTime;
-    }
-
-    @Override
-    public String toString() {
-        return "FlushEvent{" +
-                "records.size=" + records.size() +
-                ", flushTime=" + flushTime +
-                '}';
-    }
 }
