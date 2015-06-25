@@ -93,7 +93,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         tracker.track("rec1", "rec12Desc", 200);
         tracker.track("rec2", "rec2Desc", 300);
         tracker.track("inactivatedRec", "blabla", 1000);
-        final Map<String, List<Record>> records = mapRecords(tracker.getRecords());
+        final Map<String, List<Record>> records = mapRecords(tracker.getRecordsCopy());
         assertEquals(2, records.size());
         assertEquals(2, records.get("rec1").size());
         assertEquals(1, records.get("rec2").size());
@@ -127,7 +127,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         tracker.track("rec2", "rec2Desc", 300);
         tracker.track("inactivatedRec", "blabla", 1000);
 
-        assertTrue(tracker.getRecords().isEmpty());
+        assertTrue(tracker.getRecordsCopy().isEmpty());
     }
 
     @Test
@@ -138,7 +138,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         tracker.track("rec1", "desc2", 100);
         Thread.sleep(2);
         tracker.track("rec1", "desc2", 200);
-        final Map<String, List<Record>> records = mapRecords(tracker.getRecords());
+        final Map<String, List<Record>> records = mapRecords(tracker.getRecordsCopy());
         assertEquals(1, records.size());
         assertEquals(2, records.get("rec1").size());
 
@@ -256,13 +256,13 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         tracker = createTimeTracker(true, null, 2, 2, "rec");
         tracker.start();
         tracker.track("rec", "rec1", 100);
-        assertEquals(1, tracker.getRecords().size());
+        assertEquals(1, tracker.getRecordsCopy().size());
         tracker.track("rec", "rec2", 100);
-        assertEquals(2, tracker.getRecords().size());
+        assertEquals(2, tracker.getRecordsCopy().size());
         tracker.track("rec", "rec3", 100);
-        assertEquals(2, tracker.getRecords().size());
-        assertEquals("rec2", tracker.getRecords().get(0).getDescription());
-        assertEquals("rec3", tracker.getRecords().get(1).getDescription());
+        assertEquals(2, tracker.getRecordsCopy().size());
+        assertEquals("rec2", tracker.getRecordsCopy().get(0).getDescription());
+        assertEquals("rec3", tracker.getRecordsCopy().get(1).getDescription());
         tracker.stop();
     }
 }

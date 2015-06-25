@@ -226,7 +226,7 @@ public class TimeTracker implements TenantLifecycleService {
         lastFlushTimestamp = System.currentTimeMillis();
         final List<Record> records;
         synchronized (this) {
-            records = getRecords();
+            records = getRecordsCopy();
             clearRecords();
         }
         final FlushEvent flushEvent = new FlushEvent(records);
@@ -253,7 +253,7 @@ public class TimeTracker implements TenantLifecycleService {
         }
     }
 
-    public List<Record> getRecords() {
+    public List<Record> getRecordsCopy() {
         return Arrays.asList(records.toArray(new Record[records.size()]));
     }
 
