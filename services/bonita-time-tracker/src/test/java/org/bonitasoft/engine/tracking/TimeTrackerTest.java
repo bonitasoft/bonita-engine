@@ -208,10 +208,13 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
         final FlushEventListener listener1 = mock(FlushEventListener.class);
         when(listener1.getName()).thenReturn("listener1");
+        when(listener1.activateAtStart()).thenReturn(true);
         final FlushEventListener listener2 = mock(FlushEventListener.class);
         when(listener2.getName()).thenReturn("listener2");
+        when(listener2.activateAtStart()).thenReturn(true);
         final FlushEventListener listener3 = mock(FlushEventListener.class);
         when(listener3.getName()).thenReturn("listener3");
+        when(listener3.activateAtStart()).thenReturn(true);
 
         Mockito.when(listener2.flush(Mockito.any(FlushEvent.class))).thenThrow(new Exception());
 
@@ -238,8 +241,10 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
         final FlushEventListener listener1 = mock(FlushEventListener.class);
         when(listener1.getName()).thenReturn("listener1");
+        when(listener1.activateAtStart()).thenReturn(true);
         final FlushEventListener listener2 = mock(FlushEventListener.class);
         when(listener2.getName()).thenReturn("listener2");
+        when(listener2.activateAtStart()).thenReturn(true);
 
         final List<FlushEventListener> listeners = new ArrayList<>();
         listeners.add(listener1);

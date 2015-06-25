@@ -27,6 +27,8 @@ import org.bonitasoft.engine.tracking.Record;
 
 public class CSVFlushEventListener implements FlushEventListener {
 
+    private final boolean activateAtStart;
+
     private final String csvSeparator;
 
     private final String outputFolder;
@@ -37,8 +39,9 @@ public class CSVFlushEventListener implements FlushEventListener {
 
     public static final String FILE_SUFFIX = ".csv";
 
-    public CSVFlushEventListener(final TechnicalLoggerService logger, final String outputFolder, final String csvSeparator) {
+    public CSVFlushEventListener(final boolean activateAtStart, final TechnicalLoggerService logger, final String outputFolder, final String csvSeparator) {
         super();
+        this.activateAtStart = activateAtStart;
         this.logger = logger;
         this.outputFolder = outputFolder;
         this.csvSeparator = csvSeparator;
@@ -91,6 +94,11 @@ public class CSVFlushEventListener implements FlushEventListener {
     @Override
     public String getName() {
         return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean activateAtStart() {
+        return activateAtStart;
     }
 
     @Override

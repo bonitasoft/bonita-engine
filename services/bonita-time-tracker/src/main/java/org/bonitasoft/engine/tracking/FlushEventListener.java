@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.tracking;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-
 public interface FlushEventListener {
 
     FlushEventListenerResult flush(final FlushEvent flushEvent) throws Exception;
@@ -22,6 +20,8 @@ public interface FlushEventListener {
     String getStatus();
 
     String getName();
+
+    boolean activateAtStart();
 
     void notifyStopTracking();
 }

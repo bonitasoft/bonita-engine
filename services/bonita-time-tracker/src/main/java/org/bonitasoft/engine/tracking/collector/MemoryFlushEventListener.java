@@ -1,30 +1,27 @@
 package org.bonitasoft.engine.tracking.collector;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.logging.Logger;
-
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.tracking.FlushEvent;
 import org.bonitasoft.engine.tracking.FlushEventListener;
 import org.bonitasoft.engine.tracking.FlushEventListenerResult;
-import org.bonitasoft.engine.tracking.Record;
 
 public class MemoryFlushEventListener implements FlushEventListener {
 
+    private final boolean activateAtStart;
     private final int maxSize;
     private DayRecord dayRecord;
 
     private final TechnicalLoggerService logger;
 
-    public MemoryFlushEventListener(final TechnicalLoggerService logger, final int maxSize) {
+    public MemoryFlushEventListener(final boolean activateAtStart, final TechnicalLoggerService logger, final int maxSize) {
+        this.activateAtStart = activateAtStart;
         this.maxSize = maxSize;
         this.logger = logger;
     }
-    
+
+
+
     @Override
     public synchronized FlushEventListenerResult flush(final FlushEvent flushEvent) throws Exception {
 
@@ -65,6 +62,11 @@ public class MemoryFlushEventListener implements FlushEventListener {
     @Override
     public String getName() {
         return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean activateAtStart() {
+        return activateAtStart;
     }
 
     @Override

@@ -1018,12 +1018,14 @@
     </bean>
 
     <bean id="csvFlushEventListener" class="org.bonitasoft.engine.tracking.csv.CSVFlushEventListener">
+        <constructor-arg name="activateAtStart" value="${bonita.tenant.timetracker.csv.activateAtStart}" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="outputFolder" value="${bonita.tenant.timetracker.csv.folder}" />
         <constructor-arg name="csvSeparator" value="${bonita.tenant.timetracker.csv.separator}" />
     </bean>
 
     <bean id="memoryFlushEventListener" class="org.bonitasoft.engine.tracking.memory.MemoryFlushEventListener">
+        <constructor-arg name="activateAtStart" value="${bonita.tenant.timetracker.memory.activateAtStart}" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="maxSize" value="${bonita.tenant.timetracker.memory.maxSize}" />
     </bean>

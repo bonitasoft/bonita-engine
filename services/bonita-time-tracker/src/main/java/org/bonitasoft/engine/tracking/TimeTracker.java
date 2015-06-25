@@ -80,7 +80,9 @@ public class TimeTracker implements TenantLifecycleService {
                     this.logger.log(getClass(), TechnicalLogSeverity.ERROR,
                             "Duplicate entry for flushEventListener with name: " + name);
                 }
-                this.flushEventListeners.put(name, flushEventListener);
+                if (flushEventListener.activateAtStart()) {
+                    this.flushEventListeners.put(name, flushEventListener);
+                }
             }
         }
         activeFlushEventListeners = new ArrayList<>();
