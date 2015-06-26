@@ -21,7 +21,11 @@ public interface FlushEventListener {
 
     String getName();
 
-    boolean activateAtStart();
+    boolean isActive();
 
     void notifyStopTracking();
+
+    void activate();
+
+    void deactivate();
 }

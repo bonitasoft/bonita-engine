@@ -21,28 +21,23 @@ import java.util.List;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.tracking.AbstractFlushEventListener;
 import org.bonitasoft.engine.tracking.FlushEvent;
 import org.bonitasoft.engine.tracking.FlushEventListener;
 import org.bonitasoft.engine.tracking.Record;
 
-public class CSVFlushEventListener implements FlushEventListener {
-
-    private final boolean activateAtStart;
+public class CSVFlushEventListener extends AbstractFlushEventListener {
 
     private final String csvSeparator;
 
     private final String outputFolder;
-
-    private final TechnicalLoggerService logger;
 
     public static final String FILE_PREFIX = "bonita_timetracker_";
 
     public static final String FILE_SUFFIX = ".csv";
 
     public CSVFlushEventListener(final boolean activateAtStart, final TechnicalLoggerService logger, final String outputFolder, final String csvSeparator) {
-        super();
-        this.activateAtStart = activateAtStart;
-        this.logger = logger;
+        super(activateAtStart, logger);
         this.outputFolder = outputFolder;
         this.csvSeparator = csvSeparator;
 
@@ -84,22 +79,11 @@ public class CSVFlushEventListener implements FlushEventListener {
 
     @Override
     public String getStatus() {
-        String status = getName() + ": \n";
+        String status = super.getStatus() + "\n";
         status += "outputFolder: " + outputFolder + "\n";
         return status;
     }
 
-
-
-    @Override
-    public String getName() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public boolean activateAtStart() {
-        return activateAtStart;
-    }
 
     @Override
     public void notifyStopTracking() {

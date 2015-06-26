@@ -35,7 +35,6 @@ public class TimeTracker implements TenantLifecycleService {
     private final Set<String> activatedRecords;
     private final FlushThread flushThread;
     private final Map<String, FlushEventListener> flushEventListeners;
-    private final List<FlushEventListener> activeFlushEventListeners;
     private final TechnicalLoggerService logger;
     private final Queue<Record> records;
     private final Clock clock;
@@ -80,13 +79,9 @@ public class TimeTracker implements TenantLifecycleService {
                     this.logger.log(getClass(), TechnicalLogSeverity.ERROR,
                             "Duplicate entry for flushEventListener with name: " + name);
                 }
-                if (flushEventListener.activateAtStart()) {
-                    this.flushEventListeners.put(name, flushEventListener);
-                }
+                this.flushEventListeners.put(name, flushEventListener);
             }
         }
-        activeFlushEventListeners = new ArrayList<>();
-        activeFlushEventListeners.addAll(this.flushEventListeners.values());
 
         if (activatedRecords == null || activatedRecords.length == 0) {
             this.activatedRecords = Collections.emptySet();
@@ -100,22 +95,37 @@ public class TimeTracker implements TenantLifecycleService {
         }
     }
 
-    public boolean addFlushEventListener(final String flushEventListenerName) {
+    private List<FlushEventListener> getActiveFlushEventListeners() {
+        final List<FlushEventListener> active = new ArrayList<>();
+        for (FlushEventListener flushEventListener : flushEventListeners.values()) {
+            if (flushEventListener.isActive()) {
+                active.add(flushEventListener);
+            }
+        }
+        return active;
+    }
+
+    public boolean activateFlushEventListener(final String flushEventListenerName) {
         final FlushEventListener flushEventListener = this.flushEventListeners.get(flushEventListenerName);
         if (flushEventListener == null) {
             return false;
         }
-        this.activeFlushEventListeners.add(flushEventListener);
+        flushEventListener.activate();
         return true;
     }
-    public boolean removeFlushEventListener(final String flushEventListenerName) {
-        return this.activeFlushEventListeners.remove(flushEventListenerName);
+    public boolean deactivateFlushEventListener(final String flushEventListenerName) {
+        final FlushEventListener flushEventListener = this.flushEventListeners.get(flushEventListenerName);
+        if (flushEventListener == null) {
+            return false;
+        }
+        flushEventListener.deactivate();
+        return true;
     }
-    public void addActivatedRecord(final String activatedRecord) {
+    public void activateRecord(final String activatedRecord) {
         this.activatedRecords.add(activatedRecord);
     }
 
-    public void removeActivatedRecord(final String activatedRecord) {
+    public void deactivatedRecord(final String activatedRecord) {
         this.activatedRecords.remove(activatedRecord);
     }
 
@@ -170,7 +180,7 @@ public class TimeTracker implements TenantLifecycleService {
             if (flushThread.isStarted()) {
                 flushThread.interrupt();
             }
-            for (final FlushEventListener listener : activeFlushEventListeners) {
+            for (final FlushEventListener listener : getActiveFlushEventListeners()) {
                 listener.notifyStopTracking();
             }
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
@@ -225,12 +235,8 @@ public class TimeTracker implements TenantLifecycleService {
         }
         sb.append("\n");
 
-        sb.append("  - availableFlushEventListeners: ");
-        sb.append(flushEventListeners.keySet());
-        sb.append("\n");
-
-        sb.append("  - activeFlushEventListeners: ");
-        for (FlushEventListener flushEventListener : activeFlushEventListeners) {
+        sb.append("  - flushEventListeners: ");
+        for (FlushEventListener flushEventListener : this.flushEventListeners.values()) {
             sb.append(flushEventListener.getStatus());
             sb.append(" ");
         }
@@ -296,7 +302,7 @@ public class TimeTracker implements TenantLifecycleService {
         if (flushEventListeners == null) {
             return;
         }
-        for (final FlushEventListener listener : activeFlushEventListeners) {
+        for (final FlushEventListener listener : getActiveFlushEventListeners()) {
             try {
                 final FlushEventListenerResult flushEventListenerResult = listener.flush(flushEvent);
                 flushEventListenerResults.add(flushEventListenerResult);
