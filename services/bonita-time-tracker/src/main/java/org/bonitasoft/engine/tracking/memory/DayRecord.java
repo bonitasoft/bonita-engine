@@ -1,6 +1,8 @@
 package org.bonitasoft.engine.tracking.memory;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Queue;
@@ -26,8 +28,8 @@ public class DayRecord {
         return dayKey;
     }
 
-    public Queue<Record> getRecords() {
-        return records;
+    public List<Record> getRecordsCopy() {
+        return new ArrayList<>(this.records);
     }
 
     public boolean isExpectedDayKey(final long timestamp) {
