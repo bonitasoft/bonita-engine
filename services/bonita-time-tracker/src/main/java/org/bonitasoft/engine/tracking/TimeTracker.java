@@ -119,6 +119,10 @@ public class TimeTracker implements TenantLifecycleService {
         this.activatedRecords.remove(activatedRecord);
     }
 
+    public Set<String> getActivatedRecords() {
+        return Collections.unmodifiableSet(this.activatedRecords);
+    }
+
     public void startTracking() {
         if (!serviceStarted) {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
