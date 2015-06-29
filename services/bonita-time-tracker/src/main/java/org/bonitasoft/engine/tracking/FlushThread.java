@@ -33,9 +33,9 @@ public class FlushThread extends Thread {
         info("Starting " + this.getName() + "...");
         long lastFlushTimestamp = System.currentTimeMillis();
         while (true) {
+            final long now = System.currentTimeMillis();
             try {
-                final long flushDuration = System.currentTimeMillis() - lastFlushTimestamp;
-                final long sleepTime = this.timeTracker.getFlushIntervalInMS() - flushDuration;
+                final long sleepTime = getSleepTime(now, lastFlushTimestamp);
                 if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                     this.logger.log(getClass(), TechnicalLogSeverity.DEBUG, "FlushThread: sleeping for: " + sleepTime + "ms");
                 }
@@ -43,17 +43,33 @@ public class FlushThread extends Thread {
             } catch (InterruptedException e) {
                 break;
             }
-            try {
-                final FlushResult flushResult = this.timeTracker.flush();
-                lastFlushTimestamp = flushResult.getFlushTime();
-            } catch (Exception e) {
-                if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                    this.logger.log(getClass(), TechnicalLogSeverity.WARNING, "Exception caught while flushing: " + e.getMessage(), e);
-                }
-            }
+            lastFlushTimestamp = flush(now);
         }
         info(this.getName() + " stopped.");
     }
+
+    long getSleepTime(final long now, final long lastFlushTimestamp) throws InterruptedException {
+        final long flushDuration = now - lastFlushTimestamp;
+        return this.timeTracker.getFlushIntervalInMS() - flushDuration;
+    }
+
+    long flush(final long now) {
+        try {
+            final FlushResult flushResult = this.timeTracker.flush();
+            return flushResult.getFlushTime();
+        } catch (Exception e) {
+            if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                this.logger.log(getClass(), TechnicalLogSeverity.WARNING, "Exception caught while flushing: " + e.getMessage(), e);
+            }
+        }
+        return now;
+    }
+/*
+    private long getSleepDuration(final long now, final lastFlushTime) {
+        final long flushDuration = System.currentTimeMillis() - lastFlushTimestamp;
+        final long sleepTime = this.timeTracker.getFlushIntervalInMS() - flushDuration;
+    }
+    */
 
     void info(String message) {
         if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {

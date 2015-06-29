@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.tracking;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -48,6 +49,35 @@ public class FlushThreadTest {
         flushThread.join(60000);
         verify(timeTracker, times(3)).flush();
         verify(clock, times(4)).sleep(anyLong());
+    }
+
+    @Test
+    public void should_flush_thread_flush_on_latest_flush_interval() throws Exception {
+        final TimeTracker timeTracker = mock(TimeTracker.class);
+        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        when(timeTracker.getLogger()).thenReturn(logger);
+        final FlushThread flushThread = new FlushThread(timeTracker);
+        final long now = 10;
+        final long lastFlushTimestamp = 9;
+
+        when(timeTracker.getFlushIntervalInMS()).thenReturn(4L);
+        assertEquals(3, flushThread.getSleepTime(now, lastFlushTimestamp));
+
+        when(timeTracker.getFlushIntervalInMS()).thenReturn(3L);
+        assertEquals(2, flushThread.getSleepTime(now, lastFlushTimestamp));
+    }
+
+    @Test
+    public void should_last_flush_timestamp_move_to_now() throws Exception {
+        final TimeTracker timeTracker = mock(TimeTracker.class);
+        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        when(timeTracker.getLogger()).thenReturn(logger);
+        final FlushThread flushThread = new FlushThread(timeTracker);
+        final long now = 10;
+
+        when(timeTracker.flush()).thenThrow(Exception.class);
+        final long lastFlushTimestamp = flushThread.flush(now);
+        assertEquals(now, lastFlushTimestamp);
     }
 
 }
