@@ -389,4 +389,15 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         verify(listener1, times(1)).notifyStopTracking();
         verify(listener2, times(1)).notifyStopTracking();
     }
+
+    @Test
+    public void should_start_tracking_start_flush_thread() {
+        tracker = createTimeTracker(true, null, 2, 2, REC);
+        when(this.flushThread.isStarted()).thenReturn(false);
+        tracker.start();
+
+        tracker.startTracking();
+
+        verify(flushThread, times(2)).start();
+    }
 }
