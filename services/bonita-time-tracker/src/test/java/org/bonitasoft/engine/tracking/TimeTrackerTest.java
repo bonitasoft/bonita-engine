@@ -354,4 +354,17 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         tracker.deactivatedRecord(REC);
         assertEquals(1, tracker.getActivatedRecords().size());
     }
+
+    @Test
+    public void testFlushInterval() {
+        tracker = createTimeTracker(true, null, 2, 1, REC);
+
+        assertEquals(1000, tracker.getFlushIntervalInMS());
+
+        tracker.setFlushIntervalInMS(111);
+        assertEquals(111, tracker.getFlushIntervalInMS());
+
+        tracker.setFlushIntervalInSeconds(10);
+        assertEquals(10000, tracker.getFlushIntervalInMS());
+    }
 }
