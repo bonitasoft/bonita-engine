@@ -17,8 +17,7 @@ public abstract class AbstractFlushEventListener implements FlushEventListener {
 
     @Override
     public String getStatus() {
-        String status = getName() + ": \n" + "active: " + isActive();
-        return status;
+        return getName() + ": \n" + "active: " + isActive();
     }
 
     @Override
