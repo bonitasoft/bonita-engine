@@ -6,6 +6,8 @@ public interface AddressDAO
 {
 
 
+    public Address findByPersistenceId(Long persistenceId);
+
     public Address findByCity(String city);
 
     public List<Address> findByStreet(String street, int startIndex, int maxResults);
