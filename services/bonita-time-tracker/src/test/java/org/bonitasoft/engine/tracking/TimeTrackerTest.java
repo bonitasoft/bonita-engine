@@ -367,4 +367,26 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         tracker.setFlushIntervalInSeconds(10);
         assertEquals(10000, tracker.getFlushIntervalInMS());
     }
+
+    @Test
+    public void should_stop_tracking_interrupt_flush_thread_and_listeners() {
+        final FlushEventListener listener1 = mock(FlushEventListener.class);
+        when(listener1.getName()).thenReturn("listener1");
+        when(listener1.isActive()).thenReturn(true);
+        final FlushEventListener listener2 = mock(FlushEventListener.class);
+        when(listener2.getName()).thenReturn("listener2");
+        when(listener2.isActive()).thenReturn(true);
+
+        final List<FlushEventListener> flushEventListeners = new ArrayList<>();
+        flushEventListeners.add(listener1);
+        flushEventListeners.add(listener2);
+
+        tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
+        when(this.flushThread.isStarted()).thenReturn(true);
+
+        tracker.stopTracking();
+        verify(flushThread, times(1)).interrupt();
+        verify(listener1, times(1)).notifyStopTracking();
+        verify(listener2, times(1)).notifyStopTracking();
+    }
 }
