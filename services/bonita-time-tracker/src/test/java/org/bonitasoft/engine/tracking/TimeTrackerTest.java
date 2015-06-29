@@ -337,4 +337,21 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         tracker.deactivateFlushEventListener("listener1");
         verify(listener1, times(1)).deactivate();
     }
+
+    @Test
+    public void testActivatedRecords() {
+        tracker = createTimeTracker(true, null, 2, 2, REC);
+
+        assertEquals(1, tracker.getActivatedRecords().size());
+
+        tracker.activateRecord(REC2);
+        assertEquals(2, tracker.getActivatedRecords().size());
+
+        //no duplicate
+        tracker.activateRecord(REC2);
+        assertEquals(2, tracker.getActivatedRecords().size());
+
+        tracker.deactivatedRecord(REC);
+        assertEquals(1, tracker.getActivatedRecords().size());
+    }
 }
