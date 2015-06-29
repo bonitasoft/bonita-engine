@@ -285,4 +285,56 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         assertEquals("rec3", tracker.getRecordsCopy().get(1).getDescription());
         tracker.stop();
     }
+
+    @Test
+    public void testGetActiveListeners() {
+        final FlushEventListener listener1 = mock(FlushEventListener.class);
+        when(listener1.getName()).thenReturn("listener1");
+        when(listener1.isActive()).thenReturn(true);
+        final FlushEventListener listener2 = mock(FlushEventListener.class);
+        when(listener2.getName()).thenReturn("listener2");
+        when(listener2.isActive()).thenReturn(false);
+
+        final List<FlushEventListener> flushEventListeners = new ArrayList<>();
+        flushEventListeners.add(listener1);
+        flushEventListeners.add(listener2);
+
+        tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
+
+        assertEquals(1, tracker.getActiveFlushEventListeners().size());
+    }
+
+    @Test
+    public void testActivateListeners() {
+        final FlushEventListener listener1 = mock(FlushEventListener.class);
+        when(listener1.getName()).thenReturn("listener1");
+        when(listener1.isActive()).thenReturn(true);
+        final FlushEventListener listener2 = mock(FlushEventListener.class);
+        when(listener2.getName()).thenReturn("listener2");
+        when(listener2.isActive()).thenReturn(false);
+
+        final List<FlushEventListener> flushEventListeners = new ArrayList<>();
+        flushEventListeners.add(listener1);
+        flushEventListeners.add(listener2);
+
+        tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
+
+        tracker.activateFlushEventListener("listener2");
+        verify(listener2, times(1)).activate();
+    }
+
+    @Test
+    public void testDeactivateListeners() {
+        final FlushEventListener listener1 = mock(FlushEventListener.class);
+        when(listener1.getName()).thenReturn("listener1");
+        when(listener1.isActive()).thenReturn(true);
+
+        final List<FlushEventListener> flushEventListeners = new ArrayList<>();
+        flushEventListeners.add(listener1);
+
+        tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
+
+        tracker.deactivateFlushEventListener("listener1");
+        verify(listener1, times(1)).deactivate();
+    }
 }

@@ -98,7 +98,7 @@ public class TimeTracker implements TenantLifecycleService {
         }
     }
 
-    private List<FlushEventListener> getActiveFlushEventListeners() {
+    List<FlushEventListener> getActiveFlushEventListeners() {
         final List<FlushEventListener> active = new ArrayList<>();
         for (FlushEventListener flushEventListener : flushEventListeners.values()) {
             if (flushEventListener.isActive()) {
