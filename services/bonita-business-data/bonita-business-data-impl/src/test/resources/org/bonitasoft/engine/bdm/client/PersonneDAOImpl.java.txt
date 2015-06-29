@@ -27,6 +27,22 @@ public class PersonneDAOImpl
         this.proxyfier = new Proxyfier(lazyLoader);
     }
 
+    public com.test.model.Personne findByPersistenceId(Long persistenceId) {
+        try {
+            CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
+            Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
+            commandParameters.put("queryName", "Personne.findByPersistenceId");
+            commandParameters.put("returnsList", false);
+            commandParameters.put("returnType", "com.test.model.Personne");
+            Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+            queryParameters.put("persistenceId", persistenceId);
+            commandParameters.put("queryParameters", ((Serializable) queryParameters));
+            return proxyfier.proxify(deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), com.test.model.Personne.class));
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     public com.test.model.Personne findByPrenomAndNomAndBirthDate(String prenom, String nom, Date birthDate) {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
