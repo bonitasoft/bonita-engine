@@ -28,4 +28,11 @@ public interface MultipleBusinessDataReference extends BusinessDataReference {
      * @return the business data identifiers.
      */
     List<Long> getStorageIds();
+
+    /**
+     * Lists the business data identifiers.
+     *
+     * @return the business data identifiers as String .
+     */
+    List<String> getStorageIdsAsString();
 }

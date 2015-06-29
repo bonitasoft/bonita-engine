@@ -17,6 +17,8 @@ import java.util.Objects;
 
 import org.bonitasoft.engine.business.data.SimpleBusinessDataReference;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author Matthieu Chaffotte
  */
@@ -26,9 +28,15 @@ public class SimpleBusinessDataReferenceImpl extends BusinessDataReferenceImpl i
 
     private final Long storageId;
 
+    @JsonProperty("storageId_string")
+    private String storageIdAsString=null;
+
     public SimpleBusinessDataReferenceImpl(final String name, final String type, final Long storageId) {
         super(name, type);
         this.storageId = storageId;
+        if (storageId != null) {
+            this.storageIdAsString = storageId.toString();
+        }
     }
 
     @Override
@@ -37,16 +45,24 @@ public class SimpleBusinessDataReferenceImpl extends BusinessDataReferenceImpl i
     }
 
     @Override
+    public String getStorageIdAsString() {
+        return storageIdAsString;
+    }
+
+    @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         SimpleBusinessDataReferenceImpl that = (SimpleBusinessDataReferenceImpl) o;
         return Objects.equals(storageId, that.storageId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), storageId);
+        return Objects.hash(super.hashCode(), storageId, storageIdAsString);
     }
 }

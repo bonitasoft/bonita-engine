@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bonitasoft.engine.business.data.MultipleBusinessDataReference;
 
 
@@ -29,17 +30,28 @@ public class MultipleBusinessDataReferenceImpl extends BusinessDataReferenceImpl
 
     private final List<Long> storageIds;
 
+    @JsonProperty("storageIds_string")
+    private final List<String> storageIdsAsString;
+
+
     public MultipleBusinessDataReferenceImpl(final String name, final String type, final List<Long> storageIds) {
         super(name, type);
-        this.storageIds = new ArrayList<Long>();
+        this.storageIds = new ArrayList<>();
+        this.storageIdsAsString = new ArrayList<>();
         for (final Long storageId : storageIds) {
             this.storageIds.add(storageId);
+            this.storageIdsAsString.add(storageId.toString());
         }
     }
 
     @Override
     public List<Long> getStorageIds() {
         return storageIds;
+    }
+
+    @Override
+    public List<String> getStorageIdsAsString() {
+        return storageIdsAsString;
     }
 
     @Override
@@ -53,6 +65,6 @@ public class MultipleBusinessDataReferenceImpl extends BusinessDataReferenceImpl
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), storageIds);
+        return Objects.hash(super.hashCode(), storageIds,storageIdsAsString);
     }
 }

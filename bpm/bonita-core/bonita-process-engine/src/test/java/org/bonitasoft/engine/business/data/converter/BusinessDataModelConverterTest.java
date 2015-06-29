@@ -36,6 +36,7 @@ public class BusinessDataModelConverterTest {
 
         final SimpleBusinessDataReference reference = BusinessDataModelConverter.toSimpleBusinessDataReference(sReference);
         assertThat(reference.getStorageId()).isEqualTo(87997L);
+        assertThat(reference.getStorageIdAsString()).isEqualTo("87997");
         assertThat(reference.getName()).isEqualTo("employee");
         assertThat(reference.getType()).isEqualTo("com.bonitasoft.Employee");
     }
@@ -50,6 +51,7 @@ public class BusinessDataModelConverterTest {
 
         final MultipleBusinessDataReference reference = BusinessDataModelConverter.toMultipleBusinessDataReference(sReference);
         assertThat(reference.getStorageIds()).isEqualTo(Arrays.asList(87997L, 654312354L, 4786454L));
+        assertThat(reference.getStorageIdsAsString()).isEqualTo(Arrays.asList("87997", "654312354", "4786454"));
         assertThat(reference.getName()).isEqualTo("employees");
         assertThat(reference.getType()).isEqualTo("com.bonitasoft.Employee");
     }

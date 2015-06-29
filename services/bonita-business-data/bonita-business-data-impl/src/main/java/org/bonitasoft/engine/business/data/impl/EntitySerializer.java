@@ -19,20 +19,21 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import javassist.util.proxy.MethodHandler;
-
-import org.bonitasoft.engine.commons.ClassReflector;
-
-import org.bonitasoft.engine.bdm.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import javassist.util.proxy.MethodHandler;
+import org.bonitasoft.engine.bdm.Entity;
+import org.bonitasoft.engine.business.data.impl.utils.JsonNumberSerializerHelper;
+import org.bonitasoft.engine.commons.ClassReflector;
 
 public class EntitySerializer extends JsonSerializer<Entity> {
 
+    public static final String STRING_SUFFIX = "_string";
+    private final JsonNumberSerializerHelper jsonNumberSerializerHelper;
     private String patternURI;
 
     public void setPatternURI(final String patternURI) {
@@ -41,8 +42,12 @@ public class EntitySerializer extends JsonSerializer<Entity> {
 
     private String buildURI(final Entity result, final String businessDataURIPattern, final Field entityField) {
         String uri = businessDataURIPattern.replace("{className}", result.getClass().getName());
-        uri = uri.replace("{id}", result.getPersistenceId().toString());
+        uri = uri.replace("{id}", jsonNumberSerializerHelper.convertToString(result.getPersistenceId()));
         return uri.replace("{field}", entityField.getName());
+    }
+
+    public EntitySerializer(JsonNumberSerializerHelper jsonNumberSerializerHelper) {
+        this.jsonNumberSerializerHelper = jsonNumberSerializerHelper;
     }
 
     @Override
@@ -53,26 +58,31 @@ public class EntitySerializer extends JsonSerializer<Entity> {
         final List<Link> links = new ArrayList<Link>();
         for (final Field field : valueClass.getDeclaredFields()) {
             final Class<?> fieldType = field.getType();
-            if (fieldType.equals(MethodHandler.class)) {
+            if (shouldSkipField(fieldType)) {
                 continue;
             }
-            if (field.isAnnotationPresent(JsonIgnore.class)) {
+            if (shouldReplaceFieldByLink(field)) {
                 links.add(new Link(field.getName(), buildURI(value, patternURI, field)));
+                continue;
             }
-            else {
-                try {
-                    Method declaredMethod;
-                    final String getterName = ClassReflector.getGetterName(field.getName(), fieldType);
-                    declaredMethod = valueClass.getDeclaredMethod(getterName);
-                    final Object invoke = declaredMethod.invoke(value);
-                    jgen.writeObjectField(field.getName(), invoke);
-                } catch (final NoSuchMethodException e) {
-                    // nothing to do
+            try {
+                Method declaredMethod;
+                final String getterName = ClassReflector.getGetterName(field.getName(), fieldType);
+                declaredMethod = valueClass.getDeclaredMethod(getterName);
+                final Object invoke = declaredMethod.invoke(value);
+                jgen.writeObjectField(field.getName(), invoke);
+                if (jsonNumberSerializerHelper.shouldAddStringRepresentationForNumber(field)) {
+                    jgen.writeObjectField(field.getName().concat(STRING_SUFFIX), jsonNumberSerializerHelper.convertToString(invoke));
                 }
-                catch (final Exception e) {
-                    throw new JsonGenerationException(e);
+                if (jsonNumberSerializerHelper.shouldAddStringRepresentationForNumberList(field)) {
+                    jgen.writeObjectField(field.getName().concat(STRING_SUFFIX), jsonNumberSerializerHelper.convertToStringList((List) invoke));
                 }
+            } catch (final NoSuchMethodException e) {
+                // nothing to do
+            } catch (final Exception e) {
+                throw new JsonGenerationException(e);
             }
+
         }
         if (!links.isEmpty()) {
             jgen.writeArrayFieldStart("links");
@@ -82,6 +92,14 @@ public class EntitySerializer extends JsonSerializer<Entity> {
             jgen.writeEndArray();
         }
         jgen.writeEndObject();
+    }
+
+    protected boolean shouldReplaceFieldByLink(Field field) {
+        return field.isAnnotationPresent(JsonIgnore.class);
+    }
+
+    protected boolean shouldSkipField(Class<?> fieldType) {
+        return fieldType.equals(MethodHandler.class);
     }
 
     @Override
