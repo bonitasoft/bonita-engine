@@ -28,10 +28,13 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.tracking.AbstractTimeTrackerTest;
 import org.bonitasoft.engine.tracking.FlushEvent;
 import org.bonitasoft.engine.tracking.Record;
+import org.bonitasoft.engine.tracking.TimeTrackerRecords;
 import org.junit.After;
 import org.junit.Test;
 
 public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
+
+    private static final TimeTrackerRecords REC = TimeTrackerRecords.EVALUATE_EXPRESSION;
 
     @After
     public void after() {
@@ -75,8 +78,8 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
     public void flushedCsv() throws Exception {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         final CSVFlushEventListener csvFlushEventListener = new CSVFlushEventListener(true, logger, System.getProperty("java.io.tmpdir"), ";");
-        final Record rec1 = new Record(System.currentTimeMillis(), "rec", "rec1Desc", 100);
-        final Record rec2 = new Record(System.currentTimeMillis(), "rec", "rec2Desc", 200);
+        final Record rec1 = new Record(System.currentTimeMillis(), REC, "rec1Desc", 100);
+        final Record rec2 = new Record(System.currentTimeMillis(), REC, "rec2Desc", 200);
 
         final CSVFlushEventListenerResult csvFlushResult = csvFlushEventListener.flush(new FlushEvent(System.currentTimeMillis(), Arrays.asList(rec1, rec2)));
 
@@ -94,7 +97,7 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
     }
 
     private void checkCSVRecord(final Record record, final List<String> csvValues) {
-        // timestamp, year, month, day, hour, minute, second, milisecond, duration, name, description]
+        // timestamp, year, month, day, hour, minute, second, millisecond, duration, name, description]
         assertEquals(11, csvValues.size());
 
         final long timestamp = record.getTimestamp();
@@ -106,7 +109,7 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
         final int hourOfDay = cal.get(Calendar.HOUR_OF_DAY);
         final int minute = cal.get(Calendar.MINUTE);
         final int second = cal.get(Calendar.SECOND);
-        final int milisecond = cal.get(Calendar.MILLISECOND);
+        final int millisecond = cal.get(Calendar.MILLISECOND);
 
         assertEquals(timestamp, Long.valueOf(csvValues.get(0)).longValue());
         assertEquals(year, Integer.valueOf(csvValues.get(1)).intValue());
@@ -115,10 +118,10 @@ public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
         assertEquals(hourOfDay, Integer.valueOf(csvValues.get(4)).intValue());
         assertEquals(minute, Integer.valueOf(csvValues.get(5)).intValue());
         assertEquals(second, Integer.valueOf(csvValues.get(6)).intValue());
-        assertEquals(milisecond, Integer.valueOf(csvValues.get(7)).intValue());
+        assertEquals(millisecond, Integer.valueOf(csvValues.get(7)).intValue());
 
         assertEquals(record.getDuration(), Long.valueOf(csvValues.get(8)).longValue());
-        assertEquals(record.getName(), csvValues.get(9));
+        assertEquals(record.getName().name(), csvValues.get(9));
         assertEquals(record.getDescription(), csvValues.get(10));
 
     }

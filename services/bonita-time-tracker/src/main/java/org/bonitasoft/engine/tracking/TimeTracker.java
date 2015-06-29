@@ -32,7 +32,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 public class TimeTracker implements TenantLifecycleService {
 
 
-    private final Set<String> activatedRecords;
+    private final Set<TimeTrackerRecords> activatedRecords;
     private final FlushThread flushThread;
     private final Map<String, FlushEventListener> flushEventListeners;
     private final TechnicalLoggerService logger;
@@ -86,7 +86,10 @@ public class TimeTracker implements TenantLifecycleService {
         if (activatedRecords == null || activatedRecords.length == 0) {
             this.activatedRecords = Collections.emptySet();
         } else {
-            this.activatedRecords = new HashSet<>(Arrays.asList(activatedRecords));
+            this.activatedRecords = new HashSet<>();
+            for (String activatedRecord : activatedRecords) {
+                this.activatedRecords.add(TimeTrackerRecords.valueOf(activatedRecord));
+            }
         }
         flushThread = createFlushThread();
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
@@ -121,15 +124,15 @@ public class TimeTracker implements TenantLifecycleService {
         flushEventListener.deactivate();
         return true;
     }
-    public void activateRecord(final String activatedRecord) {
+    public void activateRecord(final TimeTrackerRecords activatedRecord) {
         this.activatedRecords.add(activatedRecord);
     }
 
-    public void deactivatedRecord(final String activatedRecord) {
+    public void deactivatedRecord(final TimeTrackerRecords activatedRecord) {
         this.activatedRecords.remove(activatedRecord);
     }
 
-    public Set<String> getActivatedRecords() {
+    public Set<TimeTrackerRecords> getActivatedRecords() {
         return Collections.unmodifiableSet(this.activatedRecords);
     }
 
@@ -229,8 +232,8 @@ public class TimeTracker implements TenantLifecycleService {
         sb.append("\n");
 
         sb.append("  - activatedRecords: ");
-        for (String activatedRecord : activatedRecords) {
-            sb.append(activatedRecord);
+        for (TimeTrackerRecords activatedRecord : activatedRecords) {
+            sb.append(activatedRecord.name());
             sb.append(" ");
         }
         sb.append("\n");
@@ -255,7 +258,7 @@ public class TimeTracker implements TenantLifecycleService {
         return sb.toString();
     }
 
-    public boolean isTrackable(final String recordName) {
+    public boolean isTrackable(final TimeTrackerRecords recordName) {
         return isTracking() && activatedRecords.contains(recordName);
     }
 
@@ -263,7 +266,7 @@ public class TimeTracker implements TenantLifecycleService {
         return logger;
     }
 
-    public void track(final String recordName, final String recordDescription, final long duration) {
+    public void track(final TimeTrackerRecords recordName, final String recordDescription, final long duration) {
         if (!isTrackable(recordName)) {
             return;
         }

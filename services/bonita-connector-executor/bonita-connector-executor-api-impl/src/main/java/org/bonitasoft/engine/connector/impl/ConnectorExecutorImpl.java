@@ -135,7 +135,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         }
     }
 
-    private void track(final String recordName, final long startTime, final SConnector sConnector, final Map<String, Object> inputParameters) {
+    private void track(final TimeTrackerRecords recordName, final long startTime, final SConnector sConnector, final Map<String, Object> inputParameters) {
         if (timeTracker.isTrackable(recordName)) {
             final long endTime = System.currentTimeMillis();
             final StringBuilder desc = new StringBuilder();

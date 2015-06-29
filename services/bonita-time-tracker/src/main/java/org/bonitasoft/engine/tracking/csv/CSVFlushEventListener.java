@@ -113,7 +113,7 @@ public class CSVFlushEventListener extends AbstractFlushEventListener {
         row.add(String.valueOf(second));
         row.add(String.valueOf(millisecond));
         row.add(String.valueOf(record.getDuration()));
-        row.add(record.getName());
+        row.add(record.getName().name());
         row.add(record.getDescription());
         return row;
     }

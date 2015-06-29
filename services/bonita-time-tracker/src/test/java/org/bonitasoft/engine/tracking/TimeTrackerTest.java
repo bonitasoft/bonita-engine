@@ -45,9 +45,15 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Mock
     private TechnicalLoggerService logger;
 
+    private static final TimeTrackerRecords REC = TimeTrackerRecords.EVALUATE_EXPRESSION;
+    private static final TimeTrackerRecords REC1 = TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT;
+    private static final TimeTrackerRecords REC2 = TimeTrackerRecords.EXECUTE_CONNECTOR_CALLABLE;
+    private static final TimeTrackerRecords REC3 = TimeTrackerRecords.EXECUTE_CONNECTOR_DISCONNECT;
+    private static final TimeTrackerRecords INACTIVATED_REC = TimeTrackerRecords.EXECUTE_CONNECTOR_OUTPUT_OPERATIONS;
+
     TimeTracker createTimeTracker(TechnicalLoggerService logger, Clock clock, List<FlushEventListener> listeners, boolean enabled, int maxSize,
-            int flushIntervalInSeconds, String rec) {
-        return new TimeTracker(logger, clock, enabled, listeners, maxSize, flushIntervalInSeconds, rec) {
+            int flushIntervalInSeconds, TimeTrackerRecords rec) {
+        return new TimeTracker(logger, clock, enabled, listeners, maxSize, flushIntervalInSeconds, rec.name()) {
 
             @Override
             FlushThread createFlushThread() {
@@ -57,8 +63,12 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     TimeTracker createTimeTracker(boolean enabled, List<FlushEventListener> flushEventListeners, int maxSize,
-            int flushIntervalInSeconds, String... records) {
-        return new TimeTracker(logger, enabled, flushEventListeners, maxSize, flushIntervalInSeconds, records) {
+            int flushIntervalInSeconds, TimeTrackerRecords... records) {
+        final List<String> recordsAsString = new ArrayList<>();
+        for (TimeTrackerRecords record : records) {
+            recordsAsString.add(record.name());
+        }
+        return new TimeTracker(logger, enabled, flushEventListeners, maxSize, flushIntervalInSeconds, recordsAsString.toArray(new String[records.length])) {
 
             @Override
             FlushThread createFlushThread() {
@@ -69,50 +79,50 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_isTrackable_returns_false_if_not_started() {
-        tracker = createTimeTracker(true, null, 10, 2, "rec");
-        assertFalse(tracker.isTrackable("rec"));
+        tracker = createTimeTracker(true, null, 10, 2, REC);
+        assertFalse(tracker.isTrackable(REC));
     }
 
     @Test
     public void isTrackable() {
         when(flushThread.isStarted()).thenReturn(true);
-        tracker = createTimeTracker(true, null, 10, 2, "rec1", "rec2");
+        tracker = createTimeTracker(true, null, 10, 2, REC1, REC2);
         tracker.start();
-        assertTrue(tracker.isTrackable("rec1"));
-        assertTrue(tracker.isTrackable("rec2"));
-        assertFalse(tracker.isTrackable("rec3"));
+        assertTrue(tracker.isTrackable(REC1));
+        assertTrue(tracker.isTrackable(REC2));
+        assertFalse(tracker.isTrackable(REC3));
         tracker.stop();
     }
 
     @Test
     public void trackRecords() {
         when(flushThread.isStarted()).thenReturn(true);
-        tracker = createTimeTracker(true, null, 10, 2, "rec1", "rec2");
+        tracker = createTimeTracker(true, null, 10, 2, REC1, REC2);
         tracker.start();
-        tracker.track("rec1", "rec11Desc", 100);
-        tracker.track("rec1", "rec12Desc", 200);
-        tracker.track("rec2", "rec2Desc", 300);
-        tracker.track("inactivatedRec", "blabla", 1000);
-        final Map<String, List<Record>> records = mapRecords(tracker.getRecordsCopy());
+        tracker.track(REC1, "rec11Desc", 100);
+        tracker.track(REC1, "rec12Desc", 200);
+        tracker.track(REC2, "rec2Desc", 300);
+        tracker.track(INACTIVATED_REC, "blabla", 1000);
+        final Map<TimeTrackerRecords, List<Record>> records = mapRecords(tracker.getRecordsCopy());
         assertEquals(2, records.size());
-        assertEquals(2, records.get("rec1").size());
-        assertEquals(1, records.get("rec2").size());
+        assertEquals(2, records.get(REC1).size());
+        assertEquals(1, records.get(REC2).size());
 
-        final List<Record> rec1s = records.get("rec1");
+        final List<Record> rec1s = records.get(REC1);
 
         final Record rec11 = rec1s.get(0);
-        assertEquals("rec1", rec11.getName());
+        assertEquals(REC1, rec11.getName());
         assertEquals("rec11Desc", rec11.getDescription());
         assertEquals(100L, rec11.getDuration());
 
         final Record rec12 = rec1s.get(1);
-        assertEquals("rec1", rec12.getName());
+        assertEquals(REC1, rec12.getName());
         assertEquals("rec12Desc", rec12.getDescription());
         assertEquals(200L, rec12.getDuration());
 
-        final List<Record> rec2s = records.get("rec2");
+        final List<Record> rec2s = records.get(REC2);
         final Record rec2 = rec2s.get(0);
-        assertEquals("rec2", rec2.getName());
+        assertEquals(REC2, rec2.getName());
         assertEquals("rec2Desc", rec2.getDescription());
         assertEquals(300L, rec2.getDuration());
         tracker.stop();
@@ -120,12 +130,12 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
 
     @Test
     public void should_not_track_when_not_enabled() {
-        tracker = createTimeTracker(false, null, 10, 2, "rec1", "rec2");
+        tracker = createTimeTracker(false, null, 10, 2, REC1, REC2);
         tracker.start();
-        tracker.track("rec1", "rec11Desc", 100);
-        tracker.track("rec1", "rec12Desc", 200);
-        tracker.track("rec2", "rec2Desc", 300);
-        tracker.track("inactivatedRec", "blabla", 1000);
+        tracker.track(REC1, "rec11Desc", 100);
+        tracker.track(REC1, "rec12Desc", 200);
+        tracker.track(REC2, "rec2Desc", 300);
+        tracker.track(INACTIVATED_REC, "blabla", 1000);
 
         assertTrue(tracker.getRecordsCopy().isEmpty());
     }
@@ -133,26 +143,26 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void timestamp() throws Exception {
         when(flushThread.isStarted()).thenReturn(true);
-        tracker = createTimeTracker(true, null, 10, 2, "rec1");
+        tracker = createTimeTracker(true, null, 10, 2, REC1);
         tracker.start();
-        tracker.track("rec1", "desc2", 100);
+        tracker.track(REC1, "desc2", 100);
         Thread.sleep(2);
-        tracker.track("rec1", "desc2", 200);
-        final Map<String, List<Record>> records = mapRecords(tracker.getRecordsCopy());
+        tracker.track(REC1, "desc2", 200);
+        final Map<TimeTrackerRecords, List<Record>> records = mapRecords(tracker.getRecordsCopy());
         assertEquals(1, records.size());
-        assertEquals(2, records.get("rec1").size());
+        assertEquals(2, records.get(REC1).size());
 
-        final List<Record> rec1s = records.get("rec1");
+        final List<Record> rec1s = records.get(REC1);
 
         assertTrue(rec1s.get(0).getTimestamp() < rec1s.get(1).getTimestamp());
         tracker.stop();
     }
 
-    private Map<String, List<Record>> mapRecords(final List<Record> records) {
-        final Map<String, List<Record>> result = new HashMap<>();
+    private Map<TimeTrackerRecords, List<Record>> mapRecords(final List<Record> records) {
+        final Map<TimeTrackerRecords, List<Record>> result = new HashMap<>();
         if (records != null) {
             for (final Record record : records) {
-                final String name = record.getName();
+                final TimeTrackerRecords name = record.getName();
                 if (!result.containsKey(name)) {
                     result.put(name, new ArrayList<Record>());
                 }
@@ -223,9 +233,9 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         listeners.add(listener2);
         listeners.add(listener3);
 
-        tracker = createTimeTracker(logger, clock, listeners, true, 10, 1, "rec");
+        tracker = createTimeTracker(logger, clock, listeners, true, 10, 1, REC);
 
-        tracker.track("rec", "desc", 10);
+        tracker.track(REC, "desc", 10);
 
         tracker.flush();
 
@@ -250,9 +260,9 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
         listeners.add(listener1);
         listeners.add(listener2);
 
-        tracker = createTimeTracker(logger, clock, listeners, true, 10, 1, "rec");
+        tracker = createTimeTracker(logger, clock, listeners, true, 10, 1, REC);
 
-        tracker.track("rec", "desc", 10);
+        tracker.track(REC, "desc", 10);
 
         tracker.flush();
 
@@ -263,13 +273,13 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     @Test
     public void rollingRecords() {
         when(flushThread.isStarted()).thenReturn(true);
-        tracker = createTimeTracker(true, null, 2, 2, "rec");
+        tracker = createTimeTracker(true, null, 2, 2, REC);
         tracker.start();
-        tracker.track("rec", "rec1", 100);
+        tracker.track(REC, "rec1", 100);
         assertEquals(1, tracker.getRecordsCopy().size());
-        tracker.track("rec", "rec2", 100);
+        tracker.track(REC, "rec2", 100);
         assertEquals(2, tracker.getRecordsCopy().size());
-        tracker.track("rec", "rec3", 100);
+        tracker.track(REC, "rec3", 100);
         assertEquals(2, tracker.getRecordsCopy().size());
         assertEquals("rec2", tracker.getRecordsCopy().get(0).getDescription());
         assertEquals("rec3", tracker.getRecordsCopy().get(1).getDescription());
