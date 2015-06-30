@@ -14,7 +14,7 @@
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
-    <application profile="User" state="ACTIVATED" token="HR-dashboard" version="2.0" homePage="my-new-custom-page" layout="custompage_defaultlayout" theme="custompage_defaulttheme">
+    <application profile="User" state="ACTIVATED" token="HR-dashboard" version="2.0" homePage="my-new-custom-page" layout="custompage_defaultlayout" theme="custompage_bootstrapdefaulttheme">
         <displayName>My HR dashboard</displayName>
         <description>This is the HR dashboard.</description>
         <iconPath>/icon.jpg</iconPath>
@@ -35,7 +35,7 @@
             </applicationMenu>
         </applicationMenus>
     </application>
-    <application state="ACTIVATED" token="My" version="2.0" layout="custompage_defaultlayout" theme="custompage_defaulttheme">
+    <application state="ACTIVATED" token="My" version="2.0" layout="custompage_defaultlayout" theme="custompage_bootstrapdefaulttheme">
         <displayName>Marketing</displayName>
     </application>
 </applications>
