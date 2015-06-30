@@ -37,8 +37,36 @@ public class AbstractFlushEventListenerTest extends AbstractTimeTrackerTest {
             public void notifyStopTracking() {
 
             }
+
+            @Override
+            public void notifyStartTracking() {
+
+            }
         });
         listener.deactivate();
         verify(listener, times(1)).notifyStopTracking();
+    }
+
+    @Test
+    public void should_activate_notifyStartTracking() {
+        final AbstractFlushEventListener listener = spy(new AbstractFlushEventListener(true, null) {
+
+            @Override
+            public FlushEventListenerResult flush(FlushEvent flushEvent) throws Exception {
+                return null;
+            }
+
+            @Override
+            public void notifyStopTracking() {
+
+            }
+
+            @Override
+            public void notifyStartTracking() {
+
+            }
+        });
+        listener.activate();
+        verify(listener, times(1)).notifyStartTracking();
     }
 }

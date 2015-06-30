@@ -90,6 +90,11 @@ public class CSVFlushEventListener extends AbstractFlushEventListener {
         //nothing to do
     }
 
+    @Override
+    public void notifyStartTracking() {
+        //nothing to do
+    }
+
 
     private List<String> getRow(final Record record) {
         final long timestamp = record.getTimestamp();

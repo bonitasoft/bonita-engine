@@ -33,6 +33,7 @@ public abstract class AbstractFlushEventListener implements FlushEventListener {
     @Override
     public void activate() {
         this.active = true;
+        notifyStartTracking();
     }
 
     @Override

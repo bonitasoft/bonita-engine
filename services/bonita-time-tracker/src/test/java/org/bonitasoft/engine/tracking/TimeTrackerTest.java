@@ -391,13 +391,26 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void should_start_tracking_start_flush_thread() {
-        tracker = createTimeTracker(true, null, 2, 2, REC);
+    public void should_start_tracking_start_flush_thread_and_listeners() {
+        final FlushEventListener listener1 = mock(FlushEventListener.class);
+        when(listener1.getName()).thenReturn("listener1");
+        when(listener1.isActive()).thenReturn(true);
+        final FlushEventListener listener2 = mock(FlushEventListener.class);
+        when(listener2.getName()).thenReturn("listener2");
+        when(listener2.isActive()).thenReturn(true);
+
+        final List<FlushEventListener> flushEventListeners = new ArrayList<>();
+        flushEventListeners.add(listener1);
+        flushEventListeners.add(listener2);
+
+        tracker = createTimeTracker(true, flushEventListeners, 2, 2, REC);
         when(this.flushThread.isStarted()).thenReturn(false);
         tracker.start();
 
         tracker.startTracking();
 
         verify(flushThread, times(2)).start();
+        verify(listener1, times(2)).notifyStartTracking();
+        verify(listener2, times(2)).notifyStartTracking();
     }
 }

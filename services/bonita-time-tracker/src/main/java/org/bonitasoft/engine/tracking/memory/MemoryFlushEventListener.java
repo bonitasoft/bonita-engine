@@ -60,6 +60,11 @@ public class MemoryFlushEventListener extends AbstractFlushEventListener {
         this.dayRecord = null;
     }
 
+    @Override
+    public void notifyStartTracking() {
+        //nothinh to do
+    }
+
     public synchronized DayRecord getDayRecord() {
         return this.dayRecord;
     }

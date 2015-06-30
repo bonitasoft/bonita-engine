@@ -28,4 +28,6 @@ public interface FlushEventListener {
     void activate();
 
     void deactivate();
+
+    void notifyStartTracking();
 }

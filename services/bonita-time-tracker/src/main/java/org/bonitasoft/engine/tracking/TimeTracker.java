@@ -167,6 +167,9 @@ public class TimeTracker implements TenantLifecycleService {
             if (!flushThread.isStarted()) {
                 flushThread.start();
             }
+            for (final FlushEventListener listener : getActiveFlushEventListeners()) {
+                listener.notifyStartTracking();
+            }
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
                 this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
                         "Time tracker tracking is activated. This may not be used in production as performances may be strongly impacted.");
