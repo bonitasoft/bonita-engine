@@ -3,9 +3,7 @@ package org.bonitasoft.engine.tracking.memory;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.tracking.FlushEvent;
