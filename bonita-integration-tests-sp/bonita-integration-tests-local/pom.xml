@@ -134,50 +134,50 @@
                 <executions>
                     <execution>
 
-            <id>unpack-community-local-tests</id>
-            <phase>process-test-resources</phase>
-            <goals>
-                <goal>unpack</goal>
-            </goals>
-            <configuration>
-                <outputDirectory>${project.build.directory}</outputDirectory>
-                <artifactItems>
-                    <artifactItem>
-                        <groupId>org.bonitasoft.engine.test</groupId>
-                        <artifactId>bonita-integration-tests-local</artifactId>
-                        <version>${project.version}</version>
-                        <type>zip</type>
-                    </artifactItem>
-                </artifactItems>
-            </configuration>
-        </execution>
-    </executions>
-</plugin>
+                        <id>unpack-community-local-tests</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.bonitasoft.engine.test</groupId>
+                                    <artifactId>bonita-integration-tests-local</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
 
-    <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-            <execution>
-                <id>unpack-server-tests-util</id>
-                <phase>process-test-resources</phase>
-                <goals>
-                    <goal>unpack</goal>
-                </goals>
-                <configuration>
-                    <outputDirectory>${project.build.directory}</outputDirectory>
-                    <artifactItems>
-                        <artifactItem>
-                            <groupId>org.bonitasoft.engine.test</groupId>
-                            <artifactId>bonita-server-test-utils</artifactId>
-                            <version>${project.version}</version>
-                            <type>zip</type>
-                        </artifactItem>
-                    </artifactItems>
-                </configuration>
-            </execution>
-            </executions>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-server-tests-util</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.bonitasoft.engine.test</groupId>
+                                    <artifactId>bonita-server-test-utils</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -215,7 +215,7 @@
                         </goals>
                         <configuration>
                             <target name="build-home-sp-tests">
-                                <ant antfile="build-home-sp-tests.xml" target="build-home-sp-tests"/>
+                                <ant antfile="build-home-sp-tests.xml" target="build-home-sp-tests" />
                             </target>
                         </configuration>
                     </execution>
