@@ -281,9 +281,9 @@ public class TimeTracker implements TenantLifecycleService {
         }
     }
 
-    void log(TechnicalLogSeverity debug, String message) {
-        if (logger.isLoggable(getClass(), debug)) {
-            logger.log(getClass(), debug, message);
+    void log(TechnicalLogSeverity severity, String message) {
+        if (logger.isLoggable(getClass(), severity)) {
+            logger.log(getClass(), severity, message);
         }
     }
 
