@@ -35,7 +35,7 @@ import org.junit.runners.Suite.SuiteClasses;
         BPMLocalSuiteTests.class,
         BPMRemoteTestsLocal.class,
         FormMappingIT.class,
-        PageAPIIT.raclass,
+        PageAPIIT.class,
         ApplicationIT.class,
         ApplicationPageIT.class,
         ApplicationMenuIT.class,
