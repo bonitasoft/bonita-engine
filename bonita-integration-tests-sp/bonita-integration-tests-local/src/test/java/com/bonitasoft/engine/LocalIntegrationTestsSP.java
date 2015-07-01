@@ -25,7 +25,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({BPMSPTests.class,
         BPMLocalSuiteTests.class,
         BPMRemoteTestsLocal.class,
-        BPMRemoteSPTests.class,
         LocalLogTest.class,
         APIMethodSPIT.class,
         ConnectorExecutionTimeOutTest.class,

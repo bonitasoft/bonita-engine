@@ -40,7 +40,6 @@ import com.bonitasoft.engine.tenant.TenantIT;
         ApplicationAPIITs.class,
 
         ApplicationAPIExtITs.class,
-        TenantIT.class,
         NodeAPITest.class,
         LogTest.class,
         ExternalCommandsTestSP.class,
