@@ -425,13 +425,7 @@
   	<query name="searchSAProcessInstanceWithoutSubProcess">
 		SELECT ap
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
-		WHERE ap.archiveDate = (
-			SELECT MAX(api.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
-			WHERE api.sourceObjectId = ap.sourceObjectId )
-		AND ap.id = (
-			SELECT MAX(api.id) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
-			WHERE api.sourceObjectId = ap.sourceObjectId )
-		AND ap.callerId = -1
+		WHERE ap.callerId = -1
 		AND ap.stateId IN (6,7,3,4)
   	</query>
 
@@ -476,13 +470,7 @@
 		SELECT COUNT(DISTINCT ap)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-		WHERE ap.archiveDate = (
-			SELECT MAX(api.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
-			WHERE api.sourceObjectId = ap.sourceObjectId )
-		AND ap.id = (
-			SELECT MAX(api.id) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
-			WHERE api.sourceObjectId = ap.sourceObjectId )
-		AND ap.stateId IN (6,7,3,4)
+		WHERE ap.stateId IN (6,7,3,4)
 		AND ap.processDefinitionId = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (
@@ -504,13 +492,7 @@
 		SELECT DISTINCT ap
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
 			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
-		WHERE ap.archiveDate = (
-			SELECT MAX(api.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
-			WHERE api.sourceObjectId = ap.sourceObjectId )
-		AND ap.id = (
-			SELECT MAX(api.id) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS api
-			WHERE api.sourceObjectId = ap.sourceObjectId )
-		AND ap.stateId IN (6,7,3,4)
+		WHERE ap.stateId IN (6,7,3,4)
 		AND ap.processDefinitionId = supervisor.processDefId
 		AND (supervisor.userId = :userId
 			OR (supervisor.id IN (

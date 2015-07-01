@@ -15,8 +15,9 @@ package org.bonitasoft.engine.business.data.impl;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bonitasoft.engine.business.data.SimpleBusinessDataReference;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Matthieu Chaffotte
