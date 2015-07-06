@@ -63,14 +63,10 @@ public class CSVFlushEventListener extends AbstractFlushEventListener {
         final File outputFile = getDayFile(flushTime, outputFolder, FILE_PREFIX, FILE_SUFFIX);
 
         if (!outputFile.exists()) {
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Generating new csv file to: " + outputFile);
-            }
+            log(TechnicalLogSeverity.INFO, "Generating new csv file to: " + outputFile);
             CSVUtil.writeCSVRow(outputFile, getHeaderRow(), csvSeparator);
         } else {
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Reusing csv file: " + outputFile);
-            }
+            log(TechnicalLogSeverity.INFO, "Reusing csv file: " + outputFile);
         }
         CSVUtil.writeCSVRows(outputFile, csvContent, csvSeparator);
         return new CSVFlushEventListenerResult(flushEvent, outputFile);

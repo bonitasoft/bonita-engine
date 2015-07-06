@@ -30,22 +30,20 @@ public class FlushThread extends Thread {
 
     @Override
     public void run() {
-        info("Starting " + this.getName() + "...");
+        log(TechnicalLogSeverity.INFO, "Starting " + this.getName() + "...");
         long lastFlushTimestamp = System.currentTimeMillis();
         while (true) {
             final long now = System.currentTimeMillis();
             try {
                 final long sleepTime = getSleepTime(now, lastFlushTimestamp);
-                if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    this.logger.log(getClass(), TechnicalLogSeverity.DEBUG, "FlushThread: sleeping for: " + sleepTime + "ms");
-                }
+                log(TechnicalLogSeverity.DEBUG, "FlushThread: sleeping for: " + sleepTime + "ms");
                 this.timeTracker.getClock().sleep(sleepTime);
             } catch (InterruptedException e) {
                 break;
             }
             lastFlushTimestamp = flush(now);
         }
-        info(this.getName() + " stopped.");
+        log(TechnicalLogSeverity.INFO, this.getName() + " stopped.");
     }
 
     long getSleepTime(final long now, final long lastFlushTimestamp) throws InterruptedException {
@@ -58,22 +56,20 @@ public class FlushThread extends Thread {
             final FlushResult flushResult = this.timeTracker.flush();
             return flushResult.getFlushTime();
         } catch (Exception e) {
-            if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                this.logger.log(getClass(), TechnicalLogSeverity.WARNING, "Exception caught while flushing: " + e.getMessage(), e);
-            }
+            log(TechnicalLogSeverity.WARNING, "Exception caught while flushing: " + e.getMessage(), e);
         }
         return now;
     }
-/*
-    private long getSleepDuration(final long now, final lastFlushTime) {
-        final long flushDuration = System.currentTimeMillis() - lastFlushTimestamp;
-        final long sleepTime = this.timeTracker.getFlushIntervalInMS() - flushDuration;
-    }
-    */
 
-    void info(String message) {
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, message);
+    void log(TechnicalLogSeverity severity, String message) {
+        if (logger.isLoggable(getClass(), severity)) {
+            logger.log(getClass(), severity, message);
+        }
+    }
+
+    void log(TechnicalLogSeverity severity, String message, Exception e) {
+        if (logger.isLoggable(getClass(), severity)) {
+            logger.log(getClass(), severity, message, e);
         }
     }
 

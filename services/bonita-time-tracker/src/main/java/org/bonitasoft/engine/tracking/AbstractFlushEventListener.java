@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.tracking;
 
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -40,5 +41,11 @@ public abstract class AbstractFlushEventListener implements FlushEventListener {
     public void deactivate() {
         this.active = false;
         notifyStopTracking();
+    }
+
+    protected void log(TechnicalLogSeverity severity, String message) {
+        if (logger.isLoggable(getClass(), severity)) {
+            logger.log(getClass(), severity, message);
+        }
     }
 }

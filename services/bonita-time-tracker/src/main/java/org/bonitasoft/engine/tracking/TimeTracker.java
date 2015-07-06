@@ -76,8 +76,7 @@ public class TimeTracker implements TenantLifecycleService {
             for (FlushEventListener flushEventListener : flushEventListeners) {
                 final String name = flushEventListener.getName();
                 if (this.flushEventListeners.containsKey(name)) {
-                    this.logger.log(getClass(), TechnicalLogSeverity.ERROR,
-                            "Duplicate entry for flushEventListener with name: " + name);
+                    log(TechnicalLogSeverity.ERROR, "Duplicate entry for flushEventListener with name: " + name);
                 }
                 this.flushEventListeners.put(name, flushEventListener);
             }
@@ -92,10 +91,7 @@ public class TimeTracker implements TenantLifecycleService {
             }
         }
         flushThread = createFlushThread();
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            this.logger.log(getClass(), TechnicalLogSeverity.INFO,
-                    getStatus());
-        }
+        log(TechnicalLogSeverity.INFO, getStatus());
     }
 
     List<FlushEventListener> getActiveFlushEventListeners() {
@@ -138,10 +134,7 @@ public class TimeTracker implements TenantLifecycleService {
 
     public void startTracking() {
         if (!serviceStarted) {
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                        "Cannot start Time tracker tracking because service is not started.");
-            }
+            log(TechnicalLogSeverity.WARNING, "Cannot start Time tracker tracking because service is not started.");
             return;
         }
         startTracking = true;
@@ -160,39 +153,27 @@ public class TimeTracker implements TenantLifecycleService {
 
     private void internalStartTracking() {
         if (startTracking) {
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                        "Starting Time tracker tracking...");
-            }
+            log(TechnicalLogSeverity.WARNING, "Starting Time tracker tracking...");
             if (!flushThread.isStarted()) {
                 flushThread.start();
             }
             for (final FlushEventListener listener : getActiveFlushEventListeners()) {
                 listener.notifyStartTracking();
             }
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                        "Time tracker tracking is activated. This may not be used in production as performances may be strongly impacted.");
-            }
+            log(TechnicalLogSeverity.WARNING, "Time tracker tracking is activated. This may not be used in production as performances may be strongly impacted.");
         }
     }
 
     private void internalStopTracking() {
         if (isTracking()) {
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                        "Stopping Time tracker tracking...");
-            }
+            log(TechnicalLogSeverity.WARNING, "Stopping Time tracker tracking...");
             if (flushThread.isStarted()) {
                 flushThread.interrupt();
             }
             for (final FlushEventListener listener : getActiveFlushEventListeners()) {
                 listener.notifyStopTracking();
             }
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                this.logger.log(getClass(), TechnicalLogSeverity.WARNING,
-                        "Time tracker tracking is deactivated.");
-            }
+            log(TechnicalLogSeverity.WARNING, "Time tracker tracking is deactivated.");
         }
     }
 

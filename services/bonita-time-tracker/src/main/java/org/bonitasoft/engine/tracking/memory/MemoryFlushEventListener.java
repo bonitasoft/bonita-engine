@@ -25,9 +25,7 @@ public class MemoryFlushEventListener extends AbstractFlushEventListener {
             return new FlushEventListenerResult(flushEvent);
         }
 
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "FlushEvent received with " + flushEvent.getRecords().size() + " records.");
-        }
+        log(TechnicalLogSeverity.DEBUG, "Reusing csv file: " + "FlushEvent received with " + flushEvent.getRecords().size() + " records.");
 
         final long flushTime = flushEvent.getFlushTime();
         if (this.dayRecord == null || !this.dayRecord.isExpectedDayKey(flushTime)) {
@@ -35,10 +33,8 @@ public class MemoryFlushEventListener extends AbstractFlushEventListener {
         }
         this.dayRecord.addRecords(flushEvent.getRecords());
 
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, "Adding '" + flushEvent.getRecords().size()
-                    + "' records to DayRecord with dayKey '" + this.dayRecord.getDayKey() + "'");
-        }
+        log(TechnicalLogSeverity.INFO, "Adding '" + flushEvent.getRecords().size() + "' records to DayRecord with dayKey '" + this.dayRecord.getDayKey() + "'");
+
         return new FlushEventListenerResult(flushEvent);
     }
 
@@ -62,7 +58,7 @@ public class MemoryFlushEventListener extends AbstractFlushEventListener {
 
     @Override
     public void notifyStartTracking() {
-        //nothinh to do
+        //nothing to do
     }
 
     public synchronized DayRecord getDayRecord() {
