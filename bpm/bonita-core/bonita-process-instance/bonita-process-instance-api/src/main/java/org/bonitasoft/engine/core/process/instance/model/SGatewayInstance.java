@@ -24,4 +24,6 @@ public interface SGatewayInstance extends SFlowNodeInstance {
 
     String getHitBys();
 
+    boolean isFinished();
+
 }

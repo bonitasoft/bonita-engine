@@ -20,7 +20,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.PlatformAPI;
@@ -737,6 +736,35 @@ public class GatewayExecutionIT extends TestWithUser {
     }
 
     /**
+     * Exclusive with default path then Inclusive Gateway
+     * Expected : step5
+     * BS-13596
+     */
+   @Test
+    public void exclusiveThenInclusive() throws Exception {
+        createTrueAndFalseExpression();
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
+                .createNewInstance("My_Process_with_exclusive_inclusive_gateways", PROCESS_VERSION).addActor(ACTOR_NAME).addAutomaticTask("step1")
+                .addAutomaticTask("step2").addAutomaticTask("step3").addAutomaticTask("step4").addUserTask("step5", ACTOR_NAME).addAutomaticTask("step6")
+                .addGateway("gateway1", GatewayType.EXCLUSIVE).addGateway("gateway2", GatewayType.INCLUSIVE).addGateway("gateway3", GatewayType.INCLUSIVE)
+                .addTransition("step1", "gateway1")
+                .addTransition("gateway1", "step6", falseExpression)
+                .addDefaultTransition("gateway1", "gateway2").addTransition("gateway2", "step2", trueExpression).addTransition("gateway2", "step3", trueExpression)
+                .addDefaultTransition("gateway2", "step4").addTransition("step2", "gateway3").addTransition("step3", "gateway3")
+                .addTransition("step4", "gateway3").addTransition("gateway3", "step5").getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+
+        // test execution
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        // we should have 2 elements ready:
+        waitForUserTaskAndExecuteIt(processInstance, "step5", user);
+
+        waitForProcessToFinish(processInstance);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    /**
      * Exclusive then Exclusive Gateway
      * expected : step4
      */
@@ -1051,8 +1079,8 @@ public class GatewayExecutionIT extends TestWithUser {
         processDefinitionBuilder.addTransition("Gateway1", "Step1");
         processDefinitionBuilder.addTransition("Gateway1", "Step2");
         processDefinitionBuilder.addTransition("Step2", "Exclu");
-        processDefinitionBuilder.addTransition("Exclu", "Step3",trueExpression);
-        processDefinitionBuilder.addTransition("Exclu", "Gateway2",falseExpression);
+        processDefinitionBuilder.addTransition("Exclu", "Step3", trueExpression);
+        processDefinitionBuilder.addTransition("Exclu", "Gateway2", falseExpression);
         processDefinitionBuilder.addTransition("Step1", "Gateway2");
         processDefinitionBuilder.addTransition("Gateway2", "Step4");
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
@@ -1073,12 +1101,11 @@ public class GatewayExecutionIT extends TestWithUser {
     public void processWithAlternativePathUsingExclusiveGatewayMergedByInclusive() throws Exception {
 
         /*
-            Diagram: one step5 is executed, step6 should be ready
-                    ╭────❲Step2❳────────────────────╮
-        ○─❲Step1❳─❬o❭                             ❬o❭─❲Step6❳─○
-                    ╰────❲Step3❳──❬x❭──❲Step4❳────╯
-                                    ╰────❲Step5❳──○
-
+         * Diagram: one step5 is executed, step6 should be ready
+         * ╭────❲Step2❳────────────────────╮
+         * ○─❲Step1❳─❬o❭ ❬o❭─❲Step6❳─○
+         * ╰────❲Step3❳──❬x❭──❲Step4❳────╯
+         * ╰────❲Step5❳──○
          */
         ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         processDefinitionBuilder = processDefinitionBuilder.createNewInstance("processWithDiedBranch", PROCESS_VERSION);
@@ -1098,7 +1125,7 @@ public class GatewayExecutionIT extends TestWithUser {
         processDefinitionBuilder.addTransition("Gateway1", "Step3");
         processDefinitionBuilder.addTransition("Step3", "Exclu");
         processDefinitionBuilder.addDefaultTransition("Exclu", "Step4");
-        processDefinitionBuilder.addTransition("Exclu", "Step5",trueExpression);
+        processDefinitionBuilder.addTransition("Exclu", "Step5", trueExpression);
         processDefinitionBuilder.addTransition("Step4", "Gateway2");
         processDefinitionBuilder.addTransition("Step2", "Gateway2");
         processDefinitionBuilder.addTransition("Gateway2", "Step6");
@@ -1112,7 +1139,6 @@ public class GatewayExecutionIT extends TestWithUser {
         waitForUserTask("Step6");
         disableAndDeleteProcess(processDefinition);
     }
-
 
     @Test
     public void processWithLoopAndInclusive() throws Exception {
@@ -1151,7 +1177,6 @@ public class GatewayExecutionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-
     @Test
     @Cover(classes = {}, concept = BPMNConcept.GATEWAY, keywords = { "restart", "Gateway", "Failed" }, jira = "BS-9367")
     public void restartNodeShouldNotRestartGatewaysWithNotFullfilledMergingCondition() throws Exception {
@@ -1188,7 +1213,8 @@ public class GatewayExecutionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = {GatewayDefinition.class, TransitionDefinition.class}, concept = Cover.BPMNConcept.GATEWAY, jira = "BS-10329", keywords = {"transition", "condition", "logical complement", "null variable"})
+    @Cover(classes = { GatewayDefinition.class, TransitionDefinition.class }, concept = Cover.BPMNConcept.GATEWAY, jira = "BS-10329", keywords = {
+            "transition", "condition", "logical complement", "null variable" })
     @Test
     public void can_evaluate_transitions_with_logical_complement_expression_using_null_variable() throws Exception {
         //given
@@ -1214,7 +1240,6 @@ public class GatewayExecutionIT extends TestWithUser {
 
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "delivery", user);
 
-
         //when
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -1224,8 +1249,8 @@ public class GatewayExecutionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
-
-    @Cover(classes = {GatewayDefinition.class, TransitionDefinition.class}, concept = Cover.BPMNConcept.GATEWAY, jira = "BS-10329", keywords = {"transition", "condition", "comparison", "null variable"})
+    @Cover(classes = { GatewayDefinition.class, TransitionDefinition.class }, concept = Cover.BPMNConcept.GATEWAY, jira = "BS-10329", keywords = {
+            "transition", "condition", "comparison", "null variable" })
     @Test
     public void can_evaluate_transitions_with_comparison_expression_using_null_variable() throws Exception {
         //given
@@ -1252,7 +1277,6 @@ public class GatewayExecutionIT extends TestWithUser {
 
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "delivery", user);
 
-
         //when
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -1261,6 +1285,5 @@ public class GatewayExecutionIT extends TestWithUser {
 
         disableAndDeleteProcess(processDefinition);
     }
-
 
 }

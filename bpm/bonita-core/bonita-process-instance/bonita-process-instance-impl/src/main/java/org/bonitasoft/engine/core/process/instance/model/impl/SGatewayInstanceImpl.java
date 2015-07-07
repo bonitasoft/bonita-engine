@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.process.instance.model.impl;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
+import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 
 /**
@@ -56,6 +57,11 @@ public class SGatewayInstanceImpl extends SFlowNodeInstanceImpl implements SGate
     @Override
     public String getHitBys() {
         return hitBys;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return hitBys != null && hitBys.startsWith(GatewayInstanceService.FINISH);
     }
 
     public void setGatewayType(final SGatewayType gatewayType) {
