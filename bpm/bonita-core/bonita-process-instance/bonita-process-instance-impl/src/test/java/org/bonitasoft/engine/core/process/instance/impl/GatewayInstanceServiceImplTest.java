@@ -476,4 +476,21 @@ public class GatewayInstanceServiceImplTest {
         verify(gatewayInstanceService, times(2)).addBackwardReachableTransitions(eq(processContainer), eq(nodeDefinition), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class), anyListOf(STransitionDefinition.class));
         verify(gatewayInstanceService).transitionsContainsAToken(anyListOf(STransitionDefinition.class), eq(nodeDefinition), eq(PROCESS_INSTANCE_ID), eq(processContainer));
     }
+
+    @Test
+    public void should_isInclusiveGatewayActivated_return_false_when_finished() throws SBonitaReadException {
+        SProcessDefinitionImpl processDefinition = new SProcessDefinitionImpl("P", "1.0");
+        processDefinition.setProcessContainer(processContainer);
+        SGatewayInstanceImpl gate = new SGatewayInstanceImpl();
+        gate.setName("gate");
+        gate.setHitBys("FINISH:1");
+        gate.setFlowNodeDefinitionId(50L);
+        gate.setParentContainerId(PROCESS_INSTANCE_ID);
+        node(50L, "gate");
+
+        boolean activated = gatewayInstanceService.isInclusiveGatewayActivated(processDefinition, gate);
+
+        assertThat(activated).isFalse();
+    }
+
 }
