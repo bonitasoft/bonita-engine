@@ -48,7 +48,6 @@ public class InclusiveExclusiveTransitionEvaluator {
         if (chosenTransitions.isEmpty()) {
             STransitionDefinition defaultTransition = defaultTransitionGetter.getDefaultTransition(transitions, sDefinition, flowNodeInstance);
             chosenTransitions.add(defaultTransition);
-            outgoingTransitionDefinitions.add(defaultTransition);
         }
 
         return chosenTransitions;

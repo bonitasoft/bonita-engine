@@ -15,6 +15,7 @@ package org.bonitasoft.engine.execution.flowmerger;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
@@ -43,7 +44,7 @@ public class FlowNodeTransitionsWrapper {
     }
 
     public List<STransitionDefinition> getNonDefaultOutgoingTransitionDefinitions() {
-        return allOutgoingTransitionDefinitions;
+        return Collections.unmodifiableList(allOutgoingTransitionDefinitions);
     }
 
     public void setAllOutgoingTransitionDefinitions(final List<STransitionDefinition> allOutgoingTransitionDefinitions) {
@@ -55,7 +56,7 @@ public class FlowNodeTransitionsWrapper {
     }
 
     public List<STransitionDefinition> getValidOutgoingTransitionDefinitions() {
-        return validOutgoingTransitionDefinitions;
+        return Collections.unmodifiableList(validOutgoingTransitionDefinitions);
     }
 
     public void setValidOutgoingTransitionDefinitions(final List<STransitionDefinition> validOutgoingTransitionDefinitions) {
