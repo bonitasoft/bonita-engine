@@ -25,7 +25,7 @@ import org.bonitasoft.engine.execution.flowmerger.FlowNodeTransitionsWrapper;
 public class ParallelGatewayTransitionEvaluator {
 
     public List<STransitionDefinition> evaluateTransitions(FlowNodeTransitionsWrapper transitions) {
-        return new ArrayList<STransitionDefinition>(transitions.getAllOutgoingTransitionDefinitions());
+        return new ArrayList<>(transitions.getNonDefaultOutgoingTransitionDefinitions());
     }
 
 }

@@ -28,9 +28,9 @@ public class FlowNodeTransitionsWrapper {
 
     private int inputTransitionsSize;
 
-    private List<STransitionDefinition> allOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
+    private List<STransitionDefinition> allOutgoingTransitionDefinitions = new ArrayList<>();
 
-    private List<STransitionDefinition> validOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
+    private List<STransitionDefinition> validOutgoingTransitionDefinitions = new ArrayList<>();
 
     private STransitionDefinition defaultTransition;
 
@@ -42,7 +42,7 @@ public class FlowNodeTransitionsWrapper {
         this.inputTransitionsSize = inputTransitionsSize;
     }
 
-    public List<STransitionDefinition> getAllOutgoingTransitionDefinitions() {
+    public List<STransitionDefinition> getNonDefaultOutgoingTransitionDefinitions() {
         return allOutgoingTransitionDefinitions;
     }
 
@@ -50,7 +50,7 @@ public class FlowNodeTransitionsWrapper {
         if (allOutgoingTransitionDefinitions != null) {
             this.allOutgoingTransitionDefinitions = allOutgoingTransitionDefinitions;
         } else {
-            this.allOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
+            this.allOutgoingTransitionDefinitions = new ArrayList<>();
         }
     }
 
@@ -62,7 +62,7 @@ public class FlowNodeTransitionsWrapper {
         if (validOutgoingTransitionDefinitions != null) {
             this.validOutgoingTransitionDefinitions = validOutgoingTransitionDefinitions;
         } else {
-            this.validOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
+            this.validOutgoingTransitionDefinitions = new ArrayList<>();
         }
     }
 
