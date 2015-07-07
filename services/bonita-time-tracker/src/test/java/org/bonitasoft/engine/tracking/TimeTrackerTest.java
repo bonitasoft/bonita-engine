@@ -173,9 +173,9 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void should_build_do_not_start_flush_thread() {
+    public void should_build_do_not_start_tracking() {
         tracker = createTimeTracker(true, null, 10, 2);
-        verifyZeroInteractions(flushThread);
+        assertFalse(flushThread.isStarted());
     }
 
     @Test
