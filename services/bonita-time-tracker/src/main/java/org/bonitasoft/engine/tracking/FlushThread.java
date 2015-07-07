@@ -20,43 +20,56 @@ public class FlushThread extends Thread {
 
     private final TimeTracker timeTracker;
 
-    private final long flushIntervalInMilliSeconds;
-
-    private final Clock clock;
-
     private final TechnicalLoggerService logger;
 
-    public FlushThread(final Clock clock, final long flushIntervalInMilliSeconds, final TimeTracker timeTracker, final TechnicalLoggerService logger) {
-        super("TimeTracker-FlushThread");
-        this.clock = clock;
-        this.logger = logger;
-        this.flushIntervalInMilliSeconds = flushIntervalInMilliSeconds;
+    public FlushThread(final TimeTracker timeTracker) {
+        super("Bonita-TimeTracker-FlushThread");
+        this.logger = timeTracker.getLogger();
         this.timeTracker = timeTracker;
     }
 
     @Override
     public void run() {
-        info("Starting " + this.getName() + "...");
+        log(TechnicalLogSeverity.INFO, "Starting " + this.getName() + "...");
+        long lastFlushTimestamp = System.currentTimeMillis();
         while (true) {
+            final long now = System.currentTimeMillis();
             try {
-                clock.sleep(flushIntervalInMilliSeconds);
+                final long sleepTime = getSleepTime(now, lastFlushTimestamp);
+                log(TechnicalLogSeverity.DEBUG, "FlushThread: sleeping for: " + sleepTime + "ms");
+                this.timeTracker.getClock().sleep(sleepTime);
             } catch (InterruptedException e) {
                 break;
             }
-            try {
-                this.timeTracker.flush();
-            } catch (Exception e) {
-                if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                    this.logger.log(getClass(), TechnicalLogSeverity.WARNING, "Exception caught while flushing: " + e.getMessage(), e);
-                }
-            }
+            lastFlushTimestamp = flush(now);
         }
-        info(this.getName() + " stopped.");
+        log(TechnicalLogSeverity.INFO, this.getName() + " stopped.");
     }
 
-    void info(String message) {
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(getClass(), TechnicalLogSeverity.INFO, message);
+    long getSleepTime(final long now, final long lastFlushTimestamp) throws InterruptedException {
+        final long flushDuration = now - lastFlushTimestamp;
+        return this.timeTracker.getFlushIntervalInMS() - flushDuration;
+    }
+
+    long flush(final long now) {
+        try {
+            final FlushResult flushResult = this.timeTracker.flush();
+            return flushResult.getFlushTime();
+        } catch (Exception e) {
+            log(TechnicalLogSeverity.WARNING, "Exception caught while flushing: " + e.getMessage(), e);
+        }
+        return now;
+    }
+
+    void log(TechnicalLogSeverity severity, String message) {
+        if (logger.isLoggable(getClass(), severity)) {
+            logger.log(getClass(), severity, message);
+        }
+    }
+
+    void log(TechnicalLogSeverity severity, String message, Exception e) {
+        if (logger.isLoggable(getClass(), severity)) {
+            logger.log(getClass(), severity, message, e);
         }
     }
 
