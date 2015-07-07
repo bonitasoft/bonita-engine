@@ -15,18 +15,18 @@ package org.bonitasoft.engine.bdm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.text.WordUtils;
-
 import org.bonitasoft.engine.bdm.model.BusinessObject;
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel;
 import org.bonitasoft.engine.bdm.model.Query;
 import org.bonitasoft.engine.bdm.model.UniqueConstraint;
 import org.bonitasoft.engine.bdm.model.field.Field;
+import org.bonitasoft.engine.bdm.model.field.FieldType;
 import org.bonitasoft.engine.bdm.model.field.RelationField;
 import org.bonitasoft.engine.bdm.model.field.SimpleField;
 
@@ -58,22 +58,22 @@ public class BDMQueryUtil {
         if (uniqueConstraint == null) {
             throw new IllegalArgumentException("uniqueConstraint cannot be null");
         }
-        return getQueryName(uniqueConstraint.getFieldNames());
+        return getQueryName(uniqueConstraint.getFieldNames().toArray(new String[0]));
     }
 
-    public static String getQueryName(final List<String> fieldNames) {
+    public static String getQueryName(final String... fieldNames) {
         final StringBuilder nameBuilder = new StringBuilder();
         nameBuilder.append("find");
-        if (!fieldNames.isEmpty()) {
+        if (fieldNames != null && fieldNames.length > 0) {
             nameBuilder.append("By");
             String paramName;
-            final int numberOfFields = fieldNames.size() - 1;
+            final int numberOfFields = fieldNames.length - 1;
             for (int i = 0; i < numberOfFields; i++) {
-                final String fieldName = fieldNames.get(i);
+                final String fieldName = fieldNames[i];
                 paramName = WordUtils.capitalize(fieldName);
                 nameBuilder.append(paramName).append("And");
             }
-            final String fieldName = fieldNames.get(numberOfFields);
+            final String fieldName = fieldNames[numberOfFields];
             paramName = WordUtils.capitalize(fieldName);
             nameBuilder.append(paramName);
         }
@@ -118,11 +118,24 @@ public class BDMQueryUtil {
         return q;
     }
 
+    public static Query createQueryForPersistenceId(final BusinessObject businessObject) {
+        final SimpleField persistenceIdField = new SimpleField();
+        persistenceIdField.setName(Field.PERSISTENCE_ID);
+        persistenceIdField.setType(FieldType.LONG);
+        final String name = createQueryNameForField(persistenceIdField);
+        final UniqueConstraint constraint = new UniqueConstraint();
+        constraint.setFieldNames(Arrays.asList(persistenceIdField.getName()));
+        final String content = createQueryContentForUniqueConstraint(businessObject.getQualifiedName(), constraint);
+        final Query q = new Query(name, content, businessObject.getQualifiedName());
+        q.addQueryParameter(persistenceIdField.getName(), persistenceIdField.getType().getClazz().getName());
+        return q;
+    }
+
     public static String createQueryNameForField(final Field field) {
         if (field == null) {
             throw new IllegalArgumentException("field cannot be null");
         }
-        return getQueryName(Arrays.asList(field.getName()));
+        return getQueryName(field.getName());
     }
 
     public static Field getField(final String fieldName, final BusinessObject businessObject) {
@@ -168,6 +181,13 @@ public class BDMQueryUtil {
     public static List<Query> createProvidedQueriesForBusinessObject(final BusinessObject businessObject) {
         final List<Query> queries = new ArrayList<Query>();
         final Set<String> queryNames = new HashSet<String>();
+
+        if (!containsQueryWithName(businessObject, getQueryName(Field.PERSISTENCE_ID))) {
+            final Query query = createQueryForPersistenceId(businessObject);
+            queries.add(query);
+            queryNames.add(query.getName());
+        }
+
         for (final UniqueConstraint uc : businessObject.getUniqueConstraints()) {
             final Query query = createQueryForUniqueConstraint(businessObject, uc);
             queryNames.add(query.getName());
@@ -232,6 +252,14 @@ public class BDMQueryUtil {
 
     public static Set<String> getAllProvidedQueriesNameForBusinessObject(final BusinessObject businessObject) {
         final Set<String> queryNames = new HashSet<String>();
+
+        if (!containsQueryWithName(businessObject, getQueryName(Field.PERSISTENCE_ID))) {
+            final SimpleField persistenceIdField = new SimpleField();
+            persistenceIdField.setName(Field.PERSISTENCE_ID);
+            persistenceIdField.setType(FieldType.LONG);
+            queryNames.add(createQueryNameForField(persistenceIdField));
+        }
+
         for (final UniqueConstraint uc : businessObject.getUniqueConstraints()) {
             queryNames.add(createQueryNameForUniqueConstraint(uc));
         }
@@ -244,6 +272,15 @@ public class BDMQueryUtil {
         }
         queryNames.add(createSelectAllQueryName());
         return queryNames;
+    }
+
+    private static boolean containsQueryWithName(final BusinessObject businessObject, final String queryName) {
+        for (final Query q : businessObject.getQueries()) {
+            if (Objects.equals(queryName, q.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Query createSelectAllQueryForBusinessObject(final BusinessObject businessObject) {
@@ -268,7 +305,7 @@ public class BDMQueryUtil {
     }
 
     public static String createSelectAllQueryName() {
-        return getQueryName(Collections.<String> emptyList());
+        return getQueryName();
     }
 
     private static String buildSelectFrom(final String simpleName, final char var) {

@@ -23,6 +23,22 @@ public class AddressDAOImpl
         this.proxyfier = new Proxyfier(lazyLoader);
     }
 
+    public Address findByPersistenceId(Long persistenceId) {
+        try {
+            CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
+            Map<String, Serializable> commandParameters = new HashMap<String, Serializable>();
+            commandParameters.put("queryName", "Address.findByPersistenceId");
+            commandParameters.put("returnsList", false);
+            commandParameters.put("returnType", "Address");
+            Map<String, Serializable> queryParameters = new HashMap<String, Serializable>();
+            queryParameters.put("persistenceId", persistenceId);
+            commandParameters.put("queryParameters", ((Serializable) queryParameters));
+            return proxyfier.proxify(deserializer.deserialize(((byte[]) commandApi.execute("executeBDMQuery", commandParameters)), Address.class));
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     public Address findByCity(String city) {
         try {
             CommandAPI commandApi = org.bonitasoft.engine.api.TenantAPIAccessor.getCommandAPI(session);
