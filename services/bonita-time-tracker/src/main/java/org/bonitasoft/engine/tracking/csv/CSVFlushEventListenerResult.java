@@ -11,40 +11,24 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.tracking;
+package org.bonitasoft.engine.tracking.csv;
 
-public class Record {
+import java.io.File;
 
-    private final long timestamp;
+import org.bonitasoft.engine.tracking.FlushEvent;
+import org.bonitasoft.engine.tracking.FlushEventListenerResult;
 
-    private final TimeTrackerRecords name;
+public class CSVFlushEventListenerResult extends FlushEventListenerResult {
 
-    private final String description;
+    private final File outputFile;
 
-    private final long duration;
-
-    public Record(long timestamp, TimeTrackerRecords name, String description, long duration) {
-        super();
-        this.timestamp = timestamp;
-        this.name = name;
-        this.description = description;
-        this.duration = duration;
+    public CSVFlushEventListenerResult(final FlushEvent flushEvent, final File outputFile) {
+        super(flushEvent);
+        this.outputFile = outputFile;
     }
 
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public TimeTrackerRecords getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public long getDuration() {
-        return duration;
+    public File getOutputFile() {
+        return outputFile;
     }
 
 }

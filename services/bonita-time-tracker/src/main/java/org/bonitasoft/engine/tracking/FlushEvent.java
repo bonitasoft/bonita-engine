@@ -20,21 +20,30 @@ public final class FlushEvent {
 
     private final List<Record> records;
 
-    public FlushEvent(final List<Record> records) {
+    private final long flushTime;
+
+    public FlushEvent(final long flushTime, final List<Record> records) {
         if (records != null) {
             this.records = records;
         } else {
             this.records = Collections.emptyList();
         }
+        this.flushTime = flushTime;
     }
 
     public List<Record> getRecords() {
         return records;
     }
 
-    @Override
-    public String toString() {
-        return "FlushEvent [records.size=" + records.size() + "]";
+    public long getFlushTime() {
+        return flushTime;
     }
 
+    @Override
+    public String toString() {
+        return "FlushEvent{" +
+                "records.size=" + records.size() +
+                ", flushTime=" + flushTime +
+                '}';
+    }
 }
