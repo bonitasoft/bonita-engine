@@ -37,6 +37,7 @@ public class SearchUserDescriptor extends SearchEntityDescriptor {
 
     SearchUserDescriptor() {
         userKeys = new HashMap<String, FieldDescriptor>(8);
+        userKeys.put(UserSearchDescriptor.ID, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getIdKey()));
         userKeys.put(UserSearchDescriptor.USER_NAME, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getUserNameKey()));
         userKeys.put(UserSearchDescriptor.FIRST_NAME, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getFirstNameKey()));
         userKeys.put(UserSearchDescriptor.LAST_NAME, new FieldDescriptor(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getLastNameKey()));

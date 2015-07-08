@@ -10,16 +10,22 @@
       {
         "persistenceId": null,
         "persistenceVersion": null,
+        "persistenceId_string": null,
+        "persistenceVersion_string": null,
         "number": "1234560"
       },
       {
         "persistenceId": null,
         "persistenceVersion": null,
+        "persistenceId_string": null,
+        "persistenceVersion_string": null,
         "number": "1234561"
       },
       {
         "persistenceId": null,
         "persistenceVersion": null,
+        "persistenceId_string": null,
+        "persistenceVersion_string": null,
         "number": "1234562"
       }
     ],
@@ -43,16 +49,22 @@
       {
         "persistenceId": null,
         "persistenceVersion": null,
+        "persistenceId_string": null,
+        "persistenceVersion_string": null,
         "number": "1234560"
       },
       {
         "persistenceId": null,
         "persistenceVersion": null,
+        "persistenceId_string": null,
+        "persistenceVersion_string": null,
         "number": "1234561"
       },
       {
         "persistenceId": null,
         "persistenceVersion": null,
+        "persistenceId_string": null,
+        "persistenceVersion_string": null,
         "number": "1234562"
       }
     ],

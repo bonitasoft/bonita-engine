@@ -5,11 +5,13 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
 import java.io.StringWriter;
 import java.util.Date;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.business.data.impl.utils.JsonNumberSerializerHelper;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
  * @author Laurent Leseigneur
@@ -23,7 +25,7 @@ public class EntitySerializerTest {
     @Before
     public void setUp() throws Exception {
         mapper = new ObjectMapper();
-        serializer = new EntitySerializer();
+        serializer = new EntitySerializer(new JsonNumberSerializerHelper());
         final SimpleModule hbm = new SimpleModule();
         hbm.addSerializer(serializer);
         mapper.registerModule(hbm);
@@ -41,7 +43,6 @@ public class EntitySerializerTest {
 
         //then
         final String expectedJson = new String(IOUtils.toByteArray(this.getClass().getResourceAsStream("EntitySerializerPojo.json")));
-        // assertThat(string).as("should replace field value").isEqualTo(expectedJson);
         assertThatJson(string).as("should replace field value").isEqualTo(expectedJson);
     }
 
@@ -64,15 +65,5 @@ public class EntitySerializerTest {
         entitySerializerPojo.addToManyString("def");
 
         return entitySerializerPojo;
-    }
-
-    @Test
-    public void testSerialize() throws Exception {
-
-    }
-
-    @Test
-    public void testHandledType() throws Exception {
-
     }
 }

@@ -14,10 +14,13 @@
 package org.bonitasoft.engine.home;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.junit.Test;
@@ -91,4 +94,30 @@ public class BonitaHomeServerTest {
         assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
     }
 
+    @Test
+    public void storeConnectorFileShouldEnsureParentFoldersExist() throws Exception {
+        final String home = System.getProperty("java.io.tmpdir") + File.separator + "home-test";
+        final File homeFile = new File(home);
+        final String oldBonitaHome = System.setProperty(BonitaHome.BONITA_HOME, home);
+        final long tenantId = 44L;
+        final long processId = 5421L;
+        final File connectorFolder = FolderMgr.getTenantWorkProcessConnectorsFolder(BonitaHomeServer.getInstance().getBonitaHomeFolder(), tenantId, processId)
+                .getFile();
+
+        connectorFolder.mkdirs();
+
+        try {
+            final BonitaHomeServer bonitaHomeServer = spy(BonitaHomeServer.getInstance());
+            final String resourceName = "src/net/dummy/MyConnectorImpl.java";
+            bonitaHomeServer.storeConnectorFile(tenantId, processId, resourceName, "someBytes".getBytes());
+
+            verify(bonitaHomeServer).createFoldersIfNecessary(new File(connectorFolder, resourceName).getParentFile());
+
+        } finally {
+            if (oldBonitaHome != null) {
+                System.setProperty(BonitaHome.BONITA_HOME, oldBonitaHome);
+            }
+            IOUtil.deleteDir(homeFile);
+        }
+    }
 }
