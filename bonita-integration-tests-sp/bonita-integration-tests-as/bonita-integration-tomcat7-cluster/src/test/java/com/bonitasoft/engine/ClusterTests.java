@@ -14,17 +14,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.api.ProcessAPI;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -41,6 +43,7 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.wait.WaitProcessToFinishAndBeArchived;
 import org.bonitasoft.engine.util.APITypeManager;
@@ -52,6 +55,7 @@ import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
@@ -77,13 +81,13 @@ public class ClusterTests extends CommonAPISPIT {
             platformAPI.startNode();
         }
         changeToNode1();
-                    loginOnDefaultTenantWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
     @After
-    public void afterTest () throws Exception {
-            deleteUser(user);
-            changeToNode1();
+    public void afterTest() throws Exception {
+        deleteUser(user);
+        changeToNode1();
         logoutOnTenant();
     }
 
@@ -210,8 +214,8 @@ public class ClusterTests extends CommonAPISPIT {
     }
 
     /*
- * Check that works are executed on node that started it
- */
+     * Check that works are executed on node that started it
+     */
     @Test
     public void executeAProcessInCluster() throws Exception {
 
@@ -220,8 +224,10 @@ public class ClusterTests extends CommonAPISPIT {
                 "1.0");
         designProcessDefinition.addActor(ACTOR_NAME);
         designProcessDefinition.addConnector("connectorOnEnter1", "org.bonitasoft.connector.testExternalConnector", "1.0", ConnectorEvent.ON_ENTER);
-        designProcessDefinition.addConnector("connectorOnEnter2","org.bonitasoft.connector.testExternalConnector","1.0",ConnectorEvent.ON_ENTER).addInput("param1", new ExpressionBuilder().createConstantStringExpression("plop"));
-        designProcessDefinition.addConnector("connectorOnFinish","org.bonitasoft.connector.testExternalConnector","1.0",ConnectorEvent.ON_FINISH).addInput("param1",new ExpressionBuilder().createConstantStringExpression("plop"));
+        designProcessDefinition.addConnector("connectorOnEnter2", "org.bonitasoft.connector.testExternalConnector", "1.0", ConnectorEvent.ON_ENTER).addInput(
+                "param1", new ExpressionBuilder().createConstantStringExpression("plop"));
+        designProcessDefinition.addConnector("connectorOnFinish", "org.bonitasoft.connector.testExternalConnector", "1.0", ConnectorEvent.ON_FINISH).addInput(
+                "param1", new ExpressionBuilder().createConstantStringExpression("plop"));
 
         designProcessDefinition.addStartEvent("start");
         // create 10 tasks that set a data with the node name
@@ -235,7 +241,8 @@ public class ClusterTests extends CommonAPISPIT {
             designProcessDefinition.addTransition("start", "autoStep" + i);
         }
 
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndConnector(designProcessDefinition, ACTOR_NAME, user, "TestExternalConnector.impl",
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndConnector(designProcessDefinition, ACTOR_NAME, user,
+                "TestExternalConnector.impl",
                 TestExternalConnector.class,
                 "TestExternalConnector.jar");
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -299,6 +306,41 @@ public class ClusterTests extends CommonAPISPIT {
             printArchivedFlowNodes(processInstance);
         }
         assertTrue("Process was not finished", waitUntil);
+    }
+
+    @Test
+    public void tasksWithNullValue() throws Exception {
+
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
+        final ProcessDefinition autoDef1 = deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("processDef1", "1.0")
+                .addAutomaticTask("step1").getProcess());
+        final ProcessDefinition humanDef1 = deployAndEnableProcessWithActor(new ProcessDefinitionBuilder().createNewInstance("processDef2", "1.0")
+                .addActor("actor").addUserTask("step1", "actor").getProcess(), "actor", user);
+
+
+        final ProcessInstance human1 = getProcessAPI().startProcess(humanDef1.getId());
+
+
+        changeToNode2();
+
+
+
+        Thread.sleep(2000);
+
+
+        List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 4, ActivityInstanceCriterion.DEFAULT);
+        assertThat(pendingHumanTaskInstances).hasSize(1);
+        for (HumanTaskInstance pendingHumanTaskInstance : pendingHumanTaskInstances) {
+            getProcessAPI().assignUserTask(pendingHumanTaskInstance.getId(), user.getId());
+            getProcessAPI().executeUserTask(pendingHumanTaskInstance.getId(), Collections.<String, Serializable>emptyMap());
+        }
+
+        Thread.sleep(2000);
+
+        assertThat(getProcessAPI().searchArchivedProcessInstances(new SearchOptionsBuilder(0,10).filter("sourceObjectId", human1.getId()).done()).getResult()).hasSize(1);
+
+        disableAndDeleteProcess(autoDef1);
+        disableAndDeleteProcess(humanDef1);
     }
 
 }

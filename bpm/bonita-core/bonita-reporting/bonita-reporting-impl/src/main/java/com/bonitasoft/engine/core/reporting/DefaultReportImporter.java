@@ -26,7 +26,6 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class DefaultReportImporter {
 
-
     private ReportingServiceImpl reportingService;
     private TechnicalLoggerService logger;
 
@@ -49,26 +48,27 @@ public class DefaultReportImporter {
             SReport reportByName = reportingService.getReportByName(reportName);
             if (reportByName != null) {
                 updateIfDifferent(reportName, reportContent, reportByName, description, screenShot);
-            }else{
+            } else {
                 importDefaultReport(reportName, reportContent, description, screenShot);
             }
         } catch (final Exception e) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Report "+reportName+" can't be imported");
+            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Report " + reportName + " can't be imported", e);
         }
     }
 
-    private void updateIfDifferent(String reportName, byte[] reportContent, SReport existingReport, String description, byte[] screenShot) throws SBonitaReadException, SReportNotFoundException, SObjectModificationException {
+    private void updateIfDifferent(String reportName, byte[] reportContent, SReport existingReport, String description, byte[] screenShot)
+            throws SBonitaReadException, SReportNotFoundException, SObjectModificationException {
         final byte[] existingReportContent = reportingService.getReportContent(existingReport.getId());
-        if (reportContent.length != existingReportContent.length){
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Report "+reportName+" exists but the content is not up to date, updating it.");
+        if (reportContent.length != existingReportContent.length) {
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Report " + reportName + " exists but the content is not up to date, updating it.");
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-            entityUpdateDescriptor.addField(SReportFields.NAME,reportName);
-            entityUpdateDescriptor.addField(SReportFields.DESCRIPTION,description);
-            entityUpdateDescriptor.addField(SReportFields.SCREENSHOT,screenShot);
-            entityUpdateDescriptor.addField(SReportFields.CONTENT,reportContent);
+            entityUpdateDescriptor.addField(SReportFields.NAME, reportName);
+            entityUpdateDescriptor.addField(SReportFields.DESCRIPTION, description);
+            entityUpdateDescriptor.addField(SReportFields.SCREENSHOT, screenShot);
+            entityUpdateDescriptor.addField(SReportFields.CONTENT, reportContent);
             reportingService.update(existingReport, entityUpdateDescriptor);
-        }else{
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Report "+reportName+" exists and is up to date, do nothing");
+        } else {
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Report " + reportName + " exists and is up to date, do nothing");
         }
     }
 
@@ -83,7 +83,7 @@ public class DefaultReportImporter {
     }
 
     private void importDefaultReport(String reportName, byte[] reportContent, String description, byte[] screenShot) throws SReportCreationException {
-        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Report "+reportName+" was not imported, importing it.");
+        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Report " + reportName + " was not imported, importing it.");
         final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(reportName, /* system user */-1, true,
                 description, screenShot);
         reportingService.addReport(reportBuilder.done(), reportContent);

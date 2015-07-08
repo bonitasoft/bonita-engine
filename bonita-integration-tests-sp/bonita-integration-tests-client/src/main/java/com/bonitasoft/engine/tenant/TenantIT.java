@@ -10,8 +10,10 @@ package com.bonitasoft.engine.tenant;
 
 import static org.junit.Assert.*;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.PrintTestsStatusRule;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.TenantAdministrationAPI;
 import org.bonitasoft.engine.api.internal.ServerAPI;
@@ -42,8 +44,12 @@ import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.bonitasoft.engine.theme.ThemeType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.APITestSPUtil;
 import com.bonitasoft.engine.BPMTestSPUtil;
@@ -84,6 +90,17 @@ public class TenantIT {
     private static PlatformLoginAPI platformLoginAPI;
 
     private static PlatformSession session;
+
+    private final Logger LOGGER = LoggerFactory.getLogger(TenantIT.class);
+
+    @Rule
+    public TestRule testWatcher = new PrintTestsStatusRule(LOGGER) {
+
+        @Override
+        public List<String> clean() throws Exception {
+            return Collections.emptyList();
+        }
+    };
 
     @BeforeClass
     public static void beforeClass() throws BonitaException {

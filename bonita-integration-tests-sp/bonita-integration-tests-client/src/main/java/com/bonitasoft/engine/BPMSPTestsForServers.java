@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import com.bonitasoft.engine.business.application.ApplicationAPIExtITs;
 import org.bonitasoft.engine.activity.PendingTasksIT;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
@@ -17,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.activity.TaskOnDemandIT;
+import com.bonitasoft.engine.business.application.ApplicationAPIExtITs;
 import com.bonitasoft.engine.business.application.ApplicationAPIITs;
 import com.bonitasoft.engine.business.data.BDRepositoryIT;
 import com.bonitasoft.engine.command.ExecuteBDMQueryCommandIT;
@@ -38,7 +38,6 @@ import com.bonitasoft.engine.tenant.TenantIT;
         PageAPIIT.class,
         ApplicationAPIITs.class,
         ApplicationAPIExtITs.class,
-        TenantIT.class,
         NodeAPITest.class,
         LogTest.class,
         ExternalCommandsTestSP.class,
