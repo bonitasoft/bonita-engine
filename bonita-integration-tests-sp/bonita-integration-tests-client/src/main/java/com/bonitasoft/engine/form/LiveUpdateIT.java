@@ -83,6 +83,7 @@ public class LiveUpdateIT extends CommonAPISPIT {
                 .setFormMappings(
                         FormMappingModelBuilder.buildFormMappingModel().addProcessStartForm("processStartForm", FormMappingTarget.URL)
                                 .addTaskForm("task1Form", FormMappingTarget.INTERNAL, "step1")
+                                .addTaskForm("task1Form", FormMappingTarget.UNDEFINED, "step2")
                                 .addProcessOverviewForm("process1OverviewForm", FormMappingTarget.URL).build());
 
         ProcessDefinition p = getProcessAPI().deploy(bar.done());
@@ -90,7 +91,7 @@ public class LiveUpdateIT extends CommonAPISPIT {
 
         assertThat(getProcessAPI().getProcessDeploymentInfo(p.getId()).getConfigurationState()).as(
                 "before the update of form mapping the process should be unresolved").isEqualTo(ConfigurationState.UNRESOLVED);
-        assertThat(getProcessAPI().getProcessResolutionProblems(p.getId())).as("before the update of form mapping the process should be unresolved").hasSize(1);
+        assertThat(getProcessAPI().getProcessResolutionProblems(p.getId())).as("before the update of form mapping the process should be unresolved").hasSize(2).extracting("resourceId").containsOnly("step1","step2");
         long afterDeploy = System.currentTimeMillis();
         ProcessAPI processConfigurationAPI = getProcessAPI();
 
