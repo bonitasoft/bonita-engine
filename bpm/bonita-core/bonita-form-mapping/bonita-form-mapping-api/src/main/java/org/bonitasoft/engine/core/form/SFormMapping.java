@@ -25,6 +25,7 @@ public interface SFormMapping extends PersistentObject {
     String TARGET_URL = "URL";
     String TARGET_LEGACY = "LEGACY";
     String TARGET_UNDEFINED = "UNDEFINED";
+    String TARGET_NONE = "NONE";
 
     int TYPE_PROCESS_START = 1;
     int TYPE_PROCESS_OVERVIEW = 2;

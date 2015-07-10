@@ -158,7 +158,7 @@ public class FormMappingServiceImplTest {
         QueryOptions queryOptions = mock(QueryOptions.class);
         formMappingService.getNumberOfFormMappings(queryOptions);
 
-        verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
+        verify(persistenceService).getNumberOfEntities(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
     }
 
     @Test
@@ -166,7 +166,7 @@ public class FormMappingServiceImplTest {
         formMappingService.get("theKey");
 
         verify(persistenceService).selectOne(
-                new SelectOneDescriptor<SFormMapping>("getFormMappingByKey", Collections.<String, Object> singletonMap("key", "theKey"), SFormMapping.class));
+                new SelectOneDescriptor<SFormMapping>("getFormMappingByKey", Collections.<String, Object>singletonMap("key", "theKey"), SFormMapping.class));
     }
 
     @Test
@@ -174,7 +174,7 @@ public class FormMappingServiceImplTest {
         QueryOptions queryOptions = mock(QueryOptions.class);
         formMappingService.searchFormMappings(queryOptions);
 
-        verify(persistenceService).searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object> emptyMap());
+        verify(persistenceService).searchEntity(SFormMapping.class, queryOptions, Collections.<String, Object>emptyMap());
     }
 
     @Test
@@ -186,6 +186,17 @@ public class FormMappingServiceImplTest {
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
         assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", "http://fake.url"), entry("pageMapping.pageId", null),
                 entry("pageMapping.urlAdapter", EXTERNAL));
+    }
+
+    @Test
+    public void test_update_with_no_page_nor_url() throws Exception {
+        SFormMapping formMapping = createFormMapping(ID);
+
+        formMappingService.update(formMapping, null, null);
+
+        verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", null), entry("pageMapping.pageId", null),
+                entry("pageMapping.urlAdapter", null));
     }
 
     private SFormMapping createFormMapping(long id) {
@@ -235,10 +246,4 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, "", null);
     }
 
-    @Test(expected = SObjectModificationException.class)
-    public void test_update_with_invalid_parameters4() throws Exception {
-        SFormMapping formMapping = createFormMapping(ID);
-
-        formMappingService.update(formMapping, null, null);
-    }
 }

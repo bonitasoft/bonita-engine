@@ -1121,6 +1121,7 @@ CREATE TABLE form_mapping (
   page_mapping_id NUMERIC(19, 0),
   lastUpdateDate NUMERIC(19, 0),
   lastUpdatedBy NUMERIC(19, 0),
+  target NVARCHAR(16),
   PRIMARY KEY (tenantId, id)
 )
 GO

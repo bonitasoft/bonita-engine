@@ -132,11 +132,14 @@ public class FormMappingServiceImpl implements FormMappingService {
             case SFormMapping.TARGET_UNDEFINED:
                 sPageMapping = null;
                 break;
+            case SFormMapping.TARGET_NONE:
+                sPageMapping = null;
+                break;
             default:
                 throw new IllegalArgumentException("Illegal form target " + target);
 
         }
-        SFormMappingImpl sFormMapping = new SFormMappingImpl(processDefinitionId, type, task);
+        SFormMappingImpl sFormMapping = new SFormMappingImpl(processDefinitionId, type, task, target);
         insertFormMapping(sFormMapping, sPageMapping);
         return sFormMapping;
     }
@@ -173,7 +176,16 @@ public class FormMappingServiceImpl implements FormMappingService {
     public void update(SFormMapping formMapping, String url, Long pageId) throws SObjectModificationException {
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(FORM_MAPPING).setObject(formMapping)
                 .done();
-        checkExclusiveUrlOrPageId(url, pageId);
+        if (url != null && pageId != null) {
+            throw new SObjectModificationException("Can't update the form mapping with both url and pageId");
+        }
+        String target = SFormMapping.TARGET_NONE;
+        if(url != null){
+            target = SFormMapping.TARGET_URL;
+        }else if (pageId != null){
+            target = SFormMapping.TARGET_INTERNAL;
+        }
+
         String urlAdapter = checkAndGetUrlAdapter(url);
         checkThatInternalPageExists(pageId);
         FormMappingLogBuilder logBuilder = getLogBuilder(ActionType.UPDATED);
@@ -183,6 +195,7 @@ public class FormMappingServiceImpl implements FormMappingService {
             Long oldPageId = null;
             String oldUrlAdapter = null;
             String oldUrl = null;
+            entityUpdateDescriptor.addField("target", target);
             entityUpdateDescriptor.addField("lastUpdatedBy", getSessionUserId());
             entityUpdateDescriptor.addField("lastUpdateDate", System.currentTimeMillis());
             // case where page mapping did not exist already (TARGET == UNDEFINED):
@@ -270,12 +283,6 @@ public class FormMappingServiceImpl implements FormMappingService {
     protected void checkUrlNotEmpty(String url) throws SObjectModificationException {
         if (url.isEmpty()) {
             throw new SObjectModificationException("Can't have an empty url");
-        }
-    }
-
-    protected void checkExclusiveUrlOrPageId(String url, Long pageId) throws SObjectModificationException {
-        if (!((url != null) ^ (pageId != null))) {
-            throw new SObjectModificationException("Can't update the form mapping with both url and pageId");
         }
     }
 
