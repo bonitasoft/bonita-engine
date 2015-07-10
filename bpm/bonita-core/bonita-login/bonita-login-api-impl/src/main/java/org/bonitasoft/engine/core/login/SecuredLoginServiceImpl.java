@@ -112,7 +112,8 @@ public class SecuredLoginServiceImpl implements LoginService {
         } catch (final AuthenticationException ae) {
             throw new SLoginException(ae);
         } catch (final SUserNotFoundException e) {
-            throw new SLoginException("Unable to found user " + userName);
+            warningLog("Unable to find user with username " + userName + " in database.");
+            throw new SLoginException("Unable to find user " + userName);
         } finally {
             // clean session accessor
             sessionAccessor.deleteSessionId();
@@ -232,8 +233,16 @@ public class SecuredLoginServiceImpl implements LoginService {
     }
     
     protected void debugLog(String message) {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
+        log(TechnicalLogSeverity.DEBUG, message);
+    }
+    
+    protected void warningLog(String message) {
+        log(TechnicalLogSeverity.WARNING, message);
+    }
+    
+    protected void log(TechnicalLogSeverity severity, String message) {
+        if (logger.isLoggable(this.getClass(), severity)) {
+            logger.log(this.getClass(), severity, message);
         }
     }
 
