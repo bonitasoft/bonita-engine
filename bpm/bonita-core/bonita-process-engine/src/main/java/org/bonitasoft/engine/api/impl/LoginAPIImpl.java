@@ -37,7 +37,6 @@ import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
-import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
@@ -72,8 +71,6 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     public APISession login(final String userName, final String password) throws LoginException {
         try {
             return loginInternal(userName, password, null);
-        } catch (final UnknownUserException e) {
-            throw e;
         } catch (final LoginException e) {
             throw e;
         } catch (final Exception e) {
@@ -86,8 +83,6 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     protected APISession login(final String userName, final String password, final Long tenantId) throws LoginException {
         try {
             return loginInternal(userName, password, tenantId);
-        } catch (final UnknownUserException e) {
-            throw e;
         } catch (final LoginException e) {
             throw e;
         } catch (final Exception e) {
@@ -104,8 +99,6 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
             final Long tenantId = NumberUtils.isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) ? NumberUtils.toLong(String
                     .valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) : null;
             return loginInternal(tenantId, credentials);
-        } catch (final UnknownUserException e) {
-            throw e;
         } catch (final LoginException e) {
             throw e;
         } catch (final Exception e) {
