@@ -75,7 +75,7 @@ public class SecuredLoginServiceImpl implements LoginService {
     }
 
     @Override
-    public SSession login(final Map<String, Serializable> credentials) throws SLoginException {
+    public SSession login(final Map<String, Serializable> credentials) throws SLoginException, SUserNotFoundException {
         debugLog("Loging in");
         if (credentials == null) {
             throw new SLoginException("invalid credentials, map is null");
@@ -110,9 +110,11 @@ public class SecuredLoginServiceImpl implements LoginService {
                 }
             }
         } catch (final AuthenticationException ae) {
+            debugLog("Unable to authenticate user with username " + userName);
             throw new SLoginException(ae);
         } catch (final SUserNotFoundException e) {
-            throw new SLoginException("Unable to found user " + userName);
+            debugLog("Unable to find user with username " + userName + " in database.");
+            throw e;
         } finally {
             // clean session accessor
             sessionAccessor.deleteSessionId();
@@ -236,5 +238,4 @@ public class SecuredLoginServiceImpl implements LoginService {
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
         }
     }
-
 }

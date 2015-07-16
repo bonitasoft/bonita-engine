@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.login;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.model.SSession;
 
@@ -32,8 +33,10 @@ public interface LoginService {
      * @return the session created if login succeeds
      * @throws SLoginException
      *             if login fails
+     * @throws SUserNotFoundException 
+     *             if the user does not exist in the database
      */
-    SSession login(Map<String, Serializable> credentials) throws SLoginException;
+    SSession login(Map<String, Serializable> credentials) throws SLoginException, SUserNotFoundException;
 
     boolean isValid(final long sessionId);
 
