@@ -1001,7 +1001,7 @@ CREATE TABLE form_mapping (
   page_mapping_id BIGINT,
   lastUpdateDate BIGINT,
   lastUpdatedBy BIGINT,
-  target VARCHAR(16),
+  target VARCHAR(16) NOT NULL,
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;
 
