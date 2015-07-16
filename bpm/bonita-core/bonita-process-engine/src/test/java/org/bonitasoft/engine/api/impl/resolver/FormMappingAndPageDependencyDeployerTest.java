@@ -436,11 +436,11 @@ public class FormMappingAndPageDependencyDeployerTest {
         formMappingAndPageDependencyDeployer.checkFormMappingResolution(tenantServiceAccessor, sFormMappingTask, problems);
         formMappingAndPageDependencyDeployer.checkFormMappingResolution(tenantServiceAccessor, sFormMappingProcessOverview, problems);
         formMappingAndPageDependencyDeployer.checkFormMappingResolution(tenantServiceAccessor, sFormMappingProcessStart, problems);
-        assertThat(problems).as("the problem list should contain three mapping problems").hasSize(0);
+        assertThat(problems).as("the problem list should not contain any mapping problem").hasSize(0);
     }
 
     @Test
-    public void checkFormMappingResolutionShouldNotAddProblemsIfThereIsUNDEFINED() throws Exception {
+    public void checkFormMappingResolutionShouldAddProblemsIfThereIsUNDEFINED() throws Exception {
         ArrayList<Problem> problems = new ArrayList<>();
 
         SFormMappingImpl sFormMappingTask = new SFormMappingImpl(321324, FormMappingType.TASK.getId(), "Step1", SFormMapping.TARGET_UNDEFINED);

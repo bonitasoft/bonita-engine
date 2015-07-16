@@ -152,8 +152,7 @@ public class FormMappingAndPageDependencyDeployer implements ProcessDependencyDe
             if (pageId == null || tenantAccessor.getPageService().getPage(pageId) == null) {
                 addProblem(formMapping, problems);
             }
-        }
-        if (isUndefined(formMapping)) {
+        } else if (isUndefined(formMapping)) {
             addProblem(formMapping, problems);
         }
     }

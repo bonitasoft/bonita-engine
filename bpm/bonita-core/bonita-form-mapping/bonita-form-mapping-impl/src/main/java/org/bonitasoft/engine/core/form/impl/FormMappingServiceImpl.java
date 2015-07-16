@@ -176,21 +176,11 @@ public class FormMappingServiceImpl implements FormMappingService {
     public void update(SFormMapping formMapping, String url, Long pageId) throws SObjectModificationException {
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(FORM_MAPPING).setObject(formMapping)
                 .done();
-        if (url != null && pageId != null) {
-            throw new SObjectModificationException("Can't update the form mapping with both url and pageId");
-        }
-        String target = SFormMapping.TARGET_NONE;
-        if(url != null){
-            target = SFormMapping.TARGET_URL;
-        }else if (pageId != null){
-            target = SFormMapping.TARGET_INTERNAL;
-        }
-
+        String target = getFormMappingTarget(url, pageId);
         String urlAdapter = checkAndGetUrlAdapter(url);
         checkThatInternalPageExists(pageId);
         FormMappingLogBuilder logBuilder = getLogBuilder(ActionType.UPDATED);
         EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-
         try {
             Long oldPageId = null;
             String oldUrlAdapter = null;
@@ -222,8 +212,21 @@ public class FormMappingServiceImpl implements FormMappingService {
         }
     }
 
+    String getFormMappingTarget(String url, Long pageId) throws SObjectModificationException {
+        if (url != null && pageId != null) {
+            throw new SObjectModificationException("Can't update the form mapping with both url and pageId");
+        }
+        String target = SFormMapping.TARGET_NONE;
+        if (url != null) {
+            target = SFormMapping.TARGET_URL;
+        } else if (pageId != null) {
+            target = SFormMapping.TARGET_INTERNAL;
+        }
+        return target;
+    }
+
     String truncate(String rawMessage) {
-        return rawMessage.substring(0,Math.min(255,rawMessage.length()));
+        return rawMessage.substring(0, Math.min(255, rawMessage.length()));
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder) {

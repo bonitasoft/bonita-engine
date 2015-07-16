@@ -184,7 +184,7 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, "http://fake.url", null);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", "http://fake.url"), entry("pageMapping.pageId", null),
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_URL), entry("pageMapping.url", "http://fake.url"), entry("pageMapping.pageId", null),
                 entry("pageMapping.urlAdapter", EXTERNAL));
     }
 
@@ -195,7 +195,7 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, null, null);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", null), entry("pageMapping.pageId", null),
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_NONE),entry("pageMapping.url", null), entry("pageMapping.pageId", null),
                 entry("pageMapping.urlAdapter", null));
     }
 
@@ -214,7 +214,7 @@ public class FormMappingServiceImplTest {
         formMappingService.update(formMapping, null, PAGE_ID);
 
         verify(recorder).recordUpdate(updateRecordCaptor.capture(), updateEventCaptor.capture());
-        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("pageMapping.url", null), entry("pageMapping.pageId", PAGE_ID),
+        assertThat(updateRecordCaptor.getValue().getFields()).contains(entry("target", SFormMapping.TARGET_INTERNAL),entry("pageMapping.url", null), entry("pageMapping.pageId", PAGE_ID),
                 entry("pageMapping.urlAdapter", null));
     }
 
