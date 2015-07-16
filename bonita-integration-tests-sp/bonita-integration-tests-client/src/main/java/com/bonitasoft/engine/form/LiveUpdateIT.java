@@ -91,7 +91,8 @@ public class LiveUpdateIT extends CommonAPISPIT {
 
         assertThat(getProcessAPI().getProcessDeploymentInfo(p.getId()).getConfigurationState()).as(
                 "before the update of form mapping the process should be unresolved").isEqualTo(ConfigurationState.UNRESOLVED);
-        assertThat(getProcessAPI().getProcessResolutionProblems(p.getId())).as("before the update of form mapping the process should be unresolved").hasSize(2).extracting("resourceId").containsOnly("step1","step2");
+        assertThat(getProcessAPI().getProcessResolutionProblems(p.getId())).as("before the update of form mapping the process should be unresolved").hasSize(2)
+                .extracting("resourceId").containsOnly("step1", "step2");
         long afterDeploy = System.currentTimeMillis();
         ProcessAPI processConfigurationAPI = getProcessAPI();
 
