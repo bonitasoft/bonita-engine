@@ -1,4 +1,5 @@
-/**
+
+/*******************************************************************************
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,7 +11,8 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ ******************************************************************************/
+
 package org.bonitasoft.engine.api.impl.resolver;
 
 import java.util.ArrayList;
@@ -40,7 +42,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.xml.Parser;
 
 /**
  * @author Baptiste Mesta
@@ -56,12 +57,6 @@ public class ActorProcessDependencyDeployer implements ProcessDependencyDeployer
         BuilderFactory.getInstance();
         final SActorBuilderFactory sActorBuilderFactory = BuilderFactory.get(SActorBuilderFactory.class);
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        Parser parser = null;
-        try {
-            parser = tenantAccessor.getActorMappingParser();
-        } catch (final IllegalArgumentException e) {
-            throw new ActorMappingImportException("unable to instantiate parser of actor mapping", e);
-        }
         final Set<SActorDefinition> actors = processDefinition.getActors();
         final Set<SActor> sActors = new HashSet<SActor>(actors.size() + 1);
         final SActorDefinition actorInitiator = processDefinition.getActorInitiator();
@@ -84,7 +79,7 @@ public class ActorProcessDependencyDeployer implements ProcessDependencyDeployer
             final byte[] actorMappingXML = businessArchive.getResource(ActorMappingContribution.ACTOR_MAPPING_FILE);
             if (actorMappingXML != null) {
                 final String actorMapping = new String(actorMappingXML);
-                final ImportActorMapping importActorMapping = new ImportActorMapping(actorMappingService, identityService, parser, processDefinition.getId(),
+                final ImportActorMapping importActorMapping = new ImportActorMapping(actorMappingService, identityService, processDefinition.getId(),
                         actorMapping);
                 try {
                     importActorMapping.execute();

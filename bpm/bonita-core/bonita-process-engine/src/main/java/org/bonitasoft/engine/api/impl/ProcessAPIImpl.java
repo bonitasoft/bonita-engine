@@ -1,4 +1,5 @@
-/**
+
+/*******************************************************************************
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,7 +11,8 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ ******************************************************************************/
+
 package org.bonitasoft.engine.api.impl;
 
 import static java.util.Collections.singletonMap;
@@ -314,7 +316,6 @@ import org.bonitasoft.engine.exception.NotSerializableException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UnauthorizedAccessException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -352,7 +353,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.page.PageURL;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -432,7 +432,6 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.XMLWriter;
 
 /**
@@ -453,17 +452,16 @@ public class ProcessAPIImpl implements ProcessAPI {
     private static final String CONTAINER_TYPE_PROCESS_INSTANCE = "PROCESS_INSTANCE";
 
     private static final String CONTAINER_TYPE_ACTIVITY_INSTANCE = "ACTIVITY_INSTANCE";
-
-    private final ProcessManagementAPIImplDelegate processManagementAPIImplDelegate;
-
-    private final DocumentAPI documentAPI;
     protected final ProcessConfigurationAPIImpl processConfigurationAPI;
+    private final ProcessManagementAPIImplDelegate processManagementAPIImplDelegate;
+    private final DocumentAPI documentAPI;
 
     public ProcessAPIImpl() {
         this(new ProcessManagementAPIImplDelegate(), new DocumentAPIImpl(), new ProcessConfigurationAPIImpl());
     }
 
-    public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI, ProcessConfigurationAPIImpl processConfigurationAPI) {
+    public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI,
+            ProcessConfigurationAPIImpl processConfigurationAPI) {
         processManagementAPIImplDelegate = processManagementAPIDelegate;
         this.documentAPI = documentAPI;
         this.processConfigurationAPI = processConfigurationAPI;
@@ -557,7 +555,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstancesFromProcessDefinition(final long processDefinitionId, final TenantServiceAccessor tenantAccessor)
-            throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+            throws SBonitaException {
         List<ProcessInstance> processInstances;
         final int maxResults = 1000;
         do {
@@ -569,7 +567,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstancesInsideLocks(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
-            final List<ProcessInstance> processInstances, final long tenantId) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+            final List<ProcessInstance> processInstances, final long tenantId) throws SBonitaException {
         final List<Long> processInstanceIds = new ArrayList<Long>(processInstances.size());
         for (final ProcessInstance processInstance : processInstances) {
             processInstanceIds.add(processInstance.getId());
@@ -578,7 +576,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstancesInsideLocksFromIds(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
-            final List<Long> processInstanceIds, final long tenantId) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+            final List<Long> processInstanceIds, final long tenantId) throws SBonitaException {
         final LockService lockService = tenantAccessor.getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         final List<Long> lockedProcesses = new ArrayList<Long>();
@@ -616,7 +614,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstancesInTransaction(final TenantServiceAccessor tenantAccessor, final boolean ignoreProcessInstanceNotFound,
-            final List<Long> processInstanceIds) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+            final List<Long> processInstanceIds) throws SBonitaException {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -625,7 +623,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void deleteProcessInstances(final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger,
             final boolean ignoreProcessInstanceNotFound, final ActivityInstanceService activityInstanceService, final List<Long> processInstanceIds)
-            throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+            throws SBonitaException {
         for (final Long processInstanceId : processInstanceIds) {
             try {
                 deleteProcessInstance(processInstanceService, processInstanceId, activityInstanceService);
@@ -642,7 +640,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstance(final ProcessInstanceService processInstanceService, final Long processInstanceId,
-            final ActivityInstanceService activityInstanceService) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
+            final ActivityInstanceService activityInstanceService) throws SBonitaException {
         final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
         final long callerId = sProcessInstance.getCallerId();
         if (callerId > 0) {
@@ -726,7 +724,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();;
+        final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
 
         SProcessDefinition sProcessDefinition;
         try {
@@ -1674,7 +1672,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final int totalNumber = activityInstanceService.getNumberOfOpenActivityInstances(processInstanceId);
             // If there are no instances, return an empty list:
             if (totalNumber == 0) {
-                return Collections.<ActivityInstance> emptyList();
+                return Collections.emptyList();
             }
             final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForActivityInstance(criterion);
             return ModelConvertor.toActivityInstances(
@@ -1726,7 +1724,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Category createCategory(final String name, final String description) throws AlreadyExistsException, CreationException {
+    public Category createCategory(final String name, final String description) throws CreationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
 
@@ -1798,7 +1796,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void addCategoriesToProcess(final long processDefinitionId, final List<Long> categoryIds) throws AlreadyExistsException, CreationException {
+    public void addCategoriesToProcess(final long processDefinitionId, final List<Long> categoryIds) throws CreationException {
         try {
             final CategoryService categoryService = getTenantAccessor().getCategoryService();
             final ProcessDefinitionService processDefinitionService = getTenantAccessor().getProcessDefinitionService();
@@ -1824,7 +1822,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void addProcessDefinitionToCategory(final long categoryId, final long processDefinitionId) throws AlreadyExistsException, CreationException {
+    public void addProcessDefinitionToCategory(final long categoryId, final long processDefinitionId) throws CreationException {
         try {
             final CategoryService categoryService = getTenantAccessor().getCategoryService();
             final ProcessDefinitionService processDefinitionService = getTenantAccessor().getProcessDefinitionService();
@@ -1843,7 +1841,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void addProcessDefinitionsToCategory(final long categoryId, final List<Long> processDefinitionIds) throws AlreadyExistsException, CreationException {
+    public void addProcessDefinitionsToCategory(final long categoryId, final List<Long> processDefinitionIds) throws CreationException {
         try {
             final CategoryService categoryService = getTenantAccessor().getCategoryService();
             final ProcessDefinitionService processDefinitionService = getTenantAccessor().getProcessDefinitionService();
@@ -2684,9 +2682,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final IdentityService identityService = tenantAccessor.getIdentityService();
-            final Parser parser = tenantAccessor.getActorMappingParser();
             try {
-                new ImportActorMapping(actorMappingService, identityService, parser, processDefinitionId, xmlContent).execute();
+                new ImportActorMapping(actorMappingService, identityService, processDefinitionId, xmlContent).execute();
                 tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
             } catch (final SBonitaException sbe) {
                 throw new ActorMappingImportException(sbe);
@@ -2719,7 +2716,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public boolean isManagerOfUserInvolvedInProcessInstance(final long managerUserId, final long processInstanceId) throws ProcessInstanceNotFoundException,
+    public boolean isManagerOfUserInvolvedInProcessInstance(final long managerUserId, final long processInstanceId) throws
             BonitaException {
         return new ProcessInvolvementAPIImpl(this).isManagerOfUserInvolvedInProcessInstance(managerUserId, processInstanceId);
     }
@@ -4112,22 +4109,21 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ProcessSupervisor createProcessSupervisorForUser(final long processDefinitionId, final long userId) throws CreationException, AlreadyExistsException {
+    public ProcessSupervisor createProcessSupervisorForUser(final long processDefinitionId, final long userId) throws CreationException {
         final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
         supervisorBuilder.setUserId(userId);
         return createSupervisor(supervisorBuilder.done());
     }
 
     @Override
-    public ProcessSupervisor createProcessSupervisorForRole(final long processDefinitionId, final long roleId) throws CreationException, AlreadyExistsException {
+    public ProcessSupervisor createProcessSupervisorForRole(final long processDefinitionId, final long roleId) throws CreationException {
         final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
         supervisorBuilder.setRoleId(roleId);
         return createSupervisor(supervisorBuilder.done());
     }
 
     @Override
-    public ProcessSupervisor createProcessSupervisorForGroup(final long processDefinitionId, final long groupId) throws CreationException,
-            AlreadyExistsException {
+    public ProcessSupervisor createProcessSupervisorForGroup(final long processDefinitionId, final long groupId) throws CreationException {
         final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
         supervisorBuilder.setGroupId(groupId);
         return createSupervisor(supervisorBuilder.done());
@@ -4135,7 +4131,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessSupervisor createProcessSupervisorForMembership(final long processDefinitionId, final long groupId, final long roleId)
-            throws CreationException, AlreadyExistsException {
+            throws CreationException {
         final SProcessSupervisorBuilder supervisorBuilder = buildSProcessSupervisor(processDefinitionId);
         supervisorBuilder.setGroupId(groupId);
         supervisorBuilder.setRoleId(roleId);
@@ -4147,7 +4143,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         return sProcessSupervisorBuilderFactory.createNewInstance(processDefinitionId);
     }
 
-    private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException, AlreadyExistsException {
+    private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException {
         final TenantServiceAccessor tenantServiceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = tenantServiceAccessor.getSupervisorService();
         final TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
@@ -5850,7 +5846,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void throwContractViolationExceptionIfContractIsInvalid(final boolean wrapInTransaction, final Map<String, Serializable> inputs,
-            final TenantServiceAccessor tenantAccessor, final SFlowNodeInstance flowNodeInstance) throws SBonitaException, SContractViolationException {
+            final TenantServiceAccessor tenantAccessor, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
         final GetContractOfUserTaskInstance contractOfUserTaskInstance = new GetContractOfUserTaskInstance(tenantAccessor.getProcessDefinitionService(),
                 (SUserTaskInstance) flowNodeInstance);
         executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);

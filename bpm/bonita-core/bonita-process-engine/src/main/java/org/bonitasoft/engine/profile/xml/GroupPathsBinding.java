@@ -1,4 +1,5 @@
-/**
+
+/*******************************************************************************
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,24 +11,25 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.actor.xml;
+ ******************************************************************************/
 
+package org.bonitasoft.engine.profile.xml;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.xml.ElementBinding;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class ActorMembershipBinding extends ElementBinding {
+public class GroupPathsBinding extends ElementBinding {
 
-    private String role;
+    private final List<String> groups;
 
-    private String group;
-
-    public ActorMembershipBinding() {
+    public GroupPathsBinding() {
+        groups = new ArrayList<String>();
     }
 
     @Override
@@ -36,11 +38,8 @@ public class ActorMembershipBinding extends ElementBinding {
 
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
-        if ("role".equals(name)) {
-            role = value;
-        }
         if ("group".equals(name)) {
-            group = value;
+            groups.add(value);
         }
     }
 
@@ -50,12 +49,12 @@ public class ActorMembershipBinding extends ElementBinding {
 
     @Override
     public Object getObject() {
-        return new BEntry<String, String>(group, role);
+        return groups;
     }
 
     @Override
     public String getElementTag() {
-        return "membership";
+        return "groups";
     }
 
 }

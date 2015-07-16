@@ -1,4 +1,5 @@
-/**
+
+/*******************************************************************************
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,13 +11,15 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ ******************************************************************************/
+
 package org.bonitasoft.engine.api.impl.transaction.actor;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.List;
 import java.util.Set;
+
+import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorMemberAlreadyExistsException;
@@ -24,7 +27,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.xml.Actor;
 import org.bonitasoft.engine.actor.xml.ActorMapping;
-import org.bonitasoft.engine.actor.xml.SActorMappingImportException;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -32,8 +34,9 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.xml.Parser;
+import org.xml.sax.SAXException;
 
 /**
  * @author Matthieu Chaffotte
@@ -44,18 +47,15 @@ public class ImportActorMapping implements TransactionContent {
 
     private final IdentityService identityService;
 
-    private final Parser parser;
-
     private final long processDefinitionId;
 
     private final String xmlContent;
 
-    public ImportActorMapping(final ActorMappingService actorMappingService, final IdentityService identityService, final Parser parser,
+    public ImportActorMapping(final ActorMappingService actorMappingService, final IdentityService identityService,
             final long processDefinitionId, final String xmlContent) {
         super();
         this.actorMappingService = actorMappingService;
         this.identityService = identityService;
-        this.parser = parser;
         this.processDefinitionId = processDefinitionId;
         this.xmlContent = xmlContent;
     }
@@ -153,18 +153,14 @@ public class ImportActorMapping implements TransactionContent {
         } while (actorMembersOfMembership.size() > 0);
     }
 
-    private ActorMapping getActorMappingFromXML() throws SBonitaException {
-        StringReader reader = new StringReader(xmlContent);
+    ActorMapping getActorMappingFromXML() throws SBonitaException {
+        byte[] b = xmlContent.getBytes();
         try {
-            parser.validate(reader);
-            reader.close();
-            reader = new StringReader(xmlContent);
-            return (ActorMapping) parser.getObjectFromXML(reader);
-        } catch (final IOException ioe) {
-            throw new SActorMappingImportException(ioe);
-        } finally {
-            reader.close();
+            return IOUtil.unmarshallXMLtoObject(b, ActorMapping.class, ActorMapping.class.getResource("/actorMapping.xsd"));
+        } catch (JAXBException | SAXException | IOException e) {
+            throw new SBonitaReadException("Unable to read the actor mapping xml", e);
         }
+
     }
 
 }

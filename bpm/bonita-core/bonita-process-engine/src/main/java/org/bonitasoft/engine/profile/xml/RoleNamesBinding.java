@@ -1,4 +1,5 @@
-/**
+
+/*******************************************************************************
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,55 +11,50 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.actor.xml;
+ ******************************************************************************/
 
+package org.bonitasoft.engine.profile.xml;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.xml.ElementBinding;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class ActorBinding extends ElementBinding {
+public class RoleNamesBinding extends ElementBinding {
 
-    private Actor actor;
+    private final List<String> roles;
+
+    public RoleNamesBinding() {
+        roles = new ArrayList<String>();
+    }
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
-        final String name = attributes.get("name");
-        actor = new Actor(name);
     }
 
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void setChildObject(final String name, final Object value) {
-        if ("users".equals(name)) {
-            actor.addUsers((List<String>) value);
-        } else if ("groups".equals(name)) {
-            actor.addGroups((List<String>) value);
-        } else if ("roles".equals(name)) {
-            actor.addRoles((List<String>) value);
-        } else if ("membership".equals(name)) {
-            final BEntry<String, String> entry = (BEntry<String, String>) value;
-            actor.addMembership(entry.getKey(), entry.getValue());
+        if ("role".equals(name)) {
+            roles.add(value);
         }
     }
 
     @Override
-    public Actor getObject() {
-        return actor;
+    public void setChildObject(final String name, final Object value) {
+    }
+
+    @Override
+    public Object getObject() {
+        return roles;
     }
 
     @Override
     public String getElementTag() {
-        return "actorMapping";
+        return "roles";
     }
 
 }

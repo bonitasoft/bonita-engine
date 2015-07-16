@@ -1,4 +1,5 @@
-/**
+
+/*******************************************************************************
  * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
@@ -10,12 +11,21 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
+ ******************************************************************************/
+
 package org.bonitasoft.engine.actor.xml;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 
@@ -23,19 +33,26 @@ import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Actor {
 
-    private final String name;
-
+    @XmlAttribute
+    private String name;
+    @XmlAttribute
     private String description;
-
+    @XmlElementWrapper(name = "users", required = false)
+    @XmlElement(name = "user")
     private Set<String> users;
-
+    @XmlElementWrapper(name = "groups", required = false)
+    @XmlElement(name = "group")
     private Set<String> groups;
-
+    @XmlElementWrapper(name = "roles", required = false)
+    @XmlElement(name = "role")
     private Set<String> roles;
-
-    private final Set<BEntry<String, String>> memberships;
+    @XmlElementWrapper(name = "memberships", required = false)
+    @XmlJavaTypeAdapter(BEntryAdapter.class)
+    @XmlElement(name = "membership")
+    private Set<BEntry<String, String>> memberships = null;
 
     public Actor(final String name) {
         this.name = name;
@@ -45,16 +62,20 @@ public class Actor {
         memberships = new HashSet<BEntry<String, String>>();
     }
 
+    public Actor() {
+
+    }
+
     public String getName() {
         return name;
     }
 
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     public void addGroup(final String group) {
@@ -102,73 +123,34 @@ public class Actor {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (groups == null ? 0 : groups.hashCode());
-        result = prime * result + (memberships == null ? 0 : memberships.hashCode());
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (roles == null ? 0 : roles.hashCode());
-        result = prime * result + (users == null ? 0 : users.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Actor actor = (Actor) o;
+        return Objects.equals(name, actor.name) &&
+                Objects.equals(description, actor.description) &&
+                Objects.equals(users, actor.users) &&
+                Objects.equals(groups, actor.groups) &&
+                Objects.equals(roles, actor.roles) &&
+                Objects.equals(memberships, actor.memberships);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Actor other = (Actor) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (groups == null) {
-            if (other.groups != null) {
-                return false;
-            }
-        } else if (!groups.equals(other.groups)) {
-            return false;
-        }
-        if (memberships == null) {
-            if (other.memberships != null) {
-                return false;
-            }
-        } else if (!memberships.equals(other.memberships)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (roles == null) {
-            if (other.roles != null) {
-                return false;
-            }
-        } else if (!roles.equals(other.roles)) {
-            return false;
-        }
-        if (users == null) {
-            if (other.users != null) {
-                return false;
-            }
-        } else if (!users.equals(other.users)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(name, description, users, groups, roles, memberships);
     }
 
+    @Override
+    public String toString() {
+        return "Actor{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", users=" + users +
+                ", groups=" + groups +
+                ", roles=" + roles +
+                ", memberships=" + memberships +
+                '}';
+    }
 }
