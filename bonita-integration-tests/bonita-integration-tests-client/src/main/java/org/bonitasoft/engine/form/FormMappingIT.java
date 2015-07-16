@@ -120,7 +120,7 @@ public class FormMappingIT extends TestWithUser {
         assertThat(step1Form1.getPageId()).isNull();
         assertThat(step2Form1.getProcessDefinitionId()).isEqualTo(p1.getId());
         assertThat(step2Form1.getURL()).isNull();
-        assertThat(step2Form1.getTarget()).isEqualTo(FormMappingTarget.UNDEFINED);
+        assertThat(step2Form1.getTarget()).isEqualTo(FormMappingTarget.NONE);
 
         assertThat(processStartForm2.getProcessDefinitionId()).isEqualTo(p2.getId());
         assertThat(processStartForm2.getURL()).isEqualTo("processStartForm");
@@ -131,7 +131,7 @@ public class FormMappingIT extends TestWithUser {
         assertThat(step1Form2.getURL()).isEqualTo("task2Form");
         assertThat(step2Form2.getProcessDefinitionId()).isEqualTo(p2.getId());
         assertThat(step2Form2.getURL()).isNull();
-        assertThat(step2Form2.getTarget()).isEqualTo(FormMappingTarget.UNDEFINED);
+        assertThat(step2Form2.getTarget()).isEqualTo(FormMappingTarget.NONE);
 
         //search
         SearchResult<FormMapping> formMappingSearchResult = processConfigurationAPI.searchFormMappings(new SearchOptionsBuilder(0, 100).sort(
