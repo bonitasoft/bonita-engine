@@ -81,7 +81,6 @@ import org.bonitasoft.engine.api.impl.transaction.flownode.GetFlowNodeInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.SetExpectedEndDate;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.AddProcessDefinitionToCategory;
-import org.bonitasoft.engine.api.impl.transaction.process.DeleteArchivedProcessInstances;
 import org.bonitasoft.engine.api.impl.transaction.process.EnableProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
@@ -3302,20 +3301,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             transactionContent.execute();
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public void deleteProcessInstances(final long processDefinitionId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        try {
-            deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
-            new DeleteArchivedProcessInstances(tenantAccessor, processDefinitionId).execute();
-        } catch (final SProcessInstanceHierarchicalDeletionException e) {
-            throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
         }
     }
 
