@@ -18,13 +18,14 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.form.FormMappingService;
 import org.bonitasoft.engine.core.form.SFormMapping;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchFormMappingDescriptor;
-import org.bonitasoft.engine.search.descriptor.SearchProfileDescriptor;
+import org.bonitasoft.engine.service.FormRequiredAnalyzer;
 import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
@@ -33,10 +34,13 @@ import org.bonitasoft.engine.service.ModelConvertor;
 public class SearchFormMappings extends AbstractSearchEntity<FormMapping, SFormMapping> {
 
     private final FormMappingService formMappingService;
+    private final ProcessDefinitionService processDefinitionService;
 
-    public SearchFormMappings(final FormMappingService formMappingService, final SearchFormMappingDescriptor searchProfileDescriptor, final SearchOptions options) {
+    public SearchFormMappings(final FormMappingService formMappingService, final ProcessDefinitionService processDefinitionService,
+            final SearchFormMappingDescriptor searchProfileDescriptor, final SearchOptions options) {
         super(searchProfileDescriptor, options);
         this.formMappingService = formMappingService;
+        this.processDefinitionService = processDefinitionService;
     }
 
     @Override
@@ -51,7 +55,7 @@ public class SearchFormMappings extends AbstractSearchEntity<FormMapping, SFormM
 
     @Override
     public List<FormMapping> convertToClientObjects(final List<SFormMapping> serverObjects) {
-        return ModelConvertor.toFormMappings(serverObjects);
+        return ModelConvertor.toFormMappings(serverObjects, new FormRequiredAnalyzer(processDefinitionService));
     }
 
 }
