@@ -64,7 +64,7 @@ public class SecuredLoginServiceImplTest {
 
     @Mock
     private IdentityService identityService;
-    
+
     @Mock
     private TechnicalLoggerService logger;
 
@@ -84,7 +84,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testSecuredLoginServiceWithNullCredentials() {
+    public void testSecuredLoginServiceWithNullCredentials() throws SUserNotFoundException {
         try {
             securedLoginServiceImpl.login(null);
             fail();
@@ -94,7 +94,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testSecuredLoginServiceWithNullLogin() {
+    public void testSecuredLoginServiceWithNullLogin() throws SUserNotFoundException {
         try {
             final Map<String, Serializable> credentials = new HashMap<>();
             final Long tenantId = new Long(1);
@@ -123,21 +123,20 @@ public class SecuredLoginServiceImplTest {
         }
     }
 
-    @Test(expected=SUserNotFoundException.class)
+    @Test(expected = SUserNotFoundException.class)
     public void testSecuredLoginServiceWithUnknownUserThrowSUserNotFoundException() throws Exception {
-        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
-            final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
-            final Long tenantId = new Long(1);
-            final String login = "login";
-            final String password = "password";
-            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
-            credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
-            credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        final Map<String, Serializable> credentials = new HashMap<>();
+        final Long tenantId = new Long(1);
+        final String login = "login";
+        final String password = "password";
+        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
 
-            when(genericAuthenticationService.checkUserCredentials(credentials)).thenReturn(login);
-            when(identityService.getUserByUserName(login)).thenThrow(new SUserNotFoundException(login));
+        when(genericAuthenticationService.checkUserCredentials(credentials)).thenReturn(login);
+        when(identityService.getUserByUserName(login)).thenThrow(new SUserNotFoundException(login));
 
-            securedLoginServiceImpl.login(credentials);
+        securedLoginServiceImpl.login(credentials);
     }
 
     @Test
@@ -374,7 +373,7 @@ public class SecuredLoginServiceImplTest {
         credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
         credentials.put(AuthenticationConstants.BASIC_USERNAME, username);
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-        
+
         spy.login(credentials);
 
         verify(sessionService).createSession(1, -1, "john", true);
