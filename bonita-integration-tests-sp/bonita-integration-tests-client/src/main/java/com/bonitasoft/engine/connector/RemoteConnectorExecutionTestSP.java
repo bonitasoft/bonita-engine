@@ -9,11 +9,7 @@
 package com.bonitasoft.engine.connector;
 
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -1554,7 +1550,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         }
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
         waitForUserTask(processInstance2.getId(), "step0");
-        getProcessAPI().deleteProcessInstances(processDefinition2.getId());
+        getProcessAPI().deleteProcessInstances(processDefinition2.getId(), 0, 100);
 
         // Clean up
         BPMTestSPUtil.deactivateAndDeleteTenant(tenant2Id);
@@ -1562,10 +1558,10 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-
     @Test
     public void failingWithConnectorCacheIssue() throws Exception {
-        final ProcessDefinitionBuilderExt processWithFailingConnector = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithFailingConnector", "1.0");
+        final ProcessDefinitionBuilderExt processWithFailingConnector = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithFailingConnector",
+                "1.0");
         processWithFailingConnector.addAutomaticTask("step1").addConnector("failing", "failing", "1", ConnectorEvent.ON_ENTER);
 
         final BusinessArchive businessArchive = new BusinessArchiveBuilder()
@@ -1600,6 +1596,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     }
 
     public class FailingConnector extends AbstractConnector {
+
         @Override
         public void validateInputParameters() throws ConnectorValidationException {
 
@@ -1607,7 +1604,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         @Override
         protected void executeBusinessLogic() throws ConnectorException {
-            int i = 1/0;
+            int i = 1 / 0;
         }
     }
 }
