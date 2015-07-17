@@ -125,21 +125,6 @@ public interface PlatformCommandAPI {
     void unregister(String name) throws CommandNotFoundException, DeletionException;
 
     /**
-     * Returns the command descriptor.
-     *
-     * @param name
-     *        the command name
-     * @return the descriptor of the command
-     * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         occurs when the session is not valid
-     * @throws CommandNotFoundException
-     *         occurs when the command name does not refer to an existing command.
-     * @deprecated As of release 6.2.1, replaced by {@link #getCommand(String)} that does not throw CreationException.
-     */
-    @Deprecated
-    CommandDescriptor get(String name) throws CommandNotFoundException, CreationException;
-
-    /**
      * Returns the command descriptor corresponding to the given command name.
      *
      * @param commandName
