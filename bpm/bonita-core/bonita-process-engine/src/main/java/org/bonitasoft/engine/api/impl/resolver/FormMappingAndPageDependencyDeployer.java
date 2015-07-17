@@ -194,8 +194,7 @@ public class FormMappingAndPageDependencyDeployer implements ProcessDependencyDe
         if (isHumanTask(activity)) {
             // create mapping as declared in form mapping:
             createFormMapping(formMappingService, processDefinitionId, getFormMappingForHumanTask(activity.getName(), formMappings),
-                    FormMappingType.TASK.getId(),
-                    activity.getName());
+                    FormMappingType.TASK.getId(), activity.getName());
         } else if (activity instanceof SubProcessDefinition) {
             final org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition subProcessContainer = ((SubProcessDefinition) activity)
                     .getSubProcessContainer();
