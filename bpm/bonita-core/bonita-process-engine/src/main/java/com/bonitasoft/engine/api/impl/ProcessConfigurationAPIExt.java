@@ -22,6 +22,7 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.form.FormMapping;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.service.FormRequiredAnalyzer;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -58,7 +59,7 @@ public class ProcessConfigurationAPIExt extends ProcessConfigurationAPIImpl {
             SFormMapping sFormMapping = formMappingService.get(formMappingId);
             formMappingService.update(sFormMapping, url, pageId);
             tenantAccessor.getDependencyResolver().resolveDependencies(sFormMapping.getProcessDefinitionId(), tenantAccessor);
-            return ModelConvertor.toFormMapping(sFormMapping);
+            return ModelConvertor.toFormMapping(sFormMapping, new FormRequiredAnalyzer(tenantAccessor.getProcessDefinitionService()));
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
         } catch (SObjectNotFoundException e) {
