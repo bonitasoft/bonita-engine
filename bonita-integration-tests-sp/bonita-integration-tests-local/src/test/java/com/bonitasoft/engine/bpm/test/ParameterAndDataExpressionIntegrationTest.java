@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.CommonBPMServicesSPTest;
-import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -32,6 +30,9 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.bonitasoft.engine.CommonBPMServicesSPTest;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServicesSPTest {
 
@@ -85,7 +86,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         // create expression
         // check
         assertEquals("baptiste", createAndEvaluateParameterExpression(nameParameter, deployId, "processDefinitionId"));
-        processAPIImpl.deleteProcess(deploy.getId());
+        processAPIImpl.deleteProcessDefinition(deploy.getId());
     }
 
     @Test(expected = SExpressionEvaluationException.class)
@@ -97,7 +98,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         try {
             createAndEvaluateParameterExpression("nonExistingParameter", deployId, "processDefinitionId");
         } finally {
-            processAPIImpl.deleteProcess(deploy.getId());
+            processAPIImpl.deleteProcessDefinition(deploy.getId());
         }
     }
 
