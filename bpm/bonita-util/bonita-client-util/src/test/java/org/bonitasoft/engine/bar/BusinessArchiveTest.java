@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,10 +11,15 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.bar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,13 +33,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
-import org.bonitasoft.engine.bpm.bar.ActorMappingContribution;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
+import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingDefinition;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
@@ -330,22 +335,26 @@ public class BusinessArchiveTest {
         assertThat(readBusinessArchive.getFormMappingModel().getFormMappings()).as("Form Mapping should be found in BusinessArchive").hasSize(2);
     }
 
+    /*
+     * Changed to work with the new system of actorMapping storage. Note that the test may have lost his purpose
+     * since you cannot give the BusinessArchive garbage as an actorMapping, you need an actual actorMapping class
+     * object
+     */
     @Test
     public void putActorMappingInBar() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ProductionPlanning", "3.1");
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
+        ActorMapping actorMapping = new ActorMapping();
         // Add a resource to the biz archive:
-        final byte[] xmlBytes = "<toto>text</toto>".getBytes();
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
-                .setActorMapping(xmlBytes).done();
+                .setActorMapping(actorMapping).done();
 
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
 
         // read from the file
         final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(barFile);
         // final ProcessDefinition processDefinition = processAPI.deploy(readBusinessArchive);
-        assertTrue("Actor Mapping not found in BusinessArchive",
-                Arrays.equals(xmlBytes, readBusinessArchive.getResource(ActorMappingContribution.ACTOR_MAPPING_FILE)));
+        assertEquals(actorMapping, readBusinessArchive.getActorMapping());
     }
 
     @Test

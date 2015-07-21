@@ -1,7 +1,6 @@
-
-/*******************************************************************************
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+/**
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,58 +10,48 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ******************************************************************************/
+ **/
 
 package org.bonitasoft.engine.api.impl.transaction.actor;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorMemberAlreadyExistsException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
-import org.bonitasoft.engine.actor.xml.Actor;
-import org.bonitasoft.engine.actor.xml.ActorMapping;
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
+import org.bonitasoft.engine.bpm.bar.ActorMappingMarshaller;
+import org.bonitasoft.engine.bpm.bar.XmlMarshallException;
+import org.bonitasoft.engine.bpm.bar.actorMapping.Actor;
+import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.xml.sax.SAXException;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class ImportActorMapping implements TransactionContent {
+public class ImportActorMapping {
 
     private final ActorMappingService actorMappingService;
 
     private final IdentityService identityService;
 
-    private final long processDefinitionId;
-
-    private final String xmlContent;
-
-    public ImportActorMapping(final ActorMappingService actorMappingService, final IdentityService identityService,
-            final long processDefinitionId, final String xmlContent) {
-        super();
+    public ImportActorMapping(final ActorMappingService actorMappingService, IdentityService identityService) {
         this.actorMappingService = actorMappingService;
         this.identityService = identityService;
-        this.processDefinitionId = processDefinitionId;
-        this.xmlContent = xmlContent;
     }
 
-    @Override
-    public void execute() throws SBonitaException {
-        final ActorMapping actorMapping = getActorMappingFromXML();
+    public void importActorMappingFromXml(String xmlContent, long processDefinitionId) throws SBonitaException {
+        ActorMapping actorMapping = getActorMappingFromXML(xmlContent);
+        execute(actorMapping, processDefinitionId);
+    }
+
+    public void execute(ActorMapping actorMapping, long processDefinitionId) throws SBonitaException {
         final List<Actor> actors = actorMapping.getActors();
         for (final Actor actor : actors) {
             final SActor sActor = actorMappingService.getActor(actor.getName(), processDefinitionId);
@@ -85,10 +74,10 @@ public class ImportActorMapping implements TransactionContent {
                 checkAlreadyExistingGroupMapping(actorId, group.getId());
                 actorMappingService.addGroupToActor(actorId, group.getId());
             }
-            final Set<BEntry<String, String>> memberships = actor.getMemberships();
-            for (final BEntry<String, String> membership : memberships) {
-                final SGroup group = identityService.getGroupByPath(membership.getKey());
-                final SRole role = identityService.getRoleByName(membership.getValue());
+            final Set<Actor.Membership> memberships = actor.getMemberships();
+            for (final Actor.Membership membership : memberships) {
+                final SGroup group = identityService.getGroupByPath(membership.getGroup());
+                final SRole role = identityService.getRoleByName(membership.getRole());
                 checkAlreadyExistingMembershipMapping(actorId, group.getId(), role.getId());
                 actorMappingService.addRoleAndGroupToActor(actorId, role.getId(), group.getId());
             }
@@ -153,11 +142,11 @@ public class ImportActorMapping implements TransactionContent {
         } while (actorMembersOfMembership.size() > 0);
     }
 
-    ActorMapping getActorMappingFromXML() throws SBonitaException {
+    private ActorMapping getActorMappingFromXML(String xmlContent) throws SBonitaException {
         byte[] b = xmlContent.getBytes();
         try {
-            return IOUtil.unmarshallXMLtoObject(b, ActorMapping.class, ActorMapping.class.getResource("/actorMapping.xsd"));
-        } catch (JAXBException | SAXException | IOException e) {
+            return ActorMappingMarshaller.deserializeFromXML(b);
+        } catch (XmlMarshallException e) {
             throw new SBonitaReadException("Unable to read the actor mapping xml", e);
         }
 

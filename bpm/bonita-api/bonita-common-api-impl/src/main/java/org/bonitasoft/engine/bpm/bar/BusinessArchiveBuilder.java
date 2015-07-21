@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,14 +11,17 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.bpm.bar;
 
-import java.util.ArrayList;
-import java.util.Map;
-
+import org.bonitasoft.engine.bpm.bar.actorMapping.ActorMapping;
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * <b>Creates {@link BusinessArchive}</b>
@@ -149,8 +152,16 @@ public class BusinessArchiveBuilder {
      * @return
      *         the same {@link BusinessArchiveBuilder} in order to chain calls
      */
-    public BusinessArchiveBuilder setActorMapping(final byte[] xmlContent) {
-        entity.addResource(ActorMappingContribution.ACTOR_MAPPING_FILE, xmlContent);
+    @Deprecated
+    public BusinessArchiveBuilder setActorMapping(final byte[] xmlContent) throws IOException {
+        ActorMapping actorMapping;
+        ActorMappingMarshaller marshaller = new ActorMappingMarshaller();
+        try {
+            actorMapping = marshaller.deserializeFromXML(xmlContent);
+        } catch (XmlMarshallException e) {
+            throw new IOException("Generation of the actorMapping from the provided Xml failed", e);
+        }
+        setActorMapping(actorMapping);
         return this;
     }
 
@@ -224,4 +235,13 @@ public class BusinessArchiveBuilder {
         return entity;
     }
 
+    public ActorMapping getActorMapping() {
+        return entity.getActorMapping();
+    }
+
+    public BusinessArchiveBuilder setActorMapping(ActorMapping actorMapping) {
+        entity.setActorMapping(actorMapping);
+        return this;
+
+    }
 }

@@ -14,6 +14,11 @@
 
 package org.bonitasoft.engine;
 
+import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.test.APITestUtil;
+
 import javax.naming.Context;
 import java.io.File;
 import java.io.IOException;
@@ -24,11 +29,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.test.APITestUtil;
 
 public class LocalServerTestsInitializer {
 

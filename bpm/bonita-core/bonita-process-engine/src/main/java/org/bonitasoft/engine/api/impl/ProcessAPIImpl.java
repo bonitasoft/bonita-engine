@@ -1,7 +1,7 @@
 
-/*******************************************************************************
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+/**
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,7 +11,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ******************************************************************************/
+ **/
 
 package org.bonitasoft.engine.api.impl;
 
@@ -432,7 +432,6 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.bonitasoft.engine.xml.XMLWriter;
 
 /**
  * @author Baptiste Mesta
@@ -2683,7 +2682,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final IdentityService identityService = tenantAccessor.getIdentityService();
             try {
-                new ImportActorMapping(actorMappingService, identityService, processDefinitionId, xmlContent).execute();
+                new ImportActorMapping(actorMappingService,identityService).importActorMappingFromXml(xmlContent,processDefinitionId);
                 tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
             } catch (final SBonitaException sbe) {
                 throw new ActorMappingImportException(sbe);
@@ -2696,9 +2695,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final XMLWriter writer = tenantAccessor.getXMLWriter();
         try {
-            final ExportActorMapping exportActorMapping = new ExportActorMapping(actorMappingService, identityService, writer, processDefinitionId);
+            final ExportActorMapping exportActorMapping = new ExportActorMapping(actorMappingService, identityService, processDefinitionId);
             exportActorMapping.execute();
             return exportActorMapping.getResult();
         } catch (final SBonitaException sbe) {

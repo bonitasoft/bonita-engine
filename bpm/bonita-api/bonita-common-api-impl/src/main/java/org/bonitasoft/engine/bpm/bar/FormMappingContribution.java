@@ -13,14 +13,13 @@
  **/
 package org.bonitasoft.engine.bpm.bar;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.xml.bind.JAXBException;
-
 import org.bonitasoft.engine.bpm.bar.form.model.FormMappingModel;
 import org.bonitasoft.engine.io.IOUtil;
 import org.xml.sax.SAXException;
+
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author Emmanuel Duchastenier
@@ -45,7 +44,7 @@ public class FormMappingContribution implements BusinessArchiveContribution {
         if (file.exists()) {
             final byte[] content = IOUtil.getContent(file);
             try {
-                businessArchive.setFormMappings(new FormMappingModelConverter().deserializeFromXML(content));
+                businessArchive.setFormMappings(new FormMappingModelMarshaller().deserializeFromXML(content));
             } catch (JAXBException | SAXException e) {
                 return false;
             }
@@ -57,7 +56,7 @@ public class FormMappingContribution implements BusinessArchiveContribution {
     public void saveToBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {
         final FormMappingModel formMappingModel = businessArchive.getFormMappingModel();
         try {
-            final byte[] fileContent = new FormMappingModelConverter().serializeToXML(formMappingModel);
+            final byte[] fileContent = new FormMappingModelMarshaller().serializeToXML(formMappingModel);
             final File file = new File(barFolder, FORM_MAPPING_FILE);
             IOUtil.write(file, fileContent);
         } catch (JAXBException | SAXException e) {

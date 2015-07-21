@@ -13,12 +13,6 @@
  **/
 package org.bonitasoft.engine.process.actor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
-import java.io.InputStream;
-import java.util.List;
-
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
@@ -31,6 +25,12 @@ import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.junit.Test;
+
+import java.io.InputStream;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Matthieu Chaffotte
@@ -66,7 +66,7 @@ public class ExportActorMappingIT extends TestWithUser {
         // should work
         final String xmlContent = getProcessAPI().exportActorMapping(definition.getId());
         disableAndDeleteProcess(definition);
-        assertFalse(xmlContent.contains("group") || xmlContent.contains("sale"));
+        assertFalse(xmlContent.contains("<group>") || xmlContent.contains("<sale>"));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class ExportActorMappingIT extends TestWithUser {
         // should work
         final String xmlContent = getProcessAPI().exportActorMapping(definition.getId());
         disableAndDeleteProcess(definition);
-        assertFalse(xmlContent.contains("user") || xmlContent.contains("john"));
+        assertFalse(xmlContent.contains("<user>") || xmlContent.contains("john"));
     }
 
     @Test
@@ -106,7 +106,7 @@ public class ExportActorMappingIT extends TestWithUser {
         // should work
         final String xmlContent = getProcessAPI().exportActorMapping(definition.getId());
         deleteProcess(definition);
-        assertFalse(xmlContent.contains("group") || xmlContent.contains("role"));
+        assertFalse(xmlContent.contains("<group>") || xmlContent.contains("<role>"));
         deleteGroups(group);
     }
 
@@ -132,7 +132,7 @@ public class ExportActorMappingIT extends TestWithUser {
         // should work
         final String xmlContent = getProcessAPI().exportActorMapping(definition.getId());
         deleteProcess(definition);
-        assertFalse(xmlContent, xmlContent.contains("group") || xmlContent.contains("sale"));
+        assertFalse(xmlContent, xmlContent.contains("<group>") || xmlContent.contains("<sale>"));
     }
 
     @Test
@@ -147,7 +147,7 @@ public class ExportActorMappingIT extends TestWithUser {
         // should work
         final String xmlContent = getProcessAPI().exportActorMapping(definition.getId());
         disableAndDeleteProcess(definition);
-        assertFalse(xmlContent.contains("role") || xmlContent.contains("sale"));
+        assertFalse(xmlContent.contains("<role>") || xmlContent.contains("<sale>"));
     }
 
     @Test
@@ -183,7 +183,6 @@ public class ExportActorMappingIT extends TestWithUser {
         } finally {
             xmlStream.close();
         }
-        // getIdentityAPI().deleteUserMembership(createUserMembership.getId());
         getIdentityAPI().deleteGroup(rd.getId());
         getIdentityAPI().deleteRole(role.getId());
         deleteUser(john);
