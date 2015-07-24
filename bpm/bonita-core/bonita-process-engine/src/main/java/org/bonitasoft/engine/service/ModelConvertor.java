@@ -331,7 +331,7 @@ public class ModelConvertor {
     }
 
     public static List<ActivityInstance> toActivityInstances(final List<SActivityInstance> sActivities, final FlowNodeStateManager flowNodeStateManager) {
-        final List<ActivityInstance> activityInstances = new ArrayList<ActivityInstance>();
+        final List<ActivityInstance> activityInstances = new ArrayList<>();
         for (final SActivityInstance sActivity : sActivities) {
             final ActivityInstance activityInstance = toActivityInstance(sActivity, flowNodeStateManager);
             activityInstances.add(activityInstance);
@@ -340,7 +340,7 @@ public class ModelConvertor {
     }
 
     public static List<FlowNodeInstance> toFlowNodeInstances(final List<SFlowNodeInstance> sFlowNodes, final FlowNodeStateManager flowNodeStateManager) {
-        final List<FlowNodeInstance> flowNodeInstances = new ArrayList<FlowNodeInstance>();
+        final List<FlowNodeInstance> flowNodeInstances = new ArrayList<>();
         for (final SFlowNodeInstance sFlowNode : sFlowNodes) {
             final FlowNodeInstance flowNodeInstance = toFlowNodeInstance(sFlowNode, flowNodeStateManager);
             flowNodeInstances.add(flowNodeInstance);
@@ -477,7 +477,7 @@ public class ModelConvertor {
     }
 
     public static List<UserTaskInstance> toUserTaskInstances(final List<SUserTaskInstance> sUserTasks, final FlowNodeStateManager flowNodeStateManager) {
-        final List<UserTaskInstance> userTaskInstances = new ArrayList<UserTaskInstance>();
+        final List<UserTaskInstance> userTaskInstances = new ArrayList<>();
         for (final SUserTaskInstance sUserTask : sUserTasks) {
             final UserTaskInstance userTask = toUserTaskInstance(sUserTask, flowNodeStateManager);
             userTaskInstances.add(userTask);
@@ -520,7 +520,7 @@ public class ModelConvertor {
 
     public static List<HumanTaskInstance> toHumanTaskInstances(final List<? extends SHumanTaskInstance> sHumanTasks,
             final FlowNodeStateManager flowNodeStateManager) {
-        final List<HumanTaskInstance> humanTaskInstances = new ArrayList<HumanTaskInstance>(sHumanTasks.size());
+        final List<HumanTaskInstance> humanTaskInstances = new ArrayList<>(sHumanTasks.size());
         for (final SHumanTaskInstance sUserTask : sHumanTasks) {
             final HumanTaskInstance userTask = toHumanTaskInstance(sUserTask, flowNodeStateManager);
             humanTaskInstances.add(userTask);
@@ -555,9 +555,9 @@ public class ModelConvertor {
 
     public static List<ProcessInstance> toProcessInstances(final List<SProcessInstance> sProcessInstances,
             final ProcessDefinitionService processDefinitionService) {
-        final List<ProcessInstance> clientProcessInstances = new ArrayList<ProcessInstance>();
+        final List<ProcessInstance> clientProcessInstances = new ArrayList<>();
         if (sProcessInstances != null) {
-            final Map<Long, SProcessDefinition> processDefinitions = new HashMap<Long, SProcessDefinition>();
+            final Map<Long, SProcessDefinition> processDefinitions = new HashMap<>();
 
             for (final SProcessInstance sProcessInstance : sProcessInstances) {
                 final SProcessDefinition sProcessDefinition = getProcessDefinition(processDefinitionService, processDefinitions,
@@ -575,7 +575,7 @@ public class ModelConvertor {
             try {
                 sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
                 processDefinitions.put(sProcessDefinition.getId(), sProcessDefinition);
-            } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e ) {
+            } catch (final SProcessDefinitionNotFoundException | SBonitaReadException e) {
                 throw new SBonitaRuntimeException(e);
             }
         }
@@ -615,7 +615,7 @@ public class ModelConvertor {
     }
 
     public static List<ProcessDeploymentInfo> toProcessDeploymentInfo(final List<SProcessDefinitionDeployInfo> processDefinitionDIs) {
-        final List<ProcessDeploymentInfo> deploymentInfos = new ArrayList<ProcessDeploymentInfo>();
+        final List<ProcessDeploymentInfo> deploymentInfos = new ArrayList<>();
         for (final SProcessDefinitionDeployInfo processDefinitionDI : processDefinitionDIs) {
             final ProcessDeploymentInfo deploymentInfo = toProcessDeploymentInfo(processDefinitionDI);
             deploymentInfos.add(deploymentInfo);
@@ -633,7 +633,7 @@ public class ModelConvertor {
 
     public static Map<Long, ProcessDeploymentInfo> toProcessDeploymentInfos(final Map<Long, SProcessDefinitionDeployInfo> sProcessDeploymentInfos) {
         if (sProcessDeploymentInfos != null && !sProcessDeploymentInfos.isEmpty()) {
-            final Map<Long, ProcessDeploymentInfo> processDeploymentInfos = new HashMap<Long, ProcessDeploymentInfo>();
+            final Map<Long, ProcessDeploymentInfo> processDeploymentInfos = new HashMap<>();
             final Set<Entry<Long, SProcessDefinitionDeployInfo>> entries = sProcessDeploymentInfos.entrySet();
             for (final Entry<Long, SProcessDefinitionDeployInfo> entry : entries) {
                 processDeploymentInfos.put(entry.getKey(), toProcessDeploymentInfo(entry.getValue()));
@@ -735,7 +735,7 @@ public class ModelConvertor {
 
     public static List<ArchivedUserTaskInstance> toArchivedUserTaskInstances(final List<SAUserTaskInstance> sInstances,
             final FlowNodeStateManager flowNodeStateManager) {
-        final List<ArchivedUserTaskInstance> archivedUserTaskInstances = new ArrayList<ArchivedUserTaskInstance>();
+        final List<ArchivedUserTaskInstance> archivedUserTaskInstances = new ArrayList<>();
         for (final SAUserTaskInstance sAUserTaskInstance : sInstances) {
             final ArchivedUserTaskInstance archivedUserTaskInstance = toArchivedUserTaskInstance(sAUserTaskInstance, flowNodeStateManager);
             archivedUserTaskInstances.add(archivedUserTaskInstance);
@@ -745,7 +745,7 @@ public class ModelConvertor {
 
     public static List<ArchivedReceiveTaskInstance> toArchivedReceiveTaskInstances(final List<SAReceiveTaskInstance> sInstances,
             final FlowNodeStateManager flowNodeStateManager) {
-        final List<ArchivedReceiveTaskInstance> archivedReceiveTaskInstances = new ArrayList<ArchivedReceiveTaskInstance>();
+        final List<ArchivedReceiveTaskInstance> archivedReceiveTaskInstances = new ArrayList<>();
         for (final SAReceiveTaskInstance sAReceiveTaskInstance : sInstances) {
             final ArchivedReceiveTaskInstance archivedReceiveTaskInstance = toArchivedReceiveTaskInstance(sAReceiveTaskInstance, flowNodeStateManager);
             archivedReceiveTaskInstances.add(archivedReceiveTaskInstance);
@@ -755,7 +755,7 @@ public class ModelConvertor {
 
     public static List<ArchivedHumanTaskInstance> toArchivedHumanTaskInstances(final List<? extends SAHumanTaskInstance> sInstances,
             final FlowNodeStateManager flowNodeStateManager) {
-        final List<ArchivedHumanTaskInstance> archivedUserTaskInstances = new ArrayList<ArchivedHumanTaskInstance>();
+        final List<ArchivedHumanTaskInstance> archivedUserTaskInstances = new ArrayList<>();
         for (final SAHumanTaskInstance sInstance : sInstances) {
             final ArchivedHumanTaskInstance archivedUserTaskInstance = toArchivedHumanTaskInstance(sInstance, flowNodeStateManager);
             archivedUserTaskInstances.add(archivedUserTaskInstance);
@@ -855,7 +855,7 @@ public class ModelConvertor {
 
     public static List<ArchivedActivityInstance> toArchivedActivityInstances(final List<SAActivityInstance> saActivityInstances,
             final FlowNodeStateManager flowNodeStateManager) {
-        final List<ArchivedActivityInstance> archivedActivityInstances = new ArrayList<ArchivedActivityInstance>();
+        final List<ArchivedActivityInstance> archivedActivityInstances = new ArrayList<>();
         for (final SAActivityInstance saActivityInstance : saActivityInstances) {
             final ArchivedActivityInstance archivedActivityInstance = toArchivedActivityInstance(saActivityInstance, flowNodeStateManager);
             archivedActivityInstances.add(archivedActivityInstance);
@@ -866,8 +866,8 @@ public class ModelConvertor {
     public static List<ArchivedProcessInstance> toArchivedProcessInstances(final List<SAProcessInstance> saProcessInstances,
             final ProcessDefinitionService processDefinitionService) {
         if (saProcessInstances != null) {
-            final List<ArchivedProcessInstance> clientProcessInstances = new ArrayList<ArchivedProcessInstance>(saProcessInstances.size());
-            final Map<Long, SProcessDefinition> processDefinitions = new HashMap<Long, SProcessDefinition>(saProcessInstances.size());
+            final List<ArchivedProcessInstance> clientProcessInstances = new ArrayList<>(saProcessInstances.size());
+            final Map<Long, SProcessDefinition> processDefinitions = new HashMap<>(saProcessInstances.size());
 
             for (final SAProcessInstance saProcessInstance : saProcessInstances) {
                 final SProcessDefinition sProcessDefinition = getProcessDefinition(processDefinitionService, processDefinitions,
@@ -881,7 +881,7 @@ public class ModelConvertor {
 
     public static List<ArchivedProcessInstance> toArchivedProcessInstances(final List<SAProcessInstance> sProcessInstances,
             final SProcessDefinition sProcessDefinition) {
-        final List<ArchivedProcessInstance> clientProcessInstances = new ArrayList<ArchivedProcessInstance>(sProcessInstances.size());
+        final List<ArchivedProcessInstance> clientProcessInstances = new ArrayList<>(sProcessInstances.size());
         for (final SAProcessInstance sProcessInstance : sProcessInstances) {
             clientProcessInstances.add(toArchivedProcessInstance(sProcessInstance, sProcessDefinition));
         }
@@ -928,7 +928,7 @@ public class ModelConvertor {
     }
 
     public static List<Group> toGroups(final List<SGroup> sGroups) {
-        final List<Group> clientGroups = new ArrayList<Group>();
+        final List<Group> clientGroups = new ArrayList<>();
         if (sGroups != null) {
             for (final SGroup sGroup : sGroups) {
                 clientGroups.add(toGroup(sGroup));
@@ -997,7 +997,7 @@ public class ModelConvertor {
     }
 
     public static List<User> toUsers(final List<SUser> sUsers, final Map<Long, SUser> userIdToUser) {
-        final List<User> users = new ArrayList<User>();
+        final List<User> users = new ArrayList<>();
         if (sUsers != null) {
             for (final SUser sUser : sUsers) {
                 final User user = ModelConvertor.toUser(sUser, userIdToUser);
@@ -1024,7 +1024,7 @@ public class ModelConvertor {
     }
 
     public static List<Role> toRoles(final List<SRole> sRoles) {
-        final List<Role> lightRoles = new ArrayList<Role>();
+        final List<Role> lightRoles = new ArrayList<>();
         if (sRoles != null) {
             for (final SRole sRole : sRoles) {
                 final Role role = toRole(sRole);
@@ -1046,7 +1046,7 @@ public class ModelConvertor {
     }
 
     public static List<UserMembership> toUserMembership(final List<SUserMembership> sUserMemberships) {
-        final List<UserMembership> userMemberships = new ArrayList<UserMembership>();
+        final List<UserMembership> userMemberships = new ArrayList<>();
         if (sUserMemberships != null) {
             for (final SUserMembership sMembership : sUserMemberships) {
                 final UserMembership userMembership = toUserMembership(sMembership);
@@ -1058,7 +1058,7 @@ public class ModelConvertor {
 
     public static List<UserMembership> toUserMembership(final List<SUserMembership> sUserMemberships, final Map<Long, String> userNames,
             final Map<Long, String> groupIdToGroup) {
-        final List<UserMembership> userMemberships = new ArrayList<UserMembership>();
+        final List<UserMembership> userMemberships = new ArrayList<>();
         if (sUserMemberships != null) {
             for (final SUserMembership sMembership : sUserMemberships) {
                 final UserMembership userMembership = toUserMembership(sMembership, userNames, groupIdToGroup);
@@ -1110,7 +1110,7 @@ public class ModelConvertor {
 
     public static List<CommandDescriptor> toCommandDescriptors(final List<SCommand> sCommands) {
         if (sCommands != null) {
-            final List<CommandDescriptor> commandList = new ArrayList<CommandDescriptor>();
+            final List<CommandDescriptor> commandList = new ArrayList<>();
             for (final SCommand sCommand : sCommands) {
                 commandList.add(toCommandDescriptor(sCommand));
             }
@@ -1121,7 +1121,7 @@ public class ModelConvertor {
 
     public static List<CommandDescriptor> toPlatformCommandDescriptors(final List<SPlatformCommand> sPlatformCommands) {
         if (sPlatformCommands != null) {
-            final List<CommandDescriptor> platformCommandList = new ArrayList<CommandDescriptor>();
+            final List<CommandDescriptor> platformCommandList = new ArrayList<>();
             for (final SPlatformCommand sCommand : sPlatformCommands) {
                 platformCommandList.add(toCommandDescriptor(sCommand));
             }
@@ -1132,7 +1132,7 @@ public class ModelConvertor {
 
     public static List<Category> toCategories(final List<SCategory> sCategories) {
         if (sCategories != null) {
-            final List<Category> categoryList = new ArrayList<Category>();
+            final List<Category> categoryList = new ArrayList<>();
             for (final SCategory sCategory : sCategories) {
                 categoryList.add(toCategory(sCategory));
             }
@@ -1142,7 +1142,7 @@ public class ModelConvertor {
     }
 
     public static List<EventInstance> toEventInstances(final Collection<SEventInstance> sEvents, final FlowNodeStateManager flowNodeStateManager) {
-        final List<EventInstance> eventInstances = new ArrayList<EventInstance>();
+        final List<EventInstance> eventInstances = new ArrayList<>();
         for (final SEventInstance sEvent : sEvents) {
             final EventInstance eventInstance = toEventInstance(sEvent, flowNodeStateManager);
             eventInstances.add(eventInstance);
@@ -1157,7 +1157,7 @@ public class ModelConvertor {
     }
 
     public static List<EventTriggerInstance> toEventTriggerInstances(final List<SEventTriggerInstance> sEventTriggerInstances) {
-        final List<EventTriggerInstance> eventTriggerInstances = new ArrayList<EventTriggerInstance>();
+        final List<EventTriggerInstance> eventTriggerInstances = new ArrayList<>();
         for (final SEventTriggerInstance sEventTriggerInstance : sEventTriggerInstances) {
             final EventTriggerInstance eventTriggerInstance = toEventTriggerInstance(sEventTriggerInstance);
             if (eventTriggerInstance != null) {
@@ -1168,7 +1168,7 @@ public class ModelConvertor {
     }
 
     public static List<TimerEventTriggerInstance> toTimerEventTriggerInstances(final List<STimerEventTriggerInstance> sEventTriggerInstances) {
-        final List<TimerEventTriggerInstance> eventTriggerInstances = new ArrayList<TimerEventTriggerInstance>();
+        final List<TimerEventTriggerInstance> eventTriggerInstances = new ArrayList<>();
         for (final STimerEventTriggerInstance sEventTriggerInstance : sEventTriggerInstances) {
             final TimerEventTriggerInstance eventTriggerInstance = toTimerEventTriggerInstance(sEventTriggerInstance);
             if (eventTriggerInstance != null) {
@@ -1237,7 +1237,7 @@ public class ModelConvertor {
     }
 
     public static List<WaitingEvent> toWaitingEvents(final List<SWaitingEvent> sWaitingEvents) {
-        final List<WaitingEvent> waitingEvents = new ArrayList<WaitingEvent>(sWaitingEvents.size());
+        final List<WaitingEvent> waitingEvents = new ArrayList<>(sWaitingEvents.size());
         for (final SWaitingEvent sWaitingEvent : sWaitingEvents) {
             waitingEvents.add(toWaitingEvent(sWaitingEvent));
         }
@@ -1264,7 +1264,7 @@ public class ModelConvertor {
 
     public static List<DataInstance> toDataInstances(final List<SDataInstance> sDataInstances) {
         if (sDataInstances != null) {
-            final List<DataInstance> dataInstanceList = new ArrayList<DataInstance>();
+            final List<DataInstance> dataInstanceList = new ArrayList<>();
             for (final SDataInstance sDataInstance : sDataInstances) {
                 dataInstanceList.add(toDataInstance(sDataInstance));
             }
@@ -1275,7 +1275,7 @@ public class ModelConvertor {
 
     public static List<DataDefinition> toDataDefinitions(final List<SDataDefinition> sDataDefinitions) {
         if (sDataDefinitions != null) {
-            final List<DataDefinition> dataDefinitionList = new ArrayList<DataDefinition>();
+            final List<DataDefinition> dataDefinitionList = new ArrayList<>();
             for (final SDataDefinition sDataDefinition : sDataDefinitions) {
                 dataDefinitionList.add(toDataDefinition(sDataDefinition));
             }
@@ -1297,7 +1297,7 @@ public class ModelConvertor {
 
     public static List<Expression> toExpressions(final List<SExpression> sExpressions) {
         if (sExpressions != null && !sExpressions.isEmpty()) {
-            final List<Expression> expList = new ArrayList<Expression>(sExpressions.size());
+            final List<Expression> expList = new ArrayList<>(sExpressions.size());
             for (final SExpression sexp : sExpressions) {
                 expList.add(toExpression(sexp));
             }
@@ -1351,7 +1351,7 @@ public class ModelConvertor {
     }
 
     public static List<ArchivedDataInstance> toArchivedDataInstances(final List<SADataInstance> sADataInstances) {
-        final List<ArchivedDataInstance> dataInstances = new ArrayList<ArchivedDataInstance>();
+        final List<ArchivedDataInstance> dataInstances = new ArrayList<>();
         for (final SADataInstance sADataInstance : sADataInstances) {
             final ArchivedDataInstance dataInstance = toArchivedDataInstance(sADataInstance);
             dataInstances.add(dataInstance);
@@ -1379,7 +1379,7 @@ public class ModelConvertor {
     }
 
     public static List<ActorMember> toActorMembers(final List<SActorMember> sActorMembers) {
-        final List<ActorMember> actorMembers = new ArrayList<ActorMember>();
+        final List<ActorMember> actorMembers = new ArrayList<>();
         for (final SActorMember sActorMember : sActorMembers) {
             final ActorMember actorMember = toActorMember(sActorMember);
             actorMembers.add(actorMember);
@@ -1597,7 +1597,7 @@ public class ModelConvertor {
     }
 
     public static List<ProcessSupervisor> toProcessSupervisors(final List<SProcessSupervisor> sSupervisors) {
-        final List<ProcessSupervisor> processSupervisors = new ArrayList<ProcessSupervisor>();
+        final List<ProcessSupervisor> processSupervisors = new ArrayList<>();
         if (sSupervisors != null) {
             for (final SProcessSupervisor sSupervisor : sSupervisors) {
                 processSupervisors.add(toProcessSupervisor(sSupervisor));
@@ -1617,7 +1617,7 @@ public class ModelConvertor {
     }
 
     public static List<Document> toDocuments(final Collection<SMappedDocument> mappedDocuments, final DocumentService documentService) {
-        final List<Document> documents = new ArrayList<Document>();
+        final List<Document> documents = new ArrayList<>();
         for (final SMappedDocument mappedDocument : mappedDocuments) {
             final Document document = toDocument(mappedDocument, documentService);
             documents.add(document);
@@ -1657,7 +1657,7 @@ public class ModelConvertor {
     }
 
     public static List<ArchivedDocument> toArchivedDocuments(final Collection<SAMappedDocument> mappedDocuments, final DocumentService documentService) {
-        final List<ArchivedDocument> documents = new ArrayList<ArchivedDocument>();
+        final List<ArchivedDocument> documents = new ArrayList<>();
         for (final SAMappedDocument mappedDocument : mappedDocuments) {
             final ArchivedDocument document = toArchivedDocument(mappedDocument, documentService);
             documents.add(document);
@@ -1731,7 +1731,7 @@ public class ModelConvertor {
     }
 
     public static List<Comment> toComments(final List<SComment> sComments) {
-        final List<Comment> comments = new ArrayList<Comment>();
+        final List<Comment> comments = new ArrayList<>();
         for (final SComment sComment : sComments) {
             comments.add(toComment(sComment));
         }
@@ -1740,7 +1740,7 @@ public class ModelConvertor {
 
     public static Map<String, SExpression> constructExpressions(final Map<String, Expression> inputs) {
 
-        final Map<String, SExpression> result = new HashMap<String, SExpression>(inputs.size());
+        final Map<String, SExpression> result = new HashMap<>(inputs.size());
         for (final Entry<String, Expression> expression : inputs.entrySet()) {
             result.put(expression.getKey(), constructSExpression(expression.getValue()));
         }
@@ -1748,7 +1748,7 @@ public class ModelConvertor {
     }
 
     public static SExpression constructSExpression(final Expression model) {
-        final ArrayList<SExpression> dependencies = new ArrayList<SExpression>();
+        final ArrayList<SExpression> dependencies = new ArrayList<>();
         for (final Expression dep : model.getDependencies()) {
             dependencies.add(constructSExpression(dep));
         }
@@ -1785,7 +1785,7 @@ public class ModelConvertor {
         if (operations == null) {
             return Collections.emptyList();
         }
-        final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
+        final List<SOperation> sOperations = new ArrayList<>(operations.size());
         for (final Operation operation : operations) {
             sOperations.add(convertOperation(operation));
         }
@@ -1795,7 +1795,7 @@ public class ModelConvertor {
     public static List<ConnectorImplementationDescriptor> toConnectorImplementationDescriptors(
             final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors) {
         if (sConnectorImplementationDescriptors != null) {
-            final List<ConnectorImplementationDescriptor> connectorImplementationDescriptors = new ArrayList<ConnectorImplementationDescriptor>(
+            final List<ConnectorImplementationDescriptor> connectorImplementationDescriptors = new ArrayList<>(
                     sConnectorImplementationDescriptors.size());
             for (final SConnectorImplementationDescriptor sConnectorImplementationDescriptor : sConnectorImplementationDescriptors) {
                 connectorImplementationDescriptors.add(toConnectorImplementationDescriptor(sConnectorImplementationDescriptor));
@@ -1814,7 +1814,7 @@ public class ModelConvertor {
     }
 
     public static List<ArchivedComment> toArchivedComments(final List<SAComment> serverObjects) {
-        final List<ArchivedComment> commments = new ArrayList<ArchivedComment>();
+        final List<ArchivedComment> commments = new ArrayList<>();
         for (final SAComment saComment : serverObjects) {
             final ArchivedComment comment = toArchivedComment(saComment);
             commments.add(comment);
@@ -1873,7 +1873,7 @@ public class ModelConvertor {
     }
 
     public static List<ActorInstance> toActors(final List<SActor> sActors) {
-        final List<ActorInstance> actors = new ArrayList<ActorInstance>();
+        final List<ActorInstance> actors = new ArrayList<>();
         for (final SActor sActor : sActors) {
             final ActorInstance actor = toActorInstance(sActor);
             actors.add(actor);
@@ -1883,7 +1883,7 @@ public class ModelConvertor {
 
     public static List<ArchivedFlowNodeInstance> toArchivedFlowNodeInstances(final List<SAFlowNodeInstance> saFlowNodes,
             final FlowNodeStateManager flowNodeStateManager) {
-        final List<ArchivedFlowNodeInstance> flowNodeInstances = new ArrayList<ArchivedFlowNodeInstance>();
+        final List<ArchivedFlowNodeInstance> flowNodeInstances = new ArrayList<>();
         for (final SAFlowNodeInstance saFlowNode : saFlowNodes) {
             final ArchivedFlowNodeInstance flowNodeInstance = toArchivedFlowNodeInstance(saFlowNode, flowNodeStateManager);
             flowNodeInstances.add(flowNodeInstance);
@@ -1938,7 +1938,7 @@ public class ModelConvertor {
     }
 
     public static List<ConnectorInstance> toConnectorInstances(final List<SConnectorInstance> sConnectorInstances) {
-        final ArrayList<ConnectorInstance> connectorInstances = new ArrayList<ConnectorInstance>(sConnectorInstances.size());
+        final ArrayList<ConnectorInstance> connectorInstances = new ArrayList<>(sConnectorInstances.size());
         for (final SConnectorInstance sConnectorInstance : sConnectorInstances) {
             connectorInstances.add(toConnectorInstance(sConnectorInstance));
         }
@@ -1974,7 +1974,7 @@ public class ModelConvertor {
     }
 
     public static List<ArchivedConnectorInstance> toArchivedConnectorInstances(final List<SAConnectorInstance> serverObjects) {
-        final List<ArchivedConnectorInstance> commments = new ArrayList<ArchivedConnectorInstance>();
+        final List<ArchivedConnectorInstance> commments = new ArrayList<>();
         for (final SAConnectorInstance saConnectorInstance : serverObjects) {
             final ArchivedConnectorInstance archivedConnectorInstance = toArchivedConnectorInstance(saConnectorInstance);
             commments.add(archivedConnectorInstance);
@@ -1983,7 +1983,7 @@ public class ModelConvertor {
     }
 
     public static List<Profile> toProfiles(final List<SProfile> sProfiles) {
-        final List<Profile> profiles = new ArrayList<Profile>(sProfiles.size());
+        final List<Profile> profiles = new ArrayList<>(sProfiles.size());
         for (final SProfile sProfile : sProfiles) {
             final Profile profile = toProfile(sProfile);
             profiles.add(profile);
@@ -2004,7 +2004,7 @@ public class ModelConvertor {
     }
 
     public static List<ProfileEntry> toProfileEntries(final List<SProfileEntry> sProfileEntries) {
-        final List<ProfileEntry> profiles = new ArrayList<ProfileEntry>(sProfileEntries.size());
+        final List<ProfileEntry> profiles = new ArrayList<>(sProfileEntries.size());
         for (final SProfileEntry sProfileEntry : sProfileEntries) {
             final ProfileEntry profile = toProfileEntry(sProfileEntry);
             profiles.add(profile);
@@ -2025,7 +2025,7 @@ public class ModelConvertor {
     }
 
     public static List<ProfileMember> toProfileMembers(final List<SProfileMember> sProfileMembers) {
-        final List<ProfileMember> profiles = new ArrayList<ProfileMember>(sProfileMembers.size());
+        final List<ProfileMember> profiles = new ArrayList<>(sProfileMembers.size());
         for (final SProfileMember sProfileMember : sProfileMembers) {
             final ProfileMember profile = toProfileMember(sProfileMember);
             profiles.add(profile);
@@ -2066,7 +2066,7 @@ public class ModelConvertor {
     }
 
     public static List<FailedJob> toFailedJobs(final List<SFailedJob> sFailedJobs) {
-        final List<FailedJob> failedJobs = new ArrayList<FailedJob>(sFailedJobs.size());
+        final List<FailedJob> failedJobs = new ArrayList<>(sFailedJobs.size());
         for (final SFailedJob sFailedJob : sFailedJobs) {
             failedJobs.add(toFailedJob(sFailedJob));
         }
@@ -2083,7 +2083,7 @@ public class ModelConvertor {
     }
 
     public static List<Theme> toThemes(final List<STheme> sThemes) {
-        final List<Theme> themes = new ArrayList<Theme>(sThemes.size());
+        final List<Theme> themes = new ArrayList<>(sThemes.size());
         for (final STheme sTheme : sThemes) {
             final Theme theme = toTheme(sTheme);
             themes.add(theme);
@@ -2116,7 +2116,7 @@ public class ModelConvertor {
         return value;
     }
 
-    public static FormMapping toFormMapping(final SFormMapping sFormMapping) {
+    public static FormMapping toFormMapping(final SFormMapping sFormMapping, final FormRequiredAnalyzer formRequiredAnalyzer) {
         if (sFormMapping == null) {
             return null;
         }
@@ -2135,13 +2135,16 @@ public class ModelConvertor {
         final long lastUpdateDate = sFormMapping.getLastUpdateDate();
         formMapping.setLastUpdateDate(lastUpdateDate > 0 ? new Date(lastUpdateDate) : null);
         formMapping.setLastUpdatedBy(sFormMapping.getLastUpdatedBy());
+
+        formMapping.setFormRequired(formRequiredAnalyzer.isFormRequired(sFormMapping));
+
         return formMapping;
     }
 
-    public static List<FormMapping> toFormMappings(final List<SFormMapping> serverObjects) {
+    public static List<FormMapping> toFormMappings(final List<SFormMapping> serverObjects, final FormRequiredAnalyzer formRequiredAnalyzer) {
         final List<FormMapping> clientObjects = new ArrayList<>(serverObjects.size());
         for (final SFormMapping serverObject : serverObjects) {
-            clientObjects.add(toFormMapping(serverObject));
+            clientObjects.add(toFormMapping(serverObject, formRequiredAnalyzer));
         }
         return clientObjects;
     }
@@ -2179,7 +2182,7 @@ public class ModelConvertor {
     }
 
     private static InputDefinition toInput(final SInputDefinition input) {
-        final List<InputDefinition> inputDefinitions = new ArrayList<InputDefinition>();
+        final List<InputDefinition> inputDefinitions = new ArrayList<>();
         for (final SInputDefinition sInputDefinition : input.getInputDefinitions()) {
             inputDefinitions.add(toInput(sInputDefinition));
         }

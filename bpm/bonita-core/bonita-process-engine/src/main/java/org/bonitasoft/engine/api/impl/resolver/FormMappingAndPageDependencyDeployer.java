@@ -125,7 +125,8 @@ public class FormMappingAndPageDependencyDeployer implements ProcessDependencyDe
         return problems;
     }
 
-    protected List<Problem> checkPageProcessResolution(TenantServiceAccessor tenantAccessor, SProcessDefinition sProcessDefinition) throws SBonitaReadException,
+    protected List<Problem> checkPageProcessResolution(TenantServiceAccessor tenantAccessor, SProcessDefinition sProcessDefinition)
+            throws SBonitaReadException,
             SObjectNotFoundException {
         final List<Problem> problems = new ArrayList<>();
         final FormMappingService formMappingService = tenantAccessor.getFormMappingService();
@@ -151,15 +152,22 @@ public class FormMappingAndPageDependencyDeployer implements ProcessDependencyDe
             if (pageId == null || tenantAccessor.getPageService().getPage(pageId) == null) {
                 addProblem(formMapping, problems);
             }
+        } else if (isUndefined(formMapping)) {
+            addProblem(formMapping, problems);
         }
     }
 
     private void addProblem(SFormMapping formMapping, List<Problem> problems) {
-        problems.add(new ProblemImpl(Problem.Level.ERROR, formMapping.getProcessElementName(), "form mapping", String.format(ERROR_MESSAGE, formMapping.toString())));
+        problems.add(new ProblemImpl(Problem.Level.ERROR, formMapping.getProcessElementName(), "form mapping", String.format(ERROR_MESSAGE,
+                formMapping.toString())));
     }
 
     private boolean isMappingRelatedToCustomPage(SFormMapping formMapping) {
         return FormMappingTarget.INTERNAL.name().equals(formMapping.getTarget());
+    }
+
+    private boolean isUndefined(SFormMapping formMapping) {
+        return FormMappingTarget.UNDEFINED.name().equals(formMapping.getTarget());
     }
 
     public void deployFormMappings(final BusinessArchive businessArchive, final long processDefinitionId, TenantServiceAccessor tenantAccessor)
@@ -181,14 +189,15 @@ public class FormMappingAndPageDependencyDeployer implements ProcessDependencyDe
         }
     }
 
-    void createFormMapping(long processDefinitionId, FormMappingService formMappingService, List<FormMappingDefinition> formMappings, ActivityDefinition activity) throws SObjectCreationException, SBonitaReadException {
+    void createFormMapping(long processDefinitionId, FormMappingService formMappingService, List<FormMappingDefinition> formMappings,
+            ActivityDefinition activity) throws SObjectCreationException, SBonitaReadException {
         if (isHumanTask(activity)) {
             // create mapping as declared in form mapping:
             createFormMapping(formMappingService, processDefinitionId, getFormMappingForHumanTask(activity.getName(), formMappings),
-                    FormMappingType.TASK.getId(),
-                    activity.getName());
-        }else if(activity instanceof SubProcessDefinition){
-            final org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition subProcessContainer = ((SubProcessDefinition) activity).getSubProcessContainer();
+                    FormMappingType.TASK.getId(), activity.getName());
+        } else if (activity instanceof SubProcessDefinition) {
+            final org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition subProcessContainer = ((SubProcessDefinition) activity)
+                    .getSubProcessContainer();
             for (ActivityDefinition activityDefinition : subProcessContainer.getActivities()) {
                 createFormMapping(processDefinitionId, formMappingService, formMappings, activityDefinition);
             }
@@ -201,7 +210,7 @@ public class FormMappingAndPageDependencyDeployer implements ProcessDependencyDe
         if (formMappingDefinition != null) {
             createSFormMapping(formMappingService, processDefinitionId, formMappingDefinition);
         } else {
-            formMappingService.create(processDefinitionId, taskName, type, FormMappingTarget.UNDEFINED.name(), null);
+            formMappingService.create(processDefinitionId, taskName, type, FormMappingTarget.NONE.name(), null);
         }
     }
 
