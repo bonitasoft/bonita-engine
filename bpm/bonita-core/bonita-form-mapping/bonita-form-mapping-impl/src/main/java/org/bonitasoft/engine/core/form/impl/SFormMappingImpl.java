@@ -27,6 +27,7 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
 
     private long processDefinitionId;
     private String task;
+    private String target;
     private SPageMapping pageMapping;
     private Integer type = null;
     private long lastUpdateDate;
@@ -35,10 +36,11 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
     public SFormMappingImpl() {
     }
 
-    public SFormMappingImpl(long processDefinitionId, Integer type, String task) {
+    public SFormMappingImpl(long processDefinitionId, Integer type, String task, String target) {
         this.processDefinitionId = processDefinitionId;
         this.task = task;
         this.type = type;
+        this.target = target;
     }
 
     @Override
@@ -111,16 +113,11 @@ public class SFormMappingImpl extends PersistentObjectId implements SFormMapping
 
     @Override
     public String getTarget() {
-        if (getPageMapping() == null) {
-            return TARGET_UNDEFINED;
-        }
-        if (getPageMapping().getUrl() != null) {
-            return TARGET_URL;
-        }
-        if (getPageMapping().getUrlAdapter() != null) {
-            return TARGET_LEGACY;
-        }
-        return TARGET_INTERNAL;
+      return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
     }
 
     @Override
