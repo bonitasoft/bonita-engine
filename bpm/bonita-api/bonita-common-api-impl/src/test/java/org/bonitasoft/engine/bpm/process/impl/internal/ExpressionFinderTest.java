@@ -13,9 +13,6 @@
  */
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
@@ -51,6 +48,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 /**
  * author Emmanuel Duchastenier
  */

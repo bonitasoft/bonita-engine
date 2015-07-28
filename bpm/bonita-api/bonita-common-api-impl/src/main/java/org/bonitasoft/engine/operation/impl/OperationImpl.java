@@ -15,27 +15,39 @@ package org.bonitasoft.engine.operation.impl;
 
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Zhang Bole
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class OperationImpl implements Operation {
 
     private static final long serialVersionUID = -7255854432856258651L;
-
+    @XmlElement(type = LeftOperandImpl.class)
     private LeftOperand leftOperand;
-
+    @XmlAttribute
     private OperatorType type;
-
+    @XmlAttribute
     private String operator;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression rightOperand;
 
+
+
+    public void OperationImpl(){
+
+    }
     public void setLeftOperand(final LeftOperand leftOperand) {
         this.leftOperand = leftOperand;
     }

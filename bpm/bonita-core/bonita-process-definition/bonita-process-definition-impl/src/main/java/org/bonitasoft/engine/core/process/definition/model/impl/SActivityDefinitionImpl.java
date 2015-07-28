@@ -13,12 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
@@ -37,6 +31,13 @@ import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventD
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SBoundaryEventDefinitionImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.operation.Operation;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * @author Matthieu Chaffotte

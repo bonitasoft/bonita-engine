@@ -17,23 +17,34 @@ import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl implements HumanTaskDefinition {
 
     private static final long serialVersionUID = -7657152341382296289L;
-
+    @XmlAttribute
     private final String actorName;
-
+    @XmlElement(type = UserTaskDefinitionImpl.class)
     private UserFilterDefinition userFilterDefinition;
-
+    @XmlAttribute
     private Long expectedDuration;
-
+    @XmlAttribute
     private String priority;
 
+    public HumanTaskDefinitionImpl(){
+        actorName = "default actor name";
+    }
     public HumanTaskDefinitionImpl(final String name, final String actorName) {
         super(name);
         this.actorName = actorName;

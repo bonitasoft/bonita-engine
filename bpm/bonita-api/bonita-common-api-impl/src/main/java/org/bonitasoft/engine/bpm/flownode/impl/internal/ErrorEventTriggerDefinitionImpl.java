@@ -16,17 +16,28 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+
 /**
  * @author Elias Ricken de Medeiros
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ErrorEventTriggerDefinitionImpl implements ErrorEventTriggerDefinition {
 
     private static final long serialVersionUID = -8002085238119587513L;
-
+    @XmlAttribute
     private final String errorCode;
 
     public ErrorEventTriggerDefinitionImpl(final String errorCode) {
         this.errorCode = errorCode;
+    }
+
+    public ErrorEventTriggerDefinitionImpl() {
+        this.errorCode = "Default error";
     }
 
     @Override

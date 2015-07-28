@@ -14,12 +14,6 @@
 
 package org.bonitasoft.engine.bpm.bar.xml;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
-
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
@@ -75,6 +69,13 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.io.xml.XMLNode;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
+
 
 /**
  * @author Baptiste Mesta

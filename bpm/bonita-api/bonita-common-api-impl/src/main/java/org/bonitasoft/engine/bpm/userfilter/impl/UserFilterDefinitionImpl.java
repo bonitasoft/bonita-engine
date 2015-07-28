@@ -13,27 +13,35 @@
  **/
 package org.bonitasoft.engine.bpm.userfilter.impl;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
+import org.bonitasoft.engine.bpm.flownode.impl.internal.MapAdapterExpression;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 import org.bonitasoft.engine.expression.Expression;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  * @author Baptiste Mesta
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class UserFilterDefinitionImpl extends NamedElementImpl implements UserFilterDefinition {
 
     private static final long serialVersionUID = -6045216424839658552L;
-
+@XmlAttribute
     private final String filterId;
-
+@XmlAttribute
     private final String version;
-
+@XmlJavaTypeAdapter(MapAdapterExpression.class)
+@XmlElement(name = "input")
     private final Map<String, Expression> inputs = new HashMap<>();
 
     public UserFilterDefinitionImpl(final String name, final String filterId, final String version) {
@@ -42,6 +50,11 @@ public class UserFilterDefinitionImpl extends NamedElementImpl implements UserFi
         this.version = version;
     }
 
+    public UserFilterDefinitionImpl(){
+        super();
+        this.filterId = "default Id";
+        this.version = "default version";
+    }
     @Override
     public String getUserFilterId() {
         return filterId;

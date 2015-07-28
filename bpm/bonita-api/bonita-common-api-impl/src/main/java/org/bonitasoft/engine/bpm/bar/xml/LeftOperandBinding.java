@@ -13,10 +13,11 @@
  **/
 package org.bonitasoft.engine.bpm.bar.xml;
 
-import java.util.Map;
-
 import org.bonitasoft.engine.io.xml.ElementBinding;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
+
+import java.util.Map;
+
 
 /**
  * @author Baptiste Mesta

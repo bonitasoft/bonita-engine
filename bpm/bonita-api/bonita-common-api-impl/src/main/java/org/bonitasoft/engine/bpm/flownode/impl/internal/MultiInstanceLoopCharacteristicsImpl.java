@@ -16,26 +16,33 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import org.bonitasoft.engine.bpm.flownode.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Baptiste Mesta
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class MultiInstanceLoopCharacteristicsImpl implements MultiInstanceLoopCharacteristics {
 
     private static final long serialVersionUID = 22281767220832906L;
-
+    @XmlAttribute
     private boolean isSequential;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression loopCardinality;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression completionCondition;
-
+    @XmlAttribute
     private String loopDataInputRef;
-
+    @XmlAttribute
     private String loopDataOutputRef;
-
+    @XmlAttribute
     private String dataInputItemRef;
-
+    @XmlAttribute
     private String dataOutputItemRef;
 
     public MultiInstanceLoopCharacteristicsImpl(final boolean isSequential, final Expression loopCardinality) {

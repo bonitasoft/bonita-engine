@@ -39,6 +39,10 @@ public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTa
         this.trigger = new ThrowMessageEventTriggerDefinitionImpl(trigger);
     }
 
+    public SendTaskDefinitionImpl(){
+        super();
+        trigger = new ThrowMessageEventTriggerDefinitionImpl();
+    }
     public void setTargetFlowNode(final Expression targetFlowNode) {
         trigger.setTargetFlowNode(targetFlowNode);
     }

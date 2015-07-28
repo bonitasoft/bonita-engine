@@ -19,16 +19,25 @@ import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  * @author Julien Molinaro
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ReceiveTaskDefinitionImpl extends TaskDefinitionImpl implements ReceiveTaskDefinition {
 
     private static final long serialVersionUID = -5793747387538282891L;
-
+    @XmlElement
     private final CatchMessageEventTriggerDefinitionImpl trigger;
 
+    public ReceiveTaskDefinitionImpl(){
+        super();
+        trigger = new CatchMessageEventTriggerDefinitionImpl("default name");
+    }
     public ReceiveTaskDefinitionImpl(final String name, final String messageName) {
         super(name);
         trigger = new CatchMessageEventTriggerDefinitionImpl(messageName);

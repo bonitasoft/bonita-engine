@@ -27,6 +27,9 @@ public class CatchSignalEventTriggerDefinitionImpl extends SignalEventTriggerDef
         super(signalName);
     }
 
+    public CatchSignalEventTriggerDefinitionImpl(){
+        super();
+    }
     @Override
     public void accept(ModelFinderVisitor visitor, long modelId) {
         // nothing to do here:

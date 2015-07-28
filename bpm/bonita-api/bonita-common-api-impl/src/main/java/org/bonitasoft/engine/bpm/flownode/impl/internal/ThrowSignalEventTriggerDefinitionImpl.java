@@ -22,6 +22,7 @@ public class ThrowSignalEventTriggerDefinitionImpl extends SignalEventTriggerDef
 
     private static final long serialVersionUID = 5042891449855476318L;
 
+    public ThrowSignalEventTriggerDefinitionImpl(){}
     public ThrowSignalEventTriggerDefinitionImpl(final String name) {
         super(name);
     }

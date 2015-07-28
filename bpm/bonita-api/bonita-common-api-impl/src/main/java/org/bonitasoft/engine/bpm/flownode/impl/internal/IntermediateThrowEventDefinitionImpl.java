@@ -24,6 +24,9 @@ public class IntermediateThrowEventDefinitionImpl extends ThrowEventDefinitionIm
 
     private static final long serialVersionUID = 3876200120954720838L;
 
+    public IntermediateThrowEventDefinitionImpl(){
+        super();
+    }
     public IntermediateThrowEventDefinitionImpl(final String name) {
         super(name);
     }

@@ -13,38 +13,49 @@
  **/
 package org.bonitasoft.engine.bpm.connector.impl;
 
+import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.connector.FailAction;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.MapAdapterExpression;
+import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.impl.OperationImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
-import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.connector.FailAction;
-import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
-import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.operation.Operation;
-
 /**
  * @author Baptiste Mesta
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ConnectorDefinitionImpl extends NamedElementImpl implements ConnectorDefinition {
 
     private static final long serialVersionUID = 1892648036453422626L;
-
+    @XmlAttribute
     private final String connectorId;
-
+    @XmlJavaTypeAdapter(MapAdapterExpression.class)
+    @XmlElement(name = "input")
     private final Map<String, Expression> inputs = new HashMap<String, Expression>();
-
+    @XmlElementWrapper(name = "outputs")
+    @XmlElement(name = "output", type = OperationImpl.class)
     private final List<Operation> outputs = new ArrayList<Operation>();
 
     private final ConnectorEvent actiationEvent;
-
+    @XmlAttribute
     private final String version;
 
     private FailAction failAction = FailAction.FAIL;
-
+    @XmlAttribute
     private String errorCode;
 
     public ConnectorDefinitionImpl(final String name, final String connectorId, final String version, final ConnectorEvent actiationEvent) {
@@ -52,6 +63,12 @@ public class ConnectorDefinitionImpl extends NamedElementImpl implements Connect
         this.connectorId = connectorId;
         this.version = version;
         this.actiationEvent = actiationEvent;
+    }
+
+    public ConnectorDefinitionImpl() {
+        this.connectorId = "default id";
+        this.version = "default version";
+        this.actiationEvent = ConnectorEvent.ON_ENTER;
     }
 
     @Override

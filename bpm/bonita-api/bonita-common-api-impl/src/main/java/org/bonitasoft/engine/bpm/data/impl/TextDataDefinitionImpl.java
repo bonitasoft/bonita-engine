@@ -16,17 +16,23 @@ package org.bonitasoft.engine.bpm.data.impl;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.expression.Expression;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+
 /**
  * @author Feng Hui
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TextDataDefinitionImpl extends DataDefinitionImpl implements TextDataDefinition {
 
     private static final long serialVersionUID = 1619846767581787465L;
-
+    @XmlAttribute
     private boolean longText;
 
+    public TextDataDefinitionImpl(){}
     public TextDataDefinitionImpl(final String name, final Expression defaultValueExpression) {
         super(name, defaultValueExpression);
     }

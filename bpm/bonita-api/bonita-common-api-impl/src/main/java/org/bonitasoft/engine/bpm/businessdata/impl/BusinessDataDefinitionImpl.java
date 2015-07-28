@@ -17,23 +17,30 @@ import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Emmanuel Duchastenier
  * @author Romain Bioteau
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class BusinessDataDefinitionImpl extends NamedElementImpl implements BusinessDataDefinition {
 
     private static final long serialVersionUID = 6900164253595599909L;
-
+    @XmlAttribute
     private String description;
-
+    @XmlAttribute
     private String type;
-
+    @XmlAttribute
     private String className;
-
+    @XmlAttribute
     private boolean multiple = false;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression defaultValueExpression;
 
     public BusinessDataDefinitionImpl(final String name, final Expression defaultValueExpression) {
@@ -41,6 +48,7 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
         this.defaultValueExpression = defaultValueExpression;
     }
 
+    public BusinessDataDefinitionImpl(){}
     @Override
     public String getDescription() {
         return description;

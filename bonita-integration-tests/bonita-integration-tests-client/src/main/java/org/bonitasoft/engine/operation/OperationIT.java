@@ -13,18 +13,6 @@
  **/
 package org.bonitasoft.engine.operation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -44,6 +32,18 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta

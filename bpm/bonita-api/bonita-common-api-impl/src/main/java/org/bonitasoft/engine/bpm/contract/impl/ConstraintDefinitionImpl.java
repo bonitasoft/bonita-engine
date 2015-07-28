@@ -13,14 +13,20 @@
  **/
 package org.bonitasoft.engine.bpm.contract.impl;
 
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 
 /**
  * @author Matthieu Chaffotte
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ConstraintDefinitionImpl implements ConstraintDefinition {
 
     @Override
@@ -78,10 +84,14 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
     }
 
     private static final long serialVersionUID = 2793703451225519896L;
-
+@XmlAttribute
     private final String name;
+    @XmlElement
     private final String expression;
+    @XmlElement
     private final String explanation;
+    @XmlElementWrapper
+    @XmlElement(name = "inputName")
     private final List<String> inputNames;
 
     public ConstraintDefinitionImpl(final String name, final String expression, final String explanation) {
@@ -91,6 +101,12 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
         inputNames = new ArrayList<String>();
     }
 
+    public ConstraintDefinitionImpl(){
+        this.name = "default constraint name";
+        this.explanation = "no explanation (default explanation)";
+        this.expression = "default expression";
+        inputNames = new ArrayList<String>();
+    }
     @Override
     public String getName() {
         return name;

@@ -13,26 +13,35 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.flownode.ThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowSignalEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl implements ThrowEventDefinition {
 
     private static final long serialVersionUID = -3142554305988571206L;
-
+    @XmlElementWrapper(name = "messageEventTriggerDefinitions")
+    @XmlElement(type = ThrowMessageEventTriggerDefinitionImpl.class, name = "messageEventTriggerDefinitions")
     private final List<ThrowMessageEventTriggerDefinition> messageEventTriggerDefinitions;
-
+    @XmlElementWrapper(name = "signalEventTriggerDefinitions")
+    @XmlElement(type = ThrowSignalEventTriggerDefinitionImpl.class, name = "signalEventTriggerDefinitions")
     private final List<ThrowSignalEventTriggerDefinition> signalEventTriggerDefinitions;
 
     public ThrowEventDefinitionImpl(final String name) {
@@ -43,6 +52,12 @@ public abstract class ThrowEventDefinitionImpl extends EventDefinitionImpl imple
 
     public ThrowEventDefinitionImpl(final long id, final String name) {
         super(id, name);
+        messageEventTriggerDefinitions = new ArrayList<>(1);
+        signalEventTriggerDefinitions = new ArrayList<>(1);
+    }
+
+    public ThrowEventDefinitionImpl() {
+        super();
         messageEventTriggerDefinitions = new ArrayList<>(1);
         signalEventTriggerDefinitions = new ArrayList<>(1);
     }

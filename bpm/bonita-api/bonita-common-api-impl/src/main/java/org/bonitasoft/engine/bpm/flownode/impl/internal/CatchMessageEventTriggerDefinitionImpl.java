@@ -13,22 +13,29 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.impl.OperationImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerDefinitionImpl implements CatchMessageEventTriggerDefinition {
 
     private static final long serialVersionUID = -8667216649689173514L;
-
+    @XmlElementWrapper(name = "operations")
+    @XmlElement(name = "operation", type = OperationImpl.class)
     private final List<Operation> operations;
 
     public CatchMessageEventTriggerDefinitionImpl(final String messageName) {
@@ -36,6 +43,10 @@ public class CatchMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
         operations = new ArrayList<>(1);
     }
 
+    public CatchMessageEventTriggerDefinitionImpl() {
+        super();
+        operations = new ArrayList<>(1);
+    }
     public CatchMessageEventTriggerDefinitionImpl(final CatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {
         super(catchMessageEventTriggerDefinition);
         operations = catchMessageEventTriggerDefinition.getOperations();

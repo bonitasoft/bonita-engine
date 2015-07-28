@@ -13,37 +13,48 @@
  */
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
+import org.bonitasoft.engine.bpm.flownode.CallableElementType;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.impl.OperationImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
-import org.bonitasoft.engine.bpm.flownode.CallableElementType;
-import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.operation.Operation;
-
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implements CallActivityDefinition {
 
     private static final long serialVersionUID = -6798914951807258918L;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression callableElement;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression callableElementVersion;
-
+    @XmlElementWrapper
+    @XmlElement(type = OperationImpl.class, name = "dataInputOperations")
     private final List<Operation> dataInputOperations;
-
+    @XmlJavaTypeAdapter(MapAdapterExpression.class)
+    @XmlElement(name="contractInput")
     private final Map<String, Expression> contractInputs;
-
+    @XmlElementWrapper
+    @XmlElement(type = OperationImpl.class, name = "dataOutputOperations")
     private final List<Operation> dataOutputOperations;
-
+    @XmlElement
     private CallableElementType callableElementType;
 
     public CallActivityDefinitionImpl(final String name) {
@@ -60,6 +71,13 @@ public class CallActivityDefinitionImpl extends ActivityDefinitionImpl implement
         contractInputs = new HashMap<>();
     }
 
+    public CallActivityDefinitionImpl() {
+        super();
+        dataInputOperations = new ArrayList<>(3);
+        dataOutputOperations = new ArrayList<>(3);
+        contractInputs = new HashMap<>();
+
+    }
     @Override
     public Expression getCallableElement() {
         return callableElement;

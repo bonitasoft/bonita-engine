@@ -13,36 +13,60 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.ObjectSeeker;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
+import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
+import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
+import org.bonitasoft.engine.bpm.data.impl.XMLDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.impl.OperationImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl implements ActivityDefinition {
 
     private static final long serialVersionUID = 5575175860474559979L;
-
+    @XmlElementWrapper(name = "dataDefinitions")
+    @XmlElements({
+            @XmlElement(type = DataDefinitionImpl.class, name = "dataDefinition"),
+            @XmlElement(type = DataDefinitionImpl.class, name = "dataDefinition"),
+            @XmlElement(type = XMLDataDefinitionImpl.class, name = "dataDefinition")
+    })
     private final List<DataDefinition> dataDefinitions;
-
+    @XmlElementWrapper(name = "BusinessDataDefinitions")
+    @XmlElement(type = BusinessDataDefinitionImpl.class, name = "BusinessDataDefinition")
     private final List<BusinessDataDefinition> businessDataDefinitions;
-
+    @XmlElementWrapper(name = "operations")
+    @XmlElement(type = OperationImpl.class, name = "operation")
     private final List<Operation> operations;
-
+    @XmlElements(
+    {
+            @XmlElement(type = StandardLoopCharacteristicsImpl.class),
+            @XmlElement(type = MultiInstanceLoopCharacteristicsImpl.class)
+    })
     private LoopCharacteristics loopCharacteristics;
-
+    @XmlElementWrapper(name = "boundaryEventDefinitions")
+    @XmlElement(type = BoundaryEventDefinitionImpl.class, name = "boundaryEventDefinition")
     private final List<BoundaryEventDefinition> boundaryEventDefinitions;
 
     public ActivityDefinitionImpl(final long id, final String name) {
@@ -55,6 +79,14 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
 
     public ActivityDefinitionImpl(final String name) {
         super(name);
+        dataDefinitions = new ArrayList<>();
+        operations = new ArrayList<>();
+        boundaryEventDefinitions = new ArrayList<>(1);
+        businessDataDefinitions = new ArrayList<>(3);
+    }
+
+    public ActivityDefinitionImpl() {
+        super();
         dataDefinitions = new ArrayList<>();
         operations = new ArrayList<>();
         boundaryEventDefinitions = new ArrayList<>(1);

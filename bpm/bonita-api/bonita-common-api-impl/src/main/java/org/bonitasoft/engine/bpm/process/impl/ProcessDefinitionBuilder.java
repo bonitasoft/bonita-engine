@@ -13,16 +13,6 @@
  */
 package org.bonitasoft.engine.bpm.process.impl;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.lang.model.SourceVersion;
-
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
@@ -61,6 +51,16 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
+
+import javax.lang.model.SourceVersion;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * Builder to define a process.

@@ -16,10 +16,14 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
 /**
  * @author Feng Hui
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class GatewayDefinitionImpl extends FlowNodeDefinitionImpl implements GatewayDefinition {
 
     private static final long serialVersionUID = 8091472342735043092L;
@@ -34,6 +38,11 @@ public class GatewayDefinitionImpl extends FlowNodeDefinitionImpl implements Gat
     public GatewayDefinitionImpl(final long id, final String name, final GatewayType gatewayType) {
         super(id, name);
         this.gatewayType = gatewayType;
+    }
+
+    public GatewayDefinitionImpl() {
+        super();
+        gatewayType = GatewayType.EXCLUSIVE;
     }
 
     @Override

@@ -17,25 +17,35 @@ import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Feng Hui
  * @author Matthieu Chaffotte
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DataDefinitionImpl extends NamedElementImpl implements DataDefinition {
 
     private static final long serialVersionUID = -4126105713210029929L;
-
+    @XmlAttribute
     private String description;
-
+    @XmlAttribute
     private String type;
-
+    @XmlAttribute
     private boolean transientData;
-
+    @XmlAttribute
     private String className;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression defaultValueExpression;
 
+    public DataDefinitionImpl(){
+        super();
+    }
     public DataDefinitionImpl(final String name, final Expression defaultValueExpression) {
         super(name);
         this.defaultValueExpression = defaultValueExpression;

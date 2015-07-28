@@ -14,22 +14,30 @@
 
 package org.bonitasoft.engine.bpm.contract.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.contract.InputContainerDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Baptiste Mesta
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class InputContainerDefinitionImpl implements InputContainerDefinition {
 
+    @XmlElementWrapper
+    @XmlElement(type = InputDefinitionImpl.class, name = "input")
     protected final List<InputDefinition> inputs;
 
     public InputContainerDefinitionImpl() {
         inputs = new ArrayList<>();
     }
+
     public InputContainerDefinitionImpl(List<InputDefinition> inputs) {
         this.inputs = inputs;
     }

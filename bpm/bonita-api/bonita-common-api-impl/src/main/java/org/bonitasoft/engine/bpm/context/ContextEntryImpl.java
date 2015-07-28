@@ -14,17 +14,24 @@
 
 package org.bonitasoft.engine.bpm.context;
 
-import java.util.Objects;
-
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * @author Baptiste Mesta
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ContextEntryImpl implements ContextEntry {
 
+    @XmlElement
     private String key;
+    @XmlElement(type = ExpressionImpl.class)
     private Expression expression;
 
     public ContextEntryImpl() {

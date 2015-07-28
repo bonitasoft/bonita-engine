@@ -17,16 +17,22 @@ import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TimerEventTriggerDefinitionImpl implements TimerEventTriggerDefinition {
 
     private static final long serialVersionUID = -1000995843357026775L;
 
     private final TimerType timerType;
-
+    @XmlElement(type = ExpressionImpl.class)
     private final Expression timerValue;
 
     public TimerEventTriggerDefinitionImpl(final TimerType timerType, final Expression timerExpression) {
@@ -34,6 +40,10 @@ public class TimerEventTriggerDefinitionImpl implements TimerEventTriggerDefinit
         timerValue = timerExpression;
     }
 
+    public TimerEventTriggerDefinitionImpl(){
+        this.timerType = TimerType.CYCLE;
+        timerValue = new ExpressionImpl();
+    }
     @Override
     public TimerType getTimerType() {
         return timerType;

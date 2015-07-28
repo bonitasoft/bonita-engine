@@ -13,21 +13,27 @@
  */
 package org.bonitasoft.engine.bpm.contract.impl;
 
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
-import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 
 /**
  * @author Matthieu Chaffotte
  * @author Laurent Leseigneur
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ContractDefinitionImpl extends InputContainerDefinitionImpl implements ContractDefinition {
 
     private static final long serialVersionUID = 786706819903231008L;
-
+    @XmlElementWrapper
+    @XmlElement(type = ConstraintDefinitionImpl.class, name = "constraint")
     private final List<ConstraintDefinition> constraints;
 
     public ContractDefinitionImpl() {
@@ -54,8 +60,10 @@ public class ContractDefinitionImpl extends InputContainerDefinitionImpl impleme
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ContractDefinitionImpl that = (ContractDefinitionImpl) o;
         return Objects.equals(constraints, that.constraints) &&
                 Objects.equals(inputs, that.inputs);

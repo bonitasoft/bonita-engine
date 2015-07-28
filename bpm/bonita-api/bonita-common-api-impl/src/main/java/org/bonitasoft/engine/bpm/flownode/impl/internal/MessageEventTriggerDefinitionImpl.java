@@ -13,25 +13,34 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.flownode.CorrelationDefinition;
 import org.bonitasoft.engine.bpm.flownode.MessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class MessageEventTriggerDefinitionImpl implements MessageEventTriggerDefinition {
 
     private static final long serialVersionUID = -190616505159460399L;
-
+    @XmlAttribute
     private final String messageName;
-
+    @XmlElementWrapper(name = "correlations")
+    @XmlElement(type = CorrelationDefinitionImpl.class, name = "correlation")
     private final List<CorrelationDefinition> correlations;
 
     public MessageEventTriggerDefinitionImpl(final String name) {
@@ -47,6 +56,11 @@ public abstract class MessageEventTriggerDefinitionImpl implements MessageEventT
     public MessageEventTriggerDefinitionImpl(final MessageEventTriggerDefinition trigger) {
         messageName = trigger.getMessageName();
         correlations = trigger.getCorrelations();
+    }
+
+    public MessageEventTriggerDefinitionImpl() {
+        messageName = "default name";
+        correlations = new ArrayList<>(1);
     }
 
     @Override

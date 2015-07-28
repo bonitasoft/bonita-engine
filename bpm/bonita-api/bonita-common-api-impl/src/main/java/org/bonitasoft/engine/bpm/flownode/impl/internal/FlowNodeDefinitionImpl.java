@@ -13,41 +13,54 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
+import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Zhao Na
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements FlowNodeDefinition {
 
     private static final long serialVersionUID = 429640943678358154L;
-
+    @XmlElementWrapper(name = "incomings")
+    @XmlElement(type = TransitionDefinitionImpl.class, name = "incoming")
     private final List<TransitionDefinition> incomings;
-
+    @XmlElementWrapper(name = "outgoings")
+    @XmlElement(type = TransitionDefinitionImpl.class, name = "outgoing")
     private final List<TransitionDefinition> outgoings;
-
+    @XmlElementWrapper(name = "connectors")
+    @XmlElement(type = ConnectorDefinitionImpl.class, name = "connector")
     private final List<ConnectorDefinition> connectors;
-
+    @XmlAttribute
     private String description;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression displayDescription;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression displayName;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression displayDescriptionAfterCompletion;
-
+    @XmlElement(type = TransitionDefinitionImpl.class)
     private TransitionDefinition defaultTransition;
 
     public FlowNodeDefinitionImpl(final long id, final String name) {
@@ -60,6 +73,12 @@ public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements
 
     public FlowNodeDefinitionImpl(final String name) {
         this(Math.abs(UUID.randomUUID().getLeastSignificantBits()), name);
+    }
+
+    public FlowNodeDefinitionImpl() {
+        incomings = new ArrayList<>();
+        outgoings = new ArrayList<>();
+        connectors = new ArrayList<>();
     }
 
     @Override

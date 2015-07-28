@@ -16,23 +16,32 @@ package org.bonitasoft.engine.bpm.process.impl.internal;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ProcessDefinitionImpl extends NamedElementImpl implements ProcessDefinition {
-
     private static final long serialVersionUID = -6292790136832048011L;
-
+    @XmlAttribute(required = true)
     private final String version;
-
+    @XmlAttribute(required = true)
     private String description;
 
     public ProcessDefinitionImpl(final String name, final String version) {
         super(name);
         this.version = version;
     }
-
+    public ProcessDefinitionImpl(){
+        super();
+        this.version = "default version";
+    }
     @Override
     public String getVersion() {
         return version;

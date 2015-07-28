@@ -15,20 +15,28 @@ package org.bonitasoft.engine.bpm.internal;
 
 import org.bonitasoft.engine.bpm.NamedElement;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class NamedElementImpl extends BaseElementImpl implements NamedElement {
 
     private static final long serialVersionUID = -6260501789773631525L;
-
+    @XmlAttribute(required = true)
     private String name;
 
     public NamedElementImpl(final String name) {
         this.name = name;
     }
 
+    public NamedElementImpl(){this.name ="default name";}
     @Override
     public String getName() {
         return name;

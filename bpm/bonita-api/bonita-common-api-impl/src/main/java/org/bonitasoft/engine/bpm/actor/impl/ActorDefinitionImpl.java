@@ -15,18 +15,23 @@ package org.bonitasoft.engine.bpm.actor.impl;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ActorDefinitionImpl implements ActorDefinition {
 
     private static final long serialVersionUID = 1915238328442058288L;
-
+    @XmlAttribute(required = true)
     private final String name;
-
+    @XmlAttribute(required = false)
     private String description;
-
+    @XmlAttribute(required = false)
     private boolean initiator;
 
     /**
@@ -39,6 +44,10 @@ public class ActorDefinitionImpl implements ActorDefinition {
         initiator = false;
     }
 
+    public ActorDefinitionImpl() {
+        this.name = "default name";
+        initiator = false;
+    }
     @Override
     public String getName() {
         return name;

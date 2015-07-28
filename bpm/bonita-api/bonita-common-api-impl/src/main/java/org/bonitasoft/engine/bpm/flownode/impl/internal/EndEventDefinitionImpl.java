@@ -13,26 +13,37 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TerminateEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowErrorEventTriggerDefinition;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class EndEventDefinitionImpl extends ThrowEventDefinitionImpl implements EndEventDefinition {
 
     private static final long serialVersionUID = -6726824751097930154L;
-
+    @XmlElementWrapper(name = "errorEventTriggerDefinitions")
+    @XmlElement(type = ThrowErrorEventTriggerDefinitionImpl.class, name = "errorEventTriggerDefinition")
     private final List<ThrowErrorEventTriggerDefinition> errorEventTriggerDefinitions;
-
+    @XmlElement(type = TerminateEventTriggerDefinitionImpl.class, name = "terminateEventTriggerDefinition")
     private TerminateEventTriggerDefinition terminateEventTriggerDefinition;
+
+    public EndEventDefinitionImpl() {
+        super();
+        errorEventTriggerDefinitions = new ArrayList<>(1);
+    }
 
     public EndEventDefinitionImpl(final String name) {
         super(name);

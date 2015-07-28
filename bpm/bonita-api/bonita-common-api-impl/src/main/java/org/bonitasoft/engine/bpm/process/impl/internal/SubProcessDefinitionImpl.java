@@ -15,24 +15,36 @@ package org.bonitasoft.engine.bpm.process.impl.internal;
 
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SubProcessDefinitionImpl extends ActivityDefinitionImpl implements SubProcessDefinition {
 
     private static final long serialVersionUID = -5578839351835375715L;
-
+    @XmlAttribute
     private final boolean triggeredByEvent;
 
+    @XmlElement(type = FlowElementContainerDefinitionImpl.class)
     private FlowElementContainerDefinition subProcessContainer;
 
     public SubProcessDefinitionImpl(final String name, final boolean triggeredByEvent) {
         super(name);
         this.triggeredByEvent = triggeredByEvent;
+    }
+
+    public SubProcessDefinitionImpl() {
+        triggeredByEvent = false;
     }
 
     public SubProcessDefinitionImpl(final long id, final String name, final boolean triggeredByEvent) {

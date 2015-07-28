@@ -13,22 +13,40 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.flownode.EventDefinition;
 import org.bonitasoft.engine.bpm.flownode.EventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class EventDefinitionImpl extends FlowNodeDefinitionImpl implements EventDefinition {
 
     private static final long serialVersionUID = 2606127153595667535L;
-
+@XmlElementWrapper(name = "eventTriggers")
+@XmlElements({
+        @XmlElement(name = "ErrorEventTrigger",type = CatchErrorEventTriggerDefinitionImpl.class),
+        @XmlElement(name = "MessageEventTrigger",type = CatchMessageEventTriggerDefinitionImpl.class),
+        @XmlElement(name = "CatchSignalEventTrigger",type = CatchSignalEventTriggerDefinitionImpl.class),
+        @XmlElement(name = "TerminateEventTrigger",type = TerminateEventTriggerDefinitionImpl.class),
+        @XmlElement(name = "ThrowErrorEventTrigger",type = ThrowErrorEventTriggerDefinitionImpl.class),
+        @XmlElement(name = "ThrowMessageEventTrigger",type = ThrowMessageEventTriggerDefinitionImpl.class),
+        @XmlElement(name = "ThrowSignalEventTrigger",type = ThrowSignalEventTriggerDefinitionImpl.class),
+        @XmlElement(name = "TimerEventTrigger",type = TimerEventTriggerDefinitionImpl.class),
+})
     private final List<EventTriggerDefinition> eventTriggers;
 
     public EventDefinitionImpl(final String name) {
@@ -41,6 +59,10 @@ public abstract class EventDefinitionImpl extends FlowNodeDefinitionImpl impleme
         eventTriggers = new ArrayList<>();
     }
 
+    public EventDefinitionImpl() {
+        super();
+        eventTriggers = new ArrayList<>();
+    }
     @Override
     public List<EventTriggerDefinition> getEventTriggers() {
         return Collections.unmodifiableList(eventTriggers);

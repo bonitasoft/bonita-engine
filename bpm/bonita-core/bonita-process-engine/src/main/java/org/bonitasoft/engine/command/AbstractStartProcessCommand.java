@@ -13,12 +13,7 @@
  **/
 package org.bonitasoft.engine.command;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-
 import org.bonitasoft.engine.api.impl.ProcessStarter;
-import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
@@ -29,6 +24,10 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViola
 import org.bonitasoft.engine.execution.AdvancedStartProcessValidator;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Elias Ricken de Medeiros

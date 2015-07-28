@@ -13,22 +13,31 @@
  */
 package org.bonitasoft.engine.bpm.contract.impl;
 
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.Type;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
-import org.bonitasoft.engine.bpm.contract.Type;
-
 /**
  * @author Matthieu Chaffotte
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class InputDefinitionImpl extends InputContainerDefinitionImpl implements InputDefinition {
 
     private static final long serialVersionUID = 2836592506382887928L;
+    @XmlAttribute
     protected final Type type;
+    @XmlElement
     private final String description;
+    @XmlAttribute
     private final String name;
+    @XmlAttribute
     private final boolean multiple;
 
     public InputDefinitionImpl(final String name, final String description, final boolean multiple, Type type, final List<InputDefinition> inputDefinitions) {

@@ -17,20 +17,27 @@ import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TransitionDefinitionImpl extends NamedElementImpl implements TransitionDefinition {
 
     private static final long serialVersionUID = -5629473055955264480L;
-
+    @XmlAttribute
     private long source;
-
+    @XmlAttribute
     private long target;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression expression;
 
     public TransitionDefinitionImpl(final String name) {
@@ -43,6 +50,7 @@ public class TransitionDefinitionImpl extends NamedElementImpl implements Transi
         this.target = target;
     }
 
+    public TransitionDefinitionImpl(){}
     @Override
     public long getSource() {
         return source;

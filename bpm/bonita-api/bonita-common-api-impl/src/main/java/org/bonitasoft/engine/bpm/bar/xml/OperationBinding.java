@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.bpm.bar.xml;
 
-import java.util.Map;
-
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.io.xml.ElementBinding;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.operation.impl.OperationImpl;
+
+import java.util.Map;
+
 
 /**
  * @author Elias Ricken de Medeiros

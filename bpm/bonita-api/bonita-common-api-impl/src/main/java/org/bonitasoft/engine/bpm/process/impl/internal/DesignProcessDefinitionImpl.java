@@ -13,26 +13,34 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
+import org.bonitasoft.engine.bpm.actor.ActorDefinition;
+import org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl;
+import org.bonitasoft.engine.bpm.context.ContextEntry;
+import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
+import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
+import org.bonitasoft.engine.bpm.parameter.impl.ParameterDefinitionImpl;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
+import org.bonitasoft.engine.bpm.process.Visitable;
+import org.bonitasoft.engine.expression.Expression;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import org.bonitasoft.engine.bpm.actor.ActorDefinition;
-import org.bonitasoft.engine.bpm.context.ContextEntry;
-import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
-import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
-import org.bonitasoft.engine.bpm.process.Visitable;
-import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Matthieu Chaffotte
@@ -41,50 +49,50 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition, Visitable {
 
     private static final long serialVersionUID = -4719128363958199300L;
-
+    @XmlAttribute
     private String displayName;
-
+    @XmlAttribute(required = true)
     private String displayDescription;
-
+    @XmlElementWrapper(name = "parameters")
+    @XmlElement(type = ParameterDefinitionImpl.class, name = "parameter")
     private final Set<ParameterDefinition> parameters;
-
+    @XmlElementWrapper
+    @XmlElement(type = ActorDefinitionImpl.class, name = "actor")
     private final List<ActorDefinition> actors;
-
+    @XmlElement(type = ActorDefinitionImpl.class)
     private ActorDefinition actorInitiator;
-
+    @XmlElement(type = FlowElementContainerDefinitionImpl.class)
     private FlowElementContainerDefinition flowElementContainer;
-
-    private String stringIndexLabel1;
-
-    private String stringIndexLabel2;
-
-    private String stringIndexLabel3;
-
-    private String stringIndexLabel4;
-
-    private String stringIndexLabel5;
-
-    private Expression stringIndexValue1;
-
-    private Expression stringIndexValue2;
-
-    private Expression stringIndexValue3;
-
-    private Expression stringIndexValue4;
-
-    private Expression stringIndexValue5;
-
+    @XmlElementWrapper(name = "stringIndexes", required = false, nillable = true)
+    @XmlElement(name = "stringIndex")
+    private IndexLabel[] listIndex = new IndexLabel[5];
+    @XmlElement(type = ContractDefinitionImpl.class)
     private ContractDefinition contract;
-
+    @XmlElementWrapper(name = "contexts")
+    @XmlElement(type = ContextEntryImpl.class)
     private List<ContextEntry> context = new ArrayList<>();
 
     public DesignProcessDefinitionImpl(final String name, final String version) {
         super(name, version);
         parameters = new HashSet<>();
         actors = new ArrayList<>();
+        for(int i = 0; i<5;i++){
+            listIndex[i] = new IndexLabel(Integer.toString(i+1),"",null);
+        }
+    }
+
+    public DesignProcessDefinitionImpl() {
+        super();
+        parameters = new HashSet<>();
+        actors = new ArrayList<>();
+        for(int i = 0; i<5;i++){
+            listIndex[i] = new IndexLabel(Integer.toString(i),"",null);
+        }
     }
 
     public void setDisplayName(final String name) {
@@ -156,15 +164,15 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     public String getStringIndexLabel(final int index) {
         switch (index) {
             case 1:
-                return stringIndexLabel1;
+                return listIndex[0].getLabel();
             case 2:
-                return stringIndexLabel2;
+                return listIndex[1].getLabel();
             case 3:
-                return stringIndexLabel3;
+                return listIndex[2].getLabel();
             case 4:
-                return stringIndexLabel4;
+                return listIndex[3].getLabel();
             case 5:
-                return stringIndexLabel5;
+                return listIndex[4].getLabel();
             default:
                 throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
         }
@@ -174,15 +182,15 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     public Expression getStringIndexValue(final int index) {
         switch (index) {
             case 1:
-                return stringIndexValue1;
+                return listIndex[0].getValue();
             case 2:
-                return stringIndexValue2;
+                return listIndex[1].getValue();
             case 3:
-                return stringIndexValue3;
+                return listIndex[2].getValue();
             case 4:
-                return stringIndexValue4;
+                return listIndex[3].getValue();
             case 5:
-                return stringIndexValue5;
+                return listIndex[4].getValue();
             default:
                 throw new IndexOutOfBoundsException("string index value must be between 1 and 5 (included)");
         }
@@ -205,66 +213,23 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     public void setStringIndex(final int index, final String label, final Expression initialValue) {
         switch (index) {
             case 1:
-                stringIndexLabel1 = label;
-                stringIndexValue1 = initialValue;
+                listIndex[0] = new IndexLabel("1", label, initialValue);
                 break;
             case 2:
-                stringIndexLabel2 = label;
-                stringIndexValue2 = initialValue;
+                listIndex[1] = new IndexLabel("2", label, initialValue);
                 break;
             case 3:
-                stringIndexLabel3 = label;
-                stringIndexValue3 = initialValue;
+                listIndex[2] = new IndexLabel("3", label, initialValue);
                 break;
             case 4:
-                stringIndexLabel4 = label;
-                stringIndexValue4 = initialValue;
+                listIndex[3] = new IndexLabel("4", label, initialValue);
                 break;
             case 5:
-                stringIndexLabel5 = label;
-                stringIndexValue5 = initialValue;
+                listIndex[4] = new IndexLabel("5", label, initialValue);
                 break;
             default:
                 throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
         }
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(displayName).append(displayDescription).append(parameters).append(actors).append(actorInitiator)
-                .append(flowElementContainer).append(stringIndexLabel1).append(stringIndexLabel2).append(stringIndexLabel3).append(stringIndexLabel4)
-                .append(stringIndexLabel5).append(stringIndexValue1).append(stringIndexValue2).append(stringIndexValue3).append(stringIndexValue4)
-                .append(stringIndexValue5).append(contract).build();
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final DesignProcessDefinitionImpl other = (DesignProcessDefinitionImpl) obj;
-        return new EqualsBuilder().append(displayName, other.displayName).append(displayDescription, other.displayDescription)
-                .append(parameters, other.parameters).append(actors, other.actors).append(actorInitiator, other.actorInitiator)
-                .append(flowElementContainer, other.flowElementContainer).append(stringIndexLabel1, other.stringIndexLabel1)
-                .append(stringIndexLabel2, other.stringIndexLabel2).append(stringIndexLabel3, other.stringIndexLabel3)
-                .append(stringIndexLabel4, other.stringIndexLabel4).append(stringIndexLabel5, other.stringIndexLabel5)
-                .append(stringIndexValue1, other.stringIndexValue1).append(stringIndexValue2, other.stringIndexValue2)
-                .append(stringIndexValue3, other.stringIndexValue3).append(stringIndexValue4, other.stringIndexValue4)
-                .append(stringIndexValue5, other.stringIndexValue5).append(contract, other.contract).build();
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).append(getName()).append(getVersion()).append(displayName)
-                .append(displayDescription).append(parameters).append(actors).append(actorInitiator).append(flowElementContainer).append(stringIndexLabel1)
-                .append(stringIndexLabel2).append(stringIndexLabel3).append(stringIndexLabel4).append(stringIndexLabel5).append(stringIndexValue1)
-                .append(stringIndexValue2).append(stringIndexValue3).append(stringIndexValue4).append(stringIndexValue5).append(contract).build();
     }
 
     @Override
@@ -298,5 +263,53 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     @Override
     public List<Expression> getStringIndexValues() {
         return Arrays.asList(getStringIndexValue(1), getStringIndexValue(2), getStringIndexValue(3), getStringIndexValue(4), getStringIndexValue(5));
+    }
+
+    /*
+     * Bear in mind that you need to modify the automatically generated equals to take into account the listIndex array
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
+        DesignProcessDefinitionImpl that = (DesignProcessDefinitionImpl) o;
+        boolean ArrayCompare = true;
+        for (int i = 0; i < 5; i++) {
+            ArrayCompare = ArrayCompare && listIndex[i].equals(that.listIndex[i]);
+        }
+        return Objects.equals(displayName, that.displayName) &&
+                Objects.equals(displayDescription, that.displayDescription) &&
+                Objects.equals(parameters, that.parameters) &&
+                Objects.equals(actors, that.actors) &&
+                Objects.equals(actorInitiator, that.actorInitiator) &&
+                Objects.equals(flowElementContainer, that.flowElementContainer) &&
+                ArrayCompare &&
+                Objects.equals(contract, that.contract) &&
+                Objects.equals(context, that.context);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), displayName, displayDescription, parameters, actors, actorInitiator, flowElementContainer, listIndex, contract,
+                context);
+    }
+
+    @Override
+    public String toString() {
+        return "DesignProcessDefinitionImpl{" +
+                "displayName='" + displayName + '\'' +
+                ", displayDescription='" + displayDescription + '\'' +
+                ", parameters=" + parameters +
+                ", actors=" + actors +
+                ", actorInitiator=" + actorInitiator +
+                ", flowElementContainer=" + flowElementContainer +
+                ", listIndex=" + Arrays.toString(listIndex) +
+                ", contract=" + contract +
+                ", context=" + context +
+                '}';
     }
 }

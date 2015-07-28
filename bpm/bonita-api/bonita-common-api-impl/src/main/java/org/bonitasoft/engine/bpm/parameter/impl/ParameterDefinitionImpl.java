@@ -16,20 +16,30 @@ package org.bonitasoft.engine.bpm.parameter.impl;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  * @author Matthieu Chaffotte
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ParameterDefinitionImpl extends NamedElementImpl implements ParameterDefinition {
 
     private static final long serialVersionUID = -3997656451808629180L;
-
+    @XmlAttribute(required = true)
     private final String type;
-
+    @XmlElement
     private String description;
 
     public ParameterDefinitionImpl(final String parameterName, final String type) {
         super(parameterName);
         this.type = type;
+    }
+    public ParameterDefinitionImpl(){
+        super("default name");
+        this.type = "default type";
     }
 
     @Override

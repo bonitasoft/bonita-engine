@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.flownode.CatchErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
@@ -24,23 +20,39 @@ import org.bonitasoft.engine.bpm.flownode.CatchSignalEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl implements CatchEventDefinition {
 
     private static final long serialVersionUID = 250215494961033080L;
-
+    @XmlElementWrapper(name = "timerEventTriggers")
+    @XmlElement(type = TimerEventTriggerDefinitionImpl.class, name = "timerEventTrigger")
     private final List<TimerEventTriggerDefinition> timerEventTriggers;
-
+    @XmlElementWrapper(name = "messageEventTriggers")
+    @XmlElement(type = CatchMessageEventTriggerDefinitionImpl.class, name = "messageEventTrigger")
     private final List<CatchMessageEventTriggerDefinition> messageEventTriggers;
-
+    @XmlElementWrapper(name = "signalEventTriggers")
+    @XmlElement(type = CatchSignalEventTriggerDefinitionImpl.class, name = "signalEventTrigger")
     private final List<CatchSignalEventTriggerDefinition> signalEventTriggers;
-
+    @XmlElementWrapper(name = "errorlEventTriggers")
+    @XmlElement(type = CatchErrorEventTriggerDefinitionImpl.class, name = "errorEventTrigger")
     private final List<CatchErrorEventTriggerDefinition> errorEventTriggers;
-
+    @XmlAttribute
     private boolean isInterrupting = true;
 
     public CatchEventDefinitionImpl(final String name) {
@@ -53,6 +65,14 @@ public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl imple
 
     public CatchEventDefinitionImpl(final long id, final String name) {
         super(id, name);
+        timerEventTriggers = new ArrayList<>(1);
+        messageEventTriggers = new ArrayList<>(1);
+        signalEventTriggers = new ArrayList<>(1);
+        errorEventTriggers = new ArrayList<>(1);
+    }
+
+    public CatchEventDefinitionImpl() {
+        super();
         timerEventTriggers = new ArrayList<>(1);
         messageEventTriggers = new ArrayList<>(1);
         signalEventTriggers = new ArrayList<>(1);

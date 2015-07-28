@@ -23,6 +23,7 @@ public class TerminateEventTriggerDefinitionImpl implements TerminateEventTrigge
 
     private static final long serialVersionUID = -1494352183532063268L;
 
+    public TerminateEventTriggerDefinitionImpl(){}
     @Override
     public void accept(ModelFinderVisitor visitor, long modelId) {
         // nothing to do here:

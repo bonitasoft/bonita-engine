@@ -13,25 +13,36 @@
  **/
 package org.bonitasoft.engine.bpm.document.impl;
 
-import java.util.Objects;
-
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 /**
  * @author Baptiste Mesta
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DocumentDefinitionImpl extends NamedElementImpl implements DocumentDefinition {
 
     private static final long serialVersionUID = 2L;
-
+    @XmlAttribute
     private String url;
+    @XmlAttribute
     private String file;
+    @XmlAttribute
     private String mimeType;
+    @XmlAttribute
     private String description;
+    @XmlAttribute
     private String fileName;
+    @XmlElement(type = ExpressionImpl.class)
     private Expression initialValue;
 
     /**
@@ -41,6 +52,7 @@ public class DocumentDefinitionImpl extends NamedElementImpl implements Document
         super(name);
     }
 
+    public DocumentDefinitionImpl(){}
     @Override
     public String getUrl() {
         return url;

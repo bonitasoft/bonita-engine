@@ -13,32 +13,41 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
 import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Feng Hui
  * @author Matthieu Chaffotte
  */
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ExpressionImpl extends BaseElementImpl implements Expression {
 
     private static final long serialVersionUID = 1663953453575781859L;
-
+    @XmlAttribute
     private String name;
-
+    @XmlElement
     private String content;
-
+    @XmlAttribute
     private String expressionType;
-
+    @XmlAttribute
     private String returnType;
-
+    @XmlAttribute
     private String interpreter;
-
+    @XmlElementWrapper
+    @XmlElement(type = ExpressionImpl.class)
     private List<Expression> dependencies = Collections.emptyList();
 
     public ExpressionImpl() {
@@ -119,44 +128,26 @@ public class ExpressionImpl extends BaseElementImpl implements Expression {
     }
 
     @Override
+    public void accept(ModelFinderVisitor visitor, long modelId) {
+        visitor.find(this, modelId);
+    }
+
+    @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof ExpressionImpl))
-            return false;
-        if (!super.equals(o))
-            return false;
-
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         ExpressionImpl that = (ExpressionImpl) o;
-
-        if (name != null ? !name.equals(that.name) : that.name != null)
-            return false;
-        if (content != null ? !content.equals(that.content) : that.content != null)
-            return false;
-        if (expressionType != null ? !expressionType.equals(that.expressionType) : that.expressionType != null)
-            return false;
-        if (returnType != null ? !returnType.equals(that.returnType) : that.returnType != null)
-            return false;
-        if (interpreter != null ? !interpreter.equals(that.interpreter) : that.interpreter != null)
-            return false;
-        return !(dependencies != null ? !dependencies.equals(that.dependencies) : that.dependencies != null);
-
+        return Objects.equals(name, that.name) &&
+                Objects.equals(content, that.content) &&
+                Objects.equals(expressionType, that.expressionType) &&
+                Objects.equals(returnType, that.returnType) &&
+                Objects.equals(interpreter, that.interpreter) &&
+                Objects.equals(dependencies, that.dependencies);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (content != null ? content.hashCode() : 0);
-        result = 31 * result + (expressionType != null ? expressionType.hashCode() : 0);
-        result = 31 * result + (returnType != null ? returnType.hashCode() : 0);
-        result = 31 * result + (interpreter != null ? interpreter.hashCode() : 0);
-        result = 31 * result + (dependencies != null ? dependencies.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public void accept(ModelFinderVisitor visitor, long modelId) {
-        visitor.find(this, modelId);
+        return Objects.hash(super.hashCode(), name, content, expressionType, returnType, interpreter, dependencies);
     }
 }

@@ -15,13 +15,20 @@ package org.bonitasoft.engine.bpm.internal;
 
 import org.bonitasoft.engine.bpm.BaseElement;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+
 /**
  * @author Baptiste Mesta
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class BaseElementImpl implements BaseElement {
 
     private static final long serialVersionUID = -5094021692278906536L;
-
+    @XmlAttribute
     private long id;
 
     @Override
