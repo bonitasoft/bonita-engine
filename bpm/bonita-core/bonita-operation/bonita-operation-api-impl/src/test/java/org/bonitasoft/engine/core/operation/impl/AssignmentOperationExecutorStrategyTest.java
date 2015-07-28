@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.core.operation.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +23,7 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,7 +64,7 @@ public class AssignmentOperationExecutorStrategyTest {
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", "value"));
         when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_DATA);
         Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext, false);
-        assertEquals("value", returnedValue);
+        assertThat(returnedValue).isEqualTo("value");
     }
 
     @Test
@@ -72,7 +73,7 @@ public class AssignmentOperationExecutorStrategyTest {
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
         when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_EXTERNAL_DATA);
         Object returnedValue = assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext, false);
-        assertEquals("value", returnedValue);
+        assertThat(returnedValue).isEqualTo("value");
     }
 
     @Test(expected = SOperationExecutionException.class)
@@ -81,6 +82,16 @@ public class AssignmentOperationExecutorStrategyTest {
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
         when(leftOperand.getType()).thenReturn(SLeftOperand.TYPE_DATA);
         assignmentOperationExecutorStrategy.computeNewValueForLeftOperand(operation, value, expressionContext, false);
+    }
+
+    @Test
+    public void operationType_should_be_ASSIGNMENT() throws Exception {
+        assertThat(assignmentOperationExecutorStrategy.getOperationType()).isEqualTo(SOperatorType.ASSIGNMENT.name());
+    }
+
+    @Test
+    public void should_not_persist_on_null() throws Exception {
+        assertThat(assignmentOperationExecutorStrategy.shouldPersistOnNullValue()).isFalse();
     }
 
 }

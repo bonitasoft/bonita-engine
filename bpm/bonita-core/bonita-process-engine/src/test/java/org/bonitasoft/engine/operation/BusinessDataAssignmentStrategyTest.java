@@ -89,4 +89,9 @@ public class BusinessDataAssignmentStrategyTest {
     public void getOperationType_should_return_business_data_assignment() throws Exception {
         assertThat(strategy.getOperationType()).isEqualTo(SOperatorType.ASSIGNMENT + "_" + SLeftOperand.TYPE_BUSINESS_DATA);
     }
+
+    @Test
+    public void should_not_persist_on_null() throws Exception {
+        assertThat(strategy.shouldPersistOnNullValue()).isFalse();
+    }
 }

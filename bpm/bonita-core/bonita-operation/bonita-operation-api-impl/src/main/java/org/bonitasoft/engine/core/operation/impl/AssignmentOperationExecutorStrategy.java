@@ -72,4 +72,9 @@ public class AssignmentOperationExecutorStrategy implements OperationExecutorStr
         return SOperatorType.ASSIGNMENT.name();
     }
 
+    @Override
+    public boolean shouldPersistOnNullValue() {
+        return false;
+    }
+
 }

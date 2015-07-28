@@ -28,6 +28,7 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -38,9 +39,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class JavaMethodOperationExecutorStrategyTest {
 
+    private JavaMethodOperationExecutorStrategy strategy;
+
+    @Before
+    public void setUp() throws Exception {
+        strategy = new JavaMethodOperationExecutorStrategy();
+    }
+
     @Test(expected = SOperationExecutionException.class)
     public void dontThrowNPEIfObjectDoesNotExist() throws Exception {
-        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy();
         final SOperation operation = mock(SOperation.class);
         final SLeftOperand leftOperand = mock(SLeftOperand.class);
         final SExpression rightOperand = mock(SExpression.class);
@@ -59,7 +66,6 @@ public class JavaMethodOperationExecutorStrategyTest {
 
     @Test(expected = SOperationExecutionException.class)
     public void shouldThrowExceptionWhenInvokeJavaMethodFails() throws Exception {
-        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy();
         final SOperation operation = mock(SOperation.class);
         final SLeftOperand leftOperand = mock(SLeftOperand.class);
         final SExpression rightOperand = mock(SExpression.class);
@@ -81,7 +87,6 @@ public class JavaMethodOperationExecutorStrategyTest {
 
     @Test
     public void computeValue() throws Exception {
-        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy();
         final SOperation operation = mock(SOperation.class);
         final SLeftOperand leftOperand = mock(SLeftOperand.class);
         final SExpression rightOperand = mock(SExpression.class);
@@ -103,7 +108,6 @@ public class JavaMethodOperationExecutorStrategyTest {
 
     @Test
     public void shouldExtractParameterType() throws Exception {
-        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy();
         final SOperation operation = mock(SOperation.class);
 
         when(operation.getOperator()).thenReturn("setThing");
@@ -113,14 +117,18 @@ public class JavaMethodOperationExecutorStrategyTest {
 
     @Test
     public void getOperationType() throws Exception {
-        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy();
 
         //when
         final String operationType = strategy.getOperationType();
 
         //then
-        assertThat(operationType).as("should get opration type").isEqualTo(JavaMethodOperationExecutorStrategy.TYPE_JAVA_METHOD);
+        assertThat(operationType).as("should get operation type").isEqualTo(JavaMethodOperationExecutorStrategy.TYPE_JAVA_METHOD);
 
+    }
+
+    @Test
+    public void should_not_persist_on_null() throws Exception {
+        assertThat(strategy.shouldPersistOnNullValue()).isFalse();
     }
 
     public class MyClass {

@@ -76,4 +76,9 @@ public class JavaMethodOperationExecutorStrategy implements OperationExecutorStr
         return TYPE_JAVA_METHOD;
     }
 
+    @Override
+    public boolean shouldPersistOnNullValue() {
+        return false;
+    }
+
 }

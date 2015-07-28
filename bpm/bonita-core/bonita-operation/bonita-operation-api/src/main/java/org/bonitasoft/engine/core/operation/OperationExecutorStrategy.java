@@ -26,7 +26,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 public interface OperationExecutorStrategy {
 
     /**
-     * Calculate the new value of the left operand base of right operand expression value
+     * Calculates the new value of the left operand base of right operand expression value
      *
      * @param operation the operation in progress
      * @param rightOperandValue
@@ -41,5 +41,11 @@ public interface OperationExecutorStrategy {
             throws SOperationExecutionException;
 
     String getOperationType();
+
+    /**
+     * Determines if the operation right value should be persisted when the value is evaluated to null.
+     * @return true if the the evaluated right value should be persisted; false otherwise.
+     */
+    boolean shouldPersistOnNullValue();
 
 }
