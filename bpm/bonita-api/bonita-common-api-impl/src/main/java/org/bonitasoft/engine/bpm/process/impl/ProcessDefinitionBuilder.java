@@ -62,6 +62,7 @@ import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
 
+
 /**
  * Builder to define a process.
  *

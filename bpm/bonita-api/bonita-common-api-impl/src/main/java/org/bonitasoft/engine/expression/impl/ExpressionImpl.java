@@ -13,36 +13,42 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
-import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.bonitasoft.engine.bpm.internal.ProcessBaseElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Feng Hui
  * @author Matthieu Chaffotte
  */
-public class ExpressionImpl extends BaseElementImpl implements Expression {
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class ExpressionImpl extends ProcessBaseElementImpl implements Expression {
 
     private static final long serialVersionUID = 1663953453575781859L;
-
+    @XmlAttribute
     private String name;
-
+    @XmlElement
     private String content;
-
+    @XmlAttribute
     private String expressionType;
-
+    @XmlAttribute
     private String returnType;
-
+    @XmlAttribute
     private String interpreter;
-
-    private List<Expression> dependencies = Collections.emptyList();
+    @XmlElement(type = ExpressionImpl.class,name = "expression")
+    private List<Expression> dependencies = new ArrayList<>();
 
     public ExpressionImpl() {
-        this(Math.abs(UUID.randomUUID().getMostSignificantBits()));
     }
 
     public ExpressionImpl(long id) {
@@ -80,9 +86,6 @@ public class ExpressionImpl extends BaseElementImpl implements Expression {
 
     @Override
     public List<Expression> getDependencies() {
-        if (dependencies == null) {
-            return Collections.emptyList();
-        }
         return dependencies;
     }
 
@@ -108,55 +111,37 @@ public class ExpressionImpl extends BaseElementImpl implements Expression {
 
     @Override
     public String toString() {
-        return "ExpressionImpl{" +
-                "name='" + name + '\'' +
-                ", content='" + content + '\'' +
-                ", expressionType='" + expressionType + '\'' +
-                ", returnType='" + returnType + '\'' +
-                ", interpreter='" + interpreter + '\'' +
-                ", dependencies=" + dependencies +
-                "} " + super.toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof ExpressionImpl))
-            return false;
-        if (!super.equals(o))
-            return false;
-
-        ExpressionImpl that = (ExpressionImpl) o;
-
-        if (name != null ? !name.equals(that.name) : that.name != null)
-            return false;
-        if (content != null ? !content.equals(that.content) : that.content != null)
-            return false;
-        if (expressionType != null ? !expressionType.equals(that.expressionType) : that.expressionType != null)
-            return false;
-        if (returnType != null ? !returnType.equals(that.returnType) : that.returnType != null)
-            return false;
-        if (interpreter != null ? !interpreter.equals(that.interpreter) : that.interpreter != null)
-            return false;
-        return !(dependencies != null ? !dependencies.equals(that.dependencies) : that.dependencies != null);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (content != null ? content.hashCode() : 0);
-        result = 31 * result + (expressionType != null ? expressionType.hashCode() : 0);
-        result = 31 * result + (returnType != null ? returnType.hashCode() : 0);
-        result = 31 * result + (interpreter != null ? interpreter.hashCode() : 0);
-        result = 31 * result + (dependencies != null ? dependencies.hashCode() : 0);
-        return result;
+        return new ToStringBuilder(this)
+                .append("name", name)
+                .append("content", content)
+                .append("expressionType", expressionType)
+                .append("returnType", returnType)
+                .append("interpreter", interpreter)
+                .append("dependencies", dependencies)
+                .toString();
     }
 
     @Override
     public void accept(ModelFinderVisitor visitor, long modelId) {
         visitor.find(this, modelId);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ExpressionImpl that = (ExpressionImpl) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(content, that.content) &&
+                Objects.equals(expressionType, that.expressionType) &&
+                Objects.equals(returnType, that.returnType) &&
+                Objects.equals(interpreter, that.interpreter) &&
+                Objects.equals(dependencies, that.dependencies);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), name, content, expressionType, returnType, interpreter, dependencies);
     }
 }

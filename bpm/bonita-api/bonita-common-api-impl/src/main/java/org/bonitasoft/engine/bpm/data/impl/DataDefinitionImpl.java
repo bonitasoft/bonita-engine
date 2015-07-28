@@ -13,29 +13,42 @@
  **/
 package org.bonitasoft.engine.bpm.data.impl;
 
+import java.util.Objects;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
 /**
  * @author Feng Hui
  * @author Matthieu Chaffotte
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DataDefinitionImpl extends NamedElementImpl implements DataDefinition {
 
     private static final long serialVersionUID = -4126105713210029929L;
-
+    @XmlAttribute
     private String description;
-
+    @XmlAttribute
     private String type;
-
+    @XmlAttribute(name = "transient")
     private boolean transientData;
-
+    @XmlAttribute
     private String className;
-
+    @XmlElement(type = ExpressionImpl.class,name = "defaultValue")
     private Expression defaultValueExpression;
 
+    public DataDefinitionImpl(){
+        super();
+    }
     public DataDefinitionImpl(final String name, final Expression defaultValueExpression) {
         super(name);
         this.defaultValueExpression = defaultValueExpression;
@@ -86,80 +99,32 @@ public class DataDefinitionImpl extends NamedElementImpl implements DataDefiniti
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (className == null ? 0 : className.hashCode());
-        result = prime * result + (defaultValueExpression == null ? 0 : defaultValueExpression.hashCode());
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (transientData ? 1231 : 1237);
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        DataDefinitionImpl that = (DataDefinitionImpl) o;
+        return Objects.equals(transientData, that.transientData) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(className, that.className) &&
+                Objects.equals(defaultValueExpression, that.defaultValueExpression);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final DataDefinitionImpl other = (DataDefinitionImpl) obj;
-        if (className == null) {
-            if (other.className != null) {
-                return false;
-            }
-        } else if (!className.equals(other.className)) {
-            return false;
-        }
-        if (defaultValueExpression == null) {
-            if (other.defaultValueExpression != null) {
-                return false;
-            }
-        } else if (!defaultValueExpression.equals(other.defaultValueExpression)) {
-            return false;
-        }
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (transientData != other.transientData) {
-            return false;
-        }
-        if (type == null) {
-            if (other.type != null) {
-                return false;
-            }
-        } else if (!type.equals(other.type)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), description, type, transientData, className, defaultValueExpression);
     }
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("DataDefinitionImpl [name=");
-        builder.append(getName());
-        builder.append(", description=");
-        builder.append(description);
-        builder.append(", type=");
-        builder.append(type);
-        builder.append(", transientData=");
-        builder.append(transientData);
-        builder.append(", className=");
-        builder.append(className);
-        builder.append(", defaultValueExpression=");
-        builder.append(defaultValueExpression);
-        builder.append("]");
-        return builder.toString();
+        return new ToStringBuilder(this)
+                .append("description", description)
+                .append("type", type)
+                .append("transientData", transientData)
+                .append("className", className)
+                .append("defaultValueExpression", defaultValueExpression)
+                .toString();
     }
 
     @Override

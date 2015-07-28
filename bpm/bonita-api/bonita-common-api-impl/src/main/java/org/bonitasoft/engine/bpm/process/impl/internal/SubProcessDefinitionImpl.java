@@ -13,8 +13,17 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl.internal;
 
+import java.util.Objects;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 
@@ -22,17 +31,23 @@ import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SubProcessDefinitionImpl extends ActivityDefinitionImpl implements SubProcessDefinition {
 
     private static final long serialVersionUID = -5578839351835375715L;
-
+    @XmlAttribute
     private final boolean triggeredByEvent;
 
+    @XmlElement(type = FlowElementContainerDefinitionImpl.class, name = "flowElements")
     private FlowElementContainerDefinition subProcessContainer;
 
     public SubProcessDefinitionImpl(final String name, final boolean triggeredByEvent) {
         super(name);
         this.triggeredByEvent = triggeredByEvent;
+    }
+
+    public SubProcessDefinitionImpl() {
+        triggeredByEvent = false;
     }
 
     public SubProcessDefinitionImpl(final long id, final String name, final boolean triggeredByEvent) {
@@ -55,37 +70,26 @@ public class SubProcessDefinitionImpl extends ActivityDefinitionImpl implements 
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (triggeredByEvent ? 1231 : 1237);
-        result = prime * result + (subProcessContainer == null ? 0 : subProcessContainer.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        SubProcessDefinitionImpl that = (SubProcessDefinitionImpl) o;
+        return Objects.equals(triggeredByEvent, that.triggeredByEvent) &&
+                Objects.equals(subProcessContainer, that.subProcessContainer);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SubProcessDefinitionImpl other = (SubProcessDefinitionImpl) obj;
-        if (triggeredByEvent != other.triggeredByEvent) {
-            return false;
-        }
-        if (subProcessContainer == null) {
-            if (other.subProcessContainer != null) {
-                return false;
-            }
-        } else if (!subProcessContainer.equals(other.subProcessContainer)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), triggeredByEvent, subProcessContainer);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("triggeredByEvent", triggeredByEvent)
+                .append("subProcessContainer", subProcessContainer)
+                .toString();
     }
 
     @Override

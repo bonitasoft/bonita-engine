@@ -13,20 +13,34 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import java.util.Objects;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ErrorEventTriggerDefinitionImpl implements ErrorEventTriggerDefinition {
 
     private static final long serialVersionUID = -8002085238119587513L;
-
+    @XmlAttribute
     private final String errorCode;
 
     public ErrorEventTriggerDefinitionImpl(final String errorCode) {
         this.errorCode = errorCode;
+    }
+
+    public ErrorEventTriggerDefinitionImpl() {
+        this.errorCode = null;
     }
 
     @Override
@@ -35,33 +49,23 @@ public abstract class ErrorEventTriggerDefinitionImpl implements ErrorEventTrigg
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (errorCode == null ? 0 : errorCode.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ErrorEventTriggerDefinitionImpl that = (ErrorEventTriggerDefinitionImpl) o;
+        return Objects.equals(errorCode, that.errorCode);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ErrorEventTriggerDefinitionImpl other = (ErrorEventTriggerDefinitionImpl) obj;
-        if (errorCode == null) {
-            if (other.errorCode != null) {
-                return false;
-            }
-        } else if (!errorCode.equals(other.errorCode)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(errorCode);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("errorCode", errorCode)
+                .toString();
     }
 
     @Override

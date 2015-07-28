@@ -87,7 +87,7 @@ public class ProcessDefinitionBARContributionTest {
     @Test
     public void should_deserializeProcessDefinition_of_old_process_throw_exception() throws Exception {
         exception.expect(InvalidBusinessArchiveFormatException.class);
-        exception.expectMessage("Wrong version");
+        exception.expectMessage("Deserialization of the ProcessDesignFailed");
         final String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
         final File createTempFile = IOUtil.createTempFileInDefaultTempDirectory("old", "process.xml");
 

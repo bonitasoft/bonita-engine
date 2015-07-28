@@ -15,23 +15,36 @@ package org.bonitasoft.engine.bpm.document.impl;
 
 import java.util.Objects;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
 /**
  * @author Baptiste Mesta
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DocumentDefinitionImpl extends NamedElementImpl implements DocumentDefinition {
 
     private static final long serialVersionUID = 2L;
-
+    @XmlElement
     private String url;
+    @XmlElement
     private String file;
+    @XmlAttribute
     private String mimeType;
+    @XmlElement
     private String description;
+    @XmlElement
     private String fileName;
+    @XmlElement(type = ExpressionImpl.class,name = "expression")
     private Expression initialValue;
 
     /**
@@ -41,6 +54,7 @@ public class DocumentDefinitionImpl extends NamedElementImpl implements Document
         super(name);
     }
 
+    public DocumentDefinitionImpl(){}
     @Override
     public String getUrl() {
         return url;
@@ -126,14 +140,14 @@ public class DocumentDefinitionImpl extends NamedElementImpl implements Document
 
     @Override
     public String toString() {
-        return "DocumentDefinitionImpl{" +
-                "url='" + url + '\'' +
-                ", file='" + file + '\'' +
-                ", mimeType='" + mimeType + '\'' +
-                ", description='" + description + '\'' +
-                ", fileName='" + fileName + '\'' +
-                ", initialValue=" + initialValue +
-                "} " + super.toString();
+        return new ToStringBuilder(this)
+                .append("url", url)
+                .append("file", file)
+                .append("mimeType", mimeType)
+                .append("description", description)
+                .append("fileName", fileName)
+                .append("initialValue", initialValue)
+                .toString();
     }
 
     @Override

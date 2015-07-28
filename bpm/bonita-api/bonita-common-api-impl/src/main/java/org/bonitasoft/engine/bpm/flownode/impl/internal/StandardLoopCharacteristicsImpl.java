@@ -13,22 +13,33 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import java.util.Objects;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.StandardLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class StandardLoopCharacteristicsImpl implements StandardLoopCharacteristics {
+@XmlAccessorType(XmlAccessType.FIELD)
+public class StandardLoopCharacteristicsImpl implements StandardLoopCharacteristics, LoopCharacteristics {
 
     private static final long serialVersionUID = -8405419721405699090L;
-
+    @XmlElement(type = ExpressionImpl.class)
     private final Expression loopCondition;
-
+    @XmlAttribute
     private final boolean testBefore;
-
+    @XmlElement(type = ExpressionImpl.class)
     private final Expression loopMax;
 
     public StandardLoopCharacteristicsImpl(final Expression loopCondition, final boolean testBefore) {
@@ -45,6 +56,12 @@ public class StandardLoopCharacteristicsImpl implements StandardLoopCharacterist
         this.loopMax = loopMax;
     }
 
+    public StandardLoopCharacteristicsImpl() {
+        this.testBefore = false;
+        this.loopCondition = new ExpressionImpl();
+        this.loopMax = null;
+    }
+
     public Expression getLoopCondition() {
         return loopCondition;
     }
@@ -58,45 +75,27 @@ public class StandardLoopCharacteristicsImpl implements StandardLoopCharacterist
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (testBefore ? 1231 : 1237);
-        result = prime * result + (loopCondition == null ? 0 : loopCondition.hashCode());
-        result = prime * result + (loopMax == null ? 0 : loopMax.hashCode());
-        return result;
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("loopCondition", loopCondition)
+                .append("testBefore", testBefore)
+                .append("loopMax", loopMax)
+                .toString();
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final StandardLoopCharacteristicsImpl other = (StandardLoopCharacteristicsImpl) obj;
-        if (testBefore != other.testBefore) {
-            return false;
-        }
-        if (loopCondition == null) {
-            if (other.loopCondition != null) {
-                return false;
-            }
-        } else if (!loopCondition.equals(other.loopCondition)) {
-            return false;
-        }
-        if (loopMax == null) {
-            if (other.loopMax != null) {
-                return false;
-            }
-        } else if (!loopMax.equals(other.loopMax)) {
-            return false;
-        }
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StandardLoopCharacteristicsImpl that = (StandardLoopCharacteristicsImpl) o;
+        return Objects.equals(testBefore, that.testBefore) &&
+                Objects.equals(loopCondition, that.loopCondition) &&
+                Objects.equals(loopMax, that.loopMax);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(loopCondition, testBefore, loopMax);
     }
 
     @Override

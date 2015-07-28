@@ -273,7 +273,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     SProcessDefinition readSProcessDefinitionFromDatabase(long processId, SProcessDefinitionDeployInfo processDeploymentInfo) throws IOException, XMLParseException, SReflectException, SCacheException {
-                final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent()
+        final DesignProcessDefinition objectFromXML = processDefinitionBARContribution.convertXmlToProcess(processDeploymentInfo.getDesignContent()
                         .getContent());
         SProcessDefinition sProcessDefinition = convertDesignProcessDefinition(objectFromXML);
                 setIdOnProcessDefinition(sProcessDefinition, processId);

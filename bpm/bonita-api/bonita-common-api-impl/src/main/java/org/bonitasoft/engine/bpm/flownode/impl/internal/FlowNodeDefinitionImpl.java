@@ -16,50 +16,65 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+import java.util.Objects;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
+import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
 /**
  * @author Zhao Na
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlTransient
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements FlowNodeDefinition {
 
     private static final long serialVersionUID = 429640943678358154L;
-
-    private final List<TransitionDefinition> incomings;
-
-    private final List<TransitionDefinition> outgoings;
-
-    private final List<ConnectorDefinition> connectors;
-
+    @XmlIDREF
+    @XmlElement(type = TransitionDefinitionImpl.class, name = "incomingTransition")
+    private final List<TransitionDefinition> incomings = new ArrayList<>();
+    @XmlIDREF
+    @XmlElement(type = TransitionDefinitionImpl.class, name = "outgoingTransition")
+    private final List<TransitionDefinition> outgoings = new ArrayList<>();
+    @XmlElement(type = ConnectorDefinitionImpl.class, name = "connector")
+    private final List<ConnectorDefinition> connectors = new ArrayList<>();
+    @XmlAttribute
     private String description;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression displayDescription;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression displayName;
-
+    @XmlElement(type = ExpressionImpl.class)
     private Expression displayDescriptionAfterCompletion;
-
+    @XmlIDREF
+    @XmlElement(type = TransitionDefinitionImpl.class)
     private TransitionDefinition defaultTransition;
 
     public FlowNodeDefinitionImpl(final long id, final String name) {
         super(name);
-        incomings = new ArrayList<>();
-        outgoings = new ArrayList<>();
-        connectors = new ArrayList<>();
         setId(id);
     }
 
     public FlowNodeDefinitionImpl(final String name) {
-        this(Math.abs(UUID.randomUUID().getLeastSignificantBits()), name);
+        super(name);
+    }
+
+    public FlowNodeDefinitionImpl() {
     }
 
     @Override
@@ -160,113 +175,38 @@ public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (connectors == null ? 0 : connectors.hashCode());
-        result = prime * result + (defaultTransition == null ? 0 : defaultTransition.hashCode());
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
-        result = prime * result + (displayDescriptionAfterCompletion == null ? 0 : displayDescriptionAfterCompletion.hashCode());
-        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
-        result = prime * result + (incomings == null ? 0 : incomings.hashCode());
-        result = prime * result + (outgoings == null ? 0 : outgoings.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        FlowNodeDefinitionImpl that = (FlowNodeDefinitionImpl) o;
+        return Objects.equals(incomings, that.incomings) &&
+                Objects.equals(outgoings, that.outgoings) &&
+                Objects.equals(connectors, that.connectors) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(displayDescription, that.displayDescription) &&
+                Objects.equals(displayName, that.displayName) &&
+                Objects.equals(displayDescriptionAfterCompletion, that.displayDescriptionAfterCompletion) &&
+                Objects.equals(defaultTransition, that.defaultTransition);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final FlowNodeDefinitionImpl other = (FlowNodeDefinitionImpl) obj;
-        if (connectors == null) {
-            if (other.connectors != null) {
-                return false;
-            }
-        } else if (!connectors.equals(other.connectors)) {
-            return false;
-        }
-        if (defaultTransition == null) {
-            if (other.defaultTransition != null) {
-                return false;
-            }
-        } else if (!defaultTransition.equals(other.defaultTransition)) {
-            return false;
-        }
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (displayDescription == null) {
-            if (other.displayDescription != null) {
-                return false;
-            }
-        } else if (!displayDescription.equals(other.displayDescription)) {
-            return false;
-        }
-        if (displayDescriptionAfterCompletion == null) {
-            if (other.displayDescriptionAfterCompletion != null) {
-                return false;
-            }
-        } else if (!displayDescriptionAfterCompletion.equals(other.displayDescriptionAfterCompletion)) {
-            return false;
-        }
-        if (displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
-            return false;
-        }
-        if (incomings == null) {
-            if (other.incomings != null) {
-                return false;
-            }
-        } else if (!incomings.equals(other.incomings)) {
-            return false;
-        }
-        if (outgoings == null) {
-            if (other.outgoings != null) {
-                return false;
-            }
-        } else if (!outgoings.equals(other.outgoings)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), incomings, outgoings, connectors, description, displayDescription, displayName, displayDescriptionAfterCompletion, defaultTransition);
     }
 
     @Override
     public String toString() {
-        final int maxLen = 5;
-        final StringBuilder builder = new StringBuilder();
-        builder.append("FlowNodeDefinitionImpl [incomings=");
-        builder.append(incomings != null ? incomings.subList(0, Math.min(incomings.size(), maxLen)) : null);
-        builder.append(", outgoings=");
-        builder.append(outgoings != null ? outgoings.subList(0, Math.min(outgoings.size(), maxLen)) : null);
-        builder.append(", connectors=");
-        builder.append(connectors != null ? connectors.subList(0, Math.min(connectors.size(), maxLen)) : null);
-        builder.append(", description=");
-        builder.append(description);
-        builder.append(", displayDescription=");
-        builder.append(displayDescription);
-        builder.append(", displayName=");
-        builder.append(displayName);
-        builder.append(", displayDescriptionAfterCompletion=");
-        builder.append(displayDescriptionAfterCompletion);
-        builder.append(", defaultTransition=");
-        builder.append(defaultTransition);
-        builder.append("]");
-        return builder.toString();
+        return new ToStringBuilder(this)
+                .append("incomings", incomings)
+                .append("outgoings", outgoings)
+                .append("connectors", connectors)
+                .append("description", description)
+                .append("displayDescription", displayDescription)
+                .append("displayName", displayName)
+                .append("displayDescriptionAfterCompletion", displayDescriptionAfterCompletion)
+                .append("defaultTransition", defaultTransition)
+                .toString();
     }
 
     @Override

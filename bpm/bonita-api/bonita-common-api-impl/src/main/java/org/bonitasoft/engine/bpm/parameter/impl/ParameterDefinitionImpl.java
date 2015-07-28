@@ -13,23 +13,36 @@
  **/
 package org.bonitasoft.engine.bpm.parameter.impl;
 
+import java.util.Objects;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 
 /**
  * @author Matthieu Chaffotte
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ParameterDefinitionImpl extends NamedElementImpl implements ParameterDefinition {
 
     private static final long serialVersionUID = -3997656451808629180L;
-
+    @XmlAttribute(required = true)
     private final String type;
-
+    @XmlElement
     private String description;
 
     public ParameterDefinitionImpl(final String parameterName, final String type) {
         super(parameterName);
         this.type = type;
+    }
+    public ParameterDefinitionImpl(){
+        super();
+        this.type = "";
     }
 
     @Override
@@ -47,52 +60,26 @@ public class ParameterDefinitionImpl extends NamedElementImpl implements Paramet
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ParameterDefinitionImpl that = (ParameterDefinitionImpl) o;
+        return Objects.equals(type, that.type) &&
+                Objects.equals(description, that.description);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ParameterDefinitionImpl other = (ParameterDefinitionImpl) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (type == null) {
-            if (other.type != null) {
-                return false;
-            }
-        } else if (!type.equals(other.type)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), type, description);
     }
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("ParameterDefinitionImpl [type=");
-        builder.append(type);
-        builder.append(", description=");
-        builder.append(description);
-        builder.append("]");
-        return builder.toString();
+        return new ToStringBuilder(this)
+                .append("type", type)
+                .append("description", description)
+                .toString();
     }
 
 }

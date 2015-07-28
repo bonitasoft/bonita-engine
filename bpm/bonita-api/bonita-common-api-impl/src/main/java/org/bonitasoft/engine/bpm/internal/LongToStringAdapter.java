@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2015 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,16 +11,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.bar.xml;
+
+package org.bonitasoft.engine.bpm.internal;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * @author Baptiste Mesta
+ * @author mazourd
  */
-public class IncomingTransitionRefBinding extends TransitionRefBinding {
-
+public class LongToStringAdapter extends XmlAdapter<String, Long> {
     @Override
-    public String getElementTag() {
-        return XMLProcessDefinition.INCOMING_TRANSITION;
+    public Long unmarshal(String id) throws Exception {
+        return  Long.parseLong(id);
     }
 
+    @Override
+    public String marshal(Long id) throws Exception {
+        if(id==null) return "" ;
+            return id.toString();
+    }
 }
