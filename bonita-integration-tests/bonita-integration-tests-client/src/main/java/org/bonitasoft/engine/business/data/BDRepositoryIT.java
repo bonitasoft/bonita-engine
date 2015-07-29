@@ -898,6 +898,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         processDefinitionBuilder.addBusinessData(businessDataName2, EMPLOYEE_QUALIFIED_NAME, null);
         processDefinitionBuilder.addBusinessData("address", ADDRESS_QUALIFIED_NAME, createNewAddressExpression);
         processDefinitionBuilder.addBusinessData("country", COUNTRY_QUALIFIED_NAME, createNewCountryExpression);
+        processDefinitionBuilder.addBusinessData("noneAddress", ADDRESS_QUALIFIED_NAME, null);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder
                 .addAutomaticTask("step1")
@@ -915,13 +916,23 @@ public class BDRepositoryIT extends CommonAPIIT {
                                 new ExpressionBuilder().createConstantStringExpression("Plip")))
                 .addOperation(
                         new OperationBuilder().createBusinessDataSetAttributeOperation("address", "setCountry", COUNTRY_QUALIFIED_NAME,
-                                countryQueryExpression));
+                                countryQueryExpression))
+                .addOperation(
+                        new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName2, "setAddress", ADDRESS_QUALIFIED_NAME,
+                                new ExpressionBuilder().createBusinessDataExpression("noneAddress", ADDRESS_QUALIFIED_NAME)));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask(processInstance, "step2");
+
+
+        Expression getEmployeeAddressExpression = new ExpressionBuilder().createGroovyScriptExpression("getEmployeeAddress", "if (" + businessDataName2 + ".address == null) return \"null\"\n"+ businessDataName2 + ".address.city", String.class.getName(),
+                new ExpressionBuilder().createBusinessDataExpression(businessDataName2, EMPLOYEE_QUALIFIED_NAME));
+        Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), Collections.singletonMap(getEmployeeAddressExpression, (Map<String, Serializable>) null));
+        assertThat(result.get(getEmployeeAddressExpression.getName())).isEqualTo("null");
+
 
         disableAndDeleteProcess(definition.getId());
     }

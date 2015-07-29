@@ -101,7 +101,7 @@ public class OperationServiceImpl implements OperationService {
         final Map<SLeftOperand, LeftOperandUpdateStatus> leftOperandsToUpdate = new HashMap<>();
         for (int i = 0; i < operations.size(); i++) {
             final SOperation currentOperation = operations.get(i);
-            final boolean shouldPersistValue = persistRightOperandResolver.shouldPersist(i, operations);
+            final boolean shouldPersistValue = persistRightOperandResolver.shouldPersistByPosition(i, operations);
             final LeftOperandUpdateStatus currentUpdateStatus = calculateRightOperandValue(currentOperation, expressionContext, shouldPersistValue);
             if (shouldUpdateLeftOperandContext(leftOperandsToUpdate, currentOperation.getLeftOperand(), currentUpdateStatus)) {
                 leftOperandsToUpdate.put(currentOperation.getLeftOperand(), currentUpdateStatus);
@@ -111,15 +111,16 @@ public class OperationServiceImpl implements OperationService {
     }
 
     private LeftOperandUpdateStatus calculateRightOperandValue(final SOperation operation, final SExpressionContext expressionContext,
-            final boolean shouldPersistValue)
+            boolean shouldPersistValue)
             throws SOperationExecutionException {
         final SLeftOperand leftOperand = operation.getLeftOperand();
         final LeftOperandUpdateStatus currentUpdateStatus = new LeftOperandUpdateStatus(operation.getType());
         if (currentUpdateStatus.shouldUpdate()) {
             final OperationExecutorStrategy operationExecutorStrategy = operationExecutorStrategyProvider.getOperationExecutorStrategy(operation);
             final Object rightOperandValue = evaluateRightOperandExpression(operation, expressionContext, operation.getRightOperand());
+            shouldPersistValue = persistRightOperandResolver.shouldPersistByValue(rightOperandValue, shouldPersistValue, operationExecutorStrategy.shouldPersistOnNullValue());
             final Object value = operationExecutorStrategy.computeNewValueForLeftOperand(operation, rightOperandValue, expressionContext,
-                    rightOperandValue != null && shouldPersistValue);
+                    shouldPersistValue);
             expressionContext.getInputValues().put(leftOperand.getName(), value);
             logOperation(TechnicalLogSeverity.DEBUG, operation, rightOperandValue, expressionContext);
         }

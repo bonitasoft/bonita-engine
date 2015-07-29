@@ -37,6 +37,7 @@ import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
@@ -102,7 +103,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testSecuredLoginServiceWithNullCredentials() {
+    public void testSecuredLoginServiceWithNullCredentials() throws Exception {
         securedLoginServiceImpl = instantiateLoginServiceWithAuthenticationService();
         try {
             securedLoginServiceImpl.login(null);
@@ -113,7 +114,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testSecuredLoginServiceWithNullLogin() {
+    public void testSecuredLoginServiceWithNullLogin() throws Exception {
         securedLoginServiceImpl = instantiateLoginServiceWithAuthenticationService();
         try {
             final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
@@ -142,6 +143,23 @@ public class SecuredLoginServiceImplTest {
         } catch (final Exception e) {
             assertThat(e.getMessage()).isEqualToIgnoringCase("User name or password is not valid!");
         }
+    }
+    
+    @Test(expected=SUserNotFoundException.class)
+    public void testSecuredLoginServiceWithUnknownUserThrowSUserNotFoundException() throws Exception {
+        securedLoginServiceImpl = instantiateLoginServieWithGenericAuthenticationService();
+            final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+            final Long tenantId = new Long(1);
+            final String login = "login";
+            final String password = "password";
+            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+            credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
+            credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+
+            when(genericAuthenticationService.checkUserCredentials(credentials)).thenReturn(login);
+            when(identityService.getUserByUserName(login)).thenThrow(new SUserNotFoundException(login));
+
+            securedLoginServiceImpl.login(credentials);
     }
 
     @Test

@@ -17,18 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bdm.Entity;
-import org.bonitasoft.engine.business.data.BusinessDataRepository;
+import org.bonitasoft.engine.business.data.BusinessDataRetriever;
 import org.bonitasoft.engine.business.data.RefBusinessDataRetriever;
-import org.bonitasoft.engine.business.data.proxy.ServerLazyLoader;
-import org.bonitasoft.engine.business.data.proxy.ServerProxyfier;
 import org.bonitasoft.engine.commons.Container;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SMultiRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -45,12 +40,12 @@ public class BusinessDataExpressionExecutorStrategy extends CommonBusinessDataEx
 
     private final RefBusinessDataRetriever refBusinessDataRetriever;
 
-    private final BusinessDataRepository businessDataRepository;
+    private final BusinessDataRetriever businessDataRetriever;
 
-    public BusinessDataExpressionExecutorStrategy(final RefBusinessDataRetriever refBusinessDataRetriever, final BusinessDataRepository businessDataRepository) {
+    public BusinessDataExpressionExecutorStrategy(final RefBusinessDataRetriever refBusinessDataRetriever, BusinessDataRetriever businessDataRetriever) {
         super();
         this.refBusinessDataRetriever = refBusinessDataRetriever;
-        this.businessDataRepository = businessDataRepository;
+        this.businessDataRetriever = businessDataRetriever;
     }
 
     @Override
@@ -70,35 +65,12 @@ public class BusinessDataExpressionExecutorStrategy extends CommonBusinessDataEx
         try {
             final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataRetriever.getRefBusinessDataInstance(new BusinessDataContext(
                     businessDataName, new Container(containerId, containerType)));
-            return getBusinessData(refBusinessDataInstance);
+            return businessDataRetriever.getBusinessData(refBusinessDataInstance);
         } catch (final SBonitaReadException | SFlowNodeReadException e) {
-            throw new SExpressionEvaluationException(e, "Unable to retrieve business data instance with name " + businessDataName);
+            throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + businessDataName, e, businessDataName);
         } catch (final SBonitaException e) {
             setProcessInstanceId(containerId, containerType, e);
             throw new SExpressionEvaluationException(e, expression.getName());
-        }
-    }
-
-    Object getBusinessData(final SRefBusinessDataInstance refBusinessDataInstance) throws org.bonitasoft.engine.business.data.SBusinessDataNotFoundException, SExpressionEvaluationException {
-        try {
-            final Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
-            if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance) {
-                final SSimpleRefBusinessDataInstance reference = (SSimpleRefBusinessDataInstance) refBusinessDataInstance;
-                final Entity findByNamedQuery = businessDataRepository.findById(bizClass, reference.getDataId());
-                final ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
-                return proxyfier.proxify(findByNamedQuery);
-            }
-            final SMultiRefBusinessDataInstance reference = (SMultiRefBusinessDataInstance) refBusinessDataInstance;
-            final List<Entity> entities = businessDataRepository.findByIds(bizClass, reference.getDataIds());
-
-            final List<Entity> e = new ArrayList<>();
-            for (final Entity entity : entities) {
-                final ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
-                e.add(proxyfier.proxify(entity));
-            }
-            return e;
-        } catch (final ClassNotFoundException e) {
-            throw new SExpressionEvaluationException(e, "Unable to load class for the business data having reference" + refBusinessDataInstance.getName());
         }
     }
 

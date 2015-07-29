@@ -73,4 +73,9 @@ public class BusinessDataJavaMethodOperationExecutorStrategy extends JavaMethodO
         return SLeftOperand.TYPE_BUSINESS_DATA.equals(operation.getLeftOperand().getType());
     }
 
+    @Override
+    public boolean shouldPersistOnNullValue() {
+        // should persist because the null value will be used to set an object field, but the object itself is not null
+        return true;
+    }
 }

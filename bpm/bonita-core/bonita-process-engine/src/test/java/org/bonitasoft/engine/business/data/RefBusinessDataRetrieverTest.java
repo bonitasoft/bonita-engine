@@ -15,6 +15,7 @@
 package org.bonitasoft.engine.business.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.business.data.DummyBusinessDataRefBuilder.buildSimpleRefBusinessData;
 import static org.mockito.BDDMockito.given;
 
 import org.bonitasoft.engine.commons.Container;
@@ -23,8 +24,6 @@ import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.business.data.SRefBusinessDataInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SRefBusinessDataInstance;
 import org.bonitasoft.engine.core.process.instance.model.business.data.SSimpleRefBusinessDataInstance;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SProcessSimpleRefBusinessDataInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.business.data.SSimpleRefBusinessDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.operation.BusinessDataContext;
 import org.junit.Test;
@@ -53,7 +52,7 @@ public class RefBusinessDataRetrieverTest {
     @Test
     public void getRefBusinessData_should_retrieve_data_using_process_context_when_container_is_a_process() throws Exception {
         //given
-        SSimpleRefBusinessDataInstance refBusinessDataInstance = createSimpleRefBusinessDataInstance(4L);
+        SSimpleRefBusinessDataInstance refBusinessDataInstance = buildSimpleRefBusinessData(4L);
         given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willReturn(refBusinessDataInstance);
 
         //when
@@ -66,7 +65,7 @@ public class RefBusinessDataRetrieverTest {
     @Test
     public void getRefBusinessData_should_retrieve_data_using_flow_node_context_when_container_is_a_flown_ode() throws Exception {
         //given
-        SSimpleRefBusinessDataInstance refBusinessDataInstance = createSimpleRefBusinessDataInstance(4L);
+        SSimpleRefBusinessDataInstance refBusinessDataInstance = buildSimpleRefBusinessData(4L);
         given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID)).willReturn(refBusinessDataInstance);
 
         //when
@@ -79,7 +78,7 @@ public class RefBusinessDataRetrieverTest {
     @Test
     public void getRefBusinessData_should_retry_to_retrieve_data_using_process_context_when_retrieving_data_using_flow_node_fails() throws Exception {
         //given
-        SSimpleRefBusinessDataInstance refBusinessDataInstance = createSimpleRefBusinessDataInstance(4L);
+        SSimpleRefBusinessDataInstance refBusinessDataInstance = buildSimpleRefBusinessData(4L);
         given(refBusinessDataService.getFlowNodeRefBusinessDataInstance("data", FLOW_NODE_INSTANCE_ID)).willThrow(new SRefBusinessDataInstanceNotFoundException(PROCESS_INSTANCE_ID, "data"));
         given(flowNodeInstanceService.getProcessInstanceId(FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.name())).willReturn(PROCESS_INSTANCE_ID);
         given(refBusinessDataService.getRefBusinessDataInstance("data", PROCESS_INSTANCE_ID)).willReturn(refBusinessDataInstance);
@@ -91,10 +90,5 @@ public class RefBusinessDataRetrieverTest {
         assertThat(retrievedData).isEqualTo(refBusinessDataInstance);
     }
 
-    private SSimpleRefBusinessDataInstance createSimpleRefBusinessDataInstance(final Long dataId) {
-        final SSimpleRefBusinessDataInstanceImpl sRefBusinessDataInstanceImpl = new SProcessSimpleRefBusinessDataInstanceImpl();
-        sRefBusinessDataInstanceImpl.setDataId(dataId);
-        return sRefBusinessDataInstanceImpl;
-    }
 
 }
