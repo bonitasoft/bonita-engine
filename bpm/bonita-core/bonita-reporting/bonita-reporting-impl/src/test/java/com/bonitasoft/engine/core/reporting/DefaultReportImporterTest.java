@@ -87,7 +87,7 @@ public class DefaultReportImporterTest {
     }
 
     @Test
-    public void should_delete_and_import_when_is_different() throws Exception {
+    public void should_update_when_is_different() throws Exception {
         //given
         byte[] screenshot = "plop".getBytes();
         byte[] zipContent = zip(entry("the_report-screenshot.png", "plop"),
@@ -108,6 +108,8 @@ public class DefaultReportImporterTest {
         EntityUpdateDescriptor value = captor.getValue();
         assertThat((byte[])value.getFields().get("content")).containsExactly(zipContent);
         assertThat((byte[])value.getFields().get("screenshot")).containsExactly(screenshot);
+        assertThat(value.getFields().get("description")).isEqualTo("The description of the report");
+        assertThat(value.getFields().keySet()).containsOnly("content", "screenshot", "description");
     }
 
     private InputStream stream(byte[] zip) throws IOException {
