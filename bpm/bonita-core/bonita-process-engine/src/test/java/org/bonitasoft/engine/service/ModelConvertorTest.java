@@ -14,16 +14,8 @@
 package org.bonitasoft.engine.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -96,6 +88,9 @@ public class ModelConvertorTest {
 
     @Mock
     private FlowNodeStateManager manager;
+
+    @Mock
+    private FormRequiredAnalyzer formRequiredAnalyzer;
 
     @Test
     public void convertDataInstanceIsTransient() {
@@ -394,7 +389,7 @@ public class ModelConvertorTest {
         sFormMapping.setPageMapping(new SPageMappingImpl());
 
         // Then
-        FormMapping formMapping = ModelConvertor.toFormMapping(sFormMapping);
+        FormMapping formMapping = ModelConvertor.toFormMapping(sFormMapping, formRequiredAnalyzer);
 
         // When
         assertThat(formMapping).isNotNull();
@@ -419,7 +414,7 @@ public class ModelConvertorTest {
         sFormMapping.setPageMapping(new SPageMappingImpl());
 
         // Then
-        List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping>asList(sFormMapping));
+        List<FormMapping> formMapping = ModelConvertor.toFormMappings(Arrays.<SFormMapping> asList(sFormMapping), formRequiredAnalyzer);
 
         // When
         assertThat(formMapping).hasSize(1);
@@ -437,7 +432,7 @@ public class ModelConvertorTest {
         // Given
 
         // Then
-        FormMapping formMapping = ModelConvertor.toFormMapping(null);
+        FormMapping formMapping = ModelConvertor.toFormMapping(null, formRequiredAnalyzer);
 
         // When
         assertThat(formMapping).isNull();
@@ -470,6 +465,7 @@ public class ModelConvertorTest {
         assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
         assertThat(contract.getInputs()).as("should convert inputs").containsExactly(expectedSimpleInput, expectedComplexInput);
     }
+
     @Test
     public void convertNullSContractDefinition() {
         //when
