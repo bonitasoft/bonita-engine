@@ -32,10 +32,10 @@ Structure
 ### `engine-server/conf/tenants`
 : Contains configurations of tenants.
 #### `engine-server/conf/tenants/template`
-: Default files that are taken when a new tenant is created.  You can change new tenant configuration in the `bonita-tenant-community-custom.properties` by uncommenting lines and replace services implementations by adding them in the `bonita-tenants-custom.xml`
+: Default files that are copied when a new tenant is created. You can change the new tenant configuration in the `bonita-tenant-community-custom.properties` by uncommenting lines, and replace service implementations by adding them in the `bonita-tenants-custom.xml`.
 #### `engine-server/conf/tenants/<tenant_id>`
-: Configuration of the tenant having the id `<tenant_id>`, see section on `engine-server/conf/tenants/template`  for more details
+: Configuration of the tenant having the id `<tenant_id>`, see section on `engine-server/conf/tenants/template`  for more details.
 ### `engine-server/temp`
-: Contains temporary data, can be deleted when the engine is shutdown
+: Contains temporary data, can be deleted when the engine is Shutdown
 ### `engine-server/work`
-: Contains runtime data and default configuration. content is handled by the engine **Should not be modified**
+: Contains runtime data and default configuration. Content is handled by the engine **Should not be modified**
