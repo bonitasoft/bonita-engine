@@ -197,4 +197,9 @@ public class BusinessDataJavaMethodOperationExecutorStrategyTest {
 
     }
 
+    @Test
+    public void shouldPersistOnNullValue_should_return_true() throws Exception {
+        assertThat(strategy.shouldPersistOnNullValue()).isTrue();
+    }
+
 }

@@ -734,9 +734,22 @@
         </property>
     </bean>
 
+    <bean id="serverLazyLoader" class="org.bonitasoft.engine.business.data.proxy.ServerLazyLoader" >
+        <constructor-arg name="bdBusinessDataRepository" ref="businessDataRepository"/>
+    </bean>
+
+    <bean id="serverProxyfier" class="org.bonitasoft.engine.business.data.proxy.ServerProxyfier" >
+        <constructor-arg name="lazyLoader" ref="serverLazyLoader"/>
+    </bean>
+
+    <bean id="businessDataRetriever" class="org.bonitasoft.engine.business.data.BusinessDataRetriever">
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+        <constructor-arg name="proxyfier" ref="serverProxyfier" />
+    </bean>
+
     <bean id="businessDataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.BusinessDataExpressionExecutorStrategy">
         <constructor-arg name="refBusinessDataRetriever" ref="refBusinessDataRetriever" />
-        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+        <constructor-arg name="businessDataRetriever" ref="businessDataRetriever" />
     </bean>
 
     <bean id="businessObjectDAOExpressionStrategy" class="org.bonitasoft.engine.expression.BusinessObjectDAOExpressionStrategy">

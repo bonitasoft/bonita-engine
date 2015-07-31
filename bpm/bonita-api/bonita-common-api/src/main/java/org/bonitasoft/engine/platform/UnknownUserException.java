@@ -11,19 +11,30 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.instance.model;
+package org.bonitasoft.engine.platform;
 
-import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 
 /**
- * @author Feng Hui
+ * Indicates that the user trying to login is unknown to bonita
+ *
+ * @author Anthony Birembaut
  */
-public interface SGatewayInstance extends SFlowNodeInstance {
+public class UnknownUserException extends LoginException {
 
-    SGatewayType getGatewayType();
+    private static final long serialVersionUID = 9074655520113937276L;
 
-    String getHitBys();
+    /**
+     * @param message a String indicating the exception message
+     */
+    public UnknownUserException(final String message) {
+        super(message);
+    }
 
-    boolean isFinished();
+    /**
+     * @param cause a Throwable indicating the root cause
+     */
+    public UnknownUserException(final Throwable cause) {
+        super(cause);
+    }
 
 }

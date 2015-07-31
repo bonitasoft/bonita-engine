@@ -11,19 +11,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.instance.model;
 
-import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
+package org.bonitasoft.engine.core.operation.impl;
 
-/**
- * @author Feng Hui
- */
-public interface SGatewayInstance extends SFlowNodeInstance {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    SGatewayType getGatewayType();
+import org.junit.Test;
 
-    String getHitBys();
+public class XpathUpdateQueryOperationExecutorStrategyTest {
 
-    boolean isFinished();
+    @Test
+    public void should_not_persist_on_null() throws Exception {
+        assertThat(new XpathUpdateQueryOperationExecutorStrategy().shouldPersistOnNullValue()).isFalse();
+    }
 
 }

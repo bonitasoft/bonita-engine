@@ -53,4 +53,8 @@ public class BusinessDataAssignmentStrategy implements OperationExecutorStrategy
         return SOperatorType.ASSIGNMENT.name() + "_" + SLeftOperand.TYPE_BUSINESS_DATA;
     }
 
+    @Override
+    public boolean shouldPersistOnNullValue() {
+        return false;
+    }
 }

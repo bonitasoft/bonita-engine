@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
+import org.bonitasoft.engine.platform.UnknownUserException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 
@@ -41,9 +42,11 @@ public interface LoginAPI {
      * @return the session to use with other tenant API methods
      * @throws LoginException
      *             occurs when an exception is thrown during login
+     * @throws UnknownUserException
+     *             occurs when the user trying to login is unknown to the engine
      */
     @NoSessionRequired
-    APISession login(String userName, String password) throws LoginException;
+    APISession login(String userName, String password) throws LoginException, UnknownUserException;
 
     /**
      * Connects the user in order to use API methods of the default tenant.
