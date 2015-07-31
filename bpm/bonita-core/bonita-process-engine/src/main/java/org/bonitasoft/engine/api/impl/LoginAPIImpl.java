@@ -36,12 +36,14 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.TenantStatusException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.UnknownUserException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -91,7 +93,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     @Override
     @CustomTransactions
     @AvailableWhenTenantIsPaused
-    public APISession login(final Map<String, Serializable> credentials) throws LoginException {
+    public APISession login(final Map<String, Serializable> credentials) throws LoginException, UnknownUserException {
         checkCredentialsAreNotNullOrEmpty(credentials);
         try {
             final Long tenantId = NumberUtils.isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) ? NumberUtils.toLong(String
@@ -218,6 +220,8 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
                     final UpdateUser updateUser = new UpdateUser(identityService, sUser.getId(), updateDescriptor, null, null);
                     updateUser.execute();
                 }
+            } catch (SUserNotFoundException e) {
+                throw new UnknownUserException("Unable to find user in database.");
             } finally {
                 if (sessionAccessor != null) {
                     sessionAccessor.deleteSessionId();

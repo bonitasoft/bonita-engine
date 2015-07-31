@@ -45,7 +45,7 @@ public class ServerProxyfier {
 
     @SuppressWarnings("unchecked")
     public <T extends Entity> T proxify(final T entity) {
-        if (isLazyMethodProxyfied(entity)) {
+        if (entity == null || isLazyMethodProxyfied(entity)) {
             return entity;
         }
         return (T) proxifyEntity(entity);
@@ -201,6 +201,7 @@ public class ServerProxyfier {
 
     /**
      * Retrieves the real class for the given entity. This result will be same as {@code entity.getClass()} if the entity is not a proxy.
+     * 
      * @param entity
      * @return
      */

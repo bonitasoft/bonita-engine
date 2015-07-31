@@ -39,13 +39,13 @@ public class ImplicitGatewayTransitionEvaluator {
 
     public List<STransitionDefinition> evaluateTransitions(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance,
             FlowNodeTransitionsWrapper transitions, final SExpressionContext sExpressionContext) throws SBonitaException {
-        EvaluatedTransitions evaluatedTransitions = evaluatedTransitions(sExpressionContext, transitions.getAllOutgoingTransitionDefinitions());
+        EvaluatedTransitions evaluatedTransitions = evaluatedTransitions(sExpressionContext, transitions.getNonDefaultOutgoingTransitionDefinitions());
         return buildChosenTransitions(evaluatedTransitions, transitions, sDefinition, flowNodeInstance);
     }
 
     private List<STransitionDefinition> buildChosenTransitions(final EvaluatedTransitions evaluatedTransitions, final FlowNodeTransitionsWrapper transitions,
             final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
-        final List<STransitionDefinition> chosenTransitions = new ArrayList<STransitionDefinition>(evaluatedTransitions.getUnconditionalTransitions().size()
+        final List<STransitionDefinition> chosenTransitions = new ArrayList<>(evaluatedTransitions.getUnconditionalTransitions().size()
                 + evaluatedTransitions.getTrueTransitions().size());
         if (evaluatedTransitions.hasUnconditionalTransitions()) {
             chosenTransitions.addAll(evaluatedTransitions.getUnconditionalTransitions());

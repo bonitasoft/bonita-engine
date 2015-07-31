@@ -170,13 +170,19 @@ public class ServerProxyfierTest {
     @Test
     public void should_retrieve_real_class() throws Exception {
         //given
-        PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
+        final PersonEntity proxy = serverProxyfier.proxify(new PersonEntity());
 
         //when
-        Class<? extends Entity> realClass = ServerProxyfier.getRealClass(proxy);
+        final Class<? extends Entity> realClass = ServerProxyfier.getRealClass(proxy);
 
         //then
         assertThat(realClass.getName()).isEqualTo(PersonEntity.class.getName());
     }
 
+    @Test
+    public void should_return_null_when_proxifying_a_null_entity() throws Exception {
+        final Entity proxy = serverProxyfier.proxify((Entity) null);
+
+        assertThat(proxy).isNull();
+    }
 }
