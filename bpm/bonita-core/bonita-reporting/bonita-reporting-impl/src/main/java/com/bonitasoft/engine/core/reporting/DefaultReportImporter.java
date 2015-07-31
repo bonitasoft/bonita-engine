@@ -62,7 +62,6 @@ public class DefaultReportImporter {
         if (reportContent.length != existingReportContent.length) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Report " + reportName + " exists but the content is not up to date, updating it.");
             EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-            entityUpdateDescriptor.addField(SReportFields.NAME, reportName);
             entityUpdateDescriptor.addField(SReportFields.DESCRIPTION, description);
             entityUpdateDescriptor.addField(SReportFields.SCREENSHOT, screenShot);
             entityUpdateDescriptor.addField(SReportFields.CONTENT, reportContent);
