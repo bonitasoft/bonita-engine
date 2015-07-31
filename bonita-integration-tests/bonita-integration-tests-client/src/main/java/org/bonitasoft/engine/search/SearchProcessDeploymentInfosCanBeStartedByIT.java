@@ -116,24 +116,24 @@ public class SearchProcessDeploymentInfosCanBeStartedByIT extends TestWithTechni
     @Test
     public void searchProcessDefinitionsUserCanStart() throws Exception {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
-        SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(0).getId(), searchOptionsBuilder.done());
+        SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosCanBeStartedBy(users.get(0).getId(), searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
         assertEquals(enabledProcessDefinitions.get(0).getName(), searchRes.getResult().get(0).getName());
 
-        searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(1).getId(), searchOptionsBuilder.done());
+        searchRes = getProcessAPI().searchProcessDeploymentInfosCanBeStartedBy(users.get(1).getId(), searchOptionsBuilder.done());
         assertEquals(2, searchRes.getCount());
         assertEquals(enabledProcessDefinitions.get(1).getName(), searchRes.getResult().get(0).getName());
         assertEquals(enabledProcessDefinitions.get(2).getName(), searchRes.getResult().get(1).getName());
 
         // user associated to a process without actor initiator
-        searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(2).getId(), searchOptionsBuilder.done());
+        searchRes = getProcessAPI().searchProcessDeploymentInfosCanBeStartedBy(users.get(2).getId(), searchOptionsBuilder.done());
         assertEquals(0, searchRes.getCount());
     }
 
     @Test
     public void searchProcessDefinitionsUserCanStartFromGroup() throws Exception {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
-        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(4).getId(), searchOptionsBuilder.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosCanBeStartedBy(users.get(4).getId(), searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
         assertEquals(enabledProcessDefinitions.get(4).getName(), searchRes.getResult().get(0).getName());
     }
@@ -141,7 +141,7 @@ public class SearchProcessDeploymentInfosCanBeStartedByIT extends TestWithTechni
     @Test
     public void searchProcessDefinitionsUserCanStartFromRole() throws Exception {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
-        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(5).getId(), searchOptionsBuilder.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosCanBeStartedBy(users.get(5).getId(), searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
         assertEquals(enabledProcessDefinitions.get(5).getName(), searchRes.getResult().get(0).getName());
     }
@@ -149,7 +149,7 @@ public class SearchProcessDeploymentInfosCanBeStartedByIT extends TestWithTechni
     @Test
     public void searchProcessDefinitionsUserCanStartFromRoleAndGroup() throws Exception {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
-        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(3).getId(), searchOptionsBuilder.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosCanBeStartedBy(users.get(3).getId(), searchOptionsBuilder.done());
         assertEquals(3, searchRes.getCount());
         assertEquals(enabledProcessDefinitions.get(4).getName(), searchRes.getResult().get(0).getName()); // from group
         assertEquals(enabledProcessDefinitions.get(5).getName(), searchRes.getResult().get(1).getName()); // from role
@@ -161,7 +161,7 @@ public class SearchProcessDeploymentInfosCanBeStartedByIT extends TestWithTechni
         // test term
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         searchOptionsBuilder.searchTerm("My_Process2"); // use name as term
-        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(1).getId(), searchOptionsBuilder.done());
+        final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosCanBeStartedBy(users.get(1).getId(), searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
         assertEquals(enabledProcessDefinitions.get(1).getId(), searchRes.getResult().get(0).getProcessId());
     }
@@ -171,14 +171,14 @@ public class SearchProcessDeploymentInfosCanBeStartedByIT extends TestWithTechni
         // test filter on process name
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         searchOptionsBuilder.filter(ProcessDeploymentInfoSearchDescriptor.NAME, "My_Process2");
-        SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(1).getId(), searchOptionsBuilder.done());
+        SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosCanBeStartedBy(users.get(1).getId(), searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
         assertEquals(enabledProcessDefinitions.get(1).getId(), searchRes.getResult().get(0).getProcessId());
 
         // test filter category
         searchOptionsBuilder = new SearchOptionsBuilder(0, 5).sort(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
         searchOptionsBuilder.filter(ProcessDeploymentInfoSearchDescriptor.CATEGORY_ID, categories.get(0).getId());
-        searchRes = getProcessAPI().searchProcessDeploymentInfos(users.get(1).getId(), searchOptionsBuilder.done());
+        searchRes = getProcessAPI().searchProcessDeploymentInfosCanBeStartedBy(users.get(1).getId(), searchOptionsBuilder.done());
         assertEquals(1, searchRes.getCount());
         assertEquals(enabledProcessDefinitions.get(2).getId(), searchRes.getResult().get(0).getProcessId());
     }

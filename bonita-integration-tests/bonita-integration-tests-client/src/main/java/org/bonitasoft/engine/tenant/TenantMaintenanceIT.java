@@ -77,10 +77,8 @@ public class TenantMaintenanceIT extends TestWithUser {
     }
 
     private void logNumberOfProcess() throws Exception {
-        final long numberOfProcessInstances = getProcessAPI()
-                .getNumberOfProcessInstances();
-        final long numberOfArchivedProcessInstances = getProcessAPI()
-                .getNumberOfArchivedProcessInstances();
+        final long numberOfProcessInstances = getProcessAPI().getNumberOfProcessInstances();
+        final long numberOfArchivedProcessInstances = getProcessAPI().getNumberOfArchivedProcessInstances();
 
         LOGGER.info(String.format(
                 "tenant: process instance:%d archived process:%d",
