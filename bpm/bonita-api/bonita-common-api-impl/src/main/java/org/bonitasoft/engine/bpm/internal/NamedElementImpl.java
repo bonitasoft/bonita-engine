@@ -36,7 +36,7 @@ public abstract class NamedElementImpl extends BaseElementImpl implements NamedE
         this.name = name;
     }
 
-    public NamedElementImpl(){this.name ="default name";}
+    public NamedElementImpl(){this.name = null;}
     @Override
     public String getName() {
         return name;

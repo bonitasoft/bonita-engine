@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
+import org.bonitasoft.engine.bpm.userfilter.impl.UserFilterDefinitionImpl;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -35,7 +36,7 @@ public abstract class HumanTaskDefinitionImpl extends TaskDefinitionImpl impleme
     private static final long serialVersionUID = -7657152341382296289L;
     @XmlAttribute
     private final String actorName;
-    @XmlElement(type = UserTaskDefinitionImpl.class)
+    @XmlElement(type = UserFilterDefinitionImpl.class)
     private UserFilterDefinition userFilterDefinition;
     @XmlAttribute
     private Long expectedDuration;

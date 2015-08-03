@@ -59,7 +59,7 @@ public abstract class MessageEventTriggerDefinitionImpl implements MessageEventT
     }
 
     public MessageEventTriggerDefinitionImpl() {
-        messageName = "default name";
+        messageName = null;
         correlations = new ArrayList<>(1);
     }
 

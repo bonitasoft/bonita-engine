@@ -13,11 +13,6 @@
  */
 package org.bonitasoft.engine.bpm.bar;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.File;
-import java.io.IOException;
-
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.context.ContextEntryImpl;
 import org.bonitasoft.engine.bpm.contract.Type;
@@ -34,6 +29,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Celine Souchet
@@ -87,7 +87,7 @@ public class ProcessDefinitionBARContributionTest {
     @Test
     public void should_deserializeProcessDefinition_of_old_process_throw_exception() throws Exception {
         exception.expect(InvalidBusinessArchiveFormatException.class);
-        exception.expectMessage("Wrong version");
+        exception.expectMessage("Deserialization of the ProcessDesignFailed");
         final String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
         final File createTempFile = IOUtil.createTempFileInDefaultTempDirectory("old", "process.xml");
 

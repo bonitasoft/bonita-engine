@@ -44,10 +44,10 @@ public class ConnectorDefinitionImpl extends NamedElementImpl implements Connect
     @XmlAttribute
     private final String connectorId;
     @XmlJavaTypeAdapter(MapAdapterExpression.class)
-    @XmlElement(name = "input")
+    //@XmlElement(name = "input")
     private final Map<String, Expression> inputs = new HashMap<String, Expression>();
     @XmlElementWrapper(name = "outputs")
-    @XmlElement(name = "output", type = OperationImpl.class)
+    @XmlElement(name = "operation", type = OperationImpl.class)
     private final List<Operation> outputs = new ArrayList<Operation>();
 
     private final ConnectorEvent actiationEvent;

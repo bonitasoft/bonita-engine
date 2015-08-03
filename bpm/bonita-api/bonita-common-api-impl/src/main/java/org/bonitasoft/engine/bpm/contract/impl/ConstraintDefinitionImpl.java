@@ -84,7 +84,7 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
     }
 
     private static final long serialVersionUID = 2793703451225519896L;
-@XmlAttribute
+    @XmlAttribute
     private final String name;
     @XmlElement
     private final String expression;
@@ -101,12 +101,13 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
         inputNames = new ArrayList<String>();
     }
 
-    public ConstraintDefinitionImpl(){
-        this.name = "default constraint name";
-        this.explanation = "no explanation (default explanation)";
-        this.expression = "default expression";
+    public ConstraintDefinitionImpl() {
+        this.name = null;
+        this.explanation = null;
+        this.expression = null;
         inputNames = new ArrayList<String>();
     }
+
     @Override
     public String getName() {
         return name;

@@ -15,8 +15,6 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
-import org.bonitasoft.engine.bpm.data.impl.TextDataDefinitionImpl;
-import org.bonitasoft.engine.bpm.data.impl.XMLDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.CorrelationDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
@@ -26,11 +24,10 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlElements;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -45,18 +42,14 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
     private Expression targetProcess;
     @XmlElement(type = ExpressionImpl.class)
     private Expression targetFlowNode;
-    @XmlElementWrapper(name = "dataDefinitions")
-    @XmlElements({
-            @XmlElement(type = DataDefinitionImpl.class),
-            @XmlElement(type = TextDataDefinitionImpl.class),
-            @XmlElement(type = XMLDataDefinitionImpl.class)
-    })
+    @XmlElement(type = DataDefinitionImpl.class)
     private final List<DataDefinition> dataDefinitions;
 
-    public ThrowMessageEventTriggerDefinitionImpl(){
+    public ThrowMessageEventTriggerDefinitionImpl() {
         super();
         dataDefinitions = new ArrayList<>();
     }
+
     public ThrowMessageEventTriggerDefinitionImpl(final String messageName) {
         super(messageName);
         dataDefinitions = new ArrayList<>();
@@ -129,45 +122,22 @@ public class ThrowMessageEventTriggerDefinitionImpl extends MessageEventTriggerD
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ThrowMessageEventTriggerDefinitionImpl other = (ThrowMessageEventTriggerDefinitionImpl) obj;
-        if (dataDefinitions == null) {
-            if (other.dataDefinitions != null) {
-                return false;
-            }
-        } else if (!dataDefinitions.equals(other.dataDefinitions)) {
-            return false;
-        }
-        if (targetFlowNode == null) {
-            if (other.targetFlowNode != null) {
-                return false;
-            }
-        } else if (!targetFlowNode.equals(other.targetFlowNode)) {
-            return false;
-        }
-        if (targetProcess == null) {
-            if (other.targetProcess != null) {
-                return false;
-            }
-        } else if (!targetProcess.equals(other.targetProcess)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public void accept(ModelFinderVisitor visitor, long modelId) {
         super.accept(visitor, modelId);
         visitor.find(this, modelId);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
+        ThrowMessageEventTriggerDefinitionImpl that = (ThrowMessageEventTriggerDefinitionImpl) o;
+        return Objects.equals(targetProcess, that.targetProcess) &&
+                Objects.equals(targetFlowNode, that.targetFlowNode) &&
+                Objects.equals(dataDefinitions, that.dataDefinitions);
+    }
 }

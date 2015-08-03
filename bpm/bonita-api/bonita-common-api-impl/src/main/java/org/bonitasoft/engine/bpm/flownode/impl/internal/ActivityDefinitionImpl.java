@@ -18,6 +18,7 @@ import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
+import org.bonitasoft.engine.bpm.data.impl.TextDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.impl.XMLDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
@@ -49,8 +50,8 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
     @XmlElementWrapper(name = "dataDefinitions")
     @XmlElements({
             @XmlElement(type = DataDefinitionImpl.class, name = "dataDefinition"),
-            @XmlElement(type = DataDefinitionImpl.class, name = "dataDefinition"),
-            @XmlElement(type = XMLDataDefinitionImpl.class, name = "dataDefinition")
+            @XmlElement(type = TextDataDefinitionImpl.class, name = "textDataDefinition"),
+            @XmlElement(type = XMLDataDefinitionImpl.class, name = "xmlDataDefinition")
     })
     private final List<DataDefinition> dataDefinitions;
     @XmlElementWrapper(name = "BusinessDataDefinitions")
@@ -61,8 +62,8 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
     private final List<Operation> operations;
     @XmlElements(
     {
-            @XmlElement(type = StandardLoopCharacteristicsImpl.class),
-            @XmlElement(type = MultiInstanceLoopCharacteristicsImpl.class)
+            @XmlElement(type = StandardLoopCharacteristicsImpl.class,name = "standardLoopCharacteristics"),
+            @XmlElement(type = MultiInstanceLoopCharacteristicsImpl.class,name = "multiInstanceLoopCharacteristics" )
     })
     private LoopCharacteristics loopCharacteristics;
     @XmlElementWrapper(name = "boundaryEventDefinitions")

@@ -28,6 +28,8 @@ import javax.xml.bind.annotation.XmlTransient;
 public abstract class BaseElementImpl implements BaseElement {
 
     private static final long serialVersionUID = -5094021692278906536L;
+    //@XmlID
+    //@XmlJavaTypeAdapter(type=long.class,value = LongtoStringAdapter.class)
     @XmlAttribute
     private long id;
 

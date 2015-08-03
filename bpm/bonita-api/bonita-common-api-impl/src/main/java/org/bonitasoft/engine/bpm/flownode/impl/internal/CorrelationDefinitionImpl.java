@@ -39,6 +39,11 @@ public class CorrelationDefinitionImpl implements CorrelationDefinition {
         this.key = key;
         this.value = value;
     }
+    public CorrelationDefinitionImpl() {
+        super();
+        this.key = new ExpressionImpl();
+        this.value = new ExpressionImpl();
+    }
 
     @Override
     public Expression getKey() {

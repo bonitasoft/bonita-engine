@@ -18,6 +18,7 @@ import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Matthieu Chaffotte
@@ -29,7 +30,7 @@ public class ActorDefinitionImpl implements ActorDefinition {
     private static final long serialVersionUID = 1915238328442058288L;
     @XmlAttribute(required = true)
     private final String name;
-    @XmlAttribute(required = false)
+    @XmlElement(required = false)
     private String description;
     @XmlAttribute(required = false)
     private boolean initiator;

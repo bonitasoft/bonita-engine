@@ -34,10 +34,10 @@ import java.util.List;
 public class EndEventDefinitionImpl extends ThrowEventDefinitionImpl implements EndEventDefinition {
 
     private static final long serialVersionUID = -6726824751097930154L;
-    @XmlElementWrapper(name = "errorEventTriggerDefinitions")
-    @XmlElement(type = ThrowErrorEventTriggerDefinitionImpl.class, name = "errorEventTriggerDefinition")
+    @XmlElementWrapper(name = "errorEventTriggers")
+    @XmlElement(type = ThrowErrorEventTriggerDefinitionImpl.class, name = "errorEventTrigger")
     private final List<ThrowErrorEventTriggerDefinition> errorEventTriggerDefinitions;
-    @XmlElement(type = TerminateEventTriggerDefinitionImpl.class, name = "terminateEventTriggerDefinition")
+    @XmlElement(type = TerminateEventTriggerDefinitionImpl.class, name = "terminateEventTrigger")
     private TerminateEventTriggerDefinition terminateEventTriggerDefinition;
 
     public EndEventDefinitionImpl() {

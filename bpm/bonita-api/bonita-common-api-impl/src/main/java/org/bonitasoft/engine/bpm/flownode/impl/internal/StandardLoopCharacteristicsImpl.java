@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.bonitasoft.engine.bpm.flownode.LoopCharacteristics;
 import org.bonitasoft.engine.bpm.flownode.StandardLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
@@ -28,7 +29,7 @@ import javax.xml.bind.annotation.XmlElement;
  * @author Celine Souchet
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class StandardLoopCharacteristicsImpl implements StandardLoopCharacteristics {
+public class StandardLoopCharacteristicsImpl implements StandardLoopCharacteristics, LoopCharacteristics {
 
     private static final long serialVersionUID = -8405419721405699090L;
     @XmlElement(type = ExpressionImpl.class)
@@ -50,6 +51,12 @@ public class StandardLoopCharacteristicsImpl implements StandardLoopCharacterist
         this.loopCondition = loopCondition;
         this.testBefore = testBefore;
         this.loopMax = loopMax;
+    }
+
+    public StandardLoopCharacteristicsImpl() {
+        this.testBefore = false;
+        this.loopCondition = new ExpressionImpl();
+        this.loopMax = new ExpressionImpl();
     }
 
     public Expression getLoopCondition() {

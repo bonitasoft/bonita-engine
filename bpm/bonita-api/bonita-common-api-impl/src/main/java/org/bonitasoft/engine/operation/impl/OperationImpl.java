@@ -34,13 +34,13 @@ import javax.xml.bind.annotation.XmlElement;
 public class OperationImpl implements Operation {
 
     private static final long serialVersionUID = -7255854432856258651L;
-    @XmlElement(type = LeftOperandImpl.class)
+    @XmlElement(type = LeftOperandImpl.class, name = "leftOperand")
     private LeftOperand leftOperand;
-    @XmlAttribute
+    @XmlAttribute(name = "operatorType")
     private OperatorType type;
     @XmlAttribute
     private String operator;
-    @XmlElement(type = ExpressionImpl.class)
+    @XmlElement(type = ExpressionImpl.class, name = "rightOperand")
     private Expression rightOperand;
 
 

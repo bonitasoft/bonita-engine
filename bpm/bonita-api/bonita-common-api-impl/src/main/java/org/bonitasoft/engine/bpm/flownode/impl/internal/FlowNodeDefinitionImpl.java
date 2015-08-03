@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,13 +42,15 @@ import java.util.UUID;
 public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements FlowNodeDefinition {
 
     private static final long serialVersionUID = 429640943678358154L;
-    @XmlElementWrapper(name = "incomings")
-    @XmlElement(type = TransitionDefinitionImpl.class, name = "incoming")
+    //@XmlElementWrapper(name = "incomings")
+    //@XmlIDREF
+    @XmlElement(type = TransitionDefinitionImpl.class, name = "incomingTransition")
     private final List<TransitionDefinition> incomings;
-    @XmlElementWrapper(name = "outgoings")
-    @XmlElement(type = TransitionDefinitionImpl.class, name = "outgoing")
+    //@XmlElementWrapper(name = "outgoingTransition")
+    //@XmlIDREF
+    @XmlElement(type = TransitionDefinitionImpl.class, name = "outgoingTransition")
     private final List<TransitionDefinition> outgoings;
-    @XmlElementWrapper(name = "connectors")
+    //@XmlElementWrapper(name = "connectors")
     @XmlElement(type = ConnectorDefinitionImpl.class, name = "connector")
     private final List<ConnectorDefinition> connectors;
     @XmlAttribute

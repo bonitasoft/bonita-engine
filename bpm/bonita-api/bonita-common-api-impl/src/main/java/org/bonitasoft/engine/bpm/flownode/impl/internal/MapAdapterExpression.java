@@ -17,7 +17,9 @@ package org.bonitasoft.engine.bpm.flownode.impl.internal;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,14 +33,17 @@ public class MapAdapterExpression extends XmlAdapter<MapAdapterExpression.Adapte
 
     public static class AdaptedMapbis {
 
+        @XmlElementWrapper(name = "inputs")
+        @XmlElement(name = "input")
         public List<Entry> entry = new ArrayList<Entry>();
 
     }
 
     public static class Entry {
 
+        @XmlAttribute(name = "name")
         public String key;
-        @XmlElement(type = ExpressionImpl.class)
+        @XmlElement(type = ExpressionImpl.class, name = "expression")
         public Expression value;
 
     }
@@ -46,7 +51,7 @@ public class MapAdapterExpression extends XmlAdapter<MapAdapterExpression.Adapte
     @Override
     public Map<String, Expression> unmarshal(AdaptedMapbis adaptedMap) throws Exception {
         Map<String, Expression> map = new HashMap<String, Expression>();
-        for(Entry entry : adaptedMap.entry) {
+        for (Entry entry : adaptedMap.entry) {
             map.put(entry.key, entry.value);
         }
         return map;
@@ -55,7 +60,7 @@ public class MapAdapterExpression extends XmlAdapter<MapAdapterExpression.Adapte
     @Override
     public AdaptedMapbis marshal(Map<String, Expression> map) throws Exception {
         AdaptedMapbis adaptedMap = new AdaptedMapbis();
-        for(Map.Entry<String, Expression> mapEntry : map.entrySet()) {
+        for (Map.Entry<String, Expression> mapEntry : map.entrySet()) {
             Entry entry = new Entry();
             entry.key = mapEntry.getKey();
             entry.value = mapEntry.getValue();

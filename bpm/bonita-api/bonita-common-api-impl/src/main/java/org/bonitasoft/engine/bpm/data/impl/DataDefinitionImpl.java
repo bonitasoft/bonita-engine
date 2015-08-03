@@ -40,7 +40,7 @@ public class DataDefinitionImpl extends NamedElementImpl implements DataDefiniti
     private boolean transientData;
     @XmlAttribute
     private String className;
-    @XmlElement(type = ExpressionImpl.class)
+    @XmlElement(type = ExpressionImpl.class,name = "defaultValue")
     private Expression defaultValueExpression;
 
     public DataDefinitionImpl(){

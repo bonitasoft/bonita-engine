@@ -52,7 +52,7 @@ public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl imple
     @XmlElementWrapper(name = "errorlEventTriggers")
     @XmlElement(type = CatchErrorEventTriggerDefinitionImpl.class, name = "errorEventTrigger")
     private final List<CatchErrorEventTriggerDefinition> errorEventTriggers;
-    @XmlAttribute
+    @XmlAttribute(name = "interrupting")
     private boolean isInterrupting = true;
 
     public CatchEventDefinitionImpl(final String name) {

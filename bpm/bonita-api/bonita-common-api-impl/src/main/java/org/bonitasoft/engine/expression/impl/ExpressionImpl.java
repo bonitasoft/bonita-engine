@@ -47,7 +47,7 @@ public class ExpressionImpl extends BaseElementImpl implements Expression {
     @XmlAttribute
     private String interpreter;
     @XmlElementWrapper
-    @XmlElement(type = ExpressionImpl.class)
+    @XmlElement(type = ExpressionImpl.class,name = "expression")
     private List<Expression> dependencies = Collections.emptyList();
 
     public ExpressionImpl() {

@@ -46,35 +46,31 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-@XmlRootElement
+//@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FlowElementContainerDefinitionImpl extends BaseElementImpl implements FlowElementContainerDefinition, Visitable {
 
     private static final long serialVersionUID = 1L;
-    @XmlElementWrapper(name = "activities")
+    //@XmlElementWrapper(name = "activities")
     @XmlElements({
-            @XmlElement(type = AutomaticTaskDefinitionImpl.class, name = "activity"),
-            @XmlElement(type = CallActivityDefinitionImpl.class, name = "activity"),
-            @XmlElement(type = ManualTaskDefinitionImpl.class, name = "activity"),
-            @XmlElement(type = ReceiveTaskDefinitionImpl.class, name = "activity"),
-            @XmlElement(type = SendTaskDefinitionImpl.class, name = "activity"),
-            @XmlElement(type = UserTaskDefinitionImpl.class, name = "activity")
+            @XmlElement(type = AutomaticTaskDefinitionImpl.class, name = "automaticTask"),
+            @XmlElement(type = CallActivityDefinitionImpl.class, name = "callActivity"),
+            @XmlElement(type = ManualTaskDefinitionImpl.class, name = "manualTask"),
+            @XmlElement(type = ReceiveTaskDefinitionImpl.class, name = "receiveTask"),
+            @XmlElement(type = SendTaskDefinitionImpl.class, name = "sendTask"),
+            @XmlElement(type = UserTaskDefinitionImpl.class, name = "userTask")
     })
     private final List<ActivityDefinition> activities;
     @XmlElementWrapper(name = "transitions")
@@ -98,8 +94,8 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     @XmlElementWrapper(name = "dataDefinitions")
     @XmlElements({
             @XmlElement(type = DataDefinitionImpl.class, name = "dataDefinition"),
-            @XmlElement(type = TextDataDefinitionImpl.class, name = "dataDefinition"),
-            @XmlElement(type = XMLDataDefinitionImpl.class, name = "dataDefinition")
+            @XmlElement(type = TextDataDefinitionImpl.class, name = "textDataDefinition"),
+            @XmlElement(type = XMLDataDefinitionImpl.class, name = "XMLDataDefinition")
     })
     private final List<DataDefinition> dataDefinitions;
     @XmlElementWrapper(name = "businessDataDefinitions")
@@ -114,9 +110,6 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     @XmlElementWrapper(name = "connectors")
     @XmlElement(type = ConnectorDefinitionImpl.class, name = "connector")
     private final List<ConnectorDefinition> connectors;
-    @XmlJavaTypeAdapter(MapAdapterFlowNode.class)
-    @XmlElement(name = "flowNode")
-    private final Map<String, FlowNodeDefinition> flowNodes;
     @XmlElement
     private final ElementFinder elementFinder = new ElementFinder();
 
@@ -133,12 +126,9 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
         documentDefinitions = new ArrayList<>();
         documentListDefinitions = new ArrayList<>();
         connectors = new ArrayList<>();
-        flowNodes = new HashMap<>();
+       // flowNodes = new HashMap<>();
     }
-//used in some Deserialisation tests decomment when needed
-    /*public void addFlowNodes(FlowNodeDefinition flowNodeDefinition){
-        flowNodes.put(new BigInteger(130, new SecureRandom()).toString(32),flowNodeDefinition);
-    }*/
+
     @Override
     public FlowNodeDefinition getFlowNode(final long sourceId) {
         return elementFinder.getElementById(getFlowNodes(), sourceId);
@@ -150,7 +140,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
         return getElementByName(flowNodes, sourceName);
     }
 
-    private/*public*/ Set<FlowNodeDefinition> getFlowNodes() {
+    private Set<FlowNodeDefinition> getFlowNodes() {
         final Set<FlowNodeDefinition> flowNodes = new HashSet<>();
         flowNodes.addAll(gateways);
         flowNodes.addAll(activities);
@@ -262,7 +252,6 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
 
     public void addActivity(final ActivityDefinition activity) {
         activities.add(activity);
-        flowNodes.put(activity.getName(), activity);
     }
 
     public void addTransition(final TransitionDefinition transition) {
@@ -271,27 +260,22 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
 
     public void addGateway(final GatewayDefinition gateway) {
         gateways.add(gateway);
-        flowNodes.put(gateway.getName(), gateway);
     }
 
     public void addStartEvent(final StartEventDefinition startEvent) {
         startEvents.add(startEvent);
-        flowNodes.put(startEvent.getName(), startEvent);
     }
 
     public void addIntermediateCatchEvent(final IntermediateCatchEventDefinition event) {
         intermediateCatchEvents.add(event);
-        flowNodes.put(event.getName(), event);
     }
 
     public void addIntermediateThrowEvent(final IntermediateThrowEventDefinition intermediateThrowEvent) {
         intermediateThrowEvents.add(intermediateThrowEvent);
-        flowNodes.put(intermediateThrowEvent.getName(), intermediateThrowEvent);
     }
 
     public void addEndEvent(final EndEventDefinition endEvent) {
         endEvents.add(endEvent);
-        flowNodes.put(endEvent.getName(), endEvent);
     }
 
     public void addBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {

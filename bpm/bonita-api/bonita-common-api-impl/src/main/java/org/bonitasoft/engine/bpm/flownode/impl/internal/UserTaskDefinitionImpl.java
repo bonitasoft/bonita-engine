@@ -36,13 +36,15 @@ import java.util.List;
 public class UserTaskDefinitionImpl extends HumanTaskDefinitionImpl implements UserTaskDefinition {
 
     private static final long serialVersionUID = -8168685139931497082L;
-@XmlElement(type = ContractDefinitionImpl.class)
+    @XmlElement(type = ContractDefinitionImpl.class)
     private ContractDefinition contract;
     @XmlElementWrapper(name = "context")
-    @XmlElement(name = "contextEntry",type = ContextEntryImpl.class)
+    @XmlElement(name = "contextEntry", type = ContextEntryImpl.class)
     private List<ContextEntry> context = new ArrayList<>();
 
-    public UserTaskDefinitionImpl(){}
+    public UserTaskDefinitionImpl() {
+    }
+
     public UserTaskDefinitionImpl(final String name, final String actorName) {
         super(name, actorName);
     }

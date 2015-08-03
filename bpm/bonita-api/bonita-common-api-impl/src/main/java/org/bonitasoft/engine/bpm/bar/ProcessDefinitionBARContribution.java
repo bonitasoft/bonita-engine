@@ -13,20 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.bar;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.xml.bind.ValidationException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bonitasoft.engine.bpm.bar.xml.ActorDefinitionBinding;
@@ -102,12 +88,30 @@ import org.bonitasoft.engine.bpm.bar.xml.XMLDataDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.xml.ElementBinding;
 import org.bonitasoft.engine.io.xml.XMLHandler;
 import org.bonitasoft.engine.io.xml.XMLNode;
 import org.bonitasoft.engine.io.xml.XMLParseException;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.ValidationException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Baptiste Mesta
@@ -247,18 +251,41 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     public DesignProcessDefinition deserializeProcessDefinition(final File file) throws IOException, InvalidBusinessArchiveFormatException {
         try {
-            handler.validate(file);
-            final Object objectFromXML = handler.getObjectFromXML(file);
-
-            if (!(objectFromXML instanceof DesignProcessDefinition)) {
-                throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + objectFromXML);
+            JAXBContext jaxbContext = JAXBContext.newInstance(DesignProcessDefinitionImpl.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            Object deserializedObject = unmarshaller.unmarshal(file);
+            if (!(deserializedObject instanceof DesignProcessDefinition)) {
+                throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + deserializedObject);
             }
-            return (DesignProcessDefinition) objectFromXML;
-        } catch (final XMLParseException e) {
-            throw new InvalidBusinessArchiveFormatException(e);
+           /* DesignProcessDefinitionImpl process = (DesignProcessDefinitionImpl)deserializedObject;
+            FlowElementContainerDefinitionImpl container = (FlowElementContainerDefinitionImpl) process.getProcessContainer();
+            Set<TransitionDefinition> listTransitions = process.getFlowElementContainer().getTransitions();
+            for (final TransitionDefinition transition : listTransitions) {
+                final long source = transition.getSource();
+                final FlowNodeDefinitionImpl sourceNode = (FlowNodeDefinitionImpl) container.getFlowNode(source);
+                if (sourceNode != null) {
+                    final TransitionDefinition defaultTransition = sourceNode.getDefaultTransition();
+                    if (defaultTransition != null && ((TransitionDefinitionImpl) defaultTransition).getId() == ((TransitionDefinitionImpl) transition).getId()) {
+                        sourceNode.setDefaultTransition(transition);
+                    } else {
+                        final List<TransitionDefinition> outgoingTransitionsForSourceNode = sourceNode.getOutgoingTransitions();
+                        for (final TransitionDefinition transitionRef : outgoingTransitionsForSourceNode) {
+                            if (((TransitionDefinitionImpl) transitionRef).getId() == ((TransitionDefinitionImpl) transition).getId()) {
+                                final int indexOfSTransitionRef = outgoingTransitionsForSourceNode.indexOf(transitionRef);
+                                sourceNode.removeOutgoingTransition(transitionRef);
+                                sourceNode.addOutgoingTransition(indexOfSTransitionRef, transition);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }*/
+            return (DesignProcessDefinition) deserializedObject;
         } catch (final ValidationException e) {
             checkVersion(IOUtil.read(file));
             throw new InvalidBusinessArchiveFormatException(e);
+        } catch (JAXBException e) {
+            throw new InvalidBusinessArchiveFormatException("Deserialization of the ProcessDesignFailed", e);
         }
     }
 
@@ -279,17 +306,21 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     @Override
     public void saveToBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {
         final DesignProcessDefinition processDefinition = businessArchive.getProcessDefinition();
-        serializeProcessDefinition(barFolder, processDefinition);
+            serializeProcessDefinition(barFolder, processDefinition);
     }
 
     public void serializeProcessDefinition(final File barFolder, final DesignProcessDefinition processDefinition) throws IOException {
+        StringWriter result = new StringWriter();
         try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(DesignProcessDefinitionImpl.class);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.marshal(processDefinition, result);
             try (FileOutputStream outputStream = new FileOutputStream(new File(barFolder, PROCESS_DEFINITION_XML))) {
-                handler.write(getXMLNode(processDefinition), outputStream);
+                outputStream.write(result.toString().getBytes());//this particular line is unreliable, needs to be changed inthe future
             }
             final String infos = generateInfosFromDefinition(processDefinition);
             IOUtil.writeContentToFile(getProcessInfos(infos), new File(barFolder, PROCESS_INFOS_FILE));
-        } catch (final FileNotFoundException e) {
+        } catch (final FileNotFoundException | JAXBException e) {
             throw new IOException(e);
         }
     }

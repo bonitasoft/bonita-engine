@@ -34,6 +34,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -49,8 +50,11 @@ import java.util.Set;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-@XmlRootElement
+@XmlRootElement(name = "processDefinition")
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlSeeAlso({SubProcessDefinitionImpl.class}) /*AutomaticTaskDefinitionImpl.class, SendTaskDefinitionImpl.class, UserTaskDefinitionImpl.class, CallActivityDefinitionImpl.class,
+        SubProcessDefinitionImpl.class, ManualTaskDefinitionImpl.class, ReceiveTaskDefinitionImpl.class, MultiInstanceLoopCharacteristicsImpl.class,
+        StandardLoopCharacteristicsImpl.class,AutomaticTaskDefinitionImpl.class })*/
 public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition, Visitable {
 
     private static final long serialVersionUID = -4719128363958199300L;
@@ -61,19 +65,19 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     @XmlElementWrapper(name = "parameters")
     @XmlElement(type = ParameterDefinitionImpl.class, name = "parameter")
     private final Set<ParameterDefinition> parameters;
-    @XmlElementWrapper
+    @XmlElementWrapper(name = "actors")
     @XmlElement(type = ActorDefinitionImpl.class, name = "actor")
     private final List<ActorDefinition> actors;
     @XmlElement(type = ActorDefinitionImpl.class)
     private ActorDefinition actorInitiator;
-    @XmlElement(type = FlowElementContainerDefinitionImpl.class)
+    @XmlElement(type = FlowElementContainerDefinitionImpl.class, name = "flowElements")
     private FlowElementContainerDefinition flowElementContainer;
     @XmlElementWrapper(name = "stringIndexes", required = false, nillable = true)
     @XmlElement(name = "stringIndex")
     private IndexLabel[] listIndex = new IndexLabel[5];
     @XmlElement(type = ContractDefinitionImpl.class)
     private ContractDefinition contract;
-    @XmlElementWrapper(name = "contexts")
+    //@XmlElementWrapper(name = "contexts")
     @XmlElement(type = ContextEntryImpl.class)
     private List<ContextEntry> context = new ArrayList<>();
 
@@ -81,8 +85,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
         super(name, version);
         parameters = new HashSet<>();
         actors = new ArrayList<>();
-        for(int i = 0; i<5;i++){
-            listIndex[i] = new IndexLabel(Integer.toString(i+1),"",null);
+        for (int i = 0; i < 5; i++) {
+            listIndex[i] = new IndexLabel(Integer.toString(i + 1), "", null);
         }
     }
 
@@ -90,8 +94,8 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
         super();
         parameters = new HashSet<>();
         actors = new ArrayList<>();
-        for(int i = 0; i<5;i++){
-            listIndex[i] = new IndexLabel(Integer.toString(i),"",null);
+        for (int i = 0; i < 5; i++) {
+            listIndex[i] = new IndexLabel(Integer.toString(i), "", null);
         }
     }
 
