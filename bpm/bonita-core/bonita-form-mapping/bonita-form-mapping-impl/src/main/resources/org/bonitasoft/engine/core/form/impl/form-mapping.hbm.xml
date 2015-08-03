@@ -31,6 +31,7 @@
         <property name="task" type="java.lang.String" column="task" />
         <property name="lastUpdateDate" type="long" column="lastupdatedate" />
         <property name="lastUpdatedBy" type="long" column="lastupdatedby" />
+        <property name="target" type="string" column="target" />
 
         <many-to-one name="pageMapping" class="org.bonitasoft.engine.page.impl.SPageMappingImpl" update="true" fetch="join" lazy="false">
             <column name="page_mapping_tenant_id" />

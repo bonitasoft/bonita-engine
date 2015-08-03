@@ -15,6 +15,7 @@ package org.bonitasoft.engine.execution.flowmerger;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
@@ -28,9 +29,9 @@ public class FlowNodeTransitionsWrapper {
 
     private int inputTransitionsSize;
 
-    private List<STransitionDefinition> allOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
+    private List<STransitionDefinition> allOutgoingTransitionDefinitions = new ArrayList<>();
 
-    private List<STransitionDefinition> validOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
+    private List<STransitionDefinition> validOutgoingTransitionDefinitions = new ArrayList<>();
 
     private STransitionDefinition defaultTransition;
 
@@ -42,27 +43,27 @@ public class FlowNodeTransitionsWrapper {
         this.inputTransitionsSize = inputTransitionsSize;
     }
 
-    public List<STransitionDefinition> getAllOutgoingTransitionDefinitions() {
-        return allOutgoingTransitionDefinitions;
+    public List<STransitionDefinition> getNonDefaultOutgoingTransitionDefinitions() {
+        return Collections.unmodifiableList(allOutgoingTransitionDefinitions);
     }
 
     public void setAllOutgoingTransitionDefinitions(final List<STransitionDefinition> allOutgoingTransitionDefinitions) {
         if (allOutgoingTransitionDefinitions != null) {
             this.allOutgoingTransitionDefinitions = allOutgoingTransitionDefinitions;
         } else {
-            this.allOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
+            this.allOutgoingTransitionDefinitions = new ArrayList<>();
         }
     }
 
     public List<STransitionDefinition> getValidOutgoingTransitionDefinitions() {
-        return validOutgoingTransitionDefinitions;
+        return Collections.unmodifiableList(validOutgoingTransitionDefinitions);
     }
 
     public void setValidOutgoingTransitionDefinitions(final List<STransitionDefinition> validOutgoingTransitionDefinitions) {
         if (validOutgoingTransitionDefinitions != null) {
             this.validOutgoingTransitionDefinitions = validOutgoingTransitionDefinitions;
         } else {
-            this.validOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>();
+            this.validOutgoingTransitionDefinitions = new ArrayList<>();
         }
     }
 

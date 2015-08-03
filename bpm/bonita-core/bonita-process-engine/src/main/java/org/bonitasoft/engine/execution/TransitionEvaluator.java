@@ -61,7 +61,7 @@ public class TransitionEvaluator {
         if (SFlowNodeType.GATEWAY.equals(flowNodeInstance.getType())) {
             return evaluateOutgoingTransitionsForGateways(transitions, sDefinition, flowNodeInstance, sExpressionContext);
         } else if (SFlowNodeType.BOUNDARY_EVENT.equals(flowNodeInstance.getType())) {
-            return new ArrayList<STransitionDefinition>(transitions.getAllOutgoingTransitionDefinitions());
+            return new ArrayList<>(transitions.getNonDefaultOutgoingTransitionDefinitions());
         } else {
             return evaluateOutgoingTransitionsForActivity(transitions, sDefinition, flowNodeInstance, sExpressionContext);
         }
@@ -70,7 +70,7 @@ public class TransitionEvaluator {
     List<STransitionDefinition> evaluateOutgoingTransitionsForActivity(final FlowNodeTransitionsWrapper transitions, final SProcessDefinition sDefinition,
             final SFlowNodeInstance flowNodeInstance, final SExpressionContext sExpressionContext)
             throws SBonitaException {
-        if (transitions.getAllOutgoingTransitionDefinitions().isEmpty()) {
+        if (transitions.getNonDefaultOutgoingTransitionDefinitions().isEmpty()) {
             STransitionDefinition defaultTransition;
             if ((defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance)) == null) {
                 return Collections.emptyList();
@@ -118,7 +118,7 @@ public class TransitionEvaluator {
             transitionsDescriptor.setAllOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
         } else {
             transitionsDescriptor.setInputTransitionsSize(flowNode.getIncomingTransitions().size());
-            transitionsDescriptor.setAllOutgoingTransitionDefinitions(new ArrayList<STransitionDefinition>(flowNode.getOutgoingTransitions()));
+            transitionsDescriptor.setAllOutgoingTransitionDefinitions(new ArrayList<>(flowNode.getOutgoingTransitions()));
             transitionsDescriptor.setDefaultTransition(flowNode.getDefaultTransition());
         }
 

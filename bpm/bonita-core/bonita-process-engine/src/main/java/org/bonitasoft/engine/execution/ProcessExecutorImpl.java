@@ -354,7 +354,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      */
     private SGatewayInstance getActivateGateway(final SProcessDefinition sProcessDefinition, final SFlowNodeDefinition flowNodeDefinition,
             final SStateCategory stateCategory, final long parentProcessInstanceId, final long rootProcessInstanceId) throws SBonitaException {
-        SGatewayInstance gatewayInstance = null;
+        SGatewayInstance gatewayInstance;
         try {
             gatewayInstance = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(parentProcessInstanceId, flowNodeDefinition.getName());
         } catch (final SGatewayNotFoundException e) {
@@ -527,7 +527,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SExpressionContext expressionContext,
             final Map<String, Object> context, final List<SDocumentDefinition> documentDefinitions) throws SExpressionTypeUnknownException,
             SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SOperationExecutionException {
-        final List<SExpression> initialValuesExpressions = new ArrayList<SExpression>(documentDefinitions.size());
+        final List<SExpression> initialValuesExpressions = new ArrayList<>(documentDefinitions.size());
         final Map<SExpression, DocumentValue> evaluatedDocumentValue = new HashMap<>();
         for (final SDocumentDefinition documentDefinition : documentDefinitions) {
             if (documentDefinition.getInitialValue() != null) {
@@ -563,7 +563,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private List<Object> evaluateInitialExpressionsOfDocumentLists(final SProcessInstance processInstance, final SExpressionContext expressionContext,
             final Map<String, Object> context, final List<SDocumentListDefinition> documentListDefinitions) throws SExpressionTypeUnknownException,
             SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
-        final List<SExpression> initialValuesExpressions = new ArrayList<SExpression>(documentListDefinitions.size());
+        final List<SExpression> initialValuesExpressions = new ArrayList<>(documentListDefinitions.size());
         for (final SDocumentListDefinition documentList : documentListDefinitions) {
             initialValuesExpressions.add(documentList.getExpression());
         }
@@ -692,9 +692,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SFlowNodeDefinition sFlowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
         final FlowNodeTransitionsWrapper transitionsDescriptor = transitionEvaluator.buildTransitionsWrapper(sFlowNodeDefinition, processDefinition, child);
 
-        final List<STransitionDefinition> chosenGatewaysTransitions = new ArrayList<STransitionDefinition>(transitionsDescriptor
+        final List<STransitionDefinition> chosenGatewaysTransitions = new ArrayList<>(transitionsDescriptor
                 .getValidOutgoingTransitionDefinitions().size());
-        final List<SFlowNodeDefinition> chosenFlowNode = new ArrayList<SFlowNodeDefinition>(transitionsDescriptor.getValidOutgoingTransitionDefinitions()
+        final List<SFlowNodeDefinition> chosenFlowNode = new ArrayList<>(transitionsDescriptor.getValidOutgoingTransitionDefinitions()
                 .size());
         for (final STransitionDefinition sTransitionDefinition : transitionsDescriptor.getValidOutgoingTransitionDefinitions()) {
             final SFlowNodeDefinition flowNodeDefinition = processDefinitionService.getNextFlowNode(processDefinition, sTransitionDefinition.getName());
@@ -746,7 +746,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private boolean needToReevaluateInclusiveGateways(final FlowNodeTransitionsWrapper transitionsDescriptor) {
-        final int allOutgoingTransitions = transitionsDescriptor.getAllOutgoingTransitionDefinitions().size()
+        final int allOutgoingTransitions = transitionsDescriptor.getNonDefaultOutgoingTransitionDefinitions().size()
                 + (transitionsDescriptor.getDefaultTransition() != null ? 1 : 0);
         final int takenTransition = transitionsDescriptor.getValidOutgoingTransitionDefinitions().size();
         /*
@@ -814,7 +814,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SProcessInstance sProcessInstance = createProcessInstance(sProcessDefinition, starterId, starterSubstituteId, callerId);
 
             final boolean isInitializing = initialize(starterId, sProcessDefinition, sProcessInstance, expressionContext,
-                    operations != null ? new ArrayList<SOperation>(operations) : null, context, selector.getContainer(), connectors,
+                    operations != null ? new ArrayList<>(operations) : null, context, selector.getContainer(), connectors,
                     selector, processInputs);
             try {
                 handleEventSubProcess(sProcessDefinition, sProcessInstance, selector.getSubProcessDefinitionId());
@@ -832,13 +832,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 return sProcessInstance;
             }
             return startElements(sProcessInstance, selector);
-        } catch (final BonitaException e) {
-            throw new SProcessInstanceCreationException(e);
-        } catch (final IOException e) {
-            throw new SProcessInstanceCreationException(e);
         } catch (final SProcessInstanceCreationException e) {
             throw e;
-        } catch (final SBonitaException e) {
+        } catch (final SBonitaException | IOException | BonitaException e) {
             throw new SProcessInstanceCreationException(e);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);

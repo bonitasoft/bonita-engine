@@ -18,6 +18,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -185,6 +186,10 @@ public class OperationServiceImplTest {
                 argThat(new MatchOperationType(SOperatorType.JAVA_METHOD)));
         doReturn(Arrays.asList(leftOperandHandler1, leftOperandHandler2, leftOperandHandler3, leftOperandHandler4)).when(leftOperandHandlerProvider)
                 .getLeftOperandHandlers();
+
+        given(assignmentOperationExecutorStrategy.shouldPersistOnNullValue()).willReturn(true);
+        given(xPathOperationExecutorStrategy.shouldPersistOnNullValue()).willReturn(true);
+        given(javaMethodOperationExecutorStrategy.shouldPersistOnNullValue()).willReturn(true);
         operationServiceImpl = new OperationServiceImpl(operationExecutorStrategyProvider, leftOperandHandlerProvider, expressionResolverService,
                 persistRightOperandResolver, logger);
     }
@@ -220,9 +225,11 @@ public class OperationServiceImplTest {
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", inputValues);
 
         final List<SOperation> operations = Arrays.asList(op1, op2, op3);
-        given(persistRightOperandResolver.shouldPersist(0, operations)).willReturn(true);
-        given(persistRightOperandResolver.shouldPersist(1, operations)).willReturn(false);
-        given(persistRightOperandResolver.shouldPersist(2, operations)).willReturn(true);
+        given(persistRightOperandResolver.shouldPersistByPosition(0, operations)).willReturn(true);
+        given(persistRightOperandResolver.shouldPersistByPosition(1, operations)).willReturn(false);
+        given(persistRightOperandResolver.shouldPersistByPosition(2, operations)).willReturn(true);
+        given(persistRightOperandResolver.shouldPersistByValue(anyObject(), eq(true), eq(true))).willReturn(true);
+        given(persistRightOperandResolver.shouldPersistByValue(anyObject(), eq(false), eq(true))).willReturn(false);
         given(expressionResolverService.evaluate(sExpression, expressionContext)).willReturn(1983L);
 
         doReturn("value1").when(assignmentOperationExecutorStrategy).computeNewValueForLeftOperand(op1, 1983L, expressionContext, true);

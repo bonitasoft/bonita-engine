@@ -47,7 +47,7 @@ public class PersistRightOperandResolverTest {
     @Test
     public void should_not_persist_if_not_business_data() throws Exception {
         //when
-        boolean persist = resolver.shouldPersist(0, Arrays.<SOperation> asList(buildMockOperation(SLeftOperand.TYPE_DATA)));
+        boolean persist = resolver.shouldPersistByPosition(0, Arrays.<SOperation>asList(buildMockOperation(SLeftOperand.TYPE_DATA)));
 
         //then
         assertThat(persist).isFalse();
@@ -66,7 +66,7 @@ public class PersistRightOperandResolverTest {
         given(operationsAnalyzer.calculateIndexes(2, operations)).willReturn(indexes);
 
         //when
-        boolean persist = resolver.shouldPersist(2, operations);
+        boolean persist = resolver.shouldPersistByPosition(2, operations);
 
         //then
         assertThat(persist).isTrue();
@@ -91,7 +91,7 @@ public class PersistRightOperandResolverTest {
         given(operationsAnalyzer.calculateIndexes(0, operations)).willReturn(indexes);
 
         //when
-        boolean persist = resolver.shouldPersist(currentIndex, operations);
+        boolean persist = resolver.shouldPersistByPosition(currentIndex, operations);
 
         //then
         assertThat(persist).isTrue();
@@ -114,11 +114,40 @@ public class PersistRightOperandResolverTest {
         given(operationsAnalyzer.findBusinessDataDependencyIndex("address", indexOfCurrentOperation + 1, operations)).willReturn(-1);
 
         //when
-        boolean persist = resolver.shouldPersist(indexOfCurrentOperation, operations);
+        boolean persist = resolver.shouldPersistByPosition(indexOfCurrentOperation, operations);
 
         //then
         assertThat(persist).isFalse();
 
     }
 
+    @Test
+    public void should_not_persist_when_right_operand_is_null_and_should_not_persist_on_null() throws Exception {
+        //then
+        assertThat(resolver.shouldPersistByValue(null, true, false)).isFalse();
+    }
+
+    @Test
+    public void should_not_persist_when_right_operand_is_null_and_should_not_persist_by_position() throws Exception {
+        //then
+        assertThat(resolver.shouldPersistByValue(null, false, true)).isFalse();
+    }
+
+    @Test
+    public void should_persist_when_right_operand_is_null_and_should_not_persist_by_position_and_on_null() throws Exception {
+        //then
+        assertThat(resolver.shouldPersistByValue(null, true, true)).isTrue();
+    }
+
+    @Test
+    public void should_persist_if_right_operand_is_not_null_and_should_persist_by_position() throws Exception {
+        //then
+        assertThat(resolver.shouldPersistByValue("anyNotNullValue", true, true)).isTrue();
+    }
+
+    @Test
+    public void should_not_persist_if_right_operand_is_not_null_and_should_not_persist_by_position() throws Exception {
+        //then
+        assertThat(resolver.shouldPersistByValue("anyNotNullValue", false, true)).isFalse();
+    }
 }

@@ -15,11 +15,9 @@ package org.bonitasoft.engine.core.operation.impl;
 
 import java.io.IOException;
 import java.io.StringReader;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPath;
@@ -135,21 +133,13 @@ public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecu
                 parentNode.appendChild(document.createTextNode(getStringValue(variableValue)));
             }
             return DocumentManager.getDocumentContent(document);
-        } catch (final ParserConfigurationException pce) {
+        } catch (final ParserConfigurationException | SAXException | IOException | XPathExpressionException | TransformerFactoryConfigurationError | TransformerException pce) {
             throw new SOperationExecutionException(pce);
-        } catch (final SAXException saxe) {
-            throw new SOperationExecutionException(saxe);
-        } catch (final IOException ioe) {
-            throw new SOperationExecutionException(ioe);
-        } catch (final XPathExpressionException xpee) {
-            throw new SOperationExecutionException(xpee);
-        } catch (final TransformerConfigurationException tce) {
-            throw new SOperationExecutionException(tce);
-        } catch (final TransformerFactoryConfigurationError tfce) {
-            throw new SOperationExecutionException(tfce);
-        } catch (final TransformerException te) {
-            throw new SOperationExecutionException(te);
         }
     }
 
+    @Override
+    public boolean shouldPersistOnNullValue() {
+        return false;
+    }
 }

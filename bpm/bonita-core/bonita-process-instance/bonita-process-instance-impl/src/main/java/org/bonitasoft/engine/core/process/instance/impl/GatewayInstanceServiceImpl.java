@@ -144,6 +144,10 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             logger.log(TAG, TechnicalLogSeverity.DEBUG,
                     "Evaluate if gateway " + gatewayInstance.getName() + " of instance " + gatewayInstance.getRootProcessInstanceId() + " of definition "
                             + sDefinition.getName() + " must be activated ");
+        logger.log(TAG, TechnicalLogSeverity.DEBUG, "HitBys = " + gatewayInstance.getHitBys());
+        if(gatewayInstance.isFinished()) {
+            return false;
+        }
         SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
         SFlowNodeDefinition gatewayDefinition = processContainer.getFlowNode(gatewayInstance.getFlowNodeDefinitionId());
         long processInstanceId = gatewayInstance.getParentContainerId();
@@ -153,7 +157,6 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         List<STransitionDefinition> incomingWithTokens = new ArrayList<STransitionDefinition>();
         List<STransitionDefinition> incomingWithoutTokens = new ArrayList<STransitionDefinition>();
 
-        logger.log(TAG, TechnicalLogSeverity.DEBUG, "HitBys = " + gatewayInstance.getHitBys());
         for (int i = 0; i < incomingTransitions.size(); i++) {
             STransitionDefinition currentTransition = incomingTransitions.get(i);
             if (hitByTransitionList.contains(String.valueOf(i + 1))) {
