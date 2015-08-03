@@ -18,7 +18,10 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.UUID;
 
 /**
  * @author Baptiste Mesta
@@ -28,10 +31,10 @@ import javax.xml.bind.annotation.XmlTransient;
 public abstract class BaseElementImpl implements BaseElement {
 
     private static final long serialVersionUID = -5094021692278906536L;
-    //@XmlID
-    //@XmlJavaTypeAdapter(type=long.class,value = LongtoStringAdapter.class)
+    @XmlID
+    @XmlJavaTypeAdapter(type=long.class,value = LongtoStringAdapter.class)
     @XmlAttribute
-    private long id;
+    private long id = Math.abs(UUID.randomUUID().getLeastSignificantBits());
 
     @Override
     public long getId() {

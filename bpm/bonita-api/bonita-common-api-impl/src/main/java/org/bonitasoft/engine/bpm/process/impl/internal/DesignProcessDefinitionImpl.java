@@ -52,8 +52,9 @@ import java.util.Set;
  */
 @XmlRootElement(name = "processDefinition")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlSeeAlso({SubProcessDefinitionImpl.class}) /*AutomaticTaskDefinitionImpl.class, SendTaskDefinitionImpl.class, UserTaskDefinitionImpl.class, CallActivityDefinitionImpl.class,
-        SubProcessDefinitionImpl.class, ManualTaskDefinitionImpl.class, ReceiveTaskDefinitionImpl.class, MultiInstanceLoopCharacteristicsImpl.class,
+@XmlSeeAlso({SubProcessDefinitionImpl.class})
+/*AutomaticTaskDefinitionImpl.class, SendTaskDefinitionImpl.class, UserTaskDefinitionImpl.class, CallActivityDefinitionImpl.class,
+        ManualTaskDefinitionImpl.class, ReceiveTaskDefinitionImpl.class, MultiInstanceLoopCharacteristicsImpl.class,
         StandardLoopCharacteristicsImpl.class,AutomaticTaskDefinitionImpl.class })*/
 public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition, Visitable {
 

@@ -79,7 +79,6 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     @XmlElementWrapper(name = "gateways")
     @XmlElement(type = GatewayDefinitionImpl.class, name = "gateway")
     private final List<GatewayDefinition> gateways;
-    @XmlElementWrapper(name = "startEvents")
     @XmlElement(type = StartEventDefinitionImpl.class, name = "startEvent")
     private final List<StartEventDefinition> startEvents;
     @XmlElementWrapper(name = "intermediateCatchEvents")
@@ -88,7 +87,6 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     @XmlElementWrapper(name = "intermediateThrowEvents")
     @XmlElement(type = IntermediateThrowEventDefinitionImpl.class, name = "intermediateThrowEvent")
     private final List<IntermediateThrowEventDefinition> intermediateThrowEvents;
-    @XmlElementWrapper(name = "endEvents")
     @XmlElement(type = EndEventDefinitionImpl.class, name = "endEvent")
     private final List<EndEventDefinition> endEvents;
     @XmlElementWrapper(name = "dataDefinitions")

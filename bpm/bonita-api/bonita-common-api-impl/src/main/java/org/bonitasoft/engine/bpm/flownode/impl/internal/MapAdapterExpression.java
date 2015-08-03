@@ -19,7 +19,6 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +32,6 @@ public class MapAdapterExpression extends XmlAdapter<MapAdapterExpression.Adapte
 
     public static class AdaptedMapbis {
 
-        @XmlElementWrapper(name = "inputs")
         @XmlElement(name = "input")
         public List<Entry> entry = new ArrayList<Entry>();
 

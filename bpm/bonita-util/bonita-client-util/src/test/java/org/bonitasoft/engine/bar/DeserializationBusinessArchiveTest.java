@@ -16,6 +16,8 @@ package org.bonitasoft.engine.bar;
 
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
+import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.io.IOUtil;
 import org.junit.After;
@@ -28,6 +30,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -91,17 +94,25 @@ public class DeserializationBusinessArchiveTest {
     }
 
     @Test
-    public void TestAdaptedXml() throws JAXBException {
+    public void TestAdaptedXml() throws JAXBException, IOException, InvalidBusinessArchiveFormatException {
+        LinkedList<DesignProcessDefinition> listProcessesNew = new LinkedList();
+        LinkedList<DesignProcessDefinition> listProcessesOld = new LinkedList();
         for (File file : listOfFiles) {
-            if (file.getName().contains("xml")) {
-                System.out.println(file.getName());
+            System.out.println(file.getName());
+            if (file.getName().endsWith("xml") && file.getName().contains("modified")) {
                 JAXBContext jaxbContext = JAXBContext.newInstance(DesignProcessDefinitionImpl.class);
                 Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
                 Object deserializedObject = unmarshaller.unmarshal(file);
                 DesignProcessDefinitionImpl process = (DesignProcessDefinitionImpl) deserializedObject;
-                System.out.println(process.toString());
+                listProcessesNew.add(process);
+            } else if (file.getName().endsWith("xml")) {
+                ProcessDefinitionBARContribution PDBC = new ProcessDefinitionBARContribution();
+                DesignProcessDefinitionImpl designProcessDefinition = (DesignProcessDefinitionImpl) PDBC.deserializeProcessDefinitionOld(file);
+                listProcessesOld.add(designProcessDefinition);
             }
         }
+        System.out.println(listProcessesOld.toString());
+        System.out.println(listProcessesNew.toString());
     }
 
     //@Test

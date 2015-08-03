@@ -249,6 +249,22 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         }
     }
 
+    public DesignProcessDefinition deserializeProcessDefinitionOld(final File file) throws InvalidBusinessArchiveFormatException, IOException {
+        try {
+            handler.validate(file);
+            final Object objectFromXML = handler.getObjectFromXML(file);
+
+            if (!(objectFromXML instanceof DesignProcessDefinition)) {
+                throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + objectFromXML);
+            }
+            return (DesignProcessDefinition) objectFromXML;
+        } catch (final XMLParseException e) {
+            throw new InvalidBusinessArchiveFormatException(e);
+        } catch (final ValidationException e) {
+            checkVersion(IOUtil.read(file));
+            throw new InvalidBusinessArchiveFormatException(e);
+        }
+    }
     public DesignProcessDefinition deserializeProcessDefinition(final File file) throws IOException, InvalidBusinessArchiveFormatException {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(DesignProcessDefinitionImpl.class);
@@ -257,29 +273,6 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
             if (!(deserializedObject instanceof DesignProcessDefinition)) {
                 throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + deserializedObject);
             }
-           /* DesignProcessDefinitionImpl process = (DesignProcessDefinitionImpl)deserializedObject;
-            FlowElementContainerDefinitionImpl container = (FlowElementContainerDefinitionImpl) process.getProcessContainer();
-            Set<TransitionDefinition> listTransitions = process.getFlowElementContainer().getTransitions();
-            for (final TransitionDefinition transition : listTransitions) {
-                final long source = transition.getSource();
-                final FlowNodeDefinitionImpl sourceNode = (FlowNodeDefinitionImpl) container.getFlowNode(source);
-                if (sourceNode != null) {
-                    final TransitionDefinition defaultTransition = sourceNode.getDefaultTransition();
-                    if (defaultTransition != null && ((TransitionDefinitionImpl) defaultTransition).getId() == ((TransitionDefinitionImpl) transition).getId()) {
-                        sourceNode.setDefaultTransition(transition);
-                    } else {
-                        final List<TransitionDefinition> outgoingTransitionsForSourceNode = sourceNode.getOutgoingTransitions();
-                        for (final TransitionDefinition transitionRef : outgoingTransitionsForSourceNode) {
-                            if (((TransitionDefinitionImpl) transitionRef).getId() == ((TransitionDefinitionImpl) transition).getId()) {
-                                final int indexOfSTransitionRef = outgoingTransitionsForSourceNode.indexOf(transitionRef);
-                                sourceNode.removeOutgoingTransition(transitionRef);
-                                sourceNode.addOutgoingTransition(indexOfSTransitionRef, transition);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }*/
             return (DesignProcessDefinition) deserializedObject;
         } catch (final ValidationException e) {
             checkVersion(IOUtil.read(file));
