@@ -50,7 +50,7 @@ public class FormRequiredAnalyzer {
                 {
                     final List<ActivityDefinition> activities = designProcessDefinition.getFlowElementContainer().getActivities();
                     final UserTaskDefinition userTaskDefinition = findActivityWithName(activities, sFormMapping.getTask());
-                    return userTaskDefinition != null && userTaskDefinition.getContract() != null;
+                    return userTaskDefinition != null && userTaskDefinition.getContract() != null && userTaskDefinition.getContract().getInputs() != null && !userTaskDefinition.getContract().getInputs().isEmpty();
                 }
             }
         } catch (SBonitaException e) {
