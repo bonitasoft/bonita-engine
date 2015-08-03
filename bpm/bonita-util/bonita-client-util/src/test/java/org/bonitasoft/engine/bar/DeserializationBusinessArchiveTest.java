@@ -93,7 +93,7 @@ public class DeserializationBusinessArchiveTest {
 
     }
 
-    @Test
+    //@Test
     public void TestAdaptedXml() throws JAXBException, IOException, InvalidBusinessArchiveFormatException {
         LinkedList<DesignProcessDefinition> listProcessesNew = new LinkedList();
         LinkedList<DesignProcessDefinition> listProcessesOld = new LinkedList();

@@ -46,7 +46,8 @@ public class ActorDefinitionImpl implements ActorDefinition {
     }
 
     public ActorDefinitionImpl() {
-        this.name = "default name";
+        this.name = "";
+        this.description = null;
         initiator = false;
     }
     @Override

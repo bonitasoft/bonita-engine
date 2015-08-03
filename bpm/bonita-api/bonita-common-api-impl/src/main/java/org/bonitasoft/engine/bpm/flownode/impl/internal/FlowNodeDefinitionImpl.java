@@ -31,7 +31,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author Zhao Na
@@ -43,17 +42,14 @@ import java.util.UUID;
 public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements FlowNodeDefinition {
 
     private static final long serialVersionUID = 429640943678358154L;
-    //@XmlElementWrapper(name = "incomings")
     @XmlIDREF
     @XmlElement(type = TransitionDefinitionImpl.class, name = "incomingTransition")
-    private final List<TransitionDefinition> incomings;
-    //@XmlElementWrapper(name = "outgoingTransition")
+    private final List<TransitionDefinition> incomings = new ArrayList<>();
     @XmlIDREF
     @XmlElement(type = TransitionDefinitionImpl.class, name = "outgoingTransition")
-    private final List<TransitionDefinition> outgoings;
-    //@XmlElementWrapper(name = "connectors")
+    private final List<TransitionDefinition> outgoings = new ArrayList<>();
     @XmlElement(type = ConnectorDefinitionImpl.class, name = "connector")
-    private final List<ConnectorDefinition> connectors;
+    private final List<ConnectorDefinition> connectors = new ArrayList<>();
     @XmlAttribute
     private String description;
     @XmlElement(type = ExpressionImpl.class)
@@ -67,20 +63,14 @@ public abstract class FlowNodeDefinitionImpl extends NamedElementImpl implements
 
     public FlowNodeDefinitionImpl(final long id, final String name) {
         super(name);
-        incomings = new ArrayList<>();
-        outgoings = new ArrayList<>();
-        connectors = new ArrayList<>();
         setId(id);
     }
 
     public FlowNodeDefinitionImpl(final String name) {
-        this(Math.abs(UUID.randomUUID().getLeastSignificantBits()), name);
+        super(name);
     }
 
     public FlowNodeDefinitionImpl() {
-        incomings = new ArrayList<>();
-        outgoings = new ArrayList<>();
-        connectors = new ArrayList<>();
     }
 
     @Override

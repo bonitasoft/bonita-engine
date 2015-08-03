@@ -51,7 +51,6 @@ public class ExpressionImpl extends BaseElementImpl implements Expression {
     private List<Expression> dependencies = Collections.emptyList();
 
     public ExpressionImpl() {
-        this(Math.abs(UUID.randomUUID().getMostSignificantBits()));
     }
 
     public ExpressionImpl(long id) {

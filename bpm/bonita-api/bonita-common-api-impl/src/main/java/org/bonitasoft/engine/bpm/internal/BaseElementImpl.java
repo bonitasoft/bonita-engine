@@ -32,9 +32,12 @@ public abstract class BaseElementImpl implements BaseElement {
 
     private static final long serialVersionUID = -5094021692278906536L;
     @XmlID
-    @XmlJavaTypeAdapter(type=long.class,value = LongtoStringAdapter.class)
+    @XmlJavaTypeAdapter(type = long.class, value = LongtoStringAdapter.class)
     @XmlAttribute
     private long id = Math.abs(UUID.randomUUID().getLeastSignificantBits());
+
+    public BaseElementImpl() {
+    }
 
     @Override
     public long getId() {
