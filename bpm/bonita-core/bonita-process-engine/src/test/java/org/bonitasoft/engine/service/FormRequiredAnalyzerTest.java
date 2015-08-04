@@ -105,12 +105,24 @@ public class FormRequiredAnalyzerTest {
     }
 
     @Test
-    public void isFormRequiredShouldBeTrueIfContractFoundOnProcessStart() throws Exception {
+    public void isFormRequiredShouldBeTrueIfNonEmptyContractFoundOnProcessStart() throws Exception {
         final DesignProcessDefinition definition = mock(DesignProcessDefinition.class);
-        doReturn(mock(ContractDefinition.class)).when(definition).getContract();
+        final ContractDefinitionImpl contractDefinition = new ContractDefinitionImpl();
+        contractDefinition.addInput(new InputDefinitionImpl("input1", "theInput"));
+        doReturn(contractDefinition).when(definition).getContract();
         doReturn(definition).when(processDefinitionService).getDesignProcessDefinition(111L);
         final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMappingImpl(111L, SFormMappingImpl.TYPE_PROCESS_START, null, ""));
         assertThat(formRequired).isTrue();
+    }
+
+    @Test
+    public void isFormRequiredShouldBeFalseIfEmptyContractFoundOnProcessStart() throws Exception {
+        final DesignProcessDefinition definition = mock(DesignProcessDefinition.class);
+        final ContractDefinitionImpl contractDefinition = new ContractDefinitionImpl();
+        doReturn(contractDefinition).when(definition).getContract();
+        doReturn(definition).when(processDefinitionService).getDesignProcessDefinition(111L);
+        final boolean formRequired = formRequiredAnalyzer.isFormRequired(new SFormMappingImpl(111L, SFormMappingImpl.TYPE_PROCESS_START, null, ""));
+        assertThat(formRequired).isFalse();
     }
 
     @Test
