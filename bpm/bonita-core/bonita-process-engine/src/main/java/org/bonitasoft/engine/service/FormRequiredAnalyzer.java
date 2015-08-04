@@ -45,7 +45,7 @@ public class FormRequiredAnalyzer {
             final DesignProcessDefinition designProcessDefinition = processDefinitionService.getDesignProcessDefinition(sFormMapping.getProcessDefinitionId());
             if (designProcessDefinition != null) {
                 if (sFormMapping.getType() == SFormMapping.TYPE_PROCESS_START) {
-                    return designProcessDefinition.getContract() != null;
+                    return designProcessDefinition.getContract() != null && designProcessDefinition.getContract().getInputs() != null && !designProcessDefinition.getContract().getInputs().isEmpty();
                 } else // if (sFormMapping.getType() == TYPE_TASK)
                 {
                     final List<ActivityDefinition> activities = designProcessDefinition.getFlowElementContainer().getActivities();
