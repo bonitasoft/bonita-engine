@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
@@ -1242,6 +1241,40 @@ public class BDRepositoryIT extends CommonAPIIT {
 
         final String employeeToString = getEmployeesToString("myEmployees", instance.getId());
         assertThat(employeeToString).contains("John", "Doe");
+
+        disableAndDeleteProcess(processDefinition);
+        disableAndDeleteProcess(subProcessDefinition);
+    }
+
+
+    //BS-13803
+    @Test
+    public void initializeBusinessDataInCalledProcessWithContractInput() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression(
+                "createNewEmployee",
+                "import " + EMPLOYEE_QUALIFIED_NAME + "; Employee john = new Employee(); john.firstName = theInput; john.lastName = 'Doe'; john;",
+                EMPLOYEE_QUALIFIED_NAME, new ExpressionBuilder().createContractInputExpression("theInput", String.class.getName()));
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("createEmployeeInCallActivity", "1.2-beta");
+        builder.addActor(ACTOR_NAME);
+        builder.addContract().addInput("theInput", Type.TEXT, "the input");
+        builder.addBusinessData("employee", EMPLOYEE_QUALIFIED_NAME, employeeExpression);
+        builder.addUserTask("step1", ACTOR_NAME);
+        final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+
+        builder = new ProcessDefinitionBuilder().createNewInstance("createEmployeeInCallActivityMaster", "1.2-beta");
+        builder.addActor(ACTOR_NAME);
+        builder.addCallActivity("call",
+                new ExpressionBuilder().createConstantStringExpression(subProcessDefinition.getName()),
+                new ExpressionBuilder().createConstantStringExpression(subProcessDefinition.getVersion())).addProcessStartContractInput("theInput", new ExpressionBuilder().createConstantStringExpression("theValue"));
+        builder.addUserTask("step2", ACTOR_NAME);
+        builder.addTransition("call", "step2");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+
+        final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
+        final long step1Id = waitForUserTask("step1");
+        getProcessAPI().assignUserTask(step1Id, matti.getId());
+        getProcessAPI().executeFlowNode(step1Id);
+        waitForUserTask(instance, "step2");
 
         disableAndDeleteProcess(processDefinition);
         disableAndDeleteProcess(subProcessDefinition);
