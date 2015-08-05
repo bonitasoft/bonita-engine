@@ -56,7 +56,7 @@ public class PlatformRetrieverImplTest {
     }
 
     @Test
-    public final void getPlatform_should_throw_SPlatformNotFoundException_when_persisistence_service_returns_null() throws SBonitaException {
+    public final void getPlatform_should_throw_SPlatformNotFoundException_when_persistence_service_returns_null() throws SBonitaException {
         given(persistenceService.selectOne(new SelectOneDescriptor<SPlatform>("getPlatform", null, SPlatform.class))).willReturn(null);
 
         //then
@@ -68,7 +68,7 @@ public class PlatformRetrieverImplTest {
     }
 
     @Test
-    public final void getPlatform_should_throw_SPlatformNotFoundException_when_persisistence_service_throws_Exception() throws SBonitaException {
+    public final void getPlatform_should_throw_SPlatformNotFoundException_when_persistence_service_throws_Exception() throws SBonitaException {
         SBonitaReadException exception = new SBonitaReadException("Unable to access database");
         given(persistenceService.selectOne(new SelectOneDescriptor<SPlatform>("getPlatform", null, SPlatform.class))).willThrow(exception);
 
