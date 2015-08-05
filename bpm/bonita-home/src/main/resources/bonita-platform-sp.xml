@@ -285,4 +285,61 @@
 		<constructor-arg name="defaultCacheConcurrencyStrategy" value="read-write"/>
 	</bean>
 
+	<bean id="platformInformationService" class="com.bonitasoft.engine.service.platform.PlatformInformationServiceImpl">
+		<constructor-arg name="persistenceService" ref="platformPersistenceService"/>
+	</bean>
+
+	<bean id="platformInformationProvider" class="com.bonitasoft.engine.service.platform.PlatformInformationProvider" />
+
+	<bean id="simplePlatformInformationManager" class="com.bonitasoft.engine.service.platform.PlatformInformationManagerImpl">
+		<constructor-arg name="platformRetriever" ref="platformRetriever" />
+		<constructor-arg name="platformInformationService" ref="platformInformationService" />
+		<constructor-arg name="platformInformationProvider" ref="platformInformationProvider" />
+	</bean>
+
+	<bean id="transactionalPlatformInformationUpdater" class="com.bonitasoft.engine.service.platform.TransactionalPlatformInformationUpdater" >
+		<constructor-arg name="lockService" ref="lockService" />
+		<constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="platformInformationManager" ref="simplePlatformInformationManager" />
+		<constructor-arg name="platformInformationProvider" ref="platformInformationProvider" />
+		<constructor-arg name="loggerService" ref="platformTechnicalLoggerService" />
+	</bean>
+
+	<bean id="updatePlatformInfoSynchronization" class="com.bonitasoft.engine.service.platform.UpdatePlatformInfoSynchronization">
+		<constructor-arg name="platformInformationProvider" ref="platformInformationProvider"/>
+	</bean>
+
+	<bean id="synchronizationPlatformInfoManager" class="com.bonitasoft.engine.service.platform.SynchronizationPlatformInfoManager" >
+		<constructor-arg name="transactionService" ref="transactionService"/>
+		<constructor-arg name="synchronization" ref="updatePlatformInfoSynchronization"/>
+	</bean>
+
+	<bean id="platformInfoScheduler" class="com.bonitasoft.engine.service.platform.PlatformInfoUpdateScheduledExecutor">
+		<constructor-arg name="transactionalPlatformInformationUpdater" ref="transactionalPlatformInformationUpdater" />
+	</bean>
+
+	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
+		<property name="shouldStartScheduler" value="true" />
+		<property name="shouldRestartElements" value="true" />
+		<property name="tenantRestartHandlers" ref="tenantRestartHandlers"/>
+		<property name="restartHandlers">
+			<list>
+				<ref bean="schedulerServiceRestartHandler" />
+			</list>
+		</property>
+		<property name="lifecycleServices">
+			<list>
+				<ref bean="classLoaderService" />
+				<ref bean="platformCacheService" />
+				<ref bean="platformInfoScheduler" />
+			</list>
+		</property>
+		<property name="jobListeners">
+			<list>
+				<ref bean="loggerJobListener" />
+				<ref bean="jdbcJobListener" />
+			</list>
+		</property>
+	</bean>
+
 </beans>
