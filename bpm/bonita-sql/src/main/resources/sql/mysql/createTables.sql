@@ -883,6 +883,7 @@ CREATE TABLE platform (
   initialVersion VARCHAR(50) NOT NULL,
   created BIGINT NOT NULL,
   createdBy VARCHAR(50) NOT NULL,
+  information TEXT,
   PRIMARY KEY (id)
 ) ENGINE = INNODB;
 

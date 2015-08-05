@@ -876,6 +876,7 @@ CREATE TABLE platform (
   initialVersion VARCHAR(50) NOT NULL,
   created BIGINT NOT NULL,
   createdBy VARCHAR(50) NOT NULL,
+  information CLOB,
   PRIMARY KEY (id)
 );
 
