@@ -11,25 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.platform.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+package org.bonitasoft.engine.platform.model.builder.impl;
 
-/**
- * @author Charles Souillard
- */
-public interface SPlatform extends PersistentObject {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    String getVersion();
+import org.junit.Test;
 
-    String getPreviousVersion();
+public class SPlatformBuilderFactoryImplTest {
 
-    String getInitialVersion();
+    @Test
+    public void getInformationKey_should_return_string_information() throws Exception {
+        //given
+        SPlatformBuilderFactoryImpl builderFactory = new SPlatformBuilderFactoryImpl();
 
-    long getCreated();
-
-    String getCreatedBy();
-
-    String getInformation();
+        //then
+        assertThat(builderFactory.getInformationKey()).isEqualTo("information");
+    }
 
 }

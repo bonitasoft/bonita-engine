@@ -33,4 +33,6 @@ public interface SPlatformBuilderFactory {
 
     String getCreatedByKey();
 
+    String getInformationKey();
+
 }
