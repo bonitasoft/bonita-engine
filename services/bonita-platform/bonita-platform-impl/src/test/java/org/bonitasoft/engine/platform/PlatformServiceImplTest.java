@@ -133,7 +133,7 @@ public class PlatformServiceImplTest {
     public final void getNumberOfTenants() throws SBonitaException {
         final long numberOfTenants = 155L;
         final Map<String, Object> emptyMap = Collections.emptyMap();
-        when(persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenants", emptyMap, STenant.class, Long.class)))
+        when(persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfTenants", emptyMap, STenant.class, Long.class)))
         .thenReturn(numberOfTenants);
 
         assertEquals(numberOfTenants, platformServiceImpl.getNumberOfTenants());
@@ -142,7 +142,7 @@ public class PlatformServiceImplTest {
     @Test(expected = STenantException.class)
     public final void getNumberOfTenantsThrowException() throws SBonitaException {
         final Map<String, Object> emptyMap = Collections.emptyMap();
-        when(persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenants", emptyMap, STenant.class, Long.class))).thenThrow(
+        when(persistenceService.selectOne(new SelectOneDescriptor<>("getNumberOfTenants", emptyMap, STenant.class, Long.class))).thenThrow(
                 new SBonitaReadException(""));
 
         platformServiceImpl.getNumberOfTenants();
@@ -198,21 +198,21 @@ public class PlatformServiceImplTest {
     @Test
     public final void getTenantById() throws SBonitaException {
         final STenant sTenant = buildTenant(15l, "tenant1");
-        when(persistenceService.selectById(new SelectByIdDescriptor<STenant>("getTenantById", STenant.class, 15l))).thenReturn(sTenant);
+        when(persistenceService.selectById(new SelectByIdDescriptor<>("getTenantById", STenant.class, 15l))).thenReturn(sTenant);
 
         assertEquals(sTenant, platformServiceImpl.getTenant(15L));
     }
 
     @Test(expected = STenantNotFoundException.class)
     public final void getTenantByIdNotExists() throws SBonitaException {
-        when(persistenceService.selectById(new SelectByIdDescriptor<STenant>("getTenantById", STenant.class, 15l))).thenReturn(null);
+        when(persistenceService.selectById(new SelectByIdDescriptor<>("getTenantById", STenant.class, 15l))).thenReturn(null);
 
         platformServiceImpl.getTenant(15L);
     }
 
     @Test(expected = STenantNotFoundException.class)
     public final void getTenantByIdThrowException() throws SBonitaException {
-        when(persistenceService.selectById(new SelectByIdDescriptor<STenant>("getTenantById", STenant.class, 15l))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectById(new SelectByIdDescriptor<>("getTenantById", STenant.class, 15l))).thenThrow(new SBonitaReadException(""));
 
         platformServiceImpl.getTenant(15L);
     }
@@ -245,7 +245,7 @@ public class PlatformServiceImplTest {
 
     @Test
     public final void getTenantsByIds() throws SBonitaException {
-        final List<STenant> sTenants = new ArrayList<STenant>();
+        final List<STenant> sTenants = new ArrayList<>();
         sTenants.add(buildTenant(15, "name"));
         final QueryOptions options = getQueryOptions();
         final List<Long> ids = Collections.singletonList(15L);
@@ -262,7 +262,7 @@ public class PlatformServiceImplTest {
 
     @Test(expected = STenantNotFoundException.class)
     public final void getTenantsByIdsNotExists() throws SBonitaException {
-        final List<STenant> sTenants = new ArrayList<STenant>();
+        final List<STenant> sTenants = new ArrayList<>();
         sTenants.add(buildTenant(15, "name"));
         final QueryOptions options = getQueryOptions();
         final List<Long> ids = Arrays.asList(15l, 32l);
@@ -285,7 +285,7 @@ public class PlatformServiceImplTest {
 
     @Test
     public final void getTenantsWithOptions() throws SBonitaException {
-        final List<STenant> sTenants = new ArrayList<STenant>();
+        final List<STenant> sTenants = new ArrayList<>();
         sTenants.add(buildTenant(48, "name"));
         final QueryOptions options = getQueryOptions();
         when(persistenceService.selectList(new SelectListDescriptor<STenant>("getTenants", null, STenant.class, options))).thenReturn(sTenants);
@@ -340,7 +340,7 @@ public class PlatformServiceImplTest {
 
     @Test
     public final void searchTenants() throws SBonitaException {
-        final List<STenant> sTenants = new ArrayList<STenant>();
+        final List<STenant> sTenants = new ArrayList<>();
         sTenants.add(buildTenant(87, "tenant"));
         final QueryOptions options = getQueryOptions();
         when(persistenceService.searchEntity(STenant.class, options, null)).thenReturn(sTenants);
