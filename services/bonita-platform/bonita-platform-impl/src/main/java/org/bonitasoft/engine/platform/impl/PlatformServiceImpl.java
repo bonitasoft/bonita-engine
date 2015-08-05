@@ -47,6 +47,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.platform.PlatformRetriever;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.exception.SPlatformCreationException;
@@ -118,8 +119,6 @@ public class PlatformServiceImpl implements PlatformService {
 
     private static final String QUERY_GET_TENANTS_BY_IDS = "getTenantsByIds";
 
-    private static final String QUERY_GET_PLATFORM = "getPlatform";
-
     private static String CACHE_KEY = "PLATFORM";
 
     private final PersistenceService platformPersistenceService;
@@ -140,21 +139,23 @@ public class PlatformServiceImpl implements PlatformService {
 
     private final String statementDelimiter;
 
+    private final PlatformRetriever platformRetriever;
+
     private final List<String> sqlFolders;
 
-    public PlatformServiceImpl(final PersistenceService platformPersistenceService, final Recorder recorder,
-            final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
-            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource,
-            final String sqlFolder,
-            final String statementDelimiter) {
-        this(platformPersistenceService, recorder, tenantPersistenceServices, logger, platformCacheService, sPlatformProperties, datasource, asList(sqlFolder),
+    public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever, final Recorder recorder,
+                               final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
+                               final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource,
+                               final String sqlFolder,
+                               final String statementDelimiter) {
+        this(platformPersistenceService, platformRetriever, recorder, tenantPersistenceServices, logger, platformCacheService, sPlatformProperties, datasource, asList(sqlFolder),
                 statementDelimiter);
     }
 
-    public PlatformServiceImpl(final PersistenceService platformPersistenceService, final Recorder recorder,
-            final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
-            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource,
-            final List<String> sqlFolders, final String statementDelimiter) {
+    public PlatformServiceImpl(final PersistenceService platformPersistenceService, PlatformRetriever platformRetriever, final Recorder recorder,
+                               final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
+                               final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource,
+                               final List<String> sqlFolders, final String statementDelimiter) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
         this.logger = logger;
@@ -164,6 +165,7 @@ public class PlatformServiceImpl implements PlatformService {
         this.datasource = datasource;
         this.sqlFolders = sqlFolders;
         this.statementDelimiter = statementDelimiter;
+        this.platformRetriever = platformRetriever;
 
         isTraced = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
     }
@@ -533,16 +535,18 @@ public class PlatformServiceImpl implements PlatformService {
         if (isTraced) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_GET_PLATFORM));
         }
-        SPlatform platform = null;
         try {
-            platform = platformPersistenceService.selectOne(new SelectOneDescriptor<SPlatform>(QUERY_GET_PLATFORM, null, SPlatform.class));
-            if (platform == null) {
-                throw new SPlatformNotFoundException("No platform found");
-            }
+            SPlatform platform = platformRetriever.getPlatform();
             if (isTraced) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_GET_PLATFORM));
             }
             return platform;
+        } catch (SPlatformNotFoundException e) {
+            if (isTraced) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_GET_PLATFORM, e.getMessage()));
+            }
+            throw e;
         } catch (final Exception e) {
             if (isTraced) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
