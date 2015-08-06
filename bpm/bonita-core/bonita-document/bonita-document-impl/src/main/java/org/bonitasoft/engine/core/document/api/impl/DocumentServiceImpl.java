@@ -204,7 +204,7 @@ public class DocumentServiceImpl implements DocumentService {
     public SAMappedDocument getArchivedVersionOfProcessDocument(final long documentId) throws SObjectNotFoundException {
         try {
             final SAMappedDocument aDocMapping = definitiveArchiveReadPersistenceService.selectOne(SelectDescriptorBuilder
-                    .getArchivedVersionOdDocument(documentId));
+                    .getArchivedVersionOfDocument(documentId));
             if (aDocMapping == null) {
                 throw new SObjectNotFoundException(documentId);
             }
