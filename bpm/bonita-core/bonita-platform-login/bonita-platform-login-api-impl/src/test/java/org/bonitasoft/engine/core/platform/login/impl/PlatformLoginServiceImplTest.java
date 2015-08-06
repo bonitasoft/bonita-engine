@@ -22,6 +22,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.bonitasoft.engine.core.platform.login.SInvalidPlatformCredentialsException;
 import org.bonitasoft.engine.core.platform.login.SPlatformLoginException;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.authentication.SInvalidPasswordException;
@@ -60,7 +61,7 @@ public class PlatformLoginServiceImplTest {
      * Test method for {@link org.bonitasoft.engine.core.platform.login.impl.PlatformLoginServiceImpl#login(java.lang.String, java.lang.String)}.
      */
     @Test
-    public final void login() throws SPlatformLoginException, SSessionException, SInvalidUserException, SInvalidPasswordException {
+    public final void login() throws Exception {
         final String userName = "userName";
         final String password = "pwd";
         doNothing().when(authenticationService).checkUserCredentials(userName, password);
@@ -70,8 +71,9 @@ public class PlatformLoginServiceImplTest {
         assertEquals(sPlatformSession, platformLoginServiceImpl.login(userName, password));
     }
 
-    @Test(expected = SPlatformLoginException.class)
-    public final void loginThrowSInvalidUserException() throws SPlatformLoginException, SInvalidUserException, SInvalidPasswordException {
+
+    @Test(expected = SInvalidPlatformCredentialsException.class)
+    public final void loginThrowSInvalidUserException() throws Exception {
         final String userName = "userName";
         final String password = "pwd";
         doThrow(new SInvalidUserException("")).when(authenticationService).checkUserCredentials(userName, password);
@@ -79,17 +81,18 @@ public class PlatformLoginServiceImplTest {
         platformLoginServiceImpl.login(userName, password);
     }
 
-    @Test(expected = SPlatformLoginException.class)
-    public final void loginThrowSInvalidPasswordException() throws SPlatformLoginException, SInvalidUserException, SInvalidPasswordException {
+    @Test(expected = SInvalidPlatformCredentialsException.class)
+    public final void loginThrowSInvalidPasswordException() throws Exception {
         final String userName = "userName";
         final String password = "pwd";
         doThrow(new SInvalidPasswordException("")).when(authenticationService).checkUserCredentials(userName, password);
 
-        platformLoginServiceImpl.login(userName, password);
+        platformLoginServiceImpl.login(userName,
+                password);
     }
 
     @Test(expected = SPlatformLoginException.class)
-    public final void loginThrowSSessionException() throws SPlatformLoginException, SSessionException, SInvalidUserException, SInvalidPasswordException {
+    public final void loginThrowSSessionException() throws Exception {
         final String userName = "userName";
         final String password = "pwd";
         doNothing().when(authenticationService).checkUserCredentials(userName, password);

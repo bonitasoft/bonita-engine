@@ -34,8 +34,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +69,7 @@ public class PlatformLoginIT extends CommonAPIIT {
     };
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Login" }, story = "Try to log with wrong loggin.", jira = "")
-    @Test(expected = PlatformLoginException.class)
+    @Test(expected = InvalidPlatformCredentialsException.class)
     public void wrongLogin() throws BonitaException {
         try {
             platformLoginAPI.logout(session);
