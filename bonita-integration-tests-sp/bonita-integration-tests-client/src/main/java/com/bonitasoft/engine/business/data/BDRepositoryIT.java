@@ -66,6 +66,7 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -135,6 +136,8 @@ public class BDRepositoryIT extends CommonAPISPIT {
     private User matti;
 
     private File clientFolder;
+
+    private String bdmDeployedVersion="0";
 
     private BusinessObjectModel buildBOM() {
         final SimpleField name = new SimpleField();
@@ -360,6 +363,16 @@ public class BDRepositoryIT extends CommonAPISPIT {
         getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
         getTenantManagementAPI().installBusinessDataModel(zip);
         getTenantManagementAPI().resume();
+        verifyBdmIsWellDeployed();
+    }
+
+    private void verifyBdmIsWellDeployed() throws Exception{
+        final String businessDataModelVersion = getTenantAdministrationAPI().getBusinessDataModelVersion();
+        APITestUtil.LOGGER.warn("previous businessDataModelVersion:" + this.bdmDeployedVersion);
+        APITestUtil.LOGGER.warn("new businessDataModelVersion     :" + businessDataModelVersion);
+        assertThat(businessDataModelVersion).as("should have deployed a new version of BDM").isNotNull().isNotEqualTo(this.bdmDeployedVersion);
+        this.bdmDeployedVersion = businessDataModelVersion;
+
     }
 
     private ProcessDefinition deploySimpleProcessWithBusinessData(final String aQualifiedName) throws Exception {
