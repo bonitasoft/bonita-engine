@@ -23,4 +23,24 @@ public class SProcessInstanceImplTest {
     public void defaultInterruptingEventIdShouldBeMinusOne() {
         assertThat(new SProcessInstanceImpl().getInterruptingEventId()).isEqualTo(-1L);
     }
+
+    @Test
+    public void should_be_root_instance_when_callerId_is_less_than_zero() throws Exception {
+        //given
+        SProcessInstanceImpl instance = new SProcessInstanceImpl();
+        instance.setCallerId(-1);
+
+        //then
+        assertThat(instance.isRootInstance()).isTrue();
+    }
+
+    @Test
+    public void should_not_be_root_instance_when_callerId_is_greater_than_zero() throws Exception {
+        //given
+        SProcessInstanceImpl instance = new SProcessInstanceImpl();
+        instance.setCallerId(1);
+
+        //then
+        assertThat(instance.isRootInstance()).isFalse();
+    }
 }
