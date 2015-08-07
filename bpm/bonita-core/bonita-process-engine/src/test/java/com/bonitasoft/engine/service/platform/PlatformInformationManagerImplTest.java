@@ -18,6 +18,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import com.bonitasoft.manager.Manager;
+import com.bonitasoft.manager.ManagerIllegalStateException;
 import org.bonitasoft.engine.platform.PlatformRetriever;
 import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
 import org.bonitasoft.engine.platform.model.SPlatform;
@@ -126,13 +127,13 @@ public class PlatformInformationManagerImplTest {
         SPlatformImpl platform = buildPlatform(initialInfo);
 
         given(platformRetriever.getPlatform()).willReturn(platform);
-        Exception exception = new Exception("error");
-        given(manager.calculateNewPlatformInfo(initialInfo)).willThrow(exception);
+        ManagerIllegalStateException managerIllegalStateException = new ManagerIllegalStateException("error");
+        given(manager.calculateNewPlatformInfo(initialInfo)).willThrow(managerIllegalStateException);
         given(provider.getAndReset()).willReturn(1);
 
         //then
         expectedException.expect(SPlatformUpdateException.class);
-        expectedException.expectCause(equalTo(exception));
+        expectedException.expectCause(equalTo(managerIllegalStateException));
         expectedException.expectMessage("Unable to calculate the new platform information");
 
         // when
