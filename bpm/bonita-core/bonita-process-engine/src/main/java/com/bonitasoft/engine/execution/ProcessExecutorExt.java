@@ -8,8 +8,15 @@
  *******************************************************************************/
 package com.bonitasoft.engine.execution;
 
+import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
+import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
+import com.bonitasoft.engine.service.platform.PlatformInformationManager;
+import com.bonitasoft.engine.service.platform.SynchronizationPlatformInfoManager;
+import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.business.data.BusinessDataRepository;
@@ -22,6 +29,7 @@ import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
+import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -29,6 +37,7 @@ import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SContractViolationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -37,6 +46,7 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
+import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutorImpl;
 import org.bonitasoft.engine.execution.TransitionEvaluator;
 import org.bonitasoft.engine.execution.event.EventsHandler;
@@ -49,11 +59,10 @@ import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownExceptio
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
+import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.work.WorkService;
-
-import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
-import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
 
 /**
  * @author Baptiste Mesta
@@ -65,6 +74,8 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
  */
 public class ProcessExecutorExt extends ProcessExecutorImpl {
 
+    private final SynchronizationPlatformInfoManager platformInformationManager;
+
     public ProcessExecutorExt(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
             final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
             final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
@@ -75,11 +86,12 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
             final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
             final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService, TransitionEvaluator transitionEvaluator,
-            final ContractDataService contractDataService) {
+            final ContractDataService contractDataService, SynchronizationPlatformInfoManager platformInformationManager) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
                 eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
                 expressionResolverService, expressionService, eventService, handlers, documentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
                 eventsHandler, flowNodeStateManager, businessDataRepository, refBusinessDataService, transitionEvaluator, contractDataService);
+        this.platformInformationManager = platformInformationManager;
     }
 
     protected void initializeData(final SProcessDefinition sDefinition, final SProcessInstance sInstance) throws SProcessInstanceCreationException {
@@ -125,6 +137,32 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
         if (update) {
             processInstanceService.updateProcess(sInstance, updateBuilder.done());
         }
+    }
+
+    //REFACTOR-ME: too many parameters
+    @Override
+    public SProcessInstance start(final long starterId, final long starterSubstituteId, final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectors, final long callerId, final FlowNodeSelector selector, final Map<String, Serializable> processInputs) throws SProcessInstanceCreationException, SContractViolationException {
+        SProcessInstance instance = startSuper(starterId, starterSubstituteId, expressionContext, operations, context, connectors, callerId, selector, processInputs);
+        updatePlatformInfo(instance);
+        return instance;
+    }
+
+    private void updatePlatformInfo(final SProcessInstance instance) throws SProcessInstanceCreationException {
+        try {
+            if(instance.isRootInstance()) {
+                getPlatformInformationManager().update();
+            }
+        } catch (SPlatformNotFoundException | SPlatformUpdateException e) {
+           throw  new SProcessInstanceCreationException(e);
+        }
+    }
+
+    protected SProcessInstance startSuper(final long starterId, final long starterSubstituteId, final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectors, final long callerId, final FlowNodeSelector selector, final Map<String, Serializable> processInputs) throws SProcessInstanceCreationException, SContractViolationException {
+        return super.start(starterId, starterSubstituteId, expressionContext, operations, context, connectors, callerId, selector, processInputs);
+    }
+
+    protected PlatformInformationManager getPlatformInformationManager() {
+        return platformInformationManager;
     }
 
 }
