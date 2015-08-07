@@ -110,7 +110,7 @@ public class BDRepositoryIT extends CommonAPIIT {
     private File clientFolder;
     private Long tenantId;
 
-    private String bdmDeployedVersion = "0";
+    private static String bdmDeployedVersion = "0";
 
     private BusinessObjectModel buildBOM() {
         final SimpleField name = new SimpleField();
@@ -337,8 +337,9 @@ public class BDRepositoryIT extends CommonAPIIT {
         final byte[] zip = converter.zip(bom);
         getTenantAdministrationAPI().pause();
         getTenantAdministrationAPI().cleanAndUninstallBusinessDataModel();
-        getTenantAdministrationAPI().installBusinessDataModel(zip);
+        final String businessDataModelVersion = getTenantAdministrationAPI().installBusinessDataModel(zip);
         getTenantAdministrationAPI().resume();
+        assertThat(businessDataModelVersion).as("should have deployed BDM").isNotNull();
         verifyBdmIsWellDeployed();
     }
 
@@ -346,7 +347,7 @@ public class BDRepositoryIT extends CommonAPIIT {
         final String businessDataModelVersion = getTenantAdministrationAPI().getBusinessDataModelVersion();
         APITestUtil.LOGGER.warn("previous businessDataModelVersion:" + this.bdmDeployedVersion);
         APITestUtil.LOGGER.warn("new businessDataModelVersion     :" + businessDataModelVersion);
-        assertThat(businessDataModelVersion).as("should have deployed a new version of BDM").isNotNull().isNotEqualTo(this.bdmDeployedVersion);
+        assertThat(businessDataModelVersion).as("should have deployed a new version of BDM").isNotEqualTo(this.bdmDeployedVersion);
         this.bdmDeployedVersion = businessDataModelVersion;
     }
 
