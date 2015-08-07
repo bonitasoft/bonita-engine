@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
@@ -87,43 +88,27 @@ import org.xml.sax.SAXException;
 
 public class BDRepositoryIT extends CommonAPIIT {
 
-    private static final String BDM_PACKAGE_PREFIX = "com.company.model";
-
-    private static final String COUNTRY_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Country";
-
-    private static final String ADDRESS_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Address";
-
-    private static final String EMPLOYEE_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Employee";
-
-    private static final String PRODUCT_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Product";
-
-    private static final String PRODUCT_CATALOG_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".ProductCatalog";
-
-    private static final String PERSON_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Person";
-
-    private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "findByLastName";
-
-    private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
-
-    private static final String FIND_BY_FIRST_NAME_FETCH_ADDRESSES = "findByFirstNameFetchAddresses";
-
-    private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
-
-    private static final String COUNT_EMPLOYEE = "countEmployee";
-
-    private static final String COUNT_ADDRESS = "countAddress";
-
-    private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
-
     public static final String BUSINESS_DATA_CLASS_NAME_ID_FIELD = "/businessdata/{className}/{id}/{field}";
-
     public static final String ENTITY_CLASS_NAME = "entityClassName";
-
     public static final String FIND_BY_HIRE_DATE_RANGE = "findByHireDateRange";
-
+    private static final String BDM_PACKAGE_PREFIX = "com.company.model";
+    private static final String COUNTRY_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Country";
+    private static final String ADDRESS_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Address";
+    private static final String EMPLOYEE_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Employee";
+    private static final String PRODUCT_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Product";
+    private static final String PRODUCT_CATALOG_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".ProductCatalog";
+    private static final String PERSON_QUALIFIED_NAME = BDM_PACKAGE_PREFIX + ".Person";
+    private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "findByLastName";
+    private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
+    private static final String FIND_BY_FIRST_NAME_FETCH_ADDRESSES = "findByFirstNameFetchAddresses";
+    private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
+    private static final String COUNT_EMPLOYEE = "countEmployee";
+    private static final String COUNT_ADDRESS = "countAddress";
+    private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
     private User matti;
 
     private File clientFolder;
+    private Long tenantId;
 
     private String bdmDeployedVersion = "0";
 
@@ -292,8 +277,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         model.addBusinessObject(catalogBO);
         return model;
     }
-
-    private Long tenantId;
 
     @Before
     public void setUp() throws Exception {
@@ -999,38 +982,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         assertThat(result.get("countEmployee")).isEqualTo(1L);
     }
 
-    class AddressRef {
-
-        private final String varName;
-
-        private final String street;
-
-        private final String city;
-
-        AddressRef(final String varName, final String street, final String city) {
-            this.varName = varName;
-            this.street = street;
-            this.city = city;
-        }
-
-        public Expression createDependency() throws InvalidExpressionException {
-            return new ExpressionBuilder().createBusinessDataExpression(getVarName(), ADDRESS_QUALIFIED_NAME);
-        }
-
-        public String getVarName() {
-            return varName;
-        }
-
-        public String getStreet() {
-            return street;
-        }
-
-        public String getCity() {
-            return city;
-        }
-
-    }
-
     @Test
     public void deployABDRAndCreateAndUdpateAMultipleBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression(
@@ -1266,7 +1217,6 @@ public class BDRepositoryIT extends CommonAPIIT {
         disableAndDeleteProcess(subProcessDefinition);
     }
 
-
     //BS-13803
     @Test
     public void initializeBusinessDataInCalledProcessWithContractInput() throws Exception {
@@ -1285,13 +1235,19 @@ public class BDRepositoryIT extends CommonAPIIT {
         builder.addActor(ACTOR_NAME);
         builder.addCallActivity("call",
                 new ExpressionBuilder().createConstantStringExpression(subProcessDefinition.getName()),
-                new ExpressionBuilder().createConstantStringExpression(subProcessDefinition.getVersion())).addProcessStartContractInput("theInput", new ExpressionBuilder().createConstantStringExpression("theValue"));
+                new ExpressionBuilder().createConstantStringExpression(subProcessDefinition.getVersion())).addProcessStartContractInput("theInput",
+                new ExpressionBuilder().createConstantStringExpression("theValue"));
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("call", "step2");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
 
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
         final long step1Id = waitForUserTask("step1");
+        final Expression employee = new ExpressionBuilder().createGroovyScriptExpression("script", "employee.firstName", String.class.getName(),
+                new ExpressionBuilder().createBusinessDataExpression("employee", EMPLOYEE_QUALIFIED_NAME));
+        Serializable employeeResult = getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id,
+                Collections.<Expression, Map<String, Serializable>> singletonMap(employee, null)).get("script");
+        assertThat(employeeResult).isEqualTo("theValue");
         getProcessAPI().assignUserTask(step1Id, matti.getId());
         getProcessAPI().executeFlowNode(step1Id);
         waitForUserTask(instance, "step2");
@@ -1825,6 +1781,38 @@ public class BDRepositoryIT extends CommonAPIIT {
             System.err.println(eee.getMessage());
             return null;
         }
+    }
+
+    class AddressRef {
+
+        private final String varName;
+
+        private final String street;
+
+        private final String city;
+
+        AddressRef(final String varName, final String street, final String city) {
+            this.varName = varName;
+            this.street = street;
+            this.city = city;
+        }
+
+        public Expression createDependency() throws InvalidExpressionException {
+            return new ExpressionBuilder().createBusinessDataExpression(getVarName(), ADDRESS_QUALIFIED_NAME);
+        }
+
+        public String getVarName() {
+            return varName;
+        }
+
+        public String getStreet() {
+            return street;
+        }
+
+        public String getCity() {
+            return city;
+        }
+
     }
 
 }
