@@ -67,6 +67,9 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     protected CacheConfiguration getEhCacheConfiguration(final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig) {
         final CacheConfiguration ehCacheConfig = new CacheConfiguration();
+        if (null != cacheConfig.getName()) {
+            ehCacheConfig.setName(cacheConfig.getName());
+        }
         ehCacheConfig.setMaxElementsInMemory(cacheConfig.getMaxElementsInMemory());
         ehCacheConfig.setMaxElementsOnDisk(cacheConfig.getMaxElementsOnDisk());
         ehCacheConfig.setOverflowToDisk(!cacheConfig.isInMemoryOnly());
@@ -81,6 +84,9 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     protected void buildCacheManagerWithDefaultConfiguration() {
         final Configuration configuration = new Configuration();
+        if (null != defaultCacheConfiguration.getName()) {
+            configuration.setName(defaultCacheConfiguration.getName());
+        }
         configuration.setDefaultCacheConfiguration(defaultCacheConfiguration);
         configuration.diskStore(new DiskStoreConfiguration().path(diskStorePath));
         cacheManager = new CacheManager(configuration);
