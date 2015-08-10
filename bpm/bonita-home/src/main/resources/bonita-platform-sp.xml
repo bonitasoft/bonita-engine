@@ -342,4 +342,8 @@
 		</property>
 	</bean>
 
+	<bean id="platformVerifier" class="com.bonitasoft.engine.execution.PlatformVerifier">
+		<constructor-arg name="platformRetriever" ref="platformRetriever"/>
+	</bean>
+
 </beans>

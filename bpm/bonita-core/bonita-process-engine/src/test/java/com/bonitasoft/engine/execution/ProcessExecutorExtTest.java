@@ -18,6 +18,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -36,6 +37,7 @@ import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -65,6 +67,9 @@ public class ProcessExecutorExtTest {
     @Mock
     Map<String, SProcessInstanceHandler<SEvent>> handlers;
 
+    @Mock
+    private PlatformVerifier verifier;
+
     @InjectMocks
     private ProcessExecutorExt processExecutorExt;
 
@@ -77,17 +82,15 @@ public class ProcessExecutorExtTest {
     public void setUp() throws Exception {
         spy = spy(processExecutorExt);
         given(spy.getPlatformInformationManager()).willReturn(manager);
-        given(handlers.entrySet()).willReturn(Collections.<Map.Entry<String,SProcessInstanceHandler<SEvent>>>emptySet());
+        given(handlers.entrySet()).willReturn(Collections.<Map.Entry<String, SProcessInstanceHandler<SEvent>>>emptySet());
     }
 
     @Test
     public void start_should_update_platform_info_when_is_root_process_instance() throws Exception {
         long callerId = -1;
-        SProcessInstanceImpl processInstance = new SProcessInstanceImpl();
-        processInstance.setCallerId(callerId);
 
         //given
-        doReturn(processInstance).when(spy).startSuper(anyLong(), anyLong(), any(SExpressionContext.class), Matchers.<List<SOperation>>any(), Matchers.<Map<String, Object>>any(), Matchers.<List<ConnectorDefinitionWithInputValues>>any(), anyLong(), any(FlowNodeSelector.class),  Matchers.<Map<String, Serializable>>any());
+        doReturn(buildProcessInstance(callerId)).when(spy).startSuper(anyLong(), anyLong(), any(SExpressionContext.class), Matchers.<List<SOperation>>any(), Matchers.<Map<String, Object>>any(), Matchers.<List<ConnectorDefinitionWithInputValues>>any(), anyLong(), any(FlowNodeSelector.class),  Matchers.<Map<String, Serializable>>any());
 
         //when
         spy.start(-1, -1, new SExpressionContext(), null, null, null, callerId, null, null);
@@ -99,11 +102,9 @@ public class ProcessExecutorExtTest {
     @Test
     public void start_should_not_update_platform_info_when_is_not_root_process_instance() throws Exception {
         long callerId = 4;
-        SProcessInstanceImpl processInstance = new SProcessInstanceImpl();
-        processInstance.setCallerId(callerId);
 
         //given
-        doReturn(processInstance).when(spy).startSuper(anyLong(), anyLong(), any(SExpressionContext.class), Matchers.<List<SOperation>>any(), Matchers.<Map<String, Object>>any(), Matchers.<List<ConnectorDefinitionWithInputValues>>any(), anyLong(), any(FlowNodeSelector.class), Matchers.<Map<String, Serializable>>any());
+        doReturn(buildProcessInstance(callerId)).when(spy).startSuper(anyLong(), anyLong(), any(SExpressionContext.class), Matchers.<List<SOperation>>any(), Matchers.<Map<String, Object>>any(), Matchers.<List<ConnectorDefinitionWithInputValues>>any(), anyLong(), any(FlowNodeSelector.class), Matchers.<Map<String, Serializable>>any());
 
         //when
         spy.start(-1, -1, new SExpressionContext(), null, null, null, callerId, null, null);
@@ -115,11 +116,9 @@ public class ProcessExecutorExtTest {
     @Test
     public void start_should_throw_SProcessInstanceCreationException_when_update_platform_info_throws_Exception() throws Exception {
         long callerId = -1;
-        SProcessInstanceImpl processInstance = new SProcessInstanceImpl();
-        processInstance.setCallerId(callerId);
 
         //given
-        doReturn(processInstance).when(spy).startSuper(anyLong(), anyLong(), any(SExpressionContext.class), Matchers.<List<SOperation>>any(), Matchers.<Map<String, Object>>any(), Matchers.<List<ConnectorDefinitionWithInputValues>>any(), anyLong(), any(FlowNodeSelector.class), Matchers.<Map<String, Serializable>>any());
+        doReturn(buildProcessInstance(callerId)).when(spy).startSuper(anyLong(), anyLong(), any(SExpressionContext.class), Matchers.<List<SOperation>>any(), Matchers.<Map<String, Object>>any(), Matchers.<List<ConnectorDefinitionWithInputValues>>any(), anyLong(), any(FlowNodeSelector.class), Matchers.<Map<String, Serializable>>any());
         SPlatformUpdateException updateException = new SPlatformUpdateException("unable to update");
         doThrow(updateException).when(manager).update();
 
@@ -130,6 +129,58 @@ public class ProcessExecutorExtTest {
         //when
         spy.start(-1, -1, new SExpressionContext(), null, null, null, callerId, null, null);
 
+    }
+
+    @Test
+    public void start_should_re_throw_Exception_when_starterVerifier_throws_Runtime_Exception() throws Exception {
+        //given
+        long callerId = -1;
+        RuntimeException error = new RuntimeException("error");
+        given(verifier.check()).willThrow(error);
+
+        //then
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("error");
+
+        //when
+        spy.start(-1, -1, new SExpressionContext(), null, null, null, callerId, null, null);
+
+    }
+
+    @Test
+    public void start_should_throw_ProcessInstanceCreationException_when_starterVerifier_throws_PlatformNotFoundException() throws Exception {
+        //given
+        long callerId = -1;
+        SPlatformNotFoundException error = new SPlatformNotFoundException("error");
+        given(verifier.check()).willThrow(error);
+
+        //then
+        expectedException.expect(SProcessInstanceCreationException.class);
+        expectedException.expectCause(equalTo(error));
+
+        //when
+        spy.start(-1, -1, new SExpressionContext(), null, null, null, callerId, null, null);
+
+    }
+
+    @Test
+    public void start_should_not_call_starterVerifier_when_is_not_a_root_instance() throws Exception {
+        //given
+        long callerId = 9;
+        doReturn(buildProcessInstance(callerId)).when(spy).startSuper(anyLong(), anyLong(), any(SExpressionContext.class), Matchers.<List<SOperation>>any(), Matchers.<Map<String, Object>>any(), Matchers.<List<ConnectorDefinitionWithInputValues>>any(), anyLong(), any(FlowNodeSelector.class), Matchers.<Map<String, Serializable>>any());
+
+        //when
+        spy.start(-1, -1, new SExpressionContext(), null, null, null, callerId, null, null);
+
+        //then
+        verifyZeroInteractions(verifier);
+
+    }
+
+    private SProcessInstanceImpl buildProcessInstance(final long callerId) {
+        SProcessInstanceImpl processInstance = new SProcessInstanceImpl();
+        processInstance.setCallerId(callerId);
+        return processInstance;
     }
 
 }
