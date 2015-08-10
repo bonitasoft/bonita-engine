@@ -9,7 +9,6 @@
 
 package com.bonitasoft.engine.service.platform;
 
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -18,9 +17,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import com.bonitasoft.manager.Manager;
-import com.bonitasoft.manager.ManagerIllegalStateException;
 import org.bonitasoft.engine.platform.PlatformRetriever;
-import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.impl.SPlatformImpl;
 import org.junit.Before;
@@ -127,14 +124,13 @@ public class PlatformInformationManagerImplTest {
         SPlatformImpl platform = buildPlatform(initialInfo);
 
         given(platformRetriever.getPlatform()).willReturn(platform);
-        ManagerIllegalStateException managerIllegalStateException = new ManagerIllegalStateException("error");
-        given(manager.calculateNewPlatformInfo(initialInfo)).willThrow(managerIllegalStateException);
+        IllegalStateException illegalStateException = new IllegalStateException("error");
+        given(manager.calculateNewPlatformInfo(initialInfo)).willThrow(illegalStateException);
         given(provider.getAndReset()).willReturn(1);
 
         //then
-        expectedException.expect(SPlatformUpdateException.class);
-        expectedException.expectCause(equalTo(managerIllegalStateException));
-        expectedException.expectMessage("Unable to calculate the new platform information");
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("error");
 
         // when
         sypInfoManager.update();

@@ -43,12 +43,8 @@ public class PlatformInformationManagerImpl implements PlatformInformationManage
 
     private String calculateNewInfo(final int toUpdate, final String currentInfo) throws SPlatformUpdateException {
         String newInfo = currentInfo;
-        try {
-            for (int i = 0; i < toUpdate; i++) {
-                newInfo = getManager().calculateNewPlatformInfo(newInfo);
-            }
-        } catch (Throwable throwable) {
-            throw new SPlatformUpdateException("Unable to calculate the new platform information", throwable);
+        for (int i = 0; i < toUpdate; i++) {
+            newInfo = getManager().calculateNewPlatformInfo(newInfo);
         }
         return newInfo;
     }
