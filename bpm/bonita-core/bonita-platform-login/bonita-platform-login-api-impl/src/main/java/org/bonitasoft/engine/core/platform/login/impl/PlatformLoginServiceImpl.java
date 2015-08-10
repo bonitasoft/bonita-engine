@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.platform.login.impl;
 
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
+import org.bonitasoft.engine.core.platform.login.SInvalidPlatformCredentialsException;
 import org.bonitasoft.engine.core.platform.login.SPlatformLoginException;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.authentication.SInvalidPasswordException;
@@ -40,14 +41,12 @@ public class PlatformLoginServiceImpl implements PlatformLoginService {
     }
 
     @Override
-    public SPlatformSession login(final String userName, final String password) throws SPlatformLoginException {
+    public SPlatformSession login(final String userName, final String password) throws SPlatformLoginException, SInvalidPlatformCredentialsException {
         try {
             authenticationService.checkUserCredentials(userName, password);
             return sessionService.createSession(userName);
-        } catch (final SInvalidUserException e) {
-            throw new SPlatformLoginException(e);
-        } catch (final SInvalidPasswordException e) {
-            throw new SPlatformLoginException(e);
+        } catch (final SInvalidUserException | SInvalidPasswordException e) {
+            throw new SInvalidPlatformCredentialsException(e);
         } catch (final SSessionException e) {
             throw new SPlatformLoginException(e);
         }
