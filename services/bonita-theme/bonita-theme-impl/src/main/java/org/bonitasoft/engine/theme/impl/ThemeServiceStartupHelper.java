@@ -35,36 +35,25 @@ import org.bonitasoft.engine.theme.model.SThemeType;
  */
 public class ThemeServiceStartupHelper {
 
-    private static final String BONITA_PORTAL_THEME_DEFAULT = "bonita-portal-theme";
+    static final String BONITA_PORTAL_THEME_DEFAULT = "bonita-portal-theme";
 
-    private static final String BONITA_MOBILE_THEME_DEFAULT = "bonita-mobile-theme";
+    static final String BONITA_MOBILE_THEME_DEFAULT = "bonita-mobile-theme";
 
     private static final String ZIP = ".zip";
-
-    private final String portalDefaultThemeFilename;
-
-    private final String mobileDefaultThemeFilename;
 
     private final ThemeService themeService;
 
     public ThemeServiceStartupHelper(final ThemeService themeService) {
-        this(themeService, BONITA_PORTAL_THEME_DEFAULT, BONITA_MOBILE_THEME_DEFAULT);
-    }
-
-    public ThemeServiceStartupHelper(final ThemeService themeService, final String portalDefaultThemeFilename, final String mobileDefaultThemeFilename) {
-        super();
         this.themeService = themeService;
-        this.portalDefaultThemeFilename = portalDefaultThemeFilename;
-        this.mobileDefaultThemeFilename = mobileDefaultThemeFilename;
     }
 
     private File unzipDefaultPortalThemeCss() {
         InputStream defaultThemeCssZip = null;
         File unzippedCssPortalThemeFolder;
         try {
-            defaultThemeCssZip = getResourceAsStream(portalDefaultThemeFilename + "-css" + ZIP);
+            defaultThemeCssZip = getResourceAsStream(BONITA_PORTAL_THEME_DEFAULT + "-css" + ZIP);
             if (defaultThemeCssZip != null) {
-                unzippedCssPortalThemeFolder = IOUtil.createTempDirectoryInDefaultTempDirectory(portalDefaultThemeFilename + "-css");
+                unzippedCssPortalThemeFolder = IOUtil.createTempDirectoryInDefaultTempDirectory(BONITA_PORTAL_THEME_DEFAULT + "-css");
                 IOUtil.unzipToFolder(defaultThemeCssZip, unzippedCssPortalThemeFolder);
             } else {
                 unzippedCssPortalThemeFolder = null;
@@ -91,12 +80,11 @@ public class ThemeServiceStartupHelper {
      * @throws SThemeReadException
      */
     public void createDefaultThemes() throws IOException, SThemeCreationException, SThemeReadException {
-        // Create default Mobile theme if it does not exist
-        try {
-            themeService.getTheme(SThemeType.MOBILE, true);
-        } catch (SThemeNotFoundException e) {
-            createDefaultMobileTheme();
-        }
+        createOrUpdateDefaultMobileTheme();
+        createOrUpdateDefaultPortalTheme();
+    }
+
+    void createOrUpdateDefaultPortalTheme() throws SThemeReadException, IOException, SThemeCreationException {
         // Create default Portal theme if it does not exist
         try {
             themeService.getTheme(SThemeType.PORTAL, true);
@@ -105,8 +93,17 @@ public class ThemeServiceStartupHelper {
         }
     }
 
+    void createOrUpdateDefaultMobileTheme() throws SThemeReadException, IOException, SThemeCreationException {
+        // Create default Mobile theme if it does not exist
+        try {
+            themeService.getTheme(SThemeType.MOBILE, true);
+        } catch (SThemeNotFoundException e) {
+            createDefaultMobileTheme();
+        }
+    }
+
     void createDefaultPortalTheme() throws IOException, SThemeCreationException {
-        final byte[] defaultThemeZip = getFileContent(portalDefaultThemeFilename + ZIP);
+        final byte[] defaultThemeZip = getFileContent(BONITA_PORTAL_THEME_DEFAULT + ZIP);
         File unzippedCssPortalThemeFolder = unzipDefaultPortalThemeCss();
         if (unzippedCssPortalThemeFolder != null) {
             if (defaultThemeZip != null && defaultThemeZip.length > 0) {
@@ -121,7 +118,7 @@ public class ThemeServiceStartupHelper {
     }
 
     void createDefaultMobileTheme() throws IOException, SThemeCreationException {
-        final byte[] defaultThemeZip = getFileContent(mobileDefaultThemeFilename + ZIP);
+        final byte[] defaultThemeZip = getFileContent(BONITA_MOBILE_THEME_DEFAULT + ZIP);
         if (defaultThemeZip != null && defaultThemeZip.length > 0) {
             final STheme sTheme = buildSTheme(defaultThemeZip, null, SThemeType.MOBILE);
             themeService.createTheme(sTheme);

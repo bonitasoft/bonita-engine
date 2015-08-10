@@ -21,151 +21,164 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 
 import org.bonitasoft.engine.theme.ThemeService;
-import org.bonitasoft.engine.theme.exception.SThemeCreationException;
 import org.bonitasoft.engine.theme.exception.SThemeNotFoundException;
 import org.bonitasoft.engine.theme.exception.SThemeReadException;
 import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
  * @author Philippe Ozil
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ThemeServiceStartupHelperTest {
 
+    @Mock
+    private ThemeService themeService;
+    @InjectMocks
+    @Spy
+    private ThemeServiceStartupHelper themeServiceStartupHelper;
+
     @Test
-    public final void createDefaultThemes_should_call_createDefaultMobileTheme_when_default_mobile_theme_does_not_exist() throws SThemeNotFoundException,
-            SThemeReadException, SThemeCreationException, IOException {
-        final ThemeService themeService = getMockThemeService(false, true);
+    public final void createDefaultThemes_should_call_create_on_mobile_and_portal() throws Exception {
+        hasNotDefaultTheme(SThemeType.MOBILE);
+        hasDefaultTheme(SThemeType.PORTAL);
 
-        final ThemeServiceStartupHelper startupHelper = spy(new ThemeServiceStartupHelper(themeService));
-        doNothing().when(startupHelper).createDefaultMobileTheme();
-        doNothing().when(startupHelper).createDefaultPortalTheme();
+        doNothing().when(themeServiceStartupHelper).createOrUpdateDefaultMobileTheme();
+        doNothing().when(themeServiceStartupHelper).createOrUpdateDefaultMobileTheme();
 
-        startupHelper.createDefaultThemes();
+        themeServiceStartupHelper.createDefaultThemes();
 
-        verify(startupHelper, times(1)).createDefaultMobileTheme();
+        verify(themeServiceStartupHelper, times(1)).createOrUpdateDefaultMobileTheme();
+        verify(themeServiceStartupHelper, times(1)).createOrUpdateDefaultMobileTheme();
     }
 
     @Test
-    public final void createDefaultThemes_should_not_call_createDefaultMobileTheme_when_default_mobile_theme_exists() throws SThemeNotFoundException,
-            SThemeReadException, SThemeCreationException, IOException {
-        final ThemeService themeService = getMockThemeService(true, true);
+    public final void createOrUpdateDefaultMobileTheme_should_call_createDefaultMobileTheme_when_default_mobile_theme_does_not_exist() throws Exception {
+        hasNotDefaultTheme(SThemeType.MOBILE);
+        hasDefaultTheme(SThemeType.PORTAL);
 
-        final ThemeServiceStartupHelper startupHelper = spy(new ThemeServiceStartupHelper(themeService));
-        doNothing().when(startupHelper).createDefaultMobileTheme();
-        doNothing().when(startupHelper).createDefaultPortalTheme();
+        doNothing().when(themeServiceStartupHelper).createDefaultMobileTheme();
+        doNothing().when(themeServiceStartupHelper).createDefaultPortalTheme();
 
-        startupHelper.createDefaultThemes();
+        themeServiceStartupHelper.createOrUpdateDefaultMobileTheme();
 
-        verify(startupHelper, times(0)).createDefaultMobileTheme();
+        verify(themeServiceStartupHelper, times(1)).createDefaultMobileTheme();
     }
 
     @Test
-    public final void createDefaultThemes_should_call_createDefaultPortalTheme_when_default_portal_theme_does_not_exist() throws SThemeNotFoundException,
-            SThemeReadException, SThemeCreationException, IOException {
-        final ThemeService themeService = getMockThemeService(true, false);
+    public final void createOrUpdateDefaultMobileTheme_should_not_call_createDefaultMobileTheme_when_default_mobile_theme_exists() throws Exception {
+        hasDefaultTheme(SThemeType.MOBILE);
+        hasDefaultTheme(SThemeType.PORTAL);
 
-        final ThemeServiceStartupHelper startupHelper = spy(new ThemeServiceStartupHelper(themeService));
-        doNothing().when(startupHelper).createDefaultMobileTheme();
-        doNothing().when(startupHelper).createDefaultPortalTheme();
+        doNothing().when(themeServiceStartupHelper).createDefaultMobileTheme();
+        doNothing().when(themeServiceStartupHelper).createDefaultPortalTheme();
 
-        startupHelper.createDefaultThemes();
+        themeServiceStartupHelper.createOrUpdateDefaultMobileTheme();
 
-        verify(startupHelper, times(1)).createDefaultPortalTheme();
+        verify(themeServiceStartupHelper, times(0)).createDefaultMobileTheme();
     }
 
     @Test
-    public final void createDefaultThemes_should_not_call_createDefaultPortalTheme_when_default_portal_theme_exists() throws SThemeNotFoundException,
-            SThemeReadException, SThemeCreationException, IOException {
-        final ThemeService themeService = getMockThemeService(true, true);
+    public final void createDefaultPortalTheme_should_call_createDefaultPortalTheme_when_default_portal_theme_does_not_exist() throws Exception {
+        hasDefaultTheme(SThemeType.MOBILE);
+        hasNotDefaultTheme(SThemeType.PORTAL);
 
-        final ThemeServiceStartupHelper startupHelper = spy(new ThemeServiceStartupHelper(themeService));
-        doNothing().when(startupHelper).createDefaultMobileTheme();
-        doNothing().when(startupHelper).createDefaultPortalTheme();
+        doNothing().when(themeServiceStartupHelper).createDefaultMobileTheme();
+        doNothing().when(themeServiceStartupHelper).createDefaultPortalTheme();
 
-        startupHelper.createDefaultThemes();
+        themeServiceStartupHelper.createOrUpdateDefaultPortalTheme();
 
-        verify(startupHelper, times(0)).createDefaultMobileTheme();
+        verify(themeServiceStartupHelper, times(1)).createDefaultPortalTheme();
     }
 
     @Test
-    public final void createDefaultMobileTheme_should_create_theme_when_zip_in_classpath() throws SThemeCreationException,
-            IOException, SThemeReadException, SThemeNotFoundException {
-        final ThemeService themeService = mock(ThemeService.class);
-        final ThemeServiceStartupHelper startupHelper = spy(new ThemeServiceStartupHelper(themeService));
+    public final void createDefaultPortalTheme_should_not_call_createDefaultPortalTheme_when_default_portal_theme_exists() throws Exception {
+        hasDefaultTheme(SThemeType.MOBILE);
+        hasDefaultTheme(SThemeType.PORTAL);
+
+        doNothing().when(themeServiceStartupHelper).createDefaultMobileTheme();
+        doNothing().when(themeServiceStartupHelper).createDefaultPortalTheme();
+
+        themeServiceStartupHelper.createOrUpdateDefaultPortalTheme();
+
+        verify(themeServiceStartupHelper, times(0)).createDefaultMobileTheme();
+    }
+
+    @Test
+    public final void createDefaultMobileTheme_should_create_theme_when_zip_in_classpath() throws Exception {
+        doReturn(new byte[] {1}).when(themeServiceStartupHelper).getFileContent(ThemeServiceStartupHelper.BONITA_MOBILE_THEME_DEFAULT + ".zip");
         final STheme sTheme = mock(STheme.class);
-        doReturn(sTheme).when(startupHelper).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
+        doReturn(sTheme).when(themeServiceStartupHelper).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
 
-        startupHelper.createDefaultMobileTheme();
+        themeServiceStartupHelper.createDefaultMobileTheme();
 
         verify(themeService, times(1)).createTheme(sTheme);
     }
 
     @Test
-    public final void createDefaultMobileTheme_should_not_create_theme_when_zip_not_in_classpath() throws SThemeCreationException, IOException {
-        final ThemeService themeService = mock(ThemeService.class);
-        final ThemeServiceStartupHelper startupHelper = spy(new ThemeServiceStartupHelper(themeService, "not_used_in_this_test", "not_in_classpath"));
+    public final void createDefaultMobileTheme_should_not_create_theme_when_zip_not_in_classpath() throws Exception {
+        doReturn(null).when(themeServiceStartupHelper).getFileContent(ThemeServiceStartupHelper.BONITA_MOBILE_THEME_DEFAULT + ".zip");
 
-        startupHelper.createDefaultMobileTheme();
-
-        verify(themeService, times(0)).createTheme(any(STheme.class));
-    }
-
-    @Test
-    public final void createDefaultMobileTheme_should_not_create_theme_when_empty_zip_in_classpath() throws SThemeCreationException, IOException {
-        final ThemeService themeService = mock(ThemeService.class);
-        final ThemeServiceStartupHelper startupHelper = spy(new ThemeServiceStartupHelper(themeService, "not_used_in_this_test", "empty-theme"));
-
-        startupHelper.createDefaultMobileTheme();
+        themeServiceStartupHelper.createDefaultMobileTheme();
 
         verify(themeService, times(0)).createTheme(any(STheme.class));
     }
 
     @Test
-    public final void createDefaultPortalTheme_should_create_theme_when_zip_in_classpath() throws SThemeCreationException,
-            IOException, SThemeReadException, SThemeNotFoundException {
-        final ThemeService themeService = mock(ThemeService.class);
-        final ThemeServiceStartupHelper startupHelper = spy(new ThemeServiceStartupHelper(themeService));
+    public final void createDefaultMobileTheme_should_not_create_theme_when_empty_zip_in_classpath() throws Exception {
+        doReturn(new byte[] {}).when(themeServiceStartupHelper).getFileContent(ThemeServiceStartupHelper.BONITA_MOBILE_THEME_DEFAULT + ".zip");
+
+        themeServiceStartupHelper.createDefaultMobileTheme();
+
+        verify(themeService, times(0)).createTheme(any(STheme.class));
+    }
+
+    @Test
+    public final void createDefaultPortalTheme_should_create_theme_when_zip_in_classpath() throws Exception {
+        doReturn(new byte[] {1}).when(themeServiceStartupHelper).getFileContent(ThemeServiceStartupHelper.BONITA_PORTAL_THEME_DEFAULT + ".zip");
         final STheme sTheme = mock(STheme.class);
-        doReturn(sTheme).when(startupHelper).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
+        doReturn(sTheme).when(themeServiceStartupHelper).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
 
-        startupHelper.createDefaultPortalTheme();
+        themeServiceStartupHelper.createDefaultPortalTheme();
 
         verify(themeService, times(1)).createTheme(sTheme);
     }
 
     @Test
-    public final void createDefaultPortalTheme_should_not_create_theme_when_zip_not_in_classpath() throws SThemeCreationException, IOException {
-        final ThemeService themeService = mock(ThemeService.class);
-        final ThemeServiceStartupHelper startupHelper = spy(new ThemeServiceStartupHelper(themeService, "not_in_classpath", "not_used_in_this_test"));
+    public final void createDefaultPortalTheme_should_not_create_theme_when_zip_not_in_classpath() throws Exception {
+        doReturn(null).when(themeServiceStartupHelper).getFileContent(ThemeServiceStartupHelper.BONITA_PORTAL_THEME_DEFAULT + ".zip");
 
-        startupHelper.createDefaultPortalTheme();
+
+        themeServiceStartupHelper.createDefaultPortalTheme();
 
         verify(themeService, times(0)).createTheme(any(STheme.class));
     }
 
     @Test
-    public final void createDefaultPortalTheme_should_not_create_theme_when_empty_zip_in_classpath() throws SThemeCreationException, IOException {
-        final ThemeService themeService = mock(ThemeService.class);
-        final ThemeServiceStartupHelper startupHelper = spy(new ThemeServiceStartupHelper(themeService, "empty-theme", "not_used_in_this_test"));
+    public final void createDefaultPortalTheme_should_not_create_theme_when_empty_zip_in_classpath() throws Exception {
+        doReturn(new byte[] {}).when(themeServiceStartupHelper).getFileContent(ThemeServiceStartupHelper.BONITA_PORTAL_THEME_DEFAULT + ".zip");
 
-        startupHelper.createDefaultPortalTheme();
+
+        themeServiceStartupHelper.createDefaultPortalTheme();
 
         verify(themeService, times(0)).createTheme(any(STheme.class));
     }
 
     @Test
     public void getFileContent_should_return_null_when_file_not_in_classpath() throws IOException {
-        final ThemeService themeService = mock(ThemeService.class);
         final ThemeServiceStartupHelper startupHelper = new ThemeServiceStartupHelper(themeService);
 
         assertNull(startupHelper.getFileContent("filename_not_in_classpath.txt"));
@@ -173,7 +186,6 @@ public class ThemeServiceStartupHelperTest {
 
     @Test
     public void getFileContent_should_return_content_when_file_in_classpath() throws IOException {
-        final ThemeService themeService = mock(ThemeService.class);
         final ThemeServiceStartupHelper startupHelper = new ThemeServiceStartupHelper(themeService);
 
         final byte[] fileContent = startupHelper.getFileContent("filename_in_classpath.txt");
@@ -181,29 +193,11 @@ public class ThemeServiceStartupHelperTest {
         assertNotEquals(0, fileContent.length);
     }
 
-    /**
-     * Returns a mock of the theme service
-     * 
-     * @param hasDefaultMobileTheme whether attempts to retrieve the default mobile theme will return something (null) or throw SThemeNotFoundException
-     * @param hasDefaultPortalTheme whether attempts to retrieve the default portal theme will return something (null) or throw SThemeNotFoundException
-     * @return theme service mock
-     * @throws SThemeReadException
-     * @throws SThemeNotFoundException
-     */
-    private ThemeService getMockThemeService(final boolean hasDefaultMobileTheme, final boolean hasDefaultPortalTheme) throws SThemeNotFoundException,
-            SThemeReadException {
-        final ThemeService themeService = mock(ThemeService.class);
+    private void hasNotDefaultTheme(SThemeType portal) throws SThemeNotFoundException, SThemeReadException {
+        doThrow(SThemeNotFoundException.class).when(themeService).getTheme(portal, true);
+    }
 
-        if (hasDefaultMobileTheme)
-            doReturn(null).when(themeService).getTheme(SThemeType.MOBILE, true);
-        else
-            doThrow(SThemeNotFoundException.class).when(themeService).getTheme(SThemeType.MOBILE, true);
-
-        if (hasDefaultPortalTheme)
-            doReturn(null).when(themeService).getTheme(SThemeType.PORTAL, true);
-        else
-            doThrow(SThemeNotFoundException.class).when(themeService).getTheme(SThemeType.PORTAL, true);
-
-        return themeService;
+    private void hasDefaultTheme(SThemeType mobile) throws SThemeNotFoundException, SThemeReadException {
+        doReturn(null).when(themeService).getTheme(mobile, true);
     }
 }
