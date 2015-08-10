@@ -44,7 +44,7 @@ public class ThemeServiceStartupHelper {
     private final String portalDefaultThemeFilename;
 
     private final String mobileDefaultThemeFilename;
-    
+
     private final ThemeService themeService;
 
     public ThemeServiceStartupHelper(final ThemeService themeService) {
@@ -85,27 +85,28 @@ public class ThemeServiceStartupHelper {
 
     /**
      * Create the default Portal and Mobile themes if they do not already exist else do nothing
+     * 
      * @throws IOException
      * @throws SThemeCreationException
-     * @throws SThemeReadException 
+     * @throws SThemeReadException
      */
     public void createDefaultThemes() throws IOException, SThemeCreationException, SThemeReadException {
-    	// Create default Mobile theme if it does not exist
-    	try {
- 			themeService.getTheme(SThemeType.MOBILE, true);
- 		} catch (SThemeNotFoundException e) {
- 			createDefaultMobileTheme();
- 		}
+        // Create default Mobile theme if it does not exist
+        try {
+            themeService.getTheme(SThemeType.MOBILE, true);
+        } catch (SThemeNotFoundException e) {
+            createDefaultMobileTheme();
+        }
         // Create default Portal theme if it does not exist
         try {
-			themeService.getTheme(SThemeType.PORTAL, true);
-		} catch (SThemeNotFoundException e) {
-			createDefaultPortalTheme();
-		}
+            themeService.getTheme(SThemeType.PORTAL, true);
+        } catch (SThemeNotFoundException e) {
+            createDefaultPortalTheme();
+        }
     }
 
     void createDefaultPortalTheme() throws IOException, SThemeCreationException {
-    	final byte[] defaultThemeZip = getFileContent(portalDefaultThemeFilename + ZIP);
+        final byte[] defaultThemeZip = getFileContent(portalDefaultThemeFilename + ZIP);
         File unzippedCssPortalThemeFolder = unzipDefaultPortalThemeCss();
         if (unzippedCssPortalThemeFolder != null) {
             if (defaultThemeZip != null && defaultThemeZip.length > 0) {
@@ -138,13 +139,13 @@ public class ThemeServiceStartupHelper {
 
     byte[] getFileContent(final String fileName) throws IOException {
         try (final InputStream inputStream = getResourceAsStream(fileName)) {
-        	if (inputStream == null) {
+            if (inputStream == null) {
                 // no file
                 return null;
             }
-        	else {
-        		return IOUtil.getAllContentFrom(inputStream);	
-        	}
+            else {
+                return IOUtil.getAllContentFrom(inputStream);
+            }
         }
     }
 
