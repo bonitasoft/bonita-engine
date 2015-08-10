@@ -43,14 +43,13 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private final TransactionServiceContextThreadLocal txContextThreadLocal;
 
-	/**
+    /**
      * We maintain a list of Callables that must be executed just before the real commit (and before the beforeCompletion method is called), so that we ensure
      * that Hibernate has not already flushed its session.
      */
     private final ThreadLocal<List<Callable<Void>>> beforeCommitCallables = new ThreadLocal<>();
-   
 
-    private ThreadLocal<String> txLastBegin = new ThreadLocal<>();
+    private final ThreadLocal<String> txLastBegin = new ThreadLocal<>();
 
     public JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager) {
         this.logger = logger;
@@ -61,32 +60,34 @@ public class JTATransactionServiceImpl implements TransactionService {
         txContextThreadLocal = new TransactionServiceContextThreadLocal(txManager);
     }
 
+    public static TransactionState convert(int status) {
+        switch (status) {
+            case Status.STATUS_ACTIVE:
+                return TransactionState.ACTIVE;
+            case Status.STATUS_COMMITTED:
+                return TransactionState.COMMITTED;
+            case Status.STATUS_MARKED_ROLLBACK:
+                return TransactionState.ROLLBACKONLY;
+            case Status.STATUS_ROLLEDBACK:
+                return TransactionState.ROLLEDBACK;
+            case Status.STATUS_NO_TRANSACTION:
+                return TransactionState.NO_TRANSACTION;
+            default:
+                throw new IllegalStateException("Can't map the JTA status : " + status);
+        }
+    }
+
     @Override
     public void begin() throws STransactionCreationException {
+        final TransactionServiceContext txContext = txContextThreadLocal.get();
         try {
-            final TransactionServiceContext txContext = txContextThreadLocal.get();
-            if (txContext.isTransactionActiveOnThread()) {
-                TransactionState txState = null;
-                try {
-                    txState = getState();
-                } catch (STransactionException e) {
-                    e.printStackTrace();
-                }
-                String message = "We do not support nested calls to the transaction service. Current state is: " + txState + ". ";
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
-                    message += "Last begin made by: " + txLastBegin.get();
-                }
-                throw new STransactionCreationException(message);
-            }
+            checkForNestedTransaction(txContext);
+
             txContext.setTransactionActiveOnThread();
-
-            if (!txContext.isExternallyManaged()) {
-                beforeCommitCallables.remove();
-                createTransaction(false);
-            }
-
-            // Either we initiated the transaction or it has already been initiated outside of the service :
-            // in both cases, register a synchronization to clean the ThreadLocal variables.
+            //always clear before commit callables on begin
+            beforeCommitCallables.remove();
+            createTransaction(txContext, false);
+            // Always Register a synchronization to clean the ThreadLocal variables.
             final Transaction tx = txManager.getTransaction();
 
             // Ensure the transaction is created and not set to rollback.
@@ -94,18 +95,34 @@ public class JTATransactionServiceImpl implements TransactionService {
                 registerSynchronization(tx);
             }
         } catch (final SystemException e) {
-            resetTxCounter(txContextThreadLocal.get());
+            resetTxCounter(txContext);
             throw new STransactionCreationException(e);
         } catch (final STransactionCreationException e) {
-            resetTxCounter(txContextThreadLocal.get());
+            resetTxCounter(txContext);
             throw e;
+        }
+    }
+
+    void checkForNestedTransaction(TransactionServiceContext txContext) throws STransactionCreationException {
+        if (txContext.isTransactionActiveOnThread()) {
+            TransactionState txState = null;
+            try {
+                txState = getState();
+            } catch (STransactionException e) {
+                e.printStackTrace();
+            }
+            String message = "We do not support nested calls to the transaction service. Current state is: " + txState + ". ";
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
+                message += "Last begin made by: " + txLastBegin.get();
+            }
+            throw new STransactionCreationException(message);
         }
     }
 
     private void registerSynchronization(final Transaction tx) throws SystemException, STransactionCreationException {
         try {
             // Avoid a memory-leak by cleaning the ThreadLocal after the transaction's completion
-            tx.registerSynchronization(new ResetCounterSynchronization(this));
+            tx.registerSynchronization(new ResetContextSynchronization(this));
 
             // Then the monitoring of numberOfActiveTransactions is up-to-date.
             tx.registerSynchronization(new DecrementNumberOfActiveTransactionsSynchronization(this));
@@ -114,27 +131,21 @@ public class JTATransactionServiceImpl implements TransactionService {
         }
     }
 
-    void createTransaction(boolean transactionStarted) throws STransactionCreationException, SystemException {
+    void createTransaction(TransactionServiceContext txContext, boolean transactionStarted) throws STransactionCreationException, SystemException {
+        if (txContext.isExternallyManaged()) {
+            //do not create the transaction if it's opened by an other system
+            return;
+        }
         try {
             txManager.begin();
             transactionStarted = true;
-
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
-                final Transaction tx = txManager.getTransaction();
-                logger.log(getClass(), TechnicalLogSeverity.TRACE, "Beginning transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
+                logger.log(getClass(), TechnicalLogSeverity.TRACE,
+                        "Beginning transaction in thread " + Thread.currentThread().getId() + " " + txManager.getTransaction());
             }
-
             numberOfActiveTransactions.getAndIncrement();
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(this.getClass().getName() + " new transaction started by: ");
-                sb.append("\n");
-                final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-                for (final StackTraceElement stackTraceElement : stackTraceElements) {
-                    sb.append("\n        at ");
-                    sb.append(stackTraceElement);
-                }
-                txLastBegin.set(sb.toString());
+                txLastBegin.set(generateCurrentStack());
             }
         } catch (final NotSupportedException e) {
             // Should never happen as we do not want to support nested transaction
@@ -145,6 +156,18 @@ public class JTATransactionServiceImpl implements TransactionService {
             }
             throw new STransactionCreationException(t);
         }
+    }
+
+    private String generateCurrentStack() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getClass().getName()).append(" new transaction started by: ");
+        sb.append("\n");
+        final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        for (final StackTraceElement stackTraceElement : stackTraceElements) {
+            sb.append("\n        at ");
+            sb.append(stackTraceElement);
+        }
+        return sb.toString();
     }
 
     @Override
@@ -177,10 +200,7 @@ public class JTATransactionServiceImpl implements TransactionService {
         } catch (final SystemException e) {
             resetTxCounter(txContextThreadLocal.get());
             throw new STransactionCommitException(e);
-        } catch (final STransactionCommitException e) {
-            resetTxCounter(txContextThreadLocal.get());
-            throw e;
-        } catch (final STransactionRollbackException e) {
+        } catch (final STransactionCommitException | STransactionRollbackException e) {
             resetTxCounter(txContextThreadLocal.get());
             throw e;
         }
@@ -223,24 +243,8 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionState getState() throws STransactionException {
-        // TODO Factorize this with the TransactionWrapper.convert
         try {
-            final int status = txManager.getStatus();
-
-            switch (status) {
-                case Status.STATUS_ACTIVE:
-                    return TransactionState.ACTIVE;
-                case Status.STATUS_COMMITTED:
-                    return TransactionState.COMMITTED;
-                case Status.STATUS_MARKED_ROLLBACK:
-                    return TransactionState.ROLLBACKONLY;
-                case Status.STATUS_ROLLEDBACK:
-                    return TransactionState.ROLLEDBACK;
-                case Status.STATUS_NO_TRANSACTION:
-                    return TransactionState.NO_TRANSACTION;
-                default:
-                    throw new STransactionException("Can't map the JTA status : " + status);
-            }
+            return convert(txManager.getStatus());
         } catch (final SystemException e) {
             throw new STransactionException(e);
         }
@@ -311,21 +315,22 @@ public class JTATransactionServiceImpl implements TransactionService {
         try {
             return callable.call();
         } catch (final Exception e) {
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Setting rollbackOnly on current transaction because callable '" + callable
-                        + "' has thrown an exception: " + e.getMessage(), e);
-            }
+            log(callable, e);
             setRollbackOnly();
             throw e;
         } catch (final Throwable t) {
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Setting rollbackOnly on current transaction because callable '" + callable
-                        + "' has thrown an exception: " + t.getMessage(), t);
-            }
+            log(callable, t);
             setRollbackOnly();
             throw new SBonitaRuntimeException(t);
         } finally {
             complete();
+        }
+    }
+
+    private <T> void log(Callable<T> callable, Throwable e) {
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Setting rollbackOnly on current transaction because callable '" + callable
+                    + "' has thrown an exception: " + e.getMessage(), e);
         }
     }
 
@@ -334,11 +339,11 @@ public class JTATransactionServiceImpl implements TransactionService {
         return numberOfActiveTransactions.get();
     }
 
-    private static class ResetCounterSynchronization implements Synchronization {
+    private static class ResetContextSynchronization implements Synchronization {
 
         private final JTATransactionServiceImpl txService;
 
-        public ResetCounterSynchronization(final JTATransactionServiceImpl txService) {
+        public ResetContextSynchronization(final JTATransactionServiceImpl txService) {
             this.txService = txService;
         }
 

@@ -22,12 +22,12 @@ public class SRetryableException extends SBonitaRuntimeException {
 
     private static final long serialVersionUID = -2007050544702839857L;
 
-    public SRetryableException(final Throwable cause) {
+    public SRetryableException(final Exception cause) {
         super(cause);
     }
 
-    public SRetryableException(final String message, final Throwable cause) {
-        super(message, cause);
+    @Override
+    public synchronized Exception getCause() {
+        return (Exception) super.getCause();
     }
-
 }

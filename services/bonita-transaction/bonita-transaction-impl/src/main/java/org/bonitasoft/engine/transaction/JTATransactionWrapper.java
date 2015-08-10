@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 public class JTATransactionWrapper implements Synchronization {
@@ -31,18 +30,7 @@ public class JTATransactionWrapper implements Synchronization {
 
     @Override
     public void afterCompletion(final int status) {
-        bonitaTx.afterCompletion(convert(status));
-    }
-
-    private TransactionState convert(final int status) {
-        switch (status) {
-            case Status.STATUS_COMMITTED:
-                return TransactionState.COMMITTED;
-            case Status.STATUS_ROLLEDBACK:
-                return TransactionState.ROLLEDBACK;
-            default:
-                throw new IllegalStateException();
-        }
+        bonitaTx.afterCompletion(JTATransactionServiceImpl.convert(status));
     }
 
 }

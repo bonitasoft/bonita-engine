@@ -121,16 +121,10 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             final Session session = getSession(true);
             final Object pe = session.get(mappedClass, new PersistentObjectId(entity.getId(), getTenantId()));
             session.delete(pe);
-        } catch (final STenantIdNotSetException e) {
+        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
+            throw new SRetryableException(e);
+        } catch (final STenantIdNotSetException | HibernateException e) {
             throw new SPersistenceException(e);
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException he) {
-            throw new SPersistenceException(he);
         }
     }
 
@@ -161,18 +155,12 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             Class<? extends PersistentObject> mappedClass = null;
             mappedClass = getMappedClass(selectDescriptor.getEntityType());
             return (T) session.get(mappedClass, id);
-        } catch (final SPersistenceException e) {
-            throw new SBonitaReadException(e);
         } catch (final STenantIdNotSetException e) {
             return super.selectById(session, selectDescriptor);
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException he) {
-            throw new SBonitaReadException(he);
+        } catch (final AssertionFailure | LockAcquisitionException | StaleStateException e) {
+            throw new SRetryableException(e);
+        } catch (final SPersistenceException | HibernateException e) {
+            throw new SBonitaReadException(e);
         }
     }
 
