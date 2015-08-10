@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.bonitasoft.engine.util</groupId>
 		<artifactId>bonita-util</artifactId>
-        <version>7.0.2-SNAPSHOT</version>
+        <version>7.0.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-common-util</artifactId>

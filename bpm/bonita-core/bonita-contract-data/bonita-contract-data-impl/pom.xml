@@ -4,7 +4,7 @@
     <parent>
         <artifactId>bonita-contract-data</artifactId>
         <groupId>org.bonitasoft.engine.core.contract.data</groupId>
-        <version>7.0.2-SNAPSHOT</version>
+        <version>7.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-contract-data-impl</artifactId>
