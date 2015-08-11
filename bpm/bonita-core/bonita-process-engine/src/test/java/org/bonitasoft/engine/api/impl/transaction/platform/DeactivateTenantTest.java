@@ -14,6 +14,7 @@
 
 package org.bonitasoft.engine.api.impl.transaction.platform;
 
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.platform.PlatformService;
@@ -48,6 +49,8 @@ public class DeactivateTenantTest {
 
     @Test
     public void should_pause_jobs_of_the_tenant() throws Exception {
+        doReturn(true).when(schedulerService).isStarted();
+
         deactivateTenant.execute();
 
         verify(schedulerService).pauseJobs(tenantId);
