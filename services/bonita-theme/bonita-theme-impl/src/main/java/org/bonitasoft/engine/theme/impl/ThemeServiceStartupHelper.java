@@ -13,19 +13,20 @@
  **/
 package org.bonitasoft.engine.theme.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.theme.builder.SThemeBuilder;
 import org.bonitasoft.engine.theme.builder.SThemeBuilderFactory;
+import org.bonitasoft.engine.theme.builder.SThemeUpdateBuilder;
+import org.bonitasoft.engine.theme.builder.SThemeUpdateBuilderFactory;
 import org.bonitasoft.engine.theme.exception.SThemeCreationException;
 import org.bonitasoft.engine.theme.exception.SThemeNotFoundException;
 import org.bonitasoft.engine.theme.exception.SThemeReadException;
+import org.bonitasoft.engine.theme.exception.SThemeUpdateException;
 import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
 
@@ -47,31 +48,6 @@ public class ThemeServiceStartupHelper {
         this.themeService = themeService;
     }
 
-    private File unzipDefaultPortalThemeCss() {
-        InputStream defaultThemeCssZip = null;
-        File unzippedCssPortalThemeFolder;
-        try {
-            defaultThemeCssZip = getResourceAsStream(BONITA_PORTAL_THEME_DEFAULT + "-css" + ZIP);
-            if (defaultThemeCssZip != null) {
-                unzippedCssPortalThemeFolder = IOUtil.createTempDirectoryInDefaultTempDirectory(BONITA_PORTAL_THEME_DEFAULT + "-css");
-                IOUtil.unzipToFolder(defaultThemeCssZip, unzippedCssPortalThemeFolder);
-            } else {
-                unzippedCssPortalThemeFolder = null;
-            }
-        } catch (final IOException e) {
-            unzippedCssPortalThemeFolder = null;
-        } finally {
-            if (defaultThemeCssZip != null) {
-                try {
-                    defaultThemeCssZip.close();
-                } catch (final IOException e) {
-                    throw new SBonitaRuntimeException(e);
-                }
-            }
-        }
-        return unzippedCssPortalThemeFolder;
-    }
-
     /**
      * Create the default Portal and Mobile themes if they do not already exist else do nothing
      * 
@@ -79,70 +55,59 @@ public class ThemeServiceStartupHelper {
      * @throws SThemeCreationException
      * @throws SThemeReadException
      */
-    public void createDefaultThemes() throws IOException, SThemeCreationException, SThemeReadException {
-        createOrUpdateDefaultMobileTheme();
-        createOrUpdateDefaultPortalTheme();
+    public void createOrUpdateDefaultThemes() throws IOException, SThemeCreationException, SThemeReadException, SThemeUpdateException {
+        createOrUpdateDefaultTheme(SThemeType.MOBILE, BONITA_MOBILE_THEME_DEFAULT);
+        createOrUpdateDefaultTheme(SThemeType.PORTAL, BONITA_PORTAL_THEME_DEFAULT);
     }
 
-    void createOrUpdateDefaultPortalTheme() throws SThemeReadException, IOException, SThemeCreationException {
-        // Create default Portal theme if it does not exist
+    void createOrUpdateDefaultTheme(SThemeType portal, String themeDefault) throws IOException, SThemeReadException, SThemeUpdateException,
+            SThemeCreationException {
+        final byte[] defaultThemeZip = getFileContent(themeDefault + ZIP);
         try {
-            themeService.getTheme(SThemeType.PORTAL, true);
-        } catch (SThemeNotFoundException e) {
-            createDefaultPortalTheme();
-        }
-    }
-
-    void createOrUpdateDefaultMobileTheme() throws SThemeReadException, IOException, SThemeCreationException {
-        // Create default Mobile theme if it does not exist
-        try {
-            themeService.getTheme(SThemeType.MOBILE, true);
-        } catch (SThemeNotFoundException e) {
-            createDefaultMobileTheme();
-        }
-    }
-
-    void createDefaultPortalTheme() throws IOException, SThemeCreationException {
-        final byte[] defaultThemeZip = getFileContent(BONITA_PORTAL_THEME_DEFAULT + ZIP);
-        File unzippedCssPortalThemeFolder = unzipDefaultPortalThemeCss();
-        if (unzippedCssPortalThemeFolder != null) {
-            if (defaultThemeZip != null && defaultThemeZip.length > 0) {
-                final byte[] defaultThemeCss = IOUtil.getAllContentFrom(new File(unzippedCssPortalThemeFolder, "bonita.css"));
-                if (defaultThemeCss != null) {
-                    final STheme sTheme = buildSTheme(defaultThemeZip, defaultThemeCss, SThemeType.PORTAL);
-                    themeService.createTheme(sTheme);
-                }
+            final STheme theme = themeService.getTheme(portal, true);
+            if (defaultThemeZip.length != theme.getContent().length) {
+                updateDefaultTheme(theme, defaultThemeZip, portal);
             }
-            IOUtil.deleteDir(unzippedCssPortalThemeFolder);
+        } catch (SThemeNotFoundException e) {
+            createDefaultTheme(defaultThemeZip, portal);
         }
     }
 
-    void createDefaultMobileTheme() throws IOException, SThemeCreationException {
-        final byte[] defaultThemeZip = getFileContent(BONITA_MOBILE_THEME_DEFAULT + ZIP);
+    void createDefaultTheme(byte[] defaultThemeZip, SThemeType type) throws IOException, SThemeCreationException {
         if (defaultThemeZip != null && defaultThemeZip.length > 0) {
-            final STheme sTheme = buildSTheme(defaultThemeZip, null, SThemeType.MOBILE);
+            final STheme sTheme = buildSTheme(defaultThemeZip, getCssContent(type), type);
             themeService.createTheme(sTheme);
         }
+    }
+
+    void updateDefaultTheme(STheme theme, byte[] defaultThemeZip, SThemeType mobile) throws IOException, SThemeUpdateException {
+        final SThemeUpdateBuilder updateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class).createNewInstance();
+        updateBuilder.setContent(defaultThemeZip);
+        updateBuilder.setCSSContent(getCssContent(mobile));
+        updateBuilder.setLastUpdateDate(System.currentTimeMillis());
+        themeService.updateTheme(theme, updateBuilder.done());
+    }
+
+    byte[] getCssContent(SThemeType type) throws IOException {
+        if (type.equals(SThemeType.PORTAL)) {
+            return IOUtil.getZipEntryContent("bonita.css", getFileContent(BONITA_PORTAL_THEME_DEFAULT + "-css" + ZIP));
+        }
+        return null;
     }
 
     STheme buildSTheme(final byte[] defaultThemeZip, final byte[] defaultThemeCss, final SThemeType type) {
         final long lastUpdateDate = System.currentTimeMillis();
         final SThemeBuilder sThemeBuilder = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(defaultThemeZip, true, type, lastUpdateDate);
-        if (SThemeType.PORTAL.equals(type)) {
-            sThemeBuilder.setCSSContent(defaultThemeCss);
-        }
+        sThemeBuilder.setCSSContent(defaultThemeCss);
         return sThemeBuilder.done();
     }
 
     byte[] getFileContent(final String fileName) throws IOException {
         try (final InputStream inputStream = getResourceAsStream(fileName)) {
             if (inputStream == null) {
-                // no file
                 return null;
             }
-            else {
-                return IOUtil.getAllContentFrom(inputStream);
-            }
+            return IOUtil.getAllContentFrom(inputStream);
         }
     }
 

@@ -301,7 +301,7 @@ public class ThemeServiceImpl implements ThemeService {
 	@Override
 	public void start() throws SBonitaException {
 		try {
-			new ThemeServiceStartupHelper(this).createDefaultThemes();
+			new ThemeServiceStartupHelper(this).createOrUpdateDefaultThemes();
 		} catch (IOException e) {
 			throw new SBonitaRuntimeException("Failed to start theme service due to: "+ e.getMessage(), e);
 		}
