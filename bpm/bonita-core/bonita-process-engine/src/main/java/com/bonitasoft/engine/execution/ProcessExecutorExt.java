@@ -75,6 +75,7 @@ import org.bonitasoft.engine.work.WorkService;
 public class ProcessExecutorExt extends ProcessExecutorImpl {
 
     private final SynchronizationPlatformInfoManager platformInformationManager;
+    private final PlatformVerifier platformVerifier;
 
     public ProcessExecutorExt(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
             final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
@@ -86,12 +87,13 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
             final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
             final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService, TransitionEvaluator transitionEvaluator,
-            final ContractDataService contractDataService, SynchronizationPlatformInfoManager platformInformationManager) {
+            final ContractDataService contractDataService, SynchronizationPlatformInfoManager platformInformationManager, PlatformVerifier platformVerifier) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
                 eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
                 expressionResolverService, expressionService, eventService, handlers, documentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
                 eventsHandler, flowNodeStateManager, businessDataRepository, refBusinessDataService, transitionEvaluator, contractDataService);
         this.platformInformationManager = platformInformationManager;
+        this.platformVerifier = platformVerifier;
     }
 
     protected void initializeData(final SProcessDefinition sDefinition, final SProcessInstance sInstance) throws SProcessInstanceCreationException {
@@ -142,9 +144,20 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
     //REFACTOR-ME: too many parameters
     @Override
     public SProcessInstance start(final long starterId, final long starterSubstituteId, final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectors, final long callerId, final FlowNodeSelector selector, final Map<String, Serializable> processInputs) throws SProcessInstanceCreationException, SContractViolationException {
+        verifyPlatformInfo(callerId);
         SProcessInstance instance = startSuper(starterId, starterSubstituteId, expressionContext, operations, context, connectors, callerId, selector, processInputs);
         updatePlatformInfo(instance);
         return instance;
+    }
+
+    private void verifyPlatformInfo(final long callerId) throws SProcessInstanceCreationException {
+        if(callerId <= 0) {
+            try {
+                platformVerifier.check();
+            } catch (SPlatformNotFoundException e) {
+                throw new SProcessInstanceCreationException(e);
+            }
+        }
     }
 
     private void updatePlatformInfo(final SProcessInstance instance) throws SProcessInstanceCreationException {
