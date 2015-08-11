@@ -29,7 +29,6 @@ public class PlatformInfoUpdateScheduledExecutor implements PlatformLifecycleSer
 
     public PlatformInfoUpdateScheduledExecutor(TransactionalPlatformInformationUpdater transactionalPlatformInformationUpdater) {
         this.transactionalPlatformInformationUpdater = transactionalPlatformInformationUpdater;
-        this.scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
         this.period = PERIOD;
     }
 
@@ -37,7 +36,10 @@ public class PlatformInfoUpdateScheduledExecutor implements PlatformLifecycleSer
         return period;
     }
 
-    public ScheduledExecutorService getScheduledExecutor() {
+    protected ScheduledExecutorService getScheduledExecutor() {
+        if(scheduledExecutor == null) {
+            scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+        }
         return scheduledExecutor;
     }
 
@@ -49,6 +51,7 @@ public class PlatformInfoUpdateScheduledExecutor implements PlatformLifecycleSer
     @Override
     public void stop() throws SBonitaException {
         getScheduledExecutor().shutdown();
+        scheduledExecutor = null;
     }
 
     @Override
