@@ -511,26 +511,42 @@ public class DocumentIT extends TestWithUser {
     @Test
     public void searchDocuments() throws Exception {
         // add a new document, search it.
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessDoc", "12000");
         builder.addActor("actor").addUserTask("step1", "actor");
         builder.addDocumentDefinition("Doc1").addDescription("This is a description").addContentFileName("doc.jpg").addMimeType("image").addFile("doc.jpg");
+        builder.addDocumentDefinition("Doc2").addDescription("This is a description2").addContentFileName("doc2.jpg").addMimeType("image").addFile("doc2.jpg");
+
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(builder.done())
-                .addDocumentResource(new BarResource("doc.jpg", "Hello World".getBytes()));
+                .addDocumentResource(new BarResource("doc.jpg", "Hello World".getBytes()))
+                .addDocumentResource(new BarResource("doc2.jpg", "Hello World2".getBytes()));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), "actor", user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        final long step1 = waitForUserTask("step1");
         searchOptionsBuilder.filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
         searchOptionsBuilder.sort(DocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC);
-        final SearchResult<Document> documentSearch = getProcessAPI().searchDocuments(searchOptionsBuilder.done());
-        assertEquals(1, documentSearch.getCount());
+        SearchResult<Document> documentSearch = getProcessAPI().searchDocuments(searchOptionsBuilder.done());
+        assertThat(documentSearch.getCount()).isEqualTo(2);
+        assertThat(documentSearch.getResult()).extracting("contentFileName", "processInstanceId", "author").containsExactly(
+                tuple("doc.jpg", processInstance.getId(), user.getId()), tuple("doc2.jpg", processInstance.getId(), user.getId()));
         final Document document = documentSearch.getResult().get(0);
-        assertEquals(processInstance.getId(), document.getProcessInstanceId());
-        assertEquals(user.getId(), document.getAuthor());
-
         assertThat(getProcessAPI().searchDocuments(new SearchOptionsBuilder(0, 45).searchTerm("Doc").done()).getResult().get(0).getId()).isEqualTo(
                 document.getId());
         assertThat(getProcessAPI().searchDocuments(new SearchOptionsBuilder(0, 45).searchTerm("This is").done()).getResult().get(0).getId()).isEqualTo(
                 document.getId());
+        getProcessAPI().assignUserTask(step1, user.getId());
+        getProcessAPI().executeUserTask(user.getId(), step1, Collections.<String, Serializable> emptyMap());
+        waitForProcessToFinish(processInstance);
+        //search archive document order by archive date
+        searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
+        searchOptionsBuilder.sort(ArchivedDocumentsSearchDescriptor.ARCHIVE_DATE, Order.DESC);
+        SearchResult<ArchivedDocument> archiveDocumentSearch = getProcessAPI().searchArchivedDocuments(searchOptionsBuilder.done());
+        assertThat(archiveDocumentSearch.getCount()).isEqualTo(2);
+        assertThat(archiveDocumentSearch.getResult()).extracting("contentFileName", "processInstanceId", "author").containsOnly(
+                tuple("doc.jpg", processInstance.getId(), user.getId()), tuple("doc2.jpg", processInstance.getId(), user.getId()));
+
         disableAndDeleteProcess(processInstance.getProcessDefinitionId());
     }
 
@@ -688,14 +704,17 @@ public class DocumentIT extends TestWithUser {
         try {
             final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance);
             final Document doc = BuildTestUtil.buildDocument(beforeUpdate.getName());
-            getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
-                    "contentOfTheDoc".getBytes());
+            getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), "newContent1.file", doc.getContentMimeType(),
+                    "contentOfTheDoc1".getBytes());
+            getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), "newContent2.file", doc.getContentMimeType(),
+                    "contentOfTheDoc2".getBytes());
             getAttachmentWithoutItsContent(processInstance);
 
             // get archived document
             final ArchivedDocument archivedDocument = getProcessAPI().getArchivedVersionOfProcessDocument(beforeUpdate.getId());
             assertNotNull(archivedDocument.getArchiveDate());
             assertEquals(beforeUpdate.getId(), archivedDocument.getSourceObjectId());
+            assertEquals("newContent1.file", archivedDocument.getContentFileName());
             assertEquals(processInstance.getId(), archivedDocument.getProcessInstanceId());
         } finally {
             disableAndDeleteProcess(processInstance.getProcessDefinitionId());

@@ -296,7 +296,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     @Override
     public void setState(final SGatewayInstance gatewayInstance, final int stateId) throws SGatewayModificationException {
-        updateOneColum(gatewayInstance, sGatewayInstanceBuilderFactory.getStateIdKey(), stateId, GATEWAYINSTANCE_STATE);
+        updateOneColumAndMetaData(gatewayInstance, sGatewayInstanceBuilderFactory.getStateIdKey(), stateId, GATEWAYINSTANCE_STATE);
     }
 
     @Override
@@ -310,13 +310,16 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         } else {
             columnValue = hitBys + "," + transitionIndex;
         }
-        updateOneColum(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
+        updateOneColumAndMetaData(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
 
-    private void updateOneColum(final SGatewayInstance gatewayInstance, final String columnName, final Serializable columnValue, final String event)
+    private void updateOneColumAndMetaData(final SGatewayInstance gatewayInstance, final String columnName, final Serializable columnValue, final String event)
             throws SGatewayModificationException {
+        final long now = System.currentTimeMillis();
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(columnName, columnValue);
+        entityUpdateDescriptor.addField("lastUpdateDate", now);
+        entityUpdateDescriptor.addField("reachedStateDate", now);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(gatewayInstance, entityUpdateDescriptor);
 
@@ -423,7 +426,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     void setFinished(SGatewayInstance gatewayInstance, int numberOfTokenToMerge) throws SGatewayModificationException {
         final String columnValue = FINISH + numberOfTokenToMerge;
         logger.log(TAG, TechnicalLogSeverity.TRACE, "set finish on gateway " + gatewayInstance.getName() + " " + columnValue);
-        updateOneColum(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
+        updateOneColumAndMetaData(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
 
 

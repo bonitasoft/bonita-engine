@@ -48,6 +48,12 @@
 			</fileset>
 		</copy>
 
+		<copy todir="${bh.dir}">
+			<fileset dir="${resources.dir}">
+				<include name="README.md"/>
+			</fileset>
+		</copy>
+
 		<copy todir="${bh.dir}/engine-server/work/tenants/template">
 			<fileset dir="${resources.dir}">
 				<include name="bonita-tenant-community.properties"/>
