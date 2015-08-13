@@ -132,12 +132,9 @@ public class ServerAPIImpl implements ServerAPI {
             } catch (final ServerAPIRuntimeException sapire) {
                 throw sapire.getCause();
             }
-        } catch (final BonitaRuntimeException bre) {
+        } catch (final BonitaRuntimeException | BonitaException bre) {
             fillGlobalContextForException(session, bre);
             throw createServerWrappedException(bre);
-        } catch (final BonitaException be) {
-            fillGlobalContextForException(session, be);
-            throw createServerWrappedException(be);
         } catch (final UndeclaredThrowableException ute) {
             technicalDebugLog(ute);
             throw createServerWrappedException(ute);
