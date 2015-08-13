@@ -21,7 +21,6 @@ import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
@@ -31,7 +30,7 @@ import javax.xml.bind.annotation.XmlElement;
 public class DocumentListDefinitionImpl extends NamedElementImpl implements DocumentListDefinition {
 
     private static final long serialVersionUID = 1L;
-    @XmlAttribute
+    @XmlElement
     private String description;
     @XmlElement(type = ExpressionImpl.class)
     private Expression expression;

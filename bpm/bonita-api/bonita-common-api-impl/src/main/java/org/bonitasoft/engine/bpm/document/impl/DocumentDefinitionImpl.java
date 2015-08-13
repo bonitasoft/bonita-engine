@@ -33,7 +33,7 @@ import java.util.Objects;
 public class DocumentDefinitionImpl extends NamedElementImpl implements DocumentDefinition {
 
     private static final long serialVersionUID = 2L;
-    @XmlAttribute
+    @XmlElement
     private String url;
     @XmlElement
     private String file;
@@ -43,7 +43,7 @@ public class DocumentDefinitionImpl extends NamedElementImpl implements Document
     private String description;
     @XmlElement
     private String fileName;
-    @XmlElement(type = ExpressionImpl.class)
+    @XmlElement(type = ExpressionImpl.class,name = "expression")
     private Expression initialValue;
 
     /**

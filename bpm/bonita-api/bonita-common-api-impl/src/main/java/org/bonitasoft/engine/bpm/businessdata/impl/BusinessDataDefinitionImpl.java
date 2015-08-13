@@ -42,7 +42,7 @@ public class BusinessDataDefinitionImpl extends NamedElementImpl implements Busi
     private String className;
     @XmlAttribute
     private boolean multiple = false;
-    @XmlElement(type = ExpressionImpl.class)
+    @XmlElement(type = ExpressionImpl.class,name = "defaultValue")
     private Expression defaultValueExpression;
 
     public BusinessDataDefinitionImpl(final String name, final Expression defaultValueExpression) {

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.CatchErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
@@ -28,6 +29,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -124,61 +126,32 @@ public abstract class CatchEventDefinitionImpl extends EventDefinitionImpl imple
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (errorEventTriggers == null ? 0 : errorEventTriggers.hashCode());
-        result = prime * result + (isInterrupting ? 1231 : 1237);
-        result = prime * result + (messageEventTriggers == null ? 0 : messageEventTriggers.hashCode());
-        result = prime * result + (signalEventTriggers == null ? 0 : signalEventTriggers.hashCode());
-        result = prime * result + (timerEventTriggers == null ? 0 : timerEventTriggers.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CatchEventDefinitionImpl that = (CatchEventDefinitionImpl) o;
+        return Objects.equals(isInterrupting, that.isInterrupting) &&
+                Objects.equals(timerEventTriggers, that.timerEventTriggers) &&
+                Objects.equals(messageEventTriggers, that.messageEventTriggers) &&
+                Objects.equals(signalEventTriggers, that.signalEventTriggers) &&
+                Objects.equals(errorEventTriggers, that.errorEventTriggers);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final CatchEventDefinitionImpl other = (CatchEventDefinitionImpl) obj;
-        if (errorEventTriggers == null) {
-            if (other.errorEventTriggers != null) {
-                return false;
-            }
-        } else if (!errorEventTriggers.equals(other.errorEventTriggers)) {
-            return false;
-        }
-        if (isInterrupting != other.isInterrupting) {
-            return false;
-        }
-        if (messageEventTriggers == null) {
-            if (other.messageEventTriggers != null) {
-                return false;
-            }
-        } else if (!messageEventTriggers.equals(other.messageEventTriggers)) {
-            return false;
-        }
-        if (signalEventTriggers == null) {
-            if (other.signalEventTriggers != null) {
-                return false;
-            }
-        } else if (!signalEventTriggers.equals(other.signalEventTriggers)) {
-            return false;
-        }
-        if (timerEventTriggers == null) {
-            if (other.timerEventTriggers != null) {
-                return false;
-            }
-        } else if (!timerEventTriggers.equals(other.timerEventTriggers)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), timerEventTriggers, messageEventTriggers, signalEventTriggers, errorEventTriggers, isInterrupting);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("timerEventTriggers", timerEventTriggers)
+                .append("messageEventTriggers", messageEventTriggers)
+                .append("signalEventTriggers", signalEventTriggers)
+                .append("errorEventTriggers", errorEventTriggers)
+                .append("isInterrupting", isInterrupting)
+                .toString();
     }
 
     @Override

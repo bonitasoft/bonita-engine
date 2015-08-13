@@ -13,12 +13,14 @@
  **/
 package org.bonitasoft.engine.bpm.data.impl;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.expression.Expression;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import java.util.Objects;
 
 /**
  * @author Feng Hui
@@ -47,29 +49,23 @@ public class TextDataDefinitionImpl extends DataDefinitionImpl implements TextDa
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (longText ? 1231 : 1237);
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        TextDataDefinitionImpl that = (TextDataDefinitionImpl) o;
+        return Objects.equals(longText, that.longText);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final TextDataDefinitionImpl other = (TextDataDefinitionImpl) obj;
-        if (longText != other.longText) {
-            return false;
-        }
-        return true;
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("longText", longText)
+                .toString();
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), longText);
+    }
 }

@@ -13,6 +13,7 @@
  */
 package org.bonitasoft.engine.bpm.contract.impl;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 
@@ -52,10 +53,9 @@ public class ContractDefinitionImpl extends InputContainerDefinitionImpl impleme
 
     @Override
     public String toString() {
-        return "ContractDefinitionImpl{" +
-                "constraints=" + constraints +
-                ", inputs=" + inputs +
-                '}';
+        return new ToStringBuilder(this)
+                .append("constraints", constraints)
+                .toString();
     }
 
     @Override

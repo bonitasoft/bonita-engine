@@ -37,12 +37,12 @@ import java.util.Objects;
 public class UserFilterDefinitionImpl extends NamedElementImpl implements UserFilterDefinition {
 
     private static final long serialVersionUID = -6045216424839658552L;
-@XmlAttribute(name = "userFilterId")
+    @XmlAttribute(name = "userFilterId")
     private final String filterId;
-@XmlAttribute
+    @XmlAttribute
     private final String version;
-@XmlJavaTypeAdapter(MapAdapterExpression.class)
-@XmlElement(name = "inputs")
+    @XmlJavaTypeAdapter(MapAdapterExpression.class)
+    @XmlElement(name = "inputs")
     private final Map<String, Expression> inputs = new HashMap<>();
 
     public UserFilterDefinitionImpl(final String name, final String filterId, final String version) {
@@ -51,11 +51,12 @@ public class UserFilterDefinitionImpl extends NamedElementImpl implements UserFi
         this.version = version;
     }
 
-    public UserFilterDefinitionImpl(){
+    public UserFilterDefinitionImpl() {
         super();
         this.filterId = "default Id";
         this.version = "default version";
     }
+
     @Override
     public String getUserFilterId() {
         return filterId;
@@ -77,9 +78,12 @@ public class UserFilterDefinitionImpl extends NamedElementImpl implements UserFi
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         UserFilterDefinitionImpl that = (UserFilterDefinitionImpl) o;
         return Objects.equals(filterId, that.filterId) &&
                 Objects.equals(version, that.version) &&

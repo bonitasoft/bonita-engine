@@ -13,19 +13,26 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl.internal;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.flownode.SendTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ModelFinderVisitor;
 import org.bonitasoft.engine.expression.Expression;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
+
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTaskDefinition {
 
     private static final long serialVersionUID = -3069440054837402115L;
-
+    @XmlElement(name = "throwMessageEventTrigger")
     private final ThrowMessageEventTriggerDefinitionImpl trigger;
 
     public SendTaskDefinitionImpl(final String name, final String messageName, final Expression targetProcess) {
@@ -39,10 +46,11 @@ public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTa
         this.trigger = new ThrowMessageEventTriggerDefinitionImpl(trigger);
     }
 
-    public SendTaskDefinitionImpl(){
+    public SendTaskDefinitionImpl() {
         super();
         trigger = new ThrowMessageEventTriggerDefinitionImpl();
     }
+
     public void setTargetFlowNode(final Expression targetFlowNode) {
         trigger.setTargetFlowNode(targetFlowNode);
     }
@@ -57,33 +65,20 @@ public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTa
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (trigger == null ? 0 : trigger.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
+        SendTaskDefinitionImpl that = (SendTaskDefinitionImpl) o;
+        return Objects.equals(trigger, that.trigger);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SendTaskDefinitionImpl other = (SendTaskDefinitionImpl) obj;
-        if (trigger == null) {
-            if (other.trigger != null) {
-                return false;
-            }
-        } else if (!trigger.equals(other.trigger)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), trigger);
     }
 
     @Override
@@ -92,4 +87,10 @@ public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTa
         visitor.find(this, modelId);
     }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("trigger", trigger)
+                .toString();
+    }
 }

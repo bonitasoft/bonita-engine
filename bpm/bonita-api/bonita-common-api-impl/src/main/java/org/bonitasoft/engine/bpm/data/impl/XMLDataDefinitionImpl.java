@@ -13,12 +13,14 @@
  **/
 package org.bonitasoft.engine.bpm.data.impl;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
 import org.bonitasoft.engine.expression.Expression;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import java.util.Objects;
 
 /**
  * @author Feng Hui
@@ -57,41 +59,25 @@ public class XMLDataDefinitionImpl extends DataDefinitionImpl implements XMLData
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (namespace == null ? 0 : namespace.hashCode());
-        result = prime * result + (element == null ? 0 : element.hashCode());
-        return result;
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("namespace", namespace)
+                .append("element", element)
+                .toString();
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final XMLDataDefinitionImpl other = (XMLDataDefinitionImpl) obj;
-        if (namespace == null) {
-            if (other.namespace != null) {
-                return false;
-            }
-        } else if (!namespace.equals(other.namespace)) {
-            return false;
-        }
-        if (element == null) {
-            if (other.element != null) {
-                return false;
-            }
-        } else if (!element.equals(other.element)) {
-            return false;
-        }
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        XMLDataDefinitionImpl that = (XMLDataDefinitionImpl) o;
+        return Objects.equals(namespace, that.namespace) &&
+                Objects.equals(element, that.element);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), namespace, element);
+    }
 }
