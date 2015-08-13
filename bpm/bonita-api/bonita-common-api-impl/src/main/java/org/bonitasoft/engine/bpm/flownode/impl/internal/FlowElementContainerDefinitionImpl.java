@@ -61,7 +61,7 @@ import java.util.Set;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-//@XmlRootElement
+
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FlowElementContainerDefinitionImpl extends ProcessBaseElementImpl implements FlowElementContainerDefinition, Visitable {
 
@@ -73,7 +73,7 @@ public class FlowElementContainerDefinitionImpl extends ProcessBaseElementImpl i
             @XmlElement(type = ReceiveTaskDefinitionImpl.class, name = "receiveTask"),
             @XmlElement(type = SendTaskDefinitionImpl.class, name = "sendTask"),
             @XmlElement(type = UserTaskDefinitionImpl.class, name = "userTask"),
-            @XmlElement(type = SubProcessDefinitionImpl.class,name = "subProcess")
+            @XmlElement(type = SubProcessDefinitionImpl.class, name = "subProcess")
     })
     private final List<ActivityDefinition> activities;
     @XmlElementWrapper(name = "transitions")
@@ -331,9 +331,12 @@ public class FlowElementContainerDefinitionImpl extends ProcessBaseElementImpl i
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
         FlowElementContainerDefinitionImpl that = (FlowElementContainerDefinitionImpl) o;
         return Objects.equals(activities, that.activities) &&
                 Objects.equals(transitions, that.transitions) &&
@@ -352,6 +355,7 @@ public class FlowElementContainerDefinitionImpl extends ProcessBaseElementImpl i
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), activities, transitions, gateways, startEvents, intermediateCatchEvents, intermediateThrowEvents, endEvents, dataDefinitions, businessDataDefinitions, documentDefinitions, documentListDefinitions, connectors, elementFinder);
+        return Objects.hash(super.hashCode(), activities, transitions, gateways, startEvents, intermediateCatchEvents, intermediateThrowEvents, endEvents,
+                dataDefinitions, businessDataDefinitions, documentDefinitions, documentListDefinitions, connectors, elementFinder);
     }
 }
